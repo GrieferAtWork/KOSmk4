@@ -671,52 +671,6 @@ NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
 }
 /*[[[end:libc__searchenv_s]]]*/
 
-
-
-
-PRIVATE ATTR_SECTION(".rodata.crt.fs.exec.system.system") char const path_bin_busybox[] = "/bin/busybox";
-PRIVATE ATTR_SECTION(".rodata.crt.fs.exec.system.system") char const path_bin_sh[] = "/bin/sh";
-PRIVATE ATTR_SECTION(".rodata.crt.fs.exec.system.system") char const dash_c[] = "-c";
-
-INTERN ATTR_NOINLINE ATTR_SECTION(".text.crt.fs.exec.system.system") pid_t
-NOTHROW_RPC(LIBCCALL libc_do_system_spawn)(char const *__restrict command) {
-	pid_t cpid;
-	cpid = vfork();
-	if (cpid == 0) {
-		execl(path_bin_busybox, path_bin_sh + 5, dash_c, command, (char *)NULL);
-		execl(path_bin_sh, path_bin_sh + 5, dash_c, command, (char *)NULL);
-		/* NOTE: system() must return ZERO(0) if no command processor is available. */
-		_Exit(command ? 127 : 0);
-	}
-	return cpid;
-}
-
-/*[[[head:libc_system,hash:CRC-32=0x5ec78712]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
-NOTHROW_RPC(LIBCCALL libc_system)(char const *command)
-/*[[[body:libc_system]]]*/
-{
-	pid_t cpid, error;
-	int status;
-	cpid = libc_do_system_spawn(command);
-	if (cpid < 0)
-		return -1;
-	for (;;) {
-		error = waitpid(cpid, &status, 0);
-		if (error == cpid)
-			break;
-		if (error >= 0)
-			continue;
-		if (libc_geterrno() != EINTR)
-			return -1;
-	}
-	return WIFEXITED(status)
-	       ? WEXITSTATUS(status)
-	       : 1;
-}
-/*[[[end:libc_system]]]*/
-
-
 struct atexit_callback {
 	__on_exit_func_t ac_func; /* [1..1] The function to-be invoked. */
 	void            *ac_arg;  /* Argument for `ac_func'. */
@@ -2197,9 +2151,8 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6a7d2e74]]]*/
+/*[[[start:exports,hash:CRC-32=0x39f33ea4]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
-DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
 DEFINE_PUBLIC_ALIAS(quick_exit, libc_quick_exit);

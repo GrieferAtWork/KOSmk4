@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb722bd39 */
+/* HASH CRC-32:0xec03aeb9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,6 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_system)(char const *command);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) THROWS(...);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) THROWS(...);

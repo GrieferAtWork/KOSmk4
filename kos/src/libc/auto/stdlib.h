@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1044c4e3 */
+/* HASH CRC-32:0x1b8784a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,9 +95,20 @@ INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_wcstombs)(char *__restri
 INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst, char32_t const *__restrict src, size_t dstlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> system(3)
+ * Execute a given `command' on the system interpreter (as in `sh -c $command')
+ * The return value is the exit status after running `command'
+ * When `command' is `NULL' only check if a system interpreter is available.
+ * When no system interpreter is available, `127' is returned. */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_system)(char const *command);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> system(3)
+ * Execute a given `command' on the system interpreter (as in `sh -c $command')
+ * The return value is the exit status after running `command'
+ * When `command' is `NULL' only check if a system interpreter is available.
+ * When no system interpreter is available, `127' is returned. */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_system)(char const *command);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_abort)(void) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -550,6 +561,26 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *temp
  *                       This mode is only recognized when `$has_function(open) || $has_function(stat)'
  *                       NOTE: `flags' is ignored in this mode */
 INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what, char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> shexec(3)
+ * Execute command with the system interpreter (such as: `/bin/sh -c $command')
+ * This function is used to implement `system(3)' and `popen(3)', and may be
+ * used to invoke the system interpreter.
+ * This function only returns on failure (similar to exec(2)), and will never
+ * return on success (since in that case, the calling program will have been
+ * replaced by the system shell) */
+INTDEF int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> shexec(3)
+ * Execute command with the system interpreter (such as: `/bin/sh -c $command')
+ * This function is used to implement `system(3)' and `popen(3)', and may be
+ * used to invoke the system interpreter.
+ * This function only returns on failure (similar to exec(2)), and will never
+ * return on success (since in that case, the calling program will have been
+ * replaced by the system shell) */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd_reallocf)(void *mallptr, size_t num_bytes);

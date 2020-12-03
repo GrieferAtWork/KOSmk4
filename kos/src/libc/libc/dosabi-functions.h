@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b3549b8 */
+/* HASH CRC-32:0xa9238698 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1506,6 +1506,7 @@ DFUN(".text.crt.dos.io.tty", libd_ptsname_r, libc_ptsname_r, TD, 3, TIn(__SIZEOF
 DFUN(".text.crt.dos.fs.property", libd_canonicalize_file_name, libc_canonicalize_file_name, TP, 1, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkostemp, libc_mkostemp, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.utility", libd_mkostemps, libc_mkostemps, TIn(__SIZEOF_FD_T__), 3, TP, TD, TIn(__SIZEOF_OFLAG_T__))
+DFUN(".text.crt.dos.fs.exec.system", libd_shexec, libc_shexec, TD, 1, TP)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_reallocf, libc_reallocf, TP, 2, TP, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_recallocarray, libc_recallocarray, TP, 4, TP, TI, TI, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_freezero, libc_freezero, TV, 2, TP, TI)

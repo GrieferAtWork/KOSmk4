@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x427daec0 */
+/* HASH CRC-32:0x2bac17d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 #include "../user/sys.ioctl.h"
 #include "../user/sys.stat.h"
 #include "../user/sys.time.h"
+#include "../user/sys.wait.h"
 #include "unicode.h"
 #include "../user/unistd.h"
 #include "../user/wchar.h"
@@ -289,6 +290,51 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
                                     char32_t const *__restrict src,
                                     size_t dstlen) {
 	return libc_wcsrtombs(dst, (char32_t const **)&src, dstlen, NULL);
+}
+#include <asm/os/wait.h>
+/* >> system(3)
+ * Execute a given `command' on the system interpreter (as in `sh -c $command')
+ * The return value is the exit status after running `command'
+ * When `command' is `NULL' only check if a system interpreter is available.
+ * When no system interpreter is available, `127' is returned. */
+INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
+NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
+	int status;
+	pid_t cpid, error;
+#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
+	cpid = libc_vfork();
+#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
+	cpid = libc_fork();
+#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
+	if (cpid == 0) {
+		libc_shexec(command);
+		/* NOTE: system() must return ZERO(0) if no command processor is available. */
+		libc__Exit(command ? 127 : 0);
+	}
+	if (cpid < 0)
+		return -1;
+	for (;;) {
+		error = libc_waitpid(cpid, &status, 0);
+		if (error == cpid)
+			break;
+		if (error >= 0)
+			continue;
+#if defined(__libc_geterrno) && defined(__EINTR)
+		if (__libc_geterrno() != __EINTR)
+			return -1;
+#else /* __libc_geterrno && __EINTR */
+		return -1;
+#endif /* !__libc_geterrno || !__EINTR */
+	}
+#ifdef __WIFEXITED
+	if (!__WIFEXITED(status))
+		return 1;
+#endif /* __WIFEXITED */
+#ifdef __WEXITSTATUS
+	return __WEXITSTATUS(status);
+#else /* __WEXITSTATUS */
+	return status;
+#endif /* !__WEXITSTATUS */
 }
 #ifndef LIBC_ARCH_HAVE_ABORT
 #include <asm/os/stdlib.h>
@@ -1443,6 +1489,29 @@ do_try_again:
 		}
 	}
 	return result;
+}
+/* >> shexec(3)
+ * Execute command with the system interpreter (such as: `/bin/sh -c $command')
+ * This function is used to implement `system(3)' and `popen(3)', and may be
+ * used to invoke the system interpreter.
+ * This function only returns on failure (similar to exec(2)), and will never
+ * return on success (since in that case, the calling program will have been
+ * replaced by the system shell) */
+INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
+NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
+	static char const arg_sh[] = "sh";
+	static char const arg__c[] = "-c";
+
+	/* By default, KOS uses busybox, so try to invoke that first. */
+	libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
+	libc_execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
+	libc_execl("/bin/bash", arg_sh, arg__c, command, (char *)NULL);
+
+
+
+
+
+	return -1;
 }
 #include <libc/local/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
@@ -3554,6 +3623,7 @@ DEFINE_PUBLIC_ALIAS(DOS$mbstowcs, libd_mbstowcs);
 DEFINE_PUBLIC_ALIAS(mbstowcs, libc_mbstowcs);
 DEFINE_PUBLIC_ALIAS(DOS$wcstombs, libd_wcstombs);
 DEFINE_PUBLIC_ALIAS(wcstombs, libc_wcstombs);
+DEFINE_PUBLIC_ALIAS(system, libc_system);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORT)
 DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort);
@@ -3643,6 +3713,7 @@ DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp);
 DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
 DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
+DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);

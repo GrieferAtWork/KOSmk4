@@ -603,8 +603,54 @@ size_t wcstombs([[nonnull]] char *__restrict dst,
 	return wcsrtombs(dst, (wchar_t const **)&src, dstlen, NULL);
 }
 
+@@>> system(3)
+@@Execute a given `command' on the system interpreter (as in `sh -c $command')
+@@The return value is the exit status after running `command'
+@@When `command' is `NULL' only check if a system interpreter is available.
+@@When no system interpreter is available, `127' is returned.
 [[cp, std, guard, section(".text.crt{|.dos}.fs.exec.system")]]
-int system([[nullable]] char const *command);
+[[impl_include("<asm/os/wait.h>")]]
+[[requires($has_function(shexec) && $has_function(_Exit) &&
+           $has_function(waitpid) &&
+           ($has_function(vfork) || $has_function(fork)))]]
+int system([[nullable]] char const *command) {
+	int status;
+	pid_t cpid, error;
+@@pp_if $has_function(vfork)@@
+	cpid = vfork();
+@@pp_else@@
+	cpid = fork();
+@@pp_endif@@
+	if (cpid == 0) {
+		shexec(command);
+		/* NOTE: system() must return ZERO(0) if no command processor is available. */
+		_Exit(command ? 127 : 0);
+	}
+	if (cpid < 0)
+		return -1;
+	for (;;) {
+		error = waitpid(cpid, &status, 0);
+		if (error == cpid)
+			break;
+		if (error >= 0)
+			continue;
+@@pp_if defined(__libc_geterrno) && defined(__EINTR)@@
+		if (__libc_geterrno() != __EINTR)
+			return -1;
+@@pp_else@@
+		return -1;
+@@pp_endif@@
+	}
+@@pp_ifdef __WIFEXITED@@
+	if (!__WIFEXITED(status))
+		return 1;
+@@pp_endif@@
+@@pp_ifdef __WEXITSTATUS@@
+	return __WEXITSTATUS(status);
+@@pp_else@@
+	return status;
+@@pp_endif@@
+}
 
 
 %[default:section(".text.crt{|.dos}.application.exit")]
@@ -2269,6 +2315,31 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 %#endif /* ... */
 %#endif /* !__MALLOC_OVERLOADS_DEFINED */
 %#endif /* __USE_STRING_OVERLOADS */
+
+@@>> shexec(3)
+@@Execute command with the system interpreter (such as: `/bin/sh -c $command')
+@@This function is used to implement `system(3)' and `popen(3)', and may be
+@@used to invoke the system interpreter.
+@@This function only returns on failure (similar to exec(2)), and will never
+@@return on success (since in that case, the calling program will have been
+@@replaced by the system shell)
+[[cp, guard, section(".text.crt{|.dos}.fs.exec.system")]]
+[[requires_function(execl)]]
+int shexec([[nullable]] char const *command) {
+	static char const arg_sh[] = "sh";
+	static char const arg__c[] = "-c";
+@@pp_ifdef __KOS__@@
+	/* By default, KOS uses busybox, so try to invoke that first. */
+	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
+	execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
+	execl("/bin/bash", arg_sh, arg__c, command, (char *)NULL);
+@@pp_else@@
+	execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
+	execl("/bin/bash", arg_sh, arg__c, command, (char *)NULL);
+	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
+@@pp_endif@@
+	return -1;
+}
 %#endif /* __USE_KOS */
 
 %

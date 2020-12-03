@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d7b7a8d */
+/* HASH CRC-32:0xd70f10a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -676,11 +676,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __std_system_defined
 #define __std_system_defined 1
 #ifdef __system_defined
+/* >> system(3)
+ * Execute a given `command' on the system interpreter (as in `sh -c $command')
+ * The return value is the exit status after running `command'
+ * When `command' is `NULL' only check if a system interpreter is available.
+ * When no system interpreter is available, `127' is returned. */
 __NAMESPACE_GLB_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return (:: system)(__command); })
 #elif defined(__CRT_HAVE_system)
+/* >> system(3)
+ * Execute a given `command' on the system interpreter (as in `sh -c $command')
+ * The return value is the exit status after running `command'
+ * When `command' is `NULL' only check if a system interpreter is available.
+ * When no system interpreter is available, `127' is returned. */
 __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #else /* ... */
+__NAMESPACE_STD_END
+#include <libc/local/environ.h>
+__NAMESPACE_STD_BEGIN
+#if (defined(__CRT_HAVE_shexec) || defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork))
+__NAMESPACE_STD_END
+#include <libc/local/stdlib/system.h>
+__NAMESPACE_STD_BEGIN
+/* >> system(3)
+ * Execute a given `command' on the system interpreter (as in `sh -c $command')
+ * The return value is the exit status after running `command'
+ * When `command' is `NULL' only check if a system interpreter is available.
+ * When no system interpreter is available, `127' is returned. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(system))(__command); })
+#else /* (__CRT_HAVE_shexec || __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ)) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE_fork || __CRT_HAVE___fork) */
 #undef __std_system_defined
+#endif /* (!__CRT_HAVE_shexec && !__CRT_HAVE_execl && !__CRT_HAVE__execl && !__CRT_HAVE_execv && !__CRT_HAVE__execv && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ)) || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE_fork && !__CRT_HAVE___fork) */
 #endif /* !... */
 #endif /* !__std_system_defined */
 #ifndef __std_abort_defined
@@ -2435,6 +2460,31 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 #endif /* ... */
 #endif /* !__MALLOC_OVERLOADS_DEFINED */
 #endif /* __USE_STRING_OVERLOADS */
+#ifndef __shexec_defined
+#define __shexec_defined 1
+#ifdef __CRT_HAVE_shexec
+/* >> shexec(3)
+ * Execute command with the system interpreter (such as: `/bin/sh -c $command')
+ * This function is used to implement `system(3)' and `popen(3)', and may be
+ * used to invoke the system interpreter.
+ * This function only returns on failure (similar to exec(2)), and will never
+ * return on success (since in that case, the calling program will have been
+ * replaced by the system shell) */
+__CDECLARE(,int,__NOTHROW_RPC,shexec,(char const *__command),(__command))
+#elif defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
+#include <libc/local/stdlib/shexec.h>
+/* >> shexec(3)
+ * Execute command with the system interpreter (such as: `/bin/sh -c $command')
+ * This function is used to implement `system(3)' and `popen(3)', and may be
+ * used to invoke the system interpreter.
+ * This function only returns on failure (similar to exec(2)), and will never
+ * return on success (since in that case, the calling program will have been
+ * replaced by the system shell) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL shexec)(char const *__command) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shexec))(__command); })
+#else /* ... */
+#undef __shexec_defined
+#endif /* !... */
+#endif /* !__shexec_defined */
 #endif /* __USE_KOS */
 
 #ifdef __USE_BSD

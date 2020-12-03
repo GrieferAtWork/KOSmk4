@@ -3077,6 +3077,7 @@
 #define __CRT_HAVE_setxattr
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
+#define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open
 #define __CRT_HAVE_shm_unlink
 #define __CRT_HAVE_shmat
@@ -7286,6 +7287,7 @@
 #define __CRT_HAVE_KOS$setxattr
 #define __CRT_HAVE_KOS$sgetspent
 #define __CRT_HAVE_KOS$sgetspent_r
+#define __CRT_HAVE_KOS$shexec
 #define __CRT_HAVE_KOS$shm_open
 #define __CRT_HAVE_KOS$shm_unlink
 #define __CRT_HAVE_KOS$shmat
@@ -10671,6 +10673,7 @@
 #define __CRT_HAVE_DOS$setxattr
 #define __CRT_HAVE_DOS$sgetspent
 #define __CRT_HAVE_DOS$sgetspent_r
+#define __CRT_HAVE_DOS$shexec
 #define __CRT_HAVE_DOS$shm_open
 #define __CRT_HAVE_DOS$shm_unlink
 #define __CRT_HAVE_DOS$shmat

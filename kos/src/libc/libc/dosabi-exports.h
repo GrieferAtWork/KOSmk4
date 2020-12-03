@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x382095ce */
+/* HASH CRC-32:0x3eba01e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1930,6 +1930,7 @@ DEFINE_PUBLIC_ALIAS(DOS$mkostemp64, libd_mkostemp);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemp, libd_mkostemp);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemps64, libd_mkostemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemps, libd_mkostemps);
+DEFINE_PUBLIC_ALIAS(DOS$shexec, libd_shexec);
 DEFINE_PUBLIC_ALIAS(DOS$reallocf, libd_reallocf);
 DEFINE_PUBLIC_ALIAS(DOS$recallocarray, libd_recallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$freezero, libd_freezero);

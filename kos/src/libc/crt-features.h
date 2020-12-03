@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf9e00cc */
+/* HASH CRC-32:0x3c1cae7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2244,6 +2244,7 @@
 #define __CRT_HAVE_DOS$setxattr
 #define __CRT_HAVE_DOS$sgetspent
 #define __CRT_HAVE_DOS$sgetspent_r
+#define __CRT_HAVE_DOS$shexec
 #define __CRT_HAVE_DOS$shm_open
 #define __CRT_HAVE_DOS$shm_unlink
 #define __CRT_HAVE_DOS$shmat
@@ -5296,6 +5297,7 @@
 #define __CRT_HAVE_setxattr
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
+#define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open
 #define __CRT_HAVE_shm_unlink
 #define __CRT_HAVE_shmat

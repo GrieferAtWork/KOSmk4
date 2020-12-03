@@ -3081,6 +3081,7 @@
 #define __CRT_HAVE_setxattr
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
+#define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open
 #define __CRT_HAVE_shm_unlink
 #define __CRT_HAVE_shmat
