@@ -3250,6 +3250,7 @@
 #define __CRT_HAVE_strroff
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
+#define __CRT_HAVE_strsigcode_s
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsignal_s
 #define __CRT_HAVE_strspn
@@ -7451,6 +7452,7 @@
 #define __CRT_HAVE_KOS$strroff
 #define __CRT_HAVE_KOS$strsep
 #define __CRT_HAVE_KOS$strset
+#define __CRT_HAVE_KOS$strsigcode_s
 #define __CRT_HAVE_KOS$strsignal
 #define __CRT_HAVE_KOS$strsignal_s
 #define __CRT_HAVE_KOS$strspn
@@ -10835,6 +10837,7 @@
 #define __CRT_HAVE_DOS$strroff
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
+#define __CRT_HAVE_DOS$strsigcode_s
 #define __CRT_HAVE_DOS$strsignal
 #define __CRT_HAVE_DOS$strsignal_s
 #define __CRT_HAVE_DOS$strspn

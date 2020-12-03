@@ -20,6 +20,9 @@
 #ifndef _ASM_OS_KOS_SIGINFO_H
 #define _ASM_OS_KOS_SIGINFO_H 1
 
+/* NOTE: After changing the IDs/comments in this file, you must re-run:
+ * $ deemon -F kos/src/libc/magic/signal.c */
+
 #include <__stdinc.h>
 
 /************************************************************************/

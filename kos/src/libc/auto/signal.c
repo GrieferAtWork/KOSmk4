@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9108f82e */
+/* HASH CRC-32:0x2587264a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,6 +274,529 @@ NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
 		libc_fprintf(stderr, "Unknown signal %d\n", signo);
 	}
 }
+#include <bits/crt/inttypes.h>
+#include <bits/types.h>
+/* >> psiginfo(3)
+ * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
+                                    char const *s) {
+	char const *text;
+	text = libc_strsignal_s(pinfo->si_signo);
+	if (s && *s)
+		libc_fprintf(stderr, "%s: ", s);
+	if (text) {
+		libc_fprintf(stderr, "%s (", text);
+#if (defined(__CRT_HAVE___libc_current_sigrtmin) || defined(__SIGRTMIN)) && (defined(__CRT_HAVE___libc_current_sigrtmax) || defined(__SIGRTMAX))
+	} else if (pinfo->si_signo >= libc___libc_current_sigrtmin() &&
+	           pinfo->si_signo <= libc___libc_current_sigrtmax()) {
+		unsigned int offset;
+		offset = (unsigned int)(pinfo->si_signo - libc___libc_current_sigrtmin());
+		if (offset != 0) {
+			libc_fprintf(stderr, "SIGRTMIN+%u (", offset);
+		} else {
+			libc_fprintf(stderr, "SIGRTMIN (");
+		}
+#endif /* (__CRT_HAVE___libc_current_sigrtmin || __SIGRTMIN) && (__CRT_HAVE___libc_current_sigrtmax || __SIGRTMAX) */
+	} else {
+		libc_fprintf(stderr, "Unknown signal %d (", pinfo->si_signo);
+	}
+	text = libc_strsigcode_s(pinfo->si_signo, pinfo->si_code);
+	if (text) {
+		libc_fprintf(stderr, "%s ", text);
+	} else {
+		libc_fprintf(stderr, "%u ", (unsigned int)pinfo->si_code);
+	}
+#if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)
+	if (0
+#ifdef __SIGILL
+	    || pinfo->si_signo == __SIGILL
+#endif /* __SIGILL */
+#ifdef __SIGFPE
+	    || pinfo->si_signo == __SIGFPE
+#endif /* __SIGFPE */
+#ifdef __SIGSEGV
+	    || pinfo->si_signo == __SIGSEGV
+#endif /* __SIGSEGV */
+#ifdef __SIGBUS
+	    || pinfo->si_signo == __SIGBUS
+#endif /* __SIGBUS */
+	    ) {
+		libc_fprintf(stderr, "[%p])\n", pinfo->si_addr);
+	} else
+#endif /* __SIGILL || __SIGFPE || __SIGSEGV || __SIGBUS */
+#ifdef __SIGCHLD
+	if (pinfo->si_signo == __SIGCHLD) {
+		libc_fprintf(stderr,
+		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
+		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		        (pid_t)pinfo->si_pid,
+		        (int)pinfo->si_status,
+		        (uid_t)pinfo->si_uid);
+	} else
+#endif /* __SIGCHLD */
+#ifdef __SIGPOLL
+	if (pinfo->si_signo == __SIGPOLL) {
+		libc_fprintf(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
+		        (longptr_t)pinfo->si_band);
+	} else
+#endif /* __SIGPOLL */
+	{
+		libc_fprintf(stderr,
+		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
+		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		        (pid_t)pinfo->si_pid,
+		        (uid_t)pinfo->si_uid);
+	}
+}
+#include <asm/os/siginfo.h>
+/* >> strsigcode_s(3)
+ * Return a textual description of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'. This function is used
+ * for the implementation of `psiginfo(3)' */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_strsigcode_s)(signo_t signo,
+                                        int code) {
+	char const *result = NULL;
+/*[[[deemon
+import util;
+import * from deemon;
+import * from ....misc.libgen.strendN;
+
+@@List of (name: string, comment: string, kosCode: int)
+@@For example: ("__POLL_IN", "Data input available", 1)
+global signalCodes: {(string, string, int)...} = [];
+for (local l: File.open("../../../include/asm/os/kos/siginfo.h", "r")) {
+	l = l.strip().decode("utf-8");
+	local name, code, comment;
+	try {
+		name, code, comment = l.scanf("# define %[^ ] %[^/]/" "* %[^*]")...;
+		code    = getMacroIntValue(code.strip());
+		comment = comment.strip().rstrip(".").rstrip();
+	} catch (...) {
+		continue;
+	}
+	signalCodes.append((name, code, comment));
+}
+
+
+global CODED_SIGNALS: {(string, string)...} = {
+	("SIGILL", "__ILL_"),
+	("SIGFPE", "__FPE_"),
+	("SIGSEGV", "__SEGV_"),
+	("SIGBUS", "__BUS_"),
+	("SIGTRAP", "__TRAP_"),
+	("SIGCLD", "__CLD_"),
+	("SIGPOLL", "__POLL_"),
+};
+
+print("@@pp_if defined(__KOS__) || defined(__linux__)@@");
+function printSigCodeSelector(prefix: string) {
+	local codes = [];
+	for (local name, code, comment: signalCodes) {
+		if (!name.startswith(prefix))
+			continue;
+		if (code < 0)
+			code = code.unsigned8;
+		if (code >= #codes)
+			codes.resize(code + 1);
+		codes[code] = comment;
+	}
+	local partitions: {(int, {string...})...} = splitValues(codes);
+	local isFirst = true;
+	for (local minIndex, items: partitions) {
+		local maxIndex = minIndex + #items - 1;
+		if (isFirst) {
+			print("		"),;
+			isFirst = false;
+		} else {
+			print(" else "),;
+		}
+		print("if ("),;
+		if (minIndex == maxIndex) {
+			print("(unsigned int)code == ", minIndex.hex()),;
+		} else if (minIndex == 0) {
+			print("(unsigned int)code <= ", maxIndex.hex()),;
+		} else {
+			print("(unsigned int)code >= ", minIndex.hex(), " && "
+			      "(unsigned int)code <= ", maxIndex.hex()),;
+		}
+		print(") {");
+		if (minIndex == maxIndex) {
+			print("			result = ", repr(items.first), ";");
+			print("			code   = 0;");
+		} else {
+			local reprName = "repr_" + prefix.strip("_").lower();
+			File.Writer text;
+			for (local i, item: util.enumerate(items)) {
+				if (!item)
+					item = "";
+				if (i != #items - 1)
+					item = item + "\0";
+				text << item;
+			}
+			print("			static char const ", reprName, "[] =\n			",
+				"\n			".join(for (local e: text.string.segments(64)) repr(e)),
+				";");
+			print("			result = ", reprName, ";");
+			if (minIndex)
+				print("			code -= ", minIndex.hex(), ";");
+		}
+		print("		}"),;
+	}
+	print;
+}
+print("	switch (signo) {");
+for (local signo_name, prefix: CODED_SIGNALS) {
+	print("	case __", signo_name, ":");
+	printSigCodeSelector(prefix);
+	print("		break;");
+	print;
+}
+print("	default:");
+print("		code = (unsigned int)code & 0xff;");
+printSigCodeSelector("__SI_");
+print("		break;");
+print("	}");
+print("	if (result) {");
+print("		for (; code; --code)");
+print("			result = strend(result) + 1;");
+print("		if (!*result)");
+print("			result = NULL;");
+print("	}");
+print("@@pp_else@@");
+function printFallbackSigCodeSelector(prefix: string) {
+	print("		switch (code) {");
+	for (local name, code, comment: signalCodes) {
+		if (!name.startswith(prefix))
+			continue;
+		print("@@pp_ifdef ", name, "@@");
+		print("		case ", name, ": result = ", repr(comment), "; break;");
+		print("@@pp_endif@@");
+	}
+	print("		default: break;");
+	print("		}");
+}
+print("	switch (signo) {");
+print;
+for (local signo_name, prefix: CODED_SIGNALS) {
+	print("@@pp_ifdef __", signo_name, "@@");
+	print("	case __", signo_name, ":");
+	printFallbackSigCodeSelector(prefix);
+	print("		break;");
+	print("@@pp_endif@@");
+	print;
+}
+print("	default:");
+printFallbackSigCodeSelector("__SI_");
+print("		break;");
+print("	}");
+print("@@pp_endif@@");
+]]]*/
+
+	switch (signo) {
+	case __SIGILL:
+		if ((unsigned int)code <= 0x8) {
+			static char const repr_ill[] =
+			"\0Illegal opcode\0Illegal operand\0Illegal addressing mode\0Illegal "
+			"trap\0Privileged opcode\0Privileged register\0Coprocessor error\0Int"
+			"ernal stack error";
+			result = repr_ill;
+		}
+		break;
+
+	case __SIGFPE:
+		if ((unsigned int)code <= 0x8) {
+			static char const repr_fpe[] =
+			"\0Integer divide by zero\0Integer overflow\0Floating point divide b"
+			"y zero\0Floating point overflow\0Floating point underflow\0Floating"
+			" point inexact result\0Floating point invalid operation\0Subscript"
+			" out of range";
+			result = repr_fpe;
+		}
+		break;
+
+	case __SIGSEGV:
+		if ((unsigned int)code <= 0x2) {
+			static char const repr_segv[] =
+			"\0Address not mapped to object\0Invalid permissions for mapped obj"
+			"ect";
+			result = repr_segv;
+		}
+		break;
+
+	case __SIGBUS:
+		if ((unsigned int)code <= 0x5) {
+			static char const repr_bus[] =
+			"\0Invalid address alignment\0Non-existent physical address\0Object "
+			"specific hardware error\0Hardware memory error: action required\0H"
+			"ardware memory error: action optional";
+			result = repr_bus;
+		}
+		break;
+
+	case __SIGTRAP:
+		if ((unsigned int)code <= 0x2) {
+			static char const repr_trap[] =
+			"\0Process breakpoint\0Process trace trap";
+			result = repr_trap;
+		}
+		break;
+
+	case __SIGCLD:
+		if ((unsigned int)code <= 0x6) {
+			static char const repr_cld[] =
+			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
+			"raced child has trapped\0Child has stopped\0Stopped child has cont"
+			"inued";
+			result = repr_cld;
+		}
+		break;
+
+	case __SIGPOLL:
+		if ((unsigned int)code <= 0x6) {
+			static char const repr_poll[] =
+			"\0Data input available\0Output buffers available\0Input message ava"
+			"ilable\0I/O error\0High priority input available\0Device disconnect"
+			"ed";
+			result = repr_poll;
+		}
+		break;
+
+	default:
+		code = (unsigned int)code & 0xff;
+		if ((unsigned int)code == 0x0) {
+			result = "Sent by kill, sigsend";
+			code   = 0;
+		} else if ((unsigned int)code == 0x80) {
+			result = "Send by kernel";
+			code   = 0;
+		} else if ((unsigned int)code == 0xc4) {
+			result = "Sent by asynch name lookup completion";
+			code   = 0;
+		} else if ((unsigned int)code >= 0xfa && (unsigned int)code <= 0xff) {
+			static char const repr_si[] =
+			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
+			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
+			"igqueue_entry";
+			result = repr_si;
+			code -= 0xfa;
+		}
+		break;
+	}
+	if (result) {
+		for (; code; --code)
+			result = libc_strend(result) + 1;
+		if (!*result)
+			result = NULL;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*[[[end]]]*/
+	return result;
+}
 #include <bits/os/sigstack.h>
 /* >> sigstack(2)
  * Deprecated, and slightly different version of `sigaltstack(2)'
@@ -385,6 +908,10 @@ NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 	return __SIGRTMAX;
 }
 #endif /* !__KERNEL__ */
+#undef __libc_current_sigrtmin
+#undef __libc_current_sigrtmax
+#undef libc___libc_current_sigrtmin
+#undef libc___libc_current_sigrtmax
 
 DECL_END
 
@@ -415,6 +942,8 @@ DEFINE_PUBLIC_ALIAS(signandset, libc_signandset);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(killpg, libc_killpg);
 DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
+DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
+DEFINE_PUBLIC_ALIAS(strsigcode_s, libc_strsigcode_s);
 DEFINE_PUBLIC_ALIAS(sigstack, libc_sigstack);
 DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
 DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);

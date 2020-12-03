@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24e57bf0 */
+/* HASH CRC-32:0x833c4a17 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 
 DECL_BEGIN
 
-#include <pthread.h>
 #ifndef __KERNEL__
 /* >> raise(3)
  * Raise a signal within the current thread.
@@ -310,9 +309,6 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t pid, signo
  * @return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
  * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t pid, pid_t tid, signo_t signo, siginfo_t const *uinfo);
-/* >> psiginfo(3)
- * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
 /* >> siginterrupt(3)
  * Set the `SA_RESTART' of the already-established signal handler for `signo',
  * as well as cause any future handler established by `bsd_signal()' or one of

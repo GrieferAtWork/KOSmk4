@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f4a03d4 */
+/* HASH CRC-32:0xe0589761 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,14 @@
 DECL_BEGIN
 
 #include <pthread.h>
+#ifdef __SIGRTMIN
+#define __libc_current_sigrtmin()      __SIGRTMIN
+#define libc___libc_current_sigrtmin() __SIGRTMIN
+#endif /* __SIGRTMIN */
+#ifdef __SIGRTMAX
+#define __libc_current_sigrtmax()      __SIGRTMAX
+#define libc___libc_current_sigrtmax() __SIGRTMAX
+#endif /* __SIGRTMAX */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigblock(3)
  * Deprecated method of SIG_BLOCK-ing a given set of signals.
@@ -380,6 +388,27 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo, char const *s);
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> psiginfo(3)
+ * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strsigcode_s(3)
+ * Return a textual description of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'. This function is used
+ * for the implementation of `psiginfo(3)' */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_strsigcode_s)(signo_t signo, int code);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strsigcode_s(3)
+ * Return a textual description of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'. This function is used
+ * for the implementation of `psiginfo(3)' */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_strsigcode_s)(signo_t signo, int code);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> siginterrupt(3)
  * Set the `SA_RESTART' of the already-established signal handler for `signo',
  * as well as cause any future handler established by `bsd_signal()' or one of

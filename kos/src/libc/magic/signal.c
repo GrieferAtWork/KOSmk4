@@ -36,8 +36,16 @@
 %[define_type_class(__sighandler_t = "TP")]
 %[default:section(".text.crt{|.dos}.sched.signal")]
 
-%(auto_header,user){
+%(auto_header){
 #include <pthread.h>
+#ifdef __SIGRTMIN
+#define __libc_current_sigrtmin()      __SIGRTMIN
+#define libc___libc_current_sigrtmin() __SIGRTMIN
+#endif /* __SIGRTMIN */
+#ifdef __SIGRTMAX
+#define __libc_current_sigrtmax()      __SIGRTMAX
+#define libc___libc_current_sigrtmax() __SIGRTMAX
+#endif /* __SIGRTMAX */
 }
 
 %[insert:prefix(
@@ -1039,7 +1047,9 @@ enum {
 
 
 
-#ifdef __CC__
+}
+%#ifdef __CC__
+%{
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #ifndef __sigevent_t_defined
@@ -1059,9 +1069,7 @@ typedef union sigval sigval_t;
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __stack_t_defined
 #define __stack_t_defined 1
-#ifdef __CC__
 typedef struct sigaltstack stack_t;
-#endif /* __CC__ */
 #endif /* !__stack_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
@@ -1817,7 +1825,7 @@ int killpg($pid_t pgrp, $signo_t signo) {
 @@Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
 @@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
 [[decl_include("<bits/types.h>")]]
-[[requires_include("<__crt.h>", "<libc/errno.h>")]]
+[[requires_include("<__crt.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
 void psignal($signo_t signo, [[nullable]] char const *s) {
 	char const *signam = strsignal_s(signo);
@@ -1833,8 +1841,531 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 @@>> psiginfo(3)
 @@Similar to `psignal(3)', but instead print extended signal information from `*pinfo'
 [[decl_include("<bits/os/siginfo.h>")]]
+[[impl_include("<bits/crt/inttypes.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[requires_include("<__crt.h>")]]
+[[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
-              [[nullable]] char const *s);
+              [[nullable]] char const *s) {
+	char const *text;
+	text = strsignal_s(pinfo->@si_signo@);
+	if (s && *s)
+		fprintf(stderr, "%s: ", s);
+	if (text) {
+		fprintf(stderr, "%s (", text);
+@@pp_if $has_function(__libc_current_sigrtmin) && $has_function(__libc_current_sigrtmax)@@
+	} else if (pinfo->@si_signo@ >= __libc_current_sigrtmin() &&
+	           pinfo->@si_signo@ <= __libc_current_sigrtmax()) {
+		unsigned int offset;
+		offset = (unsigned int)(pinfo->@si_signo@ - __libc_current_sigrtmin());
+		if (offset != 0) {
+			fprintf(stderr, "SIGRTMIN+%u (", offset);
+		} else {
+			fprintf(stderr, "SIGRTMIN (");
+		}
+@@pp_endif@@
+	} else {
+		fprintf(stderr, "Unknown signal %d (", pinfo->@si_signo@);
+	}
+	text = strsigcode_s(pinfo->@si_signo@, pinfo->@si_code@);
+	if (text) {
+		fprintf(stderr, "%s ", text);
+	} else {
+		fprintf(stderr, "%u ", (unsigned int)pinfo->@si_code@);
+	}
+@@pp_if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)@@
+	if (0
+@@pp_ifdef __SIGILL@@
+	    || pinfo->si_signo == __SIGILL
+@@pp_endif@@
+@@pp_ifdef __SIGFPE@@
+	    || pinfo->si_signo == __SIGFPE
+@@pp_endif@@
+@@pp_ifdef __SIGSEGV@@
+	    || pinfo->si_signo == __SIGSEGV
+@@pp_endif@@
+@@pp_ifdef __SIGBUS@@
+	    || pinfo->si_signo == __SIGBUS
+@@pp_endif@@
+	    ) {
+		fprintf(stderr, "[%p])\n", pinfo->@si_addr@);
+	} else
+@@pp_endif@@
+@@pp_ifdef __SIGCHLD@@
+	if (pinfo->si_signo == __SIGCHLD) {
+		fprintf(stderr,
+		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
+		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		        (pid_t)pinfo->@si_pid@,
+		        (int)pinfo->@si_status@,
+		        (uid_t)pinfo->@si_uid@);
+	} else
+@@pp_endif@@
+@@pp_ifdef __SIGPOLL@@
+	if (pinfo->si_signo == __SIGPOLL) {
+		fprintf(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
+		        (longptr_t)pinfo->@si_band@);
+	} else
+@@pp_endif@@
+	{
+		fprintf(stderr,
+		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
+		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		        (pid_t)pinfo->@si_pid@,
+		        (uid_t)pinfo->@si_uid@);
+	}
+}
+
+%#ifdef __USE_KOS
+@@>> strsigcode_s(3)
+@@Return a textual description of `code', as read from `siginfo_t::si_code',
+@@and used in conjunction with a given signal `signo'. This function is used
+@@for the implementation of `psiginfo(3)'
+[[wunused, const]]
+[[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
+char const *strsigcode_s($signo_t signo, int code) {
+	char const *result = NULL;
+/*[[[deemon
+import util;
+import * from deemon;
+import * from ....misc.libgen.strendN;
+
+@@List of (name: string, comment: string, kosCode: int)
+@@For example: ("__POLL_IN", "Data input available", 1)
+global signalCodes: {(string, string, int)...} = [];
+for (local l: File.open("../../../include/asm/os/kos/siginfo.h", "r")) {
+	l = l.strip().decode("utf-8");
+	local name, code, comment;
+	try {
+		name, code, comment = l.scanf("# define %[^ ] %[^/]/" "* %[^*]")...;
+		code    = getMacroIntValue(code.strip());
+		comment = comment.strip().rstrip(".").rstrip();
+	} catch (...) {
+		continue;
+	}
+	signalCodes.append((name, code, comment));
+}
+
+
+global CODED_SIGNALS: {(string, string)...} = {
+	("SIGILL", "__ILL_"),
+	("SIGFPE", "__FPE_"),
+	("SIGSEGV", "__SEGV_"),
+	("SIGBUS", "__BUS_"),
+	("SIGTRAP", "__TRAP_"),
+	("SIGCLD", "__CLD_"),
+	("SIGPOLL", "__POLL_"),
+};
+
+print("@@pp_if defined(__KOS__) || defined(__linux__)@@");
+function printSigCodeSelector(prefix: string) {
+	local codes = [];
+	for (local name, code, comment: signalCodes) {
+		if (!name.startswith(prefix))
+			continue;
+		if (code < 0)
+			code = code.unsigned8;
+		if (code >= #codes)
+			codes.resize(code + 1);
+		codes[code] = comment;
+	}
+	local partitions: {(int, {string...})...} = splitValues(codes);
+	local isFirst = true;
+	for (local minIndex, items: partitions) {
+		local maxIndex = minIndex + #items - 1;
+		if (isFirst) {
+			print("		"),;
+			isFirst = false;
+		} else {
+			print(" else "),;
+		}
+		print("if ("),;
+		if (minIndex == maxIndex) {
+			print("(unsigned int)code == ", minIndex.hex()),;
+		} else if (minIndex == 0) {
+			print("(unsigned int)code <= ", maxIndex.hex()),;
+		} else {
+			print("(unsigned int)code >= ", minIndex.hex(), " && "
+			      "(unsigned int)code <= ", maxIndex.hex()),;
+		}
+		print(") {");
+		if (minIndex == maxIndex) {
+			print("			result = ", repr(items.first), ";");
+			print("			code   = 0;");
+		} else {
+			local reprName = "repr_" + prefix.strip("_").lower();
+			File.Writer text;
+			for (local i, item: util.enumerate(items)) {
+				if (!item)
+					item = "";
+				if (i != #items - 1)
+					item = item + "\0";
+				text << item;
+			}
+			print("			static char const ", reprName, "[] =\n			",
+				"\n			".join(for (local e: text.string.segments(64)) repr(e)),
+				";");
+			print("			result = ", reprName, ";");
+			if (minIndex)
+				print("			code -= ", minIndex.hex(), ";");
+		}
+		print("		}"),;
+	}
+	print;
+}
+print("	switch (signo) {");
+for (local signo_name, prefix: CODED_SIGNALS) {
+	print("	case __", signo_name, ":");
+	printSigCodeSelector(prefix);
+	print("		break;");
+	print;
+}
+print("	default:");
+print("		code = (unsigned int)code & 0xff;");
+printSigCodeSelector("__SI_");
+print("		break;");
+print("	}");
+print("	if (result) {");
+print("		for (; code; --code)");
+print("			result = strend(result) + 1;");
+print("		if (!*result)");
+print("			result = NULL;");
+print("	}");
+print("@@pp_else@@");
+function printFallbackSigCodeSelector(prefix: string) {
+	print("		switch (code) {");
+	for (local name, code, comment: signalCodes) {
+		if (!name.startswith(prefix))
+			continue;
+		print("@@pp_ifdef ", name, "@@");
+		print("		case ", name, ": result = ", repr(comment), "; break;");
+		print("@@pp_endif@@");
+	}
+	print("		default: break;");
+	print("		}");
+}
+print("	switch (signo) {");
+print;
+for (local signo_name, prefix: CODED_SIGNALS) {
+	print("@@pp_ifdef __", signo_name, "@@");
+	print("	case __", signo_name, ":");
+	printFallbackSigCodeSelector(prefix);
+	print("		break;");
+	print("@@pp_endif@@");
+	print;
+}
+print("	default:");
+printFallbackSigCodeSelector("__SI_");
+print("		break;");
+print("	}");
+print("@@pp_endif@@");
+]]]*/
+@@pp_if defined(__KOS__) || defined(__linux__)@@
+	switch (signo) {
+	case __SIGILL:
+		if ((unsigned int)code <= 0x8) {
+			static char const repr_ill[] =
+			"\0Illegal opcode\0Illegal operand\0Illegal addressing mode\0Illegal "
+			"trap\0Privileged opcode\0Privileged register\0Coprocessor error\0Int"
+			"ernal stack error";
+			result = repr_ill;
+		}
+		break;
+
+	case __SIGFPE:
+		if ((unsigned int)code <= 0x8) {
+			static char const repr_fpe[] =
+			"\0Integer divide by zero\0Integer overflow\0Floating point divide b"
+			"y zero\0Floating point overflow\0Floating point underflow\0Floating"
+			" point inexact result\0Floating point invalid operation\0Subscript"
+			" out of range";
+			result = repr_fpe;
+		}
+		break;
+
+	case __SIGSEGV:
+		if ((unsigned int)code <= 0x2) {
+			static char const repr_segv[] =
+			"\0Address not mapped to object\0Invalid permissions for mapped obj"
+			"ect";
+			result = repr_segv;
+		}
+		break;
+
+	case __SIGBUS:
+		if ((unsigned int)code <= 0x5) {
+			static char const repr_bus[] =
+			"\0Invalid address alignment\0Non-existent physical address\0Object "
+			"specific hardware error\0Hardware memory error: action required\0H"
+			"ardware memory error: action optional";
+			result = repr_bus;
+		}
+		break;
+
+	case __SIGTRAP:
+		if ((unsigned int)code <= 0x2) {
+			static char const repr_trap[] =
+			"\0Process breakpoint\0Process trace trap";
+			result = repr_trap;
+		}
+		break;
+
+	case __SIGCLD:
+		if ((unsigned int)code <= 0x6) {
+			static char const repr_cld[] =
+			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
+			"raced child has trapped\0Child has stopped\0Stopped child has cont"
+			"inued";
+			result = repr_cld;
+		}
+		break;
+
+	case __SIGPOLL:
+		if ((unsigned int)code <= 0x6) {
+			static char const repr_poll[] =
+			"\0Data input available\0Output buffers available\0Input message ava"
+			"ilable\0I/O error\0High priority input available\0Device disconnect"
+			"ed";
+			result = repr_poll;
+		}
+		break;
+
+	default:
+		code = (unsigned int)code & 0xff;
+		if ((unsigned int)code == 0x0) {
+			result = "Sent by kill, sigsend";
+			code   = 0;
+		} else if ((unsigned int)code == 0x80) {
+			result = "Send by kernel";
+			code   = 0;
+		} else if ((unsigned int)code == 0xc4) {
+			result = "Sent by asynch name lookup completion";
+			code   = 0;
+		} else if ((unsigned int)code >= 0xfa && (unsigned int)code <= 0xff) {
+			static char const repr_si[] =
+			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
+			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
+			"igqueue_entry";
+			result = repr_si;
+			code -= 0xfa;
+		}
+		break;
+	}
+	if (result) {
+		for (; code; --code)
+			result = strend(result) + 1;
+		if (!*result)
+			result = NULL;
+	}
+@@pp_else@@
+	switch (signo) {
+
+@@pp_ifdef __SIGILL@@
+	case __SIGILL:
+		switch (code) {
+@@pp_ifdef __ILL_ILLOPC@@
+		case __ILL_ILLOPC: result = "Illegal opcode"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_ILLOPN@@
+		case __ILL_ILLOPN: result = "Illegal operand"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_ILLADR@@
+		case __ILL_ILLADR: result = "Illegal addressing mode"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_ILLTRP@@
+		case __ILL_ILLTRP: result = "Illegal trap"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_PRVOPC@@
+		case __ILL_PRVOPC: result = "Privileged opcode"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_PRVREG@@
+		case __ILL_PRVREG: result = "Privileged register"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_COPROC@@
+		case __ILL_COPROC: result = "Coprocessor error"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_BADSTK@@
+		case __ILL_BADSTK: result = "Internal stack error"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+@@pp_ifdef __SIGFPE@@
+	case __SIGFPE:
+		switch (code) {
+@@pp_ifdef __FPE_INTDIV@@
+		case __FPE_INTDIV: result = "Integer divide by zero"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_INTOVF@@
+		case __FPE_INTOVF: result = "Integer overflow"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTDIV@@
+		case __FPE_FLTDIV: result = "Floating point divide by zero"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTOVF@@
+		case __FPE_FLTOVF: result = "Floating point overflow"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTUND@@
+		case __FPE_FLTUND: result = "Floating point underflow"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTRES@@
+		case __FPE_FLTRES: result = "Floating point inexact result"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTINV@@
+		case __FPE_FLTINV: result = "Floating point invalid operation"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTSUB@@
+		case __FPE_FLTSUB: result = "Subscript out of range"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+@@pp_ifdef __SIGSEGV@@
+	case __SIGSEGV:
+		switch (code) {
+@@pp_ifdef __SEGV_MAPERR@@
+		case __SEGV_MAPERR: result = "Address not mapped to object"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_ACCERR@@
+		case __SEGV_ACCERR: result = "Invalid permissions for mapped object"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+@@pp_ifdef __SIGBUS@@
+	case __SIGBUS:
+		switch (code) {
+@@pp_ifdef __BUS_ADRALN@@
+		case __BUS_ADRALN: result = "Invalid address alignment"; break;
+@@pp_endif@@
+@@pp_ifdef __BUS_ADRERR@@
+		case __BUS_ADRERR: result = "Non-existent physical address"; break;
+@@pp_endif@@
+@@pp_ifdef __BUS_OBJERR@@
+		case __BUS_OBJERR: result = "Object specific hardware error"; break;
+@@pp_endif@@
+@@pp_ifdef __BUS_MCEERR_AR@@
+		case __BUS_MCEERR_AR: result = "Hardware memory error: action required"; break;
+@@pp_endif@@
+@@pp_ifdef __BUS_MCEERR_AO@@
+		case __BUS_MCEERR_AO: result = "Hardware memory error: action optional"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+@@pp_ifdef __SIGTRAP@@
+	case __SIGTRAP:
+		switch (code) {
+@@pp_ifdef __TRAP_BRKPT@@
+		case __TRAP_BRKPT: result = "Process breakpoint"; break;
+@@pp_endif@@
+@@pp_ifdef __TRAP_TRACE@@
+		case __TRAP_TRACE: result = "Process trace trap"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+@@pp_ifdef __SIGCLD@@
+	case __SIGCLD:
+		switch (code) {
+@@pp_ifdef __CLD_EXITED@@
+		case __CLD_EXITED: result = "Child has exited"; break;
+@@pp_endif@@
+@@pp_ifdef __CLD_KILLED@@
+		case __CLD_KILLED: result = "Child was killed"; break;
+@@pp_endif@@
+@@pp_ifdef __CLD_DUMPED@@
+		case __CLD_DUMPED: result = "Child terminated abnormally"; break;
+@@pp_endif@@
+@@pp_ifdef __CLD_TRAPPED@@
+		case __CLD_TRAPPED: result = "Traced child has trapped"; break;
+@@pp_endif@@
+@@pp_ifdef __CLD_STOPPED@@
+		case __CLD_STOPPED: result = "Child has stopped"; break;
+@@pp_endif@@
+@@pp_ifdef __CLD_CONTINUED@@
+		case __CLD_CONTINUED: result = "Stopped child has continued"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+@@pp_ifdef __SIGPOLL@@
+	case __SIGPOLL:
+		switch (code) {
+@@pp_ifdef __POLL_IN@@
+		case __POLL_IN: result = "Data input available"; break;
+@@pp_endif@@
+@@pp_ifdef __POLL_OUT@@
+		case __POLL_OUT: result = "Output buffers available"; break;
+@@pp_endif@@
+@@pp_ifdef __POLL_MSG@@
+		case __POLL_MSG: result = "Input message available"; break;
+@@pp_endif@@
+@@pp_ifdef __POLL_ERR@@
+		case __POLL_ERR: result = "I/O error"; break;
+@@pp_endif@@
+@@pp_ifdef __POLL_PRI@@
+		case __POLL_PRI: result = "High priority input available"; break;
+@@pp_endif@@
+@@pp_ifdef __POLL_HUP@@
+		case __POLL_HUP: result = "Device disconnected"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+@@pp_endif@@
+
+	default:
+		switch (code) {
+@@pp_ifdef __SI_ASYNCNL@@
+		case __SI_ASYNCNL: result = "Sent by asynch name lookup completion"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_TKILL@@
+		case __SI_TKILL: result = "Sent by tkill"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_SIGIO@@
+		case __SI_SIGIO: result = "Sent by queued SIGIO"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_ASYNCIO@@
+		case __SI_ASYNCIO: result = "Sent by AIO completion"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_MESGQ@@
+		case __SI_MESGQ: result = "Sent by real time mesq state change"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_TIMER@@
+		case __SI_TIMER: result = "Sent by timer expiration"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_QUEUE@@
+		case __SI_QUEUE: result = "Sent by sigqueue_entry"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_USER@@
+		case __SI_USER: result = "Sent by kill, sigsend"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_KERNEL@@
+		case __SI_KERNEL: result = "Send by kernel"; break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+	}
+@@pp_endif@@
+/*[[[end]]]*/
+	return result;
+}
+
+%#endif /* __USE_KOS */
 %#endif /* __USE_XOPEN2K8 */
 
 %
@@ -2100,10 +2631,18 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 #endif /* __USE_GLIBC */
 }
 
+%
+%#endif /* __CC__ */
 %{
-
-#endif /* __CC__ */
 
 __SYSDECL_END
 
 }
+
+%(auto_source){
+#undef __libc_current_sigrtmin
+#undef __libc_current_sigrtmax
+#undef libc___libc_current_sigrtmin
+#undef libc___libc_current_sigrtmax
+}
+

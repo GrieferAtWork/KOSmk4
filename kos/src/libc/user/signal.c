@@ -838,22 +838,6 @@ NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t pid,
 }
 /*[[[end:libc_tgsigqueueinfo]]]*/
 
-
-/*[[[head:libc_psiginfo,hash:CRC-32=0x8d98a19b]]]*/
-/* >> psiginfo(3)
- * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
-                                    char const *s)
-/*[[[body:libc_psiginfo]]]*/
-/*AUTO*/{
-	(void)pinfo;
-	(void)s;
-	CRT_UNIMPLEMENTEDF("psiginfo(%p, %q)", pinfo, s); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_psiginfo]]]*/
-
 /*[[[head:libc_siginterrupt,hash:CRC-32=0x235b7f05]]]*/
 /* >> siginterrupt(3)
  * Set the `SA_RESTART' of the already-established signal handler for `signo',
@@ -979,7 +963,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6b820bb0]]]*/
+/*[[[start:exports,hash:CRC-32=0x49d14112]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1014,7 +998,6 @@ DEFINE_PUBLIC_ALIAS(sigqueue, libc_sigqueue);
 DEFINE_PUBLIC_ALIAS(sigtimedwait64, libc_sigtimedwait64);
 DEFINE_PUBLIC_ALIAS(sigqueueinfo, libc_sigqueueinfo);
 DEFINE_PUBLIC_ALIAS(tgsigqueueinfo, libc_tgsigqueueinfo);
-DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
 DEFINE_PUBLIC_ALIAS(siginterrupt, libc_siginterrupt);
 DEFINE_PUBLIC_ALIAS(sigaltstack, libc_sigaltstack);
 DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);

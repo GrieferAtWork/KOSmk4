@@ -3254,6 +3254,7 @@
 #define __CRT_HAVE_strroff
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
+#define __CRT_HAVE_strsigcode_s
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsignal_s
 #define __CRT_HAVE_strspn

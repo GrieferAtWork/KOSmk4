@@ -124,7 +124,13 @@ function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...}
 @@Convert a macro's expansion value to an integer
 @@If this is impossible, return @none instead
 function getMacroIntValue(macroValue: string): int | none {
+again:
 	if (macroValue.endswith(")")) {
+		if (macroValue.startswith("(") &&
+		    macroValue.findmatch("(", ")", 1) == #macroValue - 1) {
+			macroValue = macroValue[1:-1].strip();
+			goto again;
+		}
 		local newval = macroValue.lstrip("_U");
 		for (local prefix: { "INT8_C", "INT16_C", "INT32_C", "INT64_C" }) {
 			if (!newval.startswith(prefix))
@@ -289,6 +295,27 @@ function getPrefixedMacrosFromFile(
 		if (macroValue >= #result)
 			result.resize(macroValue + 1);
 		if (result[macroValue] is none)
+			result[macroValue] = macroName;
+	}
+	return result;
+}
+
+function getPrefixedMacrosFromFileAsMapping(
+		filename: string, prefix: string, suffix: string = ""): {int: string} {
+	local result = Dict();
+	for (local macroName, macroValue: enumerateMacrosFromFile(filename)) {
+		if (!macroName.startswith(prefix))
+			continue;
+		if (suffix) {
+			if (!macroName.endswith(suffix))
+				continue;
+			macroName = macroName[:-#suffix];
+		}
+		macroName = macroName[#prefix:];
+		macroValue = getMacroIntValue(macroValue);
+		if (macroValue !is int)
+			continue;
+		if (macroValue !in result)
 			result[macroValue] = macroName;
 	}
 	return result;
