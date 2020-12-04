@@ -1807,6 +1807,16 @@
 #define __CRT_HAVE_ftruncate
 #define __CRT_HAVE_ftruncate64
 #define __CRT_HAVE_ftrylockfile
+#define __CRT_HAVE_fts64_children
+#define __CRT_HAVE_fts64_close
+#define __CRT_HAVE_fts64_open
+#define __CRT_HAVE_fts64_read
+#define __CRT_HAVE_fts64_set
+#define __CRT_HAVE_fts_children
+#define __CRT_HAVE_fts_close
+#define __CRT_HAVE_fts_open
+#define __CRT_HAVE_fts_read
+#define __CRT_HAVE_fts_set
 #define __CRT_HAVE_funlockfile
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin

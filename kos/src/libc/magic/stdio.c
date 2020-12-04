@@ -2027,7 +2027,7 @@ $off_t ftello([[nonnull]] $FILE *__restrict stream) {
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
 @@64-bit variant of `tmpfile'
-[[cp, alias("tmpfile"), wunused]]
+[[cp, wunused, alias("tmpfile")]]
 [[largefile64_variant_of(tmpfile)]]
 $FILE *tmpfile64();
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bee246c */
+/* HASH CRC-32:0x787db424 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -252,6 +252,18 @@ DEFINE_PUBLIC_ALIAS(DOS$format_vprintf, libd_format_vprintf);
 DEFINE_PUBLIC_ALIAS(DOS$format_vscanf, libd_format_vscanf);
 DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_pack, libd_format_aprintf_pack);
 DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_alloc, libd_format_aprintf_alloc);
+
+/* fts */
+DEFINE_PUBLIC_ALIAS(DOS$fts_children, libd_fts_children);
+DEFINE_PUBLIC_ALIAS(DOS$fts_close, libd_fts_close);
+DEFINE_PUBLIC_ALIAS(DOS$fts_open, libd_fts_open);
+DEFINE_PUBLIC_ALIAS(DOS$fts_read, libd_fts_read);
+DEFINE_PUBLIC_ALIAS(DOS$fts_set, libd_fts_set);
+DEFINE_PUBLIC_ALIAS(DOS$fts64_children, libd_fts64_children);
+DEFINE_PUBLIC_ALIAS(DOS$fts64_close, libd_fts64_close);
+DEFINE_PUBLIC_ALIAS(DOS$fts64_open, libd_fts64_open);
+DEFINE_PUBLIC_ALIAS(DOS$fts64_read, libd_fts64_read);
+DEFINE_PUBLIC_ALIAS(DOS$fts64_set, libd_fts64_set);
 
 /* getopt */
 DEFINE_PUBLIC_ALIAS(DOS$getopt, libd_getopt);

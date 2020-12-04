@@ -914,6 +914,13 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 				break;
 		}
 	}
+	/* TODO: Return some kind of info-was-optimized-away error at this point!
+	 *       This would return get/set-reg operators to return an UNWIND_*
+	 *       error code instead of a bool, but that's something I've wanted
+	 *       to change for some time already!
+	 * NOTE: Only return this error if we didn't find a `DW_TAG_GNU_call_site'
+	 *       tag for the given PC-location, because no such tag exists.
+	 *       Anything else should cause some other error to be returned, instead! */
 err:
 	self->ce_parser.dup_cu_info_pos = saved_dip;
 	return false;

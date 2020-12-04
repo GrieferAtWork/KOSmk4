@@ -105,6 +105,41 @@ again:
 	fp.ppIf(usedCond);
 }
 
+@@@return: true:  #elif was used
+@@@return: false: #else; #if was used
+function CWriter_ppElifEscaped(
+		fp: CWriter, ppCond: string | UserString, escapeMode: int): bool {
+	local extendedPrefixes = [];
+	local usedCond = escapeText(
+		ppCond, escapeMode, extendedPrefixes: extendedPrefixes);
+	local useElseIf = false;
+	if (usedCond !in ["0", "1"]) {
+again:
+		local newExtendedPrefixes = [];
+		for (local x: extendedPrefixes) {
+			local newText = escapeText(x, escapeMode, extendedPrefixes: newExtendedPrefixes);
+			if (newText && !fp.wasPrefixPrinted(newText)) {
+				if (!useElseIf) {
+					fp.ppElse();
+					useElseIf = true;
+				}
+				fp.forceStartOfLine();
+				fp.printPrefix(str newText);
+			}
+		}
+		if (newExtendedPrefixes) {
+			extendedPrefixes = newExtendedPrefixes;
+			goto again;
+		}
+	}
+	if (useElseIf) {
+		fp.ppIf(usedCond);
+		return false;
+	}
+	fp.ppElif(usedCond);
+	return true;
+}
+
 class CType {
 	this = default;
 
@@ -1973,14 +2008,16 @@ class NamespaceBinding {
 				namespace.keyUsing(fp, exposedName);
 				fp.ppElse();
 				local isFirst = true;
+				local numAdditionalEndifs = 0;
 				for (local ppCond, prototypes: conditionalPrototypes) {
 					if (!prototypes)
 						continue;
 					if (isFirst) {
+						CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 						isFirst = false;
-						fp.ppIf(ppCond);
 					} else {
-						fp.ppElif(ppCond);
+						if (!CWriter_ppElifEscaped(fp, ppCond, escapeMode))
+							++numAdditionalEndifs;
 					}
 					if (#prototypes == 1) {
 						local callToPrototype = prototypes.first;
@@ -2007,6 +2044,7 @@ class NamespaceBinding {
 						fp.externLinkage = oldExternLinkage;
 					}
 				}
+				fp.ppEndifN(numAdditionalEndifs);
 				if (!isFirst)
 					fp.ppEndif();
 				fp.ppEndif();
@@ -2018,12 +2056,14 @@ class NamespaceBinding {
 		if (namespace.prefix)
 			cSymbolName = "({} {})".format({ namespace.prefix, cSymbolName });
 		local isFirst = true;
+		local numAdditionalEndifs = 0;
 		for (local ppCond, prototypes: conditionalPrototypes) {
 			if (isFirst) {
+				CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 				isFirst = false;
-				fp.ppIf(ppCond);
 			} else {
-				fp.ppElif(ppCond);
+				if (!CWriter_ppElifEscaped(fp, ppCond, escapeMode))
+					++numAdditionalEndifs;
 			}
 			if (#prototypes == 1) {
 				/* The complicated case: Must use `keyUsingOrImpl' */
@@ -2063,6 +2103,7 @@ class NamespaceBinding {
 				fp.ppEndif();
 			}
 		}
+		fp.ppEndifN(numAdditionalEndifs);
 		if (!isFirst)
 			fp.ppEndif();
 	}
@@ -2305,14 +2346,15 @@ do_universal_binding:
 			}
 		}
 		local isFirst = true;
+		local numAdditionalEndifs = 0;
 		for (local ppCond, associatedPrototypes: usedPrototypes) {
-			ppCond = escapeText(ppCond, escapeMode);
-			if (isFirst)
-				fp.ppIf(ppCond);
-			else {
-				fp.ppElif(ppCond);
+			if (isFirst) {
+				CWriter_ppIfEscaped(fp, ppCond, escapeMode);
+				isFirst = false;
+			} else {
+				if (!CWriter_ppElifEscaped(fp, ppCond, escapeMode))
+					++numAdditionalEndifs;
 			}
-			isFirst = false;
 			if (printDeclarationPrefixes) {
 				if (usedBinding is LocalFunction &&
 				    (#usedPrototypes == 1 && #associatedPrototypes == 1) &&
@@ -2361,6 +2403,7 @@ do_universal_binding:
 			}
 			fp.externLinkage = oldExternLinkage;
 		}
+		fp.ppEndifN(numAdditionalEndifs);
 		if (guardName !is none) {
 			if (!isFirst)
 				fp.ppElse();
@@ -3103,12 +3146,14 @@ class LibraryFunction {
 			local isFirst = true;
 			local doc = documentationString;
 			local proto = functionPrototype;
+			local numAdditionalEndifs = 0;
 			for (local bind /*: LibraryFunctionBinding*/: usedBindings) {
 				if (isFirst) {
-					fp.ppIf(bind.ppCond);
+					CWriter_ppIfEscaped(fp, bind.ppCond, escapeMode);
 					isFirst = false;
 				} else {
-					fp.ppElif(bind.ppCond);
+					if (!CWriter_ppElifEscaped(fp, bind.ppCond, escapeMode))
+						++numAdditionalEndifs;
 				}
 				local impl: FunctionImplementation | string | UserString = bind.functionBinding;
 				if (impl is FunctionImplementation) {
@@ -3153,6 +3198,7 @@ class LibraryFunction {
 						<< impl << ");\n";
 				}
 			}
+			fp.ppEndifN(numAdditionalEndifs);
 			if (!isFirst)
 				fp.ppEndif();
 			fp.ppEndif();

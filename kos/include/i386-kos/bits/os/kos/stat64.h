@@ -160,6 +160,8 @@
 #undef __kos_stat_alias64
 #define __kos_statx64_alias64 stat64
 #define __kos_stat_alias64    stat64
+#endif /* !__stat64_defined */
+#endif /* __USE_LARGEFILE64 */
 #define __OFFSET_STAT64_DEV         __OFFSET_KOS_STATX64_DEV
 #define __OFFSET_STAT64_INO         __OFFSET_KOS_STATX64_INO
 #define __OFFSET_STAT64_MODE        __OFFSET_KOS_STATX64_MODE
@@ -198,8 +200,6 @@
 #define __OFFSET_STAT64_CTIME       __OFFSET_KOS_STATX64_CTIME
 #define __OFFSET_STAT64_CTIMENSEC   __OFFSET_KOS_STATX64_CTIMENSEC
 #define __SIZEOF_STAT64             __SIZEOF_KOS_STATX64
-#endif /* !__stat64_defined */
-#endif /* __USE_LARGEFILE64 */
 
 #endif /* __KOS__ && __x86_64__ */
 

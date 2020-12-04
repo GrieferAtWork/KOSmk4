@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e4a195e */
+/* HASH CRC-32:0xee47c203 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -474,7 +474,18 @@ INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_swab)(void const *__restri
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid)(char *s);
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd_ctermid)(char *s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
  * that name in `s'. When `s' is NULL, a static buffer is used instead

@@ -37,8 +37,8 @@
  * and thus implicitly define these macros as well (fun fact
  * though: not actually <byteswap.h>), but since I suspect
  * that more programs might make this mistake, do them all a
- * favor and define then (at least as long as we're not in
- * one of the pure-header modes) */
+ * favor and define them here (at least as long as we're not
+ * in one of the pure-header modes) */
 #if !defined(__USE_ISOC_PURE) && !defined(__USE_KOS_PURE)
 #include <hybrid/byteorder.h>
 #ifndef __ORDER_LITTLE_ENDIAN__

@@ -1949,20 +1949,6 @@ err_perm:
 /*[[[end:libc_sbrk]]]*/
 
 
-
-/*[[[head:libc_ctermid,hash:CRC-32=0xa4338509]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") char *
-NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
-/*[[[body:libc_ctermid]]]*/
-{
-	char *name = (char *)"/dev/tty";
-	if (s == NULL)
-		return name;
-	return strcpy(s, name);
-}
-/*[[[end:libc_ctermid]]]*/
-
-
 #define PATHCONF_VARYING_LIMIT INTPTR_MIN
 PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] = {
 	[_PC_LINK_MAX]           = PATHCONF_VARYING_LIMIT,
@@ -3586,7 +3572,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe260ca99]]]*/
+/*[[[start:exports,hash:CRC-32=0x3bbada63]]]*/
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(_getpid, libc_getpid);
@@ -3731,7 +3717,6 @@ DEFINE_PUBLIC_ALIAS(brk, libc_brk);
 DEFINE_PUBLIC_ALIAS(__sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
-DEFINE_PUBLIC_ALIAS(ctermid, libc_ctermid);
 DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(_sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(__sysconf, libc_sysconf);

@@ -1,32 +1,32 @@
 
 Add support for *_chk variants (using __builtin_object_size())
 
-<a.out.h>
-<argp.h>
-<complex.h>
+<a.out.h>              (GLibc!)
+<argp.h>               (GLibc!)
+<bsd/[...].h>          (all of those libbsd headers should be magic-generated and contain `%[insert:extern()]' decls!)
+<bsd/readpassphrase.h> (alias for readpassphrase.h) (https://linux.die.net/man/3/readpassphrase)
+<complex.h>            (GLibc!)
 <conio.h>
 <corecrt_wstdlib.h>
 <cthreads.h>
-<fmtmsg.h>
-<fstab.h>
-<fts.h>
-<ftw.h>
-<iconv.h>
-<langinfo.h>
+<fmtmsg.h>             (GLibc!)
+<fstab.h>              (GLibc!)
+<ftw.h>                (GLibc!)
+<gnu-versions.h>       (GLibc!)
+<gnu/libc-version.h>   (GLibc!)
+<gshadow.h>            (GLibc!)
+<iconv.h>              (GLibc!)
+<langinfo.h>           (GLibc!)
+<libintl.h>            (GLibc!)
 <mbctype.h>
 <mbstring.h>
-<nl_types.h>
+<mcheck.h>             (GLibc!)
+<mkdev.h>
+<nl_types.h>           (GLibc!)
+<obstack.h>            (GLibc!)
+<readpassphrase.h>     (contains a single function: https://man.bsd.lv/readpassphrase.3)
 <regexp.h>
-<resolv.h>
-<stab.h>
-<timeconv.h>
-<tgmath.h>
-<wordexp.h>
-<readpassphrase.h> (contains a single function: https://man.bsd.lv/readpassphrase.3)
-<bsd/readpassphrase.h> (alias for readpassphrase.h) (https://linux.die.net/man/3/readpassphrase)
-<bsd/[...].h> (all of those libbsd headers should be magic-generated and contain `%[insert:extern()]' decls!)
-
-
+<resolv.h>             (GLibc!)
 <rpc/auth.h>
 <rpc/auth_des.h>
 <rpc/auth_unix.h>
@@ -42,34 +42,89 @@ Add support for *_chk variants (using __builtin_object_size())
 <rpc/svc_auth.h>
 <rpc/types.h>
 <rpc/xdr.h>
-
-<sys/capability.h>  (found in /usr/include/sys/capability.h; aka not in arch-headers!)
-<sys/kdaemon.h>
+<stab.h>               (GLibc!)
+<sys/bsdtypes.h>
+<sys/capability.h>     (found in /usr/include/sys/capability.h; aka not in arch-headers!)
 <sys/fanotify.h>
 <sys/gmon.h>
-<sys/gmon_out.h>  (Only some macros, and structs)
+<sys/gmon_out.h>       (Only some macros, and structs)
 <sys/inotify.h>
-<sys/mtio.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/kdaemon.h>
+<sys/mtio.h>           (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/personality.h>
 <sys/prctl.h>
 <sys/profil.h>
-<sys/personality.h>
-<sys/queue.h> (It's just like our <hybrid/sequence/list.h>)
+<sys/queue.h>          (It's just like our <hybrid/sequence/list.h>)
 <sys/quota.h>
-<sys/raw.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/raw.h>            (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 <sys/reg.h>
+<sys/soundcard.h>
 <sys/sysctl.h>
 <sys/vlimit.h>
 <sys/vtimes.h>
-<sys/soundcard.h>
-<sys/bsdtypes.h>
-
-<gnu/libc-version.h>
-<mkdev.h>
 <sysmacros.h>
+<tgmath.h>             (GLibc!)
+<timeconv.h>
+<thread_db.h>          (GLibc!)
+<wordexp.h>            (GLibc!)
+
+### Unlikely to ever be added
+<_G_config.h>          (GLibc!)
+<gconv.h>              (GLibc!)
+<nss.h>                (GLibc!)
+<printf.h>             (GLibc!)
 
 
 Functions:
+	- timingsafe_bcmp()
+	- timingsafe_memcmp()
 	- walkcontext()
 	- getprogname()
 	- setprogname()
+
+
+TODO: Implement kernel-support for socketcall(2) with command codes:
+	- #define SYS_SOCKET 1
+	- #define SYS_BIND 2
+	- #define SYS_CONNECT 3
+	- #define SYS_LISTEN 4
+	- #define SYS_ACCEPT 5
+	- #define SYS_GETSOCKNAME 6
+	- #define SYS_GETPEERNAME 7
+	- #define SYS_SOCKETPAIR 8
+	- #define SYS_SEND 9
+	- #define SYS_RECV 10
+	- #define SYS_SENDTO 11
+	- #define SYS_RECVFROM 12
+	- #define SYS_SHUTDOWN 13
+	- #define SYS_SETSOCKOPT 14
+	- #define SYS_GETSOCKOPT 15
+	- #define SYS_SENDMSG 16
+	- #define SYS_RECVMSG 17
+	- #define SYS_ACCEPT4 18
+	- #define SYS_RECVMMSG 19
+	- #define SYS_SENDMMSG 20
+	Also store these command codes somewhere within system headers...
+
+TODO: Expand generate_headers.dee and magic.dee to:
+	- Wrap function declarations from auto/foo.c with #if defined(WANT_xxx
+		- At the top of the file, a block
+		  #ifdef WANT_ALL
+		  #define WANT_xxx
+		  #endif
+		  should exist
+		  api.h should then #define WANT_ALL if building the shared library
+	- Add listings of recognized WANT_xxx options within seperate files that
+	  are generated alongside auto source files
+	- When building the static version of libc, read in the option files and
+	  compile the master file once for every -DWANT_xxx option found therein,
+	  generating a unique object file for every function
+	- The result of all of this should be a fairly well-optimized static
+	  version of libc (at least as far as automatically generated functions
+	  go)
+	- Alternatively, generate tiny, seperate source files for every libc-auto
+	  function. Those files could then be compiled much faster than the larger
+	  combined files, since it'd be possible to directly include only the
+	  relevant function dependencies.
+
 

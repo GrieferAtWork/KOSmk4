@@ -2012,9 +2012,16 @@ void swab([[nonnull]] void const *__restrict from,
 %
 %#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-%/* ... */
+@@>> ctermid(3)
+@@Writes the string "/dev/tty" to `s', or returns a pointer to
+@@a writable data location that contains that same string.
 [[guard, section(".text.crt{|.dos}.io.tty")]]
-char *ctermid(char *s);
+[[nonnull]] char *ctermid([[nullable]] char *s) {
+	static char buf[9];
+	if (s == NULL)
+		s = buf;
+	return strcpy(s, "/dev/tty");
+}
 
 @@>> cuserid(3)
 @@Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing

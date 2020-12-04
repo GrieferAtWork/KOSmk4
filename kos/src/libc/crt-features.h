@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63841c2b */
+/* HASH CRC-32:0x250dbdbb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1051,6 +1051,16 @@
 #define __CRT_HAVE_DOS$ftruncate
 #define __CRT_HAVE_DOS$ftruncate64
 #define __CRT_HAVE_DOS$ftrylockfile
+#define __CRT_HAVE_DOS$fts64_children
+#define __CRT_HAVE_DOS$fts64_close
+#define __CRT_HAVE_DOS$fts64_open
+#define __CRT_HAVE_DOS$fts64_read
+#define __CRT_HAVE_DOS$fts64_set
+#define __CRT_HAVE_DOS$fts_children
+#define __CRT_HAVE_DOS$fts_close
+#define __CRT_HAVE_DOS$fts_open
+#define __CRT_HAVE_DOS$fts_read
+#define __CRT_HAVE_DOS$fts_set
 #define __CRT_HAVE_DOS$funlockfile
 #define __CRT_HAVE_DOS$futex_setspin
 #define __CRT_HAVE_DOS$futex_timedwaitlock
@@ -4013,6 +4023,16 @@
 #define __CRT_HAVE_ftruncate
 #define __CRT_HAVE_ftruncate64
 #define __CRT_HAVE_ftrylockfile
+#define __CRT_HAVE_fts64_children
+#define __CRT_HAVE_fts64_close
+#define __CRT_HAVE_fts64_open
+#define __CRT_HAVE_fts64_read
+#define __CRT_HAVE_fts64_set
+#define __CRT_HAVE_fts_children
+#define __CRT_HAVE_fts_close
+#define __CRT_HAVE_fts_open
+#define __CRT_HAVE_fts_read
+#define __CRT_HAVE_fts_set
 #define __CRT_HAVE_funlockfile
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin

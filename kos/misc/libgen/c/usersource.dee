@@ -423,12 +423,24 @@ again_find_nextPresentFunction:
 			/* Deal with intern-alias bindings (*ugh* UGLY!!) */
 			for (local b: bindings[:-1]) {
 				assert b.functionBinding !is FunctionImplementation;
-				headFp << "#" << (isFirst ? "" : "el") << "if "
-					<< ppexpr.ppParse(b.ppCond)
+				local ppCond = ppexpr.ppParse(
+					escapeText(b.ppCond, ESCAPE_MODE_NONE))
 						.optimize(asBool: true, assume: ppAssume)
-						.tostr()
-					<< "\n"
-					   "DEFINE_INTERN_ALIAS(" << func.name << ", "
+						.tostr();
+				if (isFirst) {
+					if (ppCond.startswith("defined(") && ppCond.endswith(")") &&
+					    ppCond.findmatch("(", ")", 8) == #ppCond - 1)
+						headFp << "#ifdef " << ppCond[8:-1];
+					else if (ppCond.startswith("!defined(") && ppCond.endswith(")") &&
+					         ppCond.findmatch("(", ")", 9) == #ppCond - 1)
+						headFp << "#ifndef " << ppCond[9:-1];
+					else {
+						headFp << "#if " << ppCond;
+					}
+				} else {
+					headFp << "#elif " << ppCond;
+				}
+				headFp << "\nDEFINE_INTERN_ALIAS(" << func.name << ", "
 					<< str(b.functionBinding) << ");\n";
 				isFirst = false;
 			}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdca8e53e */
+/* HASH CRC-32:0xa66ef925 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -175,6 +175,16 @@
 #define __stub___freelocale
 #define __stub_freelocale
 #define __stub_ftok
+#define __stub_fts64_children
+#define __stub_fts64_close
+#define __stub_fts64_open
+#define __stub_fts64_read
+#define __stub_fts64_set
+#define __stub_fts_children
+#define __stub_fts_close
+#define __stub_fts_open
+#define __stub_fts_read
+#define __stub_fts_set
 #define __stub_gai_cancel
 #define __stub_gai_error
 #define __stub_gai_strerror

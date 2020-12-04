@@ -521,8 +521,8 @@ err:
 }
 /*[[[end:libc_getdirentries]]]*/
 
-/*[[[head:libc_getdirentries64,hash:CRC-32=0x6c4bb950]]]*/
-#if defined(_DIRENT_MATCHES_DIRENT64)
+/*[[[head:libc_getdirentries64,hash:CRC-32=0x8637337a]]]*/
+#ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
 #else /* MAGIC:alias */
 /* 64-bit variant of `getdirentries()' */

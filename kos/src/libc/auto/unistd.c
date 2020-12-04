@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x861e55a */
+/* HASH CRC-32:0x9630f162 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -302,6 +302,16 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 		((byte_t *)to)[n_bytes+1] = b;
 	}
 }
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_RETNONNULL char *
+NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s) {
+	static char buf[9];
+	if (s == NULL)
+		s = buf;
+	return libc_strcpy(s, "/dev/tty");
+}
 #include <asm/crt/stdio.h>
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
@@ -431,6 +441,7 @@ DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
 DEFINE_PUBLIC_ALIAS(swab, libc_swab);
+DEFINE_PUBLIC_ALIAS(ctermid, libc_ctermid);
 DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);

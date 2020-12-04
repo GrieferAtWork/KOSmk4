@@ -36,10 +36,6 @@
  * The function's that I've fixed are:
  *  - argz_add_sep()
  *  - argz_insert()
- * By the way: GLibc guys: If you want to copy my (fixed) implementation, that
- *                         is licensed under the ZLib license, so if one of you
- *                         comes across this, don't forget to include my copyright
- *                         notice when pasting ;)
  */
 
 #ifdef __CC__

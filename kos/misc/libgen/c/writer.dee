@@ -698,6 +698,13 @@ done:
 		return result;
 	}
 
+	public function ppEndifN(n: int): int {
+		local result = 0;
+		for (none: [:n])
+			result += ppEndif();
+		return result;
+	}
+
 	@@@return: * : The # of printed new-line characters
 	public function ppIfdef(macroName: string): int {
 		return ppIf("defined({})".format({ macroName }));

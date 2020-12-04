@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe33307 */
+/* HASH CRC-32:0x1ffddd56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,10 +41,6 @@
  * The function's that I've fixed are:
  *  - argz_add_sep()
  *  - argz_insert()
- * By the way: GLibc guys: If you want to copy my (fixed) implementation, that
- *                         is licensed under the ZLib license, so if one of you
- *                         comes across this, don't forget to include my copyright
- *                         notice when pasting ;)
  */
 
 #ifdef __CC__

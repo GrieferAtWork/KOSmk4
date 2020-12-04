@@ -186,7 +186,10 @@ typedef __uint32_t __fixpt_t;
 typedef struct __mbstate __mbstate_t;
 #endif /* !____mbstate_t_defined */
 typedef __uintmax_t __rman_res_t;
+#ifndef ____gnuc_va_list_defined
+#define ____gnuc_va_list_defined 1
 typedef __builtin_va_list __gnuc_va_list;
+#endif /* !____gnuc_va_list_defined */
 
 __DECL_END
 #endif /* __CC__ */

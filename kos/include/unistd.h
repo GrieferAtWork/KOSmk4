@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x914b0b2a */
+/* HASH CRC-32:0xcf037e6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2213,11 +2213,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 
 #if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-/* ... */
-#if !defined(__ctermid_defined) && defined(__CRT_HAVE_ctermid)
+#ifndef __ctermid_defined
 #define __ctermid_defined 1
-__CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
-#endif /* !__ctermid_defined && __CRT_HAVE_ctermid */
+#ifdef __CRT_HAVE_ctermid
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+__CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
+#else /* __CRT_HAVE_ctermid */
+#include <libc/local/unistd/ctermid.h>
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL ctermid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid))(__s); })
+#endif /* !__CRT_HAVE_ctermid */
+#endif /* !__ctermid_defined */
 #ifndef __cuserid_defined
 #define __cuserid_defined 1
 #ifdef __CRT_HAVE_cuserid
@@ -2282,13 +2292,11 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __pr
 #ifdef __CRT_HAVE_ctermid_r
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
-#elif defined(__CRT_HAVE_ctermid)
+#else /* __CRT_HAVE_ctermid_r */
 #include <libc/local/unistd/ctermid_r.h>
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
-#else /* ... */
-#undef __ctermid_r_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE_ctermid_r */
 #endif /* !__ctermid_r_defined */
 #endif /* __USE_REENTRANT || __USE_SOLARIS */
 

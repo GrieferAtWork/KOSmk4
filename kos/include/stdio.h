@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x885eb185 */
+/* HASH CRC-32:0x928fdfc6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2257,10 +2257,21 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(_
 #endif /* __USE_POSIX || __USE_REENTRANT */
 
 #ifdef __USE_POSIX
-#if !defined(__ctermid_defined) && defined(__CRT_HAVE_ctermid)
+#ifndef __ctermid_defined
 #define __ctermid_defined 1
-__CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
-#endif /* !__ctermid_defined && __CRT_HAVE_ctermid */
+#ifdef __CRT_HAVE_ctermid
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+__CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
+#else /* __CRT_HAVE_ctermid */
+#include <libc/local/unistd/ctermid.h>
+/* >> ctermid(3)
+ * Writes the string "/dev/tty" to `s', or returns a pointer to
+ * a writable data location that contains that same string. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL ctermid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid))(__s); })
+#endif /* !__CRT_HAVE_ctermid */
+#endif /* !__ctermid_defined */
 #endif /* __USE_POSIX */
 
 #ifdef __USE_REENTRANT
@@ -2269,13 +2280,11 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #ifdef __CRT_HAVE_ctermid_r
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
-#elif defined(__CRT_HAVE_ctermid)
+#else /* __CRT_HAVE_ctermid_r */
 #include <libc/local/unistd/ctermid_r.h>
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
-#else /* ... */
-#undef __ctermid_r_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE_ctermid_r */
 #endif /* !__ctermid_r_defined */
 #endif /* __USE_REENTRANT */
 
