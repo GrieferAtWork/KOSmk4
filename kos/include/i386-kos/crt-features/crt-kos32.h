@@ -1817,6 +1817,8 @@
 #define __CRT_HAVE_fts_open
 #define __CRT_HAVE_fts_read
 #define __CRT_HAVE_fts_set
+#define __CRT_HAVE_ftw
+#define __CRT_HAVE_ftw64
 #define __CRT_HAVE_funlockfile
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
@@ -2584,6 +2586,8 @@
 #define __CRT_HAVE_nexttoward
 #define __CRT_HAVE_nexttowardf
 #define __CRT_HAVE_nexttowardl
+#define __CRT_HAVE_nftw
+#define __CRT_HAVE_nftw64
 #define __CRT_HAVE_nice
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r

@@ -200,6 +200,7 @@
 #define __SIZEOF_STAT64             __SIZEOF_KOS_STATX32
 #endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
+#define __STAT32_MATCHES_STAT64
 
 #endif /* __KOS__ && !__x86_64__ && __i386__ */
 

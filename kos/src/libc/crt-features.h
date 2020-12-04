@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x250dbdbb */
+/* HASH CRC-32:0xa7051322 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1061,6 +1061,8 @@
 #define __CRT_HAVE_DOS$fts_open
 #define __CRT_HAVE_DOS$fts_read
 #define __CRT_HAVE_DOS$fts_set
+#define __CRT_HAVE_DOS$ftw
+#define __CRT_HAVE_DOS$ftw64
 #define __CRT_HAVE_DOS$funlockfile
 #define __CRT_HAVE_DOS$futex_setspin
 #define __CRT_HAVE_DOS$futex_timedwaitlock
@@ -1769,6 +1771,8 @@
 #define __CRT_HAVE_DOS$nextafterl
 #define __CRT_HAVE_DOS$nexttoward
 #define __CRT_HAVE_DOS$nexttowardf
+#define __CRT_HAVE_DOS$nftw
+#define __CRT_HAVE_DOS$nftw64
 #define __CRT_HAVE_DOS$nice
 #define __CRT_HAVE_DOS$nrand48
 #define __CRT_HAVE_DOS$nrand48_r
@@ -4033,6 +4037,8 @@
 #define __CRT_HAVE_fts_open
 #define __CRT_HAVE_fts_read
 #define __CRT_HAVE_fts_set
+#define __CRT_HAVE_ftw
+#define __CRT_HAVE_ftw64
 #define __CRT_HAVE_funlockfile
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
@@ -4818,6 +4824,8 @@
 #define __CRT_HAVE_nextafterl
 #define __CRT_HAVE_nexttoward
 #define __CRT_HAVE_nexttowardf
+#define __CRT_HAVE_nftw
+#define __CRT_HAVE_nftw64
 #define __CRT_HAVE_nice
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r

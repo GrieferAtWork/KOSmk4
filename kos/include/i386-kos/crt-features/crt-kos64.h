@@ -1813,6 +1813,8 @@
 #define __CRT_HAVE_fts_open
 #define __CRT_HAVE_fts_read
 #define __CRT_HAVE_fts_set
+#define __CRT_HAVE_ftw
+#define __CRT_HAVE_ftw64
 #define __CRT_HAVE_funlockfile
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
@@ -2580,6 +2582,8 @@
 #define __CRT_HAVE_nexttoward
 #define __CRT_HAVE_nexttowardf
 #define __CRT_HAVE_nexttowardl
+#define __CRT_HAVE_nftw
+#define __CRT_HAVE_nftw64
 #define __CRT_HAVE_nice
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
@@ -6138,6 +6142,8 @@
 #define __CRT_HAVE_KOS$fts_open
 #define __CRT_HAVE_KOS$fts_read
 #define __CRT_HAVE_KOS$fts_set
+#define __CRT_HAVE_KOS$ftw
+#define __CRT_HAVE_KOS$ftw64
 #define __CRT_HAVE_KOS$funlockfile
 #define __CRT_HAVE_KOS$futex_setspin
 #define __CRT_HAVE_KOS$futex_timedwaitlock
@@ -6837,6 +6843,8 @@
 #define __CRT_HAVE_KOS$nexttoward
 #define __CRT_HAVE_KOS$nexttowardf
 #define __CRT_HAVE_KOS$nexttowardl
+#define __CRT_HAVE_KOS$nftw
+#define __CRT_HAVE_KOS$nftw64
 #define __CRT_HAVE_KOS$nice
 #define __CRT_HAVE_KOS$nrand48
 #define __CRT_HAVE_KOS$nrand48_r
@@ -9537,6 +9545,8 @@
 #define __CRT_HAVE_DOS$fts_open
 #define __CRT_HAVE_DOS$fts_read
 #define __CRT_HAVE_DOS$fts_set
+#define __CRT_HAVE_DOS$ftw
+#define __CRT_HAVE_DOS$ftw64
 #define __CRT_HAVE_DOS$funlockfile
 #define __CRT_HAVE_DOS$futex_setspin
 #define __CRT_HAVE_DOS$futex_timedwaitlock
@@ -10236,6 +10246,8 @@
 #define __CRT_HAVE_DOS$nexttoward
 #define __CRT_HAVE_DOS$nexttowardf
 #define __CRT_HAVE_DOS$nexttowardl
+#define __CRT_HAVE_DOS$nftw
+#define __CRT_HAVE_DOS$nftw64
 #define __CRT_HAVE_DOS$nice
 #define __CRT_HAVE_DOS$nrand48
 #define __CRT_HAVE_DOS$nrand48_r

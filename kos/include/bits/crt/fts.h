@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/os/stat.h>
+#include <bits/os/stat.h> /* __STAT32_MATCHES_STAT64 */
 #include <bits/types.h>
 
 #define __FTS_ROOTPARENTLEVEL (-1) /* ??? */
@@ -70,7 +70,7 @@
 
 
 #if (__SIZEOF_INO32_T__ == __SIZEOF_INO64_T__ && \
-     __SIZEOF_STAT == __SIZEOF_STAT64)
+     defined(__STAT32_MATCHES_STAT64))
 #define __FTS32_MATCHES_FTS64
 #endif /* ... */
 
