@@ -32,24 +32,6 @@
 #include <stdint.h>
 #endif /* __USE_GLIBC */
 
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/eventfd.h */
-/* Copyright (C) 2007-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 __SYSDECL_BEGIN
 
 /* Flags for `eventfd()'. */
@@ -114,12 +96,17 @@ typedef __uint64_t eventfd_t;
 
 }
 
-@@Return file descriptor for generic event channel. Set initial value to COUNT
+@@>> eventfd(2)
+@@Construct a new kernel event object, and return a handle for it.
+@@@param: count: The initial # of available events.
+@@@param: flags: Set of `EFD_*'
+@@@return: * : The newly constructed file handle.
 [[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t eventfd(__STDC_UINT_AS_SIZE_T count,
               __STDC_INT_AS_UINT_T flags);
 
-@@Read event counter and possibly wait for events
+@@>> eventfd_read(3)
+@@Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen
 [[cp, requires_function(read)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 int eventfd_read($fd_t fd, eventfd_t *value) {
@@ -134,7 +121,8 @@ int eventfd_read($fd_t fd, eventfd_t *value) {
 	return -1;
 }
 
-@@Increment event counter
+@@>> eventfd_write(3)
+@@Increment the event counter
 [[cp, requires_function(write)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 int eventfd_write($fd_t fd, eventfd_t value) {

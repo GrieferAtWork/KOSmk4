@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae084b40 */
+/* HASH CRC-32:0x137625d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,11 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Return file descriptor for generic event channel. Set initial value to COUNT */
+/* >> eventfd(2)
+ * Construct a new kernel event object, and return a handle for it.
+ * @param: count: The initial # of available events.
+ * @param: flags: Set of `EFD_*'
+ * @return: * : The newly constructed file handle. */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_eventfd)(__STDC_UINT_AS_SIZE_T count, __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 

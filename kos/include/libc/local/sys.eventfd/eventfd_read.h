@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4ba5b35 */
+/* HASH CRC-32:0xeb75e3ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Read event counter and possibly wait for events */
+/* >> eventfd_read(3)
+ * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
 __LOCAL_LIBC(eventfd_read) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(eventfd_read))(__fd_t __fd, __UINT64_TYPE__ *__value) {
 	__SSIZE_TYPE__ __error;

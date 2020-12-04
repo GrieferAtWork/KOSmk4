@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x658fc582 */
+/* HASH CRC-32:0xae862a8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,24 +36,6 @@
 #ifdef __USE_GLIBC
 #include <stdint.h>
 #endif /* __USE_GLIBC */
-
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/eventfd.h */
-/* Copyright (C) 2007-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 __SYSDECL_BEGIN
 
@@ -117,22 +99,30 @@ enum {
 typedef __uint64_t eventfd_t;
 #endif /* !__eventfd_t_defined */
 
-/* Return file descriptor for generic event channel. Set initial value to COUNT */
+/* >> eventfd(2)
+ * Construct a new kernel event object, and return a handle for it.
+ * @param: count: The initial # of available events.
+ * @param: flags: Set of `EFD_*'
+ * @return: * : The newly constructed file handle. */
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,eventfd,(__STDC_UINT_AS_SIZE_T __count, __STDC_INT_AS_UINT_T __flags),(__count,__flags))
 #ifdef __CRT_HAVE_eventfd_read
-/* Read event counter and possibly wait for events */
+/* >> eventfd_read(3)
+ * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
 __CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *__value),(__fd,__value))
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #include <libc/local/sys.eventfd/eventfd_read.h>
-/* Read event counter and possibly wait for events */
+/* >> eventfd_read(3)
+ * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
 __NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, __value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_eventfd_write
-/* Increment event counter */
+/* >> eventfd_write(3)
+ * Increment the event counter */
 __CDECLARE(,int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t __value),(__fd,__value))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <libc/local/sys.eventfd/eventfd_write.h>
-/* Increment event counter */
+/* >> eventfd_write(3)
+ * Increment the event counter */
 __NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t __value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write))(__fd, __value); })
 #endif /* ... */
 #endif /* __CC__ */

@@ -29,8 +29,12 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_eventfd,hash:CRC-32=0xd8b0888d]]]*/
-/* Return file descriptor for generic event channel. Set initial value to COUNT */
+/*[[[head:libc_eventfd,hash:CRC-32=0xbb3ee8f0]]]*/
+/* >> eventfd(2)
+ * Construct a new kernel event object, and return a handle for it.
+ * @param: count: The initial # of available events.
+ * @param: flags: Set of `EFD_*'
+ * @return: * : The newly constructed file handle. */
 INTERN ATTR_SECTION(".text.crt.sched.eventfd") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_eventfd)(__STDC_UINT_AS_SIZE_T count,
                                    __STDC_INT_AS_UINT_T flags)

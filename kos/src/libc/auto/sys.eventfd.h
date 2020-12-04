@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8366e7c6 */
+/* HASH CRC-32:0xfc816b7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,21 +30,29 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return file descriptor for generic event channel. Set initial value to COUNT */
+/* >> eventfd(2)
+ * Construct a new kernel event object, and return a handle for it.
+ * @param: count: The initial # of available events.
+ * @param: flags: Set of `EFD_*'
+ * @return: * : The newly constructed file handle. */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_eventfd)(__STDC_UINT_AS_SIZE_T count, __STDC_INT_AS_UINT_T flags);
-/* Read event counter and possibly wait for events */
+/* >> eventfd_read(3)
+ * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_eventfd_read)(fd_t fd, eventfd_t *value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Read event counter and possibly wait for events */
+/* >> eventfd_read(3)
+ * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd, eventfd_t *value);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Increment event counter */
+/* >> eventfd_write(3)
+ * Increment the event counter */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_eventfd_write)(fd_t fd, eventfd_t value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Increment event counter */
+/* >> eventfd_write(3)
+ * Increment the event counter */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd, eventfd_t value);
 #endif /* !__KERNEL__ */
 

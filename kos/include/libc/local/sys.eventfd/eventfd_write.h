@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87bcb45f */
+/* HASH CRC-32:0xf1ad2a38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Increment event counter */
+/* >> eventfd_write(3)
+ * Increment the event counter */
 __LOCAL_LIBC(eventfd_write) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(eventfd_write))(__fd_t __fd, __UINT64_TYPE__ __value) {
 	__SSIZE_TYPE__ __error;
