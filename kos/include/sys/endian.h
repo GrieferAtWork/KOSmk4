@@ -140,9 +140,15 @@ typedef __UINT64_TYPE__ uint64_t;
 __DECL_END
 #endif /* !__uint8_t_defined */
 #endif /* __CC__ */
+#ifndef bswap16
 #define bswap16(x) __hybrid_bswap16(x)
+#endif /* !bswap16 */
+#ifndef bswap32
 #define bswap32(x) __hybrid_bswap32(x)
+#endif /* !bswap32 */
+#ifndef bswap64
 #define bswap64(x) __hybrid_bswap64(x)
+#endif /* !bswap64 */
 #define htobe16(x) __hybrid_htobe16(x)
 #define htobe32(x) __hybrid_htobe32(x)
 #define htobe64(x) __hybrid_htobe64(x)
