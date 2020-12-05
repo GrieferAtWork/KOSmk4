@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: MSVC  (/include/crtdbg.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/crtdbg.h) */
+}
+
 %[define_replacement(size_t = __SIZE_TYPE__)]
 %[default:section(".text.crt.dos.heap.debug_malloc")]
 

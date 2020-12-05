@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/_types.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/_types.h) */
 #ifndef _SYS__TYPES_H
 #define _SYS__TYPES_H 1
-
-/* API_LEVEL: newlib */
 
 #include <__stdinc.h>
 #include <features.h>

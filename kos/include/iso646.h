@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C95 (ISO/IEC 9899:1990/AMD1:1995) */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: FreeBSD     (/include/iso646.h) */
+/* (#) Portability: MSVC        (/include/iso646.h) */
+/* (#) Portability: NetBSD      (/include/iso646.h) */
+/* (#) Portability: OpenSolaris (/usr/src/head/iso646.h) */
+/* (#) Portability: musl libc   (/include/iso646.h) */
 #ifndef _ISO646_H
 #define _ISO646_H 1
 

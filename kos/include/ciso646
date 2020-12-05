@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC (/include/ciso646) */
 #ifndef _ISO646_H
 #include "iso646.h"
 #endif /* !_ISO646_H */

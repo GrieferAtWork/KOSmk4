@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff4fc10d */
+/* HASH CRC-32:0x8475a138 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,10 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/error.h) */
+/* (#) Portability: GNU C Library (/misc/error.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/include/error.h) */
+/* (#) Portability: uClibc        (/include/error.h) */
 #include <bits/types.h>
 #include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS

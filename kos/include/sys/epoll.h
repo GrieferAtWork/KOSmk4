@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd55e0728 */
+/* HASH CRC-32:0xe54a7f7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/epoll.h) */
+/* (#) Portability: diet libc     (/include/sys/epoll.h) */
+/* (#) Portability: musl libc     (/include/sys/epoll.h) */
 #include <features.h>
 
 #include <asm/os/epoll.h>

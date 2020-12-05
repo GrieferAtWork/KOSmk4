@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x555062f7 */
+/* HASH CRC-32:0xddbdbfcb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,13 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
+/* (#) Portability: GNU C Library (/misc/sys/syslog.h) */
+/* (#) Portability: NetBSD        (/sys/sys/syslog.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
+/* (#) Portability: diet libc     (/include/sys/syslog.h) */
+/* (#) Portability: musl libc     (/include/sys/syslog.h) */
+/* (#) Portability: uClibc        (/include/sys/syslog.h) */
 #include <features.h>
 
 #include <asm/os/syslog.h>

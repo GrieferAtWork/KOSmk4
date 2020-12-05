@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/int_types.h) */
 #ifndef _SYS_INT_TYPES_H
 #define _SYS_INT_TYPES_H 1
 

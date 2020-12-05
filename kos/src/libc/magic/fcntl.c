@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/fcntl.h) */
+/* (#) Portability: DJGPP         (/include/fcntl.h) */
+/* (#) Portability: GNU C Library (/io/fcntl.h) */
+/* (#) Portability: MSVC          (/include/fcntl.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/fcntl.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/fcntl.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/fcntl.h) */
+/* (#) Portability: diet libc     (/include/fcntl.h) */
+/* (#) Portability: musl libc     (/include/fcntl.h) */
+/* (#) Portability: uClibc        (/include/fcntl.h) */
+}
+
 %[default:section(".text.crt{|.dos}.io.utility")]
 
 %[define_replacement(fd_t    = __fd_t)]

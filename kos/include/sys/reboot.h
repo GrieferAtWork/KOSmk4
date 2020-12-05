@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45c0f99b */
+/* HASH CRC-32:0x49a4b191 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,12 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/reboot.h) */
+/* (#) Portability: NetBSD        (/sys/sys/reboot.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/reboot.h) */
+/* (#) Portability: diet libc     (/include/sys/reboot.h) */
+/* (#) Portability: musl libc     (/include/sys/reboot.h) */
+/* (#) Portability: uClibc        (/include/sys/reboot.h) */
 #include <features.h>
 #include <asm/os/reboot.h>
 

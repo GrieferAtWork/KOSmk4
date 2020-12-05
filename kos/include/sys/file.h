@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac697f69 */
+/* HASH CRC-32:0xf3dff858 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/file.h) */
+/* (#) Portability: DJGPP         (/include/sys/file.h) */
+/* (#) Portability: GNU C Library (/misc/sys/file.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/file.h) */
+/* (#) Portability: NetBSD        (/sys/sys/file.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/file.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/file.h) */
+/* (#) Portability: diet libc     (/include/sys/file.h) */
+/* (#) Portability: musl libc     (/include/sys/file.h) */
+/* (#) Portability: uClibc        (/include/sys/file.h) */
 #include <features.h>
 
 #include <asm/os/fcntl.h> /* __LOCK_* */

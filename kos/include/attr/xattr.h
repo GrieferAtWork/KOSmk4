@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin    (/winsup/cygwin/include/attr/xattr.h) */
+/* (#) Portability: diet libc (/include/attr/xattr.h) */
 #ifndef _ATTR_XATTR_H
 #define _ATTR_XATTR_H 1
 #include <sys/xattr.h>

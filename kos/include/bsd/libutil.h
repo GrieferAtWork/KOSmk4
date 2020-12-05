@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: libbsd (/include/bsd/libutil.h) */
 #ifndef _BSD_LIBUTIL_H
 #define _BSD_LIBUTIL_H 1
 #include <util.h>

@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/ieee754.h) */
+/* (#) Portability: uClibc        (/include/ieee754.h) */
 #ifndef _IEEE754_H
 #define _IEEE754_H 1
 

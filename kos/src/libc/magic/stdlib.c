@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/stdlib.h) */
+/* (#) Portability: DJGPP         (/include/stdlib.h) */
+/* (#) Portability: FreeBSD       (/include/stdlib.h) */
+/* (#) Portability: GNU C Library (/stdlib/stdlib.h) */
+/* (#) Portability: MSVC          (/include/stdlib.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdlib.h) */
+/* (#) Portability: NetBSD        (/include/stdlib.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/stdlib.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdlib.h) */
+/* (#) Portability: diet libc     (/include/stdlib.h) */
+/* (#) Portability: musl libc     (/include/stdlib.h) */
+/* (#) Portability: uClibc        (/include/stdlib.h) */
+}
 
 %[define_ccompat_header("cstdlib")]
 %[declare_known_section(".text.crt{|.dos}.application.init")]

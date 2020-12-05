@@ -262,6 +262,8 @@
 #define __ATTR_FORCEINLINE /* nothing */
 #define __NO_ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL /* nothing */
+#define __NO_ATTR_FORMAT_ARG
+#define __ATTR_FORMAT_ARG(x) /* nothing */
 
 #define __NO_XBLOCK
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))

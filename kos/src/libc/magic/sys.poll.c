@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/poll.h) */
+/* (#) Portability: GNU C Library (/io/sys/poll.h) */
+/* (#) Portability: NetBSD        (/sys/sys/poll.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/poll.h) */
+/* (#) Portability: diet libc     (/include/sys/poll.h) */
+/* (#) Portability: musl libc     (/include/sys/poll.h) */
+/* (#) Portability: uClibc        (/include/sys/poll.h) */
+}
 
 %[define_replacement(nfds_t     = __UINTPTR_TYPE__)]
 %[define_replacement(sigset_t   = "struct __sigset_struct")]

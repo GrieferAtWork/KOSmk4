@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/stdc-predef.h) */
+/* (#) Portability: musl libc     (/include/stdc-predef.h) */
 #ifndef _STDC_PREDEF_H
 #define _STDC_PREDEF_H 1
 

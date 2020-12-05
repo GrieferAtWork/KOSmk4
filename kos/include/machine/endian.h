@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/machine/endian.h) */
+/* (#) Portability: DJGPP  (/include/machine/endian.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/machine/endian.h) */
 #ifndef _MACHINE_ENDIAN_H
 #define _MACHINE_ENDIAN_H 1
 

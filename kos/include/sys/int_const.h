@@ -17,10 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/int_const.h) */
 #ifndef _SYS_INT_CONST_H
 #define _SYS_INT_CONST_H 1
-
-/* API_LEVEL: opensolaris */
 
 #include <__stdinc.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe87af051 */
+/* HASH CRC-32:0xe4732c49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,20 @@ __NAMESPACE_STD_USING(wcstoumax)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/inttypes.h) */
+/* (#) Portability: DJGPP         (/include/inttypes.h) */
+/* (#) Portability: FreeBSD       (/include/inttypes.h) */
+/* (#) Portability: GNU C Library (/stdlib/inttypes.h) */
+/* (#) Portability: MSVC          (/include/inttypes.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/inttypes.h) */
+/* (#) Portability: NetBSD        (/include/inttypes.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/inttypes.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/inttypes.h) */
+/* (#) Portability: diet libc     (/include/inttypes.h) */
+/* (#) Portability: musl libc     (/include/inttypes.h) */
+/* (#) Portability: uClibc        (/include/inttypes.h) */
 #include <features.h>
 
 #include <hybrid/__va_size.h>

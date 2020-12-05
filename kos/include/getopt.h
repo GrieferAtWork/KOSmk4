@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f0001a1 */
+/* HASH CRC-32:0xbc995fd3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: FreeBSD       (/include/getopt.h) */
+/* (#) Portability: GNU C Library (/posix/getopt.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/getopt.h) */
+/* (#) Portability: NetBSD        (/include/getopt.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/getopt.h) */
+/* (#) Portability: diet libc     (/include/getopt.h) */
+/* (#) Portability: musl libc     (/include/getopt.h) */
+/* (#) Portability: uClibc        (/include/getopt.h) */
 #include <features.h>
 #include <hybrid/typecore.h>
 

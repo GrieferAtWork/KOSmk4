@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/elf.h) */
+/* (#) Portability: FreeBSD       (/include/elf.h) */
+/* (#) Portability: GNU C Library (/elf/elf.h) */
+/* (#) Portability: NetBSD        (/sys/arch/[...]/include/elf.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/elf.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/elf.h) */
+/* (#) Portability: diet libc     (/include/elf.h) */
+/* (#) Portability: musl libc     (/include/elf.h) */
+/* (#) Portability: uClibc        (/include/elf.h) */
 #ifndef _ELF_H
 #define _ELF_H 1
 

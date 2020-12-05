@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netdb.h) */
+/* (#) Portability: FreeBSD       (/include/netdb.h) */
+/* (#) Portability: GNU C Library (/resolv/netdb.h) */
+/* (#) Portability: NetBSD        (/include/netdb.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */
+/* (#) Portability: diet libc     (/include/netdb.h) */
+/* (#) Portability: musl libc     (/include/netdb.h) */
+/* (#) Portability: uClibc        (/include/netdb.h) */
+}
+
 %[default:section(".text.crt{|.dos}.net.db")]
 
 %[define_replacement(fd_t = __fd_t)]

@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/udp.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/udp.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/udp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/udp.h) */
+/* (#) Portability: diet libc     (/include/netinet/udp.h) */
+/* (#) Portability: musl libc     (/include/netinet/udp.h) */
+/* (#) Portability: uClibc        (/include/netinet/udp.h) */
 #ifndef __NETINET_UDP_H
 #define __NETINET_UDP_H 1
 

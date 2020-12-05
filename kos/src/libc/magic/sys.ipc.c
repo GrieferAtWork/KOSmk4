@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ipc.h) */
+/* (#) Portability: GNU C Library (/sysvipc/sys/ipc.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ipc.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ipc.h) */
+/* (#) Portability: diet libc     (/include/sys/ipc.h) */
+/* (#) Portability: musl libc     (/include/sys/ipc.h) */
+/* (#) Portability: uClibc        (/include/sys/ipc.h) */
+}
 
 %[define_replacement(uid_t = __uid_t)]
 %[define_replacement(gid_t = __gid_t)]

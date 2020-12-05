@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/alloca.h) */
+/* (#) Portability: GNU C Library (/stdlib/alloca.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/alloca.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/alloca.h) */
+/* (#) Portability: diet libc     (/include/alloca.h) */
+/* (#) Portability: musl libc     (/include/alloca.h) */
+/* (#) Portability: uClibc        (/include/alloca.h) */
 #ifndef _ALLOCA_H
 #define _ALLOCA_H 1
 

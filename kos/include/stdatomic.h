@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
+/* (#) Portability: Cygwin (/newlib/libc/include/stdatomic.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/stdatomic.h) */
 #ifndef _STDATOMIC_H
 #define _STDATOMIC_H 1
 

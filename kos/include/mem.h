@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DJGPP (/include/mem.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/mem.h) */
 #ifndef _MEM_H
 #define _MEM_H 1
 

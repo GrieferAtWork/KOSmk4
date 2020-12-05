@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x928fdfc6 */
+/* HASH CRC-32:0x6012f4c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,6 +182,20 @@ __NAMESPACE_STD_USING(snprintf)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/stdio.h) */
+/* (#) Portability: DJGPP         (/include/stdio.h) */
+/* (#) Portability: FreeBSD       (/include/stdio.h) */
+/* (#) Portability: GNU C Library (/libio/stdio.h) */
+/* (#) Portability: MSVC          (/include/stdio.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdio.h) */
+/* (#) Portability: NetBSD        (/include/stdio.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/stdio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdio.h) */
+/* (#) Portability: diet libc     (/include/stdio.h) */
+/* (#) Portability: musl libc     (/include/stdio.h) */
+/* (#) Portability: uClibc        (/include/stdio.h) */
 #include <features.h>
 
 #include <asm/crt/stdio.h>

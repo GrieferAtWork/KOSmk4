@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/cpio.h) */
+/* (#) Portability: FreeBSD       (/include/cpio.h) */
+/* (#) Portability: GNU C Library (/posix/cpio.h) */
+/* (#) Portability: NetBSD        (/include/cpio.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/cpio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/cpio.h) */
+/* (#) Portability: diet libc     (/include/cpio.h) */
+/* (#) Portability: musl libc     (/include/cpio.h) */
+/* (#) Portability: uClibc        (/include/cpio.h) */
 #ifndef _CPIO_H
 #define _CPIO_H 1
 

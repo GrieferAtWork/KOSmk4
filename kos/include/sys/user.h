@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/user.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/user.h) */
+/* (#) Portability: musl libc     (/include/sys/user.h) */
 #ifndef _SYS_USER_H
 #define _SYS_USER_H 1
 

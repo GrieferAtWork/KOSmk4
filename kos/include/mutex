@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC      (/include/mutex) */
+/* (#) Portability: libstdc++ (/include/mutex) */
 #ifndef _CXX_MUTEX
 #define _CXX_MUTEX 1
 

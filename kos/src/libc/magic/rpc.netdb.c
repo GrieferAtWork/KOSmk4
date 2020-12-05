@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/resolv/rpc/netdb.h) */
+/* (#) Portability: diet libc     (/include/rpc/netdb.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.net.rpc")]

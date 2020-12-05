@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x418a91cd */
+/* HASH CRC-32:0x7a25ed8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,13 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/monetary.h) */
+/* (#) Portability: FreeBSD       (/include/monetary.h) */
+/* (#) Portability: GNU C Library (/stdlib/monetary.h) */
+/* (#) Portability: NetBSD        (/include/monetary.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/monetary.h) */
+/* (#) Portability: musl libc     (/include/monetary.h) */
 #include <features.h>
 #include <bits/types.h>
 #ifdef __USE_XOPEN2K8

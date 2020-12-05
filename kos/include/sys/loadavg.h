@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ffb0bb9 */
+/* HASH CRC-32:0x48473543 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/loadavg.h) */
 #include <features.h>
 
 #ifdef __CC__

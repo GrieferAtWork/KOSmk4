@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/tar.h) */
+/* (#) Portability: FreeBSD       (/include/tar.h) */
+/* (#) Portability: GNU C Library (/posix/tar.h) */
+/* (#) Portability: NetBSD        (/include/tar.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/tar.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/tar.h) */
+/* (#) Portability: diet libc     (/include/tar.h) */
+/* (#) Portability: musl libc     (/include/tar.h) */
+/* (#) Portability: uClibc        (/include/tar.h) */
 #ifndef _TAR_H
 #define _TAR_H 1
 

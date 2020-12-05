@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
+/* (#) Portability: FreeBSD       (/include/uchar.h) */
+/* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */
+/* (#) Portability: musl libc     (/include/uchar.h) */
+/* (#) Portability: uClibc        (/include/uchar.h) */
+}
 
 %[define_ccompat_header("cuchar")]
 %[define_replacement(locale_t = __locale_t)]

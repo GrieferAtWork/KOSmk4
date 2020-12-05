@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DJGPP (/include/random.h) */
 #ifndef _RANDOM_H
 #define _RANDOM_H 1
 #include <stdlib.h>

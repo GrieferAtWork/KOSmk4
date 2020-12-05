@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC      (/include/type_traits) */
+/* (#) Portability: libstdc++ (/include/type_traits) */
 #ifndef _CXX_TYPE_TRAITS
 #define _CXX_TYPE_TRAITS 1
 

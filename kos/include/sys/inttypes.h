@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: NetBSD      (/sys/sys/inttypes.h) */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/inttypes.h) */
 #ifndef _SYS_INTTYPES_H
 #define _SYS_INTTYPES_H 1
 

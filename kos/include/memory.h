@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/memory.h) */
+/* (#) Portability: DJGPP         (/include/memory.h) */
+/* (#) Portability: FreeBSD       (/include/memory.h) */
+/* (#) Portability: GNU C Library (/string/memory.h) */
+/* (#) Portability: MSVC          (/include/memory.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/memory.h) */
+/* (#) Portability: NetBSD        (/include/memory.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/memory.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/memory.h) */
+/* (#) Portability: diet libc     (/include/memory.h) */
+/* (#) Portability: musl libc     (/include/memory.h) */
+/* (#) Portability: uClibc        (/include/memory.h) */
 #ifndef _MEMORY_H
 #define _MEMORY_H 1
 

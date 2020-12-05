@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1ed1b34 */
+/* HASH CRC-32:0xf8aaa413 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,13 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/newlib/libc/include/stdio_ext.h) */
+/* (#) Portability: GNU C Library (/stdio-common/stdio_ext.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/stdio_ext.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdio_ext.h) */
+/* (#) Portability: diet libc     (/include/stdio_ext.h) */
+/* (#) Portability: musl libc     (/include/stdio_ext.h) */
+/* (#) Portability: uClibc        (/include/stdio_ext.h) */
 #include <stdio.h>
 #include <kos/anno.h>
 #include <asm/crt/stdio_ext.h>

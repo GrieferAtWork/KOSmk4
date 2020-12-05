@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/time.h) */
+/* (#) Portability: DJGPP         (/include/time.h) */
+/* (#) Portability: FreeBSD       (/include/time.h) */
+/* (#) Portability: GNU C Library (/time/time.h) */
+/* (#) Portability: MSVC          (/include/time.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/time.h) */
+/* (#) Portability: NetBSD        (/include/time.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/time.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
+/* (#) Portability: diet libc     (/include/time.h) */
+/* (#) Portability: musl libc     (/include/time.h) */
+/* (#) Portability: uClibc        (/include/time.h) */
+}
 
 %[define_ccompat_header("ctime")]
 %[default:section(".text.crt{|.dos}.time")]

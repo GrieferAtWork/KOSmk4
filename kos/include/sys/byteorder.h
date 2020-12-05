@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x447282b3 */
+/* HASH CRC-32:0xcde05c2c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,17 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/byteorder.h) */
 #include <features.h>
-
-/* API_LEVEL: opensolaris */
 
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/typecore.h>
 
-#include <sys/isa_defs.h>  /* Mandatory dependency (for opensolaris compat) */
-#include <sys/int_types.h> /* Mandatory dependency (for opensolaris compat) */
+#include <sys/isa_defs.h>  /* Mandatory dependency (for OpenSolaris compat) */
+#include <sys/int_types.h> /* Mandatory dependency (for OpenSolaris compat) */
 
 #if !defined(__USE_XOPEN_EXTENDED) || defined(__USE_SOLARIS)
 #define BSWAP_8(x)  ((x) & __UINT8_C(0xff))

@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/cdefs.h) */
+/* (#) Portability: DJGPP         (/include/sys/cdefs.h) */
+/* (#) Portability: GNU C Library (/misc/sys/cdefs.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/cdefs.h) */
+/* (#) Portability: NetBSD        (/sys/sys/cdefs.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/cdefs.h) */
+/* (#) Portability: diet libc     (/include/sys/cdefs.h) */
+/* (#) Portability: uClibc        (/include/sys/cdefs.h) */
 #ifndef _SYS_CDEFS_H
 #define _SYS_CDEFS_H 1
 
@@ -63,11 +71,13 @@
 #undef __P
 #undef __PMT
 #ifdef __NO_PROTOTYPES
-#define __P(args)   ()
-#define __PMT(args) ()
+#define __P(args)     ()
+#define __PMT(args)   ()
+#define _PARAMS(args) ()
 #else /* __NO_PROTOTYPES */
-#define __P(args)   args
-#define __PMT(args) args
+#define __P(args)     args
+#define __PMT(args)   args
+#define _PARAMS(args) args
 #endif /* !__NO_PROTOTYPES */
 #define __LEAF_ATTR __ATTR_LEAF
 
@@ -89,10 +99,24 @@
 
 #define __CONCAT __PP_PRIVATE_CAT2
 #define __STRING __PP_PRIVATE_STR
-#define __ptr_t  void *
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #define __long_double_t __LONGDOUBLE
+#define _LONG_DOUBLE    __LONGDOUBLE
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
+#define __ptr_t                     void *
+#define _PTR                        void *
+#define _AND                        ,
+#define _NOARGS                     void
+#define _CONST                      const
+#define _VOLATILE                   volatile
+#define _SIGNED                     signed
+#define _DOTS                       , ...
+#define _VOID                       void
+#define _EXFUN(name, proto)         (name) proto
+#define _DEFUN(name, arglist, args) (name)(args)
+#define _DEFUN_VOID(name)           (name)(void)
+#define _CAST_VOID                  (void)
+
 
 #if defined(__cplusplus) && defined(_GLIBCPP_USE_NAMESPACES)
 #define __BEGIN_NAMESPACE_STD       __NAMESPACE_STD_BEGIN
@@ -144,7 +168,7 @@
 #ifdef __USER_LABEL_PREFIX_IS_EMPTY
 #define __ASMNAMESTR(cname) cname
 #else /* __USER_LABEL_PREFIX_IS_EMPTY */
-#define __ASMNAMESTR2(prefix, cname) __STRING(prefix) cname
+#define __ASMNAMESTR2(prefix, cname) __PP_PRIVATE_STR(prefix) cname
 #define __ASMNAMESTR(cname)          __ASMNAMESTR2(__USER_LABEL_PREFIX__, cname)
 #endif /* !__USER_LABEL_PREFIX_IS_EMPTY */
 
@@ -168,7 +192,16 @@
 #endif /* !__cplusplus */
 #endif /* !__REDIRECT_NTHNL && !__NO_ASMNAME */
 
-
+#ifndef __BOUNDED_POINTERS__
+#define __bounded                        /* nothing */
+#define __unbounded                      /* nothing */
+#define __ptrvalue                       /* nothing */
+#endif /* !__BOUNDED_POINTERS__ */
+#define __ptr_t                          void *
+#define __long_double_t                  __LONGDOUBLE
+#define __flexarr                        [0]
+#define __expect                         __builtin_expect
+#define __pure                           __ATTR_PURE
 #define __attribute_malloc__             __ATTR_MALLOC
 #define __attribute_alloc_size__         __ATTR_ALLOC_SIZE
 #define __attribute_pure__               __ATTR_PURE
@@ -183,6 +216,13 @@
 #define __attribute_artificial__         __ATTR_ARTIFICIAL
 #define __glibc_unlikely                 __unlikely
 #define __glibc_likely                   __likely
+#define __attribute_dontuse__            __ATTR_DEPRECATED_
+#define __attribute_used                 __ATTR_USED
+#define __needsNULL__                    __ATTR_SENTINEL
+#define __attribute_alloc__(x)           __ATTR_ALLOC_SIZE((x))
+#define __attribute_alloc2__(x, y)       __ATTR_ALLOC_SIZE((x, y))
+#define __attribute_formatarg__          __ATTR_FORMAT_ARG
+#define _ATTRIBUTE(attrs)                __attribute__((attrs))
 
 #if defined(__USE_FORTIFY_LEVEL) && (__USE_FORTIFY_LEVEL + 0) > 0
 #define __wur __ATTR_WUNUSED
@@ -196,6 +236,7 @@
 #define __attribute_format_arg__(x) /* Nothing */
 #endif /* !__GNUC_PREREQ(2, 8) && !__has_attribute(__format_arg__) */
 #ifndef __NO_EXTERN_INLINE
+#define _EXTERN_INLINE         __EXTERN_INLINE
 #define __extern_inline        __EXTERN_INLINE
 #define __extern_always_inline __EXTERN_FORCEINLINE
 #define __fortify_function     __EXTERN_FORCEINLINE __ATTR_ARTIFICIAL
@@ -217,6 +258,34 @@
      (!__GNUC_PREREQ(4, 6) || defined(__STRICT_ANSI__)))
 #define _Static_assert(expr, diagnostic) __STATIC_ASSERT(expr)
 #endif /* !... */
+#if !defined(__alignof) && !defined(__COMPILER_ALIGNOF_IS___ALIGNOF)
+#define __alignof(x) __COMPILER_ALIGNOF(x)
+#endif /* !__alignof && !__COMPILER_ALIGNOF_IS___ALIGNOF */
+#if !defined(_Alignof) && !defined(__COMPILER_ALIGNOF_IS__ALIGNOF)
+#define _Alignof(x) __COMPILER_ALIGNOF(x)
+#endif /* !_Alignof && !__COMPILER_ALIGNOF_IS__ALIGNOF */
+#if !defined(_Alignas) && !defined(__ATTR_ALIGNED_IS__ALIGNAS)
+#define _Alignas(x) __ATTR_ALIGNED(x)
+#endif /* !_Alignas && !__ATTR_ALIGNED_IS__ALIGNAS */
+#if !defined(_Thread_local) && !defined(__ATTR_THREAD_IS__THREAD_LOCAL)
+#define _Thread_local __ATTR_THREAD
+#endif /* !_Thread_local && !__ATTR_THREAD_IS__THREAD_LOCAL */
+#if !defined(__restrict__) && !defined(__RESTRICT_IS___RESTRICT__)
+#define __restrict__ __restrict
+#endif /* !__restrict__ && !__RESTRICT_IS___RESTRICT__ */
+#if !defined(restrict) && !defined(__RESTRICT_IS_RESTRICT)
+#define restrict __restrict
+#endif /* !restrict && !__RESTRICT_IS_RESTRICT */
+#if !defined(inline) && !defined(__ATTR_INLINE_IS_INLINE) && !defined(__NO_ATTR_INLINE)
+#define inline __ATTR_INLINE
+#endif /* !inline && !__ATTR_INLINE_IS_INLINE && !__NO_ATTR_INLINE */
+#if !defined(__inline) && !defined(__ATTR_INLINE_IS___INLINE) && !defined(__NO_ATTR_INLINE)
+#define __inline __ATTR_INLINE
+#endif /* !inline && !__ATTR_INLINE_IS___INLINE && !__NO_ATTR_INLINE */
+#if !defined(__inline__) && !defined(__ATTR_INLINE_IS___INLINE__) && !defined(__NO_ATTR_INLINE)
+#define __inline__ __ATTR_INLINE
+#endif /* !__inline__ && !__ATTR_INLINE_IS___INLINE__ && !__NO_ATTR_INLINE */
+
 
 #if (defined(__LONG_DOUBLE_MATH_OPTIONAL) && \
      defined(__NO_LONG_DOUBLE_MATH))
@@ -245,159 +314,236 @@
 #endif /* !__LDBL_COMPAT || !__REDIRECT */
 
 #ifdef __USE_BSD
-#ifndef __weak_symbol
-#define __weak_symbol __ATTR_WEAK
-#endif /* !__weak_symbol */
-#ifndef __used
-#define __used    __ATTR_USED
-#endif /* !__used */
-#ifndef __section
-#define __section __ATTR_SECTION
-#endif /* !__section */
-#ifndef __alloc_size
-#define __alloc_size(x) __ATTR_ALLOC_SIZE((x))
-#endif /* !__alloc_size */
-#ifndef __alloc_size2
-#define __alloc_size2(n, x) __ATTR_ALLOC_SIZE((n, x))
-#endif /* !__alloc_size2 */
-#ifndef __alloc_align
-#define __alloc_align(x) __ATTR_ALLOC_ALIGN(x)
-#endif /* !__alloc_align */
-#if !defined(__alignof) && !defined(__COMPILER_ALIGNOF_IS___ALIGNOF)
-#define __alignof(x) __COMPILER_ALIGNOF(x)
-#endif /* !__alignof && !__COMPILER_ALIGNOF_IS___ALIGNOF */
-#if !defined(_Alignof) && !defined(__COMPILER_ALIGNOF_IS__ALIGNOF)
-#define _Alignof(x) __COMPILER_ALIGNOF(x)
-#endif /* !_Alignof && !__COMPILER_ALIGNOF_IS__ALIGNOF */
-#if !defined(_Alignas) && !defined(__ATTR_ALIGNED_IS__ALIGNAS)
-#define _Alignas(x) __ATTR_ALIGNED(x)
-#endif /* !_Alignas && !__ATTR_ALIGNED_IS__ALIGNAS */
-#if !defined(_Thread_local) && !defined(__ATTR_THREAD_IS__THREAD_LOCAL)
-#define _Thread_local __ATTR_THREAD
-#endif /* !_Thread_local && !__ATTR_THREAD_IS__THREAD_LOCAL */
-#ifndef __generic
+/* Attributes/Annotations */
+#define __compactcall         /* nothing */
+#define __aconst              /* nothing */
+#define __CTASSERT            __STATIC_ASSERT
+#define __BEGIN_EXTERN_C      __DECL_BEGIN
+#define __END_EXTERN_C        __DECL_END
+#define __malloc_like         __ATTR_MALLOC
+#define __dead2               __ATTR_NORETURN
+#define __pure2               __ATTR_CONST
+#define __noinline            __ATTR_NOINLINE
+#define __result_use_check    __ATTR_WUNUSED
+#define __returns_twice       __ATTR_RETURNS_TWICE
+#define __unreachable         __builtin_unreachable
+#define __predict_true        __likely
+#define __predict_false       __unlikely
+#define __null_sentinel       __ATTR_SENTINEL
+#define __exported            __ATTR_VISIBILITY("default")
+#define __hidden              __ATTR_VISIBILITY("hidden")
+#define __dso_public          __ATTR_VISIBILITY("default")
+#define __dso_hidden          __ATTR_VISIBILITY("hidden")
+#define __dso_protected       __ATTR_VISIBILITY("protected")
+#define __packed              __ATTR_PACKED
+#define __aligned(x)          __ATTR_ALIGNED(x)
+#define __unused              __ATTR_UNUSED
+#define __printflike          __ATTR_FORMAT_PRINTF
+#define __scanflike           __ATTR_FORMAT_SCANF
+#define __format_arg          __attribute_format_arg__
+#define __strfmonlike         __ATTR_FORMAT_STRFMON
+#define __strftimelike        __ATTR_FORMAT_STRFTIME
+#define __printf0like(x, y)   /* __attribute__((__format__ (__printf0__, x, y))) */
+#define __bounded__(x, y, z)  /* nothing */
+#define __weak_symbol         __ATTR_WEAK
+#define __used                __ATTR_USED
+#define __section             __ATTR_SECTION
+#define __alloc_size(x)       __ATTR_ALLOC_SIZE((x))
+#define __alloc_size2(n, x)   __ATTR_ALLOC_SIZE((n, x))
+#define __alloc_align(x)      __ATTR_ALLOC_ALIGN(x)
+#ifndef __ATTR_FASTCALL_IS___FASTCALL
+#define __fastcall         __ATTR_FASTCALL
+#endif /* !__ATTR_FASTCALL_IS___FASTCALL */
+#ifndef NDEBUG
+#define __diagused         /* nothing */
+#else /* !NDEBUG */
+#define __diagused         __ATTR_UNUSED
+#endif /* NDEBUG */
+#ifdef DEBUG
+#define __debugused        /* nothing */
+#else /* DEBUG */
+#define __debugused        __ATTR_UNUSED
+#endif /* !DEBUG */
+#if __has_attribute(__no_instrument_function__)
+#define __noprofile        __attribute__((__no_instrument_function__))
+#else /* ... */
+#define __noprofile        /* nothing */
+#endif /* !... */
+#if __has_attribute(__gnu_inline__) && defined(__GNUC_STDC_INLINE__)
+#define __c99inline        extern __attribute__((__gnu_inline__)) __ATTR_INLINE
+#elif !defined(__NO_ATTR_INLINE)
+#define __c99inline        __ATTR_INLINE
+#endif /* ... */
+#if (!defined(__cplusplus) &&                       \
+     (defined(__clang__) || __GNUC_PREREQ(4, 6)) && \
+     (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901)))
+#define __min_size(x)      static(x)
+#else /* ... */
+#define __min_size(x)      (x)
+#endif /* !... */
+#if (__has_attribute(__argument_with_type_tag__) && \
+     __has_attribute(__type_tag_for_datatype__))
+#define __arg_type_tag(arg_kind, arg_idx, type_tag_idx) __attribute__((__argument_with_type_tag__(arg_kind, arg_idx, type_tag_idx)))
+#define __datatype_type_tag(kind, type)                 __attribute__((__type_tag_for_datatype__(kind, type)))
+#else /* __has_attribute(__argument_with_type_tag__) && __has_attribute(__type_tag_for_datatype__) */
+#define __arg_type_tag(arg_kind, arg_idx, type_tag_idx)
+#define __datatype_type_tag(kind, type)
+#endif /* !__has_attribute(__argument_with_type_tag__) || !__has_attribute(__type_tag_for_datatype__) */
+#if __has_extension(c_thread_safety_attributes)
+#define __lock_annotate(x) __attribute__((x))
+#else /* __has_extension(c_thread_safety_attributes) */
+#define __lock_annotate(x)
+#endif /* !__has_extension(c_thread_safety_attributes) */
+#define __lockable                __lock_annotate(lockable)
+#define __locks_exclusive(...)    __lock_annotate(exclusive_lock_function(__VA_ARGS__))
+#define __locks_shared(...)       __lock_annotate(shared_lock_function(__VA_ARGS__))
+#define __trylocks_exclusive(...) __lock_annotate(exclusive_trylock_function(__VA_ARGS__))
+#define __trylocks_shared(...)    __lock_annotate(shared_trylock_function(__VA_ARGS__))
+#define __unlocks(...)            __lock_annotate(unlock_function(__VA_ARGS__))
+#define __asserts_exclusive(...)  __lock_annotate(assert_exclusive_lock(__VA_ARGS__))
+#define __asserts_shared(...)     __lock_annotate(assert_shared_lock(__VA_ARGS__))
+#define __requires_exclusive(...) __lock_annotate(exclusive_locks_required(__VA_ARGS__))
+#define __requires_shared(...)    __lock_annotate(shared_locks_required(__VA_ARGS__))
+#define __requires_unlocked(...)  __lock_annotate(locks_excluded(__VA_ARGS__))
+#define __no_lock_analysis        __lock_annotate(no_thread_safety_analysis)
+#define __guarded_by(x)           __lock_annotate(guarded_by(x))
+#define __pt_guarded_by(x)        __lock_annotate(pt_guarded_by(x))
+
+/* Scope modifiers */
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_VISIBILITY
+#define __BEGIN_PUBLIC_DECLS _Pragma("GCC visibility push(default)") __DECL_BEGIN
+#define __END_PUBLIC_DECLS   _Pragma("GCC visibility push(hidden)")  __DECL_END
+#define __BEGIN_HIDDEN_DECLS __DECL_BEGIN _Pragma("GCC visibility pop")
+#define __END_HIDDEN_DECLS   __DECL_END   _Pragma("GCC visibility pop")
+#else /* __COMPILER_HAVE_PRAGMA_GCC_VISIBILITY */
+#define __BEGIN_PUBLIC_DECLS __DECL_BEGIN
+#define __END_PUBLIC_DECLS   __DECL_END
+#define __BEGIN_HIDDEN_DECLS __DECL_BEGIN
+#define __END_HIDDEN_DECLS   __DECL_END
+#endif /* !__COMPILER_HAVE_PRAGMA_GCC_VISIBILITY */
+
+/* Helper functions/macros */
+#define __arraycount                __COMPILER_LENOF
+#define __offsetof                  __builtin_offsetof
+#define __rangeof(type, start, end) (__builtin_offsetof(type, end) - __builtin_offsetof(type, start))
+#define __containerof               __COMPILER_CONTAINER_OF
+#define __DECONST(type, var)        ((type)(__UINTPTR_TYPE__)(void const *)(var))
+#define __DEVOLATILE(type, var)     ((type)(__UINTPTR_TYPE__)(void volatile *)(var))
+#define __DEQUALIFY(type, var)      ((type)(__UINTPTR_TYPE__)(void const volatile *)(var))
+#define __UNCONST(a)                ((void *)(__ULONGPTR_TYPE__)(void const *)(a))
+#define __UNVOLATILE(a)             ((void *)(__ULONGPTR_TYPE__)(void volatile *)(a))
+#define __FPTRCAST(t, f)            ((t)(void *)(f))
+#define __insn_barrier()            __COMPILER_BARRIER()
+#define __compiler_membar()         __COMPILER_BARRIER()
+#ifdef __cplusplus
+#define __static_cast(T, val)       static_cast<T>(val)
+#else /* __cplusplus */
+#define __static_cast(T, val)       (T)val
+#endif /* !__cplusplus */
 #ifdef __COMPILER_HAVE_C11_GENERIC
 #define	__generic(expr, t, yes, no) _Generic(expr, t: yes, default: no)
-#elif (!defined(__NO_builtin_choose_expr) &&        \
-       !defined(__NO_builtin_types_compatible_p) && \
-       defined(__COMPILER_HAVE_TYPEOF))
-#define __generic(expr, t, yes, no) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof(expr), t), yes, no)
-#endif
-#endif /* !__generic */
-#ifndef __malloc_like
-#define __malloc_like __ATTR_MALLOC
-#endif /* !__malloc_like */
-#ifndef __dead2
-#define __dead2 __ATTR_NORETURN
-#endif /* !__dead2 */
-#ifndef __pure
-#define __pure __ATTR_PURE
-#endif /* !__pure */
-#ifndef __pure2
-#define __pure2 __ATTR_CONST
-#endif /* !__pure2 */
-#ifndef __noinline
-#define __noinline __ATTR_NOINLINE
-#endif /* !__noinline */
-#ifndef __fastcall
-#define __fastcall __ATTR_FASTCALL
-#endif /* !__fastcall */
-#ifndef __result_use_check
-#define __result_use_check __ATTR_WUNUSED
-#endif /* !__result_use_check */
-#ifndef __returns_twice
-#define __returns_twice __ATTR_RETURNS_TWICE
-#endif /* !__returns_twice */
-#ifndef __unreachable
-#define __unreachable __builtin_unreachable
-#endif /* !__unreachable */
+#elif (!defined(__NO_builtin_choose_expr) && !defined(__NO_builtin_types_compatible_p) && defined(__COMPILER_HAVE_TYPEOF))
+#define __generic(expr, t, yes, no) __builtin_choose_expr(__builtin_types_compatible_p(__typeof(expr), t), yes, no)
+#endif /* ... */
+#if !defined(__func__) && !defined(__builtin_FUNCTION_IS_func__)
+#define __func__                    __builtin_FUNCTION()
+#endif /* !__func__ && !__builtin_FUNCTION_IS_func__ */
+#undef __CONCAT
+#define __CONCAT1                   __PP_PRIVATE_CAT2
+#define __CONCAT                    __PP_CAT2
+#define __XSTRING                   __PP_STR
+
+/* Declarations */
+#define __RCSID(x)                      /* nothing */
+#define __FBSDID(x)                     /* nothing */
+#define __RCSID_SOURCE(x)               /* nothing */
+#define __SCCSID(x)                     /* nothing */
+#define __COPYRIGHT(x)                  /* nothing */
+#define __strict_weak_alias(alias, sym) __weak_reference(sym, alias)
+#ifdef __COMPILER_HAVE_GCC_ASM
+#define __strong_reference(sym, alias)  __asm__(".set " #alias ", " #sym)
+#define __weak_reference(sym, alias)    __asm__(".weak " #alias "\n.set " #alias ", " #sym)
+#define __warn_references(sym, msg)     __asm__(".section .gnu.warning." #sym "\n.asciz \"" msg "\"\n.previous")
+#define __sym_compat(sym, impl, verid)  __asm__(".symver " #impl ", " #sym "@" #verid)
+#define __sym_default(sym, impl, verid) __asm__(".symver " #impl ", " #sym "@@@" #verid)
+#define __GLOBL1(sym)                   __asm__(".globl " #sym)
+#define __GLOBL(sym)                    __GLOBL1(sym)
+#else /* __COMPILER_HAVE_GCC_ASM */
+#define __strong_reference(sym, alias)  /* nothing */
+#define __weak_reference(sym, alias)    /* nothing */
+#define __warn_references(sym, msg)     /* nothing */
+#define __sym_compat(sym, impl, verid)  /* nothing */
+#define __sym_default(sym, impl, verid) /* nothing */
+#define __GLOBL1(sym)                   /* nothing */
+#define __GLOBL(sym)                    /* nothing */
+#endif /* !__COMPILER_HAVE_GCC_ASM */
+#define __IDSTRING(name, string)        /* nothing */
+#if defined(__clang__) && __has_feature(nullability)
+#define __NULLABILITY_PRAGMA_PUSH       _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
+#define __NULLABILITY_PRAGMA_POP        _Pragma("clang diagnostic pop")
+#else /* __clang__ && __has_feature(nullability) */
+#define _Nonnull                        /* nothing */
+#define _Nullable                       /* nothing */
+#define _Null_unspecified               /* nothing */
+#define __NULLABILITY_PRAGMA_PUSH       /* nothing */
+#define __NULLABILITY_PRAGMA_POP        /* nothing */
+#endif /* !__clang__ || !__has_feature(nullability) */
+
+
+/* Features */
 #ifndef __COMPILER_HAVE_LONGLONG
 #define __LONG_LONG_SUPPORTED
 #endif /* __COMPILER_HAVE_LONGLONG */
-#ifndef __predict_true
-#define __predict_true __likely
-#endif /* !__predict_true */
-#ifndef __predict_false
-#define __predict_false __unlikely
-#endif /* !__predict_false */
-#ifndef __null_sentinel
-#define __null_sentinel __ATTR_SENTINEL
-#endif /* !__null_sentinel */
-#ifndef __exported
-#define __exported __ATTR_VISIBILITY("default")
-#endif /* !__exported */
-#ifndef __hidden
-#define __hidden __ATTR_VISIBILITYility__("hidden")
-#endif /* !__hidden */
-#ifndef __packed
-#define __packed __ATTR_PACKED
-#endif /* !__packed */
-#ifndef __aligned
-#define __aligned(x) __ATTR_ALIGNED(x)
-#endif /* !__aligned */
-#ifndef __unused
-#define __unused __ATTR_UNUSED
-#endif /* !__unused */
-#ifndef __printflike
-#define __printflike __ATTR_FORMAT_PRINTF
-#endif /* !__printflike */
-#ifndef __scanflike
-#define __scanflike __ATTR_FORMAT_SCANF
-#endif /* !__scanflike */
-#ifndef __format_arg
-#define __format_arg __attribute_format_arg__
-#endif /* !__format_arg */
-#ifndef __strfmonlike
-#define __strfmonlike __ATTR_FORMAT_STRFMON
-#endif /* !__strfmonlike */
-#ifndef __strftimelike
-#define __strftimelike __ATTR_FORMAT_STRFTIME
-#endif /* !__strftimelike */
-#ifndef __printf0like
-#define __printf0like(x, y)
-#endif /* !__printf0like */
-#ifndef __bounded__
-#define __bounded__(x, y, z)
-#endif /* !__bounded__ */
-#ifndef __arraycount
-#define __arraycount __COMPILER_LENOF
-#endif /* !__arraycount */
-#ifndef __offsetof
-#define __offsetof __builtin_offsetof
-#endif /* !__offsetof */
-#ifndef __rangeof
-#define __rangeof(type, start, end)  \
-	(__builtin_offsetof(type, end) - \
-	 __builtin_offsetof(type, start))
-#endif /* !__rangeof */
-#ifndef __containerof
-#define __containerof __COMPILER_CONTAINER_OF
-#endif /* !__containerof */
-#ifndef __RCSID
-#define __RCSID(x) /* nothing */
-#endif /* !__RCSID */
-#ifndef __FBSDID
-#define __FBSDID(x) /* nothing */
-#endif /* !__FBSDID */
-#ifndef __RCSID_SOURCE
-#define __RCSID_SOURCE(x) /* nothing */
-#endif /* !__RCSID_SOURCE */
-#ifndef __SCCSID
-#define __SCCSID(x) /* nothing */
-#endif /* !__SCCSID */
-#ifndef __COPYRIGHT
-#define __COPYRIGHT(x) /* nothing */
-#endif /* !__COPYRIGHT */
-#ifndef __DECONST
-#define __DECONST(type, var) ((type)(__UINTPTR_TYPE__)(void const *)(var))
-#endif /* !__DECONST */
-#ifndef __DEVOLATILE
-#define __DEVOLATILE(type, var) ((type)(__UINTPTR_TYPE__)(void volatile *)(var))
-#endif /* !__DEVOLATILE */
-#ifndef __DEQUALIFY
-#define __DEQUALIFY(type, var) ((type)(__UINTPTR_TYPE__)(void const volatile *)(var))
-#endif /* !__DEQUALIFY */
+#if (defined(__COVERITY__) ||                                             \
+     __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__) || \
+     __has_feature(leak_sanitizer) || defined(__SANITIZE_LEAK__))
+#define __NO_LEAKS
+#endif /* ... */
+#ifdef __COMPILER_HAVE_GCC_ASM
+#define __GNUCLIKE_ASM 3
+#endif /* __COMPILER_HAVE_GCC_ASM */
+#if (__has_builtin(__builtin_huge_val) && \
+     __has_builtin(__builtin_inf) &&      \
+     __has_builtin(__builtin_nan))
+#define __GNUCLIKE_MATH_BUILTIN_CONSTANTS
+#endif /* __has_builtin(...) */
+#ifdef __COMPILER_HAVE_TYPEOF
+#define __GNUCLIKE___TYPEOF 1
+#endif /* __COMPILER_HAVE_TYPEOF */
+#define __GNUCLIKE___OFFSETOF 1
+#ifndef __NO_ATTR_SECTION
+#define __GNUCLIKE___SECTION 1
+#endif /* !__NO_ATTR_SECTION */
+#ifndef __NO_builtin_constant_p
+#define __GNUCLIKE_BUILTIN_CONSTANT_P 1
+#endif /* !__NO_builtin_constant_p */
+#define __GNUCLIKE_BUILTIN_VARARGS   1
+#define __GNUCLIKE_BUILTIN_STDARG    1
+#define __GNUCLIKE_BUILTIN_VAALIST   1
+#define __GNUC_VA_LIST_COMPATIBILITY 1
+#if __has_builtin(__builtin_next_arg)
+#define __GNUCLIKE_BUILTIN_NEXT_ARG 1
+#endif /* __has_builtin(__builtin_next_arg) */
+/*#define __GNUCLIKE_CTOR_SECTION_HANDLING ??? */
+#if __has_builtin(__builtin_isunordered)
+#define __GNUCLIKE_MATH_BUILTIN_RELOPS
+#endif /* __has_builtin(__builtin_isunordered) */
+#if __has_builtin(__builtin_memcpy)
+#define __GNUCLIKE_BUILTIN_MEMCPY 1
+#endif /* __has_builtin(__builtin_memcpy) */
+/*#define __CC_SUPPORTS_INLINE             -- TODO*/
+/*#define __CC_SUPPORTS___INLINE           -- TODO*/
+/*#define __CC_SUPPORTS___INLINE__         -- TODO*/
+/*#define __CC_SUPPORTS___FUNC__           -- TODO*/
+/*#define __CC_SUPPORTS_WARNING            -- TODO*/
+/*#define __CC_SUPPORTS_VARADIC_XXX        -- TODO*/
+/*#define __CC_SUPPORTS_DYNAMIC_ARRAY_INIT -- TODO*/
+#define __GNUC_PREREQ__ __GNUC_PREREQ
+#if !defined(__LONG_LONG_SUPPORTED) && defined(__COMPILER_HAVE_LONGLONG)
+#define __LONG_LONG_SUPPORTED
+#endif /* !__LONG_LONG_SUPPORTED && __COMPILER_HAVE_LONGLONG */
+#define __STDC_LIMIT_MACROS
+#define __STDC_CONSTANT_MACROS
 #endif /* __USE_BSD */
 
 
@@ -450,7 +596,5 @@
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define __WORDSIZE_TIME64_COMPAT32 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-
-
 
 #endif /* !_SYS_CDEFS_H */

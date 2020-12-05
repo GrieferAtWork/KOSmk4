@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e0f6e36 */
+/* HASH CRC-32:0x82b27e70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: NetBSD (/include/util.h) */
 
 #include <features.h>
 

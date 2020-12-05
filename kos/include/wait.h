@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/wait.h) */
+/* (#) Portability: GNU C Library (/posix/wait.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/wait.h) */
+/* (#) Portability: musl libc     (/include/wait.h) */
+/* (#) Portability: uClibc        (/include/wait.h) */
 #ifndef _WAIT_H
 #define _WAIT_H 1
 

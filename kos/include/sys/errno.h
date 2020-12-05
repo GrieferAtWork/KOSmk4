@@ -17,7 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/errno.h) */
+/* (#) Portability: DJGPP         (/include/sys/errno.h) */
+/* (#) Portability: GNU C Library (/stdlib/sys/errno.h) */
+/* (#) Portability: NetBSD        (/sys/sys/errno.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/errno.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/errno.h) */
+/* (#) Portability: musl libc     (/include/sys/errno.h) */
+/* (#) Portability: uClibc        (/include/sys/errno.h) */
 #ifndef _SYS_ERRNO_H
 #define _SYS_ERRNO_H 1
+
 #include <errno.h>
+
 #endif /* !_SYS_ERRNO_H */

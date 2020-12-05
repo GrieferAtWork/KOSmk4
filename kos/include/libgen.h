@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a152385 */
+/* HASH CRC-32:0x7f83b56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: FreeBSD       (/include/libgen.h) */
+/* (#) Portability: GNU C Library (/misc/libgen.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/libgen.h) */
+/* (#) Portability: NetBSD        (/include/libgen.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/libgen.h) */
+/* (#) Portability: diet libc     (/include/libgen.h) */
+/* (#) Portability: musl libc     (/include/libgen.h) */
+/* (#) Portability: uClibc        (/include/libgen.h) */
 #include <features.h>
 
 #ifdef __CC__

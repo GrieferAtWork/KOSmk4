@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/config.h) */
+/* (#) Portability: DJGPP  (/include/sys/config.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/config.h) */
+}
 
 %{
 /* This one's kind-of a weird header, in that there's no real standard out there

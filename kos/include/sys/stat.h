@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fda9255 */
+/* HASH CRC-32:0x8dd80fcc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,18 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/stat.h) */
+/* (#) Portability: DJGPP         (/include/sys/stat.h) */
+/* (#) Portability: GNU C Library (/io/sys/stat.h) */
+/* (#) Portability: MSVC          (/include/sys/stat.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/stat.h) */
+/* (#) Portability: NetBSD        (/sys/sys/stat.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/stat.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/stat.h) */
+/* (#) Portability: diet libc     (/include/sys/stat.h) */
+/* (#) Portability: musl libc     (/include/sys/stat.h) */
+/* (#) Portability: uClibc        (/include/sys/stat.h) */
 #include <features.h>
 
 #include <asm/os/stat.h>

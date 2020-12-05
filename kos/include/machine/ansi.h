@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/machine/ansi.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/machine/ansi.h) */
 #ifndef _MACHINE_ANSI_H
 #define _MACHINE_ANSI_H 1
 

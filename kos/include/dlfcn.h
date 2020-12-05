@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/dlfcn.h) */
+/* (#) Portability: DJGPP         (/include/dlfcn.h) */
+/* (#) Portability: FreeBSD       (/include/dlfcn.h) */
+/* (#) Portability: GNU C Library (/dlfcn/dlfcn.h) */
+/* (#) Portability: NetBSD        (/include/dlfcn.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/dlfcn.h) */
+/* (#) Portability: diet libc     (/include/dlfcn.h) */
+/* (#) Portability: musl libc     (/include/dlfcn.h) */
+/* (#) Portability: uClibc        (/include/dlfcn.h) */
 #ifndef _DLFCN_H
 #define _DLFCN_H 1
 

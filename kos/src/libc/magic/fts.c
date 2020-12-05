@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/fts.h) */
+/* (#) Portability: FreeBSD       (/include/fts.h) */
+/* (#) Portability: GNU C Library (/io/fts.h) */
+/* (#) Portability: NetBSD        (/include/fts.h) */
+/* (#) Portability: uClibc        (/include/fts.h) */
+}
 
 %[default:section(".text.crt{|.dos}.fs.fts")]
 

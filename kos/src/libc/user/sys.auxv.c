@@ -76,10 +76,12 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_getauxval,hash:CRC-32=0x71fb96a6]]]*/
-/* Return the value associated with an Elf*_auxv_t type from the auxv list
- * passed to the program on startup.  If TYPE was not present in the auxv
- * list, returns zero and sets errno to ENOENT */
+/*[[[head:libc_getauxval,hash:CRC-32=0xa44182b5]]]*/
+/* >> getauxval(3)
+ * Return the value associated with a named `type' from the
+ * auxillary information vector passed to the calling program
+ * by the kernel.
+ * @param: type: One of `AT_*' from <elf.h> */
 INTERN ATTR_SECTION(".text.crt.system.auxv") ulongptr_t
 NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 /*[[[body:libc_getauxval]]]*/

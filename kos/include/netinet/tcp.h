@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/tcp.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/tcp.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/tcp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/tcp.h) */
+/* (#) Portability: diet libc     (/include/netinet/tcp.h) */
+/* (#) Portability: musl libc     (/include/netinet/tcp.h) */
+/* (#) Portability: uClibc        (/include/netinet/tcp.h) */
 #ifndef _NETINET_TCP_H
 #define _NETINET_TCP_H 1
 

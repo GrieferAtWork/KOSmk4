@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
+/* (#) Portability: diet libc     (/include/sys/auxv.h) */
+/* (#) Portability: musl libc     (/include/sys/auxv.h) */
+}
 
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 %[default:section(".text.crt{|.dos}.system.auxv")]
@@ -29,9 +35,11 @@ __SYSDECL_BEGIN
 
 }
 
-@@Return the value associated with an Elf*_auxv_t type from the auxv list
-@@passed to the program on startup.  If TYPE was not present in the auxv
-@@list, returns zero and sets errno to ENOENT
+@@>> getauxval(3)
+@@Return the value associated with a named `type' from the
+@@auxillary information vector passed to the calling program
+@@by the kernel.
+@@@param: type: One of `AT_*' from <elf.h>
 [[export_alias("__getauxval")]]
 $ulongptr_t getauxval($ulongptr_t type);
 

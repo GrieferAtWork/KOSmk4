@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebc235ae */
+/* HASH CRC-32:0xe4d9ca0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/debug/execinfo.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/execinfo.h) */
+/* (#) Portability: uClibc        (/include/execinfo.h) */
 #include <features.h> /* __STDC_INT_AS_UINT_T */
 
 #include <bits/types.h> /* $fd_t */

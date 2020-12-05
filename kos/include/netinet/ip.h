@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/ip.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/ip.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/ip.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip.h) */
+/* (#) Portability: diet libc     (/include/netinet/ip.h) */
+/* (#) Portability: musl libc     (/include/netinet/ip.h) */
+/* (#) Portability: uClibc        (/include/netinet/ip.h) */
 #ifndef _NETINET_IP_H
 #define _NETINET_IP_H 1
 

@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/ip6.h) */
+/* (#) Portability: GNU C Library (/inet/netinet/ip6.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/ip6.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip6.h) */
+/* (#) Portability: musl libc     (/include/netinet/ip6.h) */
+/* (#) Portability: uClibc        (/include/netinet/ip6.h) */
 #ifndef _NETINET_IP6_H
 #define _NETINET_IP6_H 1
 

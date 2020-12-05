@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3cde2ca */
+/* HASH CRC-32:0x687594 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/fcntl.h) */
+/* (#) Portability: DJGPP         (/include/fcntl.h) */
+/* (#) Portability: GNU C Library (/io/fcntl.h) */
+/* (#) Portability: MSVC          (/include/fcntl.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/fcntl.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/fcntl.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/fcntl.h) */
+/* (#) Portability: diet libc     (/include/fcntl.h) */
+/* (#) Portability: musl libc     (/include/fcntl.h) */
+/* (#) Portability: uClibc        (/include/fcntl.h) */
 #include <features.h>
 
 #include <asm/os/fcntl.h>

@@ -434,6 +434,8 @@
 #define __ATTR_EXTERNALLY_VISIBLE
 #define ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL
+#define ATTR_FORMAT_ARG(x)
+#define __ATTR_FORMAT_ARG(x)
 #define ATTR_FALLTHROUGH ;
 #define __ATTR_FALLTHROUGH ;
 #define ATTR_OPTIMIZE(x)
@@ -916,21 +918,21 @@
 #define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
 
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) \
-	refcnt_t handle_##name##_refcnt(T const *__restrict self) {} \
-	void handle_##name##_incref(T *__restrict self) {} \
-	void handle_##name##_decref(T *__restrict self) {} \
-	bool handle_##name##_tryincref(T *__restrict self) {} \
-	void *handle_##name##_weakgetref(T *__restrict self) {} \
-	T *handle_##name##_weaklckref(void *__restrict weakref_ptr) {} \
-	void handle_##name##_weakdecref(void *__restrict self) {}
+	refcnt_t handle_##name##_refcnt(T const *restrict self) {} \
+	void handle_##name##_incref(T *restrict self) {} \
+	void handle_##name##_decref(T *restrict self) {} \
+	bool handle_##name##_tryincref(T *restrict self) {} \
+	void *handle_##name##_weakgetref(T *restrict self) {} \
+	T *handle_##name##_weaklckref(void *restrict weakref_ptr) {} \
+	void handle_##name##_weakdecref(void *restrict self) {}
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(name,T) \
-	refcnt_t handle_##name##_refcnt(T const *__restrict self) {} \
-	void handle_##name##_incref(T *__restrict self) {} \
-	void handle_##name##_decref(T *__restrict self) {} \
-	bool handle_##name##_tryincref(T *__restrict self) {} \
-	void *handle_##name##_weakgetref(T *__restrict self) {} \
-	T *handle_##name##_weaklckref(void *__restrict weakref_ptr) {} \
-	void handle_##name##_weakdecref(void *__restrict self) {}
+	refcnt_t handle_##name##_refcnt(T const *restrict self) {} \
+	void handle_##name##_incref(T *restrict self) {} \
+	void handle_##name##_decref(T *restrict self) {} \
+	bool handle_##name##_tryincref(T *restrict self) {} \
+	void *handle_##name##_weakgetref(T *restrict self) {} \
+	T *handle_##name##_weaklckref(void *restrict weakref_ptr) {} \
+	void handle_##name##_weakdecref(void *restrict self) {}
 
 #define ATOMIC_REF(...)               atomic_ref< __VA_ARGS__ >
 #define XATOMIC_REF_STRUCT(...)       xatomic_ref_struct< __VA_ARGS__ >

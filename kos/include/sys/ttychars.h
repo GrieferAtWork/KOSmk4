@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ttychars.h) */
+/* (#) Portability: GNU C Library (/termios/sys/ttychars.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ttychars.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ttychars.h) */
 #ifndef _SYS_TTYCHARS_H
 #define _SYS_TTYCHARS_H 1
 #include <sys/ttydefaults.h>

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/features.h) */
+/* (#) Portability: GNU C Library (/include/features.h) */
+/* (#) Portability: diet libc     (/include/features.h) */
+/* (#) Portability: musl libc     (/include/features.h) */
+/* (#) Portability: uClibc        (/include/features.h) */
 #ifndef _FEATURES_H
 #define _FEATURES_H 1
 

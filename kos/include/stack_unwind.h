@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/head/stack_unwind.h) */
 #ifndef _STACK_UNWIND_H
 #define _STACK_UNWIND_H 1
 

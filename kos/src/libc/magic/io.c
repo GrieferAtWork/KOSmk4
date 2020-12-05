@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin (/winsup/cygwin/include/io.h) */
+/* (#) Portability: DJGPP  (/include/io.h) */
+/* (#) Portability: MSVC   (/include/io.h) */
+/* (#) Portability: MinGW  (/mingw-w64-headers/crt/io.h) */
+/* (#) Portability: NetBSD (/sys/arch/[...]/include/io.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]

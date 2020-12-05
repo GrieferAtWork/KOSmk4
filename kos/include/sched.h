@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa8416d6 */
+/* HASH CRC-32:0x9deccec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sched.h) */
+/* (#) Portability: GNU C Library (/posix/sched.h) */
+/* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/sched.h) */
+/* (#) Portability: NetBSD        (/include/sched.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sched.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/sched.h) */
+/* (#) Portability: diet libc     (/include/sched.h) */
+/* (#) Portability: musl libc     (/include/sched.h) */
+/* (#) Portability: uClibc        (/include/sched.h) */
 #include <features.h>
 
 #include <asm/os/sched.h>

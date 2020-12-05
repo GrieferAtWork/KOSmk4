@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/posix/sysexits.h) */
+/* (#) Portability: FreeBSD       (/include/sysexits.h) */
+/* (#) Portability: GNU C Library (/misc/sysexits.h) */
+/* (#) Portability: NetBSD        (/include/sysexits.h) */
+/* (#) Portability: Newlib        (/newlib/libc/posix/sysexits.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/sysexits.h) */
+/* (#) Portability: diet libc     (/include/sysexits.h) */
+/* (#) Portability: musl libc     (/include/sysexits.h) */
+/* (#) Portability: uClibc        (/include/sysexits.h) */
 #ifndef _SYSEXITS_H
 #define _SYSEXITS_H 1
 

@@ -17,6 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C95 (ISO/IEC 9899:1990/AMD1:1995) */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/wctype.h) */
+/* (#) Portability: DJGPP         (/include/wctype.h) */
+/* (#) Portability: FreeBSD       (/include/wctype.h) */
+/* (#) Portability: GNU C Library (/wctype/wctype.h) */
+/* (#) Portability: MSVC          (/include/wctype.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/wctype.h) */
+/* (#) Portability: NetBSD        (/include/wctype.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/wctype.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
+/* (#) Portability: diet libc     (/include/wctype.h) */
+/* (#) Portability: musl libc     (/include/wctype.h) */
+/* (#) Portability: uClibc        (/include/wctype.h) */
+}
+
 %[define_ccompat_header("cwctype")]
 
 %[define_replacement(locale_t = __locale_t)]

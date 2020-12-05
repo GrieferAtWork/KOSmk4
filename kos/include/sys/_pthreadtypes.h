@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/_pthreadtypes.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/_pthreadtypes.h) */
 #ifndef _SYS__PTHREADTYPES_H
 #define _SYS__PTHREADTYPES_H 1
-
-/* API_LEVEL: newlib */
 
 #include <__stdinc.h>
 

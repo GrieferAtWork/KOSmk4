@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab52bd02 */
+/* HASH CRC-32:0xe69a6cf4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,12 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/swap.h) */
+/* (#) Portability: NetBSD        (/sys/sys/swap.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/swap.h) */
+/* (#) Portability: diet libc     (/include/sys/swap.h) */
+/* (#) Portability: musl libc     (/include/sys/swap.h) */
+/* (#) Portability: uClibc        (/include/sys/swap.h) */
 #include <features.h>
 #include <asm/os/swap.h>
 

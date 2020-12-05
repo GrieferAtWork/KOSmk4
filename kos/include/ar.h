@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/ar.h) */
+/* (#) Portability: DJGPP         (/include/ar.h) */
+/* (#) Portability: FreeBSD       (/include/ar.h) */
+/* (#) Portability: GNU C Library (/misc/ar.h) */
+/* (#) Portability: NetBSD        (/include/ar.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/ar.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ar.h) */
+/* (#) Portability: diet libc     (/include/ar.h) */
+/* (#) Portability: musl libc     (/include/ar.h) */
+/* (#) Portability: uClibc        (/include/ar.h) */
 #ifndef _AR_H
 #define _AR_H 1
 

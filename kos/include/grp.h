@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b5c2fdb */
+/* HASH CRC-32:0x3ca7b21f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/grp.h) */
+/* (#) Portability: DJGPP         (/include/grp.h) */
+/* (#) Portability: FreeBSD       (/include/grp.h) */
+/* (#) Portability: GNU C Library (/grp/grp.h) */
+/* (#) Portability: NetBSD        (/include/grp.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/grp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/grp.h) */
+/* (#) Portability: diet libc     (/include/grp.h) */
+/* (#) Portability: musl libc     (/include/grp.h) */
+/* (#) Portability: uClibc        (/include/grp.h) */
 #include <features.h>
 
 #include <bits/crt/db/group.h>

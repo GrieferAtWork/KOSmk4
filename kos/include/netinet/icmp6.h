@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/inet/netinet/icmp6.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/icmp6.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/icmp6.h) */
+/* (#) Portability: musl libc     (/include/netinet/icmp6.h) */
+/* (#) Portability: uClibc        (/include/netinet/icmp6.h) */
 #ifndef _NETINET_ICMP6_H
 #define _NETINET_ICMP6_H 1
 

@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/pwd.h) */
+/* (#) Portability: DJGPP         (/include/pwd.h) */
+/* (#) Portability: FreeBSD       (/include/pwd.h) */
+/* (#) Portability: GNU C Library (/pwd/pwd.h) */
+/* (#) Portability: NetBSD        (/include/pwd.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/pwd.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/pwd.h) */
+/* (#) Portability: diet libc     (/include/pwd.h) */
+/* (#) Portability: musl libc     (/include/pwd.h) */
+/* (#) Portability: uClibc        (/include/pwd.h) */
+}
 
 %[define_replacement(uid_t = __uid_t)]
 %[default:section(".text.crt{|.dos}.database.pwd")]

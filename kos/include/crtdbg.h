@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8715a9fb */
+/* HASH CRC-32:0xe6f47c71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: MSVC  (/include/crtdbg.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/crtdbg.h) */
 
 #include <features.h>
 

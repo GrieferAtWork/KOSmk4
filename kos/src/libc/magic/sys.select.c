@@ -17,6 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: GNU C Library (/misc/sys/select.h) */
+/* (#) Portability: NetBSD        (/sys/sys/select.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/select.h) */
+/* (#) Portability: diet libc     (/include/sys/select.h) */
+/* (#) Portability: musl libc     (/include/sys/select.h) */
+/* (#) Portability: uClibc        (/include/sys/select.h) */
+}
 
 %[define_replacement(sigset_t   = "struct __sigset_struct")]
 %[define_replacement(time_t     = "__TM_TYPE(time)")]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6899a69d */
+/* HASH CRC-32:0x17dd2d8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,19 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/search.h) */
+/* (#) Portability: DJGPP         (/include/search.h) */
+/* (#) Portability: FreeBSD       (/include/search.h) */
+/* (#) Portability: GNU C Library (/misc/search.h) */
+/* (#) Portability: MSVC          (/include/search.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/search.h) */
+/* (#) Portability: NetBSD        (/include/search.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/search.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/search.h) */
+/* (#) Portability: diet libc     (/include/search.h) */
+/* (#) Portability: musl libc     (/include/search.h) */
+/* (#) Portability: uClibc        (/include/search.h) */
 #include <features.h>
 #include <hybrid/typecore.h>
 

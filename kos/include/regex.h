@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecdd20dc */
+/* HASH CRC-32:0x1b006cca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/regex.h) */
+/* (#) Portability: DJGPP         (/include/regex.h) */
+/* (#) Portability: FreeBSD       (/include/regex.h) */
+/* (#) Portability: GNU C Library (/posix/regex.h) */
+/* (#) Portability: NetBSD        (/include/regex.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
+/* (#) Portability: diet libc     (/include/regex.h) */
+/* (#) Portability: musl libc     (/include/regex.h) */
+/* (#) Portability: uClibc        (/include/regex.h) */
 #include <features.h>
 
 #include <hybrid/typecore.h>

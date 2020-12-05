@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/stdint.h) */
+/* (#) Portability: DJGPP         (/include/stdint.h) */
+/* (#) Portability: GNU C Library (/stdlib/stdint.h) */
+/* (#) Portability: MSVC          (/include/stdint.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdint.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/stdint.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdint.h) */
+/* (#) Portability: diet libc     (/include/stdint.h) */
+/* (#) Portability: musl libc     (/include/stdint.h) */
+/* (#) Portability: uClibc        (/include/stdint.h) */
 #ifndef _STDINT_H
 #define _STDINT_H 1
 

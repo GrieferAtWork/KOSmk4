@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/ftw.h) */
+/* (#) Portability: DJGPP         (/include/ftw.h) */
+/* (#) Portability: FreeBSD       (/include/ftw.h) */
+/* (#) Portability: GNU C Library (/io/ftw.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/ftw.h) */
+/* (#) Portability: NetBSD        (/include/ftw.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ftw.h) */
+/* (#) Portability: diet libc     (/include/ftw.h) */
+/* (#) Portability: musl libc     (/include/ftw.h) */
+/* (#) Portability: uClibc        (/include/ftw.h) */
+}
 
 %[default:section(".text.crt{|.dos}.fs.ftw")]
 

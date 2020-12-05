@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/newlib/libc/include/malloc.h) */
+/* (#) Portability: DJGPP         (/include/malloc.h) */
+/* (#) Portability: FreeBSD       (/include/malloc.h) */
+/* (#) Portability: GNU C Library (/malloc/malloc.h) */
+/* (#) Portability: MSVC          (/include/malloc.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/malloc.h) */
+/* (#) Portability: NetBSD        (/include/malloc.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/malloc.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/malloc.h) */
+/* (#) Portability: diet libc     (/include/malloc.h) */
+/* (#) Portability: musl libc     (/include/malloc.h) */
+/* (#) Portability: uClibc        (/include/malloc.h) */
+}
 
 %[default:section(".text.crt{|.dos}.heap.malloc")]
 

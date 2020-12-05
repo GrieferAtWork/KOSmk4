@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC  (/include/crtdefs.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/crtdefs.h) */
 #ifndef _INC_CRTDEFS
 #define _INC_CRTDEFS 1
 

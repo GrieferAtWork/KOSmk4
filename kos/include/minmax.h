@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC  (/include/minmax.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/include/minmax.h) */
 #ifndef _MINMAX_H
 #define _MINMAX_H 1
 

@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/pthread.h) */
+/* (#) Portability: FreeBSD       (/include/pthread.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/pthread.h) */
+/* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/pthread.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/pthread.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/pthread.h) */
+/* (#) Portability: diet libc     (/include/pthread.h) */
+/* (#) Portability: musl libc     (/include/pthread.h) */
+/* (#) Portability: uClibc        (/libpthread/nptl/sysdeps/pthread/pthread.h) */
+}
 
 %[default:section(".text.crt{|.dos}.sched.pthread")]
 %[define_replacement(clockid_t = __clockid_t)]

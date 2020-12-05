@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/machine/setjmp-dj.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/machine/setjmp-dj.h) */
 #ifndef _MACHINE_SETJMP_DJ_H
 #define _MACHINE_SETJMP_DJ_H 1
 #include <setjmp.h>

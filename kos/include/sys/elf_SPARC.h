@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/elf_SPARC.h) */
 #ifndef _SYS_ELF_SPARC_H
 #define _SYS_ELF_SPARC_H 1
 

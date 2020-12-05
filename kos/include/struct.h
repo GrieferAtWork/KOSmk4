@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: NetBSD (/include/struct.h) */
 #ifndef _STRUCT_H
 #define _STRUCT_H 1
 

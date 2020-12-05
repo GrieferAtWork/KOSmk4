@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: OpenSolaris (/usr/src/head/stropts.h) */
+/* (#) Portability: musl libc   (/include/stropts.h) */
+}
 
 %[define_replacement(uid_t = __uid_t)]
 %[default:section(".text.crt{|.dos}.io.stropts")]

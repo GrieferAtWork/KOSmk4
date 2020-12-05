@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/grp.h) */
+/* (#) Portability: DJGPP         (/include/grp.h) */
+/* (#) Portability: FreeBSD       (/include/grp.h) */
+/* (#) Portability: GNU C Library (/grp/grp.h) */
+/* (#) Portability: NetBSD        (/include/grp.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/grp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/grp.h) */
+/* (#) Portability: diet libc     (/include/grp.h) */
+/* (#) Portability: musl libc     (/include/grp.h) */
+/* (#) Portability: uClibc        (/include/grp.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(gid_t = __gid_t)]

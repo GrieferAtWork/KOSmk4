@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/strings.h) */
+/* (#) Portability: DJGPP         (/include/strings.h) */
+/* (#) Portability: FreeBSD       (/include/strings.h) */
+/* (#) Portability: GNU C Library (/string/strings.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/strings.h) */
+/* (#) Portability: NetBSD        (/include/strings.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/strings.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/strings.h) */
+/* (#) Portability: diet libc     (/include/strings.h) */
+/* (#) Portability: musl libc     (/include/strings.h) */
+/* (#) Portability: uClibc        (/include/strings.h) */
+}
 
 %{
 #include <features.h>

@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/termios.h) */
+/* (#) Portability: DJGPP         (/include/termios.h) */
+/* (#) Portability: FreeBSD       (/include/termios.h) */
+/* (#) Portability: GNU C Library (/termios/termios.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/termios.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/termios.h) */
+/* (#) Portability: diet libc     (/include/termios.h) */
+/* (#) Portability: musl libc     (/include/termios.h) */
+/* (#) Portability: uClibc        (/include/termios.h) */
+}
 
 %[define_replacement(fd_t     = __fd_t)]
 %[define_replacement(pid_t    = __pid_t)]

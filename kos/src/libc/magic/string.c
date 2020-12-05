@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/string.h) */
+/* (#) Portability: DJGPP         (/include/string.h) */
+/* (#) Portability: FreeBSD       (/include/string.h) */
+/* (#) Portability: GNU C Library (/string/string.h) */
+/* (#) Portability: MSVC          (/include/string.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/string.h) */
+/* (#) Portability: NetBSD        (/include/string.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/string.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/string.h) */
+/* (#) Portability: diet libc     (/include/string.h) */
+/* (#) Portability: musl libc     (/include/string.h) */
+/* (#) Portability: uClibc        (/include/string.h) */
+}
 
 %[define_ccompat_header("cstring")]
 

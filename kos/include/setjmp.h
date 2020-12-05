@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/setjmp.h) */
+/* (#) Portability: DJGPP         (/include/setjmp.h) */
+/* (#) Portability: FreeBSD       (/include/setjmp.h) */
+/* (#) Portability: GNU C Library (/setjmp/setjmp.h) */
+/* (#) Portability: MSVC          (/include/setjmp.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/setjmp.h) */
+/* (#) Portability: NetBSD        (/include/setjmp.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/setjmp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/setjmp.h) */
+/* (#) Portability: diet libc     (/include/setjmp.h) */
+/* (#) Portability: musl libc     (/include/setjmp.h) */
+/* (#) Portability: uClibc        (/include/setjmp.h) */
 #ifndef _SETJMP_H
 #define _SETJMP_H 1
 

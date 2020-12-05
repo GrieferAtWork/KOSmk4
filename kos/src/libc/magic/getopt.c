@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: FreeBSD       (/include/getopt.h) */
+/* (#) Portability: GNU C Library (/posix/getopt.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/getopt.h) */
+/* (#) Portability: NetBSD        (/include/getopt.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/getopt.h) */
+/* (#) Portability: diet libc     (/include/getopt.h) */
+/* (#) Portability: musl libc     (/include/getopt.h) */
+/* (#) Portability: uClibc        (/include/getopt.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_partial_replacement(argc = ___argc)]

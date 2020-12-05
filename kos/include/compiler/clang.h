@@ -634,6 +634,7 @@
 #else /* __FUNCTION__ */
 #define __FUNCTION__ __func__
 #define __builtin_FUNCTION() __func__
+#define __builtin_FUNCTION_IS_func__
 #endif /* !__FUNCTION__ */
 #endif /* !__has_builtin(__builtin_FUNCTION) */
 
@@ -670,10 +671,13 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 
 
 #if defined(inline) || defined(__cplusplus)
+#define __ATTR_INLINE_IS_INLINE
 #define __ATTR_INLINE inline
 #elif __has_attribute(__always_inline__)
+#define __ATTR_INLINE_IS___INLINE__
 #define __ATTR_INLINE __inline__
 #else /* ... */
+#define __ATTR_INLINE_IS___INLINE
 #define __ATTR_INLINE __inline
 #endif /* !... */
 
@@ -690,6 +694,13 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __NO_ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL /* nothing */
 #endif /* !__has_attribute(__artificial__) */
+
+#if __has_attribute(__format_arg__)
+#define __ATTR_FORMAT_ARG(x) __attribute__((__format_arg__(x)))
+#else /* __has_attribute(__format_arg__) */
+#define __NO_ATTR_FORMAT_ARG
+#define __ATTR_FORMAT_ARG(x) /* nothing */
+#endif /* !__has_attribute(__format_arg__) */
 
 #define __ATTR_LEAF_P  __ATTR_LEAF
 #define __ATTR_PURE_P  __ATTR_PURE

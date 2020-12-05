@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/vfs.h) */
+/* (#) Portability: DJGPP         (/include/sys/vfs.h) */
+/* (#) Portability: GNU C Library (/io/sys/vfs.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/vfs.h) */
+/* (#) Portability: diet libc     (/include/sys/vfs.h) */
+/* (#) Portability: musl libc     (/include/sys/vfs.h) */
+/* (#) Portability: uClibc        (/include/sys/vfs.h) */
 #ifndef _SYS_VFS_H
 #define _SYS_VFS_H 1
 #include <sys/statfs.h>

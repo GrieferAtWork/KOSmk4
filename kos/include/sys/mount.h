@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf63af0a1 */
+/* HASH CRC-32:0x9290d45e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,13 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/mount.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/mount.h) */
+/* (#) Portability: NetBSD        (/sys/sys/mount.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mount.h) */
+/* (#) Portability: diet libc     (/include/sys/mount.h) */
+/* (#) Portability: musl libc     (/include/sys/mount.h) */
+/* (#) Portability: uClibc        (/include/sys/mount.h) */
 #include <features.h>
 
 #include <asm/os/block.h> /* __BLK* (ioctls) */

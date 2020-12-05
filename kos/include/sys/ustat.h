@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1e0dbcf */
+/* HASH CRC-32:0x9fa036d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/ustat.h) */
+/* (#) Portability: uClibc      (/include/sys/ustat.h) */
 
 #include <features.h>
 

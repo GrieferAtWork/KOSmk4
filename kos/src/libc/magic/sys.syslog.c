@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
+/* (#) Portability: GNU C Library (/misc/sys/syslog.h) */
+/* (#) Portability: NetBSD        (/sys/sys/syslog.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
+/* (#) Portability: diet libc     (/include/sys/syslog.h) */
+/* (#) Portability: musl libc     (/include/sys/syslog.h) */
+/* (#) Portability: uClibc        (/include/sys/syslog.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.system.syslog")]

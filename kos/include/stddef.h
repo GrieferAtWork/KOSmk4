@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: DJGPP       (/include/stddef.h) */
+/* (#) Portability: FreeBSD     (/include/stddef.h) */
+/* (#) Portability: MSVC        (/include/stddef.h) */
+/* (#) Portability: MinGW       (/mingw-w64-headers/crt/stddef.h) */
+/* (#) Portability: NetBSD      (/include/stddef.h) */
+/* (#) Portability: OpenSolaris (/usr/src/head/stddef.h) */
+/* (#) Portability: diet libc   (/include/stddef.h) */
+/* (#) Portability: musl libc   (/include/stddef.h) */
 #ifndef _STDDEF_H
 #define _STDDEF_H 1
 

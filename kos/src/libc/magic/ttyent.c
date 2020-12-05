@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: FreeBSD       (/include/ttyent.h) */
+/* (#) Portability: GNU C Library (/misc/ttyent.h) */
+/* (#) Portability: NetBSD        (/include/ttyent.h) */
+/* (#) Portability: uClibc        (/include/ttyent.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.database.utmpx")]

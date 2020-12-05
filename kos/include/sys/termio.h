@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin      (/winsup/cygwin/include/sys/termio.h) */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/termio.h) */
 #ifndef _SYS_TERMIO_H
 #define _SYS_TERMIO_H 1
 

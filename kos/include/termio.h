@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/termio.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/termio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/termio.h) */
+/* (#) Portability: diet libc     (/include/termio.h) */
+/* (#) Portability: uClibc        (/include/termio.h) */
 #ifndef _TERMIO_H
 #define _TERMIO_H 1
 

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC (/include/ConcurrencySal.h) */
 #ifndef _CONCURRENCYSAL_H
 #define _CONCURRENCYSAL_H 1
 

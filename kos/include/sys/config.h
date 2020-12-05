@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6eff5d95 */
+/* HASH CRC-32:0xb43a33c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/config.h) */
+/* (#) Portability: DJGPP  (/include/sys/config.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/config.h) */
 /* This one's kind-of a weird header, in that there's no real standard out there
  * that defines what should go in here... And I'm also not entirely sure if this
  * is actually a ~real~ header that is meant to be exposed in any way, shape, or

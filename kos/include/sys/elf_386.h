@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/elf_386.h) */
 #ifndef _SYS_ELF_386_H
 #define _SYS_ELF_386_H 1
 

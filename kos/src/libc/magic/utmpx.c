@@ -17,6 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/utmpx.h) */
+/* (#) Portability: FreeBSD       (/include/utmpx.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/utmpx.h) */
+/* (#) Portability: NetBSD        (/include/utmpx.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/utmpx.h) */
+/* (#) Portability: diet libc     (/include/utmpx.h) */
+/* (#) Portability: musl libc     (/include/utmpx.h) */
+/* (#) Portability: uClibc        (/include/utmpx.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.database.utmpx")]

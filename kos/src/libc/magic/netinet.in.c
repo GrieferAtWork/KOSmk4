@@ -17,6 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in.h) */
+/* (#) Portability: DJGPP         (/include/netinet/in.h) */
+/* (#) Portability: GNU C Library (/inet/netinet/in.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/in.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in.h) */
+/* (#) Portability: diet libc     (/include/netinet/in.h) */
+/* (#) Portability: musl libc     (/include/netinet/in.h) */
+/* (#) Portability: uClibc        (/include/netinet/in.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 

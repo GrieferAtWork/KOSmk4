@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/monetary.h) */
+/* (#) Portability: FreeBSD       (/include/monetary.h) */
+/* (#) Portability: GNU C Library (/stdlib/monetary.h) */
+/* (#) Portability: NetBSD        (/include/monetary.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/monetary.h) */
+/* (#) Portability: musl libc     (/include/monetary.h) */
+}
 
 %[default:section(".text.crt{|.dos}.utility.monetary")]
 

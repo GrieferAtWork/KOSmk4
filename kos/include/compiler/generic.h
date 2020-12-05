@@ -218,6 +218,7 @@
 #elif defined(__TINYC__) || 1
 #define __FUNCTION__ __func__
 #define __builtin_FUNCTION() __func__
+#define __builtin_FUNCTION_IS_func__
 #else /* ... */
 #define __NO_builtin_FUNCTION
 #define __builtin_FUNCTION() (char *)0
@@ -784,13 +785,16 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #if (defined(inline) || defined(__cplusplus) ||        \
      (defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)) || \
      (defined(__STDC_VERSION__) && (__STDC_VERSION__ - 0 >= 199901L)))
+#define __ATTR_INLINE_IS_INLINE
 #define __ATTR_INLINE inline
 #elif (defined(__BORLANDC__) || defined(__DMC__) || \
        defined(__SC__) || defined(__WATCOMC__) ||   \
        defined(__LCC__) || defined(__DECC))
+#define __ATTR_INLINE_IS___INLINE__
 #define __ATTR_INLINE __inline
 #elif (__has_attribute(__always_inline__) || \
        defined(__DCC_VERSION__) || defined(__TINYC__))
+#define __ATTR_INLINE_IS___INLINE__
 #define __ATTR_INLINE __inline__
 #else /* ... */
 #define __NO_ATTR_INLINE
@@ -810,6 +814,13 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __NO_ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL /* nothing */
 #endif /* !__has_attribute(__artificial__) */
+
+#if __has_attribute(__format_arg__)
+#define __ATTR_FORMAT_ARG(x) __attribute__((__format_arg__(x)))
+#else /* __has_attribute(__format_arg__) */
+#define __NO_ATTR_FORMAT_ARG
+#define __ATTR_FORMAT_ARG(x) /* nothing */
+#endif /* !__has_attribute(__format_arg__) */
 
 #define __ATTR_LEAF_P  __ATTR_LEAF
 #define __ATTR_PURE_P  __ATTR_PURE
@@ -857,6 +868,7 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #ifndef __restrict
 #if (defined(restrict) || \
      (defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0) >= 199901L))
+#define __RESTRICT_IS_RESTRICT
 #define __restrict  restrict
 #else /* ... */
 #define __restrict  /* Nothing */

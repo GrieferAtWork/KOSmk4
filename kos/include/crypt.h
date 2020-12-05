@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1257e6f */
+/* HASH CRC-32:0xc4a08a18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,10 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/crypt/crypt.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/crypt.h) */
+/* (#) Portability: musl libc     (/include/crypt.h) */
+/* (#) Portability: uClibc        (/include/crypt.h) */
 #include <features.h>
 
 #ifdef __USE_GNU

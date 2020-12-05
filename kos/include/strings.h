@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc449bf3c */
+/* HASH CRC-32:0x935b0967 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,18 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/strings.h) */
+/* (#) Portability: DJGPP         (/include/strings.h) */
+/* (#) Portability: FreeBSD       (/include/strings.h) */
+/* (#) Portability: GNU C Library (/string/strings.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/strings.h) */
+/* (#) Portability: NetBSD        (/include/strings.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/strings.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/strings.h) */
+/* (#) Portability: diet libc     (/include/strings.h) */
+/* (#) Portability: musl libc     (/include/strings.h) */
+/* (#) Portability: uClibc        (/include/strings.h) */
 #include <features.h>
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>

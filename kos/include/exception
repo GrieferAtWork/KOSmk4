@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC      (/include/exception) */
+/* (#) Portability: libstdc++ (/include/exception) */
 #ifndef _CXX_EXCEPTION
 #define _CXX_EXCEPTION 1
 

@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in_systm.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/in_systm.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/in_systm.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in_systm.h) */
+/* (#) Portability: diet libc     (/include/netinet/in_systm.h) */
+/* (#) Portability: musl libc     (/include/netinet/in_systm.h) */
+/* (#) Portability: uClibc        (/include/netinet/in_systm.h) */
 #ifndef _NETINET_IN_SYSTM_H
 #define _NETINET_IN_SYSTM_H 1
 

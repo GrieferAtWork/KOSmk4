@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6631ad0 */
+/* HASH CRC-32:0x2349a5ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/pwd.h) */
+/* (#) Portability: DJGPP         (/include/pwd.h) */
+/* (#) Portability: FreeBSD       (/include/pwd.h) */
+/* (#) Portability: GNU C Library (/pwd/pwd.h) */
+/* (#) Portability: NetBSD        (/include/pwd.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/pwd.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/pwd.h) */
+/* (#) Portability: diet libc     (/include/pwd.h) */
+/* (#) Portability: musl libc     (/include/pwd.h) */
+/* (#) Portability: uClibc        (/include/pwd.h) */
 #include <features.h>
 #include <bits/types.h>
 #include <bits/crt/db/passwd.h>

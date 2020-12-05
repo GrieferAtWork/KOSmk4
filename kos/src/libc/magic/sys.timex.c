@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timex.h) */
+/* (#) Portability: NetBSD        (/sys/sys/timex.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timex.h) */
+/* (#) Portability: diet libc     (/include/sys/timex.h) */
+/* (#) Portability: musl libc     (/include/sys/timex.h) */
+/* (#) Portability: uClibc        (/include/sys/timex.h) */
+}
 
 %[define_replacement(fd_t         = __fd_t)]
 %[define_replacement(time_t       = "__TM_TYPE(time)")]

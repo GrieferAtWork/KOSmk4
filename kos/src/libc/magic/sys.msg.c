@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/msg.h) */
+/* (#) Portability: GNU C Library (/sysvipc/sys/msg.h) */
+/* (#) Portability: NetBSD        (/sys/sys/msg.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/msg.h) */
+/* (#) Portability: diet libc     (/include/sys/msg.h) */
+/* (#) Portability: musl libc     (/include/sys/msg.h) */
+/* (#) Portability: uClibc        (/include/sys/msg.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]

@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/inet/netinet/ether.h) */
+/* (#) Portability: diet libc     (/include/netinet/ether.h) */
+/* (#) Portability: musl libc     (/include/netinet/ether.h) */
+/* (#) Portability: uClibc        (/include/netinet/ether.h) */
+}
+
 %[default:section(".text.crt{|.dos}.net.ether")]
 
 %{

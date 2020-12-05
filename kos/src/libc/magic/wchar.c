@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C95 (ISO/IEC 9899:1990/AMD1:1995) */
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/wchar.h) */
+/* (#) Portability: DJGPP         (/include/wchar.h) */
+/* (#) Portability: FreeBSD       (/include/wchar.h) */
+/* (#) Portability: GNU C Library (/wcsmbs/wchar.h) */
+/* (#) Portability: MSVC          (/include/wchar.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/wchar.h) */
+/* (#) Portability: NetBSD        (/include/wchar.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/wchar.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/wchar.h) */
+/* (#) Portability: diet libc     (/include/wchar.h) */
+/* (#) Portability: musl libc     (/include/wchar.h) */
+/* (#) Portability: uClibc        (/include/wchar.h) */
+}
 
 %[define_ccompat_header("cwchar")]
 

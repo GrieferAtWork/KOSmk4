@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea39bf17 */
+/* HASH CRC-32:0x82746455 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,15 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/statvfs.h) */
+/* (#) Portability: DJGPP         (/include/sys/statvfs.h) */
+/* (#) Portability: GNU C Library (/io/sys/statvfs.h) */
+/* (#) Portability: NetBSD        (/sys/sys/statvfs.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/statvfs.h) */
+/* (#) Portability: diet libc     (/include/sys/statvfs.h) */
+/* (#) Portability: musl libc     (/include/sys/statvfs.h) */
+/* (#) Portability: uClibc        (/include/sys/statvfs.h) */
 #include <features.h>
 
 #include <asm/os/statvfs.h>  /* __ST_* */

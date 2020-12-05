@@ -17,6 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/uio.h) */
+/* (#) Portability: DJGPP         (/include/sys/uio.h) */
+/* (#) Portability: GNU C Library (/misc/sys/uio.h) */
+/* (#) Portability: NetBSD        (/sys/sys/uio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/uio.h) */
+/* (#) Portability: diet libc     (/include/sys/uio.h) */
+/* (#) Portability: musl libc     (/include/sys/uio.h) */
+/* (#) Portability: uClibc        (/include/sys/uio.h) */
+}
 
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(pid_t      = __pid_t)]

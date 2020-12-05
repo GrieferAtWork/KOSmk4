@@ -17,7 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-
+%{
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/utime.h) */
+/* (#) Portability: DJGPP         (/include/utime.h) */
+/* (#) Portability: FreeBSD       (/include/utime.h) */
+/* (#) Portability: GNU C Library (/io/utime.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/utime.h) */
+/* (#) Portability: NetBSD        (/include/utime.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/utime.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/utime.h) */
+/* (#) Portability: diet libc     (/include/utime.h) */
+/* (#) Portability: musl libc     (/include/utime.h) */
+/* (#) Portability: uClibc        (/include/utime.h) */
+}
 
 %[default:section(".text.crt{|.dos}.fs.modify_time")]
 %[define_replacement(fd_t       = __fd_t)]

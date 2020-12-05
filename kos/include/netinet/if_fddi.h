@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/if_fddi.h) */
+/* (#) Portability: uClibc        (/include/netinet/if_fddi.h) */
 #ifndef _NETINET_IF_FDDI_H
 #define _NETINET_IF_FDDI_H 1
 

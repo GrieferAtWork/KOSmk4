@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/newlib/libc/include/stdio_ext.h) */
+/* (#) Portability: GNU C Library (/stdio-common/stdio_ext.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/stdio_ext.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdio_ext.h) */
+/* (#) Portability: diet libc     (/include/stdio_ext.h) */
+/* (#) Portability: musl libc     (/include/stdio_ext.h) */
+/* (#) Portability: uClibc        (/include/stdio_ext.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.FILE.utility.ext")]

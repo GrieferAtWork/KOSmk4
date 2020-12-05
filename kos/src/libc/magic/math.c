@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/math.h) */
+/* (#) Portability: DJGPP         (/include/math.h) */
+/* (#) Portability: GNU C Library (/math/math.h) */
+/* (#) Portability: MSVC          (/include/math.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/math.h) */
+/* (#) Portability: NetBSD        (/include/math.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/math.h) */
+/* (#) Portability: diet libc     (/include/math.h) */
+/* (#) Portability: musl libc     (/include/math.h) */
+/* (#) Portability: uClibc        (/include/math.h) */
+}
 
 %[define_ccompat_header("cmath")]
 %[default:section(".text.crt{|.dos}.math.math")]

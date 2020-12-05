@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda8c130b */
+/* HASH CRC-32:0xa02bb46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,15 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: GNU C Library (/misc/sys/select.h) */
+/* (#) Portability: NetBSD        (/sys/sys/select.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/select.h) */
+/* (#) Portability: diet libc     (/include/sys/select.h) */
+/* (#) Portability: musl libc     (/include/sys/select.h) */
+/* (#) Portability: uClibc        (/include/sys/select.h) */
 #include <features.h>
 
 #include <hybrid/typecore.h>

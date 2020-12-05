@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/fnmatch.h) */
+/* (#) Portability: DJGPP         (/include/fnmatch.h) */
+/* (#) Portability: FreeBSD       (/include/fnmatch.h) */
+/* (#) Portability: GNU C Library (/posix/fnmatch.h) */
+/* (#) Portability: NetBSD        (/include/fnmatch.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/fnmatch.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/fnmatch.h) */
+/* (#) Portability: diet libc     (/include/fnmatch.h) */
+/* (#) Portability: musl libc     (/include/fnmatch.h) */
+/* (#) Portability: uClibc        (/include/fnmatch.h) */
+}
+
 %[default:section(".text.crt{|.dos}.string.match")]
 
 %{

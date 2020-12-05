@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: FreeBSD (/include/stringlist.h) */
+/* (#) Portability: NetBSD  (/include/stringlist.h) */
+}
 
 %[define_replacement(pid_t = __pid_t)]
 %[default:section(".text.crt{|.dos}.bsd.stringlist")]

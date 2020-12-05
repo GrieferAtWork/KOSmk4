@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: FreeBSD       (/include/ulimit.h) */
+/* (#) Portability: GNU C Library (/resource/ulimit.h) */
+/* (#) Portability: NetBSD        (/include/ulimit.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ulimit.h) */
+/* (#) Portability: musl libc     (/include/ulimit.h) */
+/* (#) Portability: uClibc        (/include/ulimit.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]

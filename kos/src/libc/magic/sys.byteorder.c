@@ -17,14 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/byteorder.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 
 %[insert:prefix(
 #include <features.h>
 )]%{
-
-/* API_LEVEL: opensolaris */
 
 }%[insert:prefix(
 #include <hybrid/__byteorder.h>
@@ -36,8 +37,8 @@
 #include <hybrid/typecore.h>
 )]%{
 
-#include <sys/isa_defs.h>  /* Mandatory dependency (for opensolaris compat) */
-#include <sys/int_types.h> /* Mandatory dependency (for opensolaris compat) */
+#include <sys/isa_defs.h>  /* Mandatory dependency (for OpenSolaris compat) */
+#include <sys/int_types.h> /* Mandatory dependency (for OpenSolaris compat) */
 
 #if !defined(__USE_XOPEN_EXTENDED) || defined(__USE_SOLARIS)
 #define BSWAP_8(x)  ((x) & __UINT8_C(0xff))

@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/fenv.h) */
+/* (#) Portability: GNU C Library (/math/fenv.h) */
+/* (#) Portability: MSVC          (/include/fenv.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/fenv.h) */
+/* (#) Portability: NetBSD        (/include/fenv.h) */
+/* (#) Portability: diet libc     (/include/fenv.h) */
+/* (#) Portability: musl libc     (/include/fenv.h) */
+/* (#) Portability: uClibc        (/include/fenv.h) */
+}
 
 %[define_ccompat_header("cfenv")]
 %[define_replacement(errno_t = __errno_t)]

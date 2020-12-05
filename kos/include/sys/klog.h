@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cb02625 */
+/* HASH CRC-32:0x48aa9304 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,10 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/klog.h) */
+/* (#) Portability: diet libc     (/include/sys/klog.h) */
+/* (#) Portability: musl libc     (/include/sys/klog.h) */
+/* (#) Portability: uClibc        (/include/sys/klog.h) */
 #include <features.h>
 
 /* Documentation taken from GLibc /usr/include/i386-linux-gnu/sys/klog.h */

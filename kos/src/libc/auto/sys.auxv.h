@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae45e5ec */
+/* HASH CRC-32:0x46e96cc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,11 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return the value associated with an Elf*_auxv_t type from the auxv list
- * passed to the program on startup.  If TYPE was not present in the auxv
- * list, returns zero and sets errno to ENOENT */
+/* >> getauxval(3)
+ * Return the value associated with a named `type' from the
+ * auxillary information vector passed to the calling program
+ * by the kernel.
+ * @param: type: One of `AT_*' from <elf.h> */
 INTDEF ulongptr_t NOTHROW_NCX(LIBDCALL libd_getauxval)(ulongptr_t type);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/swap.h) */
+/* (#) Portability: NetBSD        (/sys/sys/swap.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/swap.h) */
+/* (#) Portability: diet libc     (/include/sys/swap.h) */
+/* (#) Portability: musl libc     (/include/sys/swap.h) */
+/* (#) Portability: uClibc        (/include/sys/swap.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.fs.swap")]

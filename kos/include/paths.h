@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/paths.h) */
+/* (#) Portability: FreeBSD       (/include/paths.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/paths.h) */
+/* (#) Portability: NetBSD        (/include/paths.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/paths.h) */
+/* (#) Portability: diet libc     (/include/paths.h) */
+/* (#) Portability: musl libc     (/include/paths.h) */
+/* (#) Portability: uClibc        (/include/paths.h) */
 #ifndef _PATHS_H
 #define _PATHS_H 1
 

@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC      (/include/cstddef) */
+/* (#) Portability: diet libc (/include/cstddef) */
 #ifndef _CXX_CSTDDEF
 #define _CXX_CSTDDEF 1
 #ifndef _STDDEF_H

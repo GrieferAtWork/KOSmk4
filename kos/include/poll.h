@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/poll.h) */
+/* (#) Portability: GNU C Library (/io/poll.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/poll.h) */
+/* (#) Portability: diet libc     (/include/poll.h) */
+/* (#) Portability: musl libc     (/include/poll.h) */
+/* (#) Portability: uClibc        (/include/poll.h) */
 #ifndef _POLL_H
 #define _POLL_H 1
 #include <sys/poll.h>

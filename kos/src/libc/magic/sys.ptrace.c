@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/ptrace.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ptrace.h) */
+/* (#) Portability: diet libc     (/include/sys/ptrace.h) */
+/* (#) Portability: musl libc     (/include/sys/ptrace.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]

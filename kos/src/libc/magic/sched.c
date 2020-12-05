@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sched.h) */
+/* (#) Portability: GNU C Library (/posix/sched.h) */
+/* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/sched.h) */
+/* (#) Portability: NetBSD        (/include/sched.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sched.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/sched.h) */
+/* (#) Portability: diet libc     (/include/sched.h) */
+/* (#) Portability: musl libc     (/include/sched.h) */
+/* (#) Portability: uClibc        (/include/sched.h) */
+}
 
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(cpu_set_t = "struct __cpu_set_struct")]

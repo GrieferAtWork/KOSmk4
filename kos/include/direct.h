@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf057270d */
+/* HASH CRC-32:0x297ddaaf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: DJGPP (/include/direct.h) */
+/* (#) Portability: MSVC  (/include/direct.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/direct.h) */
 #include <features.h>
 
 #include <hybrid/typecore.h>

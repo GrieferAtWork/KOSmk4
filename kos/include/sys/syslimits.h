@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/syslimits.h) */
+/* (#) Portability: NetBSD (/sys/sys/syslimits.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/syslimits.h) */
 #ifndef _SYS_SYSLIMITS_H
 #define _SYS_SYSLIMITS_H 1
 

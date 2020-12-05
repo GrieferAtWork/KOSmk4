@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/xattr.h) */
+/* (#) Portability: GNU C Library (/misc/sys/xattr.h) */
+/* (#) Portability: NetBSD        (/sys/sys/xattr.h) */
+/* (#) Portability: diet libc     (/include/sys/xattr.h) */
+/* (#) Portability: musl libc     (/include/sys/xattr.h) */
+/* (#) Portability: uClibc        (/include/sys/xattr.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 

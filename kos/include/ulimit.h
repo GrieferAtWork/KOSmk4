@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd0a9f67 */
+/* HASH CRC-32:0x542c161b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,13 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: FreeBSD       (/include/ulimit.h) */
+/* (#) Portability: GNU C Library (/resource/ulimit.h) */
+/* (#) Portability: NetBSD        (/include/ulimit.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ulimit.h) */
+/* (#) Portability: musl libc     (/include/ulimit.h) */
+/* (#) Portability: uClibc        (/include/ulimit.h) */
 #include <features.h>
 #include <asm/os/ulimit.h>
 

@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/un.h) */
+/* (#) Portability: GNU C Library (/socket/sys/un.h) */
+/* (#) Portability: NetBSD        (/sys/sys/un.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/un.h) */
+/* (#) Portability: diet libc     (/include/sys/un.h) */
+/* (#) Portability: musl libc     (/include/sys/un.h) */
+/* (#) Portability: uClibc        (/include/sys/un.h) */
 #ifndef _SYS_UN_H
 #define _SYS_UN_H 1
 

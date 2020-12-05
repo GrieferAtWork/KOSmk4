@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x601a3ff7 */
+/* HASH CRC-32:0x6bfb72d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,15 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/inet.h) */
+/* (#) Portability: FreeBSD       (/include/arpa/inet.h) */
+/* (#) Portability: GNU C Library (/inet/arpa/inet.h) */
+/* (#) Portability: NetBSD        (/include/arpa/inet.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/arpa/inet.h) */
+/* (#) Portability: diet libc     (/include/arpa/inet.h) */
+/* (#) Portability: musl libc     (/include/arpa/inet.h) */
+/* (#) Portability: uClibc        (/include/arpa/inet.h) */
 #include <features.h>
 
 #include <bits/types.h>

@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/regex.h) */
+/* (#) Portability: DJGPP         (/include/regex.h) */
+/* (#) Portability: FreeBSD       (/include/regex.h) */
+/* (#) Portability: GNU C Library (/posix/regex.h) */
+/* (#) Portability: NetBSD        (/include/regex.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
+/* (#) Portability: diet libc     (/include/regex.h) */
+/* (#) Portability: musl libc     (/include/regex.h) */
+/* (#) Portability: uClibc        (/include/regex.h) */
+}
 
 %[define_replacement(errno_t = __errno_t)]
 %[define_replacement(s_reg_t = __LONGPTR_TYPE__)]

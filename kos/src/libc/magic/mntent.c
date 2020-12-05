@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/mntent.h) */
+/* (#) Portability: DJGPP         (/include/mntent.h) */
+/* (#) Portability: GNU C Library (/misc/mntent.h) */
+/* (#) Portability: diet libc     (/include/mntent.h) */
+/* (#) Portability: musl libc     (/include/mntent.h) */
+/* (#) Portability: uClibc        (/include/mntent.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.database.mntent")]

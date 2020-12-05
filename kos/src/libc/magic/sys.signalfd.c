@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/signalfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/signalfd.h) */
+/* (#) Portability: diet libc     (/include/sys/signalfd.h) */
+/* (#) Portability: musl libc     (/include/sys/signalfd.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.sched.signalfd")]

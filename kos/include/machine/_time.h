@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/machine/_time.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/machine/_time.h) */
 #ifndef _MACHINE__TIME_H
 #define _MACHINE__TIME_H 1
 

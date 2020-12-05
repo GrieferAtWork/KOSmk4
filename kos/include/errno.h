@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b67ae24 */
+/* HASH CRC-32:0xf16a9ff9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,19 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/errno.h) */
+/* (#) Portability: DJGPP         (/include/errno.h) */
+/* (#) Portability: GNU C Library (/stdlib/errno.h) */
+/* (#) Portability: MSVC          (/include/errno.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
+/* (#) Portability: NetBSD        (/include/errno.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/errno.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
+/* (#) Portability: diet libc     (/include/errno.h) */
+/* (#) Portability: musl libc     (/include/errno.h) */
+/* (#) Portability: uClibc        (/include/errno.h) */
 #include <features.h>
 
 #include <asm/os/errno.h>

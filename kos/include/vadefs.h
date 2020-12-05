@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC  (/include/vadefs.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/vadefs.h) */
 #ifndef _VADEFS_H
 #define _VADEFS_H 1
 

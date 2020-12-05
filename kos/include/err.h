@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x190c05a7 */
+/* HASH CRC-32:0xa357544c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
+/* (#) Portability: FreeBSD       (/include/err.h) */
+/* (#) Portability: GNU C Library (/misc/err.h) */
+/* (#) Portability: NetBSD        (/include/err.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
+/* (#) Portability: diet libc     (/include/err.h) */
+/* (#) Portability: musl libc     (/include/err.h) */
+/* (#) Portability: uClibc        (/include/err.h) */
 #include <features.h>
 #include <kos/anno.h>
 #include <bits/types.h>

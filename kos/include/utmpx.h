@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6df65d9c */
+/* HASH CRC-32:0xd44e1e93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,15 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/utmpx.h) */
+/* (#) Portability: FreeBSD       (/include/utmpx.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/utmpx.h) */
+/* (#) Portability: NetBSD        (/include/utmpx.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/utmpx.h) */
+/* (#) Portability: diet libc     (/include/utmpx.h) */
+/* (#) Portability: musl libc     (/include/utmpx.h) */
+/* (#) Portability: uClibc        (/include/utmpx.h) */
 #include <features.h>
 
 #include <bits/crt/db/utmpx.h>

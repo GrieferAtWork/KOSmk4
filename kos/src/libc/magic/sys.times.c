@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/times.h) */
+/* (#) Portability: DJGPP         (/include/sys/times.h) */
+/* (#) Portability: GNU C Library (/posix/sys/times.h) */
+/* (#) Portability: NetBSD        (/sys/sys/times.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/times.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/times.h) */
+/* (#) Portability: diet libc     (/include/sys/times.h) */
+/* (#) Portability: musl libc     (/include/sys/times.h) */
+/* (#) Portability: uClibc        (/include/sys/times.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(clock_t = __clock_t)]

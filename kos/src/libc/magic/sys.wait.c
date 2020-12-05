@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/wait.h) */
+/* (#) Portability: DJGPP         (/include/sys/wait.h) */
+/* (#) Portability: GNU C Library (/posix/sys/wait.h) */
+/* (#) Portability: NetBSD        (/sys/sys/wait.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/wait.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/wait.h) */
+/* (#) Portability: diet libc     (/include/sys/wait.h) */
+/* (#) Portability: musl libc     (/include/sys/wait.h) */
+/* (#) Portability: uClibc        (/include/sys/wait.h) */
+}
 
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(rusage32 = __rusage32)]

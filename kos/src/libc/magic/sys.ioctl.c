@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ioctl.h) */
+/* (#) Portability: DJGPP         (/include/sys/ioctl.h) */
+/* (#) Portability: GNU C Library (/misc/sys/ioctl.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ioctl.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ioctl.h) */
+/* (#) Portability: diet libc     (/include/sys/ioctl.h) */
+/* (#) Portability: musl libc     (/include/sys/ioctl.h) */
+/* (#) Portability: uClibc        (/include/sys/ioctl.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]

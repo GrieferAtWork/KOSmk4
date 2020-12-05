@@ -17,6 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/inet.h) */
+/* (#) Portability: FreeBSD       (/include/arpa/inet.h) */
+/* (#) Portability: GNU C Library (/inet/arpa/inet.h) */
+/* (#) Portability: NetBSD        (/include/arpa/inet.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/arpa/inet.h) */
+/* (#) Portability: diet libc     (/include/arpa/inet.h) */
+/* (#) Portability: musl libc     (/include/arpa/inet.h) */
+/* (#) Portability: uClibc        (/include/arpa/inet.h) */
+}
 
 %[default:section(".text.crt{|.dos}.net.inet")]
 %[define_replacement(fd_t = __fd_t)]

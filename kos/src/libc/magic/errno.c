@@ -17,6 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/errno.h) */
+/* (#) Portability: DJGPP         (/include/errno.h) */
+/* (#) Portability: GNU C Library (/stdlib/errno.h) */
+/* (#) Portability: MSVC          (/include/errno.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
+/* (#) Portability: NetBSD        (/include/errno.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/errno.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
+/* (#) Portability: diet libc     (/include/errno.h) */
+/* (#) Portability: musl libc     (/include/errno.h) */
+/* (#) Portability: uClibc        (/include/errno.h) */
+}
 
 %[define_replacement(errno = __libc_errno)]
 %[define_replacement(errno_t = __errno_t)]

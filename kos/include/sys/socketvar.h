@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/sys/socketvar.h) */
+/* (#) Portability: NetBSD        (/sys/sys/socketvar.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/socketvar.h) */
+/* (#) Portability: uClibc        (/include/sys/socketvar.h) */
 #ifndef _SYS_SOCKETVAR_H
 #define _SYS_SOCKETVAR_H 1
 #include <sys/socket.h>

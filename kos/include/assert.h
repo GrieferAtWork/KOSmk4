@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/assert.h) */
+/* (#) Portability: DJGPP         (/include/assert.h) */
+/* (#) Portability: FreeBSD       (/include/assert.h) */
+/* (#) Portability: GNU C Library (/assert/assert.h) */
+/* (#) Portability: MSVC          (/include/assert.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/assert.h) */
+/* (#) Portability: NetBSD        (/include/assert.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/assert.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/assert.h) */
+/* (#) Portability: diet libc     (/include/assert.h) */
+/* (#) Portability: musl libc     (/include/assert.h) */
+/* (#) Portability: uClibc        (/include/assert.h) */
+/**/
+
 /* Undef the old assert definition to allow for re-definitions! (mandated by the C standard) */
 #undef assert      /* Regular STD-C assert (with optional retry extension) */
 #undef __asserta   /* Assert + assume */
@@ -33,7 +49,7 @@
 #undef assert_failed
 #endif /* __USE_KOS */
 
-#if defined(__INTELLISENSE__)
+#ifdef __INTELLISENSE__
 #ifndef __do_assert
 #include "parts/assert.h"
 #endif /* !__do_assert */

@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: FreeBSD       (/include/libgen.h) */
+/* (#) Portability: GNU C Library (/misc/libgen.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/libgen.h) */
+/* (#) Portability: NetBSD        (/include/libgen.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/libgen.h) */
+/* (#) Portability: diet libc     (/include/libgen.h) */
+/* (#) Portability: musl libc     (/include/libgen.h) */
+/* (#) Portability: uClibc        (/include/libgen.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 

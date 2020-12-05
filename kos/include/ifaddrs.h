@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12973e60 */
+/* HASH CRC-32:0x10e25905 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,12 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/ifaddrs.h) */
+/* (#) Portability: FreeBSD       (/include/ifaddrs.h) */
+/* (#) Portability: GNU C Library (/inet/ifaddrs.h) */
+/* (#) Portability: NetBSD        (/include/ifaddrs.h) */
+/* (#) Portability: musl libc     (/include/ifaddrs.h) */
+/* (#) Portability: uClibc        (/include/ifaddrs.h) */
 #include <features.h>
 
 #include <bits/crt/ifaddrs.h>

@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: libbsd (/include/bsd/stringlist.h) */
+}
 
 %[define_replacement(errno_t = __errno_t)]
 

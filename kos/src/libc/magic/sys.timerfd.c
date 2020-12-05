@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/timerfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timerfd.h) */
+/* (#) Portability: diet libc     (/include/sys/timerfd.h) */
+/* (#) Portability: musl libc     (/include/sys/timerfd.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(itimerspec32 = __itimerspec32)]

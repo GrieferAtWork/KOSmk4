@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15226277 */
+/* HASH CRC-32:0xbea666b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,12 @@ __NAMESPACE_STD_USING(c32rtomb)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
+/* (#) Portability: FreeBSD       (/include/uchar.h) */
+/* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */
+/* (#) Portability: musl libc     (/include/uchar.h) */
+/* (#) Portability: uClibc        (/include/uchar.h) */
 #include <features.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/mbstate.h>

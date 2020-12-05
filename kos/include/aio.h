@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/aio.h) */
+/* (#) Portability: GNU C Library (/rt/aio.h) */
+/* (#) Portability: NetBSD        (/include/aio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/aio.h) */
+/* (#) Portability: musl libc     (/include/aio.h) */
 #ifndef _AIO_H
 #define _AIO_H 1
 

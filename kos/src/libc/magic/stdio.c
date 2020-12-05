@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/stdio.h) */
+/* (#) Portability: DJGPP         (/include/stdio.h) */
+/* (#) Portability: FreeBSD       (/include/stdio.h) */
+/* (#) Portability: GNU C Library (/libio/stdio.h) */
+/* (#) Portability: MSVC          (/include/stdio.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdio.h) */
+/* (#) Portability: NetBSD        (/include/stdio.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/stdio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdio.h) */
+/* (#) Portability: diet libc     (/include/stdio.h) */
+/* (#) Portability: musl libc     (/include/stdio.h) */
+/* (#) Portability: uClibc        (/include/stdio.h) */
+}
 
 /* STDIO Sections:
  * - .text.crt.FILE.locked.access         (fopen(), fclose(), ...)

@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/mqueue.h) */
+/* (#) Portability: FreeBSD       (/include/mqueue.h) */
+/* (#) Portability: GNU C Library (/rt/mqueue.h) */
+/* (#) Portability: NetBSD        (/include/mqueue.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/mqueue.h) */
+/* (#) Portability: diet libc     (/include/mqueue.h) */
+/* (#) Portability: musl libc     (/include/mqueue.h) */
+/* (#) Portability: uClibc        (/include/mqueue.h) */
 #ifndef _MQUEUE_H
 #define _MQUEUE_H 1
 

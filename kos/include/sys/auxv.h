@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe40c4afe */
+/* HASH CRC-32:0xf660fca9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,20 +28,28 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
+/* (#) Portability: diet libc     (/include/sys/auxv.h) */
+/* (#) Portability: musl libc     (/include/sys/auxv.h) */
 #include <elf.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_getauxval
-/* Return the value associated with an Elf*_auxv_t type from the auxv list
- * passed to the program on startup.  If TYPE was not present in the auxv
- * list, returns zero and sets errno to ENOENT */
+/* >> getauxval(3)
+ * Return the value associated with a named `type' from the
+ * auxillary information vector passed to the calling program
+ * by the kernel.
+ * @param: type: One of `AT_*' from <elf.h> */
 __CDECLARE(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),(__type))
 #elif defined(__CRT_HAVE___getauxval)
-/* Return the value associated with an Elf*_auxv_t type from the auxv list
- * passed to the program on startup.  If TYPE was not present in the auxv
- * list, returns zero and sets errno to ENOENT */
+/* >> getauxval(3)
+ * Return the value associated with a named `type' from the
+ * auxillary information vector passed to the calling program
+ * by the kernel.
+ * @param: type: One of `AT_*' from <elf.h> */
 __CREDIRECT(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
 #endif /* ... */
 

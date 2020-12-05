@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/shadow/shadow.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/shadow.h) */
+/* (#) Portability: diet libc     (/include/shadow.h) */
+/* (#) Portability: musl libc     (/include/shadow.h) */
+/* (#) Portability: uClibc        (/include/shadow.h) */
+}
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
 %[default:section(".text.crt{|.dos}.database.shadow")]

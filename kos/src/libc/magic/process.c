@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin      (/winsup/cygwin/include/process.h) */
+/* (#) Portability: DJGPP       (/include/process.h) */
+/* (#) Portability: MSVC        (/include/process.h) */
+/* (#) Portability: MinGW       (/mingw-w64-headers/crt/process.h) */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/contract/process.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]

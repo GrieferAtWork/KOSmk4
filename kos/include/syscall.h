@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/misc/syscall.h) */
+/* (#) Portability: musl libc     (/include/syscall.h) */
+/* (#) Portability: uClibc        (/include/syscall.h) */
 #ifndef _SYSCALL_H
 #define _SYSCALL_H 1
 #include <sys/syscall.h>

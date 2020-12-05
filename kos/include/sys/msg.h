@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39bd95ba */
+/* HASH CRC-32:0x839bf4c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/msg.h) */
+/* (#) Portability: GNU C Library (/sysvipc/sys/msg.h) */
+/* (#) Portability: NetBSD        (/sys/sys/msg.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/msg.h) */
+/* (#) Portability: diet libc     (/include/sys/msg.h) */
+/* (#) Portability: musl libc     (/include/sys/msg.h) */
+/* (#) Portability: uClibc        (/include/sys/msg.h) */
 #include <features.h>
 #include <bits/os/msq.h>
 #include <sys/ipc.h> /* [n4217.pdf:12344] #include mandated by POSIX */

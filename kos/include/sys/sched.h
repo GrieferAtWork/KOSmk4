@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/sched.h) */
+/* (#) Portability: NetBSD (/sys/sys/sched.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/sched.h) */
 #ifndef _SYS_SCHED_H
 #define _SYS_SCHED_H 1
 

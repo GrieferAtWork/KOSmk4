@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71eb372 */
+/* HASH CRC-32:0x2939f544 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,18 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/newlib/libc/include/malloc.h) */
+/* (#) Portability: DJGPP         (/include/malloc.h) */
+/* (#) Portability: FreeBSD       (/include/malloc.h) */
+/* (#) Portability: GNU C Library (/malloc/malloc.h) */
+/* (#) Portability: MSVC          (/include/malloc.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/malloc.h) */
+/* (#) Portability: NetBSD        (/include/malloc.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/malloc.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/malloc.h) */
+/* (#) Portability: diet libc     (/include/malloc.h) */
+/* (#) Portability: musl libc     (/include/malloc.h) */
+/* (#) Portability: uClibc        (/include/malloc.h) */
 #include <features.h>
 
 #include <asm/crt/malloc.h>

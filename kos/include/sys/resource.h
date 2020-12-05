@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32bdfb35 */
+/* HASH CRC-32:0x8220da1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/resource.h) */
+/* (#) Portability: DJGPP         (/include/sys/resource.h) */
+/* (#) Portability: GNU C Library (/resource/sys/resource.h) */
+/* (#) Portability: NetBSD        (/sys/sys/resource.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/resource.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/resource.h) */
+/* (#) Portability: diet libc     (/include/sys/resource.h) */
+/* (#) Portability: musl libc     (/include/sys/resource.h) */
+/* (#) Portability: uClibc        (/include/sys/resource.h) */
 #include <features.h>
 
 #include <asm/os/resource.h>

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DJGPP         (/include/values.h) */
+/* (#) Portability: GNU C Library (/include/values.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/values.h) */
+/* (#) Portability: musl libc     (/include/values.h) */
+/* (#) Portability: uClibc        (/include/values.h) */
 #ifndef _VALUES_H
 #define _VALUES_H 1
 

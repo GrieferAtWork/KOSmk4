@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: GNU C Library (/inet/aliases.h) */
+}
 
 /* Declare a couple of crt-functions that are _always_ exported by the kernel,
  * but aren't auto-implemented through libc/auto/[...].c, but rather elsewhere:

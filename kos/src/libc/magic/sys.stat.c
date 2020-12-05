@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/stat.h) */
+/* (#) Portability: DJGPP         (/include/sys/stat.h) */
+/* (#) Portability: GNU C Library (/io/sys/stat.h) */
+/* (#) Portability: MSVC          (/include/sys/stat.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/stat.h) */
+/* (#) Portability: NetBSD        (/sys/sys/stat.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/stat.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/stat.h) */
+/* (#) Portability: diet libc     (/include/sys/stat.h) */
+/* (#) Portability: musl libc     (/include/sys/stat.h) */
+/* (#) Portability: uClibc        (/include/sys/stat.h) */
+}
 
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(atflag_t   = __atflag_t)]

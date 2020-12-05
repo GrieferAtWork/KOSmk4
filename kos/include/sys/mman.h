@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d30fd70 */
+/* HASH CRC-32:0x24f25b1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,15 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/mman.h) */
+/* (#) Portability: DJGPP         (/include/sys/mman.h) */
+/* (#) Portability: GNU C Library (/misc/sys/mman.h) */
+/* (#) Portability: NetBSD        (/sys/sys/mman.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mman.h) */
+/* (#) Portability: diet libc     (/include/sys/mman.h) */
+/* (#) Portability: musl libc     (/include/sys/mman.h) */
+/* (#) Portability: uClibc        (/include/sys/mman.h) */
 
 #include <features.h>
 #include <asm/os/mman.h>

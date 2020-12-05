@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x501bfd1b */
+/* HASH CRC-32:0xacfe1de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,11 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/shadow/shadow.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/shadow.h) */
+/* (#) Portability: diet libc     (/include/shadow.h) */
+/* (#) Portability: musl libc     (/include/shadow.h) */
+/* (#) Portability: uClibc        (/include/shadow.h) */
 #include <features.h>
 #include <paths.h>
 

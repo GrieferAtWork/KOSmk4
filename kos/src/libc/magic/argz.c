@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
+/* (#) Portability: GNU C Library (/string/argz.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */
+}
 
 %[default:section(".text.crt{|.dos}.string.argz")]
 %[define_partial_replacement(argc = ___argc)]

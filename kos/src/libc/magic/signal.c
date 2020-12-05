@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/signal.h) */
+/* (#) Portability: DJGPP         (/include/signal.h) */
+/* (#) Portability: FreeBSD       (/include/signal.h) */
+/* (#) Portability: GNU C Library (/signal/signal.h) */
+/* (#) Portability: MSVC          (/include/signal.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/signal.h) */
+/* (#) Portability: NetBSD        (/include/signal.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/signal.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
+/* (#) Portability: diet libc     (/include/signal.h) */
+/* (#) Portability: musl libc     (/include/signal.h) */
+/* (#) Portability: uClibc        (/include/signal.h) */
+}
 
 %[define_ccompat_header("csignal")]
 %[define_replacement(longptr_t    = __LONGPTR_TYPE__)]

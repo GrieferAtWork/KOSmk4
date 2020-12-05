@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e7f03ca */
+/* HASH CRC-32:0x342a5d3a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,11 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/fts.h) */
+/* (#) Portability: FreeBSD       (/include/fts.h) */
+/* (#) Portability: GNU C Library (/io/fts.h) */
+/* (#) Portability: NetBSD        (/include/fts.h) */
+/* (#) Portability: uClibc        (/include/fts.h) */
 #include <features.h>
 
 #include <bits/crt/fts.h>

@@ -102,6 +102,9 @@
 #if __GCC_VERSION_NUM >= 20700
 #define __GCC_HAS_ATTRIBUTE___unused__
 #endif
+#if __GCC_VERSION_NUM >= 20800
+#define __GCC_HAS_ATTRIBUTE___format_arg__
+#endif
 #if __GCC_VERSION_NUM >= 29600
 #define __GCC_HAS_ATTRIBUTE___pure__
 #endif
@@ -109,6 +112,7 @@
 #define __GCC_HAS_ATTRIBUTE___malloc__
 #endif
 #if __GCC_VERSION_NUM >= 30100
+#define __GCC_HAS_ATTRIBUTE___no_instrument_function__
 #define __GCC_HAS_ATTRIBUTE___noinline__
 #define __GCC_HAS_ATTRIBUTE___used__
 #define __GCC_HAS_ATTRIBUTE___deprecated__ /*  - __GCC_VERSION_NUM >= 30100
@@ -207,6 +211,9 @@
 
 #define __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #define __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#if __GCC_VERSION_NUM >= 40000
+#define __COMPILER_HAVE_PRAGMA_GCC_VISIBILITY
+#endif /* __GCC_VERSION_NUM >= 40000 */
 #if __has_feature(__tpp_pragma_deprecated__)
 #define __COMPILER_HAVE_PRAGMA_DEPRECATED
 #endif /* __has_feature(__tpp_pragma_deprecated__) */
@@ -653,8 +660,10 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __ATTR_INLINE /* Nothing */
 #elif (defined(inline) || defined(__cplusplus) || \
        (defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L))
+#define __ATTR_INLINE_IS_INLINE
 #define __ATTR_INLINE inline
 #elif __GCC_VERSION_NUM >= 20700
+#define __ATTR_INLINE_IS___INLINE__
 #define __ATTR_INLINE __inline__
 #else /* ... */
 #define __NO_ATTR_INLINE
@@ -677,6 +686,13 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __NO_ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL /* nothing */
 #endif /* __GCC_VERSION_NUM < 40300 */
+
+#if __has_attribute(__format_arg__)
+#define __ATTR_FORMAT_ARG(x) __attribute__((__format_arg__(x)))
+#else /* __has_attribute(__format_arg__) */
+#define __NO_ATTR_FORMAT_ARG
+#define __ATTR_FORMAT_ARG(x) /* nothing */
+#endif /* !__has_attribute(__format_arg__) */
 
 #define __LOCAL      static __ATTR_INLINE
 #define __FORCELOCAL static __ATTR_FORCEINLINE
@@ -720,14 +736,12 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #if __GCC_VERSION_NUM < 29200 /* __GCC_VERSION_NUM < 29500 */
 #ifndef __restrict
 #if defined(restrict) || (defined(__STDC_VERSION__) && (__STDC_VERSION__+0) >= 199901L)
+#define __RESTRICT_IS_RESTRICT
 #define __restrict restrict
 #else /* restrict || ... */
 #define __restrict /* Nothing */
 #endif /* !restrict && !... */
 #endif /* !__restrict */
-#ifndef __restrict__
-#define __restrict__ __restrict
-#endif /* !__restrict__ */
 #endif /* __GCC_VERSION_NUM < 29200 */
 
 #if __GCC_VERSION_NUM >= 30100 && !defined(__GNUG__)
@@ -794,7 +808,7 @@ __extension__ typedef unsigned long long __ulonglong_t;
 
 #if !__has_builtin(__builtin_FUNCTION)
 #define __builtin_FUNCTION() __FUNCTION__
-#endif /* !__has_builtin(__builtin_FUNCTION) */
+#endif /* __has_builtin(__builtin_FUNCTION) */
 
 #if !__has_builtin(__builtin_unreachable)
 #define __builtin_unreachable() __XBLOCK({ for (;;); (void)0; })

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/lastlog.h) */
+/* (#) Portability: GNU C Library (/login/lastlog.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/lastlog.h) */
+/* (#) Portability: musl libc     (/include/lastlog.h) */
+/* (#) Portability: uClibc        (/include/lastlog.h) */
 #ifndef _LASTLOG_H
 #define _LASTLOG_H 1
 #include <utmp.h>

@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/time.h) */
+/* (#) Portability: DJGPP         (/include/sys/time.h) */
+/* (#) Portability: GNU C Library (/time/sys/time.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/time.h) */
+/* (#) Portability: NetBSD        (/sys/sys/time.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/time.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/time.h) */
+/* (#) Portability: diet libc     (/include/sys/time.h) */
+/* (#) Portability: musl libc     (/include/sys/time.h) */
+/* (#) Portability: uClibc        (/include/sys/time.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(time_t   = "__TM_TYPE(time)")]

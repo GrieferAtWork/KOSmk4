@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8244c095 */
+/* HASH CRC-32:0x4140becd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/fnmatch.h) */
+/* (#) Portability: DJGPP         (/include/fnmatch.h) */
+/* (#) Portability: FreeBSD       (/include/fnmatch.h) */
+/* (#) Portability: GNU C Library (/posix/fnmatch.h) */
+/* (#) Portability: NetBSD        (/include/fnmatch.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/fnmatch.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/fnmatch.h) */
+/* (#) Portability: diet libc     (/include/fnmatch.h) */
+/* (#) Portability: musl libc     (/include/fnmatch.h) */
+/* (#) Portability: uClibc        (/include/fnmatch.h) */
 #include <features.h>
 
 /* TODO: These constants should go into <asm/crt/fnmatch.h> */

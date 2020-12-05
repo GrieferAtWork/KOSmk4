@@ -17,6 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/spawn.h) */
+/* (#) Portability: FreeBSD       (/include/spawn.h) */
+/* (#) Portability: GNU C Library (/posix/spawn.h) */
+/* (#) Portability: NetBSD        (/include/spawn.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/spawn.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/spawn.h) */
+/* (#) Portability: musl libc     (/include/spawn.h) */
+/* (#) Portability: uClibc        (/include/spawn.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]

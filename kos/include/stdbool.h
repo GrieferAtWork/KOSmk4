@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: DJGPP       (/include/stdbool.h) */
+/* (#) Portability: FreeBSD     (/include/stdbool.h) */
+/* (#) Portability: MSVC        (/include/stdbool.h) */
+/* (#) Portability: OpenSolaris (/usr/src/head/stdbool.h) */
+/* (#) Portability: diet libc   (/include/stdbool.h) */
+/* (#) Portability: musl libc   (/include/stdbool.h) */
 #ifndef _STDBOOL_H
 #define _STDBOOL_H 1
 

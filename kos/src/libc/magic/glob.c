@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/glob.h) */
+/* (#) Portability: DJGPP         (/include/glob.h) */
+/* (#) Portability: FreeBSD       (/include/glob.h) */
+/* (#) Portability: GNU C Library (/posix/glob.h) */
+/* (#) Portability: NetBSD        (/include/glob.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/glob.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/glob.h) */
+/* (#) Portability: diet libc     (/include/glob.h) */
+/* (#) Portability: musl libc     (/include/glob.h) */
+/* (#) Portability: uClibc        (/include/glob.h) */
+}
 
 %[default:section(".text.crt{|.dos}.utility.glob")]
 %[define_replacement(glob_t = "struct __glob_struct")]

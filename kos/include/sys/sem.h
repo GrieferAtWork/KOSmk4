@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cddd522 */
+/* HASH CRC-32:0x6dad16e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sem.h) */
+/* (#) Portability: GNU C Library (/sysvipc/sys/sem.h) */
+/* (#) Portability: NetBSD        (/sys/sys/sem.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sem.h) */
+/* (#) Portability: diet libc     (/include/sys/sem.h) */
+/* (#) Portability: musl libc     (/include/sys/sem.h) */
+/* (#) Portability: uClibc        (/include/sys/sem.h) */
 #include <features.h>
 
 #include <asm/os/sem.h>

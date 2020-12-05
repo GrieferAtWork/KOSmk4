@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: libbsd (/include/bsd/sys/param.h) */
 #ifndef _BSD_SYS_PARAM_H
 #define _BSD_SYS_PARAM_H 1
 

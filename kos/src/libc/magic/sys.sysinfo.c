@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysinfo.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/sysinfo.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysinfo.h) */
+/* (#) Portability: diet libc     (/include/sys/sysinfo.h) */
+/* (#) Portability: musl libc     (/include/sys/sysinfo.h) */
+/* (#) Portability: uClibc        (/include/sys/sysinfo.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.system.info")]

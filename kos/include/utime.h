@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2c557e9 */
+/* HASH CRC-32:0x696b9f21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,18 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/utime.h) */
+/* (#) Portability: DJGPP         (/include/utime.h) */
+/* (#) Portability: FreeBSD       (/include/utime.h) */
+/* (#) Portability: GNU C Library (/io/utime.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/utime.h) */
+/* (#) Portability: NetBSD        (/include/utime.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/utime.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/utime.h) */
+/* (#) Portability: diet libc     (/include/utime.h) */
+/* (#) Portability: musl libc     (/include/utime.h) */
+/* (#) Portability: uClibc        (/include/utime.h) */
 #include <features.h>
 
 #include <bits/types.h>

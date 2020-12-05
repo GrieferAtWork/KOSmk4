@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DJGPP (/include/file.h) */
 #ifndef _FILE_H
 #define _FILE_H 1
 #include <sys/file.h>

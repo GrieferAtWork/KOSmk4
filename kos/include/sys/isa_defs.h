@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/isa_defs.h) */
 #ifndef _SYS_ISA_DEFS_H
 #define _SYS_ISA_DEFS_H 1
 

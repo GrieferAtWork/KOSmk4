@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/pty.h) */
+/* (#) Portability: GNU C Library (/login/pty.h) */
+/* (#) Portability: diet libc     (/include/pty.h) */
+/* (#) Portability: musl libc     (/include/pty.h) */
+/* (#) Portability: uClibc        (/include/pty.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]

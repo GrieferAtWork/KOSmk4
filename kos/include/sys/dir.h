@@ -17,10 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/dir.h) */
+/* (#) Portability: DJGPP         (/include/sys/dir.h) */
+/* (#) Portability: GNU C Library (/misc/sys/dir.h) */
+/* (#) Portability: NetBSD        (/sys/sys/dir.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/dir.h) */
+/* (#) Portability: musl libc     (/include/sys/dir.h) */
+/* (#) Portability: uClibc        (/include/sys/dir.h) */
 #ifndef _SYS_DIR_H
 #define _SYS_DIR_H 1
 
 #include <dirent.h>
-#define direct dirent
+#define direct   dirent
+#ifdef __USE_LARGEFILE64
+#define direct64 dirent64
+#endif /* __USE_LARGEFILE64 */
 
 #endif /* !_SYS_DIR_H */

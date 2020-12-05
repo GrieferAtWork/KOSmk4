@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD (/lib/libutil/libutil.h) */
 #ifndef _LIBUTIL_H
 #define _LIBUTIL_H 1
 #include <util.h>

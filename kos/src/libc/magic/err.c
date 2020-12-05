@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
+/* (#) Portability: FreeBSD       (/include/err.h) */
+/* (#) Portability: GNU C Library (/misc/err.h) */
+/* (#) Portability: NetBSD        (/include/err.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
+/* (#) Portability: diet libc     (/include/err.h) */
+/* (#) Portability: musl libc     (/include/err.h) */
+/* (#) Portability: uClibc        (/include/err.h) */
+}
 
 %[define_replacement(errno_t = __errno_t)]
 %[default:section(".text.crt{|.dos}.error")]

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/byteswap.h) */
+/* (#) Portability: GNU C Library (/string/byteswap.h) */
+/* (#) Portability: diet libc     (/include/byteswap.h) */
+/* (#) Portability: musl libc     (/include/byteswap.h) */
+/* (#) Portability: uClibc        (/include/byteswap.h) */
 #ifndef _BYTESWAP_H
 #define _BYTESWAP_H 1
 

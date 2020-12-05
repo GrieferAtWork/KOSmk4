@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cf95f66 */
+/* HASH CRC-32:0xcb71efad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/ucontext.h) */
+/* (#) Portability: FreeBSD       (/sys/[...]/include/ucontext.h) */
+/* (#) Portability: GNU C Library (/stdlib/ucontext.h) */
+/* (#) Portability: NetBSD        (/include/ucontext.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ucontext.h) */
+/* (#) Portability: diet libc     (/include/ucontext.h) */
+/* (#) Portability: musl libc     (/include/ucontext.h) */
+/* (#) Portability: uClibc        (/include/ucontext.h) */
 #include <features.h>
 
 #include <asm/crt/ucontext.h> /* `__CRT_SUPPORTS_UCONTEXT' */

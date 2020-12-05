@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/dirent.h) */
+/* (#) Portability: DJGPP         (/include/dirent.h) */
+/* (#) Portability: FreeBSD       (/include/dirent.h) */
+/* (#) Portability: GNU C Library (/dirent/dirent.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/dirent.h) */
+/* (#) Portability: NetBSD        (/include/dirent.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/dirent.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/dirent.h) */
+/* (#) Portability: diet libc     (/include/dirent.h) */
+/* (#) Portability: musl libc     (/include/dirent.h) */
+/* (#) Portability: uClibc        (/include/dirent.h) */
+}
 
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(off_t      = "__FS_TYPE(off)")]

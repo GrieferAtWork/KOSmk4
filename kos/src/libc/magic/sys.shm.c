@@ -17,6 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/shm.h) */
+/* (#) Portability: GNU C Library (/sysvipc/sys/shm.h) */
+/* (#) Portability: NetBSD        (/sys/sys/shm.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/shm.h) */
+/* (#) Portability: diet libc     (/include/sys/shm.h) */
+/* (#) Portability: musl libc     (/include/sys/shm.h) */
+/* (#) Portability: uClibc        (/include/sys/shm.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]

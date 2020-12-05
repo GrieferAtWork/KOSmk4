@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51ec6f17 */
+/* HASH CRC-32:0x308c0af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin        (/newlib/libc/include/envz.h) */
+/* (#) Portability: GNU C Library (/string/envz.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/envz.h) */
 #include <features.h>
 #include <bits/types.h>
 #include <argz.h>

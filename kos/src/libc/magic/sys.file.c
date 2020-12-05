@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/file.h) */
+/* (#) Portability: DJGPP         (/include/sys/file.h) */
+/* (#) Portability: GNU C Library (/misc/sys/file.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/file.h) */
+/* (#) Portability: NetBSD        (/sys/sys/file.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/file.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/file.h) */
+/* (#) Portability: diet libc     (/include/sys/file.h) */
+/* (#) Portability: musl libc     (/include/sys/file.h) */
+/* (#) Portability: uClibc        (/include/sys/file.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 

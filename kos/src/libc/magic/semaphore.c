@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/semaphore.h) */
+/* (#) Portability: FreeBSD       (/include/semaphore.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/semaphore.h) */
+/* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/semaphore.h) */
+/* (#) Portability: NetBSD        (/include/semaphore.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/semaphore.h) */
+/* (#) Portability: diet libc     (/include/semaphore.h) */
+/* (#) Portability: musl libc     (/include/semaphore.h) */
+/* (#) Portability: uClibc        (/libpthread/nptl/semaphore.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]

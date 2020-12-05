@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/ifaddrs.h) */
+/* (#) Portability: FreeBSD       (/include/ifaddrs.h) */
+/* (#) Portability: GNU C Library (/inet/ifaddrs.h) */
+/* (#) Portability: NetBSD        (/include/ifaddrs.h) */
+/* (#) Portability: musl libc     (/include/ifaddrs.h) */
+/* (#) Portability: uClibc        (/include/ifaddrs.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]

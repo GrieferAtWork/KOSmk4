@@ -17,6 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/error.h) */
+/* (#) Portability: GNU C Library (/misc/error.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/include/error.h) */
+/* (#) Portability: uClibc        (/include/error.h) */
+}
 
 %[define_replacement(errno_t = __errno_t)]
 %[default:section(".text.crt{|.dos}.error")]

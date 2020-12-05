@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD       (/include/unwind.h) */
+/* (#) Portability: GNU C Library (/sysdeps/[...]/unwind.h) */
+/* (#) Portability: NetBSD        (/sys/lib/libunwind/unwind.h) */
 #ifndef _UNWIND_H
 #define _UNWIND_H 1
 

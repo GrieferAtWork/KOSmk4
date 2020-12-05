@@ -17,6 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD       (/include/link.h) */
+/* (#) Portability: GNU C Library (/elf/link.h) */
+/* (#) Portability: NetBSD        (/include/link.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/link.h) */
+/* (#) Portability: diet libc     (/include/link.h) */
+/* (#) Portability: musl libc     (/include/link.h) */
+/* (#) Portability: uClibc        (/include/link.h) */
 #ifndef _LINK_H
 #define _LINK_H 1
 

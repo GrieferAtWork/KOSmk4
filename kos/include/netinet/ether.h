@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51c6a2f */
+/* HASH CRC-32:0xa0d05609 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,10 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: GNU C Library (/inet/netinet/ether.h) */
+/* (#) Portability: diet libc     (/include/netinet/ether.h) */
+/* (#) Portability: musl libc     (/include/netinet/ether.h) */
+/* (#) Portability: uClibc        (/include/netinet/ether.h) */
 #include <features.h>
 
 #include <net/ethernet.h>

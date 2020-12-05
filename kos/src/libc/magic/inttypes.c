@@ -17,6 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
+/* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/inttypes.h) */
+/* (#) Portability: DJGPP         (/include/inttypes.h) */
+/* (#) Portability: FreeBSD       (/include/inttypes.h) */
+/* (#) Portability: GNU C Library (/stdlib/inttypes.h) */
+/* (#) Portability: MSVC          (/include/inttypes.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/inttypes.h) */
+/* (#) Portability: NetBSD        (/include/inttypes.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/inttypes.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/inttypes.h) */
+/* (#) Portability: diet libc     (/include/inttypes.h) */
+/* (#) Portability: musl libc     (/include/inttypes.h) */
+/* (#) Portability: uClibc        (/include/inttypes.h) */
+}
 
 %[define_ccompat_header("cinttypes")]
 %[define_replacement(intmax_t  = __INTMAX_TYPE__)]

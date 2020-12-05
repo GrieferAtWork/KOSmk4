@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: uClibc (/include/_lfs_64.h) */
 #include <features.h>
 
 #if defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS + 0) != 64

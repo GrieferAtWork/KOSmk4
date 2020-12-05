@@ -17,10 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD (/sys/sys/_null.h) */
 #ifndef NULL
-
-/* API_LEVEL: bsd */
-
 #include <__stdinc.h>
 #ifndef NULL
 #define NULL __NULLPTR

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f0935ed */
+/* HASH CRC-32:0xe1364afb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/time.h) */
+/* (#) Portability: DJGPP         (/include/sys/time.h) */
+/* (#) Portability: GNU C Library (/time/sys/time.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/time.h) */
+/* (#) Portability: NetBSD        (/sys/sys/time.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/time.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/time.h) */
+/* (#) Portability: diet libc     (/include/sys/time.h) */
+/* (#) Portability: musl libc     (/include/sys/time.h) */
+/* (#) Portability: uClibc        (/include/sys/time.h) */
 #include <features.h>
 
 #include <asm/os/itimer.h> /* __ITIMER_* */

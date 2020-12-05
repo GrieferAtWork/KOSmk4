@@ -17,6 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/unistd.h) */
+/* (#) Portability: DJGPP         (/include/unistd.h) */
+/* (#) Portability: FreeBSD       (/include/unistd.h) */
+/* (#) Portability: GNU C Library (/posix/unistd.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/unistd.h) */
+/* (#) Portability: NetBSD        (/include/unistd.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/unistd.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/unistd.h) */
+/* (#) Portability: diet libc     (/include/unistd.h) */
+/* (#) Portability: musl libc     (/include/unistd.h) */
+/* (#) Portability: uClibc        (/include/unistd.h) */
+}
 
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(off_t      = "__FS_TYPE(off)")]

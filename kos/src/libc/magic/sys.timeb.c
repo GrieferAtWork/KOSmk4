@@ -17,6 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%{
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/timeb.h) */
+/* (#) Portability: DJGPP         (/include/sys/timeb.h) */
+/* (#) Portability: GNU C Library (/time/sys/timeb.h) */
+/* (#) Portability: MSVC          (/include/sys/timeb.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/timeb.h) */
+/* (#) Portability: NetBSD        (/sys/sys/timeb.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/timeb.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timeb.h) */
+/* (#) Portability: diet libc     (/include/sys/timeb.h) */
+/* (#) Portability: musl libc     (/include/sys/timeb.h) */
+/* (#) Portability: uClibc        (/include/sys/timeb.h) */
+}
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(time_t = "__TM_TYPE(time)")]

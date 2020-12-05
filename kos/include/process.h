@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b427e3d */
+/* HASH CRC-32:0x47063984 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,11 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+/* (#) Portability: Cygwin      (/winsup/cygwin/include/process.h) */
+/* (#) Portability: DJGPP       (/include/process.h) */
+/* (#) Portability: MSVC        (/include/process.h) */
+/* (#) Portability: MinGW       (/mingw-w64-headers/crt/process.h) */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/contract/process.h) */
 #include <features.h>
 
 #include <asm/crt/process.h>

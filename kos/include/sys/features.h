@@ -17,7 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/features.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/features.h) */
 #ifndef _SYS_FEATURES_H
 #define _SYS_FEATURES_H 1
+
 #include <features.h>
+
 #endif /* !_SYS_FEATURES_H */
