@@ -551,10 +551,10 @@ DlModule_ElfVerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
 	            ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
 	            ehdr->e_ident[EI_MAG3] != ELFMAG3)
 		goto err;
-	reason = "e_ident[EI_CLASS] != ELF" ELF_ARCH_CLASSNAME;
+	reason = "e_ident[EI_CLASS] != ELF" ELF_CLASSNAME(ELF_ARCH_CLASS);
 	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
 		goto err;
-	reason = "e_ident[EI_DATA] != ELF" ELF_ARCH_DATANAME;
+	reason = "e_ident[EI_DATA] != ELF" ELF_DATANAME(ELF_ARCH_DATA);
 	if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
 		goto err;
 	reason = "e_ident[EI_VERSION] != EV_CURRENT";
@@ -568,7 +568,7 @@ DlModule_ElfVerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
 		if unlikely(ehdr->e_type != ET_DYN)
 			goto err;
 	}
-	reason = "e_machine != EM_" ELF_ARCH_MACHINENAME;
+	reason = "e_machine != EM_" ELF_EMNAME(ELF_ARCH_MACHINE);
 	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 		goto err;
 	reason = "ehdr.e_ehsize < offsetafter(ElfW(Ehdr), e_phnum)";

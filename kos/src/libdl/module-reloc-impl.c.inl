@@ -289,7 +289,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_NEG_TPOFF32
 #ifndef ELF_ARCH_NAME_R_NEG_TPOFF32
-#define ELF_ARCH_NAME_R_NEG_TPOFF32 "R_" ELF_ARCH_MACHINENAME "_NEG_TPOFF32"
+#define ELF_ARCH_NAME_R_NEG_TPOFF32 "R_" ELF_EMNAME(ELF_ARCH_MACHINE) "_NEG_TPOFF32"
 #endif /* !ELF_ARCH_NAME_R_NEG_TPOFF32 */
 		ELF_ARCH_CASE_R_NEG_TPOFF32: {
 			DlModule *tls_module;
@@ -317,7 +317,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_NEG_TPOFF64
 #ifndef ELF_ARCH_NAME_R_NEG_TPOFF64
-#define ELF_ARCH_NAME_R_NEG_TPOFF64 "R_" ELF_ARCH_MACHINENAME "_NEG_TPOFF64"
+#define ELF_ARCH_NAME_R_NEG_TPOFF64 "R_" ELF_EMNAME(ELF_ARCH_MACHINE) "_NEG_TPOFF64"
 #endif /* !ELF_ARCH_NAME_R_NEG_TPOFF64 */
 		ELF_ARCH_CASE_R_NEG_TPOFF64: {
 			DlModule *tls_module;
@@ -345,7 +345,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_TPOFF32
 #ifndef ELF_ARCH_NAME_R_TPOFF32
-#define ELF_ARCH_NAME_R_TPOFF32 "R_" ELF_ARCH_MACHINENAME "_TPOFF32"
+#define ELF_ARCH_NAME_R_TPOFF32 "R_" ELF_EMNAME(ELF_ARCH_MACHINE) "_TPOFF32"
 #endif /* !ELF_ARCH_NAME_R_TPOFF32 */
 		ELF_ARCH_CASE_R_TPOFF32: {
 			DlModule *tls_module;
@@ -367,7 +367,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_TPOFF64
 #ifndef ELF_ARCH_NAME_R_TPOFF64
-#define ELF_ARCH_NAME_R_TPOFF64 "R_" ELF_ARCH_MACHINENAME "_TPOFF64"
+#define ELF_ARCH_NAME_R_TPOFF64 "R_" ELF_EMNAME(ELF_ARCH_MACHINE) "_TPOFF64"
 #endif /* !ELF_ARCH_NAME_R_TPOFF64 */
 		ELF_ARCH_CASE_R_TPOFF64: {
 			DlModule *tls_module;

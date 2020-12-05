@@ -53,31 +53,29 @@
 
 __DECL_BEGIN
 
-/* The contents of this file are based on GLibc /usr/include/elf.h
- * Note however that additions were made and more documentation was added,
+/* The contents of this file were originally based on GLibc /usr/include/elf.h
+ * Note however that heavy additions were made and more documentation was added,
  * meaning that the original should be retrieved from glibc instead.
  * Additional sources:
  *  - https://docs.oracle.com/cd/E19253-01/817-1984/chapter6-14428/index.html
  *  - GNU Binutils (internal headers)
+ *  - Misc. results from research across the internet.
  */
-/* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2003,2004,2005,2006 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
+#define __PRIVATE_ELF_NAMEIMPL_ARG_PLACEHOLDER__EN(x) ,
+#define __PRIVATE_ELF_NAMEIMPL_TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define __PRIVATE_ELF_NAMEIMPL_TAKE_SECOND_ARG(x) __PRIVATE_ELF_NAMEIMPL_TAKE_SECOND_ARG_IMPL x
+#define __PRIVATE_ELF_NAMEIMPL_IS_DEFINED2(...) __PRIVATE_ELF_NAMEIMPL_TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
+#define __PRIVATE_ELF_NAMEIMPL_IS_DEFINED(x) __PRIVATE_ELF_NAMEIMPL_IS_DEFINED2(__PRIVATE_ELF_NAMEIMPL_ARG_PLACEHOLDER_##x)
+#define __PRIVATE_ELF_NAMEIMPL_0(key, error) error
+#define __PRIVATE_ELF_NAMEIMPL_1_EN __PP_PRIVATE_STR
+#define __PRIVATE_ELF_NAMEIMPL_1(key, error) __PRIVATE_ELF_NAMEIMPL_1##key
+#define __PRIVATE_ELF_NAMEIMPL3(is, key, error) __PRIVATE_ELF_NAMEIMPL_##is(key, error)
+#define __PRIVATE_ELF_NAMEIMPL2(is, key, error) __PRIVATE_ELF_NAMEIMPL3(is, key, error)
+#define __PRIVATE_ELF_NAMEIMPL(key, error) __PRIVATE_ELF_NAMEIMPL2(__PRIVATE_ELF_NAMEIMPL_IS_DEFINED(key), key, error)
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA. */
+
 
 #define __SIZEOF_ELF32_HALF__     2
 #define __SIZEOF_ELF64_HALF__     2
@@ -289,19 +287,29 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define ELFOSABI_SYSV           0       /* Alias. */
 #define ELFOSABI_HPUX           1       /* HP-UX */
 #define ELFOSABI_NETBSD         2       /* NetBSD. */
-#define ELFOSABI_LINUX          3       /* Linux. */
+#define ELFOSABI_LINUX          3       /* GNU/Linux. */
+#define ELFOSABI_GNU            ELFOSABI_LINUX /* Alias for `ELFOSABI_LINUX' */
+#define ELFOSABI_HURD           4       /* GNU/Hurd. */
+#define ELFOSABI_86OPEN         5       /* 86Open. */
 #define ELFOSABI_SOLARIS        6       /* Sun Solaris. */
 #define ELFOSABI_AIX            7       /* IBM AIX. */
+#define ELFOSABI_MONTEREY       ELFOSABI_AIX /* IBM AIX. */
 #define ELFOSABI_IRIX           8       /* SGI Irix. */
 #define ELFOSABI_FREEBSD        9       /* FreeBSD. */
 #define ELFOSABI_TRU64          10      /* Compaq TRU64 UNIX. */
 #define ELFOSABI_MODESTO        11      /* Novell Modesto. */
 #define ELFOSABI_OPENBSD        12      /* OpenBSD. */
-#define ELFOSABI_OPENVMS        13
-#define ELFOSABI_NSK            14
-#define ELFOSABI_AROS           15
+#define ELFOSABI_OPENVMS        13      /* OpenVMS */
+#define ELFOSABI_NSK            14      /* HP Non-Stop Kernel */
+#define ELFOSABI_AROS           15      /* Amiga Research OS */
+#define ELFOSABI_FENIXOS        16      /* The FenixOS highly scalable multi-core OS */
+#define ELFOSABI_CLOUDABI       17      /* Nuxi CloudABI */
+#define ELFOSABI_OPENVOS        18      /* Stratus Technologies OpenVOS */
 #define ELFOSABI_ARM            97      /* ARM */
 #define ELFOSABI_STANDALONE     255     /* Standalone (embedded) application */
+
+
+
 
 #define EI_ABIVERSION   8               /* ABI version */
 
@@ -320,31 +328,49 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define ET_HIPROC       0xffff          /* Processor-specific range end */
 
 /* Legal values for e_machine (architecture). */
-#define EM_NONE          0              /* No machine */
-#define EM_M32           1              /* AT&T WE 32100 */
-#define EM_SPARC         2              /* SUN SPARC */
-#define EM_386           3              /* Intel 80386 */
-#define EM_68K           4              /* Motorola m68k family */
-#define EM_88K           5              /* Motorola m88k family */
-#define EM_860           7              /* Intel 80860 */
-#define EM_MIPS          8              /* MIPS R3000 big-endian */
-#define EM_S370          9              /* IBM System/370 */
+#define EM_NONE         0               /* No machine */
+#define EM_M32          1               /* AT&T WE 32100 */
+#define EM_SPARC        2               /* SUN SPARC */
+#define EM_386          3               /* Intel 80386 */
+#define EM_68K          4               /* Motorola m68k family */
+#define EM_88K          5               /* Motorola m88k family */
+#define EM_486          6               /* Intel 80486 [old] */
+#define EM_IAMCU        EM_486          /* Intel MCU. */
+#define EM_860          7               /* Intel 80860 */
+#define EM_MIPS         8               /* MIPS R3000 big-endian */
+#define EM_S370         9               /* IBM System/370 */
 #define EM_MIPS_RS3_LE  10              /* MIPS R3000 little-endian */
-
+#define EM_RS6000       11              /* IBM RS/6000 XXX reserved */
+/*      EM_             12               */
+/*      EM_             13               */
+/*      EM_             14               */
 #define EM_PARISC       15              /* HPPA */
+#define EM_NCUBE        16              /* NCube XXX reserved */
 #define EM_VPP500       17              /* Fujitsu VPP500 */
 #define EM_SPARC32PLUS  18              /* Sun's "v8plus" */
 #define EM_960          19              /* Intel 80960 */
 #define EM_PPC          20              /* PowerPC */
 #define EM_PPC64        21              /* PowerPC 64-bit */
 #define EM_S390         22              /* IBM S390 */
-
+#define EM_SPU          23              /* IBM SPU/SPC */
+/*      EM_             24               */
+/*      EM_             25               */
+/*      EM_             26               */
+/*      EM_             27               */
+/*      EM_             28               */
+/*      EM_             29               */
+/*      EM_             30               */
+/*      EM_             31               */
+/*      EM_             32               */
+/*      EM_             33               */
+/*      EM_             34               */
+/*      EM_             35               */
 #define EM_V800         36              /* NEC V800 series */
 #define EM_FR20         37              /* Fujitsu FR20 */
 #define EM_RH32         38              /* TRW RH-32 */
 #define EM_RCE          39              /* Motorola RCE */
 #define EM_ARM          40              /* ARM */
-#define EM_FAKE_ALPHA   41              /* Digital Alpha */
+#define EM_ALPHA        41              /* Digital Alpha */
 #define EM_SH           42              /* Hitachi SH */
 #define EM_SPARCV9      43              /* SPARC v9 64-bit */
 #define EM_TRICORE      44              /* Siemens Tricore */
@@ -367,7 +393,8 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define EM_TINYJ        61              /* Advanced Logic Corp. Tinyj emb.fam*/
 #define EM_X86_64       62              /* AMD x86-64 architecture */
 #define EM_PDSP         63              /* Sony DSP Processor */
-
+#define EM_PDP10        64              /* Digital Equipment Corp. PDP-10 */
+#define EM_PDP11        65              /* Digital Equipment Corp. PDP-11 */
 #define EM_FX66         66              /* Siemens FX66 microcontroller */
 #define EM_ST9PLUS      67              /* STMicroelectronics ST9+ 8/16 mc */
 #define EM_ST7          68              /* STmicroelectronics ST7 8 bit mc */
@@ -395,23 +422,466 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define EM_MN10200      90              /* Matsushita MN10200 */
 #define EM_PJ           91              /* picoJava */
 #define EM_OPENRISC     92              /* OpenRISC 32-bit embedded processor */
+#define EM_OR1K         EM_OPENRISC     /* OpenRISC 32-bit embedded processor */
 #define EM_ARC_A5       93              /* ARC Cores Tangent-A5 */
 #define EM_XTENSA       94              /* Tensilica Xtensa Architecture */
-#define EM_NUM          95
+#define EM_VIDEOCORE    95              /* Alphamosaic VideoCore processor */
+#define EM_TMM_GPP      96              /* Thompson Multimedia General Purpose Processor */
+#define EM_NS32K        97              /* National Semiconductor 32000 series */
+#define EM_TPC          98              /* Tenor Network TPC processor */
+#define EM_SNP1K        99              /* Trebia SNP 1000 processor */
+#define EM_ST200        100             /* STMicroelectronics ST200 microcontroller */
+#define EM_IP2K         101             /* Ubicom IP2xxx microcontroller family */
+#define EM_MAX          102             /* MAX processor */
+#define EM_CR           103             /* National Semiconductor CompactRISC micorprocessor */
+#define EM_F2MC16       104             /* Fujitsu F2MC16 */
+#define EM_MSP430       105             /* Texas Instruments MSP430 */
+#define EM_BLACKFIN     106             /* Analog Devices Blackfin DSP */
+#define EM_SE_C33       107             /* Seiko Epson S1C33 family */
+#define EM_SEP          108             /* Sharp embedded microprocessor */
+#define EM_ARCA         109             /* Arca RISC microprocessor */
+#define EM_UNICORE      110             /* UNICORE from PKU-Unity Ltd. and MPRC Peking University */
+#define EM_EXCESS       111             /* eXcess: 16/32/64-bit configurable embedded CPU */
+#define EM_DXP          112             /* Icera Semiconductor Inc. Deep Execution Processor */
+#define EM_ALTERA_NIOS2 113             /* Altera Nios II soft-core processor */
+#define EM_CRX          114             /* National Semiconductor CompactRISC CRX microprocessor */
+#define EM_XGATE        115             /* Motorola XGATE embedded processor */
+#define EM_C166         116             /* Infineon C16x/XC16x processor */
+#define EM_M16C         117             /* Renesas M16C series microprocessors */
+#define EM_DSPIC30F     118             /* Microchip Technology dsPIC30F Digital Signal Controller */
+#define EM_CE           119             /* Freescale Communication Engine RISC core */
+#define EM_M32C         120             /* Renesas M32C series microprocessors */
+/*      EM_             121              */
+/*      EM_             122              */
+/*      EM_             123              */
+/*      EM_             124              */
+/*      EM_             125              */
+/*      EM_             126              */
+/*      EM_             127              */
+/*      EM_             128              */
+/*      EM_             129              */
+/*      EM_             130              */
+#define EM_TSK3000      131             /* Altium TSK3000 core */
+#define EM_RS08         132             /* Freescale RS08 embedded processor */
+#define EM_SHARC        133             /* Analog Devices SHARC family of 32-bit DSP processors */
+#define EM_ECOG2        134             /* Cyan Technology eCOG2 microprocessor */
+#define EM_SCORE7       135             /* Sunplus S+core7 RISC processor */
+#define EM_DSP24        136             /* New Japan Radio (NJR) 24-bit DSP Processor */
+#define EM_VIDEOCORE3   137             /* Broadcom VideoCore III processor */
+#define EM_LATTICEMICO32 138            /* RISC processor for Lattice FPGA architecture */
+#define EM_SE_C17       139             /* Seiko Epson C17 family */
+#define EM_TI_C6000     140             /* The Texas Instruments TMS320C6000 DSP family */
+#define EM_TI_C2000     141             /* The Texas Instruments TMS320C2000 DSP family */
+#define EM_TI_C5500     142             /* The Texas Instruments TMS320C55x DSP family */
+#define EM_TI_ARP32     143             /* Texas Instruments Application Specific RISC Processor, 32bit fetch */
+#define EM_TI_PRU       144             /* Texas Instruments Programmable Realtime Unit */
+/*      EM_             145              */
+/*      EM_             146              */
+/*      EM_             147              */
+/*      EM_             148              */
+/*      EM_             149              */
+/*      EM_             150              */
+/*      EM_             151              */
+/*      EM_             152              */
+/*      EM_             153              */
+/*      EM_             154              */
+/*      EM_             155              */
+/*      EM_             156              */
+/*      EM_             157              */
+/*      EM_             158              */
+/*      EM_             159              */
+#define EM_MMDSP_PLUS   160             /* STMicroelectronics 64bit VLIW Data Signal Processor */
+#define EM_CYPRESS_M8C  161             /* Cypress M8C microprocessor */
+#define EM_R32C         162             /* Renesas R32C series microprocessors */
+#define EM_TRIMEDIA     163             /* NXP Semiconductors TriMedia architecture family */
+#define EM_QDSP6        164             /* QUALCOMM DSP6 Processor */
+#define EM_8051         165             /* Intel 8051 and variants */
+#define EM_STXP7X       166             /* STMicroelectronics STxP7x family of configurable and extensible RISC processors */
+#define EM_NDS32        167             /* Andes Technology compact code size embedded RISC processor family */
+#define EM_ECOG1        168             /* Cyan Technology eCOG1X family */
+#define EM_ECOG1X       168             /* Cyan Technology eCOG1X family */
+#define EM_MAXQ30       169             /* Dallas Semiconductor MAXQ30 Core Micro-controllers */
+#define EM_XIMO16       170             /* New Japan Radio (NJR) 16-bit DSP Processor */
+#define EM_MANIK        171             /* M2000 Reconfigurable RISC Microprocessor */
+#define EM_CRAYNV2      172             /* Cray Inc. NV2 vector architecture */
+#define EM_RX           173             /* Renesas RX family */
+#define EM_METAG        174             /* Imagination Technologies META processor architecture */
+#define EM_MCST_ELBRUS  175             /* MCST Elbrus general purpose hardware architecture */
+#define EM_ECOG16       176             /* Cyan Technology eCOG16 family */
+#define EM_CR16         177             /* National Semiconductor CompactRISC CR16 16-bit microprocessor */
+#define EM_ETPU         178             /* Freescale Extended Time Processing Unit */
+#define EM_SLE9X        179             /* Infineon Technologies SLE9X core */
+#define EM_L10M         180             /* Intel L10M */
+#define EM_K10M         181             /* Intel K10M */
+/*      EM_             182              */
+#define EM_AARCH64      183             /* AArch64 64-bit ARM microprocessor */
+/*      EM_             184              */
+#define EM_AVR32        185             /* Atmel Corporation 32-bit microprocessor family*/
+#define EM_TILE64       187             /* Tilera TILE64 multicore architecture family */
+#define EM_TILEPRO      188             /* Tilera TILEPro multicore architecture family */
+#define EM_MICROBLAZE   189             /* Xilinx MicroBlaze 32-bit RISC soft processor core */
+#define EM_CUDA         190             /* NVIDIA CUDA architecture */
+#define EM_TILEGX       191             /* Tilera TILE-GX multicore architecture family */
+#define EM_CLOUDSHIELD  192             /* CloudShield architecture family */
+#define EM_COREA_1ST    193             /* KIPO-KAIST Core-A 1st generation processor family */
+#define EM_COREA_2ND    194             /* KIPO-KAIST Core-A 2nd generation processor family */
+#define EM_ARC_COMPACT2 195             /* Synopsys ARCompact V2 */
+#define EM_OPEN8        196             /* Open8 8-bit RISC soft processor core */
+#define EM_RL78         197             /* Renesas RL78 family */
+#define EM_VIDEOCORE5   198             /* Broadcom VideoCore V processor */
+#define EM_78KOR        199             /* Renesas 78KOR family */
+#define EM_56800EX      200             /* Freescale 56800EX Digital Signal Controller (DSC) */
+#define EM_BA1          201             /* Beyond BA1 CPU architecture */
+#define EM_BA2          202             /* Beyond BA2 CPU architecture */
+#define EM_XCORE        203             /* XMOS xCORE processor family */
+#define EM_MCHP_PIC     204             /* Microchip 8-bit PIC(r) family */
+#define EM_INTEL205     205             /* Reserved by Intel */
+#define EM_INTEL206     206             /* Reserved by Intel */
+#define EM_INTEL207     207             /* Reserved by Intel */
+#define EM_INTEL208     208             /* Reserved by Intel */
+#define EM_INTEL209     209             /* Reserved by Intel */
+#define EM_KM32         210             /* KM211 KM32 32-bit processor */
+#define EM_KMX32        211             /* KM211 KMX32 32-bit processor */
+#define EM_KMX16        212             /* KM211 KMX16 16-bit processor */
+#define EM_KMX8         213             /* KM211 KMX8 8-bit processor */
+#define EM_KVARC        214             /* KM211 KVARC processor */
+#define EM_CDP          215             /* Paneve CDP architecture family */
+#define EM_COGE         216             /* Cognitive Smart Memory Processor */
+#define EM_COOL         217             /* Bluechip Systems CoolEngine */
+#define EM_NORC         218             /* Nanoradio Optimized RISC */
+#define EM_CSR_KALIMBA  219             /* CSR Kalimba architecture family */
+#define EM_Z80          220             /* Zilog Z80 */
+#define EM_VISIUM       221             /* Controls and Data Services VISIUMcore processor */
+#define EM_FT32         222             /* FTDI Chip FT32 high performance 32-bit RISC architecture */
+#define EM_MOXIE        223             /* Moxie processor family */
+#define EM_AMDGPU       224             /* AMD GPU architecture */
+/*      EM_             225              */
+/*      EM_             226              */
+/*      EM_             227              */
+/*      EM_             228              */
+/*      EM_             229              */
+/*      EM_             230              */
+/*      EM_             231              */
+/*      EM_             232              */
+/*      EM_             233              */
+/*      EM_             234              */
+/*      EM_             235              */
+/*      EM_             236              */
+/*      EM_             237              */
+/*      EM_             238              */
+/*      EM_             239              */
+/*      EM_             240              */
+/*      EM_             241              */
+/*      EM_             242              */
+#define EM_RISCV        243             /* RISC-V */
+#define EM_NUM          244             /* Max (low) used EM_* code plus 1 */
 
 /* If it is necessary to assign new unofficial EM_* values, please
  * pick large random numbers (0x8523, 0xa7f2, etc.) to minimize the
  * chances of collision with official or non-GNU unofficial values. */
-#define EM_ALPHA        0x9026
+#define EM_ALPHA_EXP    0x9026 /* used by NetBSD/alpha; obsolete */
+
 
 /* Legal values for e_version (version). */
 #define EV_NONE         0               /* Invalid ELF version */
 #define EV_CURRENT      1               /* Current version */
 #define EV_NUM          2
 
+
+/* Given one of the above EM_* constants, expand to the
+ * machine's name (that is: the part following the EM_*)
+ * If the given `em' doesn't name one of the EM_* constants,
+ * or isn't a preprocessor-time constant itself, expand to
+ * either `error', or `"?"' instead. Usage:
+ * >> static char const foo[] = "mach: " ELF_EMNAME(EM_386); // strcmp(foo, "mach: 386") == 0 */
+#ifdef __USE_KOS
+#define ELF_EMNAME(em)                   __PRIVATE_ELF_EMNAME(em, "?")
+#define ELF_EMNAME_EX(em, error)         __PRIVATE_ELF_EMNAME(em, error)
+#endif /* __USE_KOS */
+#define __ELF_EMNAME(em)                 __PRIVATE_ELF_EMNAME(em, "?")
+#define __ELF_EMNAME_EX(em, error)       __PRIVATE_ELF_EMNAME(em, error)
+#define __PRIVATE_ELF_EMNAME(key, error) __PRIVATE_ELF_NAMEIMPL(__PRIVATE_EM_NAME_##key, error)
+
+/* Database for converting a Preprocessor-time EM_* constant into a string. */
+#define __PRIVATE_EM_NAME_0      _EN(NONE)
+#define __PRIVATE_EM_NAME_1      _EN(M32)
+#define __PRIVATE_EM_NAME_2      _EN(SPARC)
+#define __PRIVATE_EM_NAME_3      _EN(386)
+#define __PRIVATE_EM_NAME_4      _EN(68K)
+#define __PRIVATE_EM_NAME_5      _EN(88K)
+#define __PRIVATE_EM_NAME_6      _EN(486)
+#define __PRIVATE_EM_NAME_7      _EN(860)
+#define __PRIVATE_EM_NAME_8      _EN(MIPS)
+#define __PRIVATE_EM_NAME_9      _EN(S370)
+#define __PRIVATE_EM_NAME_10     _EN(MIPS_RS3_LE)
+#define __PRIVATE_EM_NAME_11     _EN(RS6000)
+#define __PRIVATE_EM_NAME_15     _EN(PARISC)
+#define __PRIVATE_EM_NAME_16     _EN(NCUBE)
+#define __PRIVATE_EM_NAME_17     _EN(VPP500)
+#define __PRIVATE_EM_NAME_18     _EN(SPARC32PLUS)
+#define __PRIVATE_EM_NAME_19     _EN(960)
+#define __PRIVATE_EM_NAME_20     _EN(PPC)
+#define __PRIVATE_EM_NAME_21     _EN(PPC64)
+#define __PRIVATE_EM_NAME_22     _EN(S390)
+#define __PRIVATE_EM_NAME_23     _EN(SPU)
+#define __PRIVATE_EM_NAME_36     _EN(V800)
+#define __PRIVATE_EM_NAME_37     _EN(FR20)
+#define __PRIVATE_EM_NAME_38     _EN(RH32)
+#define __PRIVATE_EM_NAME_39     _EN(RCE)
+#define __PRIVATE_EM_NAME_40     _EN(ARM)
+#define __PRIVATE_EM_NAME_41     _EN(ALPHA)
+#define __PRIVATE_EM_NAME_42     _EN(SH)
+#define __PRIVATE_EM_NAME_43     _EN(SPARCV9)
+#define __PRIVATE_EM_NAME_44     _EN(TRICORE)
+#define __PRIVATE_EM_NAME_45     _EN(ARC)
+#define __PRIVATE_EM_NAME_46     _EN(H8_300)
+#define __PRIVATE_EM_NAME_47     _EN(H8_300H)
+#define __PRIVATE_EM_NAME_48     _EN(H8S)
+#define __PRIVATE_EM_NAME_49     _EN(H8_500)
+#define __PRIVATE_EM_NAME_50     _EN(IA_64)
+#define __PRIVATE_EM_NAME_51     _EN(MIPS_X)
+#define __PRIVATE_EM_NAME_52     _EN(COLDFIRE)
+#define __PRIVATE_EM_NAME_53     _EN(68HC12)
+#define __PRIVATE_EM_NAME_54     _EN(MMA)
+#define __PRIVATE_EM_NAME_55     _EN(PCP)
+#define __PRIVATE_EM_NAME_56     _EN(NCPU)
+#define __PRIVATE_EM_NAME_57     _EN(NDR1)
+#define __PRIVATE_EM_NAME_58     _EN(STARCORE)
+#define __PRIVATE_EM_NAME_59     _EN(ME16)
+#define __PRIVATE_EM_NAME_60     _EN(ST100)
+#define __PRIVATE_EM_NAME_61     _EN(TINYJ)
+#define __PRIVATE_EM_NAME_62     _EN(X86_64)
+#define __PRIVATE_EM_NAME_63     _EN(PDSP)
+#define __PRIVATE_EM_NAME_64     _EN(PDP10)
+#define __PRIVATE_EM_NAME_65     _EN(PDP11)
+#define __PRIVATE_EM_NAME_66     _EN(FX66)
+#define __PRIVATE_EM_NAME_67     _EN(ST9PLUS)
+#define __PRIVATE_EM_NAME_68     _EN(ST7)
+#define __PRIVATE_EM_NAME_69     _EN(68HC16)
+#define __PRIVATE_EM_NAME_70     _EN(68HC11)
+#define __PRIVATE_EM_NAME_71     _EN(68HC08)
+#define __PRIVATE_EM_NAME_72     _EN(68HC05)
+#define __PRIVATE_EM_NAME_73     _EN(SVX)
+#define __PRIVATE_EM_NAME_74     _EN(ST19)
+#define __PRIVATE_EM_NAME_75     _EN(VAX)
+#define __PRIVATE_EM_NAME_76     _EN(CRIS)
+#define __PRIVATE_EM_NAME_77     _EN(JAVELIN)
+#define __PRIVATE_EM_NAME_78     _EN(FIREPATH)
+#define __PRIVATE_EM_NAME_79     _EN(ZSP)
+#define __PRIVATE_EM_NAME_80     _EN(MMIX)
+#define __PRIVATE_EM_NAME_81     _EN(HUANY)
+#define __PRIVATE_EM_NAME_82     _EN(PRISM)
+#define __PRIVATE_EM_NAME_83     _EN(AVR)
+#define __PRIVATE_EM_NAME_84     _EN(FR30)
+#define __PRIVATE_EM_NAME_85     _EN(D10V)
+#define __PRIVATE_EM_NAME_86     _EN(D30V)
+#define __PRIVATE_EM_NAME_87     _EN(V850)
+#define __PRIVATE_EM_NAME_88     _EN(M32R)
+#define __PRIVATE_EM_NAME_89     _EN(MN10300)
+#define __PRIVATE_EM_NAME_90     _EN(MN10200)
+#define __PRIVATE_EM_NAME_91     _EN(PJ)
+#define __PRIVATE_EM_NAME_92     _EN(OPENRISC)
+#define __PRIVATE_EM_NAME_93     _EN(ARC_A5)
+#define __PRIVATE_EM_NAME_94     _EN(XTENSA)
+#define __PRIVATE_EM_NAME_95     _EN(VIDEOCORE)
+#define __PRIVATE_EM_NAME_96     _EN(TMM_GPP)
+#define __PRIVATE_EM_NAME_97     _EN(NS32K)
+#define __PRIVATE_EM_NAME_98     _EN(TPC)
+#define __PRIVATE_EM_NAME_99     _EN(SNP1K)
+#define __PRIVATE_EM_NAME_100    _EN(ST200)
+#define __PRIVATE_EM_NAME_101    _EN(IP2K)
+#define __PRIVATE_EM_NAME_102    _EN(MAX)
+#define __PRIVATE_EM_NAME_103    _EN(CR)
+#define __PRIVATE_EM_NAME_104    _EN(F2MC16)
+#define __PRIVATE_EM_NAME_105    _EN(MSP430)
+#define __PRIVATE_EM_NAME_106    _EN(BLACKFIN)
+#define __PRIVATE_EM_NAME_107    _EN(SE_C33)
+#define __PRIVATE_EM_NAME_108    _EN(SEP)
+#define __PRIVATE_EM_NAME_109    _EN(ARCA)
+#define __PRIVATE_EM_NAME_110    _EN(UNICORE)
+#define __PRIVATE_EM_NAME_111    _EN(EXCESS)
+#define __PRIVATE_EM_NAME_112    _EN(DXP)
+#define __PRIVATE_EM_NAME_113    _EN(ALTERA_NIOS2)
+#define __PRIVATE_EM_NAME_114    _EN(CRX)
+#define __PRIVATE_EM_NAME_115    _EN(XGATE)
+#define __PRIVATE_EM_NAME_116    _EN(C166)
+#define __PRIVATE_EM_NAME_117    _EN(M16C)
+#define __PRIVATE_EM_NAME_118    _EN(DSPIC30F)
+#define __PRIVATE_EM_NAME_119    _EN(CE)
+#define __PRIVATE_EM_NAME_120    _EN(M32C)
+#define __PRIVATE_EM_NAME_131    _EN(TSK3000)
+#define __PRIVATE_EM_NAME_132    _EN(RS08)
+#define __PRIVATE_EM_NAME_133    _EN(SHARC)
+#define __PRIVATE_EM_NAME_134    _EN(ECOG2)
+#define __PRIVATE_EM_NAME_135    _EN(SCORE7)
+#define __PRIVATE_EM_NAME_136    _EN(DSP24)
+#define __PRIVATE_EM_NAME_137    _EN(VIDEOCORE3)
+#define __PRIVATE_EM_NAME_138    _EN(LATTICEMICO32)
+#define __PRIVATE_EM_NAME_139    _EN(SE_C17)
+#define __PRIVATE_EM_NAME_140    _EN(TI_C6000)
+#define __PRIVATE_EM_NAME_141    _EN(TI_C2000)
+#define __PRIVATE_EM_NAME_142    _EN(TI_C5500)
+#define __PRIVATE_EM_NAME_143    _EN(TI_ARP32)
+#define __PRIVATE_EM_NAME_144    _EN(TI_PRU)
+#define __PRIVATE_EM_NAME_160    _EN(MMDSP_PLUS)
+#define __PRIVATE_EM_NAME_161    _EN(CYPRESS_M8C)
+#define __PRIVATE_EM_NAME_162    _EN(R32C)
+#define __PRIVATE_EM_NAME_163    _EN(TRIMEDIA)
+#define __PRIVATE_EM_NAME_164    _EN(QDSP6)
+#define __PRIVATE_EM_NAME_165    _EN(8051)
+#define __PRIVATE_EM_NAME_166    _EN(STXP7X)
+#define __PRIVATE_EM_NAME_167    _EN(NDS32)
+#define __PRIVATE_EM_NAME_168    _EN(ECOG1)
+#define __PRIVATE_EM_NAME_168    _EN(ECOG1X)
+#define __PRIVATE_EM_NAME_169    _EN(MAXQ30)
+#define __PRIVATE_EM_NAME_170    _EN(XIMO16)
+#define __PRIVATE_EM_NAME_171    _EN(MANIK)
+#define __PRIVATE_EM_NAME_172    _EN(CRAYNV2)
+#define __PRIVATE_EM_NAME_173    _EN(RX)
+#define __PRIVATE_EM_NAME_174    _EN(METAG)
+#define __PRIVATE_EM_NAME_175    _EN(MCST_ELBRUS)
+#define __PRIVATE_EM_NAME_176    _EN(ECOG16)
+#define __PRIVATE_EM_NAME_177    _EN(CR16)
+#define __PRIVATE_EM_NAME_178    _EN(ETPU)
+#define __PRIVATE_EM_NAME_179    _EN(SLE9X)
+#define __PRIVATE_EM_NAME_180    _EN(L10M)
+#define __PRIVATE_EM_NAME_181    _EN(K10M)
+#define __PRIVATE_EM_NAME_183    _EN(AARCH64)
+#define __PRIVATE_EM_NAME_185    _EN(AVR32)
+#define __PRIVATE_EM_NAME_187    _EN(TILE64)
+#define __PRIVATE_EM_NAME_188    _EN(TILEPRO)
+#define __PRIVATE_EM_NAME_189    _EN(MICROBLAZE)
+#define __PRIVATE_EM_NAME_190    _EN(CUDA)
+#define __PRIVATE_EM_NAME_191    _EN(TILEGX)
+#define __PRIVATE_EM_NAME_192    _EN(CLOUDSHIELD)
+#define __PRIVATE_EM_NAME_193    _EN(COREA_1ST)
+#define __PRIVATE_EM_NAME_194    _EN(COREA_2ND)
+#define __PRIVATE_EM_NAME_195    _EN(ARC_COMPACT2)
+#define __PRIVATE_EM_NAME_196    _EN(OPEN8)
+#define __PRIVATE_EM_NAME_197    _EN(RL78)
+#define __PRIVATE_EM_NAME_198    _EN(VIDEOCORE5)
+#define __PRIVATE_EM_NAME_199    _EN(78KOR)
+#define __PRIVATE_EM_NAME_200    _EN(56800EX)
+#define __PRIVATE_EM_NAME_201    _EN(BA1)
+#define __PRIVATE_EM_NAME_202    _EN(BA2)
+#define __PRIVATE_EM_NAME_203    _EN(XCORE)
+#define __PRIVATE_EM_NAME_204    _EN(MCHP_PIC)
+#define __PRIVATE_EM_NAME_205    _EN(INTEL205)
+#define __PRIVATE_EM_NAME_206    _EN(INTEL206)
+#define __PRIVATE_EM_NAME_207    _EN(INTEL207)
+#define __PRIVATE_EM_NAME_208    _EN(INTEL208)
+#define __PRIVATE_EM_NAME_209    _EN(INTEL209)
+#define __PRIVATE_EM_NAME_210    _EN(KM32)
+#define __PRIVATE_EM_NAME_211    _EN(KMX32)
+#define __PRIVATE_EM_NAME_212    _EN(KMX16)
+#define __PRIVATE_EM_NAME_213    _EN(KMX8)
+#define __PRIVATE_EM_NAME_214    _EN(KVARC)
+#define __PRIVATE_EM_NAME_215    _EN(CDP)
+#define __PRIVATE_EM_NAME_216    _EN(COGE)
+#define __PRIVATE_EM_NAME_217    _EN(COOL)
+#define __PRIVATE_EM_NAME_218    _EN(NORC)
+#define __PRIVATE_EM_NAME_219    _EN(CSR_KALIMBA)
+#define __PRIVATE_EM_NAME_220    _EN(Z80)
+#define __PRIVATE_EM_NAME_221    _EN(VISIUM)
+#define __PRIVATE_EM_NAME_222    _EN(FT32)
+#define __PRIVATE_EM_NAME_223    _EN(MOXIE)
+#define __PRIVATE_EM_NAME_224    _EN(AMDGPU)
+#define __PRIVATE_EM_NAME_243    _EN(RISCV)
+#define __PRIVATE_EM_NAME_244    _EN(NUM)
+#define __PRIVATE_EM_NAME_0x9026 _EN(ALPHA_EXP)
+
+/* Expand to the name of the given ELFCLASS* constant.
+ * The string expanded to is the part after the "ELF"
+ * prefix. E.g. "CLASS32" for `ELFCLASS32' */
+#ifdef __USE_KOS
+#define ELF_CLASSNAME(em)                   __PRIVATE_ELF_CLASSNAME(em, "?")
+#define ELF_CLASSNAME_EX(em, error)         __PRIVATE_ELF_CLASSNAME(em, error)
+#endif /* __USE_KOS */
+#define __ELF_CLASSNAME(em)                 __PRIVATE_ELF_CLASSNAME(em, "?")
+#define __ELF_CLASSNAME_EX(em, error)       __PRIVATE_ELF_CLASSNAME(em, error)
+#define __PRIVATE_ELF_CLASSNAME(key, error) __PRIVATE_ELF_NAMEIMPL(__PRIVATE_ELFCLASS_NAME_##key, error)
+
+/* Database for converting a Preprocessor-time ELFCLASS* constant into a string. */
+#define __PRIVATE_ELFCLASS_NAME_0 _EN(CLASSNONE)
+#define __PRIVATE_ELFCLASS_NAME_1 _EN(CLASS32)
+#define __PRIVATE_ELFCLASS_NAME_2 _EN(CLASS64)
+
+/* Expand to the name of the given ELFDATA* constant.
+ * The string expanded to is the part after the "ELF"
+ * prefix. E.g. "ELFDATA2LSB" for `DATA2LSB' */
+#ifdef __USE_KOS
+#define ELF_DATANAME(em)                   __PRIVATE_ELF_DATANAME(em, "?")
+#define ELF_DATANAME_EX(em, error)         __PRIVATE_ELF_DATANAME(em, error)
+#endif /* __USE_KOS */
+#define __ELF_DATANAME(em)                 __PRIVATE_ELF_DATANAME(em, "?")
+#define __ELF_DATANAME_EX(em, error)       __PRIVATE_ELF_DATANAME(em, error)
+#define __PRIVATE_ELF_DATANAME(key, error) __PRIVATE_ELF_NAMEIMPL(__PRIVATE_ELFDATA_NAME_##key, error)
+
+/* Database for converting a Preprocessor-time ELFDATA* constant into a string. */
+#define __PRIVATE_ELFDATA_NAME_0 _EN(DATANONE)
+#define __PRIVATE_ELFDATA_NAME_1 _EN(DATA2LSB)
+#define __PRIVATE_ELFDATA_NAME_2 _EN(DATA2MSB)
+
+
+/* Expand to the name of the given ELFOSABI_* constant.
+ * The string expanded to is the part after the "ELFOSABI_"
+ * prefix. E.g. "SYSV" for `ELFOSABI_SYSV' */
+#ifdef __USE_KOS
+#define ELF_OSABINAME(em)                   __PRIVATE_ELF_OSABINAME(em, "?")
+#define ELF_OSABINAME_EX(em, error)         __PRIVATE_ELF_OSABINAME(em, error)
+#endif /* __USE_KOS */
+#define __ELF_OSABINAME(em)                 __PRIVATE_ELF_OSABINAME(em, "?")
+#define __ELF_OSABINAME_EX(em, error)       __PRIVATE_ELF_OSABINAME(em, error)
+#define __PRIVATE_ELF_OSABINAME(key, error) __PRIVATE_ELF_NAMEIMPL(__PRIVATE_ELFOSABI_NAME_##key, error)
+
+/* Database for converting a Preprocessor-time ELFOSABI_* constant into a string. */
+#define __PRIVATE_ELFOSABI_NAME_0    _EN(SYSV)
+#define __PRIVATE_ELFOSABI_NAME_1    _EN(HPUX)
+#define __PRIVATE_ELFOSABI_NAME_2    _EN(NETBSD)
+#define __PRIVATE_ELFOSABI_NAME_3    _EN(LINUX)
+#define __PRIVATE_ELFOSABI_NAME_4    _EN(HURD)
+#define __PRIVATE_ELFOSABI_NAME_5    _EN(86)
+#define __PRIVATE_ELFOSABI_NAME_6    _EN(SOLARIS)
+#define __PRIVATE_ELFOSABI_NAME_7    _EN(AIX)
+#define __PRIVATE_ELFOSABI_NAME_8    _EN(IRIX)
+#define __PRIVATE_ELFOSABI_NAME_9    _EN(FREEBSD)
+#define __PRIVATE_ELFOSABI_NAME_10   _EN(TRU64)
+#define __PRIVATE_ELFOSABI_NAME_11   _EN(MODESTO)
+#define __PRIVATE_ELFOSABI_NAME_12   _EN(OPENBSD)
+#define __PRIVATE_ELFOSABI_NAME_13   _EN(OPENVMS)
+#define __PRIVATE_ELFOSABI_NAME_14   _EN(NSK)
+#define __PRIVATE_ELFOSABI_NAME_15   _EN(AROS)
+#define __PRIVATE_ELFOSABI_NAME_16   _EN(FENIXOS)
+#define __PRIVATE_ELFOSABI_NAME_17   _EN(CLOUDABI)
+#define __PRIVATE_ELFOSABI_NAME_18   _EN(OPENVOS)
+#define __PRIVATE_ELFOSABI_NAME_97   _EN(ARM)
+#define __PRIVATE_ELFOSABI_NAME_255  _EN(STANDALONE)
+
+
+/* Expand to the name of the given ET_* constant.
+ * The string expanded to is the part after the "ET_"
+ * prefix. E.g. "EXEC" for `ET_EXEC' */
+#ifdef __USE_KOS
+#define ELF_ETNAME(em)                   __PRIVATE_ELF_ETNAME(em, "?")
+#define ELF_ETNAME_EX(em, error)         __PRIVATE_ELF_ETNAME(em, error)
+#endif /* __USE_KOS */
+#define __ELF_ETNAME(em)                 __PRIVATE_ELF_ETNAME(em, "?")
+#define __ELF_ETNAME_EX(em, error)       __PRIVATE_ELF_ETNAME(em, error)
+#define __PRIVATE_ELF_ETNAME(key, error) __PRIVATE_ELF_NAMEIMPL(__PRIVATE_ET_NAME_##key, error)
+
+/* Database for converting a Preprocessor-time ET_* constant into a string. */
+#define __PRIVATE_ET_NAME_0 _EN(NONE)
+#define __PRIVATE_ET_NAME_1 _EN(REL)
+#define __PRIVATE_ET_NAME_2 _EN(EXEC)
+#define __PRIVATE_ET_NAME_3 _EN(DYN)
+#define __PRIVATE_ET_NAME_4 _EN(CORE)
+
+
+
+
+
+
 /* Section header. */
-
-
 #define __OFFSET_ELF32_SHDR_NAME      0
 #define __OFFSET_ELF32_SHDR_TYPE      4
 #define __OFFSET_ELF32_SHDR_FLAGS     8
@@ -514,7 +984,9 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHT_LOOS          0x60000000    /* Start OS-specific. */
 #define SHT_GNU_INCREMENTAL_INPUTS 0x6fff4700 /* Incremental build data */
 #define SHT_GNU_ATTRIBUTES 0x6ffffff5   /* Object attributes */
+#define SHT_SUNW_cap      0x6ffffff5
 #define SHT_GNU_HASH      0x6ffffff6    /* GNU-style hash table. */
+#define	SHT_SUNW_SIGNATURE 0x6ffffff6
 #define SHT_GNU_LIBLIST   0x6ffffff7    /* Prelink library list */
 #define SHT_CHECKSUM      0x6ffffff8    /* Checksum for DSO content. */
 #define SHT_LOSUNW        0x6ffffffa    /* Sun-specific low bound. */
@@ -533,6 +1005,8 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHT_HIPROC        0x7fffffff    /* End of processor-specific */
 #define SHT_LOUSER        0x80000000    /* Start of application-specific */
 #define SHT_HIUSER        0x8fffffff    /* End of application-specific */
+
+
 
 /* Legal values for sh_flags (section flags). */
 #define SHF_WRITE            0x00000001 /* Writable */
@@ -722,6 +1196,7 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
  */
 
 
+#define ELF_SYM_UNDEFINED 0             /* Symbol Table index of the undefined symbol */
 
 /* Symbol table indices are found in the hash buckets and chain table
  * of a symbol hash table section. This special index value indicates
@@ -740,6 +1215,9 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 #define STV_INTERNAL    1               /* Processor specific hidden class */
 #define STV_HIDDEN      2               /* Sym unavailable in other modules */
 #define STV_PROTECTED   3               /* Not preemptible, not exported */
+#define STV_EXPORTED    4               /* ??? */
+#define STV_SINGLETON   5               /* ??? */
+#define STV_ELIMINATE   6               /* ??? */
 
 
 /* Relocation table entry without addend (in section of type SHT_REL). */
@@ -1129,7 +1607,7 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define DF_1_NOOPEN     0x00000040      /* Set RTLD_NOOPEN for this object. */
 #define DF_1_ORIGIN     0x00000080      /* $ORIGIN must be handled. */
 #define DF_1_DIRECT     0x00000100      /* Direct binding enabled. */
-#define DF_1_TRANS      0x00000200
+#define DF_1_TRANS      0x00000200      /* ??? */
 #define DF_1_INTERPOSE  0x00000400      /* Object is used to interpose. */
 #define DF_1_NODEFLIB   0x00000800      /* Ignore default lib search path. */
 #define DF_1_NODUMP     0x00001000      /* Object can't be dldump'ed. */
@@ -1137,6 +1615,18 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define DF_1_ENDFILTEE  0x00004000      /* Filtee terminates filters search. */
 #define DF_1_DISPRELDNE 0x00008000      /* Disp reloc applied at build time. */
 #define DF_1_DISPRELPND 0x00010000      /* Disp reloc applied at run-time. */
+#define DF_1_NODIRECT   0x00020000      /* Has non-direct bindings */
+#define DF_1_IGNMULDEF  0x00040000      /* ??? */
+#define DF_1_NOKSYMS    0x00080000      /* ??? */
+#define DF_1_NOHDR      0x00100000      /* ??? */
+#define DF_1_EDITED     0x00200000      /* Has been modified since build */
+#define DF_1_NORELOC    0x00400000      /* ??? */
+#define DF_1_SYMINTPOSE 0x00800000      /* Has individual symbol interposers */
+#define DF_1_GLOBAUDIT  0x01000000      /* Require global auditing */
+#define DF_1_SINGLETON  0x02000000      /* Has singleton symbols */
+#define DF_1_STUB       0x04000000      /* Stub */
+#define DF_1_PIE        0x08000000      /* Position Independent Executable */
+
 
 /* Flags for the feature selection in DT_FEATURE_1. */
 #define DTF_1_PARINIT   0x00000001
@@ -1342,6 +1832,9 @@ typedef struct elf64_vernaux /*[PREFIX(vna_)]*/ {
 
 
 /* Auxiliary vector. */
+/* FIXME: The Auxiliary vector is OS-dependent and should therefor not appear
+ *        here, but instead be encoded inside of a separate header <asm/os/auxv.h>
+ */
 
 /* This vector is normally only used by the program interpreter. The
  * usual definition in an ABI supplement uses the name auxv_t. The
@@ -2027,9 +2520,10 @@ typedef struct elf_options_hw /*[PREFIX(hwp_)]*/ {
 #define R_MIPS_NUM              51
 
 /* Legal values for p_type field of Elf32_Phdr. */
-#define PT_MIPS_REGINFO 0x70000000      /* Register usage information */
-#define PT_MIPS_RTPROC  0x70000001      /* Runtime procedure table. */
-#define PT_MIPS_OPTIONS 0x70000002
+#define PT_MIPS_REGINFO  0x70000000     /* Register usage information */
+#define PT_MIPS_RTPROC   0x70000001     /* Runtime procedure table. */
+#define PT_MIPS_OPTIONS  0x70000002
+#define PT_MIPS_ABIFLAGS 0x70000003
 
 /* Special program header types. */
 #define PF_MIPS_LOCAL   0x10000000
@@ -2682,6 +3176,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #define SHF_ARM_ENTRYSECT  0x10000000   /* Section contains an entry point */
 #define SHF_ARM_COMDEF     0x80000000   /* Section may be multiply defined in the input to a link step */
 
+/* ARM-specific values for sh_type */
+#define SHT_ARM_EXIDX      0x70000001   /* exception index table */
+#define SHT_ARM_PREEMPTMAP 0x70000002   /* BPABI DLL dynamic linking pre-emption map */
+#define SHT_ARM_ATTRIBUTES 0x70000003   /* Object file compatibility attributes */
+#define SHT_ARM_DEBUGOVERLAY 0x70000004 /* See DBGOVL for details */
+#define SHT_ARM_OVERLAYSECTION 0x70000005
+
 /* ARM-specific program header flags */
 #define PF_ARM_SB          0x10000000   /* Segment contains the location addressed by the static base */
 
@@ -3182,6 +3683,10 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_X86_64_NUM            43
 #define R_X86_64_GNU_VTINHERIT  250     /* GNU C++ hack  */
 #define R_X86_64_GNU_VTENTRY    251     /* GNU C++ hack  */
+
+#define SHT_X86_64_UNWIND 0x70000001        /* unwind information */
+#define SHT_AMD64_UNWIND  SHT_X86_64_UNWIND /* unwind information */
+
 
 
 
