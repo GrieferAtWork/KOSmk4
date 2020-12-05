@@ -601,10 +601,10 @@
  *     the dedicated `_STRUCT64_MACRO_SOURCE' feature request is disabled
  *     as well), then `struct timespec' and `struct timespec64' continue
  *     to remain distinct types such that `struct timespec64' can still
- *     both be forward-declared prior to the header being included.
+ *     be forward-declared prior to the header being included.
  *   - However, when `__USE_STRUCT64_MACRO' is enabled, then headers are
  *     allowed to simply macro-alias binary-compatible struct-types with
- *     each other, and the hosted source file is responsible not to forward-
+ *     each other, and the hosted source file is responsible to not forward-
  *     declare special variants of struct types (such as `timespec64')
  *     before the declaring header has also been included.
  * WARNING: KOS-specific types such as `timespec32' are _not_ affect by
@@ -699,7 +699,15 @@
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
  * to exclude select symbol definitions done by DOS that were only there
- * in order to pollute the global namespace (e.g. `typedef ... size_t;' in <crtdefs.h>) */
+ * in order to pollute the global namespace (e.g. `typedef ... size_t;'
+ * in <crtdefs.h>, or the wchar-based functions in <stdio.h>, in addition
+ * to already being declared in <wchar.h>)
+ * Programs written to only use functions after including the _correct_
+ * header should be able to enable this option without issue. Programs
+ * that accidentally rely on DOS's excessive use of function re-declarations
+ * may use this option to check if they might be making non-portable
+ * assumption on which functions are being declared following inclusion
+ * of a system header. */
 #ifdef __USE_DOS
 #ifdef _DOS_SOURCE_CLEAN
 #define __USE_DOS_CLEAN 1
