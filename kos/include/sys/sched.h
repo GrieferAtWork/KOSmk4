@@ -23,8 +23,6 @@
 #ifndef _SYS_SCHED_H
 #define _SYS_SCHED_H 1
 
-/* API_LEVEL: newlib */
-
 #include <__stdinc.h>
 
 #include <asm/os/sched.h>

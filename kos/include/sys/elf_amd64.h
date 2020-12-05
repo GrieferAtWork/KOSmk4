@@ -21,8 +21,6 @@
 #ifndef _SYS_ELF_AMD64_H
 #define _SYS_ELF_AMD64_H 1
 
-/* API_LEVEL: opensolaris */
-
 #include <elf.h> /* Only x86_64-specific definitions are needed (R_X86_64_*, etc...) */
 
 #endif /* !_SYS_ELF_AMD64_H */

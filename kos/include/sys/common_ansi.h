@@ -17,19 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD      (/sys/sys/inttypes.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/inttypes.h) */
-#ifndef _SYS_INTTYPES_H
-#define _SYS_INTTYPES_H 1
+/* (#) Portability: NetBSD (/sys/sys/common_ansi.h) */
+#ifndef _SYS_COMMON_ANSI_H
+#define _SYS_COMMON_ANSI_H 1
 
+#include <__stdinc.h>
 #include <features.h>
 
-#include <sys/feature_tests.h>
-#include <sys/int_types.h>
-#if !defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_SOLARIS)
-#include <sys/int_limits.h>
-#include <sys/int_const.h>
-#include <sys/int_fmtio.h>
-#endif /* !__USE_XOPEN || __USE_XOPEN2K || __USE_SOLARIS */
+#include <hybrid/typecore.h>
 
-#endif /* !_SYS_INTTYPES_H */
+#include <bits/types.h>
+#include <sys/cdefs.h>
+/*#include <machine/int_types.h>*/
+
+#define _BSD_CLOCK_T_     __clock_t
+#define _BSD_PTRDIFF_T_   __PTRDIFF_TYPE__
+#define _BSD_SSIZE_T_     __SSIZE_TYPE__
+#define _BSD_SIZE_T_      __SIZE_TYPE__
+#define _BSD_TIME_T_      __TM_TYPE(time)
+#define _BSD_CLOCKID_T_   __clockid_t
+#define _BSD_TIMER_T_     __timer_t
+#define _BSD_SUSECONDS_T_ __suseconds_t
+#define _BSD_USECONDS_T_  __useconds_t
+#define _BSD_WCHAR_T_     __WCHAR_TYPE__
+#define _BSD_WINT_T_      __WINT_TYPE__
+
+#endif /* !_SYS_COMMON_ANSI_H */

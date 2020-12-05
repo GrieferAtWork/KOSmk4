@@ -21,8 +21,6 @@
 #ifndef _SYS_ELF_SPARC_H
 #define _SYS_ELF_SPARC_H 1
 
-/* API_LEVEL: opensolaris */
-
 #include <elf.h> /* Only sparc-specific definitions are needed (R_SPARC_*, etc...) */
 
 #endif /* !_SYS_ELF_SPARC_H */

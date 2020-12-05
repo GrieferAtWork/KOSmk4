@@ -21,8 +21,6 @@
 #ifndef _SYS_INT_FMTIO_H
 #define _SYS_INT_FMTIO_H 1
 
-/* API_LEVEL: opensolaris */
-
 #include <__stdinc.h>
 
 #include <inttypes.h> /* Only need non-extension PRI* and SCA* macros. */

@@ -21,8 +21,6 @@
 #ifndef _SYS_ELF_386_H
 #define _SYS_ELF_386_H 1
 
-/* API_LEVEL: opensolaris */
-
 #include <elf.h> /* Only i386-specific definitions are needed (R_386_*, etc...) */
 
 #endif /* !_SYS_ELF_386_H */

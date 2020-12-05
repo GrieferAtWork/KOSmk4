@@ -17,17 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/int_limits.h) */
-#ifndef _SYS_INT_LIMITS_H
-#define _SYS_INT_LIMITS_H 1
+/* (#) Portability: NetBSD (/sys/sys/common_int_limits.h) */
+#ifndef _SYS_COMMON_INT_LIMITS_H
+#define _SYS_COMMON_INT_LIMITS_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
 #include <hybrid/limitcore.h>
-#include <hybrid/typecore.h>
-
-#include <sys/feature_tests.h>
 
 #ifndef INT8_MAX
 #define INT8_MAX         __INT8_MAX__
@@ -128,68 +124,53 @@
 #ifndef SIG_ATOMIC_MAX
 #define SIG_ATOMIC_MAX   __SIG_ATOMIC_MAX__
 #endif /* !SIG_ATOMIC_MAX */
-#ifndef WCHAR_MAX
-#define WCHAR_MAX        __WCHAR_MAX__
-#endif /* !WCHAR_MAX */
-#ifndef WINT_MAX
-#define WINT_MAX         __WINT_MAX__
-#endif /* !WINT_MAX */
-
-#if defined(__USE_SOLARIS) || defined(__USE_XOPEN2K) || (!defined(__USE_XOPEN) && !defined(__USE_POSIX))
 #ifndef INT8_MIN
-#define INT8_MIN        __INT8_MIN__
+#define INT8_MIN         __INT8_MIN__
 #endif /* !INT8_MIN */
 #ifndef INT16_MIN
-#define INT16_MIN       __INT16_MIN__
+#define INT16_MIN        __INT16_MIN__
 #endif /* !INT16_MIN */
 #ifndef INT32_MIN
-#define INT32_MIN       __INT32_MIN__
+#define INT32_MIN        __INT32_MIN__
 #endif /* !INT32_MIN */
 #ifndef INT64_MIN
-#define INT64_MIN       __INT64_MIN__
+#define INT64_MIN        __INT64_MIN__
 #endif /* !INT64_MIN */
 #ifndef INTMAX_MIN
-#define INTMAX_MIN      __INTMAX_MIN__
+#define INTMAX_MIN       __INTMAX_MIN__
 #endif /* !INTMAX_MIN */
 #ifndef INT_LEAST8_MIN
-#define INT_LEAST8_MIN  __INT_LEAST8_MIN__
+#define INT_LEAST8_MIN   __INT_LEAST8_MIN__
 #endif /* !INT_LEAST8_MIN */
 #ifndef INT_LEAST16_MIN
-#define INT_LEAST16_MIN __INT_LEAST16_MIN__
+#define INT_LEAST16_MIN  __INT_LEAST16_MIN__
 #endif /* !INT_LEAST16_MIN */
 #ifndef INT_LEAST32_MIN
-#define INT_LEAST32_MIN __INT_LEAST32_MIN__
+#define INT_LEAST32_MIN  __INT_LEAST32_MIN__
 #endif /* !INT_LEAST32_MIN */
 #ifndef INT_LEAST64_MIN
-#define INT_LEAST64_MIN __INT_LEAST64_MIN__
+#define INT_LEAST64_MIN  __INT_LEAST64_MIN__
 #endif /* !INT_LEAST64_MIN */
 #ifndef INT_FAST8_MIN
-#define INT_FAST8_MIN   __INT_FAST8_MIN__
+#define INT_FAST8_MIN    __INT_FAST8_MIN__
 #endif /* !INT_FAST8_MIN */
 #ifndef INT_FAST16_MIN
-#define INT_FAST16_MIN  __INT_FAST16_MIN__
+#define INT_FAST16_MIN   __INT_FAST16_MIN__
 #endif /* !INT_FAST16_MIN */
 #ifndef INT_FAST32_MIN
-#define INT_FAST32_MIN  __INT_FAST32_MIN__
+#define INT_FAST32_MIN   __INT_FAST32_MIN__
 #endif /* !INT_FAST32_MIN */
 #ifndef INT_FAST64_MIN
-#define INT_FAST64_MIN  __INT_FAST64_MIN__
+#define INT_FAST64_MIN   __INT_FAST64_MIN__
 #endif /* !INT_FAST64_MIN */
 #ifndef INTPTR_MIN
-#define INTPTR_MIN      __INTPTR_MIN__
+#define INTPTR_MIN       __INTPTR_MIN__
 #endif /* !INTPTR_MIN */
 #ifndef PTRDIFF_MIN
-#define PTRDIFF_MIN     __PTRDIFF_MIN__
+#define PTRDIFF_MIN      __PTRDIFF_MIN__
 #endif /* !PTRDIFF_MIN */
 #ifndef SIG_ATOMIC_MIN
-#define SIG_ATOMIC_MIN  __SIG_ATOMIC_MIN__
+#define SIG_ATOMIC_MIN   __SIG_ATOMIC_MIN__
 #endif /* !SIG_ATOMIC_MIN */
-#ifndef WCHAR_MIN
-#define WCHAR_MIN       __WCHAR_MIN__
-#endif /* !WCHAR_MIN */
-#ifndef WINT_MIN
-#define WINT_MIN        __WINT_MIN__
-#endif /* !WINT_MIN */
-#endif /* __USE_SOLARIS || __USE_XOPEN2K || (!__USE_XOPEN && !__USE_POSIX) */
 
-#endif /* !_SYS_INT_LIMITS_H */
+#endif /* !_SYS_COMMON_INT_LIMITS_H */

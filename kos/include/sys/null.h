@@ -19,7 +19,6 @@
  */
 /* (#) Portability: NetBSD (/sys/sys/null.h) */
 #ifndef NULL
-/* API_LEVEL: netbsd */
 #include <__stdinc.h>
 #ifndef NULL
 #define NULL __NULLPTR

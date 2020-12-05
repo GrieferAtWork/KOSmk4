@@ -1054,7 +1054,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 /************************************************************************/
 /* X/OPEN                                                               */
 /************************************************************************/
-#if defined(__USE_XOPEN) || defined(__DEEMON__)
+#if defined(__USE_XOPEN) || defined(__USE_NETBSD) || defined(__DEEMON__)
 #include <asm/pagesize.h>
 
 /* System memory page size */
@@ -1194,6 +1194,6 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !NL_TEXTMAX */
 
-#endif /* __USE_XOPEN */
+#endif /* __USE_XOPEN || __USE_NETBSD */
 
 #endif /* !_LIMITS_H */

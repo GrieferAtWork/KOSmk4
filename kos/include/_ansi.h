@@ -23,8 +23,6 @@
 #define __ANSI_H 1
 #define _ANSIDECL_H_ 1
 
-/* API_LEVEL: newlib */
-
 /* DISCLAIMER: This file is based off of cygwin's `/usr/include/_ansi.h' */
 
 #include <__stdinc.h>

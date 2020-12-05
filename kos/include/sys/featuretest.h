@@ -17,19 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD      (/sys/sys/inttypes.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/inttypes.h) */
-#ifndef _SYS_INTTYPES_H
-#define _SYS_INTTYPES_H 1
+/* (#) Portability: NetBSD (/sys/sys/featuretest.h) */
+#ifndef _SYS_FEATURETEST_H
+#define _SYS_FEATURETEST_H 1
 
-#include <features.h>
+#include <__stdinc.h>
 
-#include <sys/feature_tests.h>
-#include <sys/int_types.h>
-#if !defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_SOLARIS)
-#include <sys/int_limits.h>
-#include <sys/int_const.h>
-#include <sys/int_fmtio.h>
-#endif /* !__USE_XOPEN || __USE_XOPEN2K || __USE_SOLARIS */
+#if (defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE))
+#define _POSIX_C_SOURCE 1L
+#endif /* ... */
 
-#endif /* !_SYS_INTTYPES_H */
+#if (!defined(_ANSI_SOURCE) && !defined(_POSIX_C_SOURCE) && \
+     !defined(_XOPEN_SOURCE) && !defined(_NETBSD_SOURCE))
+#define _NETBSD_SOURCE 1
+#endif /* ... */
+
+#if (((defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE - 0) >= 199506L) || \
+      (defined(_XOPEN_SOURCE) && (_XOPEN_SOURCE - 0) >= 500)) &&        \
+     !defined(_REENTRANT))
+#define _REENTRANT
+#endif /* ... */
+
+#endif /* !_SYS_FEATURETEST_H */

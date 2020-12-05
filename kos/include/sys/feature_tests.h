@@ -21,8 +21,6 @@
 #ifndef _SYS_FEATURE_TESTS_H
 #define _SYS_FEATURE_TESTS_H 1
 
-/* API_LEVEL: opensolaris */
-
 #include <__stdinc.h>
 #include <features.h>
 #include <unistd.h> /* For `_XOPEN_VERSION' */

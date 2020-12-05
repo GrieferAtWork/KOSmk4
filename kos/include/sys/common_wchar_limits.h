@@ -17,19 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD      (/sys/sys/inttypes.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/inttypes.h) */
-#ifndef _SYS_INTTYPES_H
-#define _SYS_INTTYPES_H 1
+/* (#) Portability: NetBSD (/sys/sys/common_wchar_limits.h) */
+#ifndef _SYS_COMMON_WCHAR_LIMITS_H
+#define _SYS_COMMON_WCHAR_LIMITS_H 1
 
-#include <features.h>
+#include <__stdinc.h>
 
-#include <sys/feature_tests.h>
-#include <sys/int_types.h>
-#if !defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_SOLARIS)
-#include <sys/int_limits.h>
-#include <sys/int_const.h>
-#include <sys/int_fmtio.h>
-#endif /* !__USE_XOPEN || __USE_XOPEN2K || __USE_SOLARIS */
+#include <hybrid/limitcore.h>
 
-#endif /* !_SYS_INTTYPES_H */
+#ifndef WCHAR_MIN
+#define WCHAR_MIN __WCHAR_MIN__
+#endif /* !WCHAR_MIN */
+#ifndef WCHAR_MAX
+#define WCHAR_MAX __WCHAR_MAX__
+#endif /* !WCHAR_MAX */
+#ifndef WINT_MIN
+#define WINT_MIN  __WINT_MIN__
+#endif /* !WINT_MIN */
+#ifndef WINT_MAX
+#define WINT_MAX  __WINT_MAX__
+#endif /* !WINT_MAX */
+
+#endif /* !_SYS_COMMON_WCHAR_LIMITS_H */

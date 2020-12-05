@@ -23,8 +23,6 @@
 #ifndef _SYS_TIMESPEC_H
 #define _SYS_TIMESPEC_H 1
 
-/* API_LEVEL: bsd */
-
 #include <__stdinc.h>
 #include <features.h>
 

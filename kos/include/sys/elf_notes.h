@@ -21,8 +21,6 @@
 #ifndef _SYS_ELF_NOTES_H
 #define _SYS_ELF_NOTES_H 1
 
-/* API_LEVEL: opensolaris */
-
 #include <elf.h> /* Only need `ELF_NOTE_SOLARIS' and `ELF_NOTE_PAGESIZE_HINT' */
 
 #endif /* !_SYS_ELF_NOTES_H */

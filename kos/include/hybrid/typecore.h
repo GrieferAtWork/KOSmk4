@@ -97,6 +97,16 @@
 
 #ifndef __INT8_C
 #if defined(_MSC_VER) || __has_extension(tpp_msvc_integer_suffix)
+#define __INT8_C_SUFFIX__    i8
+#define __INT16_C_SUFFIX__   i16
+#define __INT32_C_SUFFIX__   i32
+#define __INT64_C_SUFFIX__   i64
+#define __UINT8_C_SUFFIX__   ui8
+#define __UINT16_C_SUFFIX__  ui16
+#define __UINT32_C_SUFFIX__  ui32
+#define __UINT64_C_SUFFIX__  ui64
+#define __INTMAX_C_SUFFIX__  i64
+#define __UINTMAX_C_SUFFIX__ ui64
 #define __INT8_C(c)    c##i8
 #define __INT16_C(c)   c##i16
 #define __INT32_C(c)   c##i32
@@ -106,54 +116,98 @@
 #define __UINT32_C(c)  c##ui32
 #define __UINT64_C(c)  c##ui64
 #if defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 128
+#define __INT128_C_SUFFIX__  i128
+#define __UINT128_C_SUFFIX__ ui128
 #define __INT128_C(c)  c##i128
 #define __UINT128_C(c) c##ui128
 #endif /* _INTEGRAL_MAX_BITS >= 128 */
 #else /* _MSC_VER */
+#ifdef __INT8_C_SUFFIX__
+#define __INT8_C(c)    __PP_CAT2(c, __INT8_C_SUFFIX__)
+#else /* __INT8_C_SUFFIX__ */
+#define __INT8_C_SUFFIX__ /* nothing */
 #define __INT8_C(c)    c
+#endif /* !__INT8_C_SUFFIX__ */
+#ifdef __UINT8_C_SUFFIX__
+#define __UINT8_C(c)   __PP_CAT2(c, __UINT8_C_SUFFIX__)
+#else /* __UINT8_C_SUFFIX__ */
+#define __UINT8_C_SUFFIX__ u
 #define __UINT8_C(c)   c##u
-#if __SIZEOF_INT__ >= 2
+#endif /* !__UINT8_C_SUFFIX__ */
+#ifdef __INT16_C_SUFFIX__
+#define __INT16_C(c)   __PP_CAT2(c, __INT16_C_SUFFIX__)
+#elif __SIZEOF_INT__ >= 2
+#define __INT16_C_SUFFIX__ /* nothing */
 #define __INT16_C(c)   c
+#elif __SIZEOF_LONG__ >= 2
+#define __INT16_C_SUFFIX__ l
+#define __INT16_C(c)   c##l
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 2
+#define __INT16_C_SUFFIX__ ll
+#define __INT16_C(c)   c##ll
+#endif /* ... */
+#ifdef __UINT16_C_SUFFIX__
+#define __UINT16_C(c)   __PP_CAT2(c, __UINT16_C_SUFFIX__)
+#elif __SIZEOF_INT__ >= 2
+#define __UINT16_C_SUFFIX__ u
 #define __UINT16_C(c)  c##u
 #elif __SIZEOF_LONG__ >= 2
-#define __INT16_C(c)   c##l
+#define __UINT16_C_SUFFIX__ ul
 #define __UINT16_C(c)  c##ul
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 2
-#define __INT16_C(c)   c##ll
+#define __UINT16_C_SUFFIX__ ull
 #define __UINT16_C(c)  c##ull
 #endif /* ... */
-#if __SIZEOF_INT__ >= 4
+#ifdef __INT32_C_SUFFIX__
+#define __INT32_C(c)   __PP_CAT2(c, __INT32_C_SUFFIX__)
+#elif __SIZEOF_INT__ >= 4
+#define __INT32_C_SUFFIX__ /* nothing */
 #define __INT32_C(c)   c
+#elif __SIZEOF_LONG__ >= 4
+#define __INT32_C_SUFFIX__ l
+#define __INT32_C(c)   c##l
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 4
+#define __INT32_C_SUFFIX__ ll
+#define __INT32_C(c)   c##ll
+#endif /* ... */
+#ifdef __UINT32_C_SUFFIX__
+#define __UINT32_C(c)  __PP_CAT2(c, __UINT32_C_SUFFIX__)
+#elif __SIZEOF_INT__ >= 4
+#define __UINT32_C_SUFFIX__ u
 #define __UINT32_C(c)  c##u
 #elif __SIZEOF_LONG__ >= 4
-#define __INT32_C(c)   c##l
+#define __UINT32_C_SUFFIX__ ul
 #define __UINT32_C(c)  c##ul
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 4
-#define __INT32_C(c)   c##ll
+#define __UINT32_C_SUFFIX__ ull
 #define __UINT32_C(c)  c##ull
 #endif /* ... */
-#if __SIZEOF_INT__ >= 8
+#ifdef __INT64_C_SUFFIX__
+#define __INT64_C(c)   __PP_CAT2(c, __INT64_C_SUFFIX__)
+#elif __SIZEOF_INT__ >= 8
+#define __INT64_C_SUFFIX__ /* nothing */
 #define __INT64_C(c)   c
+#elif __SIZEOF_LONG__ >= 8
+#define __INT64_C_SUFFIX__ l
+#define __INT64_C(c)   c##l
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 8
+#define __INT64_C_SUFFIX__ ll
+#define __INT64_C(c)   c##ll
+#endif /* ... */
+#ifdef __UINT64_C_SUFFIX__
+#define __UINT64_C(c)  __PP_CAT2(c, __UINT64_C_SUFFIX__)
+#elif __SIZEOF_INT__ >= 8
+#define __UINT64_C_SUFFIX__ u
 #define __UINT64_C(c)  c##u
 #elif __SIZEOF_LONG__ >= 8
-#define __INT64_C(c)   c##l
+#define __UINT64_C_SUFFIX__ ul
 #define __UINT64_C(c)  c##ul
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 8
-#define __INT64_C(c)   c##ll
+#define __UINT64_C_SUFFIX__ ull
 #define __UINT64_C(c)  c##ull
 #endif /* ... */
 #endif /* ... */
 #endif /* !__INT8_C */
-
-#ifndef __INT64_C
-#if defined(_MSC_VER) || __has_extension(tpp_msvc_integer_suffix)
-#define __INT64_C(c)   c##i64
-#define __UINT64_C(c)  c##ui64
-#else /* _MSC_VER */
-#define __INT64_C(c)   c##ll
-#define __UINT64_C(c)  c##ull
-#endif /* ... */
-#endif /* !__INT64_C */
 
 #ifndef __CC__
 /* Don't append anything when not hosting by a
@@ -164,20 +218,44 @@
 #undef __UINT8_C
 #undef __UINT16_C
 #undef __UINT32_C
+#undef __INT64_C
+#undef __UINT64_C
+#undef __INT128_C
+#undef __UINT128_C
 #define __INT8_C(c)    c
 #define __INT16_C(c)   c
 #define __INT32_C(c)   c
 #define __UINT8_C(c)   c
 #define __UINT16_C(c)  c
 #define __UINT32_C(c)  c
-#undef __INT64_C
-#undef __UINT64_C
 #define __INT64_C(c)   c
 #define __UINT64_C(c)  c
-#undef __INT128_C
-#undef __UINT128_C
 #define __INT128_C(c)  c
 #define __UINT128_C(c) c
+#undef __INT8_C_SUFFIX__
+#undef __INT16_C_SUFFIX__
+#undef __INT32_C_SUFFIX__
+#undef __INT64_C_SUFFIX__
+#undef __INT128_C_SUFFIX__
+#undef __UINT8_C_SUFFIX__
+#undef __UINT16_C_SUFFIX__
+#undef __UINT32_C_SUFFIX__
+#undef __UINT64_C_SUFFIX__
+#undef __UINT128_C_SUFFIX__
+#undef __INTMAX_C_SUFFIX__
+#undef __UINTMAX_C_SUFFIX__
+#define __INT8_C_SUFFIX__    /* nothing */
+#define __INT16_C_SUFFIX__   /* nothing */
+#define __INT32_C_SUFFIX__   /* nothing */
+#define __INT64_C_SUFFIX__   /* nothing */
+#define __INT128_C_SUFFIX__  /* nothing */
+#define __UINT8_C_SUFFIX__   /* nothing */
+#define __UINT16_C_SUFFIX__  /* nothing */
+#define __UINT32_C_SUFFIX__  /* nothing */
+#define __UINT64_C_SUFFIX__  /* nothing */
+#define __UINT128_C_SUFFIX__ /* nothing */
+#define __INTMAX_C_SUFFIX__  /* nothing */
+#define __UINTMAX_C_SUFFIX__ /* nothing */
 #endif /* !__CC__ */
 
 #define __PRIVATE_MIN_S1  (-__INT8_C(127)-__INT8_C(1))

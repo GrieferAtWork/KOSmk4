@@ -17,19 +17,49 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD      (/sys/sys/inttypes.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/inttypes.h) */
-#ifndef _SYS_INTTYPES_H
-#define _SYS_INTTYPES_H 1
+/* (#) Portability: NetBSD (/sys/sys/ansi.h) */
+#ifndef _SYS_ANSI_H
+#define _SYS_ANSI_H 1
 
-#include <features.h>
+#include <__stdinc.h>
 
-#include <sys/feature_tests.h>
-#include <sys/int_types.h>
-#if !defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_SOLARIS)
-#include <sys/int_limits.h>
-#include <sys/int_const.h>
-#include <sys/int_fmtio.h>
-#endif /* !__USE_XOPEN || __USE_XOPEN2K || __USE_SOLARIS */
+#include <bits/crt/mbstate.h>
+#include <bits/crt/wctype.h> /* __wctype_t, __wctrans_t */
+#include <bits/types.h>
+#include <machine/_types.h>
+#include <net/bits/types.h>
 
-#endif /* !_SYS_INTTYPES_H */
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifndef __off_t
+#define __off_t __off_t
+typedef __off64_t __off_t;
+#endif /* !__off_t */
+
+typedef __u_net32_t __in_addr_t;
+typedef __u_net16_t __in_port_t;
+#ifndef __machine_fsblkcnt_t_defined
+#define __machine_fsblkcnt_t_defined 1
+#define __fsblkcnt_t __FS_TYPE(fsblkcnt)
+#endif /* !__machine_fsblkcnt_t_defined */
+#ifndef __machine_fsfilcnt_t_defined
+#define __machine_fsfilcnt_t_defined 1
+#define __fsfilcnt_t __FS_TYPE(fsfilcnt)
+#endif /* !__machine_fsfilcnt_t_defined */
+#ifndef ____mbstate_t_defined
+#define ____mbstate_t_defined 1
+typedef struct __mbstate __mbstate_t;
+#endif /* !____mbstate_t_defined */
+#define _BSD_WCTRANS_T_ __wctrans_t
+#define _BSD_WCTYPE_T_  __wctype_t
+#define _BSD_MBSTATE_T_ __mbstate_t
+#ifndef ____va_list_defined
+#define ____va_list_defined 1
+typedef __builtin_va_list __va_list;
+#endif /* !____va_list_defined */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_SYS_ANSI_H */

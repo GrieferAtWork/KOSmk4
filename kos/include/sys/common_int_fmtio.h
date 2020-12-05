@@ -17,19 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD      (/sys/sys/inttypes.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/inttypes.h) */
-#ifndef _SYS_INTTYPES_H
-#define _SYS_INTTYPES_H 1
+/* (#) Portability: NetBSD (/sys/sys/common_int_fmtio.h) */
+#ifndef _SYS_COMMON_INT_FMTIO_H
+#define _SYS_COMMON_INT_FMTIO_H 1
 
-#include <features.h>
+#include <inttypes.h>
 
-#include <sys/feature_tests.h>
-#include <sys/int_types.h>
-#if !defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_SOLARIS)
-#include <sys/int_limits.h>
-#include <sys/int_const.h>
-#include <sys/int_fmtio.h>
-#endif /* !__USE_XOPEN || __USE_XOPEN2K || __USE_SOLARIS */
-
-#endif /* !_SYS_INTTYPES_H */
+#endif /* !_SYS_COMMON_INT_FMTIO_H */

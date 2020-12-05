@@ -162,11 +162,17 @@ typedef __TM_TYPE(time) __time_t;
 #endif /* !__machine_socklen_t_defined */
 
 typedef int __nl_item;
+#ifndef ____va_list_defined
+#define ____va_list_defined 1
 typedef __builtin_va_list __va_list;
+#endif /* !____va_list_defined */
 
 /* Some more types from BSD */
 typedef __uint32_t __fflags_t;
+#ifndef __machine_ino_t_defined
+#define __machine_ino_t_defined 1
 typedef __FS_TYPE(ino) __ino_t;
+#endif /* !__machine_ino_t_defined */
 typedef __pid_t __lwpid_t;
 typedef int __accmode_t;
 typedef __int64_t __rlim_t;

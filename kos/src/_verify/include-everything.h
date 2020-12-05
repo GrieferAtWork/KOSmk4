@@ -228,6 +228,8 @@ incdir("");
 #include <bits/crt/fenv-inline.h>
 #include <bits/crt/fenv.h>
 #include <bits/crt/format-printer.h>
+#include <bits/crt/fts.h>
+#include <bits/crt/ftw.h>
 #include <bits/crt/glob.h>
 #include <bits/crt/ifaddrs.h>
 #include <bits/crt/inttypes.h>
@@ -436,6 +438,8 @@ incdir("");
 #include <fnmatch.h>
 #include <format-printer.h>
 #include <format-reader.h>
+#include <fts.h>
+#include <ftw.h>
 #include <getopt.h>
 #include <getpagesize.h>
 #include <glob.h>
@@ -603,6 +607,7 @@ incdir("");
 #include <kos/malloc.h>
 #include <kos/net/printf.h>
 #include <kos/personality.h>
+#include <kos/refcnt-nonatomic.h>
 #include <kos/refcnt.h>
 #include <kos/refptr.h>
 #include <kos/rtm.h>
@@ -650,6 +655,7 @@ incdir("");
 #include <libcpustate/api.h>
 #include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/api.h>
+#include <libdebuginfo/cfi_entry.h>
 #include <libdebuginfo/debug_aranges.h>
 #include <libdebuginfo/debug_frame.h>
 #include <libdebuginfo/debug_info.h>
@@ -919,6 +925,7 @@ incdir("");
 #include <pty.h>
 #include <pwd.h>
 #include <random.h>
+#include <re_comp.h>
 #include <regex.h>
 #include <rpc/netdb.h>
 #include <sal.h>
@@ -965,11 +972,21 @@ incdir("");
 #include <sys/_timeval.h>
 #include <sys/_types.h>
 #include <sys/acct.h>
+#include <sys/ansi.h>
 #include <sys/auxv.h>
 #include <sys/bitstring.h>
 #include <sys/bitypes.h>
+#include <sys/bswap.h>
 #include <sys/byteorder.h>
 #include <sys/cdefs.h>
+#include <sys/common_ansi.h>
+#include <sys/common_int_const.h>
+#include <sys/common_int_fmtio.h>
+#include <sys/common_int_limits.h>
+#include <sys/common_int_mwgwtypes.h>
+#include <sys/common_int_types.h>
+#include <sys/common_limits.h>
+#include <sys/common_wchar_limits.h>
 #include <sys/config.h>
 #include <sys/dir.h>
 #include <sys/elf.h>
@@ -985,6 +1002,7 @@ incdir("");
 #include <sys/fcntl.h>
 #include <sys/feature_tests.h>
 #include <sys/features.h>
+#include <sys/featuretest.h>
 #include <sys/file.h>
 #include <sys/filio.h>
 #include <sys/fsuid.h>
