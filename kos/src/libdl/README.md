@@ -32,7 +32,7 @@
 	- The times at which configuration variables are passed are chosen at the discretion of `libdl` itself and may not be relied upon (they may be parsed during initial program initialization, only upon first being used, or every time they are used)
 		- As such, changes made to `__peb.pp_envp` and/or `__peb.pp_envp[argi]` and/or `__peb.pp_envp[argi][chari]` may or may not affect later calls made to any of the RTLD functions exposed through `<dlfcn.h>` (with or without `defined(_KOS_SOURCE)`)
 - A new symbol type `STT_KOS_IDATA` has been added that allows for data-symbols to be exported from shared libraries, whilst providing custom callbacks for initializing said data field. This callback will only be invoked if the symbol is actually being used (i.e. as part of a dynamic relocation, or when directly addressed by a call to `dlsym(3)`).
-	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols, and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare static data objects.
+	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols, and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare data objects of `INTERN` or `PRIVATE` visibility.
 	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries, such as for example:  
 	  ```c
 	  extern pid_t process_pid;
