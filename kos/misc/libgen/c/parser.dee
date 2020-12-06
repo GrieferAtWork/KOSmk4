@@ -193,13 +193,25 @@ class CParser {
 	public function errAt(offset: int, message: string) {
 		local l, c = lcAt(offset)...;
 		local text = "{}({},{}) : Error : {}".format({ filename, l, c, message });
-		print text;
+		print File.stderr: text;
 		throw Error(text);
 	}
 
 	@@Print an error @message at the offset of the current tok
 	public function err(message: string) {
 		return errAt(tokStart, message);
+	}
+
+	@@Print an warning @message at offset @offset
+	public function warnAt(offset: int, message: string) {
+		local l, c = lcAt(offset)...;
+		local text = "{}({},{}) : Warning : {}".format({ filename, l, c, message });
+		print File.stderr: text;
+	}
+
+	@@Print an warning @message at the offset of the current tok
+	public function warn(message: string) {
+		return warnAt(tokStart, message);
 	}
 
 	@@Assert that @(this.tok == tok), and throw an error message if that isn't

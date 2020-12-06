@@ -1522,6 +1522,12 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 		default:
 			break;
 		}
+/*
+		if (self.tok) {
+			self.err("Cannot parse PP-expression: {!r}"
+				.format({ self.text[self.tokStart:] }));
+		}
+*/
 		return result;
 	} catch (Error as e) {
 		print "... while parsing expression string", repr(str(self));

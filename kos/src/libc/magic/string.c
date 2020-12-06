@@ -365,9 +365,13 @@ for (local f: funcs) {
 }
 
 %{
+}%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 #ifdef __USE_KOS
 #include <parts/malloca.h>
 #endif /* __USE_KOS */
