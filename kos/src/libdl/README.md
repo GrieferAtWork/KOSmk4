@@ -47,11 +47,11 @@
 	      return &real_process_pid;
 	  }
 	  ```
-	- Currently, `STT_KOS_IDATA` is used by KOS's `libc.so` to export `sys_errlist` without the need of additional relocations, by simply having the `STT_KOS_IDATA`-callback will in the array elements, such that no overhead exists for initializing the vector for programs that do not actually make use of the symbol.
+	- Currently, `STT_KOS_IDATA` is used by KOS's `libc.so` to export `sys_errlist` without the need of additional relocations, by simply having the `STT_KOS_IDATA`-callback fill in the array elements, such that no overhead exists for initializing the vector for programs that do not actually make use of the symbol.
 	- Behavior:
 		- No guaranty is made that a callback will only be invoked once:
-			- Subsequent calls to `dlsym(3)` may each re-invoke the callback once again
-		- The callback may be invoked simultaniously by multiple threads
+			- Subsequent calls to `dlsym(3)` may each re-invoke the callback once again (the same also goes for later-loaded modules with relocations to the same symbol, or even a single module with more than 1 relocation addressing the same symbol)
+		- The callback may be invoked simultaniously from multiple threads
 		- The size-field of the associated symbol cannot be dynamically calculated, and remains fixed at the value defined by the `st_size` field. This decision is intentional and required because symbol sizes must already be known for the puprpose of COPY-relocations when a program is linked, and changing the size of a data-symbol once linking was already done would mean that COPY-relocations using the old size would also break.
 
 
