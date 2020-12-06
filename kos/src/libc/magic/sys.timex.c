@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timex.h) */
 /* (#) Portability: NetBSD        (/sys/sys/timex.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timex.h) */

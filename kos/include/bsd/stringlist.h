@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69cb582c */
+/* HASH CRC-32:0x777a9bda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: libbsd (/include/bsd/stringlist.h) */
 #ifndef _BSD_STRINGLIST_H
 #define _BSD_STRINGLIST_H 1
 
@@ -28,7 +29,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: libbsd (/include/bsd/stringlist.h) */
 #include <stringlist.h>
 
 __SYSDECL_BEGIN

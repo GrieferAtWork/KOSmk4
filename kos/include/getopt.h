@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc995fd3 */
+/* HASH CRC-32:0xf57097e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _GETOPT_H
-#define _GETOPT_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (#) Portability: Cygwin        (/newlib/libc/include/getopt.h) */
 /* (#) Portability: FreeBSD       (/include/getopt.h) */
 /* (#) Portability: GNU C Library (/posix/getopt.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/getopt.h) */
 /* (#) Portability: musl libc     (/include/getopt.h) */
 /* (#) Portability: uClibc        (/include/getopt.h) */
+#ifndef _GETOPT_H
+#define _GETOPT_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 #include <hybrid/typecore.h>
 

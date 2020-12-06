@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/io/sys/sendfile.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sendfile.h) */
 /* (#) Portability: diet libc     (/include/sys/sendfile.h) */

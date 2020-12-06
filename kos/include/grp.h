@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ca7b21f */
+/* HASH CRC-32:0xb95c6129 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _GRP_H
-#define _GRP_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/grp.h) */
 /* (#) Portability: DJGPP         (/include/grp.h) */
@@ -39,6 +29,16 @@
 /* (#) Portability: diet libc     (/include/grp.h) */
 /* (#) Portability: musl libc     (/include/grp.h) */
 /* (#) Portability: uClibc        (/include/grp.h) */
+#ifndef _GRP_H
+#define _GRP_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <bits/crt/db/group.h>

@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/termios.h) */
 /* (#) Portability: DJGPP         (/include/termios.h) */

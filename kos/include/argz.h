@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe2d715c */
+/* HASH CRC-32:0xf84d4758 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
+/* (#) Portability: GNU C Library (/string/argz.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */
 #ifndef _ARGZ_H
 #define _ARGZ_H 1
 
@@ -28,9 +31,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
-/* (#) Portability: GNU C Library (/string/argz.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */
 #include <features.h>
 
 #include <bits/types.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1364afb */
+/* HASH CRC-32:0x58c37198 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_TIME_H
-#define _SYS_TIME_H 1
-
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/time.h) */
 /* (#) Portability: DJGPP         (/include/sys/time.h) */
@@ -39,6 +29,16 @@
 /* (#) Portability: diet libc     (/include/sys/time.h) */
 /* (#) Portability: musl libc     (/include/sys/time.h) */
 /* (#) Portability: uClibc        (/include/sys/time.h) */
+#ifndef _SYS_TIME_H
+#define _SYS_TIME_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/os/itimer.h> /* __ITIMER_* */

@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: ISO C95 (ISO/IEC 9899:1990/AMD1:1995) */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wchar.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7c156c0 */
+/* HASH CRC-32:0x3b44f50b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _PTHREAD_H
-#define _PTHREAD_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/pthread.h) */
 /* (#) Portability: FreeBSD       (/include/pthread.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/pthread.h) */
 /* (#) Portability: musl libc     (/include/pthread.h) */
 /* (#) Portability: uClibc        (/libpthread/nptl/sysdeps/pthread/pthread.h) */
+#ifndef _PTHREAD_H
+#define _PTHREAD_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/crt/pthreadvalues.h>

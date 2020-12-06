@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netdb.h) */
 /* (#) Portability: FreeBSD       (/include/netdb.h) */

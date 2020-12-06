@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sched.h) */
 /* (#) Portability: GNU C Library (/posix/sched.h) */

@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: DJGPP (/include/direct.h) */
 /* (#) Portability: MSVC  (/include/direct.h) */
 /* (#) Portability: MinGW (/mingw-w64-headers/crt/direct.h) */

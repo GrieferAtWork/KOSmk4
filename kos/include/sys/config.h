@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb43a33c3 */
+/* HASH CRC-32:0x9befe5f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/sys/config.h) */
+/* (#) Portability: DJGPP  (/include/sys/config.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/sys/config.h) */
 #ifndef _SYS_CONFIG_H
 #define _SYS_CONFIG_H 1
 
@@ -28,9 +31,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin (/newlib/libc/include/sys/config.h) */
-/* (#) Portability: DJGPP  (/include/sys/config.h) */
-/* (#) Portability: Newlib (/newlib/libc/include/sys/config.h) */
 /* This one's kind-of a weird header, in that there's no real standard out there
  * that defines what should go in here... And I'm also not entirely sure if this
  * is actually a ~real~ header that is meant to be exposed in any way, shape, or

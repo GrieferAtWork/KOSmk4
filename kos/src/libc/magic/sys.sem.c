@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sem.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/sem.h) */

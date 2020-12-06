@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysinfo.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/sysinfo.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysinfo.h) */

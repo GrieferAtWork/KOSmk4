@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/shadow/shadow.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/shadow.h) */
 /* (#) Portability: diet libc     (/include/shadow.h) */

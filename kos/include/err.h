@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa357544c */
+/* HASH CRC-32:0x3b845098 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
+/* (#) Portability: FreeBSD       (/include/err.h) */
+/* (#) Portability: GNU C Library (/misc/err.h) */
+/* (#) Portability: NetBSD        (/include/err.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
+/* (#) Portability: diet libc     (/include/err.h) */
+/* (#) Portability: musl libc     (/include/err.h) */
+/* (#) Portability: uClibc        (/include/err.h) */
 #ifndef _ERR_H
 #define _ERR_H 1
 
@@ -28,14 +36,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
-/* (#) Portability: FreeBSD       (/include/err.h) */
-/* (#) Portability: GNU C Library (/misc/err.h) */
-/* (#) Portability: NetBSD        (/include/err.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
-/* (#) Portability: diet libc     (/include/err.h) */
-/* (#) Portability: musl libc     (/include/err.h) */
-/* (#) Portability: uClibc        (/include/err.h) */
 #include <features.h>
 #include <kos/anno.h>
 #include <bits/types.h>

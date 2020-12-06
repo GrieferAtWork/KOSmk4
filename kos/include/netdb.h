@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cef80b4 */
+/* HASH CRC-32:0x899eb400 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netdb.h) */
+/* (#) Portability: FreeBSD       (/include/netdb.h) */
+/* (#) Portability: GNU C Library (/resolv/netdb.h) */
+/* (#) Portability: NetBSD        (/include/netdb.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */
+/* (#) Portability: diet libc     (/include/netdb.h) */
+/* (#) Portability: musl libc     (/include/netdb.h) */
+/* (#) Portability: uClibc        (/include/netdb.h) */
 #ifndef _NETDB_H
 #define _NETDB_H 1
 
@@ -28,15 +37,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/netdb.h) */
-/* (#) Portability: FreeBSD       (/include/netdb.h) */
-/* (#) Portability: GNU C Library (/resolv/netdb.h) */
-/* (#) Portability: NetBSD        (/include/netdb.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */
-/* (#) Portability: diet libc     (/include/netdb.h) */
-/* (#) Portability: musl libc     (/include/netdb.h) */
-/* (#) Portability: uClibc        (/include/netdb.h) */
 #include <features.h>
 
 #include <bits/crt/db/netdb.h>

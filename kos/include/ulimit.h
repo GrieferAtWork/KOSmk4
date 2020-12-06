@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x542c161b */
+/* HASH CRC-32:0x4737d7b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: FreeBSD       (/include/ulimit.h) */
+/* (#) Portability: GNU C Library (/resource/ulimit.h) */
+/* (#) Portability: NetBSD        (/include/ulimit.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ulimit.h) */
+/* (#) Portability: musl libc     (/include/ulimit.h) */
+/* (#) Portability: uClibc        (/include/ulimit.h) */
 #ifndef _ULIMIT_H
 #define _ULIMIT_H 1
 
@@ -28,13 +35,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
-/* (#) Portability: FreeBSD       (/include/ulimit.h) */
-/* (#) Portability: GNU C Library (/resource/ulimit.h) */
-/* (#) Portability: NetBSD        (/include/ulimit.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/ulimit.h) */
-/* (#) Portability: musl libc     (/include/ulimit.h) */
-/* (#) Portability: uClibc        (/include/ulimit.h) */
 #include <features.h>
 #include <asm/os/ulimit.h>
 

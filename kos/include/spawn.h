@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a28f8fb */
+/* HASH CRC-32:0xc73b46b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/spawn.h) */
+/* (#) Portability: FreeBSD       (/include/spawn.h) */
+/* (#) Portability: GNU C Library (/posix/spawn.h) */
+/* (#) Portability: NetBSD        (/include/spawn.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/spawn.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/spawn.h) */
+/* (#) Portability: musl libc     (/include/spawn.h) */
+/* (#) Portability: uClibc        (/include/spawn.h) */
 #ifndef _SPAWN_H
 #define _SPAWN_H 1
 
@@ -28,15 +37,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/spawn.h) */
-/* (#) Portability: FreeBSD       (/include/spawn.h) */
-/* (#) Portability: GNU C Library (/posix/spawn.h) */
-/* (#) Portability: NetBSD        (/include/spawn.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/spawn.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/spawn.h) */
-/* (#) Portability: musl libc     (/include/spawn.h) */
-/* (#) Portability: uClibc        (/include/spawn.h) */
 #include <features.h>
 
 #include <asm/crt/posix_spawn.h>

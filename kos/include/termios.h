@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab0b49cd */
+/* HASH CRC-32:0x68fe1b2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _TERMIOS_H
-#define _TERMIOS_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/termios.h) */
 /* (#) Portability: DJGPP         (/include/termios.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/termios.h) */
 /* (#) Portability: musl libc     (/include/termios.h) */
 /* (#) Portability: uClibc        (/include/termios.h) */
+#ifndef _TERMIOS_H
+#define _TERMIOS_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/os/termios.h>

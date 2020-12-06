@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/timeb.h) */
 /* (#) Portability: DJGPP         (/include/sys/timeb.h) */
 /* (#) Portability: GNU C Library (/time/sys/timeb.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc55b181c */
+/* HASH CRC-32:0x1f509534 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _DIRENT_H
-#define _DIRENT_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/dirent.h) */
 /* (#) Portability: DJGPP         (/include/dirent.h) */
@@ -40,6 +30,16 @@
 /* (#) Portability: diet libc     (/include/dirent.h) */
 /* (#) Portability: musl libc     (/include/dirent.h) */
 /* (#) Portability: uClibc        (/include/dirent.h) */
+#ifndef _DIRENT_H
+#define _DIRENT_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/os/dirent.h>

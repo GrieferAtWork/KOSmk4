@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: ISO C95 (ISO/IEC 9899:1990/AMD1:1995) */
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wctype.h) */

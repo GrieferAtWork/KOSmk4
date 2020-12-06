@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3df5e7d1 */
+/* HASH CRC-32:0x12a2568 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/mntent.h) */
+/* (#) Portability: DJGPP         (/include/mntent.h) */
+/* (#) Portability: GNU C Library (/misc/mntent.h) */
+/* (#) Portability: diet libc     (/include/mntent.h) */
+/* (#) Portability: musl libc     (/include/mntent.h) */
+/* (#) Portability: uClibc        (/include/mntent.h) */
 #ifndef _MNTENT_H
 #define _MNTENT_H 1
 
@@ -28,12 +34,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/mntent.h) */
-/* (#) Portability: DJGPP         (/include/mntent.h) */
-/* (#) Portability: GNU C Library (/misc/mntent.h) */
-/* (#) Portability: diet libc     (/include/mntent.h) */
-/* (#) Portability: musl libc     (/include/mntent.h) */
-/* (#) Portability: uClibc        (/include/mntent.h) */
 #include <features.h>
 #include <paths.h>
 

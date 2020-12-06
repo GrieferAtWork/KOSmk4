@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/acct.h) */
 /* (#) Portability: NetBSD        (/sys/sys/acct.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/acct.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8220da1e */
+/* HASH CRC-32:0xe360d2c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_RESOURCE_H
-#define _SYS_RESOURCE_H 1
-
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/resource.h) */
 /* (#) Portability: DJGPP         (/include/sys/resource.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/sys/resource.h) */
 /* (#) Portability: musl libc     (/include/sys/resource.h) */
 /* (#) Portability: uClibc        (/include/sys/resource.h) */
+#ifndef _SYS_RESOURCE_H
+#define _SYS_RESOURCE_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/os/resource.h>

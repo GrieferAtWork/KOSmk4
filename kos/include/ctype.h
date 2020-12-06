@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5837ff7 */
+/* HASH CRC-32:0x14340262 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/ctype.h) */
+/* (#) Portability: DJGPP         (/include/ctype.h) */
+/* (#) Portability: FreeBSD       (/include/ctype.h) */
+/* (#) Portability: GNU C Library (/ctype/ctype.h) */
+/* (#) Portability: MSVC          (/include/ctype.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/ctype.h) */
+/* (#) Portability: NetBSD        (/include/ctype.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/ctype.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
+/* (#) Portability: diet libc     (/include/ctype.h) */
+/* (#) Portability: musl libc     (/include/ctype.h) */
+/* (#) Portability: uClibc        (/include/ctype.h) */
 #ifndef _CTYPE_H
 #define _CTYPE_H 1
 
@@ -50,20 +64,6 @@ __NAMESPACE_STD_USING(isblank)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
-/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/ctype.h) */
-/* (#) Portability: DJGPP         (/include/ctype.h) */
-/* (#) Portability: FreeBSD       (/include/ctype.h) */
-/* (#) Portability: GNU C Library (/ctype/ctype.h) */
-/* (#) Portability: MSVC          (/include/ctype.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/ctype.h) */
-/* (#) Portability: NetBSD        (/include/ctype.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/ctype.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
-/* (#) Portability: diet libc     (/include/ctype.h) */
-/* (#) Portability: musl libc     (/include/ctype.h) */
-/* (#) Portability: uClibc        (/include/ctype.h) */
 #include <features.h>
 
 #ifdef __USE_XOPEN2K8

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b7e3340 */
+/* HASH CRC-32:0x22dc3dae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/math.h) */
+/* (#) Portability: DJGPP         (/include/math.h) */
+/* (#) Portability: GNU C Library (/math/math.h) */
+/* (#) Portability: MSVC          (/include/math.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/math.h) */
+/* (#) Portability: NetBSD        (/include/math.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/math.h) */
+/* (#) Portability: diet libc     (/include/math.h) */
+/* (#) Portability: musl libc     (/include/math.h) */
+/* (#) Portability: uClibc        (/include/math.h) */
 #ifndef _MATH_H
 #define _MATH_H 1
 
@@ -557,18 +569,6 @@ __NAMESPACE_STD_USING(islessgreater)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
-/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/math.h) */
-/* (#) Portability: DJGPP         (/include/math.h) */
-/* (#) Portability: GNU C Library (/math/math.h) */
-/* (#) Portability: MSVC          (/include/math.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/math.h) */
-/* (#) Portability: NetBSD        (/include/math.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/math.h) */
-/* (#) Portability: diet libc     (/include/math.h) */
-/* (#) Portability: musl libc     (/include/math.h) */
-/* (#) Portability: uClibc        (/include/math.h) */
 #ifndef __NO_FPU
 #include <features.h>
 

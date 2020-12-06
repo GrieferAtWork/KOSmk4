@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/pty.h) */
 /* (#) Portability: GNU C Library (/login/pty.h) */
 /* (#) Portability: diet libc     (/include/pty.h) */

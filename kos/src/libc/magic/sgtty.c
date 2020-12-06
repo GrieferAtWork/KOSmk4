@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/misc/sgtty.h) */
 /* (#) Portability: NetBSD        (/include/sgtty.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */

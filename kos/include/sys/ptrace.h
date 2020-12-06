@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd764717 */
+/* HASH CRC-32:0xaabec924 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/ptrace.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ptrace.h) */
+/* (#) Portability: diet libc     (/include/sys/ptrace.h) */
+/* (#) Portability: musl libc     (/include/sys/ptrace.h) */
 #ifndef _SYS_PTRACE_H
 #define _SYS_PTRACE_H 1
 
@@ -28,10 +32,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/ptrace.h) */
-/* (#) Portability: NetBSD        (/sys/sys/ptrace.h) */
-/* (#) Portability: diet libc     (/include/sys/ptrace.h) */
-/* (#) Portability: musl libc     (/include/sys/ptrace.h) */
 #include <features.h>
 
 #include <asm/os/ptrace.h>

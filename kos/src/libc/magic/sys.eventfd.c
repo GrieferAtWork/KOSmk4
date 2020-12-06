@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/eventfd.h) */
 /* (#) Portability: diet libc     (/include/sys/eventfd.h) */
 /* (#) Portability: musl libc     (/include/sys/eventfd.h) */

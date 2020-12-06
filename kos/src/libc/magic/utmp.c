@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/utmp.h) */
 /* (#) Portability: GNU C Library (/login/utmp.h) */
 /* (#) Portability: NetBSD        (/include/utmp.h) */

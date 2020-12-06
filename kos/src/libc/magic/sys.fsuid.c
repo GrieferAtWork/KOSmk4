@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/fsuid.h) */
 /* (#) Portability: diet libc     (/include/sys/fsuid.h) */
 /* (#) Portability: musl libc     (/include/sys/fsuid.h) */

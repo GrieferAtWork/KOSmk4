@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cf6286b */
+/* HASH CRC-32:0x7443eef8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_TIMEB_H
-#define _SYS_TIMEB_H 1
-
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/timeb.h) */
 /* (#) Portability: DJGPP         (/include/sys/timeb.h) */
 /* (#) Portability: GNU C Library (/time/sys/timeb.h) */
@@ -39,6 +29,16 @@
 /* (#) Portability: diet libc     (/include/sys/timeb.h) */
 /* (#) Portability: musl libc     (/include/sys/timeb.h) */
 /* (#) Portability: uClibc        (/include/sys/timeb.h) */
+#ifndef _SYS_TIMEB_H
+#define _SYS_TIMEB_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 #include <bits/os/timeb.h>
 #include <bits/types.h>

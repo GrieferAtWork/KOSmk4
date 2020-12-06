@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cb0ca2d */
+/* HASH CRC-32:0xf293497f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/io/sys/sendfile.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sendfile.h) */
+/* (#) Portability: diet libc     (/include/sys/sendfile.h) */
+/* (#) Portability: musl libc     (/include/sys/sendfile.h) */
+/* (#) Portability: uClibc        (/include/sys/sendfile.h) */
 #ifndef _SYS_SENDFILE_H
 #define _SYS_SENDFILE_H 1
 
@@ -28,11 +33,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: GNU C Library (/io/sys/sendfile.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sendfile.h) */
-/* (#) Portability: diet libc     (/include/sys/sendfile.h) */
-/* (#) Portability: musl libc     (/include/sys/sendfile.h) */
-/* (#) Portability: uClibc        (/include/sys/sendfile.h) */
 #include <features.h>
 #include <sys/types.h>
 

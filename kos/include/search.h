@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17dd2d8f */
+/* HASH CRC-32:0xb78da6f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SEARCH_H
-#define _SEARCH_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/search.h) */
 /* (#) Portability: DJGPP         (/include/search.h) */
@@ -41,6 +31,16 @@
 /* (#) Portability: diet libc     (/include/search.h) */
 /* (#) Portability: musl libc     (/include/search.h) */
 /* (#) Portability: uClibc        (/include/search.h) */
+#ifndef _SEARCH_H
+#define _SEARCH_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 #include <hybrid/typecore.h>
 

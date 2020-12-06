@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/fenv.h) */

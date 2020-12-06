@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4140becd */
+/* HASH CRC-32:0x25fbddb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _FNMATCH_H
-#define _FNMATCH_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/fnmatch.h) */
 /* (#) Portability: DJGPP         (/include/fnmatch.h) */
@@ -39,6 +29,16 @@
 /* (#) Portability: diet libc     (/include/fnmatch.h) */
 /* (#) Portability: musl libc     (/include/fnmatch.h) */
 /* (#) Portability: uClibc        (/include/fnmatch.h) */
+#ifndef _FNMATCH_H
+#define _FNMATCH_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 /* TODO: These constants should go into <asm/crt/fnmatch.h> */

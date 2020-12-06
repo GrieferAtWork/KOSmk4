@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfab69a */
+/* HASH CRC-32:0xade98663 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/signal.h) */
+/* (#) Portability: DJGPP         (/include/signal.h) */
+/* (#) Portability: FreeBSD       (/include/signal.h) */
+/* (#) Portability: GNU C Library (/signal/signal.h) */
+/* (#) Portability: MSVC          (/include/signal.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/signal.h) */
+/* (#) Portability: NetBSD        (/include/signal.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/signal.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
+/* (#) Portability: diet libc     (/include/signal.h) */
+/* (#) Portability: musl libc     (/include/signal.h) */
+/* (#) Portability: uClibc        (/include/signal.h) */
 #ifndef _SIGNAL_H
 #define _SIGNAL_H 1
 
@@ -52,20 +66,6 @@ __NAMESPACE_STD_USING(signal)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
-/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/signal.h) */
-/* (#) Portability: DJGPP         (/include/signal.h) */
-/* (#) Portability: FreeBSD       (/include/signal.h) */
-/* (#) Portability: GNU C Library (/signal/signal.h) */
-/* (#) Portability: MSVC          (/include/signal.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/signal.h) */
-/* (#) Portability: NetBSD        (/include/signal.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/signal.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
-/* (#) Portability: diet libc     (/include/signal.h) */
-/* (#) Portability: musl libc     (/include/signal.h) */
-/* (#) Portability: uClibc        (/include/signal.h) */
 #include <features.h>
 
 #include <asm/os/signal.h>

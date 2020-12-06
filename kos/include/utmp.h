@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c1c0b0 */
+/* HASH CRC-32:0x4cf4ea4e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/utmp.h) */
+/* (#) Portability: GNU C Library (/login/utmp.h) */
+/* (#) Portability: NetBSD        (/include/utmp.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/utmp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/utmp.h) */
+/* (#) Portability: diet libc     (/include/utmp.h) */
+/* (#) Portability: musl libc     (/include/utmp.h) */
+/* (#) Portability: uClibc        (/include/utmp.h) */
 #ifndef _UTMP_H
 #define _UTMP_H 1
 
@@ -28,14 +36,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/newlib/libc/include/utmp.h) */
-/* (#) Portability: GNU C Library (/login/utmp.h) */
-/* (#) Portability: NetBSD        (/include/utmp.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/utmp.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/utmp.h) */
-/* (#) Portability: diet libc     (/include/utmp.h) */
-/* (#) Portability: musl libc     (/include/utmp.h) */
-/* (#) Portability: uClibc        (/include/utmp.h) */
 #include <features.h>
 #include <bits/crt/db/utmp.h>
 #include <bits/types.h>

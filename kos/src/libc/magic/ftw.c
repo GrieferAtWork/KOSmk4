@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/ftw.h) */
 /* (#) Portability: DJGPP         (/include/ftw.h) */

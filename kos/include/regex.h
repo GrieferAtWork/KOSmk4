@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b006cca */
+/* HASH CRC-32:0xf93f25b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _REGEX_H
-#define _REGEX_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/regex.h) */
 /* (#) Portability: DJGPP         (/include/regex.h) */
@@ -39,6 +29,16 @@
 /* (#) Portability: diet libc     (/include/regex.h) */
 /* (#) Portability: musl libc     (/include/regex.h) */
 /* (#) Portability: uClibc        (/include/regex.h) */
+#ifndef _REGEX_H
+#define _REGEX_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <hybrid/typecore.h>

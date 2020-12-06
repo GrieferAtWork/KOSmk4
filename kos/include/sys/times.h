@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae14934 */
+/* HASH CRC-32:0xb63c45f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_TIMES_H
-#define _SYS_TIMES_H 1
-
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/times.h) */
 /* (#) Portability: DJGPP         (/include/sys/times.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/sys/times.h) */
 /* (#) Portability: musl libc     (/include/sys/times.h) */
 /* (#) Portability: uClibc        (/include/sys/times.h) */
+#ifndef _SYS_TIMES_H
+#define _SYS_TIMES_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <bits/types.h>
 #include <bits/os/tms.h> /* struct tms */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50ca5341 */
+/* HASH CRC-32:0x6b1f36d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in.h) */
+/* (#) Portability: DJGPP         (/include/netinet/in.h) */
+/* (#) Portability: GNU C Library (/inet/netinet/in.h) */
+/* (#) Portability: NetBSD        (/sys/netinet/in.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in.h) */
+/* (#) Portability: diet libc     (/include/netinet/in.h) */
+/* (#) Portability: musl libc     (/include/netinet/in.h) */
+/* (#) Portability: uClibc        (/include/netinet/in.h) */
 #ifndef _NETINET_IN_H
 #define _NETINET_IN_H 1
 
@@ -28,15 +37,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in.h) */
-/* (#) Portability: DJGPP         (/include/netinet/in.h) */
-/* (#) Portability: GNU C Library (/inet/netinet/in.h) */
-/* (#) Portability: NetBSD        (/sys/netinet/in.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in.h) */
-/* (#) Portability: diet libc     (/include/netinet/in.h) */
-/* (#) Portability: musl libc     (/include/netinet/in.h) */
-/* (#) Portability: uClibc        (/include/netinet/in.h) */
 #include <features.h>
 
 #include <hybrid/__byteorder.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x767c0930 */
+/* HASH CRC-32:0xac83f0d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/socket.h) */
+/* (#) Portability: GNU C Library (/socket/sys/socket.h) */
+/* (#) Portability: NetBSD        (/sys/sys/socket.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/socket.h) */
+/* (#) Portability: diet libc     (/include/sys/socket.h) */
+/* (#) Portability: musl libc     (/include/sys/socket.h) */
+/* (#) Portability: uClibc        (/include/sys/socket.h) */
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H 1
 
@@ -28,14 +36,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/socket.h) */
-/* (#) Portability: GNU C Library (/socket/sys/socket.h) */
-/* (#) Portability: NetBSD        (/sys/sys/socket.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/socket.h) */
-/* (#) Portability: diet libc     (/include/sys/socket.h) */
-/* (#) Portability: musl libc     (/include/sys/socket.h) */
-/* (#) Portability: uClibc        (/include/sys/socket.h) */
 #include <__stdinc.h>
 #include <features.h>
 

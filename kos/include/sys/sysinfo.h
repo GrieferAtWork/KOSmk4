@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa90087bd */
+/* HASH CRC-32:0x728f5df2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysinfo.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/sysinfo.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysinfo.h) */
+/* (#) Portability: diet libc     (/include/sys/sysinfo.h) */
+/* (#) Portability: musl libc     (/include/sys/sysinfo.h) */
+/* (#) Portability: uClibc        (/include/sys/sysinfo.h) */
 #ifndef _SYS_SYSINFO_H
 #define _SYS_SYSINFO_H 1
 
@@ -28,12 +34,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysinfo.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/sysinfo.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysinfo.h) */
-/* (#) Portability: diet libc     (/include/sys/sysinfo.h) */
-/* (#) Portability: musl libc     (/include/sys/sysinfo.h) */
-/* (#) Portability: uClibc        (/include/sys/sysinfo.h) */
 #include <features.h>
 #include <linux/kernel.h>
 #include <bits/types.h>

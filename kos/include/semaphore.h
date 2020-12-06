@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e5a1608 */
+/* HASH CRC-32:0xa9d9b65f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SEMAPHORE_H
-#define _SEMAPHORE_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/semaphore.h) */
 /* (#) Portability: FreeBSD       (/include/semaphore.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/semaphore.h) */
 /* (#) Portability: musl libc     (/include/semaphore.h) */
 /* (#) Portability: uClibc        (/libpthread/nptl/semaphore.h) */
+#ifndef _SEMAPHORE_H
+#define _SEMAPHORE_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/crt/semaphore.h>  /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb0e04c2 */
+/* HASH CRC-32:0xc803b4e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/time.h) */
+/* (#) Portability: DJGPP         (/include/time.h) */
+/* (#) Portability: FreeBSD       (/include/time.h) */
+/* (#) Portability: GNU C Library (/time/time.h) */
+/* (#) Portability: MSVC          (/include/time.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/time.h) */
+/* (#) Portability: NetBSD        (/include/time.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/time.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
+/* (#) Portability: diet libc     (/include/time.h) */
+/* (#) Portability: musl libc     (/include/time.h) */
+/* (#) Portability: uClibc        (/include/time.h) */
 #ifndef _TIME_H
 #define _TIME_H 1
 
@@ -76,20 +90,6 @@ __NAMESPACE_STD_USING(timespec_get)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
-/* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/time.h) */
-/* (#) Portability: DJGPP         (/include/time.h) */
-/* (#) Portability: FreeBSD       (/include/time.h) */
-/* (#) Portability: GNU C Library (/time/time.h) */
-/* (#) Portability: MSVC          (/include/time.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/time.h) */
-/* (#) Portability: NetBSD        (/include/time.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/time.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
-/* (#) Portability: diet libc     (/include/time.h) */
-/* (#) Portability: musl libc     (/include/time.h) */
-/* (#) Portability: uClibc        (/include/time.h) */
 #include <features.h>
 
 #include <bits/crt/tm.h>

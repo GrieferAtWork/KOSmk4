@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x325c4f99 */
+/* HASH CRC-32:0xb044da95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/pty.h) */
+/* (#) Portability: GNU C Library (/login/pty.h) */
+/* (#) Portability: diet libc     (/include/pty.h) */
+/* (#) Portability: musl libc     (/include/pty.h) */
+/* (#) Portability: uClibc        (/include/pty.h) */
 #ifndef _PTY_H
 #define _PTY_H 1
 
@@ -28,11 +33,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/pty.h) */
-/* (#) Portability: GNU C Library (/login/pty.h) */
-/* (#) Portability: diet libc     (/include/pty.h) */
-/* (#) Portability: musl libc     (/include/pty.h) */
-/* (#) Portability: uClibc        (/include/pty.h) */
 #include <features.h>
 
 #include <bits/types.h>

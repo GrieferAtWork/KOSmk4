@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1377962c */
+/* HASH CRC-32:0xbfdcbaf3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timex.h) */
+/* (#) Portability: NetBSD        (/sys/sys/timex.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timex.h) */
+/* (#) Portability: diet libc     (/include/sys/timex.h) */
+/* (#) Portability: musl libc     (/include/sys/timex.h) */
+/* (#) Portability: uClibc        (/include/sys/timex.h) */
 #ifndef _SYS_TIMEX_H
 #define _SYS_TIMEX_H 1
 
@@ -28,12 +34,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timex.h) */
-/* (#) Portability: NetBSD        (/sys/sys/timex.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timex.h) */
-/* (#) Portability: diet libc     (/include/sys/timex.h) */
-/* (#) Portability: musl libc     (/include/sys/timex.h) */
-/* (#) Portability: uClibc        (/include/sys/timex.h) */
 #include <features.h>
 
 #include <asm/os/timex.h>

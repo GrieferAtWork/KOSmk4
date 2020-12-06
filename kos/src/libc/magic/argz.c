@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
 /* (#) Portability: GNU C Library (/string/argz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */

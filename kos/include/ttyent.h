@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7057f388 */
+/* HASH CRC-32:0x7a5f7425 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD       (/include/ttyent.h) */
+/* (#) Portability: GNU C Library (/misc/ttyent.h) */
+/* (#) Portability: NetBSD        (/include/ttyent.h) */
+/* (#) Portability: uClibc        (/include/ttyent.h) */
 #ifndef _TTYENT_H
 #define _TTYENT_H 1
 
@@ -28,10 +32,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: FreeBSD       (/include/ttyent.h) */
-/* (#) Portability: GNU C Library (/misc/ttyent.h) */
-/* (#) Portability: NetBSD        (/include/ttyent.h) */
-/* (#) Portability: uClibc        (/include/ttyent.h) */
 #include <features.h>
 #include <asm/crt/ttyent.h>
 #include <bits/crt/db/ttyent.h>

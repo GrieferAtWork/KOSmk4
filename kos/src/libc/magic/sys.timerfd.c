@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/timerfd.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timerfd.h) */
 /* (#) Portability: diet libc     (/include/sys/timerfd.h) */

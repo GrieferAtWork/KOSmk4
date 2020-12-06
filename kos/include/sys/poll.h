@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc195b35d */
+/* HASH CRC-32:0x8fc743f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/poll.h) */
+/* (#) Portability: GNU C Library (/io/sys/poll.h) */
+/* (#) Portability: NetBSD        (/sys/sys/poll.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/poll.h) */
+/* (#) Portability: diet libc     (/include/sys/poll.h) */
+/* (#) Portability: musl libc     (/include/sys/poll.h) */
+/* (#) Portability: uClibc        (/include/sys/poll.h) */
 #ifndef _SYS_POLL_H
 #define _SYS_POLL_H 1
 
@@ -28,13 +35,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/poll.h) */
-/* (#) Portability: GNU C Library (/io/sys/poll.h) */
-/* (#) Portability: NetBSD        (/sys/sys/poll.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/poll.h) */
-/* (#) Portability: diet libc     (/include/sys/poll.h) */
-/* (#) Portability: musl libc     (/include/sys/poll.h) */
-/* (#) Portability: uClibc        (/include/sys/poll.h) */
 #include <features.h>
 
 #include <hybrid/typecore.h>

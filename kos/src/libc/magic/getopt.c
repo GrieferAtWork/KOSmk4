@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/getopt.h) */
 /* (#) Portability: FreeBSD       (/include/getopt.h) */
 /* (#) Portability: GNU C Library (/posix/getopt.h) */

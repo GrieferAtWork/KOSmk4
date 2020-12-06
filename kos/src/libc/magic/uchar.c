@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
 /* (#) Portability: FreeBSD       (/include/uchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */

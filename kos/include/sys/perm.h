@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4cdeda1 */
+/* HASH CRC-32:0xb6638fd8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/perm.h) */
 #ifndef _SYS_PERM_H
 #define _SYS_PERM_H 1
 
@@ -28,7 +29,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/perm.h) */
 #include <features.h>
 #include <hybrid/typecore.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda3a627e */
+/* HASH CRC-32:0x88b703c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _GLOB_H
-#define _GLOB_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/glob.h) */
 /* (#) Portability: DJGPP         (/include/glob.h) */
@@ -39,6 +29,16 @@
 /* (#) Portability: diet libc     (/include/glob.h) */
 /* (#) Portability: musl libc     (/include/glob.h) */
 /* (#) Portability: uClibc        (/include/glob.h) */
+#ifndef _GLOB_H
+#define _GLOB_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/crt/glob.h>

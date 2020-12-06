@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6edac12 */
+/* HASH CRC-32:0xbb93a8be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
+/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/fenv.h) */
+/* (#) Portability: GNU C Library (/math/fenv.h) */
+/* (#) Portability: MSVC          (/include/fenv.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/fenv.h) */
+/* (#) Portability: NetBSD        (/include/fenv.h) */
+/* (#) Portability: diet libc     (/include/fenv.h) */
+/* (#) Portability: musl libc     (/include/fenv.h) */
+/* (#) Portability: uClibc        (/include/fenv.h) */
 #ifndef _FENV_H
 #define _FENV_H 1
 
@@ -57,16 +67,6 @@ __NAMESPACE_STD_USING(feupdateenv)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: ISO C99 (ISO/IEC 9899:1999) */
-/* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/fenv.h) */
-/* (#) Portability: GNU C Library (/math/fenv.h) */
-/* (#) Portability: MSVC          (/include/fenv.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/fenv.h) */
-/* (#) Portability: NetBSD        (/include/fenv.h) */
-/* (#) Portability: diet libc     (/include/fenv.h) */
-/* (#) Portability: musl libc     (/include/fenv.h) */
-/* (#) Portability: uClibc        (/include/fenv.h) */
 #ifndef __NO_FPU
 #include <features.h>
 

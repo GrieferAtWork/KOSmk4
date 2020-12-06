@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11f894f9 */
+/* HASH CRC-32:0xadedc590 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ioctl.h) */
+/* (#) Portability: DJGPP         (/include/sys/ioctl.h) */
+/* (#) Portability: GNU C Library (/misc/sys/ioctl.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ioctl.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ioctl.h) */
+/* (#) Portability: diet libc     (/include/sys/ioctl.h) */
+/* (#) Portability: musl libc     (/include/sys/ioctl.h) */
+/* (#) Portability: uClibc        (/include/sys/ioctl.h) */
 #ifndef _SYS_IOCTL_H
 #define _SYS_IOCTL_H 1
 
@@ -28,14 +36,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ioctl.h) */
-/* (#) Portability: DJGPP         (/include/sys/ioctl.h) */
-/* (#) Portability: GNU C Library (/misc/sys/ioctl.h) */
-/* (#) Portability: NetBSD        (/sys/sys/ioctl.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ioctl.h) */
-/* (#) Portability: diet libc     (/include/sys/ioctl.h) */
-/* (#) Portability: musl libc     (/include/sys/ioctl.h) */
-/* (#) Portability: uClibc        (/include/sys/ioctl.h) */
 #include <features.h>
 
 #include <asm/ioctl.h>

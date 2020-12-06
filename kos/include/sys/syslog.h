@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddbdbfcb */
+/* HASH CRC-32:0x1457c57e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
+/* (#) Portability: GNU C Library (/misc/sys/syslog.h) */
+/* (#) Portability: NetBSD        (/sys/sys/syslog.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
+/* (#) Portability: diet libc     (/include/sys/syslog.h) */
+/* (#) Portability: musl libc     (/include/sys/syslog.h) */
+/* (#) Portability: uClibc        (/include/sys/syslog.h) */
 #ifndef _SYS_SYSLOG_H
 #define _SYS_SYSLOG_H 1
 
@@ -28,13 +35,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
-/* (#) Portability: GNU C Library (/misc/sys/syslog.h) */
-/* (#) Portability: NetBSD        (/sys/sys/syslog.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
-/* (#) Portability: diet libc     (/include/sys/syslog.h) */
-/* (#) Portability: musl libc     (/include/sys/syslog.h) */
-/* (#) Portability: uClibc        (/include/sys/syslog.h) */
 #include <features.h>
 
 #include <asm/os/syslog.h>

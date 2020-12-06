@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysmacros.h) */
 /* (#) Portability: DJGPP         (/include/sys/sysmacros.h) */
 /* (#) Portability: GNU C Library (/misc/sys/sysmacros.h) */

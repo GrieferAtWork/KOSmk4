@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x935b0967 */
+/* HASH CRC-32:0xd27cee7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _STRINGS_H
-#define _STRINGS_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/strings.h) */
 /* (#) Portability: DJGPP         (/include/strings.h) */
@@ -40,6 +30,16 @@
 /* (#) Portability: diet libc     (/include/strings.h) */
 /* (#) Portability: musl libc     (/include/strings.h) */
 /* (#) Portability: uClibc        (/include/strings.h) */
+#ifndef _STRINGS_H
+#define _STRINGS_H 1
+
+#include "__stdinc.h"
+#include "__crt.h"
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>

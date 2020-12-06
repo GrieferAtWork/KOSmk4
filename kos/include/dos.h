@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c3192cd */
+/* HASH CRC-32:0x7e5883ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DJGPP (/include/dos.h) */
+/* (#) Portability: MSVC  (/include/dos.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/dos.h) */
 #ifndef _DOS_H
 #define _DOS_H 1
 
@@ -28,9 +31,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: DJGPP (/include/dos.h) */
-/* (#) Portability: MSVC  (/include/dos.h) */
-/* (#) Portability: MinGW (/mingw-w64-headers/crt/dos.h) */
 #include <features.h> /* __USE_OLD_DOS */
 
 #include <hybrid/host.h> /* __i386__, __x86_64__ */

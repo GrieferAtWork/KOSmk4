@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b53d39b */
+/* HASH CRC-32:0xb5330fbb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/timerfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timerfd.h) */
+/* (#) Portability: diet libc     (/include/sys/timerfd.h) */
+/* (#) Portability: musl libc     (/include/sys/timerfd.h) */
 #ifndef _SYS_TIMERFD_H
 #define _SYS_TIMERFD_H 1
 
@@ -28,10 +32,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/timerfd.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timerfd.h) */
-/* (#) Portability: diet libc     (/include/sys/timerfd.h) */
-/* (#) Portability: musl libc     (/include/sys/timerfd.h) */
 #include <features.h>
 
 #include <asm/os/timerfd.h>

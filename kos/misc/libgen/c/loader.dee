@@ -110,6 +110,7 @@ global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 };
 
 final global KNOWN_STRING_TAGS: {string...} = {
+	"c_prefix",     /* Guard-prefix in <string.h> */
 	"c",            /* C-part in <string.h> */
 	"std",          /* std:: -part in <string.h> */
 	"ccompat",      /* c-compat-part in <string.h> */
@@ -1725,6 +1726,12 @@ class LoaderContext {
 	@@Pushed function features
 	public member pushedDefaultFeatures: {FunctionFeatures...} = none;
 
+	@@Elements to be inserted at the start of the system header (e.g. <string.h>)
+	@@These elements will be inserted after the copyright notice, but before the
+	@@include guard macro. This section is intended to be filled with portability
+	@@notes, and standard references.
+	public member result_order_headerCPrefix: {(Function | ExposedFunction | string | UserString | Callable)...} = none;
+
 	@@Elements inserted at @"%[insert:std]"
 	@@Set to non-@none once a @"%[insert:std]" directive has been reached
 	public member result_order_headerStd: {(Function | ExposedFunction | string | UserString | Callable)...} = none;
@@ -2433,6 +2440,13 @@ again:
 			if (!customDirectivesParser(this))
 				self.err("Unknown directive: {!r}".format({ tok }));
 		}
+	}
+
+	@@Insert text at the @"c_prefix" location
+	public function insertText_c_prefix(text: string | UserString) {
+		if (result_order_headerCPrefix is none)
+			result_order_headerCPrefix = [];
+		result_order_headerCPrefix.append(text);
 	}
 
 	@@Insert text at the @"c" location
@@ -5526,6 +5540,8 @@ done_function:
 			"#endif /* !{} */\n"
 			.format({ context.result_headerGuardName }));
 	}
+	if (context.result_order_headerCPrefix !is none)
+		result.order_header.insertall(0, context.result_order_headerCPrefix);
 	return result;
 }
 

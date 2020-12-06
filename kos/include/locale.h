@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2191aa9f */
+/* HASH CRC-32:0x27575af8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
+/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/locale.h) */
+/* (#) Portability: DJGPP         (/include/locale.h) */
+/* (#) Portability: FreeBSD       (/include/locale.h) */
+/* (#) Portability: GNU C Library (/locale/locale.h) */
+/* (#) Portability: MSVC          (/include/locale.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/locale.h) */
+/* (#) Portability: NetBSD        (/include/locale.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/locale.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
+/* (#) Portability: diet libc     (/include/locale.h) */
+/* (#) Portability: musl libc     (/include/locale.h) */
+/* (#) Portability: uClibc        (/include/locale.h) */
 #ifndef _LOCALE_H
 #define _LOCALE_H 1
 
@@ -42,20 +56,6 @@ __NAMESPACE_STD_USING(localeconv)
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: ISO C89 (ANSI X3.159-1989) */
-/* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/locale.h) */
-/* (#) Portability: DJGPP         (/include/locale.h) */
-/* (#) Portability: FreeBSD       (/include/locale.h) */
-/* (#) Portability: GNU C Library (/locale/locale.h) */
-/* (#) Portability: MSVC          (/include/locale.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/locale.h) */
-/* (#) Portability: NetBSD        (/include/locale.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/locale.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
-/* (#) Portability: diet libc     (/include/locale.h) */
-/* (#) Portability: musl libc     (/include/locale.h) */
-/* (#) Portability: uClibc        (/include/locale.h) */
 #include <features.h>
 #include <bits/crt/locale.h>
 #include <bits/crt/lconv.h>

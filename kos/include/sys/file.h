@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3dff858 */
+/* HASH CRC-32:0xe9ac1beb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_FILE_H
-#define _SYS_FILE_H 1
-
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/file.h) */
 /* (#) Portability: DJGPP         (/include/sys/file.h) */
 /* (#) Portability: GNU C Library (/misc/sys/file.h) */
@@ -38,6 +28,16 @@
 /* (#) Portability: diet libc     (/include/sys/file.h) */
 /* (#) Portability: musl libc     (/include/sys/file.h) */
 /* (#) Portability: uClibc        (/include/sys/file.h) */
+#ifndef _SYS_FILE_H
+#define _SYS_FILE_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/os/fcntl.h> /* __LOCK_* */

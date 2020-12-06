@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dd80fcc */
+/* HASH CRC-32:0x55d67326 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_STAT_H
-#define _SYS_STAT_H 1
-
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/stat.h) */
 /* (#) Portability: DJGPP         (/include/sys/stat.h) */
@@ -40,6 +30,16 @@
 /* (#) Portability: diet libc     (/include/sys/stat.h) */
 /* (#) Portability: musl libc     (/include/sys/stat.h) */
 /* (#) Portability: uClibc        (/include/sys/stat.h) */
+#ifndef _SYS_STAT_H
+#define _SYS_STAT_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 #include <features.h>
 
 #include <asm/os/stat.h>

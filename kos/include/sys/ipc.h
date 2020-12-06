@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1d079df */
+/* HASH CRC-32:0x40b84448 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ipc.h) */
+/* (#) Portability: GNU C Library (/sysvipc/sys/ipc.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ipc.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ipc.h) */
+/* (#) Portability: diet libc     (/include/sys/ipc.h) */
+/* (#) Portability: musl libc     (/include/sys/ipc.h) */
+/* (#) Portability: uClibc        (/include/sys/ipc.h) */
 #ifndef _SYS_IPC_H
 #define _SYS_IPC_H 1
 
@@ -28,14 +36,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ipc.h) */
-/* (#) Portability: GNU C Library (/sysvipc/sys/ipc.h) */
-/* (#) Portability: NetBSD        (/sys/sys/ipc.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ipc.h) */
-/* (#) Portability: diet libc     (/include/sys/ipc.h) */
-/* (#) Portability: musl libc     (/include/sys/ipc.h) */
-/* (#) Portability: uClibc        (/include/sys/ipc.h) */
 #include <features.h>
 
 #include <bits/types.h>

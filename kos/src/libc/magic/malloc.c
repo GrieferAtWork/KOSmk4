@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%{
+%(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/malloc.h) */
 /* (#) Portability: DJGPP         (/include/malloc.h) */
 /* (#) Portability: FreeBSD       (/include/malloc.h) */

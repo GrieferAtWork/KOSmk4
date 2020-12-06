@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb12761c */
+/* HASH CRC-32:0xbc418802 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/misc/sgtty.h) */
+/* (#) Portability: NetBSD        (/include/sgtty.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */
+/* (#) Portability: uClibc        (/include/sgtty.h) */
 #ifndef _SGTTY_H
 #define _SGTTY_H 1
 
@@ -28,10 +32,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-/* (#) Portability: GNU C Library (/misc/sgtty.h) */
-/* (#) Portability: NetBSD        (/include/sgtty.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */
-/* (#) Portability: uClibc        (/include/sgtty.h) */
 #include <features.h>
 #include <bits/types.h>
 
