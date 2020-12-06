@@ -252,11 +252,11 @@
 #define DW_OP_deref_size           0x94 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 *)p : n == 2 ? *(u16 *)p : n == 4 ? *(u32 *)p : n == 8 ? *(u64 *)p : UNDEFINED); */
 #define DW_OP_xderef_size          0x95 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 *)id:p : n == 2 ? *(u16 *)id:p : n == 4 ? *(u32 *)id:p : n == 8 ? *(u64 *)id:p : UNDEFINED); */
 #define DW_OP_nop                  0x96 /* [+0]   Do nothing */
-#define DW_OP_push_object_address  0x97 /* [+0]   Push the value of `sm_objaddr' */
+#define DW_OP_push_object_address  0x97 /* [+0]   Push the value of `ue_objaddr' */
 #define DW_OP_call2                0x98 /* [+2]   Call another DW expression (the operator is a 2-byte unsigned offset from .debug_info) */
 #define DW_OP_call4                0x99 /* [+4]   Call another DW expression (the operator is a 4-byte unsigned offset from .debug_info) */
 #define DW_OP_call_ref             0x9a /* [+*]   Call another DW expression (the operator is a dwarf_decode_uleb128 offset from .debug_info) */
-#define DW_OP_form_tls_address     0x9b /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase)) */
+#define DW_OP_form_tls_address     0x9b /* [+0]   PUSH(ADDRESS(POP() + ue_tlsbase)) */
 #define DW_OP_call_frame_cfa       0x9c /* [+0]   PUSH(CALCULATE_CFA(GET_REGISTER(PC))) */
 #define DW_OP_bit_piece            0x9d /* [+*]   size = dwarf_decode_uleb128(&pc); offset = dwarf_decode_uleb128(&pc); WRITE_RESULT((TOP >> offset) & ((1 << size) - 1), size); */
 #define DW_OP_implicit_value       0x9e /* [+*]   size = dwarf_decode_uleb128(&pc); PUSH(LVALUE(pc, size)); pc += size; */
@@ -264,7 +264,7 @@
 #define DW_OP_implicit_pointer     0xa0 /* <Not supported> */
 #define DW_OP_addrx                0xa1 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
 #define DW_OP_constx               0xa2 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
-#define DW_OP_entry_value          0xa3 /* TODO */
+#define DW_OP_entry_value          0xa3 /* [+*]   size = dwarf_decode_uleb128(&pc); EVAL_DW_OP_CODE_AT_SUBPROGRAM_ENTRY(pc, pc + size); pc += size; */
 #define DW_OP_const_type           0xa4 /* <Not supported> */
 #define DW_OP_regval_type          0xa5 /* <Not supported> */
 #define DW_OP_deref_type           0xa6 /* <Not supported> */
@@ -279,7 +279,7 @@
 
 
 /* DW Opcode extensions. */
-#define DW_OP_GNU_push_tls_address 0xe0 /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase))   (Alias for `DW_OP_form_tls_address') */
+#define DW_OP_GNU_push_tls_address 0xe0 /* [+0]   PUSH(ADDRESS(POP() + ue_tlsbase))   (Alias for `DW_OP_form_tls_address') */
 #define DW_OP_HP_unknown           0xe0 /* ??? */
 #define DW_OP_HP_is_value          0xe1 /* <Not supported> */
 #define DW_OP_HP_fltconst4         0xe2 /* <Not supported> */
@@ -300,7 +300,7 @@
 #define DW_OP_GNU_uninit           0xf0 /* [+0]   UNINIT? */
 #define DW_OP_GNU_encoded_addr     0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
 #define DW_OP_GNU_implicit_pointer 0xf2 /* <Not supported> */
-#define DW_OP_GNU_entry_value      0xf3 /* <Not supported> */
+#define DW_OP_GNU_entry_value      0xf3 /* [+*]   size = dwarf_decode_uleb128(&pc); EVAL_DW_OP_CODE_AT_SUBPROGRAM_ENTRY(pc, pc + size); pc += size; (Alias for `DW_OP_entry_value') */
 #define DW_OP_GNU_const_type       0xf4 /* <Not supported> */
 #define DW_OP_GNU_regval_type      0xf5 /* <Not supported> */
 #define DW_OP_GNU_deref_type       0xf6 /* <Not supported> */
@@ -474,12 +474,12 @@
  * When jumping to `.Lexcept' as the landing pad of an exception thrown by `syscall',
  * the custom piece of CFI instrumentation used to set `%rflags.DF = 0' will still be
  * executed, even though normally such instrumentation would only be serviced when the
- * surrounding CFI-proc would get unwound (which is the case when `.Lexcept' is jumped
- * to as the target of a landing pad transition). But if `.Lexcept' was located within
- * the same capsule as `syscall' (internally: .Lexcept would have to be followed by at
- * least 1 additional byte of program code before followed by a .cfi_endcapsule directive),
- * then the unwind rule specified by `.cfi_escape' would not be executed (since the landing
- * pad would not leave the capsule)
+ * surrounding CFI-proc would get unwound (which isn't the case when `.Lexcept' is jumped
+ * to as the target of a local landing pad transition). But if `.Lexcept' was located
+ * within the same capsule as `syscall' (internally: .Lexcept would have to be followed
+ * by at least 1 additional byte of program code before followed by a .cfi_endcapsule
+ * directive), then the unwind rule specified by `.cfi_escape' would not be executed
+ * (since the landing pad would not leave the capsule)
  *
  * Using capsules, one is thus able to force certain registers to be restored before
  * executing code from a local landing pad, which is quite useful when one needs custom
@@ -652,9 +652,9 @@ typedef struct unwind_emulator_struct {
 	__uint8_t               ue_ptrsize;            /* [const] DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf) */
 	__uint8_t               ue_piecewrite;         /* [const] Non-zero if data pieces should be written, rather than read. */
 	__uint8_t               ue_pad;                /* ... */
-	__byte_t               *ue_piecebuf;           /* [0..sm_piecesiz][const] Pointer to a buffer to receive data from `DW_OP_piece' */
-	__size_t                ue_piecesiz;           /* [const] Size of the `sm_piecebuf' buffer in bytes. */
-	__size_t                ue_piecebits;          /* [<= sm_piecesiz * 8] Number of _BITS_ within the `sm_piecebuf' buffer that are in use. */
+	__byte_t               *ue_piecebuf;           /* [0..ue_piecesiz][const] Pointer to a buffer to receive data from `DW_OP_piece' */
+	__size_t                ue_piecesiz;           /* [const] Size of the `ue_piecebuf' buffer in bytes. */
+	__size_t                ue_piecebits;          /* [<= ue_piecesiz * 8] Number of _BITS_ within the `ue_piecebuf' buffer that are in use. */
 	__uintptr_t             ue_call_frame_cfa;     /* [0..1] Lazily calculated value for the call-frame-CFA of the given register state.
 	                                                * When set to ZERO(0), this value is calculated as-needed, using:
 	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
