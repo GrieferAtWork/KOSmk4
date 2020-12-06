@@ -529,6 +529,8 @@
  *  - CFI capsules may not to used inside of initialization text (f_inittext), but can only
  *    appear inside of eval-text (f_evaltext)
  *
+ * A patch to (among other things) enable support for this extension by binutils can be found
+ * as part of the KOS source tree under /kos/misc/patches/binutils-2.32.patch
  */
 
 

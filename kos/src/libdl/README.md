@@ -5,7 +5,7 @@
 - [psABI-x86_64.pdf](https://uclibc.org/docs/psABI-x86_64.pdf)
 - [amd64-elf-abi.pdf](https://people.freebsd.org/~obrien/amd64-elf-abi.pdf)
 
-### Changes to ELF specs (all architectures)
+### Changes/Extensions to ELF specs (all architectures)
 - When execution is passed to an application's `main()` function, `libdl.so` does not make any provisions for a pre-initialized auxiliary information vector. For binary compatibility, an empty Aux-vector may be passed, but aux information in general is instead calculated/initialized on-demand, and must be accessed through use of `libc`'s `getauxval(3)` function, as found in `<sys/auxv.h>` (this header and its function `getauxval(3)` also exist in glibc and may therefor be considered portable)
 	- Similarly, an application linked without need for dynamic linking also will not have an auxiliary vector made available by the kernel
 - Runtime configuration options
@@ -31,6 +31,29 @@
 	- RTLD will always make use of the initial process environment (as available through `__peb` (from `<kos/exec/peb.h>`) and aliased by `__initenv` (from `<stdlib.h>` with `defined(_DOS_SOURCE)`))
 	- The times at which configuration variables are passed are chosen at the discretion of `libdl` itself and may not be relied upon (they may be parsed during initial program initialization, only upon first being used, or every time they are used)
 		- As such, changes made to `__peb.pp_envp` and/or `__peb.pp_envp[argi]` and/or `__peb.pp_envp[argi][chari]` may or may not affect later calls made to any of the RTLD functions exposed through `<dlfcn.h>` (with or without `defined(_KOS_SOURCE)`)
+- A new symbol type `STT_KOS_IDATA` has been added that allows for data-symbols to be exported from shared libraries, whilst providing custom callbacks for initializing said data field. This callback will only be invoked if the symbol is actually being used (i.e. as part of a dynamic relocation, or when directly addressed by a call to `dlsym(3)`).
+	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols, and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare static data objects.
+	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries, such as for example:  
+	  ```c
+	  extern pid_t process_pid;
+	  ```
+	  Note that no such symbol exists in libc, but it could be added easily as:  
+	  ```c
+	  DEFINE_PUBLIC_IDATA_G(process_pid, get_process_pid, __SIZEOF_PID_T__);
+	  static ATTR_USED pid_t *get_process_pid(void) {
+	      static pid_t real_process_pid = 0;
+	      if (!real_process_pid)
+	          real_process_pid = getpid();
+	      return &real_process_pid;
+	  }
+	  ```
+	- Currently, `STT_KOS_IDATA` is used by KOS's `libc.so` to export `sys_errlist` without the need of additional relocations, by simply having the `STT_KOS_IDATA`-callback will in the array elements, such that no overhead exists for initializing the vector for programs that do not actually make use of the symbol.
+	- Behavior:
+		- No guaranty is made that a callback will only be invoked once:
+			- Subsequent calls to `dlsym(3)` may each re-invoke the callback once again
+		- The callback may be invoked simultaniously by multiple threads
+		- The size-field of the associated symbol cannot be dynamically calculated, and remains fixed at the value defined by the `st_size` field. This decision is intentional and required because symbol sizes must already be known for the puprpose of COPY-relocations when a program is linked, and changing the size of a data-symbol once linking was already done would mean that COPY-relocations using the old size would also break.
+
 
 ### Changes to ELF specs (i386/x86_64)
 - Though not required, the KOS RLTD link driver (`libdl.so`) accepts the following relocation types in shared libraries and application binaries alike
