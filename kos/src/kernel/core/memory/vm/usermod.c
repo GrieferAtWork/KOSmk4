@@ -1221,7 +1221,7 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-LOCAL NONNULL((1, 5, 7)) unsigned int LIBUNWIND_CC
+LOCAL NONNULL((1, 5, 7)) unsigned int KCALL
 unwind_userspace_with_section(struct usermod *__restrict um, void const *absolute_pc,
                               void *eh_frame_data, size_t eh_frame_size,
                               unwind_getreg_t reg_getter, void const *reg_getter_arg,

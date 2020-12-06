@@ -322,33 +322,27 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 		switch (rule->cr_rule) {
 
 		case DW_CFA_register_rule_register:
-			if unlikely(!(*reg_getter)(reg_getter_arg,
-			                           (unwind_regno_t)rule->cr_value,
-			                           reg_buf.bytes))
-				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)rule->cr_value);
-			if unlikely(!(*reg_setter)(reg_setter_arg,
-			                           dw_regno,
-			                           reg_buf.bytes))
-				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)dw_regno);
+			result = (*reg_getter)(reg_getter_arg, (unwind_regno_t)rule->cr_value, reg_buf.bytes);
+			if unlikely(result != UNWIND_SUCCESS)
+				ERRORF(done, "regno=%u (%u)\n", (unsigned int)rule->cr_value, result);
+			result = (*reg_setter)(reg_setter_arg, dw_regno, reg_buf.bytes);
+			if unlikely(result != UNWIND_SUCCESS)
+				ERRORF(done, "regno=%u (%u)\n", (unsigned int)dw_regno, result);
 			break;
 
 		case DW_CFA_register_rule_offsetn:
-			if unlikely(OVERFLOW_SADD((intptr_t)cfa,
-			                          (intptr_t)rule->cr_value,
-			                          (intptr_t *)&reg_buf.addr))
+			if unlikely(OVERFLOW_SADD((intptr_t)cfa, (intptr_t)rule->cr_value, (intptr_t *)&reg_buf.addr))
 				ERRORF(err_segfault, "cfa=%p, cr_value=%p\n", cfa, rule->cr_value);
-			if unlikely(!guarded_memcpy(reg_buf.bytes,
-			                            (void const *)reg_buf.addr,
-			                            CFI_REGISTER_SIZE(dw_regno))) {
+			if unlikely(!guarded_memcpy(reg_buf.bytes, (void const *)reg_buf.addr, CFI_REGISTER_SIZE(dw_regno))) {
 				ERRORF(err_segfault, "reg_buf.addr=%p, cfa=%p, cr_value=%p, cv_type=%u, cv_reg=%u, cv_value=%p\n",
 				       reg_buf.addr, cfa, rule->cr_value,
 				       (unsigned int)self->cs_cfa.cv_type,
-				       (unsigned int)self->cs_cfa.cv_reg, (uintptr_t)self->cs_cfa.cv_value);
+				       (unsigned int)self->cs_cfa.cv_reg,
+				       (uintptr_t)self->cs_cfa.cv_value);
 			}
-			if unlikely(!(*reg_setter)(reg_setter_arg,
-			                           dw_regno,
-			                           reg_buf.bytes))
-				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)dw_regno);
+			result = (*reg_setter)(reg_setter_arg, dw_regno, reg_buf.bytes);
+			if unlikely(result != UNWIND_SUCCESS)
+				ERRORF(done, "regno=%u (%u)\n", (unsigned int)dw_regno, result);
 			break;
 
 		case DW_CFA_register_rule_val_offsetn:
@@ -356,10 +350,9 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 				ERRORF(err_noaddr_register, "regno=%u\n", (unsigned int)dw_regno);
 			/* No overflow checks here, because we don't reference the memory. */
 			reg_buf.addr = cfa + rule->cr_value;
-			if unlikely(!(*reg_setter)(reg_setter_arg,
-			                           dw_regno,
-			                           reg_buf.bytes))
-				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)dw_regno);
+			result = (*reg_setter)(reg_setter_arg, dw_regno, reg_buf.bytes);
+			if unlikely(result != UNWIND_SUCCESS)
+				ERRORF(done, "regno=%u (%u)\n", (unsigned int)dw_regno, result);
 			break;
 
 		case DW_CFA_register_rule_val_expression:
@@ -374,10 +367,9 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 			                                     cfa);
 			if unlikely(result != UNWIND_SUCCESS)
 				goto done;
-			if unlikely(!(*reg_setter)(reg_setter_arg,
-			                           dw_regno,
-			                           reg_buf.bytes))
-				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)dw_regno);
+			result = (*reg_setter)(reg_setter_arg, dw_regno, reg_buf.bytes);
+			if unlikely(result != UNWIND_SUCCESS)
+				ERRORF(done, "regno=%u (%u)\n", (unsigned int)dw_regno, result);
 			break;
 
 		case DW_CFA_register_rule_expression:
@@ -396,10 +388,9 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 				       (unsigned int)dw_regno, (void const *)reg_buf.addr,
 				       CFI_REGISTER_SIZE(dw_regno));
 			}
-			if unlikely(!(*reg_setter)(reg_setter_arg,
-			                           dw_regno,
-			                           reg_buf.bytes))
-				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)dw_regno);
+			result = (*reg_setter)(reg_setter_arg, dw_regno, reg_buf.bytes);
+			if unlikely(result != UNWIND_SUCCESS)
+				ERRORF(done, "regno=%u (%u)\n", (unsigned int)dw_regno, result);
 			break;
 
 		default: break;
@@ -477,10 +468,9 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 		 * >> END(MyRegisterUnwindFunction)
 		 */
 		TRACE("UNWIND(cfa=%p)\n", cfa);
-		if unlikely(!(*reg_setter)(reg_setter_arg,
-		                           CFI_UNWIND_REGISTER_SP,
-		                           &cfa))
-			ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)CFI_UNWIND_REGISTER_SP);
+		result = (*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &cfa);
+		if unlikely(result != UNWIND_SUCCESS)
+			ERRORF(done, "regno=%u (%u)\n", (unsigned int)CFI_UNWIND_REGISTER_SP, result);
 	}
 #endif /* !EH_FRAME_CFA_LANDING_APPLY */
 done:
@@ -489,8 +479,6 @@ err_segfault:
 	return UNWIND_SEGFAULT;
 err_noaddr_register:
 	return UNWIND_APPLY_NOADDR_REGISTER;
-err_invalid_register:
-	return UNWIND_INVALID_REGISTER;
 }
 
 #undef cfi_unwind_local_register_uncommon2dw

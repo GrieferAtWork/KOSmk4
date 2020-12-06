@@ -386,14 +386,14 @@ libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,
                                uintptr_t *__restrict presult) {
+	unsigned int error;
 	/* Calculate the CFA value. */
 	if (self->cv_type == UNWIND_CFA_VALUE_REGISTER) {
 		if unlikely(CFI_REGISTER_SIZE(self->cv_reg) != sizeof(uintptr_t))
 			ERRORF(err_noaddr_register, "regno=%u", (unsigned int)self->cv_reg);
-		if unlikely(!(*reg_getter)(reg_callback_arg,
-		                           self->cv_reg,
-		                           presult))
-			ERRORF(err_invalid_register, "regno=%u", (unsigned int)self->cv_reg);
+		error = (*reg_getter)(reg_callback_arg, self->cv_reg, presult);
+		if unlikely(error != UNWIND_SUCCESS)
+			ERRORF(err, "regno=%u (%u)", (unsigned int)self->cv_reg, error);
 		*presult += self->cv_value;
 	} else if (self->cv_type == UNWIND_CFA_VALUE_EXPRESSION) {
 		/* Use a CFI emulator to calculate the CFA base value. */
@@ -406,10 +406,10 @@ libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
 		*presult = 0;
 	}
 	return UNWIND_SUCCESS;
-err_invalid_register:
-	return UNWIND_INVALID_REGISTER;
 err_noaddr_register:
 	return UNWIND_APPLY_NOADDR_REGISTER;
+err:
+	return error;
 }
 
 #ifdef __INTELLISENSE__
@@ -1034,16 +1034,16 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
                                unwind_fde_t const *__restrict fde, void const *absolute_pc,
                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                unwind_setreg_t reg_setter, void *reg_setter_arg) {
+	unsigned int error;
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 	/* Quick check: If no capsules were used, then only
 	 *              apply the LPA (LandingPadAdjustment) */
 	if unlikely(self->cs_has_capsules) {
-		unsigned int result;
-		result = _unwind_cfa_landing_apply(&self->cs_state, fde, absolute_pc,
-		                                   reg_getter, reg_getter_arg,
-		                                   reg_setter, reg_setter_arg);
-		if unlikely(result != UNWIND_SUCCESS)
-			return result;
+		error = _unwind_cfa_landing_apply(&self->cs_state, fde, absolute_pc,
+		                                  reg_getter, reg_getter_arg,
+		                                  reg_setter, reg_setter_arg);
+		if unlikely(error != UNWIND_SUCCESS)
+			ERRORF(err, "%u\n", error);
 	}
 #else /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 	(void)fde;         /* Unused... */
@@ -1051,20 +1051,22 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
 #endif /* !LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 	if (self->cs_lp_adjustment != 0) {
 		uintptr_t sp;
-		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_UNWIND_REGISTER_SP, &sp))
-			ERROR(err_invalid_register);
+		error = (*reg_getter)(reg_getter_arg, CFI_UNWIND_REGISTER_SP, &sp);
+		if unlikely(error != UNWIND_SUCCESS)
+			ERRORF(err, "%u\n", error);
 		/* Adjust the stack-pointer. */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 		sp += self->cs_lp_adjustment;
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
 		sp -= self->cs_lp_adjustment;
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &sp))
-			ERROR(err_invalid_register);
+		error = (*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &sp);
+		if unlikely(error != UNWIND_SUCCESS)
+			ERRORF(err, "%u\n", error);
 	}
 	return UNWIND_SUCCESS;
-err_invalid_register:
-	return UNWIND_INVALID_REGISTER;
+err:
+	return error;
 }
 
 

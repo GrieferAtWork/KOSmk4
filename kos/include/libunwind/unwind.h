@@ -47,15 +47,15 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
 
 /* Register accessor callbacks for a variety of known cpu context structures. */
 #ifndef __KERNEL__
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 #ifndef LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS

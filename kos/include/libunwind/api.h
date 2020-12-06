@@ -71,6 +71,8 @@
 #define UNWIND_CFA_ILLEGAL_INSTRUCTION      19 /* Illegal CFA instruction encountered. */
 #define UNWIND_APPLY_NOADDR_REGISTER        20 /* Attempted to use a non-address (e.g. FPU) register as a memory location */
 #define UNWIND_PERSONALITY_ERROR            21 /* A personality function returned an error. */
+#define UNWIND_OPTIMIZED_AWAY               22 /* The requested information has been optimized away. */
+#define UNWIND_CORRUPTED                    23 /* Corrupted debug information. */
 /*...*/
 #define UNWIND_USER_DISABLED                64 /* (Used internally by the kernel): User-space exception handling is disabled. */
 #define UNWIND_USER_NOTHROW                 65 /* (Used internally by libc): Unable to unwind a function marked as NOTHROW */

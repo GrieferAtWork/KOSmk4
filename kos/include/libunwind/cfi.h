@@ -592,10 +592,12 @@ typedef struct {
  * @param: DW_REGNO: One of `CFI_[arch]_UNWIND_REGISTER_[name]'
  * @param: DST:      A buffer of `CFI_386_REGISTER_SIZE(DW_REGNO)' bytes,
  *                   to-be filled with the register value.
- * @return: true:    Processed as `UNWIND_SUCCESS'
- * @return: false:   Processed as `UNWIND_INVALID_REGISTER' */
-typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+ * @return: UNWIND_SUCCESS:          Success (only in this case will `dst'/`src' have been used)
+ * @return: UNWIND_INVALID_REGISTER: The given `DW_REGNO' is invalid/unsupported.
+ * @return: UNWIND_OPTIMIZED_AWAY:   Register information has been optimized away.
+ * @return: * :                      Some other error (propagate) */
+typedef __ATTR_NONNULL((3)) unsigned int (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((3)) unsigned int (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 
 typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal

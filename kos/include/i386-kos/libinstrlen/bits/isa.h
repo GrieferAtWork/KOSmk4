@@ -132,12 +132,12 @@ __DECL_BEGIN
 	 ? INSTRLEN_ISA_X86_64                                                                 \
 	 : INSTRLEN_ISA_I386)
 __LOCAL __uintptr_t
-_instrlen_isa_getcs_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(void const *__arg,
-                                                                           __UINTPTR_HALF_TYPE__ __dw_regno,
-                                                                           void *__restrict __dst),
+_instrlen_isa_getcs_from_unwind_getreg(unsigned int (LIBUNWIND_CC *__reg_getter)(void const *__arg,
+                                                                                 __UINTPTR_HALF_TYPE__ __dw_regno,
+                                                                                 void *__restrict __dst),
                                        void *__state) {
 	__uintptr_t __result;
-	if (!(*__reg_getter)(__state, CFI_X86_64_UNWIND_REGISTER_CS, &__result))
+	if ((*__reg_getter)(__state, CFI_X86_64_UNWIND_REGISTER_CS, &__result) != UNWIND_SUCCESS)
 		__result = SEGMENT_USER_CODE64_RPL;
 	return __result;
 }
@@ -153,12 +153,12 @@ _instrlen_isa_getcs_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(void 
 	 ? INSTRLEN_ISA_I386                                                                                               \
 	 : INSTRLEN_ISA_8086)
 __LOCAL __uintptr_t
-_instrlen_isa_geteflags_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(void const *__arg,
-                                                                               __UINTPTR_HALF_TYPE__ __dw_regno,
-                                                                               void *__restrict __dst),
+_instrlen_isa_geteflags_from_unwind_getreg(unsigned int (LIBUNWIND_CC *__reg_getter)(void const *__arg,
+                                                                                     __UINTPTR_HALF_TYPE__ __dw_regno,
+                                                                                     void *__restrict __dst),
                                            void *__state) {
 	__uintptr_t __result;
-	if (!(*__reg_getter)(__state, CFI_386_UNWIND_REGISTER_EFLAGS, &__result))
+	if ((*__reg_getter)(__state, CFI_386_UNWIND_REGISTER_EFLAGS, &__result) != UNWIND_SUCCESS)
 		__result = 0;
 	return __result;
 }

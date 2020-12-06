@@ -85,8 +85,8 @@ DATDEF struct cpu *const dbg_cpu;
 /* Get/Set debugger register for some given level.
  * NOTE: These functions are written to be compatible with `unwind_getreg_t' / `unwind_setreg_t'
  * @param: arg: One of `DBG_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_REGLEVEL_*' */
-FUNDEF bool NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg, uintptr_half_t cfi_regno, void *__restrict buf);
-FUNDEF bool NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uintptr_half_t cfi_regno, void const *__restrict buf);
+FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg, uintptr_half_t cfi_regno, void *__restrict buf);
+FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uintptr_half_t cfi_regno, void const *__restrict buf);
 
 /* Get/Set the PC/SP registers of a given register level. */
 #define dbg_getpcreg(level)        dbg_getregp(level, CFI_UNWIND_REGISTER_PC)
@@ -112,10 +112,10 @@ NOTHROW(KCALL dbg_getregp)(unsigned int level, uintptr_half_t cfi_regno) {
 #ifdef NDEBUG
 	dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
 #else /* NDEBUG */
-	bool ok;
+	unsigned int error;
 	__hybrid_assert(CFI_REGISTER_SIZE(cfi_regno) == sizeof(uintptr_t));
-	ok = dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
-	__hybrid_assert(ok);
+	error = dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
+	__hybrid_assert(error == UNWIND_SUCCESS);
 #endif /* !NDEBUG */
 	return result;
 }
@@ -125,10 +125,10 @@ NOTHROW(KCALL dbg_setregp)(unsigned int level, uintptr_half_t cfi_regno, uintptr
 #ifdef NDEBUG
 	dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
 #else /* NDEBUG */
-	bool ok;
+	unsigned int error;
 	__hybrid_assert(CFI_REGISTER_SIZE(cfi_regno) == sizeof(uintptr_t));
-	ok = dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
-	__hybrid_assert(ok);
+	error = dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
+	__hybrid_assert(error == UNWIND_SUCCESS);
 #endif /* !NDEBUG */
 }
 

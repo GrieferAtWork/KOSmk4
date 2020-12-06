@@ -553,7 +553,7 @@ nocpu:
 /* Get/Set debugger register for some given level.
  * NOTE: These functions are written to be compatible with `unwind_getreg_t' / `unwind_setreg_t'
  * @param: arg: One of `DBG_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_REGLEVEL_*' */
-PUBLIC ATTR_DBGTEXT bool
+PUBLIC ATTR_DBGTEXT unsigned int
 NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
                                  uintptr_half_t cfi_regno,
                                  void *__restrict buf) {
@@ -612,12 +612,12 @@ NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
 	default:
 		break;
 	}
-	return false;
+	return UNWIND_INVALID_REGISTER;
 ok:
-	return true;
+	return UNWIND_SUCCESS;
 }
 
-PUBLIC ATTR_DBGTEXT bool
+PUBLIC ATTR_DBGTEXT unsigned int
 NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
                                  uintptr_half_t cfi_regno,
                                  void const *__restrict buf) {
@@ -692,9 +692,9 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 	default:
 		break;
 	}
-	return false;
+	return UNWIND_INVALID_REGISTER;
 ok:
-	return true;
+	return UNWIND_SUCCESS;
 }
 
 /* Get/set a register, given its ID

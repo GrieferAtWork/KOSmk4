@@ -250,7 +250,7 @@ NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
  * simply forward the request to `arg->ce_regget'.
  * This function is used to facilitate register access inside of call-site parameter
  * expressions found in `DW_TAG_GNU_call_site_parameter:DW_AT_GNU_call_site_value'. */
-PRIVATE NONNULL((1, 3)) bool
+PRIVATE NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *arg,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
@@ -262,7 +262,7 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 		/* Found it! */
 		memcpy(dst, self->ce_unwind_regv[i].ur_data,
 		       CFI_REGISTER_SIZE(dw_regno));
-		return true;
+		return UNWIND_SUCCESS;
 	}
 	/* Forward the request to the underlying register accessor function. */
 	return (*self->ce_regget)(self->ce_regget_arg, dw_regno, dst);
@@ -479,20 +479,28 @@ err_function_not_found:
  * to load child-DW_TAG_GNU_call_site_parameter components by saving the
  * current parser position for later, and calling
  * `libdi_debuginfo_cu_parser_nextchild()' in order to load the first of a
- * variable number of should-be `DW_TAG_GNU_call_site_parameter'-components. */
-PRIVATE NONNULL((1)) bool
+ * variable number of should-be `DW_TAG_GNU_call_site_parameter'-components.
+ * 
+ * @return: UNWIND_SUCCESS:        Success.
+ * @return: UNWIND_OPTIMIZED_AWAY: The necessary information doesn't exist. */
+PRIVATE NONNULL((1)) unsigned int
 NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	struct unwind_register *pc_register;
+	unsigned int error;
 
-	if (self->ce_module)
-		return self->ce_module != (REF module_t *)-1; /* Already loaded, or cannot be loaded! */
+	if (self->ce_module) {
+		/* Already loaded, or cannot be loaded! */
+		if (self->ce_module == (REF module_t *)-1)
+			return UNWIND_OPTIMIZED_AWAY;
+		return UNWIND_SUCCESS;
+	}
 	/* Lookup an override for the PC register. */
 	pc_register = find_register(self, CFI_UNWIND_REGISTER_PC);
 	if unlikely(!pc_register)
-		goto fail;
+		goto noinfo_fail;
 	self->ce_module = module_ataddr_nx((void const *)pc_register->ur_word, self->ce_modtyp);
 	if unlikely(!self->ce_module)
-		goto fail;
+		goto noinfo_fail;
 	/* Fill in data that becomes valid once a module's been loaded. */
 	self->ce_modrelpc = pc_register->ur_word - module_getloadaddr(self->ce_module, self->ce_modtyp);
 #define lock_section(name)                               \
@@ -500,10 +508,10 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	                   name, MODULE_LOCKSECTION_FNORMAL)
 	self->ce_s_debug_info = lock_section(secname_debug_info);
 	if unlikely(!self->ce_s_debug_info) /* We absolutely _need_ the .debug_info section! */
-		goto fail_module;
+		goto noinfo_fail_module;
 	self->ce_s_debug_abbrev = lock_section(secname_debug_abbrev);
 	if unlikely(!self->ce_s_debug_abbrev) /* We absolutely _need_ the .debug_abbrev section! */
-		goto fail_module_debug_info;
+		goto noinfo_fail_module_debug_info;
 	self->ce_s_debug_aranges = lock_section(secname_debug_aranges);
 #undef lock_section
 	self->ce_s_eh_frame     = NULL; /* Loaded lazily. */
@@ -529,7 +537,6 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	             self->ce_sections.ds_debug_info_end);
 	/* Find the proper compilation-unit for `self->ce_modrelpc' */
 	{
-		unsigned int error;
 		uintptr_t debuginfo_cu_offset;
 		byte_t const *reader;
 		error = libdi_debugaranges_locate(self->ce_sections.ds_debug_aranges_start,
@@ -547,12 +554,12 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 			                                           &self->ce_abbrev,
 			                                           NULL);
 			if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
-				goto fail_module_sections;
+				goto noinfo_fail_module_sections; /* XXX: This would mean corrupted! */
 
 			/* Load the relevant call-site. */
 			error = cfientry_locate_callsite(self, true);
 			if unlikely(error != CFIENTRY_LOCATE_CALLSITE_SUCCESS)
-				goto fail_module_sections;
+				goto noinfo_fail_module_sections;
 		} else {
 			/* This can happen if the .debug_aranges section is missing.
 			 * In this case, scan _all_ CUs for the call-site function. */
@@ -564,27 +571,27 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 				                                           &self->ce_abbrev,
 				                                           NULL);
 				if (error != DEBUG_INFO_ERROR_SUCCESS)
-					goto fail_module_sections;
+					goto noinfo_fail_module_sections;
 				/* Load the relevant call-site. */
 				error = cfientry_locate_callsite(self, false);
 				if unlikely(error == CFIENTRY_LOCATE_CALLSITE_SUCCESS)
 					break; /* Found it! */
 				if unlikely(error == CFIENTRY_LOCATE_CALLSITE_NO_CALLSITE_IN_FUNCTION)
-					goto fail_module_sections; /* There isn't any call-site information */
+					goto noinfo_fail_module_sections; /* There isn't any call-site information */
 			}
 		}
 	}
-	return true;
-fail_module_sections:
+	return UNWIND_SUCCESS;
+noinfo_fail_module_sections:
 	module_section_xdecref(self->ce_s_debug_aranges, self->ce_modtyp);
 	module_section_decref(self->ce_s_debug_abbrev, self->ce_modtyp);
-fail_module_debug_info:
+noinfo_fail_module_debug_info:
 	module_section_decref(self->ce_s_debug_info, self->ce_modtyp);
-fail_module:
+noinfo_fail_module:
 	module_decref(self->ce_module, self->ce_modtyp);
-fail:
+noinfo_fail:
 	self->ce_module = (REF module_t *)-1;
-	return false;
+	return UNWIND_OPTIMIZED_AWAY;
 }
 
 #ifdef __GNUC__
@@ -641,7 +648,7 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
 #endif /* __GNUC__ */
 
 
-PRIVATE NONNULL((1, 3)) bool
+PRIVATE NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
                                      void *__restrict dst);
@@ -707,12 +714,17 @@ NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restr
 	                                 self->ce_parser.dup_addrsize,
 	                                 &expr_length);
 	if unlikely(!expr)
-		return UNWIND_NO_FRAME;
+		return UNWIND_OPTIMIZED_AWAY;
 	expr_end = expr + expr_length;
-	if unlikely(expr >= expr_end)
-		return UNWIND_NO_FRAME;
+	if unlikely(expr >= expr_end) {
+		if (expr == expr_end)
+			return UNWIND_OPTIMIZED_AWAY;
+		return UNWIND_CORRUPTED;
+	}
 	if unlikely(expr < self->ce_sections.ds_debug_info_start)
-		return UNWIND_NO_FRAME;
+		return UNWIND_CORRUPTED;
+	if unlikely(expr_end > self->ce_sections.ds_debug_info_end)
+		return UNWIND_CORRUPTED;
 
 	/* Construct an emulator for execution of the call-site-expression. */
 again_runexpr:
@@ -770,9 +782,9 @@ again_runexpr:
 	}
 
 	/* Check if we might be able to fix the error by loading some missing section. */
-	if unlikely(error == UNWIND_EMULATOR_UNKNOWN_INSTRUCTION ||
-	            error == UNWIND_EMULATOR_INVALID_FUNCTION ||
-	            error == UNWIND_EMULATOR_NO_CFA) {
+	if (error == UNWIND_EMULATOR_UNKNOWN_INSTRUCTION ||
+	    error == UNWIND_EMULATOR_INVALID_FUNCTION ||
+	    error == UNWIND_EMULATOR_NO_CFA) {
 		if (!self->ce_s_eh_frame && !self->ce_s_debug_frame &&
 		    !self->ce_s_debug_addr && !self->ce_s_debug_loc) {
 #define lock_section(name)                                       \
@@ -826,13 +838,14 @@ again_runexpr:
 #endif /* __GNUC__ */
 
 
-PRIVATE NONNULL((1, 3)) bool
+PRIVATE NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
                                      void *__restrict dst) {
 	struct cfientry *self;
 	size_t i;
 	byte_t const *saved_dip;
+	unsigned int error;
 	self = (struct cfientry *)arg;
 
 	/* First up: Check if the register can be found as part of unwind information.
@@ -842,7 +855,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 		/* Found it! */
 		memcpy(dst, self->ce_unwind_regv[i].ur_data,
 		       CFI_REGISTER_SIZE(dw_regno));
-		return true;
+		return UNWIND_SUCCESS;
 	}
 
 	/* Can't find register information from unwind data. As such, check
@@ -863,8 +876,9 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	 *     function being called.
 	 *     NOTE: Register access from inside of this expression is performed
 	 *           through use of `after_unwind_getreg()'. */
-	if (!cfientry_loadmodule(self))
-		return false; /* Load module information */
+	error = cfientry_loadmodule(self); /* Load module information */
+	if (error != UNWIND_SUCCESS)
+		return error;
 	saved_dip = self->ce_parser.dup_cu_info_pos;
 	/* Scan the call-site we've discovered for `DW_TAG_GNU_call_site_parameter' children */
 	if (libdi_debuginfo_cu_parser_nextchild(&self->ce_parser)) {
@@ -899,13 +913,11 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 				}
 				/* Check if `location' references the register that we're looking for. */
 				if (is_cfi_expression_a_simple_register_push(self, &location, dw_regno)) {
-					unsigned int error;
 					self->ce_parser.dup_cu_info_pos = saved_dip;
 					/* Found it! -> Evaluate the call-site-value expression,
 					 * and write the expression result into the `dst' buffer. */
-					error = evaluate_call_site_expression(self, &call_site_value,
-					                                      dw_regno, dst, deref_result);
-					return error == UNWIND_SUCCESS;
+					return evaluate_call_site_expression(self, &call_site_value,
+					                                     dw_regno, dst, deref_result);
 				}
 			} else {
 				libdi_debuginfo_cu_parser_skipattr(&self->ce_parser);
@@ -914,16 +926,15 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 				break;
 		}
 	}
-	/* TODO: Return some kind of info-was-optimized-away error at this point!
-	 *       This would return get/set-reg operators to return an UNWIND_*
-	 *       error code instead of a bool, but that's something I've wanted
-	 *       to change for some time already!
+	/* Return `UNWIND_OPTIMIZED_AWAY' at this point!
 	 * NOTE: Only return this error if we didn't find a `DW_TAG_GNU_call_site'
 	 *       tag for the given PC-location, because no such tag exists.
 	 *       Anything else should cause some other error to be returned, instead! */
+	self->ce_parser.dup_cu_info_pos = saved_dip;
+	return UNWIND_OPTIMIZED_AWAY;
 err:
 	self->ce_parser.dup_cu_info_pos = saved_dip;
-	return false;
+	return UNWIND_CORRUPTED;
 }
 
 
@@ -943,8 +954,10 @@ NOTHROW_NCX(CC make_rvalue)(unwind_emulator_t *__restrict self,
 
 	case UNWIND_STE_REGISTER:
 	case UNWIND_STE_REGPOINTER: {
-		if unlikely(!cfi_getreg(self->ue_regget_arg, ste->s_register, regval.buf))
-			goto err_invalid_register;
+		unsigned int error;
+		error = cfi_getreg(self->ue_regget_arg, ste->s_register, regval.buf);
+		if unlikely(error != UNWIND_SUCCESS)
+			return error;
 		/* Convert the stack-entry. */
 		if (ste->s_type == UNWIND_STE_REGISTER) {
 			ste->s_uconst = regval.p + ste->s_regoffset;
@@ -959,11 +972,9 @@ NOTHROW_NCX(CC make_rvalue)(unwind_emulator_t *__restrict self,
 		break;
 	}
 	return UNWIND_SUCCESS;
-err_invalid_register:
-	return UNWIND_INVALID_REGISTER;
 }
 
-PRIVATE NONNULL((1, 3)) bool LIBUNWIND_CC
+PRIVATE NONNULL((1, 3)) unsigned int LIBUNWIND_CC
 cfi_entry_init_setreg(void *arg,
                       unwind_regno_t dw_regno,
                       void const *__restrict src) {
@@ -985,7 +996,7 @@ cfi_entry_init_setreg(void *arg,
 			/* Register had been set before. - Just override its old data-entry. */
 			memcpy(self->ce_unwind_regv[index].ur_data,
 			       src, CFI_REGISTER_SIZE(dw_regno));
-			return true;
+			return UNWIND_SUCCESS;
 		}
 	}
 	/* Need another register override entry. */
@@ -1001,7 +1012,7 @@ cfi_entry_init_setreg(void *arg,
 	}
 	/* Track the # of unwind registers. */
 	++self->ce_unwind_regc;
-	return true;
+	return UNWIND_SUCCESS;
 }
 
 
@@ -1020,14 +1031,12 @@ NOTHROW_NCX(CC cfientry_init)(struct cfientry *__restrict self,
 		void *pc;
 	} pc_buf;
 	/* Lookup the origin PC (which we need for unwinding to the call-site) */
-	if (!(*regget)(regget_arg, CFI_UNWIND_REGISTER_PC, pc_buf.buf)) {
-		result = UNWIND_INVALID_REGISTER;
-		goto done;
+	result = (*regget)(regget_arg, CFI_UNWIND_REGISTER_PC, pc_buf.buf);
+	if likely(result == UNWIND_SUCCESS) {
+		/* Use unwind_for_debug(3) because we can. */
+		result = libdi_unwind_for_debug(pc_buf.pc, regget, regget_arg,
+		                                &cfi_entry_init_setreg, self);
 	}
-	/* Use unwind_for_debug(3) because we can. */
-	result = libdi_unwind_for_debug(pc_buf.pc, regget, regget_arg,
-	                                &cfi_entry_init_setreg, self);
-done:
 	return result;
 }
 

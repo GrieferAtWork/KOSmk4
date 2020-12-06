@@ -118,7 +118,7 @@ again:
 #endif /* !DEBUG_FRAME */
 	if unlikely(!((byte_t const *)cie >= eh_frame_start &&
 	              (byte_t const *)cie < eh_frame_end))
-		ERRORF(err_noframe, "cie=%p, eh_frame_start=%p, eh_frame_end=%p",
+		ERRORF(err_noframe, "cie=%p, eh_frame_start=%p, eh_frame_end=%p\n",
 		       cie, eh_frame_start, eh_frame_end);
 	/* Load the augmentation string of the associated CIE. */
 	cie_reader = (byte_t const *)cie;
@@ -168,7 +168,7 @@ again:
 		aug_end    = cie_reader + aug_length;
 		if unlikely(aug_end < cie_reader || aug_end > eh_frame_end) {
 			/* Check for overflow/underflow. */
-			ERRORF(err_noframe, "cie_reader=%p, aug_end=%p, eh_frame_end=%p",
+			ERRORF(err_noframe, "cie_reader=%p, aug_end=%p, eh_frame_end=%p\n",
 			       cie_reader, aug_end, eh_frame_end);
 		}
 		while (*++aug_iter && cie_reader < aug_end) {
@@ -262,7 +262,7 @@ again:
 do_next_chunk:
 	if unlikely(next_chunk < reader) {
 		/* Underflow */
-		ERRORF(err_noframe, "next_chunk=%p, reader=%p", next_chunk, reader);
+		ERRORF(err_noframe, "next_chunk=%p, reader=%p\n", next_chunk, reader);
 	}
 	reader = next_chunk;
 	goto again;
