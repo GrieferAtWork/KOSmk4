@@ -19,6 +19,18 @@ diff -Naur binutils-2.32-orig/bfd/config.bfd binutils-2.32/bfd/config.bfd
      targ_defvec=x86_64_elf64_vec
      targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec l1om_elf64_vec k1om_elf64_vec"
      case "${targ}" in
+diff -Naur binutils-2.32-orig/bfd/elf-eh-frame.c binutils-2.32/bfd/elf-eh-frame.c
+--- binutils-2.32-orig/bfd/elf-eh-frame.c	2019-01-19 17:01:32.000000000 +0100
++++ binutils-2.32/bfd/elf-eh-frame.c	2020-12-06 10:38:25.432772600 +0100
+@@ -358,6 +358,8 @@
+     case DW_CFA_restore:
+     case DW_CFA_remember_state:
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_startcapsule:
++    case DW_CFA_KOS_endcapsule:
+     case DW_CFA_GNU_window_save:
+       /* No arguments.  */
+       return TRUE;
 diff -Naur binutils-2.32-orig/bfd/elf.c binutils-2.32/bfd/elf.c
 --- binutils-2.32-orig/bfd/elf.c	2019-01-19 17:01:32.000000000 +0100
 +++ binutils-2.32/bfd/elf.c	2020-06-20 13:31:09.159461000 +0200
@@ -208,6 +220,25 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
  	    {
  	      _bfd_error_handler
  		/* xgettext:c-format */
+diff -Naur binutils-2.32-orig/binutils/dwarf.c binutils-2.32/binutils/dwarf.c
+--- binutils-2.32-orig/binutils/dwarf.c	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/binutils/dwarf.c	2020-12-06 10:39:06.428249900 +0100
+@@ -8157,6 +8157,7 @@
+ 	      break;
+ 
+ 	    case DW_CFA_remember_state:
++	    case DW_CFA_KOS_startcapsule:
+ 	      if (! do_debug_frames_interp)
+ 		printf ("  DW_CFA_remember_state\n");
+ 	      rs = (Frame_Chunk *) xmalloc (sizeof (Frame_Chunk));
+@@ -8175,6 +8176,7 @@
+ 	      break;
+ 
+ 	    case DW_CFA_restore_state:
++	    case DW_CFA_KOS_endcapsule:
+ 	      if (! do_debug_frames_interp)
+ 		printf ("  DW_CFA_restore_state\n");
+ 	      rs = remembered_state;
 diff -Naur binutils-2.32-orig/config.sub binutils-2.32/config.sub
 --- binutils-2.32-orig/config.sub	2019-01-19 17:01:33.000000000 +0100
 +++ binutils-2.32/config.sub	2019-03-17 10:50:26.187357500 +0100
@@ -247,6 +278,20 @@ diff -Naur binutils-2.32-orig/gas/configure.tgt binutils-2.32/gas/configure.tgt
    aarch64*-*-elf*)			fmt=elf;;
    aarch64*-*-fuchsia*)			fmt=elf;;
    aarch64*-*-linux*)			fmt=elf em=linux
+diff -Naur binutils-2.32-orig/include/dwarf2.def binutils-2.32/include/dwarf2.def
+--- binutils-2.32-orig/include/dwarf2.def	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/include/dwarf2.def	2020-12-06 10:42:50.085472800 +0100
+@@ -792,6 +792,10 @@
+ DW_CFA (DW_CFA_GNU_args_size, 0x2e)
+ DW_CFA (DW_CFA_GNU_negative_offset_extended, 0x2f)
+ 
++/* KOS extensions. */
++DW_CFA (DW_CFA_KOS_startcapsule, 0x38)
++DW_CFA (DW_CFA_KOS_endcapsule, 0x39)
++
+ DW_END_CFA
+ 
+ /* Index attributes in the Abbreviations Table.  */
 diff -Naur binutils-2.32-orig/ld/Makefile.am binutils-2.32/ld/Makefile.am
 --- binutils-2.32-orig/ld/Makefile.am	2019-01-19 17:01:33.000000000 +0100
 +++ binutils-2.32/ld/Makefile.am	2019-03-17 11:30:22.015644800 +0100

@@ -185,6 +185,71 @@ diff -Naur gcc-9.1.0-orig/gcc/config.gcc gcc-9.1.0/gcc/config.gcc
  aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
  	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
  	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-elf-raw.h"
+diff -Naur gcc-9.1.0-orig/gcc/dwarf2cfi.c gcc-9.1.0/gcc/dwarf2cfi.c
+--- gcc-9.1.0-orig/gcc/dwarf2cfi.c	2019-03-08 19:18:23.000000000 +0100
++++ gcc-9.1.0/gcc/dwarf2cfi.c	2020-12-06 10:46:03.944385400 +0100
+@@ -660,11 +660,13 @@
+       break;
+ 
+     case DW_CFA_remember_state:
++    case DW_CFA_KOS_startcapsule:
+       gcc_assert (!remember->in_use);
+       *remember = *loc;
+       remember->in_use = 1;
+       break;
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_endcapsule:
+       gcc_assert (remember->in_use);
+       *loc = *remember;
+       remember->in_use = 0;
+@@ -2251,6 +2253,7 @@
+ 	case DW_CFA_def_cfa_sf:
+ 	case DW_CFA_def_cfa_expression:
+ 	case DW_CFA_restore_state:
++	case DW_CFA_KOS_endcapsule:
+ 	  return true;
+ 	default:
+ 	  return false;
+@@ -3393,6 +3396,13 @@
+       fprintf (f, "\t.cfi_restore_state\n");
+       break;
+ 
++    case DW_CFA_KOS_startcapsule:
++      fprintf (f, "\t.cfi_escape 0x38\n");
++      break;
++    case DW_CFA_KOS_endcapsule:
++      fprintf (f, "\t.cfi_escape 0x39\n");
++      break;
++
+     case DW_CFA_GNU_args_size:
+       if (f == asm_out_file)
+ 	{
+diff -Naur gcc-9.1.0-orig/gcc/dwarf2out.c gcc-9.1.0/gcc/dwarf2out.c
+--- gcc-9.1.0-orig/gcc/dwarf2out.c	2019-03-25 22:19:09.000000000 +0100
++++ gcc-9.1.0/gcc/dwarf2out.c	2020-12-06 10:46:31.185870200 +0100
+@@ -514,6 +514,8 @@
+     case DW_CFA_GNU_window_save:
+     case DW_CFA_remember_state:
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_startcapsule:
++    case DW_CFA_KOS_endcapsule:
+       return dw_cfi_oprnd_unused;
+ 
+     case DW_CFA_set_loc:
+diff -Naur gcc-9.1.0-orig/include/dwarf2.def gcc-9.1.0/include/dwarf2.def
+--- gcc-9.1.0-orig/include/dwarf2.def	2019-01-01 13:31:55.000000000 +0100
++++ gcc-9.1.0/include/dwarf2.def	2020-12-06 10:47:10.920969200 +0100
+@@ -792,6 +792,10 @@
+ DW_CFA (DW_CFA_GNU_args_size, 0x2e)
+ DW_CFA (DW_CFA_GNU_negative_offset_extended, 0x2f)
+ 
++/* KOS extensions. */
++DW_CFA (DW_CFA_KOS_startcapsule, 0x38)
++DW_CFA (DW_CFA_KOS_endcapsule, 0x39)
++
+ DW_END_CFA
+ 
+ /* Index attributes in the Abbreviations Table.  */
 diff -Naur gcc-9.1.0-orig/libgcc/config.host gcc-9.1.0/libgcc/config.host
 --- gcc-9.1.0-orig/libgcc/config.host	2019-01-17 13:29:13.000000000 +0100
 +++ gcc-9.1.0/libgcc/config.host	2019-07-16 13:41:17.265573000 +0200
@@ -303,7 +368,7 @@ diff -Naur gcc-9.1.0-orig/libgcc/unwind-dw2-fde.c gcc-9.1.0/libgcc/unwind-dw2-fd
 +#endif /* !__KOS__ */
 diff -Naur gcc-9.1.0-orig/libgcc/unwind-dw2.c gcc-9.1.0/libgcc/unwind-dw2.c
 --- gcc-9.1.0-orig/libgcc/unwind-dw2.c	2019-02-19 17:10:00.000000000 +0100
-+++ gcc-9.1.0/libgcc/unwind-dw2.c	2019-07-13 16:23:04.878653000 +0200
++++ gcc-9.1.0/libgcc/unwind-dw2.c	2020-12-06 10:48:24.204872800 +0100
 @@ -22,6 +22,7 @@
     see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
     <http://www.gnu.org/licenses/>.  */
@@ -312,7 +377,23 @@ diff -Naur gcc-9.1.0-orig/libgcc/unwind-dw2.c gcc-9.1.0/libgcc/unwind-dw2.c
  #include "tconfig.h"
  #include "tsystem.h"
  #include "coretypes.h"
-@@ -1759,3 +1760,4 @@
+@@ -1066,6 +1067,7 @@
+ 	  break;
+ 
+ 	case DW_CFA_remember_state:
++	case DW_CFA_KOS_startcapsule:
+ 	  {
+ 	    struct frame_state_reg_info *new_rs;
+ 	    if (unused_rs)
+@@ -1082,6 +1084,7 @@
+ 	  break;
+ 
+ 	case DW_CFA_restore_state:
++	case DW_CFA_KOS_endcapsule:
+ 	  {
+ 	    struct frame_state_reg_info *old_rs = fs->regs.prev;
+ 	    fs->regs = *old_rs;
+@@ -1759,3 +1762,4 @@
  #endif
  
  #endif /* !USING_SJLJ_EXCEPTIONS */
