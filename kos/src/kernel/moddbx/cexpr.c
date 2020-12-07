@@ -724,6 +724,10 @@ nope:
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) dbx_errno_t FCALL
 cexpr_cfi_set_address(struct cvalue *__restrict self,
                       USER void *__restrict addr) {
+	/* Always include the expression address addend in the calculation!
+	 * Without this, you'd be unable to access (e.g.) members of a struct
+	 * who's address must be calculated via a CFI expression. */
+	addr = (byte_t *)addr + self->cv_expr.v_bufoff;
 	/* We must still write-back any unwritten modifications,
 	 * even though there really shouldn't be any at this point.  */
 	if (self->cv_kind == CVALUE_KIND_EXPR) {
