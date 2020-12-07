@@ -740,6 +740,21 @@ while IFS= read -r line; do
 			;;
 
 
+		*/aclocal/*.m4)
+			m4_filename="${line##*/}"
+			dst_filename="$BINUTILS_SYSROOT/usr/local/share/aclocal/$m4_filename"
+			if test x"$MODE_DRYRUN" != xno; then
+				echo "> aclocal_m4_config '$src_filename'"
+			elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+				echo "Installing aclocal_m4_config file $dst_filename"
+				unlink "$dst_filename" > /dev/null 2>&1
+				cmd mkdir -p "$BINUTILS_SYSROOT/usr/local/share/aclocal"
+				cmd cp "$src_filename" "$dst_filename"
+			else
+				echo "Installing aclocal_m4_config file $dst_filename (up to date)"
+			fi
+			;;
+
 		*/pkgconfig/*.pc)
 			pc_filename="${line##*/}"
 			dst_filename="$PKG_CONFIG_PATH/$pc_filename"

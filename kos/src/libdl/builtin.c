@@ -2649,7 +2649,7 @@ dlsec_builtin(char const *__restrict name) {
 		sect_name = dlsec_builtin_name(sect_index);
 		if (!sect_name)
 			break; /* Unknown section name. */
-		if (!strcmp(sect_name, name))
+		if (strcmp(sect_name, name) == 0)
 			break; /* Found it. */
 	}
 	return dlsec_builtin_index(sect_index);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4da800 */
+/* HASH CRC-32:0xf2949bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_error_name)(error_co
  * errors can't be prevented. */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_error_priority)(error_code_t code);
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void (__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) THROWS(...);
+INTDEF NONNULL((1)) void NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved);
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void (__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved) THROWS(...);
+INTDEF NONNULL((1)) void NOTHROW(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved);
 
 DECL_END
 

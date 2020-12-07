@@ -1458,7 +1458,7 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #ifndef __ERROR_NESTING_BEGIN_CC
 #define __ERROR_NESTING_BEGIN_CC __LIBKCALL
 #endif /* !__ERROR_NESTING_BEGIN_CC */
-), throws, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_BEGIN_CC)]]
+), nothrow, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_BEGIN_CC)]]
 [[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
 void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = error_info();
@@ -1488,7 +1488,7 @@ void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict 
 #ifndef __ERROR_NESTING_END_CC
 #define __ERROR_NESTING_END_CC __LIBKCALL
 #endif /* !__ERROR_NESTING_END_CC */
-), throws, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_END_CC)]]
+), nothrow, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_END_CC)]]
 [[decl_include("<kos/bits/exception_info.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
 void error_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict saved) {
@@ -1585,11 +1585,11 @@ restore_saved_exception:
 class __cxx_exception_nesting: public _exception_nesting_data {
 public:
 	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }
-	__ATTR_FORCEINLINE __cxx_exception_nesting() {
+	__ATTR_FORCEINLINE __cxx_exception_nesting() __CXX_NOEXCEPT {
 		en_size = _EXCEPTION_NESTING_DATA_SIZE;
 		error_nesting_begin(this);
 	}
-	__ATTR_FORCEINLINE ~__cxx_exception_nesting() {
+	__ATTR_FORCEINLINE ~__cxx_exception_nesting() __CXX_NOEXCEPT {
 		error_nesting_end(this);
 	}
 };

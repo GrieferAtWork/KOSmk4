@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52aea46c */
+/* HASH CRC-32:0xd7e35f08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -309,12 +309,12 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #if !defined(__error_nesting_begin_defined) && defined(__CRT_HAVE_error_nesting_begin)
 #define __error_nesting_begin_defined 1
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
-__LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_BEGIN_CC error_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __THROWS(...) __CASMNAME_SAME("error_nesting_begin");
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_BEGIN_CC error_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("error_nesting_begin");
 #endif /* !__error_nesting_begin_defined && __CRT_HAVE_error_nesting_begin */
 #if !defined(__error_nesting_end_defined) && defined(__CRT_HAVE_error_nesting_end)
 #define __error_nesting_end_defined 1
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-__LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __THROWS(...) __CASMNAME_SAME("error_nesting_end");
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("error_nesting_end");
 #endif /* !__error_nesting_end_defined && __CRT_HAVE_error_nesting_end */
 #ifdef __cplusplus
 /* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
@@ -335,11 +335,11 @@ __LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_END_CC error_nesting_end)(struc
 class __cxx_exception_nesting: public _exception_nesting_data {
 public:
 	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }
-	__ATTR_FORCEINLINE __cxx_exception_nesting() {
+	__ATTR_FORCEINLINE __cxx_exception_nesting() __CXX_NOEXCEPT {
 		en_size = _EXCEPTION_NESTING_DATA_SIZE;
 		error_nesting_begin(this);
 	}
-	__ATTR_FORCEINLINE ~__cxx_exception_nesting() {
+	__ATTR_FORCEINLINE ~__cxx_exception_nesting() __CXX_NOEXCEPT {
 		error_nesting_end(this);
 	}
 };

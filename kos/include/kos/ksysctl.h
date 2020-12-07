@@ -97,31 +97,31 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
 	                                            *       identical name had already been loaded before. */
 	__uint8_t            __im_pad1[3];         /* ... */
 	char const            *im_cmdline;         /* [0..1] Commandline for the driver. */
-	__KSYSCTL_PAD_POINTER(__im_pad2);           /* ... */
+	__KSYSCTL_PAD_POINTER(__im_pad2);          /* ... */
 	struct hop_openfd     *im_driver;          /* [OUT|OPT] A handle to the loaded driver. */
-	__KSYSCTL_PAD_POINTER(__im_pad3);           /* ... */
+	__KSYSCTL_PAD_POINTER(__im_pad3);          /* ... */
 	union {
 		struct {
-			void const *b_base;               /* [1..b_size] Base address of the blob.
-			                                   * NOTE: This should point to an `ElfW(Ehdr)' structure. */
+			void const *b_base;                /* [1..b_size] Base address of the blob.
+			                                    * NOTE: This should point to an `ElfW(Ehdr)' structure. */
 			__KSYSCTL_PAD_POINTER(__b_pad1);
-			__size_t    b_size;               /* Size of the blob (in bytes). */
+			__size_t    b_size;                /* Size of the blob (in bytes). */
 			__KSYSCTL_PAD_POINTER(__b_pad2);
-		}              im_blob;               /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_BLOB)]
-		                                       * Data blob from which to load the driver. */
+		}              im_blob;                /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_BLOB)]
+		                                        * Data blob from which to load the driver. */
 		struct {
-			__uint32_t f_node;                /* [1..1] Handle to an INode from which the driver should be loaded. */
-			__uint32_t f_path;                /* [0..1] Handle to the path containing `f_node', or (uint32_t)-1 if not given
-			                                   * When not given, the kernel will try to retrieve the path from `f_node' */
-			__uint32_t f_dentry;              /* [0..1] Handle to the directory entry describing `f_node', or (uint32_t)-1 if not given
-			                                   * When not given, the kernel will try to retrieve the directory entry from `f_node' */
-		}              im_file;               /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_FILE)]
-		                                       * File handle data. */
-		char const    *im_name;               /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_NAME)]
-		                                       * [1..1] Name of the driver that should be loaded.
-		                                       * If this string starts with '/', it is the absolute filename
-		                                       * of the driver, loaded relative to the system root VFS, as
-		                                       * can be opened by `KSYSCTL_OPEN_KERNEL_VFS' */
+			__uint32_t f_node;                 /* [1..1] Handle to an INode from which the driver should be loaded. */
+			__uint32_t f_path;                 /* [0..1] Handle to the path containing `f_node', or (uint32_t)-1 if not given
+			                                    * When not given, the kernel will try to retrieve the path from `f_node' */
+			__uint32_t f_dentry;               /* [0..1] Handle to the directory entry describing `f_node', or (uint32_t)-1 if not given
+			                                    * When not given, the kernel will try to retrieve the directory entry from `f_node' */
+		}              im_file;                /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_FILE)]
+		                                        * File handle data. */
+		char const    *im_name;                /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_NAME)]
+		                                        * [1..1] Name of the driver that should be loaded.
+		                                        * If this string starts with '/', it is the absolute filename
+		                                        * of the driver, loaded relative to the system root VFS, as
+		                                        * can be opened by `KSYSCTL_OPEN_KERNEL_VFS' */
 	};
 };
 #endif /* __CC__ */

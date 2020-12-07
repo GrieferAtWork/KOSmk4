@@ -79,7 +79,7 @@ DECL_BEGIN
 struct module_abi_struct {
 	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *ma_section_destroy[MODULE_TYPE_COUNT])(module_section_t *__restrict self);
 #ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
-	void * (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata[MODULE_TYPE_COUNT])(module_section_t *__restrict self, gfp_t gfp) THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT);
+	void * (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata[MODULE_TYPE_COUNT])(module_section_t *__restrict self, gfp_t gfp) /*THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT)*/;
 	void * /*NOTHROW*/ (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata_nx[MODULE_TYPE_COUNT])(module_section_t *__restrict self, gfp_t gfp);
 #endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
 	REF module_section_t *(WUNUSED NONNULL((1)) KCALL *ma_section_lock[MODULE_TYPE_COUNT])(module_t *__restrict self, USER CHECKED char const *name, unsigned int flags);

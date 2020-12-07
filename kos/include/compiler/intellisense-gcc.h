@@ -130,7 +130,7 @@
 static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #else
 /* This isn't really correct, either. wchar_t on linux is 4 bytes, however we
- * can't really change sizeof(xxx) using preprocessor directives, to the best
+ * can't really change sizeof(xxx) using preprocessor directives, so the best
  * we _can_ do is change intellisense to at least be consistent with itself... */
 #undef __SIZEOF_WCHAR_T__
 #define __SIZEOF_WCHAR_T__ 2

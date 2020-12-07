@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ab0627c */
+/* HASH CRC-32:0xa3132f23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1082,7 +1082,7 @@ NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
 }
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
-(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) THROWS(...) {
+NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = libc_error_info();
 	if (!(info->ei_flags & EXCEPT_FINCATCH)) {
 		/* Not inside of a catch-block (ignore the nesting request)
@@ -1107,7 +1107,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
 #include <hybrid/__assert.h>
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
-(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved) THROWS(...) {
+NOTHROW(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info;
 	if unlikely(!saved->en_size)
 		return; /* No-op */
