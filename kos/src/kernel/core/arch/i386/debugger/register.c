@@ -557,6 +557,7 @@ PUBLIC ATTR_DBGTEXT unsigned int
 NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
                                  uintptr_half_t cfi_regno,
                                  void *__restrict buf) {
+	unsigned int error;
 	switch ((unsigned int)(uintptr_t)arg) {
 
 	case DBG_REGLEVEL_EXIT:
@@ -568,37 +569,35 @@ NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
-					if (unwind_getreg_fcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_getreg_fcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_UCPU:
-					if (unwind_getreg_ucpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_getreg_ucpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_LCPU:
-					if (unwind_getreg_lcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_getreg_lcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_KCPU:
-					if (unwind_getreg_kcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_getreg_kcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_ICPU:
-					if (unwind_getreg_icpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_getreg_icpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_SCPU:
-					if (unwind_getreg_scpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_getreg_scpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
-				default: break;
+				default:
+					error = UNWIND_INVALID_REGISTER;
+					break;
 				}
+				if (error == UNWIND_SUCCESS)
+					goto done;
 			}
 			/* Access the exit CPU state. */
 			return unwind_getreg_fcpustate(&x86_dbg_exitstate, cfi_regno, buf);
@@ -613,14 +612,15 @@ NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
 		break;
 	}
 	return UNWIND_INVALID_REGISTER;
-ok:
-	return UNWIND_SUCCESS;
+done:
+	return error;
 }
 
 PUBLIC ATTR_DBGTEXT unsigned int
 NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
                                  uintptr_half_t cfi_regno,
                                  void const *__restrict buf) {
+	unsigned int error;
 	switch ((unsigned int)(uintptr_t)arg) {
 
 	case DBG_REGLEVEL_EXIT:
@@ -632,49 +632,45 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
-					if (unwind_setreg_fcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_fcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_UCPU:
-					if (unwind_setreg_ucpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_ucpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_LCPU:
-					if (unwind_setreg_lcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_lcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_KCPU:
-					if (unwind_setreg_kcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_kcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 #ifdef __x86_64__
 				case X86_DBG_STATEKIND_ICPU:
-					if (unwind_setreg_icpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_icpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_SCPU:
-					if (unwind_setreg_scpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_scpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
 					break;
 #else /* __x86_64__ */
 				case X86_DBG_STATEKIND_ICPU:
-					if (unwind_setreg_icpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_icpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf);
 					break;
 
 				case X86_DBG_STATEKIND_SCPU:
-					if (unwind_setreg_scpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf))
-						goto ok;
+					error = unwind_setreg_scpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf);
 					break;
 #endif /* !__x86_64__ */
 
-				default: break;
+				default:
+					error = UNWIND_INVALID_REGISTER;
+					break;
 				}
+				if (error == UNWIND_SUCCESS)
+					goto done;
 			}
 			/* Access the exit CPU state. */
 			return unwind_setreg_fcpustate(&x86_dbg_exitstate, cfi_regno, buf);
@@ -683,18 +679,19 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 	case DBG_REGLEVEL_ORIG:
 	case DBG_REGLEVEL_VIEW:
 		loadview();
-		if (!unwind_setreg_fcpustate(VIEWSTATE(arg), cfi_regno, buf))
-			break;
-		if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_ORIG)
-			saveorig();
-		goto ok;
+		error = unwind_setreg_fcpustate(VIEWSTATE(arg), cfi_regno, buf);
+		if (error == UNWIND_SUCCESS) {
+			if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_ORIG)
+				saveorig();
+		}
+		goto done;
 
 	default:
 		break;
 	}
 	return UNWIND_INVALID_REGISTER;
-ok:
-	return UNWIND_SUCCESS;
+done:
+	return error;
 }
 
 /* Get/set a register, given its ID
