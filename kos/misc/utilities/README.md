@@ -144,5 +144,42 @@ But I don't (really) see understand what's causing that. This is the relevant se
 [2020-12-07T14:14:55.599112041:trace ][7] sys_write(fd: STDERR_FILENO, buf: "X connection to :0 broken (explicit kill or server shutdown).\r\n", bufsize: 63)
 ```
 
-It seems that the Xorg server \[5\] decides to shut down in response to the message received at `2020-12-07T14:14:55.589151675`
+It seems that the Xorg server \[5\] decides to shut down in response to the message received at `2020-12-07T14:14:55.589151675`  
+
+The actual reason seems to boil down to `ReadRequestFromClient`, which goes down a path claiming to end by reporting an `BadLength` error (even though it doesn't actually end up reporting that error, and instead exists without any errors...)  
+
+But it appears as though this is some kind of problem with how data is sent between client and server (and most probably caused by me not understanding how stuff's actually supposed to work):
+
+```
+> trace
+/binutils/src/Xorg/xorg-server-1.20.9/os/io.c(310,13) : 08203E80+1[/bin/Xorg][ReadRequestFromClient+545]
+/binutils/src/Xorg/xorg-server-1.20.9/dix/dispatch.c(449,26) : 0806C7ED+6[/bin/Xorg][Dispatch+253]
+/binutils/src/Xorg/xorg-server-1.20.9/dix/main.c(276,9) : 0807983C+5[/bin/Xorg][dix_main+1302]
+/binutils/src/Xorg/xorg-server-1.20.9/dix/stubmain.c(34,12) : 0805EC7B+5[/bin/Xorg][main+41]
+/kos/src/crt0/i386/crt0_32.S(39) : 0805EC39+5[/bin/Xorg][_start+9]
+
+> l
+client     : (ClientPtr)0x10163EB0
+oc         : (OsCommPtr)0x10356F80
+oci        : (ConnectionInputPtr)0x10163F80
+gotnow     : (unsigned int)8068
+needed     : (unsigned int)4294901760
+result     : (int)269893296
+request    : (xReq *)0x1038807C
+need_header: (Bool)0
+move_header: (Bool)1
+
+> eval *request
+struct xReq:
+{reqType: 0, data: 0, length: 0}
+
+> eval *(xBigReq*)request
+struct xBigReq:
+{reqType: 0, data: 0, zero: 0, length: 0xffff0000}
+```
+
+And there you have the problem itself: Because the length-field of the request is zero, the Xorg server interprets the request as a whole as a big-request. That, however, contains an entirely too larger length value, and Xorg exists as a result.
+
+Furthermore, I don't think that the reqType field of the request should be `0`, so I believe that the actual problem here is probably related to the kernel-space unix-domain socket send/recv functions... (Investigate this!)
+
 
