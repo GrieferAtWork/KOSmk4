@@ -1460,11 +1460,10 @@ again_read_packet:
 			THROW(E_NET_TIMEOUT);
 	}
 	TRY {
+		u32 result_flags = 0;
 		size_t payload;
 		payload = packet->p_payload;
 		if (me->sk_type == SOCK_STREAM) {
-			if (presult_flags)
-				*presult_flags = 0;
 			if (msg_flags & MSG_PEEK) {
 				/* Don't remove the packet, but peek its data. */
 				if (payload > bufsize)
@@ -1473,20 +1472,24 @@ again_read_packet:
 				                       pb_packet_payload(packet),
 				                       bufsize);
 				result += bufsize;
-				if (packet->p_ancillary && presult_flags) {
+				if (packet->p_ancillary) {
 					/* Check if the user-space ancillary data buffer might be too small. */
 					if (!msg_control) {
-						*presult_flags = MSG_CTRUNC;
+						result_flags = MSG_CTRUNC;
 					} else {
 						size_t required_size;
 						required_size = unix_ancillary_data_decode_size(packet);
 						if (required_size > msg_control->am_controllen)
-							*presult_flags = MSG_CTRUNC;
-						/* Don't actually decode ancillary data for user-space.
-						 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
-						ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
+							result_flags = MSG_CTRUNC;
 					}
 				}
+				if (msg_control) {
+					/* Don't actually decode ancillary data for user-space.
+					 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
+					ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
+				}
+				if (presult_flags)
+					*presult_flags = result_flags;
 				pb_buffer_endread_restore(pbuf, packet);
 				goto done;
 			}
@@ -1496,6 +1499,10 @@ again_read_packet:
 				                       pb_packet_payload(packet),
 				                       bufsize);
 				result += bufsize;
+				if (presult_flags)
+					*presult_flags = 0;
+				if (msg_control)
+					ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 				packet = pb_buffer_truncate_packet(pbuf, packet, (u16)bufsize);
 				pb_buffer_endread_restore(pbuf, packet);
 				goto done;
@@ -1508,7 +1515,6 @@ again_read_packet:
 			bufsize -= payload;
 			if (packet->p_ancillary) {
 				/* Packet contains ancillary data. */
-				u32 result_flags;
 				if (msg_control) {
 					result_flags = unix_ancillary_data_decode(msg_control,
 					                                          packet,
@@ -1533,14 +1539,16 @@ again_read_packet:
 				goto done;
 				/*END:NOTHROW*/
 			}
+			if (presult_flags)
+				*presult_flags = 0;
+			if (msg_control) /* Inform the user about the absence of control information. */
+				ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 			/* Consume the packet, since it's now empty. */
 			pb_buffer_endread_consume(pbuf, packet);
 			/* If we've still got some space left, then try to read more. */
 			if (bufsize)
 				goto again_read_packet;
-		} else {
-			u32 result_flags;
-			result_flags = 0;
+		} else { /* if (me->sk_type == SOCK_STREAM) */
 			/* Packet-mode. */
 			if (payload > bufsize) {
 				/* Packet is longer than the amount of space we've been given. */
@@ -1553,7 +1561,7 @@ again_read_packet:
 				                       pb_packet_payload(packet),
 				                       payload);
 				result += payload;
-				if (packet->p_ancillary && presult_flags) {
+				if (packet->p_ancillary) {
 					/* Check if the user-space ancillary data buffer might be too small. */
 					if (!msg_control) {
 						result_flags |= MSG_CTRUNC;
@@ -1566,6 +1574,9 @@ again_read_packet:
 						 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
 						ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 					}
+				} else if (msg_control) {
+					/* Inform the user about the absence of control information. */
+					ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 				}
 				if (presult_flags)
 					*presult_flags = result_flags;
@@ -1580,13 +1591,12 @@ again_read_packet:
 			bufsize -= payload;
 			if (packet->p_ancillary) {
 				/* Packet contains ancillary data. */
-				u32 result_flags;
 				if (msg_control) {
-					result_flags = unix_ancillary_data_decode(msg_control,
-					                                          packet,
-					                                          msg_flags);
+					result_flags |= unix_ancillary_data_decode(msg_control,
+					                                           packet,
+					                                           msg_flags);
 				} else {
-					result_flags = MSG_CTRUNC;
+					result_flags |= MSG_CTRUNC;
 				}
 				if (presult_flags)
 					*presult_flags = result_flags;
@@ -1596,12 +1606,14 @@ again_read_packet:
 				goto done;
 				/*END:NOTHROW*/
 			}
+			if (msg_control) /* Inform the user about the absence of control information. */
+				ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 			/* Consume the packet, since it's now empty. */
 			pb_buffer_endread_consume(pbuf, packet);
 			if (presult_flags)
 				*presult_flags = result_flags;
 			/* Don't ever read more than a single packet at once! */
-		}
+		} /* if (me->sk_type == SOCK_STREAM) */
 	} EXCEPT {
 		pb_buffer_endread_restore(pbuf, packet);
 		RETHROW();
