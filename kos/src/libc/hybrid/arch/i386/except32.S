@@ -540,6 +540,11 @@ INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	.cfi_restore_iret_eflags
 	.cfi_restore_iret_esp
 	.cfi_restore_iret_ss
+#ifndef NDEBUG
+	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS
+#else /* NDEBUG */
+	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
+#endif /* !NDEBUG */
 	.cfi_rel_offset %edi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI
 	.cfi_rel_offset %esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI
 	.cfi_rel_offset %ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP
@@ -553,16 +558,12 @@ INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_gs
 #ifndef NDEBUG
-	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS
 .Lx86_userexcept_unwind_interrupt_kernel_esp_inside_catch:
 	movl   %esp, %ecx
 	EXTERN(x86_except_badusage_throw_current_icpustate)
 	call   x86_except_badusage_throw_current_icpustate
 	nop
-	.cfi_def_cfa_register %ecx
-#else /* !NDEBUG */
-	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
-#endif /* NDEBUG */
+#endif /* !NDEBUG */
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	movl   %ecx, %esp
 	.cfi_def_cfa_register %esp
