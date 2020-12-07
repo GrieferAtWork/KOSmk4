@@ -222,7 +222,7 @@ err_overlap:
 				                      0);
 			}
 
-#define USER_STACK_NUM_PAGES 8 /* TODO: Don't put this here! */
+#define USER_STACK_NUM_PAGES 64 /* TODO: Don't put this here! */
 			/* Allocate a new user-space stack for the calling thread. */
 			stack_base = vmb_map(&builder,
 			                     HINT_GETADDR(KERNEL_VMHINT_USER_STACK),

@@ -99,38 +99,50 @@ xinit /bin/xclock -- -dumbSched
 
 ### TODO
 
-Running the above command causes `/bin/Xorg` to crash:
+Running the above command break eventually:
 
 ```
-Coredump /bin/Xorg tid:4
-exception 0xff0e:0x1 [E_SEGFAULT_UNMAPPED] [cr2=1AF02E14] [f-u-]
-	pointer[0] = 1AF02E14
-	pointer[1] = 00000005
-signal 11
-	code:  1
-	errno: 14
-/kos/src/libc/auto/sys.socket.c(48,31) : 0D4BFEC8+2[/lib/libc.so][libc___cmsg_nxthdr+87] [faultaddr]
-/kos/src/libc/auto/sys.socket.c(48,60) : 0D4BFECA+3[/lib/libc.so][libc___cmsg_nxthdr+89] [orig_ustate]
-
-> trace
-/kos/src/libc/auto/sys.socket.c(46,2) : 0D4BFEC4+6[/lib/libc.so][libc___cmsg_nxthdr+83]
-/kos/include/X11/Xtrans/Xtranssock.c(2131,56) : 0820C7EE+5[/bin/Xorg][_XSERVTransSocketRead+300]
-/kos/include/X11/Xtrans/Xtrans.c(893,12) : 0820D8FA+2[/bin/Xorg][_XSERVTransRead+36]
-/binutils/src/Xorg/xorg-server-1.20.9/os/io.c(352,18) : 08203F4D+5[/bin/Xorg][ReadRequestFromClient+798]
-/binutils/src/Xorg/xorg-server-1.20.9/dix/dispatch.c(449,26) : 0806C7BD+6[/bin/Xorg][Dispatch+253]
-/binutils/src/Xorg/xorg-server-1.20.9/dix/main.c(276,9) : 0807980C+5[/bin/Xorg][dix_main+1302]
-/binutils/src/Xorg/xorg-server-1.20.9/dix/stubmain.c(34,12) : 0805EC4B+5[/bin/Xorg][main+41]
-/kos/src/crt0/i386/crt0_32.S(39) : 0805EC09+5[/bin/Xorg][_start+9]
-
-> lsthread
-program    pid tid S cpu location
-kernel     0       I #0  C02AA829:scheduler.c:1303:idle_unload_and_switch_to
-Xorg       4       R #0  D4BFECA:sys.socket.c:48:libc___cmsg_nxthdr
-init       1       S #0
-busybox    2       S #0
-kernel     0       S #0
-xclock     6       S #0
-???        0       R #1  C02AAE20:scheduler.c:1455:cpu_deepsleep
-xinit      3       S #1
->
+X connection to :0 broken (explicit kill or server shutdown).
+xinit: connection to X server lost
 ```
+
+But I don't (really) see understand what's causing that. This is the relevant section from the syslog:
+
+```
+[2020-12-07T14:14:55.580513304:trace ][7] sys_writev(fd: 25, iovec: [{iov_base:[0x35,0x18,...],iov_len:8680}, {iov_base:NULL,iov_len:0}, {iov_base:0x0DD2B762,iov_len:0}], count: 3)
+[2020-12-07T14:14:55.581603433:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.581949965:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.582200979:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.582472538:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.582758020:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.583085663:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.583352451:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.583615927:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.583868110:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.584112698:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.584346867:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.584584055:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.585320156:trace ][7][except] Translate exception 0x5:0x2 into errno=-11
+[2020-12-07T14:14:55.585546341:trace ][7] sys_ppoll_time64(fds: [{fd:25,events:POLLIN|POLLOUT}], nfds: 1, timeout_ts: NULL, sigmask: NULL, sigsetsize: 128)
+[2020-12-07T14:14:55.585907089:trace ][7] sys_writev(fd: 25, iovec: [{iov_base:[0x35,0x18,...],iov_len:8680}, {iov_base:NULL,iov_len:0}, {iov_base:0x0DD2B762,iov_len:0}], count: 3)
+[2020-12-07T14:14:55.587094878:trace ][7][except] Translate exception 0x5:0x2 into errno=-11
+[2020-12-07T14:14:55.587276469:trace ][7] sys_ppoll_time64(fds: [{fd:25,events:POLLIN|POLLOUT}], nfds: 1, timeout_ts: NULL, sigmask: NULL, sigsetsize: 128)
+[2020-12-07T14:14:55.587564385:trace ][7] sys_writev(fd: 25, iovec: [{iov_base:[0x35,0x18,...],iov_len:8680}, {iov_base:NULL,iov_len:0}, {iov_base:0x0DD2B762,iov_len:0}], count: 3)
+[2020-12-07T14:14:55.588680317:trace ][7][except] Translate exception 0x5:0x2 into errno=-11
+[2020-12-07T14:14:55.589151675:trace ][5] sys_recvmsg(sockfd: 27, message: 0x3dd3deac, msg_flags: 0x0)
+[2020-12-07T14:14:55.589585059:trace ][5] sys_gettimeofday(tv: 0x3dd3df58, tz: NULL)
+[2020-12-07T14:14:55.590114837:trace ][5] sys_epoll_ctl(epfd: 16, op: EPOLL_CTL_DEL, fd: 27, info: {events:0x0,data:{0xdeaae801014ffa0}})
+[2020-12-07T14:14:55.591292597:trace ][5][rtld] Lazy resolve "shutdown" in "/bin/Xorg" (to 0DD37FB6 from "/lib/libc.so")
+[2020-12-07T14:14:55.591621895:trace ][5] sys_shutdown(sockfd: 27, how: 00000002)
+[2020-12-07T14:14:55.592069300:trace ][5] sys_close(fd: 27)
+[2020-12-07T14:14:55.592813969:trace ][7] sys_ppoll_time64(fds: [{fd:25,events:POLLIN|POLLOUT}], nfds: 1, timeout_ts: NULL, sigmask: NULL, sigsetsize: 128)
+[2020-12-07T14:14:55.593275687:trace ][7][rtld] Lazy resolve "_XIOError" in "/lib/libX11.so.6" (to 0DCAC3C1 from "/lib/libX11.so.6")
+[2020-12-07T14:14:55.593612093:trace ][7][rtld] Lazy resolve "__errno_location" in "/lib/libX11.so.6" (to 0DE17A12 from "/lib/libc.so")
+[2020-12-07T14:14:55.593935451:trace ][7][rtld] Lazy resolve "ioctl" in "/lib/libX11.so.6" (to 0DE3D547 from "/lib/libc.so")
+[2020-12-07T14:14:55.594204381:trace ][7] sys_ioctl(fd: 25, command: TIOCINQ, arg: 35D8AE48)
+[2020-12-07T14:14:55.597989585:trace ][7][rtld] Lazy resolve "fprintf" in "/lib/libX11.so.6" (to 0DE68156 from "/lib/libc.so")
+[2020-12-07T14:14:55.599112041:trace ][7] sys_write(fd: STDERR_FILENO, buf: "X connection to :0 broken (explicit kill or server shutdown).\r\n", bufsize: 63)
+```
+
+It seems that the Xorg server \[5\] decides to shut down in response to the message received at `2020-12-07T14:14:55.589151675`
+
