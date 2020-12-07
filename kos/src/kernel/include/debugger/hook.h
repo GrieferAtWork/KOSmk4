@@ -481,6 +481,7 @@ struct dbg_clearhook {
 	PRIVATE ATTR_COLDBSS byte_t _DBG_PRIVATE_BZERO_NAME(_debug_bzero_backup)[size]; \
 	DBG_INIT(_DBG_PRIVATE_BZERO_NAME(_debug_bzero_init)) {                          \
 		__libc_memcpy(_DBG_PRIVATE_BZERO_NAME(_debug_bzero_backup), p, size);       \
+		__libc_memset(p, 0, size);                                                  \
 	}                                                                               \
 	DBG_RESET(_DBG_PRIVATE_BZERO_NAME(_debug_bzero_reset)) {                        \
 		__libc_memset(p, 0, size);                                                  \
@@ -491,8 +492,10 @@ struct dbg_clearhook {
 #define DEFINE_DBG_BZERO_IF(cond, p, size)                                          \
 	PRIVATE ATTR_COLDBSS byte_t _DBG_PRIVATE_BZERO_NAME(_debug_bzero_backup)[size]; \
 	DBG_INIT(_DBG_PRIVATE_BZERO_NAME(_debug_bzero_init)) {                          \
-		if (cond)                                                                   \
+		if (cond) {                                                                 \
 			__libc_memcpy(_DBG_PRIVATE_BZERO_NAME(_debug_bzero_backup), p, size);   \
+			__libc_memset(p, 0, size);                                              \
+		}                                                                           \
 	}                                                                               \
 	DBG_RESET(_DBG_PRIVATE_BZERO_NAME(_debug_bzero_reset)) {                        \
 		if (cond)                                                                   \
