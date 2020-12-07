@@ -449,6 +449,13 @@ socket_asendv(struct socket *__restrict self,
 	}
 }
 
+PRIVATE void KCALL raise_sigpipe(void) {
+	/* Make sure to allow for exception nesting when sending the signal. */
+	NESTED_EXCEPTION;
+	/* Actually send the signal. */
+	task_raisesignalprocess(THIS_TASK, SIGPIPE);
+}
+
 
 
 /* Send helper functions for blocking and non-blocking operations.
@@ -489,7 +496,7 @@ socket_send(struct socket *__restrict self,
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
 		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
-			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+			raise_sigpipe();
 		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
@@ -534,7 +541,7 @@ socket_sendv(struct socket *__restrict self,
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
 		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
-			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+			raise_sigpipe();
 		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
@@ -838,7 +845,7 @@ socket_sendto(struct socket *__restrict self,
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
 		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
-			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+			raise_sigpipe();
 		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
@@ -884,7 +891,7 @@ socket_sendtov(struct socket *__restrict self,
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
 		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
-			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+			raise_sigpipe();
 		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
