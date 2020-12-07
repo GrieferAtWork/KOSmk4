@@ -81,19 +81,20 @@ NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t i
 	return result;
 }
 
-/* Return the start of the longest valid instruction that ends at `pc'
- * If no such instruction exists, return `NULL' instead. */
-PRIVATE ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa) {
-	byte_t *result;
-	result = (byte_t *)pc - ARCH_INSTRUCTION_MAXLENGTH;
+
+/* Return the length the longest valid instruction with a length <= maxlen that ends at `pc'
+ * If no such instruction exists, return `0' instead. */
+PRIVATE ATTR_DBGTEXT ATTR_PURE WUNUSED u8
+NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa, u8 maxlen) {
+	byte_t const *result;
+	result = (byte_t const *)pc - maxlen;
 	for (; (uintptr_t)result < (uintptr_t)pc; ++result) {
 		byte_t *nextptr;
 		nextptr = dbg_instruction_succ_nx(result, isa);
-		if (nextptr == (byte_t *)pc)
-			return result;
+		if (nextptr == (byte_t const *)pc)
+			return (u8)(size_t)((byte_t const *)pc - result);
 	}
-	return NULL;
+	return 0;
 }
 
 /* # of instructions to back-track in order to verify that
@@ -105,25 +106,47 @@ NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa) {
 
 PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
 NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
-	byte_t *rev_iter_curr;
-	byte_t *rev_iter_next;
+	byte_t const *iter, *lowest_iter;
 	unsigned int i;
-	rev_iter_curr = (byte_t *)pc;
+	u8 maxlen[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
+	memset(maxlen, ARCH_INSTRUCTION_MAXLENGTH,
+	       LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE);
+	lowest_iter = (byte_t const *)pc;
+	iter        = (byte_t const *)pc;
 	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE; ++i) {
-		rev_iter_next = dbg_predmaxone(rev_iter_curr, isa);
-		if (!rev_iter_next)
-			break;
-		rev_iter_curr = rev_iter_next;
+		u8 length;
+find_shorter_instructions:
+		length = dbg_predmaxone(iter, isa, maxlen[i]);
+		if (!length) {
+			/* Try to go back and find a shorter instruction. */
+			while (i) {
+				--i;
+				iter += maxlen[i];
+				--maxlen[i];
+				if (maxlen[i] != 0)
+					goto find_shorter_instructions;
+			}
+			goto done_backtrack;
+		}
+		maxlen[i] = length;
+		iter -= length;
+		if (lowest_iter > iter)
+			lowest_iter = iter;
 	}
+done_backtrack:
+	if (lowest_iter >= (byte_t const *)pc)
+		return NULL; /* No base-reference found... */
 	/* Find the start of the first instruction that
 	 * ends at `>= pc', but starts at `>= rev_iter_curr' */
+	iter = lowest_iter;
 	for (;;) {
-		rev_iter_next = dbg_instruction_succ_nx(rev_iter_curr, isa);
-		if (!rev_iter_next)
+		byte_t const *next;
+		next = dbg_instruction_succ_nx(iter, isa);
+		if (!next)
 			break; /* No such instruction... */
-		if (rev_iter_next >= pc)
-			return rev_iter_curr; /* Found it! */
-		rev_iter_curr = rev_iter_next;
+		if (next >= pc)
+			return (byte_t *)iter; /* Found it! */
+		iter = next;
 	}
 	return NULL;
 }
