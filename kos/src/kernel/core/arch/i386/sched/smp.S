@@ -177,7 +177,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 	 *      complete its quantum. */
 	xorP   %Pdx, %Pdx
 	EXTERN(thiscpu_sched_pending)
-	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(%Pbx)
+	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(%Pbx) /* NOTE: `lock' is implicit for `xchg' */
 	testP  %Pdx, %Pdx
 	jz     .Lapic_ipi_no_pending
 #ifndef __x86_64__
@@ -237,6 +237,9 @@ INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 	pushl_cfi %gs
 	.cfi_restore_iret_gs_or_offset -16
 	pushal_cfi_r
+	/* We've clobbered %Pbx with the `popal_cfi_r' above, so re-load it here. */
+	EXTERN(this_cpu)
+	movP   %segtls:this_cpu, %Pbx
 #endif /* !__x86_64__ */
 
 	EXTERN(thiscpu_sched_current)
