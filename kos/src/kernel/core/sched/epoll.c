@@ -129,7 +129,7 @@ again:
 		/* Special case: `monitor' is the most recently raised handle.
 		 * In this case, we must use ATOMIC_CMPXCH because other monitors
 		 * may have already changed `ec_raised' in the mean time. */
-		if (!ATOMIC_CMPXCH_WEAK(self->ec_raised, rq, rq->ehm_raised))
+		if (!ATOMIC_CMPXCH_WEAK(self->ec_raised, rq, rq->ehm_rnext))
 			goto again;
 		return;
 	}
