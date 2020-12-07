@@ -186,8 +186,13 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_en
  * possibly even if a debug trap was generated before then. Such conditions include
  * assertion checks/failures, stack segment faults, unhandled exceptions, and of course,
  * calls to `kernel_panic()' and `dbg()' or kernel-space instruction breakpoints (int3) */
-#define KERNEL_DEBUG_ON_COREDUMP 0x0008
-#define KERNEL_DEBUG_ON_DEFAULT  (KERNEL_DEBUG_ON_COREDUMP)
+#define KERNEL_DEBUG_ON_COREDUMP          0x0008
+#define KERNEL_DEBUG_ON_KERNEL_BREAKPOINT 0x0040
+#define KERNEL_DEBUG_ON_USER_BREAKPOINT   0x0080
+#define KERNEL_DEBUG_ON_DEFAULT          \
+	(KERNEL_DEBUG_ON_COREDUMP |          \
+	 KERNEL_DEBUG_ON_KERNEL_BREAKPOINT | \
+	 KERNEL_DEBUG_ON_USER_BREAKPOINT)
 
 #ifdef __CC__
 /* Set of `KERNEL_DEBUGTRAP_ON_*', specifying events for which to trigger traps. */

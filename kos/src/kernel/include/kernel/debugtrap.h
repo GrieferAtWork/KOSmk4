@@ -53,11 +53,15 @@ struct kernel_debugtraps {
 #define KERNEL_DEBUGTRAP_ON_COREDUMP            0x0008 /* Trap on creation of coredumps */
 #define KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT 0x0010 /* Trap on unhandled interrupts */
 #define KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE 0x0020 /* Trap on driver initialization failure */
+#define KERNEL_DEBUGTRAP_ON_KERNEL_BREAKPOINT   0x0040 /* Trap on hitting a breakpoint instruction (within the kernel) */
+#define KERNEL_DEBUGTRAP_ON_USER_BREAKPOINT     0x0080 /* Trap on hitting a breakpoint instruction (within user-space) */
 #define KERNEL_DEBUGTRAP_ON_DEFAULT            \
 	(KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT |    \
 	 KERNEL_DEBUGTRAP_ON_COREDUMP |            \
 	 KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT | \
-	 KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE)
+	 KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE | \
+	 KERNEL_DEBUGTRAP_ON_KERNEL_BREAKPOINT |   \
+	 KERNEL_DEBUGTRAP_ON_USER_BREAKPOINT)
 
 /* Set of `KERNEL_DEBUGTRAP_ON_*', specifying events for which to trigger traps. */
 DATDEF uintptr_t volatile kernel_debugtrap_on;
