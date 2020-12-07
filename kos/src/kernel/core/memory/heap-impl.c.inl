@@ -643,11 +643,6 @@ search_heap:
 		/* Search this bucket. */
 		chain = *iter;
 		while (chain) {
-			if (!pagedir_iswritable(chain)) {
-				HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-				             "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
-				             MFREE_SIZE(chain));
-			}
 			HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
 			             "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
 			             MFREE_SIZE(chain));
