@@ -202,8 +202,9 @@ unlock_and_return_too_large:
 		return packet;
 	}
 	/* Check if the buffer size limit allows for a packet of this size to be added. */
-	if unlikely(self->pb_used + total_size >= self->pb_limt) {
-		if (!self->pb_limt)
+	if unlikely(self->pb_used + total_size > self->pb_limt) {
+		/* Check if the packet would _always_ be too large. */
+		if (total_size > self->pb_limt)
 			goto unlock_and_return_too_large;
 		unlock();
 		return PB_BUFFER_STARTWRITE_READSOME;
