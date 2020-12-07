@@ -192,11 +192,15 @@ install_rawfile() {
 	if test x"$MODE_DRYRUN" != xno; then
 		echo "> install_rawfile '$1' '$2'"
 	elif ! [ -f "$1" ] || [ "$2" -nt "$1" ]; then
-		unlink "$1" > /dev/null 2>&1
-		echo "Installing file $1"
-		if ! cp "$2" "$1" > /dev/null 2>&1; then
-			cmd mkdir -p "$(dirname "$1")"
-			cmd cp "$2" "$1"
+		if cmp -s "$1" "$2" > /dev/null 2>&1; then
+			echo "Installing file $1 (unchanged)"
+		else
+			unlink "$1" > /dev/null 2>&1
+			echo "Installing file $1"
+			if ! cp "$2" "$1" > /dev/null 2>&1; then
+				cmd mkdir -p "$(dirname "$1")"
+				cmd cp "$2" "$1"
+			fi
 		fi
 	else
 		echo "Installing file $1 (up to date)"
