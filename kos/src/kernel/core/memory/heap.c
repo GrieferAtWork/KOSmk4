@@ -233,9 +233,10 @@ DEFINE_DBG_BZERO_OBJECT(vm_datablock_debugheap.db_lock);
 
 /* Unlock the kernel heaps while inside of the debugger. */
 DEFINE_DBG_BZERO_VECTOR(&kernel_heaps[0].h_lock,
-                         __GFP_HEAPCOUNT,
-                         sizeof(kernel_heaps[0].h_lock),
-                         sizeof(kernel_heaps[0]));
+                        __GFP_HEAPCOUNT,
+                        sizeof(kernel_heaps[0].h_lock),
+                        sizeof(kernel_heaps[0]));
+
 
 DEFINE_VALIDATABLE_HEAP(kernel_default_heap);
 DEFINE_VALIDATABLE_HEAP(kernel_locked_heap);

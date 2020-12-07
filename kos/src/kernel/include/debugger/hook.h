@@ -511,6 +511,7 @@ struct dbg_clearhook {
 		byte_t const *src = (byte_t const *)(vector_base);                                     \
 		for (i = 0; i < (element_count); ++i) {                                                \
 			__libc_memcpy(dst, src, element_size);                                             \
+			__libc_memset(dst, 0, element_size);                                               \
 			dst += (element_size);                                                             \
 			src += (element_stride);                                                           \
 		}                                                                                      \
