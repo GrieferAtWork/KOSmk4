@@ -2150,6 +2150,8 @@ do_calculate_next_indent:
 						                                               flags, elem_indent,
 						                                               newline_indent, newline_tab,
 						                                               maxlinelen, NULL, false);
+						if (index_hi < used_length - 1)
+							firstline_indent += 1; /* For the trailing comma */
 					}
 					if (i < index_hi) {
 						FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_PREFIX);
