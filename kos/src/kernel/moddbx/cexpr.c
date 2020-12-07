@@ -2186,6 +2186,8 @@ do_set_type:
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL cvalue_setbool)(struct cvalue *__restrict self,
                               bool value) {
+	if (self->cv_kind == CVALUE_KIND_VOID)
+		return;
 	assert(self->cv_kind == CVALUE_KIND_DATA ||
 	       self->cv_kind == CVALUE_KIND_IDATA);
 	if (self->cv_kind == CVALUE_KIND_DATA)
@@ -2201,6 +2203,8 @@ NOTHROW(FCALL cvalue_setbool)(struct cvalue *__restrict self,
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL cvalue_setptrdiff_t)(struct cvalue *__restrict self,
                                    ptrdiff_t value) {
+	if (self->cv_kind == CVALUE_KIND_VOID)
+		return;
 	assert(self->cv_kind == CVALUE_KIND_DATA ||
 	       self->cv_kind == CVALUE_KIND_IDATA);
 	if (self->cv_kind == CVALUE_KIND_DATA)
