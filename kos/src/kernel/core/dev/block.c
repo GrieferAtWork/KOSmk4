@@ -246,8 +246,7 @@ NOTHROW(KCALL block_device_clear_delparts)(struct block_device *__restrict self)
 	iter = ATOMIC_XCH(self->bd_delparts, NULL);
 	while (iter) {
 		next = *(struct block_device_partition **)iter;
-		if (iter->bp_parts.ln_pself)
-			LLIST_REMOVE(iter, bp_parts);
+		SLIST_REMOVE(&self->bd_parts, iter, bp_parts);
 		heap_free(&kernel_locked_heap,
 		          iter,
 		          iter->bd_heapsize,
@@ -348,22 +347,19 @@ NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self) 
 		struct block_device *master;
 		part   = (struct block_device_partition *)self;
 		master = part->bp_master;
-		if (part->bp_parts.ln_pself) {
-			if (!block_device_acquire_partlock_trywrite(master)) {
-				/* Schedule the part for removal from the laster */
-				struct block_device_partition *next;
-				do {
-					next = ATOMIC_READ(master->bd_delparts);
-					*(struct block_device_partition **)part = next;
-				} while (!ATOMIC_CMPXCH_WEAK(master->bd_delparts, next, part));
-				decref(master);
-				return;
-			}
-			COMPILER_READ_BARRIER();
-			if (part->bp_parts.ln_pself)
-				LLIST_REMOVE(part, bp_parts);
-			sync_endwrite(&master->bd_parts_lock);
+		if (!block_device_acquire_partlock_trywrite(master)) {
+			/* Schedule the part for removal from the master */
+			struct block_device_partition *next;
+			do {
+				next = ATOMIC_READ(master->bd_delparts);
+				*(struct block_device_partition **)part = next;
+			} while (!ATOMIC_CMPXCH_WEAK(master->bd_delparts, next, part));
+			decref(master);
+			return;
 		}
+		COMPILER_READ_BARRIER();
+		SLIST_REMOVE(&master->bd_parts, part, bp_parts);
+		sync_endwrite(&master->bd_parts_lock);
 		decref(master);
 	} else {
 		struct block_device *me;
@@ -702,15 +698,13 @@ PRIVATE NOBLOCK NONNULL((1)) REF struct block_device_partition *
 NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
                                      lba_t part_min, lba_t part_max) {
 	struct block_device_partition *result;
-	result = self->bd_parts;
-	for (; result; result = result->bp_parts.ln_next) {
+	SLIST_FOREACH(result, &self->bd_parts, bp_parts) {
 		if (result->bp_min != part_min)
 			continue;
 		if (result->bp_max != part_max)
 			continue;
-		if (!tryincref(result))
-			continue;
-		break;
+		if (tryincref(result))
+			break;
 	}
 	return result;
 }
@@ -812,7 +806,7 @@ block_device_makepart(struct basic_block_device *__restrict master,
 		memcpy(&result->bp_typeguid, part_typeguid, sizeof(guid_t));
 	if (part_partguid)
 		memcpy(&result->bp_partguid, part_partguid, sizeof(guid_t));
-	LLIST_INSERT(dev->bd_parts, result, bp_parts);
+	SLIST_INSERT(&dev->bd_parts, result, bp_parts);
 	incref(dev);
 	sync_endwrite(&dev->bd_parts_lock);
 	/* Automatically register the newly created partition. */
@@ -830,19 +824,21 @@ block_device_makepart(struct basic_block_device *__restrict master,
 PUBLIC NONNULL((1)) void KCALL
 block_device_delparts(struct block_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
-	while (ATOMIC_READ(self->bd_parts)) {
-		struct block_device_partition *part;
-		block_device_acquire_partlock_write(self);
-		part = ATOMIC_READ(self->bd_parts);
-		while (part && !tryincref(part))
-			part = part->bp_parts.ln_next;
-		sync_endwrite(&self->bd_parts_lock);
-		if (!part)
+	struct block_device_partition *part;
+again:
+	if (SLIST_EMPTY(&self->bd_parts))
+		return;
+	COMPILER_READ_BARRIER();
+	block_device_acquire_partlock_write(self);
+	SLIST_FOREACH(part, &self->bd_parts, bp_parts) {
+		if (tryincref(part))
 			break;
-		{
-			FINALLY_DECREF_LIKELY(part);
-			block_device_unregister(part);
-		}
+	}
+	sync_endwrite(&self->bd_parts_lock);
+	if (part) {
+		FINALLY_DECREF_LIKELY(part);
+		block_device_unregister(part);
+		goto again;
 	}
 }
 
@@ -1598,7 +1594,7 @@ again:
 		do_dump_block_device(self,
 		                     longest_device_name,
 		                     longest_driver_name);
-		for (parts = me->bd_parts; parts; parts = parts->bp_parts.ln_next) {
+		SLIST_FOREACH(parts, &me->bd_parts, bp_parts) {
 			do_dump_block_device(parts,
 			                     longest_device_name,
 			                     longest_driver_name);

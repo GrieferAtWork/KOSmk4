@@ -171,6 +171,7 @@ struct bd_cached_sector {
 
 
 
+SLIST_HEAD(block_device_partition_list, block_device_partition);
 struct block_device
 #ifdef __cplusplus
 	: basic_block_device
@@ -179,7 +180,7 @@ struct block_device
 #ifndef __cplusplus
 	__BASIC_BLOCK_DEVICE_FIELDS
 #endif /* !__cplusplus */
-	LLIST(struct block_device_partition) bd_parts;      /* [0..1][lock(bd_parts_lock)] Sub-partitions of this device.
+	struct block_device_partition_list   bd_parts;      /* [0..1][lock(bd_parts_lock)] Sub-partitions of this device.
 	                                                     * NOTE: Always `NULL' for partitions devices!
 	                                                     *       Attempting to sub-partition another partition
 	                                                     *       will simply simply adjust offsets, and create
@@ -229,7 +230,7 @@ struct block_device_partition
 	__BASIC_BLOCK_DEVICE_FIELDS
 #endif /* !__cplusplus */
 	REF struct block_device       *bp_master;    /* [1..1][const] The master device for which this is a partition. */
-	LLIST_NODE(struct block_device_partition)
+	SLIST_ENTRY(struct block_device_partition)
 	                               bp_parts;     /* [lock(bp_master->bd_parts_lock)] Chain of partitions. */
 	pos_t                          bp_minaddr;   /* [const][== bp_min * bd_sector_size] Starting position of this partition. */
 	lba_t                          bp_min;       /* [const][<= bp_max] Starting LBA of this partition. */

@@ -478,8 +478,9 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 			struct block_device_partition *iter;
 			me = (struct block_device *)self;
 			sync_read(&me->bd_parts_lock);
-			for (iter = me->bd_parts; iter; iter = iter->bp_parts.ln_next)
+			SLIST_FOREACH(iter, &me->bd_parts, bp_parts) {
 				++st.bs_partcount;
+			}
 			sync_endread(&me->bd_parts_lock);
 		}
 		memcpy(st.bs_name, self->bd_name,
@@ -544,8 +545,8 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 		index = data->bop_partno;
 		COMPILER_BARRIER();
 		sync_read(&((struct block_device *)self)->bd_parts_lock);
-		part = ((struct block_device *)self)->bd_parts;
-		for (count = 0; index-- && part; ++count, part = part->bp_parts.ln_next)
+		part = SLIST_FIRST(&((struct block_device *)self)->bd_parts);
+		for (count = 0; index-- && part; ++count, part = SLIST_NEXT(part, bp_parts))
 			;
 		if unlikely(!part) {
 			sync_endread(&((struct block_device *)self)->bd_parts_lock);
