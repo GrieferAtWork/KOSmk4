@@ -37,8 +37,8 @@
  *  | | | | | +- RINGQ_*:   Ring queue (KOS extension)
  *  | | | | | |
  * [===========]
- * [1 1 2 2 2  ]   Pointers per *_HEAD
- * [2 1 1 2 2 2]   Pointers per *_ENTRY
+ * [1 1 2 2 2  ]   Pointers per *_HEAD([name], type) aka. *_HEAD_P(T)
+ * [2 1 1 2 2 2]   Pointers per *_ENTRY(type)        aka. *_ENTRY_P(T)
  * [===========]
  * [1 1 1 1 1  ]   *_HEAD_INITIALIZER(self)
  * [1 1 1 1 1  ]   *_INIT(self)
@@ -47,35 +47,73 @@
  * [      1    ]   *_CONCAT(dst, src, key)
  * [1 1 1 1 1  ]   *_EMPTY(self)
  * [1 1 1 1 1  ]   *_FIRST(self)
+ * [1 1        ]   *_PFIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
  * [      1 1  ]   *_LAST(self)
- * [1 1 1 1 1  ]   *_NEXT(elem, key)
- * [      1    ]   *_PREV(elem, headname, key)
- * [        1  ]   *_PREV(elem, key)
- * [1          ]   *_XPREV(elem, type, key)                        (Return predecessor (undef if no pred exists))
- * [        1 1]   *_LOOP_NEXT(elem, key)                          (or *_NEXT(elem, key) for RINGQ)
- * [        1 1]   *_LOOP_PREV(elem, key)                          (or *_PREV(elem, key) for RINGQ)
+ * [1 1 1 1 1 1]   *_NEXT(elem, key)
+ * [      1    ]   *_PREV(elem, [headname], key)
+ * [        1 1]   *_PREV(elem, key)
+ * [1 1        ]   *_PNEXT(elem, key)                              (Return pointer to the pointer to the next item; use with *_P_* functions)
+ * [1          ]   *_PPREV(elem, key)                              (Return pointer to the pointer to the prev item; use with *_P_* functions)
+ * [1          ]   *_XPREV(elem, [type], key)                      (Return predecessor (undef if no prev-elem exists))
+ * [  1        ]   *_P_XPREV(p_elem, [type], key)                  (Return predecessor (undef if no prev-elem exists))
+ * [        1  ]   *_LOOP_NEXT(self, elem, key)                    (NOTE: *_NEXT(elem, key) for RINGQ)
+ * [        1  ]   *_LOOP_PREV(self, elem, key)                    (NOTE: *_PREV(elem, key) for RINGQ)
  * [1 1 1     1]   *_INSERT_AFTER(predecessor, elem, key)
+ * [1 1       1]   *_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)      { ..., predecessor, lo_elem...hi_elem, predecessor.next }
  * [      1 1  ]   *_INSERT_AFTER(self, predecessor, elem, key)
  * [1     1   1]   *_INSERT_BEFORE(successor, elem, key)
+ * [1         1]   *_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)       { ..., successor.prev, lo_elem...hi_elem, successor }
  * [        1  ]   *_INSERT_BEFORE(self, successor, elem, key)
+ * [  1        ]   *_P_INSERT_BEFORE(p_successor, elem, key)
+ * [  1        ]   *_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)   { ..., (*p_successor).prev, lo_elem...hi_elem, (*p_successor) }
  * [1 1 1 1 1  ]   *_INSERT[_HEAD](self, elem, key)
  * [    1 1 1  ]   *_INSERT_TAIL(self, elem, key)
- * [N          ]   *_INSERT_TAIL(self, elem, type, key)
+ * [N N        ]   *_INSERT_TAIL(self, elem, [type], key)
  * [  1 1      ]   *_REMOVE_HEAD(elem, key)
  * [1         1]   *_REMOVE(elem, key)
- * [  N N 1 1  ]   *_REMOVE(self, elem, type, key)
- * [  N N      ]   *_TRYREMOVE(self, elem, type, key, on_failure)
- * [  N N      ]   *_CONTAINS(self, elem, type, key, on_success)
+ * [1         1]   *_REMOVE_R(lo_elem, hi_elem, key)
+ * |           |         Remove all elements `lo_elem...hi_elem' inclusively.
+ * |           |         Links between removed elements remain valid.
+ * [  1        ]   *_P_REMOVE(p_elem, key)
+ * [  1        ]   *_P_REMOVE_R(p_lo_elem, hi_elem, key)
+ * [      1 1  ]   *_REMOVE(self, elem, key)
+ * [  N N      ]   *_REMOVE(self, elem, [type], key)
+ * [N N N      ]   *_REMOVE_IF(self, out_pelem, [type], key, condition)
+ * |           |         NOTE: `*out_pelem' is written to before `condition' is
+ * |           |               evaluated to test is `*out_pelem' should be removed
+ * |           |         Assumes that `condition' is true for at least 1 element.
+ * [  N N      ]   *_TRYREMOVE(self, elem, [type], key, on_failure)
+ * [N N N      ]   *_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
+ * |           |         Same as *_REMOVE_IF, but allow `condition' to be false for all elements, or
+ * |           |         the list itself to be empty. (if this happens, `on_failure' is evaluated)
+ * [N N N      ]   *_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
+ * |           |         Remove all elements for which `condition' is true, and evaluate `on_match'
+ * |           |         every time such a match is confirmed. The associated element is `*out_pelem'
+ * [  N N      ]   *_CONTAINS(self, elem, [type], key, on_success)
  * [1         1]   *_REPLACE(old_elem, new_elem, key)
- * [  N N 1 1  ]   *_REPLACE(self, old_elem, new_elem, type, key)
- * [  N N      ]   *_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure)
+ * [  1        ]   *_P_REPLACE(p_old_elem, new_elem, key)
+ * [  N N 1 1  ]   *_REPLACE(self, old_elem, new_elem, [type], key)
+ * [  N N      ]   *_TRYREPLACE(self, old_elem, new_elem, [type], key, on_failure)
  * [N N N N N  ]   *_FOREACH(elem, self, key)
+ * [N N        ]   *_P_FOREACH(p_elem, self, key)
  * [        N  ]   *_FOREACH_REVERSE(elem, self, key)
- * [      N    ]   *_FOREACH_REVERSE(elem, self, headname, key)
+ * [      N    ]   *_FOREACH_REVERSE(elem, self, [headname], key)
+ * [===========]   -- Sub-API: Check if an element is contained within a list,
+ * [===========]               but removal requires *_UNBIND instead of *_REMOVE
+ * [1     1 1 1]   *_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
+ * [1     1 1 1]   *_ENTRY_UNBOUND_INIT(elem, key)     -- Runtime initializer for unbound elements
+ * [1     1 1 1]   *_ISBOUND(elem, key)                -- Returns non-zero if element is bound (to a list)
+ * [1         1]   *_UNBIND(elem, key)                 -- Remove element and mark as unbound
+ * [      1 1  ]   *_UNBIND(self, elem, key)           -- *ditto*
+ * [N          ]   *_UNBIND_IF(self, out_pelem, [type], key, condition)
+ * [N          ]   *_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
+ * [N          ]   *_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
  * \-----------/
  *    Runtime
  *   (in O(x))
- */
+ *
+ * NOTE: [foo]-arguments are optional and may be omitted when `__HYBRID_LIST_RESTRICT_API'
+ *       is disabled, and sufficient compiler/preprocessor-support is available. */
 
 
 #define __HYBRID_Q_KEY(key, item)     (item)->key
@@ -118,7 +156,7 @@
 #define LIST_ENTRY(T)                                           \
 	struct {                                                    \
 		T *le_next, /* [0..1] Next item */                      \
-		**le_prev;  /* [1..1][?..1] This item's self-pointer */ \
+		**le_prev;  /* [1..1][1..1] This item's self-pointer */ \
 	}
 #else /* !__HYBRID_LIST_RESTRICT_API && __cplusplus */
 #define LIST_HEAD(name, type)                         \
@@ -128,7 +166,7 @@
 #define LIST_ENTRY(type)                                                  \
 	struct {                                                              \
 		struct type *le_next, /* [0..1] Next item */                      \
-		**le_prev;            /* [1..1][?..1] This item's self-pointer */ \
+		**le_prev;            /* [1..1][1..1] This item's self-pointer */ \
 	}
 #endif /* __HYBRID_LIST_RESTRICT_API || !__cplusplus */
 #define LIST_HEAD_INITIALIZER(self) \
@@ -152,76 +190,174 @@
 		T *le_next, /* [0..1] Next item */                \
 		**le_prev;  /* [1..1] This item's self-pointer */ \
 	}
-#define LIST_ENTRY_INITIALIZER \
+#define LIST_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define LIST_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
+#define LIST_ENTRY_UNBOUND_INIT(elem, key)              (void)((elem)->key.le_prev = __NULLPTR)
+#define LIST_ENTRY_UNBOUND_INIT_P(elem, getpath)        (void)(getpath(elem).le_prev = __NULLPTR)
+#define LIST_ISBOUND(elem, key)                         ((elem)->key.le_prev != __NULLPTR)
+#define LIST_ISBOUND_P(elem, getpath)                   (getpath(elem).le_prev != __NULLPTR)
+#define LIST_UNBIND(elem, key)                          __HYBRID_LIST_UNBIND(elem, __HYBRID_Q_KEY, key)
+#define LIST_UNBIND_P(elem, getpath)                    __HYBRID_LIST_UNBIND(elem, __HYBRID_Q_PTH, getpath)
 #define LIST_INSERT_AFTER_P(predecessor, elem, getpath) __HYBRID_LIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define LIST_INSERT_BEFORE_P(successor, elem, getpath)  __HYBRID_LIST_INSERT_BEFORE(successor, elem, __HYBRID_Q_PTH, getpath)
 #define LIST_INSERT_HEAD_P(self, elem, getpath)         __HYBRID_LIST_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_LIST_XPREV_2(elem, key)                      __HYBRID_LIST_XPREV3(elem, __typeof__(*(elem)), key)
-#define __HYBRID_LIST_XPREV_P_2(elem, key)                    __HYBRID_LIST_XPREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_LIST_INSERT_TAIL_3(self, elem, key)          __HYBRID_LIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_INSERT_TAIL_P_3(self, elem, getpath)    __HYBRID_LIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_LIST_INSERT_TAIL_P_4(self, elem, T, getpath) __HYBRID_LIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_XPREV_2(elem, key)                                                   __HYBRID_LIST_XPREV3(elem, __typeof__(*(elem)), key)
+#define __HYBRID_LIST_XPREV_P_2(elem, key)                                                 __HYBRID_LIST_XPREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_XPREV_P_3(elem, T, getpath)                                          __HYBRID_LIST_XPREV4(elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_INSERT_TAIL_3(self, elem, key)                                       __HYBRID_LIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_INSERT_TAIL_P_3(self, elem, getpath)                                 __HYBRID_LIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_INSERT_TAIL_P_4(self, elem, T, getpath)                              __HYBRID_LIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_REMOVE_IF_4(self, out_pelem, key, condition)                         __HYBRID_LIST_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_LIST_REMOVE_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_LIST_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_LIST_REMOVE_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_LIST_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_LIST_UNBIND_IF_4(self, out_pelem, key, condition)                         __HYBRID_LIST_UNBIND_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_LIST_UNBIND_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_LIST_UNBIND_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_LIST_UNBIND_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_LIST_TRYREMOVE_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_LIST_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_LIST_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_LIST_TRYUNBIND_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_LIST_TRYUNBIND_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_LIST_TRYUNBIND_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_LIST_REMOVEALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_LIST_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_LIST_REMOVEALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_LIST_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_LIST_REMOVEALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_LIST_REMOVEALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_LIST_UNBINDALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_LIST_UNBINDALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_LIST_UNBINDALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_LIST_UNBINDALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_LIST_UNBINDALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
 #ifdef __cplusplus
-#define __HYBRID_LIST_XPREV_3(elem, T, key)             __HYBRID_LIST_XPREV3(elem, T, key)
-#define __HYBRID_LIST_XPREV_P_3(elem, T, getpath)       __HYBRID_LIST_XPREV4(elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_LIST_INSERT_TAIL_4(self, elem, T, key) __HYBRID_LIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_XPREV_3(elem, T, key)                                          __HYBRID_LIST_XPREV3(elem, T, key)
+#define __HYBRID_LIST_INSERT_TAIL_4(self, elem, T, key)                              __HYBRID_LIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_REMOVE_IF_5(self, out_pelem, T, key, condition)                __HYBRID_LIST_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_LIST_UNBIND_IF_5(self, out_pelem, T, key, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_LIST_TRYREMOVE_IF_6(self, out_pelem, T, key, condition, on_failure) __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_LIST_TRYUNBIND_IF_6(self, out_pelem, T, key, condition, on_failure) __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_LIST_REMOVEALL_6(self, out_pelem, T, key, condition, on_match)      __HYBRID_LIST_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_LIST_UNBINDALL_6(self, out_pelem, T, key, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define __HYBRID_LIST_XPREV_3(elem, type, key)             __HYBRID_LIST_XPREV(elem, struct type, __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_XPREV_P_3(elem, type, getpath)       __HYBRID_LIST_XPREV4(elem, struct type, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_LIST_INSERT_TAIL_4(self, elem, type, key) __HYBRID_LIST_INSERT_TAIL(self, elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_XPREV_3(elem, type, key)                                          __HYBRID_LIST_XPREV3(elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_INSERT_TAIL_4(self, elem, type, key)                              __HYBRID_LIST_INSERT_TAIL(self, elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_REMOVE_IF_5(self, out_pelem, type, key, condition)                __HYBRID_LIST_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_LIST_UNBIND_IF_5(self, out_pelem, type, key, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_LIST_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure) __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_LIST_TRYUNBIND_IF_6(self, out_pelem, type, key, condition, on_failure) __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_LIST_REMOVEALL_6(self, out_pelem, type, key, condition, on_match)      __HYBRID_LIST_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_LIST_UNBINDALL_6(self, out_pelem, type, key, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 /* clang-format off */
-/* LIST_INSERT_TAIL(self, elem, key)
- * LIST_INSERT_TAIL(self, elem, type, key) */
-#define LIST_INSERT_TAIL(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)
-/* LIST_INSERT_TAIL_P(self, elem, getpath)
- * LIST_INSERT_TAIL_P(self, elem, type, getpath) */
-#define LIST_INSERT_TAIL_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* LIST_XPREV(elem, key)
- * LIST_XPREV(elem, type, key) */
-#define LIST_XPREV(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_XPREV_, (__VA_ARGS__))(__VA_ARGS__)
-/* LIST_XPREV_P(elem, getpath)
- * LIST_XPREV_P(elem, type, getpath) */
-#define LIST_XPREV_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_XPREV_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_INSERT_TAIL(self, elem, [type], key) */
+#define LIST_INSERT_TAIL(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_INSERT_TAIL_P(self, elem, [type], getpath) */
+#define LIST_INSERT_TAIL_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_XPREV(elem, [type], key) */
+#define LIST_XPREV(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_XPREV_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_XPREV_P(elem, [type], getpath) */
+#define LIST_XPREV_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_XPREV_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define LIST_REMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_REMOVE_IF_P(self, out_pelem, [type], getpath, condition) */
+#define LIST_REMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define LIST_TRYREMOVE_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_TRYREMOVE_IF_P(self, out_pelem, [type], getpath, condition, on_failure) */
+#define LIST_TRYREMOVE_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define LIST_TRYUNBIND_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_TRYUNBIND_IF_P(self, out_pelem, [type], getpath, condition, on_failure) */
+#define LIST_TRYUNBIND_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define LIST_REMOVEALL(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_REMOVEALL_P(self, out_pelem, [type], getpath, condition, on_match) */
+#define LIST_REMOVEALL_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
+#define LIST_UNBINDALL(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* LIST_UNBINDALL_P(self, out_pelem, [type], getpath, condition, on_match) */
+#define LIST_UNBINDALL_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
 /* clang-format on */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
+#define LIST_INSERT_TAIL_P(self, elem, T, getpath)                                 __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_KEY, getpath)
+#define LIST_XPREV_P(elem, type, getpath)                                          __HYBRID_LIST_XPREV4(elem, struct type, __HYBRID_Q_PTH, getpath)
+#define LIST_REMOVE_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_LIST_REMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define LIST_UNBIND_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define LIST_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define LIST_TRYUNBIND_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define LIST_REMOVEALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_LIST_REMOVEALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define LIST_UNBINDALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
 #ifdef __cplusplus
-#define LIST_INSERT_TAIL(self, elem, T, key) __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_KEY, key)
+#define LIST_INSERT_TAIL(self, elem, T, key)                              __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_KEY, key)
+#define LIST_XPREV(elem, T, key)                                          __HYBRID_LIST_XPREV3(elem, T, __HYBRID_Q_KEY, key)
+#define LIST_REMOVE_IF(self, out_pelem, T, key, condition)                __HYBRID_LIST_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define LIST_UNBIND_IF(self, out_pelem, T, key, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define LIST_TRYREMOVE_IF(self, out_pelem, T, key, condition, on_failure) __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define LIST_TRYUNBIND_IF(self, out_pelem, T, key, condition, on_failure) __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define LIST_REMOVEALL(self, out_pelem, T, key, condition, on_match)      __HYBRID_LIST_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
+#define LIST_UNBINDALL(self, out_pelem, T, key, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define LIST_INSERT_TAIL(self, elem, type, key) __HYBRID_SLIST_REMOVE(self, elem, struct type, __HYBRID_Q_KEY, key)
+#define LIST_INSERT_TAIL(self, elem, type, key)                              __HYBRID_SLIST_REMOVE(self, elem, struct type, __HYBRID_Q_KEY, key)
+#define LIST_XPREV(elem, type, key)                                          __HYBRID_LIST_XPREV3(elem, struct type, __HYBRID_Q_KEY, key)
+#define LIST_REMOVE_IF(self, out_pelem, type, key, condition)                __HYBRID_LIST_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define LIST_UNBIND_IF(self, out_pelem, type, key, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define LIST_TRYREMOVE_IF(self, out_pelem, type, key, condition, on_failure) __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define LIST_TRYUNBIND_IF(self, out_pelem, type, key, condition, on_failure) __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define LIST_REMOVEALL(self, out_pelem, type, key, condition, on_match)      __HYBRID_LIST_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
+#define LIST_UNBINDALL(self, out_pelem, type, key, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
-#define LIST_INSERT_TAIL_P(self, elem, T, getpath) __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_KEY, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
-#define LIST_REPLACE(old_elem, new_elem, key)       __HYBRID_LIST_REPLACE(old_elem, new_elem, __HYBRID_Q_KEY, key)
-#define LIST_REPLACE_P(old_elem, new_elem, getpath) __HYBRID_LIST_REPLACE(old_elem, new_elem, __HYBRID_Q_PTH, getpath)
-#define LIST_REMOVE_P(elem, getpath)                __HYBRID_LIST_REMOVE(elem, __HYBRID_Q_PTH, getpath)
-#define LIST_FOREACH_P(elem, self, getpath)         __HYBRID_LIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
-#define LIST_NEXT_P(elem, getpath)                  __HYBRID_LIST_NEXT(elem, __HYBRID_Q_PTH, getpath)
+#define LIST_REPLACE(old_elem, new_elem, key)                         __HYBRID_LIST_REPLACE(old_elem, new_elem, __HYBRID_Q_KEY, key)
+#define LIST_REPLACE_P(old_elem, new_elem, getpath)                   __HYBRID_LIST_REPLACE(old_elem, new_elem, __HYBRID_Q_PTH, getpath)
+#define LIST_REMOVE_P(elem, getpath)                                  __HYBRID_LIST_REMOVE(elem, __HYBRID_Q_PTH, getpath)
+#define LIST_FOREACH_P(elem, self, getpath)                           __HYBRID_LIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
+#define LIST_P_FOREACH(p_elem, self, key)                             __HYBRID_LIST_P_FOREACH(p_elem, self, __HYBRID_Q_KEY, key)
+#define LIST_P_FOREACH_P(p_elem, self, getpath)                       __HYBRID_LIST_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
+#define LIST_NEXT_P(elem, getpath)                                    __HYBRID_LIST_NEXT(elem, __HYBRID_Q_PTH, getpath)
+#define LIST_PNEXT(elem, key)                                         (&(elem)->key.le_next)
+#define LIST_PNEXT_P(elem, getpath)                                   (&getpath(elem).le_next)
+#define LIST_PPREV(elem, key)                                         ((elem)->key.le_prev)
+#define LIST_PPREV_P(elem, getpath)                                   (getpath(elem).le_prev)
+#define LIST_REMOVE_R(lo_elem, hi_elem, key)                          __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define LIST_REMOVE_R_P(lo_elem, hi_elem, getpath)                    __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define LIST_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)        __HYBRID_LIST_INSERT_BEFORE_R(successor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define LIST_INSERT_BEFORE_R_P(successor, lo_elem, hi_elem, getpath)  __HYBRID_LIST_INSERT_BEFORE_R(successor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define LIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)       __HYBRID_LIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define LIST_INSERT_AFTER_R_P(predecessor, lo_elem, hi_elem, getpath) __HYBRID_LIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define LIST_PFIRST(self)                                             (&(self)->lh_first)
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
 #define __HYBRID_LIST_XPREV3(elem, T, key)  __COMPILER_CONTAINER_OF((elem)->key.le_prev, T, key.le_next)
-#define __HYBRID_LIST_XPREV4(elem, T, X, _) ((T *)((__SIZE_TYPE__)(ptr) - (__SIZE_TYPE__)(&X(_, (T *)0).le_next)))
-#define __HYBRID_LIST_INSERT_AFTER(predecessor, elem, X, _)                                       \
-	(void)((X(_, elem).le_next = *(X(_, elem).le_prev = &X(_, predecessor).le_next)) != __NULLPTR \
-	       ? (void)(X(_, X(_, elem).le_next).le_prev = &X(_, elem).le_next)                       \
-	       : (void)0,                                                                             \
-	       X(_, predecessor).le_next = (elem))
-#define __HYBRID_LIST_INSERT_BEFORE(successor, elem, X, _)            \
-	(void)(*(X(_, elem).le_prev = X(_, successor).le_prev)  = (elem), \
-	       *(X(_, successor).le_prev = &X(_, elem).le_next) = (successor))
+#define __HYBRID_LIST_XPREV4(elem, T, X, _) ((T *)((__SIZE_TYPE__)X(_, elem).le_prev - (__SIZE_TYPE__)&X(_, (T *)0).le_next))
+#define __HYBRID_LIST_INSERT_AFTER(predecessor, elem, X, _) \
+	__HYBRID_LIST_INSERT_AFTER_R(predecessor, elem, elem, X, _)
+#define __HYBRID_LIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, X, _)                               \
+	(void)((X(_, hi_elem).le_next = *(X(_, lo_elem).le_prev = &X(_, predecessor).le_next)) != __NULLPTR \
+	       ? (void)(X(_, X(_, hi_elem).le_next).le_prev = &X(_, hi_elem).le_next)                       \
+	       : (void)0,                                                                                   \
+	       X(_, predecessor).le_next = (lo_elem))
+#define __HYBRID_LIST_INSERT_BEFORE(successor, elem, X, _) \
+	__HYBRID_LIST_INSERT_BEFORE_R(successor, elem, elem, X, _)
+#define __HYBRID_LIST_INSERT_BEFORE_R(successor, lo_elem, hi_elem, X, _)    \
+	(void)(*(X(_, lo_elem).le_prev = X(_, successor).le_prev)  = (lo_elem), \
+	       *(X(_, successor).le_prev = &X(_, hi_elem).le_next) = (successor))
 #define __HYBRID_LIST_INSERT_HEAD(self, elem, X, _)                       \
 	(void)((X(_, elem).le_next = (self)->lh_first) != __NULLPTR           \
 	       ? (void)(X(_, (self)->lh_first).le_prev = &X(_, elem).le_next) \
 	       : (void)0,                                                     \
 	       *(X(_, elem).le_prev = &(self)->lh_first) = (elem))
-#define __HYBRID_LIST_REMOVE(elem, X, _)                             \
-	((*X(_, elem).le_prev = X(_, elem).le_next) != __NULLPTR         \
-	 ? (void)(X(_, X(_, elem).le_next).le_prev = X(_, elem).le_prev) \
-	 : (void)0,                                                      \
-	 __HYBRID_Q_BADPTR(X(_, elem).le_next),                          \
-	 __HYBRID_Q_BADPTR(X(_, elem).le_prev))
+#define __HYBRID_LIST_REMOVE(elem, X, _) \
+	__HYBRID_LIST_REMOVE_R(elem, elem, X, _)
+#define __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, X, _)                     \
+	((*X(_, lo_elem).le_prev = X(_, hi_elem).le_next) != __NULLPTR         \
+	 ? (void)(X(_, X(_, hi_elem).le_next).le_prev = X(_, lo_elem).le_prev) \
+	 : (void)0,                                                            \
+	 __HYBRID_Q_BADPTR(X(_, hi_elem).le_next),                             \
+	 __HYBRID_Q_BADPTR(X(_, lo_elem).le_prev))
+#define __HYBRID_LIST_UNBIND(elem, X, _)                                   \
+	(void)((*X(_, elem).le_prev = X(_, elem).le_next) != __NULLPTR         \
+	       ? (void)(X(_, X(_, elem).le_next).le_prev = X(_, elem).le_prev) \
+	       : (void)0,                                                      \
+	       __HYBRID_Q_BADPTR(X(_, elem).le_next),                          \
+	       X(_, elem).le_prev = __NULLPTR)
 #define __HYBRID_LIST_REPLACE(old_elem, new_elem, X, _)                       \
 	(*(X(_, new_elem).le_prev = X(_, old_elem).le_prev) = (new_elem),         \
 	 (X(_, new_elem).le_next = X(_, old_elem).le_next) != __NULLPTR           \
@@ -230,7 +366,7 @@
 	 __HYBRID_Q_BADPTR(X(_, old_elem).le_prev),                               \
 	 __HYBRID_Q_BADPTR(X(_, old_elem).le_next))
 #define __HYBRID_LIST_INSERT_TAIL(self, elem, T, X, _) \
-	/* Sorry, this one must be state statement */      \
+	/* Sorry, this one must be a statement */          \
 	do {                                               \
 		T **__piter = &(self)->lh_first;               \
 		while (*__piter != __NULLPTR)                  \
@@ -239,10 +375,116 @@
 		X(_, elem).le_next              = __NULLPTR;   \
 	}                                                  \
 	__WHILE0
+#define __HYBRID_LIST_REMOVE_IF(self, out_pelem, T, X, _, condition) \
+	/* Sorry, this one must be a statement */                        \
+	do {                                                             \
+		T **__piter = &(self)->lh_first;                             \
+		for (;;) {                                                   \
+			*(out_pelem) = *__piter;                                 \
+			if (condition)                                           \
+				break;                                               \
+			__piter = &X(_, *(out_pelem)).le_next;                   \
+		}                                                            \
+		if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)    \
+			X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;      \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);               \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);               \
+	}                                                                \
+	__WHILE0
+#define __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                       \
+	do {                                                                            \
+		T **__piter = &(self)->lh_first;                                            \
+		for (;;) {                                                                  \
+			if ((*(out_pelem) = *__piter) == __NULLPTR) {                           \
+				on_failure;                                                         \
+				break;                                                              \
+			}                                                                       \
+			if (condition) {                                                        \
+				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)           \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;             \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                      \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);                      \
+				break;                                                              \
+			}                                                                       \
+			__piter = &X(_, *(out_pelem)).le_next;                                  \
+		}                                                                           \
+	}                                                                               \
+	__WHILE0
+#define __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, X, _, condition) \
+	/* Sorry, this one must be a statement */                        \
+	do {                                                             \
+		T **__piter = &(self)->lh_first;                             \
+		for (;;) {                                                   \
+			*(out_pelem) = *__piter;                                 \
+			if (condition)                                           \
+				break;                                               \
+			__piter = &X(_, *(out_pelem)).le_next;                   \
+		}                                                            \
+		if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)    \
+			X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;      \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);               \
+		X(_, *(out_pelem)).le_prev = __NULLPTR;                      \
+	}                                                                \
+	__WHILE0
+#define __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                       \
+	do {                                                                            \
+		T **__piter = &(self)->lh_first;                                            \
+		for (;;) {                                                                  \
+			if ((*(out_pelem) = *__piter) == __NULLPTR) {                           \
+				on_failure;                                                         \
+				break;                                                              \
+			}                                                                       \
+			if (condition) {                                                        \
+				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)           \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;             \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                      \
+				X(_, *(out_pelem)).le_prev = __NULLPTR;                             \
+				break;                                                              \
+			}                                                                       \
+			__piter = &X(_, *(out_pelem)).le_next;                                  \
+		}                                                                           \
+	}                                                                               \
+	__WHILE0
+#define __HYBRID_LIST_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
+	/* Sorry, this one must be a statement */                                  \
+	do {                                                                       \
+		T **__piter = &(self)->lh_first;                                       \
+		while ((*(out_pelem) = *__piter) != __NULLPTR) {                       \
+			if (condition) {                                                   \
+				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)      \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;        \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                 \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);                 \
+				on_match;                                                      \
+			} else {                                                           \
+				__piter = &X(_, *(out_pelem)).le_next;                         \
+			}                                                                  \
+		}                                                                      \
+	}                                                                          \
+	__WHILE0
+#define __HYBRID_LIST_UNBINDALL(self, out_pelem, T, X, _, condition, on_match) \
+	/* Sorry, this one must be a statement */                                  \
+	do {                                                                       \
+		T **__piter = &(self)->lh_first;                                       \
+		while ((*(out_pelem) = *__piter) != __NULLPTR) {                       \
+			if (condition) {                                                   \
+				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)      \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;        \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                 \
+				X(_, *(out_pelem)).le_prev = __NULLPTR;                        \
+				on_match;                                                      \
+			} else {                                                           \
+				__piter = &X(_, *(out_pelem)).le_next;                         \
+			}                                                                  \
+		}                                                                      \
+	}                                                                          \
+	__WHILE0
 #define __HYBRID_LIST_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->lh_first; (elem); (elem) = X(_, elem).le_next)
-#define __HYBRID_LIST_EMPTY(self)      ((self)->lh_first == __NULLPTR)
-#define __HYBRID_LIST_FIRST(self)      ((self)->lh_first)
+#define __HYBRID_LIST_P_FOREACH(p_elem, self, X, _) \
+	for ((p_elem) = &(self)->lh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).le_next)
 #define __HYBRID_LIST_NEXT(elem, X, _) (X(_, elem).le_next)
 
 
@@ -305,9 +547,9 @@
 #define SLIST_INIT(self) \
 	(void)((self)->slh_first = __NULLPTR)
 #define SLIST_EMPTY(self)                          ((self)->slh_first == __NULLPTR)
-#define SLIST_FIRST(self)                          ((self)->slh_first)
+#define SLIST_FIRST(self)                          (self)->slh_first
 #define SLIST_INSERT_AFTER(predecessor, elem, key) __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_KEY, key)
-#define SLIST_INSERT(l, elem, key)             __HYBRID_SLIST_INSERT(l, elem, __HYBRID_Q_KEY, key)
+#define SLIST_INSERT(l, elem, key)                 __HYBRID_SLIST_INSERT(l, elem, __HYBRID_Q_KEY, key)
 #define SLIST_REMOVE_HEAD(self, key)               __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
 #define SLIST_FOREACH(elem, self, key)             __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_KEY, key)
 #define SLIST_NEXT(elem, key)                      __HYBRID_SLIST_NEXT(elem, __HYBRID_Q_KEY, key)
@@ -339,98 +581,167 @@
 	struct {                                \
 		T *sle_next; /* [0..1] Next-link */ \
 	}
-#define SLIST_ENTRY_INITIALIZER \
-	{ __NULLPTR }
 #define SLIST_INSERT_AFTER_P(predecessor, elem, getpath) __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_INSERT_P(l, elem, getpath)                 __HYBRID_SLIST_INSERT(l, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_REMOVE_HEAD_P(self, getpath)               __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_SLIST_REMOVE_P_3(self, elem, getpath)                                  __HYBRID_SLIST_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SLIST_REMOVE_P_4(self, elem, T, getpath)                               __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SLIST_REPLACE_4(self, old_elem, new_elem, key)                         __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_REPLACE_P_4(self, old_elem, new_elem, getpath)                   __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SLIST_REPLACE_P_5(self, old_elem, new_elem, T, getpath)                __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SLIST_TRYREMOVE_4(self, elem, key, on_failure)                         __HYBRID_SLIST_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SLIST_TRYREMOVE_P_4(self, elem, getpath, on_failure)                   __HYBRID_SLIST_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_SLIST_TRYREMOVE_P_5(self, elem, T, getpath, on_failure)                __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_SLIST_CONTAINS_4(self, elem, key, on_success)                          __HYBRID_SLIST_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_SLIST_CONTAINS_P_4(self, elem, getpath, on_success)                    __HYBRID_SLIST_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
-#define __HYBRID_SLIST_CONTAINS_P_5(self, elem, T, getpath, on_success)                 __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define __HYBRID_SLIST_TRYREPLACE_5(self, old_elem, new_elem, key, on_failure)          __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SLIST_TRYREPLACE_P_5(self, old_elem, new_elem, getpath, on_failure)    __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_SLIST_TRYREPLACE_P_6(self, old_elem, new_elem, T, getpath, on_failure) __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SLIST_REMOVE_P_3(self, elem, getpath)                                      __HYBRID_SLIST_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_REMOVE_P_4(self, elem, T, getpath)                                   __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_REPLACE_4(self, old_elem, new_elem, key)                             __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_REPLACE_P_4(self, old_elem, new_elem, getpath)                       __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_REPLACE_P_5(self, old_elem, new_elem, T, getpath)                    __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_TRYREMOVE_4(self, elem, key, on_failure)                             __HYBRID_SLIST_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_TRYREMOVE_P_4(self, elem, getpath, on_failure)                       __HYBRID_SLIST_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SLIST_TRYREMOVE_P_5(self, elem, T, getpath, on_failure)                    __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SLIST_REMOVE_IF_4(self, out_pelem, key, condition)                         __HYBRID_SLIST_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_SLIST_REMOVE_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_SLIST_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_SLIST_REMOVE_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_SLIST_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_SLIST_TRYREMOVE_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_SLIST_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_SLIST_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_SLIST_REMOVEALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_SLIST_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_SLIST_REMOVEALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_SLIST_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_SLIST_REMOVEALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_SLIST_REMOVEALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_SLIST_CONTAINS_4(self, elem, key, on_success)                              __HYBRID_SLIST_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_SLIST_CONTAINS_P_4(self, elem, getpath, on_success)                        __HYBRID_SLIST_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_SLIST_CONTAINS_P_5(self, elem, T, getpath, on_success)                     __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_SLIST_TRYREPLACE_5(self, old_elem, new_elem, key, on_failure)              __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_TRYREPLACE_P_5(self, old_elem, new_elem, getpath, on_failure)        __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SLIST_TRYREPLACE_P_6(self, old_elem, new_elem, T, getpath, on_failure)     __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SLIST_INSERT_TAIL_3(self, elem, key)                                       __HYBRID_SLIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_INSERT_TAIL_P_3(self, elem, getpath)                                 __HYBRID_SLIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_INSERT_TAIL_P_4(self, elem, T, getpath)                              __HYBRID_SLIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_P_XPREV_2(p_elem, key)                                               __HYBRID_SLIST_P_XPREV3(p_elem, __typeof__(*(elem)), key)
+#define __HYBRID_SLIST_P_XPREV_P_2(p_elem, getpath)                                         __HYBRID_SLIST_P_XPREV4(p_elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_P_XPREV_P_3(p_elem, T, getpath)                                      __HYBRID_SLIST_P_XPREV4(p_elem, T, __HYBRID_Q_PTH, getpath)
 #ifdef __cplusplus
-#define __HYBRID_SLIST_REPLACE_5(self, old_elem, new_elem, T, key)                __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_TRYREMOVE_5(self, elem, T, key, on_failure)                __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SLIST_CONTAINS_5(self, elem, T, key, on_success)                 __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_SLIST_TRYREPLACE_6(self, old_elem, new_elem, T, key, on_failure) __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_REPLACE_5(self, old_elem, new_elem, T, key)                    __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_TRYREMOVE_5(self, elem, T, key, on_failure)                    __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_CONTAINS_5(self, elem, T, key, on_success)                     __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_SLIST_TRYREPLACE_6(self, old_elem, new_elem, T, key, on_failure)     __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_INSERT_TAIL_4(self, elem, T, key)                              __HYBRID_SLIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_P_XPREV_3(p_elem, T, key)                                      __HYBRID_SLIST_P_XPREV3(p_elem, T, key)
+#define __HYBRID_SLIST_REMOVE_IF_5(self, out_pelem, T, key, condition)                __HYBRID_SLIST_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_SLIST_TRYREMOVE_IF_6(self, out_pelem, T, key, condition, on_failure) __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_SLIST_REMOVEALL_6(self, out_pelem, T, key, condition, on_match)      __HYBRID_SLIST_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define __HYBRID_SLIST_REPLACE_5(self, old_elem, new_elem, type, key)                __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_TRYREMOVE_5(self, elem, type, key, on_failure)                __HYBRID_SLIST_TRYREMOVE(self, elem, struct type, __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SLIST_CONTAINS_5(self, elem, type, key, on_success)                 __HYBRID_SLIST_CONTAINS(self, elem, struct type, __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_SLIST_TRYREPLACE_6(self, old_elem, new_elem, type, key, on_failure) __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_REPLACE_5(self, old_elem, new_elem, type, key)                    __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_TRYREMOVE_5(self, elem, type, key, on_failure)                    __HYBRID_SLIST_TRYREMOVE(self, elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_CONTAINS_5(self, elem, type, key, on_success)                     __HYBRID_SLIST_CONTAINS(self, elem, struct type, __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_SLIST_TRYREPLACE_6(self, old_elem, new_elem, type, key, on_failure)     __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SLIST_INSERT_TAIL_4(self, elem, type, key)                              __HYBRID_SLIST_INSERT_TAIL(self, elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_P_XPREV_3(p_elem, type, key)                                      __HYBRID_SLIST_P_XPREV3(p_elem, struct type, key)
+#define __HYBRID_SLIST_REMOVE_IF_5(self, out_pelem, type, key, condition)                __HYBRID_SLIST_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_SLIST_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure) __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_SLIST_REMOVEALL_6(self, out_pelem, type, key, condition, on_match)      __HYBRID_SLIST_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 /* clang-format off */
-/* SLIST_REMOVE_P(self, elem, getpath)
- * SLIST_REMOVE_P(self, elem, type, getpath) */
-#define SLIST_REMOVE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_REPLACE_P(self, old_elem, new_elem, key)
- * SLIST_REPLACE_P(self, old_elem, new_elem, type, key) */
-#define SLIST_REPLACE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_REPLACE_P(self, old_elem, new_elem, getpath)
- * SLIST_REPLACE_P(self, old_elem, new_elem, type, getpath) */
-#define SLIST_REPLACE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_TRYREMOVE(self, elem, key, on_failure)
- * SLIST_TRYREMOVE(self, elem, type, key, on_failure) */
-#define SLIST_TRYREMOVE(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_TRYREMOVE_P(self, elem, getpath, on_failure)
- * SLIST_TRYREMOVE_P(self, elem, type, getpath, on_failure) */
-#define SLIST_TRYREMOVE_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_CONTAINS(self, elem, key, on_success)
- * SLIST_CONTAINS(self, elem, type, key, on_success) */
-#define SLIST_CONTAINS(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_CONTAINS_P(self, elem, getpath, on_success)
- * SLIST_CONTAINS_P(self, elem, type, getpath, on_success) */
-#define SLIST_CONTAINS_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_TRYREPLACE(self, old_elem, new_elem, key, on_success)
- * SLIST_TRYREPLACE(self, old_elem, new_elem, type, key, on_success) */
-#define SLIST_TRYREPLACE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)
-/* SLIST_TRYREPLACE_P(self, old_elem, new_elem, getpath, on_success)
- * SLIST_TRYREPLACE_P(self, old_elem, new_elem, type, getpath, on_success) */
-#define SLIST_TRYREPLACE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REMOVE_P(self, elem, [type], getpath) */
+#define SLIST_REMOVE_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REPLACE_P(self, old_elem, new_elem, [type], key) */
+#define SLIST_REPLACE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REPLACE_P(self, old_elem, new_elem, [type], getpath) */
+#define SLIST_REPLACE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_TRYREMOVE(self, elem, [type], key, on_failure) */
+#define SLIST_TRYREMOVE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_TRYREMOVE_P(self, elem, [type], getpath, on_failure) */
+#define SLIST_TRYREMOVE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define SLIST_REMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REMOVE_IF_P(self, out_pelem, [type], getpath, condition) */
+#define SLIST_REMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define SLIST_TRYREMOVE_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_TRYREMOVE_IF_P(self, out_pelem, [type], getpath, condition, on_failure) */
+#define SLIST_TRYREMOVE_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REMVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define SLIST_REMVEALL(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMVEALL_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_REMVEALL_P(self, out_pelem, [type], getpath, condition, on_match) */
+#define SLIST_REMVEALL_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_CONTAINS(self, elem, [type], key, on_success) */
+#define SLIST_CONTAINS(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_CONTAINS_P(self, elem, [type], getpath, on_success) */
+#define SLIST_CONTAINS_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
+#define SLIST_TRYREPLACE(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_TRYREPLACE_P(self, old_elem, new_elem, [type], getpath, on_success) */
+#define SLIST_TRYREPLACE_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_INSERT_TAIL(self, elem, [type], key) */
+#define SLIST_INSERT_TAIL(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_INSERT_TAIL_P(self, elem, [type], getpath) */
+#define SLIST_INSERT_TAIL_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_P_XPREV(p_elem, [type], key) */
+#define SLIST_P_XPREV(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_P_XPREV_, (__VA_ARGS__))(__VA_ARGS__)
+/* SLIST_P_XPREV_P(p_elem, [type], getpath) */
+#define SLIST_P_XPREV_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_P_XPREV_P_, (__VA_ARGS__))(__VA_ARGS__)
 /* clang-format on */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define SLIST_REMOVE_P(self, elem, T, getpath)                               __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
-#define SLIST_REPLACE_P(self, old_elem, new_elem, T, getpath)                __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
-#define SLIST_TRYREMOVE_P(self, elem, T, getpath, on_failure)                __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define SLIST_CONTAINS_P(self, elem, T, getpath, on_success)                 __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define SLIST_TRYREPLACE_P(self, old_elem, new_elem, T, getpath, on_failure) __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SLIST_REMOVE_P(self, elem, T, getpath)                                      __HYBRID_SLIST_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define SLIST_REPLACE_P(self, old_elem, new_elem, T, getpath)                       __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
+#define SLIST_TRYREMOVE_P(self, elem, T, getpath, on_failure)                       __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SLIST_CONTAINS_P(self, elem, T, getpath, on_success)                        __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define SLIST_TRYREPLACE_P(self, old_elem, new_elem, T, getpath, on_failure)        __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SLIST_INSERT_TAIL_P(self, elem, T, getpath)                                 __HYBRID_SLIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define SLIST_REMOVE_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_SLIST_REMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define SLIST_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define SLIST_REMOVEALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_SLIST_REMOVEALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
 #ifdef __cplusplus
-#define SLIST_REPLACE(self, old_elem, new_elem, T, key)                __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
-#define SLIST_TRYREMOVE(self, elem, T, key, on_failure)                __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define SLIST_CONTAINS(self, elem, T, key, on_success)                 __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define SLIST_TRYREPLACE(self, old_elem, new_elem, T, key, on_failure) __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define SLIST_REPLACE(self, old_elem, new_elem, T, key)                    __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
+#define SLIST_TRYREMOVE(self, elem, T, key, on_failure)                    __HYBRID_SLIST_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SLIST_CONTAINS(self, elem, T, key, on_success)                     __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define SLIST_TRYREPLACE(self, old_elem, new_elem, T, key, on_failure)     __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define SLIST_INSERT_TAIL(self, elem, T, key)                              __HYBRID_SLIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_KEY, key)
+#define SLIST_P_XPREV                                                      __HYBRID_SLIST_P_XPREV3
+#define SLIST_P_XPREV_P(p_elem, T, getpath)                                __HYBRID_SLIST_P_XPREV4(p_elem, T, __HYBRID_Q_PTH, getpath)
+#define SLIST_REMOVE_IF(self, out_pelem, T, key, condition)                __HYBRID_SLIST_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define SLIST_TRYREMOVE_IF(self, out_pelem, T, key, condition, on_failure) __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define SLIST_REMOVEALL(self, out_pelem, T, key, condition, on_match)      __HYBRID_SLIST_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define SLIST_REPLACE(self, old_elem, new_elem, type, key)                __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
-#define SLIST_TRYREMOVE(self, elem, type, key, on_failure)                __HYBRID_SLIST_TRYREMOVE(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_failure)
-#define SLIST_CONTAINS(self, elem, type, key, on_success)                 __HYBRID_SLIST_CONTAINS(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_success)
-#define SLIST_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure) __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define SLIST_REPLACE(self, old_elem, new_elem, type, key)                    __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
+#define SLIST_TRYREMOVE(self, elem, type, key, on_failure)                    __HYBRID_SLIST_TRYREMOVE(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_failure)
+#define SLIST_CONTAINS(self, elem, type, key, on_success)                     __HYBRID_SLIST_CONTAINS(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_success)
+#define SLIST_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure)     __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define SLIST_INSERT_TAIL(self, elem, type, key)                              __HYBRID_SLIST_INSERT_TAIL(self, elem, struct type, __HYBRID_Q_KEY, key)
+#define SLIST_P_XPREV(p_elem, T, key)                                         __HYBRID_SLIST_P_XPREV3(p_elem, struct type, key)
+#define SLIST_P_XPREV_P(p_elem, T, getpath)                                   __HYBRID_SLIST_P_XPREV4(p_elem, struct type, __HYBRID_Q_PTH, getpath)
+#define SLIST_REMOVE_IF(self, out_pelem, type, key, condition)                __HYBRID_SLIST_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define SLIST_TRYREMOVE_IF(self, out_pelem, type, key, condition, on_failure) __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define SLIST_REMOVEALL(self, out_pelem, type, key, condition, on_match)      __HYBRID_SLIST_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
-#define SLIST_FOREACH_P(elem, self, getpath) __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
-#define SLIST_NEXT_P(elem, getpath)          __HYBRID_SLIST_NEXT(elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_FOREACH_P(elem, self, getpath)                              __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_FOREACH(p_elem, self, getpath)                            __HYBRID_SLIST_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_FOREACH_P(p_elem, self, getpath)                          __HYBRID_SLIST_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_REMOVE(p_elem, key)                                       __HYBRID_SLIST_P_REMOVE(p_elem, __HYBRID_Q_KEY, key)
+#define SLIST_P_REMOVE_P(p_elem, getpath)                                 __HYBRID_SLIST_P_REMOVE(p_elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_REMOVE_R(p_lo_elem, hi_elem, key)                         __HYBRID_SLIST_P_REMOVE_R(p_lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define SLIST_P_REMOVE_R_P(p_lo_elem, hi_elem, getpath)                   __HYBRID_SLIST_P_REMOVE_R(p_lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_INSERT_BEFORE(p_successor, elem, key)                     __HYBRID_SLIST_P_INSERT_BEFORE(p_successor, elem, __HYBRID_Q_KEY, key)
+#define SLIST_P_INSERT_BEFORE_P(p_successor, elem, getpath)               __HYBRID_SLIST_P_INSERT_BEFORE(p_successor, elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_REPLACE(p_old_elem, new_elem, key)                        __HYBRID_SLIST_P_REPLACE(p_old_elem, new_elem, __HYBRID_Q_KEY, key)
+#define SLIST_P_REPLACE_P(p_old_elem, new_elem, getpath)                  __HYBRID_SLIST_P_REPLACE(p_old_elem, new_elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_NEXT_P(elem, getpath)                                       __HYBRID_SLIST_NEXT(elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_PNEXT(elem, key)                                            (&(elem)->key.sle_next)
+#define SLIST_PNEXT_P(elem, getpath)                                      (&getpath(elem).sle_next)
+#define SLIST_PFIRST(self)                                                (&(self)->slh_first)
+#define SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)          __HYBRID_SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define SLIST_INSERT_AFTER_R_P(predecessor, lo_elem, hi_elem, getpath)    __HYBRID_SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)       __HYBRID_SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define SLIST_P_INSERT_BEFORE_R_P(p_successor, lo_elem, hi_elem, getpath) __HYBRID_SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
-#define __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, X, _)        \
-	(void)(X(_, elem).sle_next        = X(_, predecessor).sle_next, \
-	       X(_, predecessor).sle_next = (elem))
+#define __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, X, _) \
+	__HYBRID_SLIST_INSERT_AFTER_R(predecessor, elem, elem, X, _)
+#define __HYBRID_SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, X, _) \
+	(void)(X(_, hi_elem).sle_next     = X(_, predecessor).sle_next,        \
+	       X(_, predecessor).sle_next = (lo_elem))
 #define __HYBRID_SLIST_INSERT(l, elem, X, _)     \
 	(void)(X(_, elem).sle_next = (l)->slh_first, \
 	       (l)->slh_first      = (elem))
 #define __HYBRID_SLIST_REMOVE_HEAD(self, X, _) \
 	(void)((self)->slh_first = X(_, (self)->slh_first).sle_next)
 #define __HYBRID_SLIST_REMOVE(self, elem, T, X, _) \
-	/* Sorry, this one must be state statement */  \
+	/* Sorry, this one must be a statement */      \
 	do {                                           \
 		T **__piter = &(self)->slh_first;          \
 		while (*__piter != (elem))                 \
@@ -440,7 +751,7 @@
 	}                                              \
 	__WHILE0
 #define __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, X, _) \
-	/* Sorry, this one must be state statement */                 \
+	/* Sorry, this one must be a statement */                     \
 	do {                                                          \
 		T **__piter = &(self)->slh_first;                         \
 		while (*__piter != (old_elem))                            \
@@ -451,7 +762,7 @@
 	}                                                             \
 	__WHILE0
 #define __HYBRID_SLIST_TRYREMOVE(self, elem, T, X, _, on_failure) \
-	/* Sorry, this one must be state statement */                 \
+	/* Sorry, this one must be a statement */                     \
 	do {                                                          \
 		T **__piter = &(self)->slh_first;                         \
 		while (*__piter != __NULLPTR && *__piter != (elem))       \
@@ -465,7 +776,7 @@
 	}                                                             \
 	__WHILE0
 #define __HYBRID_SLIST_CONTAINS(self, elem, T, X, _, on_success) \
-	/* Sorry, this one must be state statement */                \
+	/* Sorry, this one must be a statement */                    \
 	do {                                                         \
 		T *__iter = (self)->slh_first;                           \
 		while (__iter != __NULLPTR) {                            \
@@ -478,7 +789,7 @@
 	}                                                            \
 	__WHILE0
 #define __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, X, _, on_failure) \
-	/* Sorry, this one must be state statement */                                \
+	/* Sorry, this one must be a statement */                                    \
 	do {                                                                         \
 		T **__piter = &(self)->slh_first;                                        \
 		while (*__piter != __NULLPTR && *__piter != (old_elem))                  \
@@ -492,10 +803,83 @@
 		}                                                                        \
 	}                                                                            \
 	__WHILE0
+#define __HYBRID_SLIST_INSERT_TAIL(self, elem, T, X, _) \
+	/* Sorry, this one must be a statement */           \
+	do {                                                \
+		T **__piter = &(self)->slh_first;               \
+		while (*__piter != __NULLPTR)                   \
+			__piter = &X(_, *__piter).sle_next;         \
+		*__piter           = (elem);                    \
+		X(_, elem).le_next = __NULLPTR;                 \
+	}                                                   \
+	__WHILE0
+#define __HYBRID_SLIST_REMOVE_IF(self, out_pelem, T, X, _, condition) \
+	/* Sorry, this one must be a statement */                         \
+	do {                                                              \
+		T **__piter = &(self)->slh_first;                             \
+		for (;;) {                                                    \
+			*(out_pelem) = *__piter;                                  \
+			if (condition)                                            \
+				break;                                                \
+			__piter = &X(_, *(out_pelem)).sle_next;                   \
+		}                                                             \
+		*__piter = X(_, *(out_pelem)).sle_next;                       \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).sle_next);               \
+	}                                                                 \
+	__WHILE0
+#define __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                        \
+	do {                                                                             \
+		T **__piter = &(self)->slh_first;                                            \
+		for (;;) {                                                                   \
+			if ((*(out_pelem) = *__piter) == __NULLPTR) {                            \
+				on_failure;                                                          \
+				break;                                                               \
+			}                                                                        \
+			if (condition) {                                                         \
+				*__piter = X(_, *(out_pelem)).sle_next;                              \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).sle_next);                      \
+				break;                                                               \
+			}                                                                        \
+			__piter = &X(_, *(out_pelem)).sle_next;                                  \
+		}                                                                            \
+	}                                                                                \
+	__WHILE0
+#define __HYBRID_SLIST_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
+	/* Sorry, this one must be a statement */                                   \
+	do {                                                                        \
+		T **__piter = &(self)->slh_first;                                       \
+		while ((*(out_pelem) = *__piter) != __NULLPTR) {                        \
+			if (condition) {                                                    \
+				*__piter = X(_, *(out_pelem)).sle_next;                         \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).sle_next);                 \
+				on_match;                                                       \
+			} else {                                                            \
+				__piter = &X(_, *(out_pelem)).sle_next;                         \
+			}                                                                   \
+		}                                                                       \
+	}                                                                           \
+	__WHILE0
+#define __HYBRID_SLIST_P_REMOVE(p_elem, X, _) \
+	__HYBRID_SLIST_P_REMOVE_R(p_elem, *(p_elem), X, _)
+#define __HYBRID_SLIST_P_REMOVE_R(p_lo_elem, hi_elem, X, _) \
+	(void)(*(p_lo_elem) = X(_, hi_elem).sle_next,           \
+	       __HYBRID_Q_BADPTR(X(_, hi_elem).sle_next))
+#define __HYBRID_SLIST_P_INSERT_BEFORE(p_successor, elem, X, _) \
+	__HYBRID_SLIST_P_INSERT_BEFORE_R(p_successor, elem, elem, X, _)
+#define __HYBRID_SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, X, _) \
+	(void)(X(_, hi_elem).sle_next = *(p_successor), *(p_successor) = (lo_elem))
+#define __HYBRID_SLIST_P_REPLACE(p_old_elem, new_elem, X, _)       \
+	(void)(X(_, new_elem).sle_next = X(_, *(p_old_elem)).sle_next, \
+	       *(p_old_elem)           = (new_elem))
+#define __HYBRID_SLIST_P_XPREV3(p_elem, T, key) \
+	__COMPILER_CONTAINER_OF(p_elem, T, key.sle_next)
+#define __HYBRID_SLIST_P_XPREV4(p_elem, T, X, _) \
+	((T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&X(_, (T *)0).sle_next))
 #define __HYBRID_SLIST_FOREACH(elem, self, X, _) \
-	for ((elem) = (self)->slh_first;             \
-	     (elem);                                 \
-	     (elem) = X(_, elem).sle_next)
+	for ((elem) = (self)->slh_first; (elem); (elem) = X(_, elem).sle_next)
+#define __HYBRID_SLIST_P_FOREACH(p_elem, self, X, _) \
+	for ((p_elem) = &(self)->slh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).sle_next)
 #define __HYBRID_SLIST_NEXT(elem, X, _) X(_, elem).sle_next
 
 
@@ -587,8 +971,7 @@
 #define __HYBRID_STAILQ_REMOVE_4(self, elem, type, key) __HYBRID_STAILQ_REMOVE(self, elem, struct type, __HYBRID_Q_KEY, key)
 #endif /* !__cplusplus */
 /* clang-format off */
-/* STAILQ_REMOVE(self, elem, key)
- * STAILQ_REMOVE(self, elem, type, key) */
+/* STAILQ_REMOVE(self, elem, [type], key) */
 #define STAILQ_REMOVE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_, (__VA_ARGS__))(__VA_ARGS__)
 /* clang-format on */
 #elif !defined(__HYBRID_LIST_RESTRICT_API) && defined(__cplusplus)
@@ -607,83 +990,108 @@
 	struct {                                    \
 		T *stqe_next; /* [0..1] Next element */ \
 	}
-#define STAILQ_ENTRY_INITIALIZER \
-	{ __NULLPTR }
 #define STAILQ_INSERT_HEAD_P(self, elem, getpath)               __HYBRID_STAILQ_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_INSERT_TAIL_P(self, elem, getpath)               __HYBRID_STAILQ_INSERT_TAIL(self, elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_INSERT_AFTER_P(self, predecessor, elem, getpath) __HYBRID_STAILQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_REMOVE_HEAD_P(self, getpath)                     __HYBRID_STAILQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_STAILQ_REMOVE_P_3(self, elem, getpath)                                  __HYBRID_STAILQ_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_STAILQ_REMOVE_P_4(self, elem, T, getpath)                               __HYBRID_STAILQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_STAILQ_REPLACE_4(self, old_elem, new_elem, key)                         __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_REPLACE_P_4(self, old_elem, new_elem, getpath)                   __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_STAILQ_REPLACE_P_5(self, old_elem, new_elem, T, getpath)                __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_STAILQ_TRYREMOVE_4(self, elem, key, on_failure)                         __HYBRID_STAILQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_STAILQ_TRYREMOVE_P_4(self, elem, getpath, on_failure)                   __HYBRID_STAILQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_STAILQ_TRYREMOVE_P_5(self, elem, T, getpath, on_failure)                __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_STAILQ_CONTAINS_4(self, elem, key, on_success)                          __HYBRID_STAILQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_STAILQ_CONTAINS_P_4(self, elem, getpath, on_success)                    __HYBRID_STAILQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
-#define __HYBRID_STAILQ_CONTAINS_P_5(self, elem, T, getpath, on_success)                 __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define __HYBRID_STAILQ_TRYREPLACE_5(self, old_elem, new_elem, key, on_failure)          __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_STAILQ_TRYREPLACE_P_5(self, old_elem, new_elem, getpath, on_failure)    __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_STAILQ_TRYREPLACE_P_6(self, old_elem, new_elem, T, getpath, on_failure) __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_STAILQ_REMOVE_P_3(self, elem, getpath)                                      __HYBRID_STAILQ_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_REMOVE_P_4(self, elem, T, getpath)                                   __HYBRID_STAILQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_REPLACE_4(self, old_elem, new_elem, key)                             __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_REPLACE_P_4(self, old_elem, new_elem, getpath)                       __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_REPLACE_P_5(self, old_elem, new_elem, T, getpath)                    __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_TRYREMOVE_4(self, elem, key, on_failure)                             __HYBRID_STAILQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_TRYREMOVE_P_4(self, elem, getpath, on_failure)                       __HYBRID_STAILQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_STAILQ_TRYREMOVE_P_5(self, elem, T, getpath, on_failure)                    __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_STAILQ_REMOVE_IF_4(self, out_pelem, key, condition)                         __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_STAILQ_REMOVE_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_STAILQ_REMOVE_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_STAILQ_TRYREMOVE_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_STAILQ_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_STAILQ_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_STAILQ_REMOVEALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_STAILQ_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_STAILQ_REMOVEALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_STAILQ_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_STAILQ_REMOVEALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_STAILQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_STAILQ_CONTAINS_4(self, elem, key, on_success)                              __HYBRID_STAILQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_STAILQ_CONTAINS_P_4(self, elem, getpath, on_success)                        __HYBRID_STAILQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_STAILQ_CONTAINS_P_5(self, elem, T, getpath, on_success)                     __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_STAILQ_TRYREPLACE_5(self, old_elem, new_elem, key, on_failure)              __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_TRYREPLACE_P_5(self, old_elem, new_elem, getpath, on_failure)        __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_STAILQ_TRYREPLACE_P_6(self, old_elem, new_elem, T, getpath, on_failure)     __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
 #ifdef __cplusplus
-#define __HYBRID_STAILQ_REPLACE_5(self, old_elem, new_elem, T, key)                __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_TRYREMOVE_5(self, elem, T, key, on_failure)                __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_STAILQ_CONTAINS_5(self, elem, T, key, on_success)                 __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_STAILQ_TRYREPLACE_6(self, old_elem, new_elem, T, key, on_failure) __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_REPLACE_5(self, old_elem, new_elem, T, key)                    __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_TRYREMOVE_5(self, elem, T, key, on_failure)                    __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_CONTAINS_5(self, elem, T, key, on_success)                     __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_STAILQ_TRYREPLACE_6(self, old_elem, new_elem, T, key, on_failure)     __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_REMOVE_IF_5(self, out_pelem, T, key, condition)                __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_STAILQ_TRYREMOVE_IF_6(self, out_pelem, T, key, condition, on_failure) __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_STAILQ_REMOVEALL_6(self, out_pelem, T, key, condition, on_match)      __HYBRID_STAILQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define __HYBRID_STAILQ_REPLACE_5(self, old_elem, new_elem, type, key)                __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_TRYREMOVE_5(self, elem, type, key, on_failure)                __HYBRID_STAILQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_STAILQ_CONTAINS_5(self, elem, type, key, on_success)                 __HYBRID_STAILQ_CONTAINS(self, elem, struct type, __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_STAILQ_TRYREPLACE_6(self, old_elem, new_elem, type, key, on_failure) __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_REPLACE_5(self, old_elem, new_elem, type, key)                    __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_TRYREMOVE_5(self, elem, type, key, on_failure)                    __HYBRID_STAILQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_CONTAINS_5(self, elem, type, key, on_success)                     __HYBRID_STAILQ_CONTAINS(self, elem, struct type, __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_STAILQ_TRYREPLACE_6(self, old_elem, new_elem, type, key, on_failure)     __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_STAILQ_REMOVE_IF_5(self, out_pelem, type, key, condition)                __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_STAILQ_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure) __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_STAILQ_REMOVEALL_6(self, out_pelem, type, key, condition, on_match)      __HYBRID_STAILQ_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 /* clang-format off */
-/* STAILQ_REMOVE_P(self, elem, getpath)
- * STAILQ_REMOVE_P(self, elem, type, getpath) */
-#define STAILQ_REMOVE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_REPLACE_P(self, old_elem, new_elem, key)
- * STAILQ_REPLACE_P(self, old_elem, new_elem, type, key) */
-#define STAILQ_REPLACE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_REPLACE_P(self, old_elem, new_elem, getpath)
- * STAILQ_REPLACE_P(self, old_elem, new_elem, type, getpath) */
-#define STAILQ_REPLACE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_TRYREMOVE(self, elem, key, on_failure)
- * STAILQ_TRYREMOVE(self, elem, type, key, on_failure) */
-#define STAILQ_TRYREMOVE(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_TRYREMOVE_P(self, elem, getpath, on_failure)
- * STAILQ_TRYREMOVE_P(self, elem, type, getpath, on_failure) */
-#define STAILQ_TRYREMOVE_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_CONTAINS(self, elem, key, on_success)
- * STAILQ_CONTAINS(self, elem, type, key, on_success) */
-#define STAILQ_CONTAINS(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_CONTAINS_P(self, elem, getpath, on_success)
- * STAILQ_CONTAINS_P(self, elem, type, getpath, on_success) */
-#define STAILQ_CONTAINS_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_TRYREPLACE(self, old_elem, new_elem, key, on_success)
- * STAILQ_TRYREPLACE(self, old_elem, new_elem, type, key, on_success) */
-#define STAILQ_TRYREPLACE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)
-/* STAILQ_TRYREPLACE_P(self, old_elem, new_elem, getpath, on_success)
- * STAILQ_TRYREPLACE_P(self, old_elem, new_elem, type, getpath, on_success) */
-#define STAILQ_TRYREPLACE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REMOVE_P(self, elem, [type], getpath) */
+#define STAILQ_REMOVE_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REPLACE_P(self, old_elem, new_elem, [type], key) */
+#define STAILQ_REPLACE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REPLACE_P(self, old_elem, new_elem, [type], getpath) */
+#define STAILQ_REPLACE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_TRYREMOVE(self, elem, [type], key, on_failure) */
+#define STAILQ_TRYREMOVE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_TRYREMOVE_P(self, elem, [type], getpath, on_failure) */
+#define STAILQ_TRYREMOVE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_CONTAINS(self, elem, [type], key, on_success) */
+#define STAILQ_CONTAINS(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_CONTAINS_P(self, elem, [type], getpath, on_success) */
+#define STAILQ_CONTAINS_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
+#define STAILQ_TRYREPLACE(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_TRYREPLACE_P(self, old_elem, new_elem, [type], getpath, on_success) */
+#define STAILQ_TRYREPLACE_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define STAILQ_REMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REMOVE_IF_P(self, out_pelem, [type], getpath, condition) */
+#define STAILQ_REMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define STAILQ_TRYREMOVE_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_TRYREMOVE_IF_P(self, out_pelem, [type], getpath, condition, on_failure) */
+#define STAILQ_TRYREMOVE_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define STAILQ_REMOVEALL(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)
+/* STAILQ_REMOVEALL_P(self, out_pelem, [type], getpath, condition, on_match) */
+#define STAILQ_REMOVEALL_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)
 /* clang-format on */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define STAILQ_REMOVE_P(self, elem, T, getpath)                               __HYBRID_STAILQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
-#define STAILQ_REPLACE_P(self, old_elem, new_elem, T, getpath)                __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
-#define STAILQ_TRYREMOVE_P(self, elem, T, getpath, on_failure)                __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define STAILQ_CONTAINS_P(self, elem, T, getpath, on_success)                 __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define STAILQ_TRYREPLACE_P(self, old_elem, new_elem, T, getpath, on_failure) __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define STAILQ_REMOVE_P(self, elem, T, getpath)                                      __HYBRID_STAILQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define STAILQ_REPLACE_P(self, old_elem, new_elem, T, getpath)                       __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
+#define STAILQ_TRYREMOVE_P(self, elem, T, getpath, on_failure)                       __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define STAILQ_CONTAINS_P(self, elem, T, getpath, on_success)                        __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define STAILQ_TRYREPLACE_P(self, old_elem, new_elem, T, getpath, on_failure)        __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define STAILQ_REMOVE_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define STAILQ_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define STAILQ_REMOVEALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_STAILQ_REMOVEALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
 #ifdef __cplusplus
-#define STAILQ_REPLACE(self, old_elem, new_elem, T, key)                __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
-#define STAILQ_TRYREMOVE(self, elem, T, key, on_failure)                __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define STAILQ_CONTAINS(self, elem, T, key, on_success)                 __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define STAILQ_TRYREPLACE(self, old_elem, new_elem, T, key, on_failure) __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define STAILQ_REPLACE(self, old_elem, new_elem, T, key)                    __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
+#define STAILQ_TRYREMOVE(self, elem, T, key, on_failure)                    __HYBRID_STAILQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define STAILQ_CONTAINS(self, elem, T, key, on_success)                     __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define STAILQ_TRYREPLACE(self, old_elem, new_elem, T, key, on_failure)     __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define STAILQ_REMOVE_IF(self, out_pelem, T, key, condition)                __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define STAILQ_TRYREMOVE_IF(self, out_pelem, T, key, condition, on_failure) __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define STAILQ_REMOVEALL(self, out_pelem, T, key, condition, on_match)      __HYBRID_STAILQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define STAILQ_REPLACE(self, old_elem, new_elem, type, key)                __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
-#define STAILQ_TRYREMOVE(self, elem, type, key, on_failure)                __HYBRID_STAILQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_failure)
-#define STAILQ_CONTAINS(self, elem, type, key, on_success)                 __HYBRID_STAILQ_CONTAINS(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_success)
-#define STAILQ_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure) __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define STAILQ_REPLACE(self, old_elem, new_elem, type, key)                    __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
+#define STAILQ_TRYREMOVE(self, elem, type, key, on_failure)                    __HYBRID_STAILQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_failure)
+#define STAILQ_CONTAINS(self, elem, type, key, on_success)                     __HYBRID_STAILQ_CONTAINS(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_success)
+#define STAILQ_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure)     __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define STAILQ_REMOVE_IF(self, out_pelem, type, key, condition)                __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define STAILQ_TRYREMOVE_IF(self, out_pelem, type, key, condition, on_failure) __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define STAILQ_REMOVEALL(self, out_pelem, type, key, condition, on_match)      __HYBRID_STAILQ_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #define STAILQ_FOREACH_P(elem, self, getpath) __HYBRID_STAILQ_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
@@ -709,7 +1117,7 @@
 	 ? (void)((self)->stqh_last = &(self)->stqh_first)                      \
 	 : (void)0)
 #define __HYBRID_STAILQ_REMOVE(self, elem, T, X, _)         \
-	/* Sorry, this one must be state statement */           \
+	/* Sorry, this one must be a statement */               \
 	do {                                                    \
 		T **__piter = &(self)->stqh_first;                  \
 		while (*__piter != (elem))                          \
@@ -720,7 +1128,7 @@
 	}                                                       \
 	__WHILE0
 #define __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, X, _) \
-	/* Sorry, this one must be state statement */                  \
+	/* Sorry, this one must be a statement */                      \
 	do {                                                           \
 		T **__piter = &(self)->stqh_first;                         \
 		while (*__piter != (old_elem))                             \
@@ -730,23 +1138,27 @@
 		__HYBRID_Q_BADPTR(X(_, old_elem).stqe_next);               \
 	}                                                              \
 	__WHILE0
-#define __HYBRID_STAILQ_TRYREMOVE(self, elem, T, X, _, on_failure) \
-	/* Sorry, this one must be state statement */                  \
-	do {                                                           \
-		T **__piter = &(self)->stqh_first;                         \
-		while (*__piter != __NULLPTR && *__piter != (elem))        \
-			__piter = &X(_, *__piter).stqe_next;                   \
-		if (*__piter != __NULLPTR) {                               \
-			if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)    \
-				(self)->stqh_last = __piter;                       \
-			__HYBRID_Q_BADPTR(X(_, elem).stqe_next);               \
-		} else {                                                   \
-			on_failure;                                            \
-		}                                                          \
-	}                                                              \
+#define __HYBRID_STAILQ_TRYREMOVE(self, elem, T, X, _, on_failure)  \
+	/* Sorry, this one must be a statement */                       \
+	do {                                                            \
+		T **__piter = &(self)->stqh_first;                          \
+		for (;;) {                                                  \
+			if (*__piter == __NULLPTR) {                            \
+				on_failure;                                         \
+				break;                                              \
+			}                                                       \
+			if (*__piter == (elem)) {                               \
+				if ((*__piter = X(_, elem).stqe_next) == __NULLPTR) \
+					(self)->stqh_last = __piter;                    \
+				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);            \
+				break;                                              \
+			}                                                       \
+			__piter = &X(_, *__piter).stqe_next;                    \
+		}                                                           \
+	}                                                               \
 	__WHILE0
 #define __HYBRID_STAILQ_CONTAINS(self, elem, T, X, _, on_success) \
-	/* Sorry, this one must be state statement */                 \
+	/* Sorry, this one must be a statement */                     \
 	do {                                                          \
 		T *__iter = (self)->stqh_first;                           \
 		while (__iter != __NULLPTR) {                             \
@@ -759,19 +1171,72 @@
 	}                                                             \
 	__WHILE0
 #define __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, X, _, on_failure) \
-	/* Sorry, this one must be state statement */                                 \
+	/* Sorry, this one must be a statement */                                     \
 	do {                                                                          \
 		T **__piter = &(self)->stqh_first;                                        \
-		while (*__piter != __NULLPTR && *__piter != (old_elem))                   \
+		for (;;) {                                                                \
+			if (*__piter == __NULLPTR)                                            \
+				break;                                                            \
+			if (*__piter == (old_elem)) {                                         \
+				if ((X(_, new_elem).stqe_next = *__piter) == __NULLPTR)           \
+					(self)->stqh_last = &(new_elem);                              \
+				*__piter = (new_elem);                                            \
+				__HYBRID_Q_BADPTR(X(_, old_elem).stqe_next);                      \
+				break;                                                            \
+			}                                                                     \
 			__piter = &X(_, *__piter).stqe_next;                                  \
-		if (*__piter != __NULLPTR) {                                              \
-			X(_, new_elem).stqe_next = *__piter;                                  \
-			*__piter                 = (new_elem);                                \
-			__HYBRID_Q_BADPTR(X(_, old_elem).stqe_next);                          \
-		} else {                                                                  \
-			on_failure;                                                           \
 		}                                                                         \
 	}                                                                             \
+	__WHILE0
+#define __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, T, X, _, condition) \
+	/* Sorry, this one must be a statement */                          \
+	do {                                                               \
+		T **__piter = &(self)->stqh_first;                             \
+		for (;;) {                                                     \
+			*(out_pelem) = *__piter;                                   \
+			if (condition)                                             \
+				break;                                                 \
+			__piter = &X(_, *__piter).stqe_next;                       \
+		}                                                              \
+		if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)            \
+			(self)->stqh_last = __piter;                               \
+		__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                       \
+	}                                                                  \
+	__WHILE0
+#define __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                         \
+	do {                                                                              \
+		T **__piter = &(self)->stqh_first;                                            \
+		for (;;) {                                                                    \
+			if ((*(out_pelem) = *__piter) == __NULLPTR) {                             \
+				on_failure;                                                           \
+				break;                                                                \
+			}                                                                         \
+			if (condition) {                                                          \
+				if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)                   \
+					(self)->stqh_last = __piter;                                      \
+				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                              \
+				break;                                                                \
+			}                                                                         \
+			__piter = &X(_, *__piter).stqe_next;                                      \
+		}                                                                             \
+	}                                                                                 \
+	__WHILE0
+#define __HYBRID_STAILQ_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
+	/* Sorry, this one must be a statement */                                    \
+	do {                                                                         \
+		T **__piter = &(self)->stqh_first;                                       \
+		while ((*(out_pelem) = *__piter) != __NULLPTR) {                         \
+			if (condition) {                                                     \
+				if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)              \
+					(self)->stqh_last = __piter;                                 \
+				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                         \
+				on_match;                                                        \
+			} else {                                                             \
+				__piter = &X(_, *__piter).stqe_next;                             \
+			}                                                                    \
+		}                                                                        \
+	}                                                                            \
 	__WHILE0
 #define __HYBRID_STAILQ_FOREACH(elem, self, X, _) \
 	for ((elem) = ((self)->stqh_first);           \
@@ -861,8 +1326,7 @@
 #define __HYBRID_SIMPLEQ_REMOVE_4(self, elem, type, key) __HYBRID_SIMPLEQ_REMOVE(self, elem, struct type, __HYBRID_Q_KEY, key)
 #endif /* !__cplusplus */
 /* clang-format off */
-/* SIMPLEQ_REMOVE(self, elem, key)
- * SIMPLEQ_REMOVE(self, elem, type, key) */
+/* SIMPLEQ_REMOVE(self, elem, [type], key) */
 #define SIMPLEQ_REMOVE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_, (__VA_ARGS__))(__VA_ARGS__)
 /* clang-format on */
 #elif !defined(__HYBRID_LIST_RESTRICT_API) && defined(__cplusplus)
@@ -881,83 +1345,108 @@
 	struct {                                   \
 		T *sqe_next; /* [0..1] Next element */ \
 	}
-#define SIMPLEQ_ENTRY_INITIALIZER \
-	{ __NULLPTR }
 #define SIMPLEQ_INSERT_HEAD_P(self, elem, getpath)               __HYBRID_SIMPLEQ_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_INSERT_TAIL_P(self, elem, getpath)               __HYBRID_SIMPLEQ_INSERT_TAIL(self, elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_INSERT_AFTER_P(self, predecessor, elem, getpath) __HYBRID_SIMPLEQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_REMOVE_HEAD_P(self, getpath)                     __HYBRID_SIMPLEQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_SIMPLEQ_REMOVE_P_3(self, elem, getpath)                                  __HYBRID_SIMPLEQ_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SIMPLEQ_REMOVE_P_4(self, elem, T, getpath)                               __HYBRID_SIMPLEQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SIMPLEQ_REPLACE_4(self, old_elem, new_elem, key)                         __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_SIMPLEQ_REPLACE_P_4(self, old_elem, new_elem, getpath)                   __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SIMPLEQ_REPLACE_P_5(self, old_elem, new_elem, T, getpath)                __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SIMPLEQ_TRYREMOVE_4(self, elem, key, on_failure)                         __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SIMPLEQ_TRYREMOVE_P_4(self, elem, getpath, on_failure)                   __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_SIMPLEQ_TRYREMOVE_P_5(self, elem, T, getpath, on_failure)                __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_SIMPLEQ_CONTAINS_4(self, elem, key, on_success)                          __HYBRID_SIMPLEQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_SIMPLEQ_CONTAINS_P_4(self, elem, getpath, on_success)                    __HYBRID_SIMPLEQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
-#define __HYBRID_SIMPLEQ_CONTAINS_P_5(self, elem, T, getpath, on_success)                 __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define __HYBRID_SIMPLEQ_TRYREPLACE_5(self, old_elem, new_elem, key, on_failure)          __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SIMPLEQ_TRYREPLACE_P_5(self, old_elem, new_elem, getpath, on_failure)    __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
-#define __HYBRID_SIMPLEQ_TRYREPLACE_P_6(self, old_elem, new_elem, T, getpath, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVE_P_3(self, elem, getpath)                                      __HYBRID_SIMPLEQ_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_REMOVE_P_4(self, elem, T, getpath)                                   __HYBRID_SIMPLEQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_REPLACE_4(self, old_elem, new_elem, key)                             __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_SIMPLEQ_REPLACE_P_4(self, old_elem, new_elem, getpath)                       __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_REPLACE_P_5(self, old_elem, new_elem, T, getpath)                    __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_4(self, elem, key, on_failure)                             __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_P_4(self, elem, getpath, on_failure)                       __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_P_5(self, elem, T, getpath, on_failure)                    __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVE_IF_4(self, out_pelem, key, condition)                         __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_SIMPLEQ_REMOVE_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_SIMPLEQ_REMOVE_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVEALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_SIMPLEQ_REMOVEALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_SIMPLEQ_REMOVEALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_SIMPLEQ_CONTAINS_4(self, elem, key, on_success)                              __HYBRID_SIMPLEQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_SIMPLEQ_CONTAINS_P_4(self, elem, getpath, on_success)                        __HYBRID_SIMPLEQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_SIMPLEQ_CONTAINS_P_5(self, elem, T, getpath, on_success)                     __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_SIMPLEQ_TRYREPLACE_5(self, old_elem, new_elem, key, on_failure)              __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_TRYREPLACE_P_5(self, old_elem, new_elem, getpath, on_failure)        __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
+#define __HYBRID_SIMPLEQ_TRYREPLACE_P_6(self, old_elem, new_elem, T, getpath, on_failure)     __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
 #ifdef __cplusplus
-#define __HYBRID_SIMPLEQ_REPLACE_5(self, old_elem, new_elem, T, key)                __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
-#define __HYBRID_SIMPLEQ_TRYREMOVE_5(self, elem, T, key, on_failure)                __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SIMPLEQ_CONTAINS_5(self, elem, T, key, on_success)                 __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_SIMPLEQ_TRYREPLACE_6(self, old_elem, new_elem, T, key, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_REPLACE_5(self, old_elem, new_elem, T, key)                    __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_5(self, elem, T, key, on_failure)                    __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_CONTAINS_5(self, elem, T, key, on_success)                     __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_SIMPLEQ_TRYREPLACE_6(self, old_elem, new_elem, T, key, on_failure)     __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVE_IF_5(self, out_pelem, T, key, condition)                __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_IF_6(self, out_pelem, T, key, condition, on_failure) __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVEALL_6(self, out_pelem, T, key, condition, on_match)      __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define __HYBRID_SIMPLEQ_REPLACE_5(self, old_elem, new_elem, type, key)                __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
-#define __HYBRID_SIMPLEQ_TRYREMOVE_5(self, elem, type, key, on_failure)                __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_KEY, key, on_failure)
-#define __HYBRID_SIMPLEQ_CONTAINS_5(self, elem, type, key, on_success)                 __HYBRID_SIMPLEQ_CONTAINS(self, elem, struct type, __HYBRID_Q_KEY, key, on_success)
-#define __HYBRID_SIMPLEQ_TRYREPLACE_6(self, old_elem, new_elem, type, key, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_REPLACE_5(self, old_elem, new_elem, type, key)                    __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_5(self, elem, type, key, on_failure)                    __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_CONTAINS_5(self, elem, type, key, on_success)                     __HYBRID_SIMPLEQ_CONTAINS(self, elem, struct type, __HYBRID_Q_KEY, key, on_success)
+#define __HYBRID_SIMPLEQ_TRYREPLACE_6(self, old_elem, new_elem, type, key, on_failure)     __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVE_IF_5(self, out_pelem, type, key, condition)                __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_SIMPLEQ_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure) __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_SIMPLEQ_REMOVEALL_6(self, out_pelem, type, key, condition, on_match)      __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 /* clang-format off */
-/* SIMPLEQ_REMOVE_P(self, elem, getpath)
- * SIMPLEQ_REMOVE_P(self, elem, type, getpath) */
-#define SIMPLEQ_REMOVE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_REPLACE_P(self, old_elem, new_elem, key)
- * SIMPLEQ_REPLACE_P(self, old_elem, new_elem, type, key) */
-#define SIMPLEQ_REPLACE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_REPLACE_P(self, old_elem, new_elem, getpath)
- * SIMPLEQ_REPLACE_P(self, old_elem, new_elem, type, getpath) */
-#define SIMPLEQ_REPLACE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_TRYREMOVE(self, elem, key, on_failure)
- * SIMPLEQ_TRYREMOVE(self, elem, type, key, on_failure) */
-#define SIMPLEQ_TRYREMOVE(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_TRYREMOVE_P(self, elem, getpath, on_failure)
- * SIMPLEQ_TRYREMOVE_P(self, elem, type, getpath, on_failure) */
-#define SIMPLEQ_TRYREMOVE_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_CONTAINS(self, elem, key, on_success)
- * SIMPLEQ_CONTAINS(self, elem, type, key, on_success) */
-#define SIMPLEQ_CONTAINS(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_CONTAINS_P(self, elem, getpath, on_success)
- * SIMPLEQ_CONTAINS_P(self, elem, type, getpath, on_success) */
-#define SIMPLEQ_CONTAINS_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, key, on_success)
- * SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, type, key, on_success) */
-#define SIMPLEQ_TRYREPLACE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)
-/* SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, getpath, on_success)
- * SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, type, getpath, on_success) */
-#define SIMPLEQ_TRYREPLACE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REMOVE_P(self, elem, [type], getpath) */
+#define SIMPLEQ_REMOVE_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REPLACE_P(self, old_elem, new_elem, [type], key) */
+#define SIMPLEQ_REPLACE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REPLACE_P(self, old_elem, new_elem, [type], getpath) */
+#define SIMPLEQ_REPLACE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_TRYREMOVE(self, elem, [type], key, on_failure) */
+#define SIMPLEQ_TRYREMOVE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_TRYREMOVE_P(self, elem, [type], getpath, on_failure) */
+#define SIMPLEQ_TRYREMOVE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_CONTAINS(self, elem, [type], key, on_success) */
+#define SIMPLEQ_CONTAINS(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_CONTAINS_P(self, elem, [type], getpath, on_success) */
+#define SIMPLEQ_CONTAINS_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
+#define SIMPLEQ_TRYREPLACE(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, [type], getpath, on_success) */
+#define SIMPLEQ_TRYREPLACE_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define SIMPLEQ_REMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REMOVE_IF_P(self, out_pelem, [type], getpath, condition) */
+#define SIMPLEQ_REMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define SIMPLEQ_TRYREMOVE_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_TRYREMOVE_IF_P(self, out_pelem, [type], getpath, condition, on_failure) */
+#define SIMPLEQ_TRYREMOVE_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define SIMPLEQ_REMOVEALL(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)
+/* SIMPLEQ_REMOVEALL_P(self, out_pelem, [type], getpath, condition, on_match) */
+#define SIMPLEQ_REMOVEALL_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)
 /* clang-format on */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define SIMPLEQ_REMOVE_P(self, elem, T, getpath)                               __HYBRID_SIMPLEQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
-#define SIMPLEQ_REPLACE_P(self, old_elem, new_elem, T, getpath)                __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
-#define SIMPLEQ_TRYREMOVE_P(self, elem, T, getpath, on_failure)                __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define SIMPLEQ_CONTAINS_P(self, elem, T, getpath, on_success)                 __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, T, getpath, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SIMPLEQ_REMOVE_P(self, elem, T, getpath)                                      __HYBRID_SIMPLEQ_REMOVE(self, elem, T, __HYBRID_Q_PTH, getpath)
+#define SIMPLEQ_REPLACE_P(self, old_elem, new_elem, T, getpath)                       __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
+#define SIMPLEQ_TRYREMOVE_P(self, elem, T, getpath, on_failure)                       __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SIMPLEQ_CONTAINS_P(self, elem, T, getpath, on_success)                        __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, T, getpath, on_failure)        __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SIMPLEQ_REMOVE_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define SIMPLEQ_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define SIMPLEQ_REMOVEALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
 #ifdef __cplusplus
-#define SIMPLEQ_REPLACE(self, old_elem, new_elem, T, key)                __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
-#define SIMPLEQ_TRYREMOVE(self, elem, T, key, on_failure)                __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define SIMPLEQ_CONTAINS(self, elem, T, key, on_success)                 __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
-#define SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, key, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define SIMPLEQ_REPLACE(self, old_elem, new_elem, T, key)                    __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key)
+#define SIMPLEQ_TRYREMOVE(self, elem, T, key, on_failure)                    __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, __HYBRID_Q_PTH, getpath, on_failure)
+#define SIMPLEQ_CONTAINS(self, elem, T, key, on_success)                     __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, key, on_failure)     __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, __HYBRID_Q_KEY, key, on_failure)
+#define SIMPLEQ_REMOVE_IF(self, out_pelem, T, key, condition)                __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition)
+#define SIMPLEQ_TRYREMOVE_IF(self, out_pelem, T, key, condition, on_failure) __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_failure)
+#define SIMPLEQ_REMOVEALL(self, out_pelem, T, key, condition, on_match)      __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_KEY, key, condition, on_match)
 #else /* __cplusplus */
-#define SIMPLEQ_REPLACE(self, old_elem, new_elem, type, key)                __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
-#define SIMPLEQ_TRYREMOVE(self, elem, type, key, on_failure)                __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_failure)
-#define SIMPLEQ_CONTAINS(self, elem, type, key, on_success)                 __HYBRID_SIMPLEQ_CONTAINS(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_success)
-#define SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define SIMPLEQ_REPLACE(self, old_elem, new_elem, type, key)                    __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key)
+#define SIMPLEQ_TRYREMOVE(self, elem, type, key, on_failure)                    __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_failure)
+#define SIMPLEQ_CONTAINS(self, elem, type, key, on_success)                     __HYBRID_SIMPLEQ_CONTAINS(self, elem, struct type, __HYBRID_Q_PTH, getpath, on_success)
+#define SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, type, key, on_failure)     __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, struct type, __HYBRID_Q_KEY, key, on_failure)
+#define SIMPLEQ_REMOVE_IF(self, out_pelem, type, key, condition)                __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition)
+#define SIMPLEQ_TRYREMOVE_IF(self, out_pelem, type, key, condition, on_failure) __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define SIMPLEQ_REMOVEALL(self, out_pelem, type, key, condition, on_match)      __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, struct type, __HYBRID_Q_KEY, key, condition, on_match)
 #endif /* !__cplusplus */
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #define SIMPLEQ_FOREACH_P(elem, self, getpath) __HYBRID_SIMPLEQ_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
@@ -983,7 +1472,7 @@
 	 ? (void)((self)->sqh_last = &(self)->sqh_first)                     \
 	 : (void)0)
 #define __HYBRID_SIMPLEQ_REMOVE(self, elem, T, X, _)       \
-	/* Sorry, this one must be state statement */          \
+	/* Sorry, this one must be a statement */              \
 	do {                                                   \
 		T **__piter = &(self)->sqh_first;                  \
 		while (*__piter != (elem))                         \
@@ -994,7 +1483,7 @@
 	}                                                      \
 	__WHILE0
 #define __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, X, _) \
-	/* Sorry, this one must be state statement */                   \
+	/* Sorry, this one must be a statement */                       \
 	do {                                                            \
 		T **__piter = &(self)->sqh_first;                           \
 		while (*__piter != (old_elem))                              \
@@ -1005,7 +1494,7 @@
 	}                                                               \
 	__WHILE0
 #define __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, X, _, on_failure) \
-	/* Sorry, this one must be state statement */                   \
+	/* Sorry, this one must be a statement */                       \
 	do {                                                            \
 		T **__piter = &(self)->sqh_first;                           \
 		while (*__piter != __NULLPTR && *__piter != (elem))         \
@@ -1020,7 +1509,7 @@
 	}                                                               \
 	__WHILE0
 #define __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, X, _, on_success) \
-	/* Sorry, this one must be state statement */                  \
+	/* Sorry, this one must be a statement */                      \
 	do {                                                           \
 		T *__iter = (self)->sqh_first;                             \
 		while (__iter != __NULLPTR) {                              \
@@ -1033,7 +1522,7 @@
 	}                                                              \
 	__WHILE0
 #define __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, X, _, on_failure) \
-	/* Sorry, this one must be state statement */                                  \
+	/* Sorry, this one must be a statement */                                      \
 	do {                                                                           \
 		T **__piter = &(self)->sqh_first;                                          \
 		while (*__piter != __NULLPTR && *__piter != (old_elem))                    \
@@ -1046,6 +1535,56 @@
 			on_failure;                                                            \
 		}                                                                          \
 	}                                                                              \
+	__WHILE0
+#define __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, T, X, _, condition) \
+	/* Sorry, this one must be a statement */                           \
+	do {                                                                \
+		T **__piter = &(self)->sqh_first;                               \
+		for (;;) {                                                      \
+			*(out_pelem) = *__piter;                                    \
+			if (condition)                                              \
+				break;                                                  \
+			__piter = &X(_, *__piter).sqe_next;                         \
+		}                                                               \
+		if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)              \
+			(self)->sqh_last = __piter;                                 \
+		__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                         \
+	}                                                                   \
+	__WHILE0
+#define __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                          \
+	do {                                                                               \
+		T **__piter = &(self)->sqh_first;                                              \
+		for (;;) {                                                                     \
+			if ((*(out_pelem) = *__piter) == __NULLPTR) {                              \
+				on_failure;                                                            \
+				break;                                                                 \
+			}                                                                          \
+			if (condition) {                                                           \
+				if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)                     \
+					(self)->sqh_last = __piter;                                        \
+				__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                                \
+				break;                                                                 \
+			}                                                                          \
+			__piter = &X(_, *__piter).sqe_next;                                        \
+		}                                                                              \
+	}                                                                                  \
+	__WHILE0
+#define __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
+	/* Sorry, this one must be a statement */                                     \
+	do {                                                                          \
+		T **__piter = &(self)->sqh_first;                                         \
+		while ((*(out_pelem) = *__piter) != __NULLPTR) {                          \
+			if (condition) {                                                      \
+				if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)                \
+					(self)->sqh_last = __piter;                                   \
+				__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                           \
+				on_match;                                                         \
+			} else {                                                              \
+				__piter = &X(_, *__piter).sqe_next;                               \
+			}                                                                     \
+		}                                                                         \
+	}                                                                             \
 	__WHILE0
 #define __HYBRID_SIMPLEQ_FOREACH(elem, self, X, _) \
 	for ((elem) = ((self)->sqh_first);             \
@@ -1163,8 +1702,15 @@
 		*qual *tqe_prev;  /* [1..1][1..1] This item's self-pointer. */ \
 	}
 #define TAILQ_ENTRY_P(T) _TAILQ_ENTRY_P(T, )
-#define TAILQ_ENTRY_INITIALIZER \
+#define TAILQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define TAILQ_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
+#define TAILQ_ENTRY_UNBOUND_INIT(elem, key)                    (void)((elem)->key.tqe_prev = __NULLPTR)
+#define TAILQ_ENTRY_UNBOUND_INIT_P(elem, getpath)              (void)(getpath(elem).tqe_prev = __NULLPTR)
+#define TAILQ_ISBOUND(elem, key)                               ((elem)->key.tqe_prev != __NULLPTR)
+#define TAILQ_ISBOUND_P(elem, getpath)                         (getpath(elem).tqe_prev != __NULLPTR)
+#define TAILQ_UNBIND(self, elem, key)                          __HYBRID_TAILQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
+#define TAILQ_UNBIND_P(self, elem, getpath)                    __HYBRID_TAILQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_LAST_P(self, HEAD_T)                             (*(((HEAD_T *)((self)->tqh_last))->tqh_last))
 #define TAILQ_INSERT_HEAD_P(self, elem, getpath)               __HYBRID_TAILQ_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_INSERT_TAIL_P(self, elem, getpath)               __HYBRID_TAILQ_INSERT_TAIL(self, elem, __HYBRID_Q_PTH, getpath)
@@ -1210,6 +1756,13 @@
 	 *X(_, elem).tqe_prev = X(_, elem).tqe_next,                        \
 	 __HYBRID_Q_BADPTR(X(_, elem).tqe_next),                            \
 	 __HYBRID_Q_BADPTR(X(_, elem).tqe_prev))
+#define __HYBRID_TAILQ_UNBIND(self, elem, X, _)                               \
+	(void)(X(_, elem).tqe_next != __NULLPTR                                   \
+	       ? (void)(X(_, X(_, elem).tqe_next).tqe_prev = X(_, elem).tqe_prev) \
+	       : (void)((self)->tqh_last = X(_, elem).tqe_prev),                  \
+	       *X(_, elem).tqe_prev = X(_, elem).tqe_next,                        \
+	       __HYBRID_Q_BADPTR(X(_, elem).tqe_next),                            \
+	       X(_, elem).tqe_prev = __NULLPTR)
 #define __HYBRID_TAILQ_FOREACH(elem, self, X, _) \
 	for ((elem) = ((self)->tqh_first);           \
 	     (elem);                                 \
@@ -1383,8 +1936,15 @@
 		T *cqe_next, /* [1..1] Next element */ \
 		*cqe_prev;   /* [1..1] Prev element */ \
 	}
-#define CIRCLEQ_ENTRY_INITIALIZER \
+#define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
+#define CIRCLEQ_ENTRY_UNBOUND_INIT(elem, key)                    (void)((elem)->key.cqe_prev = __NULLPTR)
+#define CIRCLEQ_ENTRY_UNBOUND_INIT_P(elem, getpath)              (void)(getpath(elem).cqe_prev = __NULLPTR)
+#define CIRCLEQ_ISBOUND(elem, key)                               ((elem)->key.cqe_prev != __NULLPTR)
+#define CIRCLEQ_ISBOUND_P(elem, getpath)                         (getpath(elem).cqe_prev != __NULLPTR)
+#define CIRCLEQ_UNBIND(self, elem, key)                          __HYBRID_CIRCLEQ_UNBIND(self, elem, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_UNBIND_P(self, elem, getpath)                    __HYBRID_CIRCLEQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_INSERT_AFTER_P(self, predecessor, elem, getpath) __HYBRID_CIRCLEQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_INSERT_BEFORE_P(self, successor, elem, getpath)  __HYBRID_CIRCLEQ_INSERT_BEFORE(self, successor, elem, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_INSERT_HEAD_P(self, elem, getpath)               __HYBRID_CIRCLEQ_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
@@ -1446,6 +2006,15 @@
 	 : (void)(X(_, X(_, elem).cqe_next).cqe_prev = X(_, elem).cqe_prev), \
 	 __HYBRID_Q_BADPTR(X(_, elem).cqe_next),                             \
 	 __HYBRID_Q_BADPTR(X(_, elem).cqe_prev))
+#define __HYBRID_CIRCLEQ_UNBIND(self, elem, X, _)                              \
+	(void)((void *)X(_, elem).cqe_prev == (void *)(self)                       \
+	       ? (void)((self)->cqh_first = X(_, elem).cqe_next)                   \
+	       : (void)(X(_, X(_, elem).cqe_prev).cqe_next = X(_, elem).cqe_next), \
+	       (void *)X(_, elem).cqe_next == (void *)(self)                       \
+	       ? (void)((self)->cqh_last = X(_, elem).cqe_prev)                    \
+	       : (void)(X(_, X(_, elem).cqe_next).cqe_prev = X(_, elem).cqe_prev), \
+	       __HYBRID_Q_BADPTR(X(_, elem).cqe_next),                             \
+	       X(_, elem).cqe_prev = __NULLPTR)
 #define __HYBRID_CIRCLEQ_FOREACH(elem, self, X, _)     \
 	for ((elem) = ((self)->cqh_first);                 \
 	     (void const *)(elem) != (void const *)(self); \
@@ -1469,10 +2038,10 @@
 
 
 
+#ifndef __HYBRID_LIST_RESTRICT_API
 /************************************************************************/
 /* RINGQ: Head-less Ring-Queue                                          */
 /************************************************************************/
-#ifndef __HYBRID_LIST_RESTRICT_API
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__cplusplus)
 #undef RINGQ_ENTRY
 #define RINGQ_ENTRY(T)                         \
@@ -1492,8 +2061,16 @@
 		T *rqe_next, /* [1..1] Next element */ \
 		*rqe_prev;   /* [1..1] Prev element */ \
 	}
-#define RINGQ_ENTRY_INITIALIZER \
+#define RINGQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define RINGQ_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
+#define RINGQ_ENTRY_UNBOUND_INIT(elem, key)       (void)((elem)->key.rqe_prev = __NULLPTR)
+#define RINGQ_ENTRY_UNBOUND_INIT_P(elem, getpath) (void)(getpath(elem).rqe_prev = __NULLPTR)
+#define RINGQ_ISBOUND(elem, key)                  ((elem)->key.rqe_prev != __NULLPTR)
+#define RINGQ_ISBOUND_P(elem, getpath)            (getpath(elem).rqe_prev != __NULLPTR)
+#define RINGQ_UNBIND(elem, key)                   __HYBRID_RINGQ_UNBIND(elem, __HYBRID_Q_KEY, key)
+#define RINGQ_UNBIND_P(elem, getpath)             __HYBRID_RINGQ_UNBIND(elem, __HYBRID_Q_PTH, getpath)
+
 /* RINGQ_INIT:          Initialize `elem' as the only element of a new ring.
  * RINGQ_NEXT:          Return the successor of `elem' within its ring.
  * RINGQ_PREV:          Return the predecessor of `elem' within its ring.
@@ -1501,44 +2078,69 @@
  * RINGQ_INSERT_BEFORE: Insert `elem' before `successor'
  * RINGQ_REMOVE:        Remove `elem' from its ring.
  * RINGQ_REPLACE:       Replace `old_elem' with `new_elem' from its ring. */
-#define RINGQ_INIT(elem, key)                            __HYBRID_RINGQ_INIT(elem, __HYBRID_Q_KEY, key)
-#define RINGQ_INIT_P(elem, getpath)                      __HYBRID_RINGQ_INIT(elem, __HYBRID_Q_PTH, getpath)
-#define RINGQ_NEXT(elem, key)                            __HYBRID_RINGQ_NEXT(elem, __HYBRID_Q_KEY, key)
-#define RINGQ_NEXT_P(elem, getpath)                      __HYBRID_RINGQ_NEXT(elem, __HYBRID_Q_PTH, getpath)
-#define RINGQ_PREV(elem, key)                            __HYBRID_RINGQ_PREV(elem, __HYBRID_Q_KEY, key)
-#define RINGQ_PREV_P(elem, getpath)                      __HYBRID_RINGQ_PREV(elem, __HYBRID_Q_PTH, getpath)
-#define RINGQ_INSERT_AFTER(predecessor, elem, key)       __HYBRID_RINGQ_INSERT_AFTER(predecessor, elem, __HYBRID_Q_KEY, key)
-#define RINGQ_INSERT_AFTER_P(predecessor, elem, getpath) __HYBRID_RINGQ_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
-#define RINGQ_INSERT_BEFORE(successor, elem, key)        __HYBRID_RINGQ_INSERT_BEFORE(successor, elem, __HYBRID_Q_KEY, key)
-#define RINGQ_INSERT_BEFORE_P(successor, elem, getpath)  __HYBRID_RINGQ_INSERT_BEFORE(successor, elem, __HYBRID_Q_PTH, getpath)
-#define RINGQ_REPLACE(old_elem, new_elem, key)           __HYBRID_RINGQ_REPLACE(old_elem, new_elem, __HYBRID_Q_KEY, key)
-#define RINGQ_REPLACE_P(old_elem, new_elem, getpath)     __HYBRID_RINGQ_REPLACE(old_elem, new_elem, __HYBRID_Q_PTH, getpath)
-#define RINGQ_REMOVE(elem, key)                          __HYBRID_RINGQ_REMOVE(elem, __HYBRID_Q_KEY, key)
-#define RINGQ_REMOVE_P(elem, getpath)                    __HYBRID_RINGQ_REMOVE(elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_INIT(elem, key)                                          __HYBRID_RINGQ_INIT(elem, __HYBRID_Q_KEY, key)
+#define RINGQ_INIT_P(elem, getpath)                                    __HYBRID_RINGQ_INIT(elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_NEXT(elem, key)                                          __HYBRID_RINGQ_NEXT(elem, __HYBRID_Q_KEY, key)
+#define RINGQ_NEXT_P(elem, getpath)                                    __HYBRID_RINGQ_NEXT(elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_PREV(elem, key)                                          __HYBRID_RINGQ_PREV(elem, __HYBRID_Q_KEY, key)
+#define RINGQ_PREV_P(elem, getpath)                                    __HYBRID_RINGQ_PREV(elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_INSERT_AFTER(predecessor, elem, key)                     __HYBRID_RINGQ_INSERT_AFTER(predecessor, elem, __HYBRID_Q_KEY, key)
+#define RINGQ_INSERT_AFTER_P(predecessor, elem, getpath)               __HYBRID_RINGQ_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_INSERT_BEFORE(successor, elem, key)                      __HYBRID_RINGQ_INSERT_BEFORE(successor, elem, __HYBRID_Q_KEY, key)
+#define RINGQ_INSERT_BEFORE_P(successor, elem, getpath)                __HYBRID_RINGQ_INSERT_BEFORE(successor, elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)       __HYBRID_RINGQ_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define RINGQ_INSERT_AFTER_R_P(predecessor, lo_elem, hi_elem, getpath) __HYBRID_RINGQ_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)        __HYBRID_RINGQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define RINGQ_INSERT_BEFORE_R_P(successor, lo_elem, hi_elem, getpath)  __HYBRID_RINGQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_REPLACE(old_elem, new_elem, key)                         __HYBRID_RINGQ_REPLACE(old_elem, new_elem, __HYBRID_Q_KEY, key)
+#define RINGQ_REPLACE_P(old_elem, new_elem, getpath)                   __HYBRID_RINGQ_REPLACE(old_elem, new_elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_REMOVE(elem, key)                                        __HYBRID_RINGQ_REMOVE(elem, __HYBRID_Q_KEY, key)
+#define RINGQ_REMOVE_P(elem, getpath)                                  __HYBRID_RINGQ_REMOVE(elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_REMOVE_R(lo_elem, hi_elem, key)                          __HYBRID_RINGQ_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_KEY, key)
+#define RINGQ_REMOVE_R_P(lo_elem, hi_elem, getpath)                    __HYBRID_RINGQ_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 
 #define __HYBRID_RINGQ_INIT(elem, X, _) (X(_, elem).rqe_next = X(_, elem).rqe_prev = (elem))
 #define __HYBRID_RINGQ_NEXT(elem, X, _) X(_, elem).rqe_next
 #define __HYBRID_RINGQ_PREV(elem, X, _) X(_, elem).rqe_prev
-#define __HYBRID_RINGQ_INSERT_AFTER(predecessor, elem, X, _)                           \
-	(void)(X(_, (X(_, elem).rqe_next = X(_, predecessor).rqe_next)).rqe_prev = (elem), \
-	       X(_, (X(_, elem).rqe_prev = (predecessor))).rqe_next              = (elem))
-#define __HYBRID_RINGQ_INSERT_BEFORE(successor, elem, X, _)                          \
-	(void)(X(_, (X(_, elem).rqe_prev = X(_, successor).rqe_prev)).rqe_next = (elem), \
-	       X(_, (X(_, elem).rqe_next = (successor))).rqe_prev              = (elem))
+#define __HYBRID_RINGQ_INSERT_AFTER(predecessor, elem, X, _) \
+	__HYBRID_RINGQ_INSERT_AFTER_R(predecessor, elem, elem, X, _)
+#define __HYBRID_RINGQ_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, X, _)                   \
+	(void)(X(_, (X(_, hi_elem).rqe_next = X(_, predecessor).rqe_next)).rqe_prev = (hi_elem), \
+	       X(_, (X(_, lo_elem).rqe_prev = (predecessor))).rqe_next              = (lo_elem))
+#define __HYBRID_RINGQ_INSERT_BEFORE(successor, elem, X, _) \
+	__HYBRID_RINGQ_INSERT_BEFORE_R(successor, elem, elem, X, _)
+#define __HYBRID_RINGQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, X, _)                  \
+	(void)(X(_, (X(_, lo_elem).rqe_prev = X(_, successor).rqe_prev)).rqe_next = (lo_elem), \
+	       X(_, (X(_, hi_elem).rqe_next = (successor))).rqe_prev              = (hi_elem))
 #define __HYBRID_RINGQ_REPLACE(old_elem, new_elem, X, _)                              \
 	(X(_, (X(_, new_elem).rqe_prev = X(_, old_elem).rqe_prev)).rqe_next = (new_elem), \
 	 X(_, (X(_, new_elem).rqe_next = X(_, old_elem).rqe_next)).rqe_prev = (new_elem), \
 	 __HYBRID_Q_BADPTR(X(_, old_elem).rqe_next),                                      \
 	 __HYBRID_Q_BADPTR(X(_, old_elem).rqe_prev))
-#define __HYBRID_RINGQ_REMOVE(elem, X, _)                      \
-	(X(_, X(_, elem).rqe_prev).rqe_next = X(_, elem).rqe_next, \
-	 X(_, X(_, elem).rqe_next).rqe_prev = X(_, elem).rqe_prev, \
-	 __HYBRID_Q_BADPTR(X(_, elem).rqe_next),                   \
-	 __HYBRID_Q_BADPTR(X(_, elem).rqe_prev))
+#define __HYBRID_RINGQ_REMOVE(elem, X, _) \
+	__HYBRID_RINGQ_REMOVE_R(elem, elem, X, _)
+#define __HYBRID_RINGQ_REMOVE_R(lo_elem, hi_elem, X, _)              \
+	(X(_, X(_, lo_elem).rqe_prev).rqe_next = X(_, hi_elem).rqe_next, \
+	 X(_, X(_, hi_elem).rqe_next).rqe_prev = X(_, lo_elem).rqe_prev, \
+	 __HYBRID_Q_BADPTR(X(_, hi_elem).rqe_next),                      \
+	 __HYBRID_Q_BADPTR(X(_, lo_elem).rqe_prev))
+#define __HYBRID_RINGQ_UNBIND(elem, X, _)                            \
+	(void)(X(_, X(_, elem).rqe_prev).rqe_next = X(_, elem).rqe_next, \
+	       X(_, X(_, elem).rqe_next).rqe_prev = X(_, elem).rqe_prev, \
+	       __HYBRID_Q_BADPTR(X(_, elem).rqe_next),                   \
+	       X(_, elem).rqe_prev = __NULLPTR)
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
 
 
+
+
+
+
+
+/************************************************************************/
+/* DEPRECATED API (or what remains there-of; to be removed eventually)  */
+/************************************************************************/
 #ifndef __HYBRID_LIST_WITHOUT_DEPRECATED
 /* OLD_SLIST */
 #define OLD_SLIST(T) T * /* [0..1] List head */
