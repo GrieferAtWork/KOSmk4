@@ -112,15 +112,15 @@
 #define    ERXCR_PRO      0x10 /* EN0_RXCR: Accept all packets with physical destination address. */
 #define    ERXCR_MON      0x20 /* EN0_RXCR: Check incoming packages, but don't buffer them. */
 #define EN0_TXCR(base)     ((base) + 0x0d) /* TX configuration reg WR */
-#define    ETXCR_CRC     0x01 /* EN0_TXCR: Set to inhibit CRC within the transmitter. */
-#define    ETXCR_LB0     0x02 /* EN0_TXCR: Loopback mode bit 0. */
-#define    ETXCR_LB1     0x04 /* EN0_TXCR: Loopback mode bit 1. */
+#define    ETXCR_CRC      0x01 /* EN0_TXCR: Set to inhibit CRC within the transmitter. */
+#define    ETXCR_LB0      0x02 /* EN0_TXCR: Loopback mode bit 0. */
+#define    ETXCR_LB1      0x04 /* EN0_TXCR: Loopback mode bit 1. */
 #define       ETXCR_LOOPBACK_NORMAL  0x00 /* EN0_TXCR: ... */
 #define       ETXCR_LOOPBACK_INTERN  ETXCR_LB0 /* EN0_TXCR: Transmitter off */
 #define       ETXCR_LOOPBACK_EXTERN  ETXCR_LB1 /* EN0_TXCR: ... */
 #define       ETXCR_LOOPBACK_EXTERN2 (ETXCR_LB0 | ETXCR_LB1) /* EN0_TXCR: Same behavior as 'ETXCR_LOOPBACK_EXTERN' */
-#define    ETXCR_ATD     0x08 /* EN0_TXCR: Auto Transmit Disable. (Leave at ZERO) */
-#define    ETXCR_OFST    0x10 /* EN0_TXCR: Collision Offset Enable. */
+#define    ETXCR_ATD      0x08 /* EN0_TXCR: Auto Transmit Disable. (Leave at ZERO) */
+#define    ETXCR_OFST     0x10 /* EN0_TXCR: Collision Offset Enable. */
 #define EN0_COUNTER0(base) ((base) + 0x0d) /* Rcv alignment error counter RD */
 #define EN0_DCFG(base)     ((base) + 0x0e) /* Data configuration reg WR */
 #define    ENDCFG_WTS     0x01 /* EN0_DCFG: Word-transfer select (0: byte-wide, 1: word-wide) */

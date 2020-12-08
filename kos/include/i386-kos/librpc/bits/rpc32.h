@@ -23,16 +23,20 @@
 #ifndef __DEEMON__
 #include <__stdinc.h>
 #include <features.h>
+
 #include <hybrid/host.h>
+
 #include <bits/types.h>
+
 #include <librpc/api.h>
+
 #include "rpc-common.h"
 
 #ifdef __USE_KOS_KERNEL
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #endif /* __USE_KOS_KERNEL */
 #ifdef __KERNEL__

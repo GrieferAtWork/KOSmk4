@@ -22,6 +22,8 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/host.h>
+
 #define RPC_SYSCALL_INFO_METHOD_INT80H_32    0x00 /* `int 80h' */
 #define RPC_SYSCALL_INFO_METHOD_SYSENTER_32  0x01 /* `sysenter' */
 #define RPC_SYSCALL_INFO_METHOD_LCALL7_32    0x02 /* `lcall $7' */

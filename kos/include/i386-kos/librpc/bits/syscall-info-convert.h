@@ -25,13 +25,15 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
+#include <libc/string.h>
+
 #include "syscall-info32.h"
 #include "syscall-info64.h"
 
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Convert between 32-bit and 64-bit siginfo_t structures */
+/* Convert between 32-bit and 64-bit `struct rpc_syscall_info' structures */
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rpc_syscall_info32_to_rpc_syscall_info32)(struct rpc_syscall_info32 const *__restrict __self,
                                                         struct rpc_syscall_info32 *__restrict __result,
