@@ -26,6 +26,13 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+/* NOTE: Macros from this header have been deprecated.
+ *       The plan is to merge this header with <sys/queue.h>, such
+ *       that macros from this header are compatible with <sys/queue.h>.
+ * Also note that it is planned to rename `LLIST' to `LIST', since the
+ * underlying type is the same as `LIST' from <sys/queue.h>. */
+
+
 /* ========================================================================
  *          LIST OVERVIEW
  * ========================================================================
@@ -45,16 +52,16 @@ __DECL_BEGIN
  * [SL][-------------------------------------------------------------------]
  * [++][     ?LIST(T)        ->  struct { ... } // type expression for the list controller
  * [++][     ?LIST_NODE(T)   ->  struct { ... } // type expression for list nodes
- * [++][     ?LIST_INIT      ->  { ... }        // __NULLPTR-Initializer for `LIST(T)'
- * [++][     ?LIST_INITNODE  ->  { ... }        // __NULLPTR-Initializer for `LIST_NODE(T)'
+ * [++][     ?LIST_INIT      ->  { ... }        // NULL-Initializer for `LIST(T)'
+ * [++][     ?LIST_INITNODE  ->  { ... }        // NULL-Initializer for `LIST_NODE(T)'
  * [++][bool ?LIST_EMPTY(LIST &l);
  * [++][bool ?LIST_NONEMPTY(LIST &l);
  * [ +][T   *?LIST_PREV(T, T *elem, key);
  * [++][T  *&?LIST_NEXT(T *elem, key);
  * [++][bool ?LIST_HASNEXT(T *elem, key);
  * [ +][bool ?LIST_HASPREV(LIST &l, T *elem, key);
- * [++][T  *&?LIST_XNEXT(T *elem, key);             // Same as `LIST_NEXT()', but return `__NULLPTR' when there is no successor
- * [ +][T   *?LIST_XPREV(T, LIST &l, T *elem, key); // Same as `LIST_PREV()', but return `__NULLPTR' when there is no successor
+ * [++][T  *&?LIST_XNEXT(T *elem, key);             // Same as `LIST_NEXT()', but return `NULL' when there is no successor
+ * [ +][T   *?LIST_XPREV(T, LIST &l, T *elem, key); // Same as `LIST_PREV()', but return `NULL' when there is no successor
  * [++][T  *&?LIST_HEAD(LIST &l);
  * [++][     ?LIST_FOREACH(T *elem, LIST &l, key) { ... }
  * [ +][     ?LIST_RFOREACH(T, T *elem, LIST &l, T *start, key) { ... }
@@ -93,7 +100,7 @@ __DECL_BEGIN
  * >> 			return i;
  * >> 		}
  * >> 	}
- * >> 	return __NULLPTR;
+ * >> 	return NULL;
  * >> }
  */
 
