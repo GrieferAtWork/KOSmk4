@@ -85,11 +85,12 @@ PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *g_stdout =
 PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *g_stderr = &default_stderr; /* !Relocation */
 
 
+typedef LIST_HEAD_P(FILE) FileList;
 
 /* [0..1][lock(all_files_lock)] Chain of all files.
  * NOTE: This chain excludes the initial stdin, stdout and stderr streams! */
 PRIVATE ATTR_SECTION(".bss.crt.application.exit.all_files")
-FILE *all_files = NULL;
+FileList all_files = LIST_HEAD_INITIALIZER(all_files);
 PRIVATE ATTR_SECTION(".bss.crt.application.exit.all_files_lock")
 struct atomic_rwlock all_files_lock = ATOMIC_RWLOCK_INIT;
 
@@ -97,8 +98,9 @@ struct atomic_rwlock all_files_lock = ATOMIC_RWLOCK_INIT;
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.allfiles_insert")
 NONNULL((1)) void LIBCCALL allfiles_insert(FILE *__restrict self) {
 	atomic_rwlock_write(&all_files_lock);
-	LLIST_INSERT(all_files, self, if_exdata->io_link);
-	assert(LLIST_ISBOUND(self, if_exdata->io_link));
+	assert(!LIST_ISBOUND(self, if_exdata->io_link));
+	LIST_INSERT_HEAD(&all_files, self, if_exdata->io_link);
+	assert(LIST_ISBOUND(self, if_exdata->io_link));
 	atomic_rwlock_endwrite(&all_files_lock);
 }
 
@@ -106,15 +108,15 @@ NONNULL((1)) void LIBCCALL allfiles_insert(FILE *__restrict self) {
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.allfiles_remove")
 NONNULL((1)) void LIBCCALL allfiles_remove(FILE *__restrict self) {
 	atomic_rwlock_write(&all_files_lock);
-	assert(LLIST_ISBOUND(self, if_exdata->io_link));
-	LLIST_REMOVE(self, if_exdata->io_link);
+	assert(LIST_ISBOUND(self, if_exdata->io_link));
+	LIST_REMOVE(self, if_exdata->io_link);
 	atomic_rwlock_endwrite(&all_files_lock);
 }
 
 
 /* [0..1][lock(changed_linebuffered_files_lock)] Chain of tty-buffers. */
 PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files")
-FILE *changed_linebuffered_files = NULL;
+FileList changed_linebuffered_files = LIST_HEAD_INITIALIZER(changed_linebuffered_files);
 PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files_lock")
 struct atomic_lock changed_linebuffered_files_lock = ATOMIC_LOCK_INIT;
 
@@ -122,9 +124,9 @@ struct atomic_lock changed_linebuffered_files_lock = ATOMIC_LOCK_INIT;
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_insert")
 NONNULL((1)) void LIBCCALL changed_linebuffered_insert(FILE *__restrict self) {
 	atomic_lock_acquire(&changed_linebuffered_files_lock);
-	if (!LLIST_ISBOUND(self, if_exdata->io_lnch))
-		LLIST_INSERT(changed_linebuffered_files, self, if_exdata->io_lnch);
-	assert(LLIST_ISBOUND(self, if_exdata->io_lnch));
+	if (!LIST_ISBOUND(self, if_exdata->io_lnch))
+		LIST_INSERT_HEAD(&changed_linebuffered_files, self, if_exdata->io_lnch);
+	assert(LIST_ISBOUND(self, if_exdata->io_lnch));
 	atomic_lock_release(&changed_linebuffered_files_lock);
 }
 
@@ -132,10 +134,8 @@ NONNULL((1)) void LIBCCALL changed_linebuffered_insert(FILE *__restrict self) {
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_remove")
 NONNULL((1)) void LIBCCALL changed_linebuffered_remove(FILE *__restrict self) {
 	atomic_lock_acquire(&changed_linebuffered_files_lock);
-	if (LLIST_ISBOUND(self, if_exdata->io_lnch)) {
-		LLIST_REMOVE(self, if_exdata->io_lnch);
-		LLIST_UNBIND(self, if_exdata->io_lnch);
-	}
+	if (LIST_ISBOUND(self, if_exdata->io_lnch))
+		LIST_UNBIND(self, if_exdata->io_lnch);
 	atomic_lock_release(&changed_linebuffered_files_lock);
 }
 
@@ -542,7 +542,7 @@ void LIBCCALL file_decref(FILE *__restrict self) {
 		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
 		assert(!(self->if_flag & IO_READING));
 		/* Make sure that the file is no longer accessible through the global file lists. */
-		if (LLIST_ISBOUND(self, if_exdata->io_lnch))
+		if (LIST_ISBOUND(self, if_exdata->io_lnch))
 			changed_linebuffered_remove(self);
 		allfiles_remove(self);
 		/* Free a heap-allocated buffer. */
@@ -562,24 +562,17 @@ void LIBCCALL file_decref(FILE *__restrict self) {
 /* Synchronize unwritten data of all line-buffered files. */
 INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_sync_lnfiles")
 void LIBCCALL file_sync_lnfiles(void) {
-	while (ATOMIC_READ(changed_linebuffered_files) != NULL) {
-		FILE *fp;
-		atomic_lock_acquire(&changed_linebuffered_files_lock);
-		fp = changed_linebuffered_files;
-		for (;;) {
-			if unlikely(!fp) {
-				atomic_lock_release(&changed_linebuffered_files_lock);
-				goto done;
-			}
-			assert(LLIST_ISBOUND(fp, if_exdata->io_lnch));
-			if (file_tryincref(fp))
-				break;
-			fp = LLIST_NEXT(fp, if_exdata->io_lnch);
-		}
-		/* Remove the file from the chain of changed line-buffered files. */
-		assert(LLIST_ISBOUND(fp, if_exdata->io_lnch));
-		LLIST_REMOVE(fp, if_exdata->io_lnch);
-		LLIST_UNBIND(fp, if_exdata->io_lnch);
+	FILE *fp;
+again:
+	if (LIST_EMPTY(&changed_linebuffered_files))
+		return;
+	atomic_lock_acquire(&changed_linebuffered_files_lock);
+	LIST_FOREACH(fp, &changed_linebuffered_files, if_exdata->io_lnch) {
+		/* Skip files which we can't incref. */
+		if (!file_tryincref(fp))
+			continue;
+		/* Unbind the file from the chain of changed line-buffered files. */
+		LIST_UNBIND(fp, if_exdata->io_lnch);
 		atomic_lock_release(&changed_linebuffered_files_lock);
 		/* Synchronize this buffer. */
 		if (FMUSTLOCK(fp)) {
@@ -590,9 +583,9 @@ void LIBCCALL file_sync_lnfiles(void) {
 			file_sync(fp);
 		}
 		file_decref(fp);
+		goto again;
 	}
-done:
-	;
+	atomic_lock_release(&changed_linebuffered_files_lock);
 }
 
 PRIVATE ATTR_SECTION(".text.crt.application.exit.file_do_syncall_locked")
@@ -600,11 +593,12 @@ void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
 		atomic_rwlock_read(&all_files_lock);
-		fp = all_files;
-		while (fp &&
-		       (fp->if_exdata->io_fver == version ||
-		        !file_tryincref(fp)))
-			fp = LLIST_NEXT(fp, if_exdata->io_link);
+		LIST_FOREACH(fp, &all_files, if_exdata->io_link) {
+			if (fp->if_exdata->io_fver != version) {
+				if (file_tryincref(fp))
+					break;
+			}
+		}
 		atomic_rwlock_endread(&all_files_lock);
 		if (!fp)
 			break;
@@ -619,11 +613,11 @@ do_flush_fp:
 			file_sync(fp);
 		}
 		atomic_rwlock_read(&all_files_lock);
-		next_fp = LLIST_NEXT(fp, if_exdata->io_link);
+		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
 		       (next_fp->if_exdata->io_fver == version ||
 		        !file_tryincref(next_fp)))
-			next_fp = LLIST_NEXT(next_fp, if_exdata->io_link);
+			next_fp = LIST_NEXT(next_fp, if_exdata->io_link);
 		atomic_rwlock_endread(&all_files_lock);
 		file_decref(fp);
 		if (!next_fp)
@@ -638,11 +632,12 @@ void LIBCCALL file_do_syncall_unlocked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
 		atomic_rwlock_read(&all_files_lock);
-		fp = all_files;
-		while (fp &&
-		       fp->if_exdata->io_fver == version &&
-		       !file_tryincref(fp))
-			fp = LLIST_NEXT(fp, if_exdata->io_link);
+		LIST_FOREACH(fp, &all_files, if_exdata->io_link) {
+			if (fp->if_exdata->io_fver != version) {
+				if (file_tryincref(fp))
+					break;
+			}
+		}
 		atomic_rwlock_endread(&all_files_lock);
 		if (!fp)
 			break;
@@ -650,11 +645,11 @@ do_flush_fp:
 		fp->if_exdata->io_fver = version;
 		file_sync(fp);
 		atomic_rwlock_read(&all_files_lock);
-		next_fp = LLIST_NEXT(fp, if_exdata->io_link);
+		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
-		       next_fp->if_exdata->io_fver == version &&
-		       !file_tryincref(next_fp))
-			next_fp = LLIST_NEXT(next_fp, if_exdata->io_link);
+		       (next_fp->if_exdata->io_fver == version ||
+		        !file_tryincref(next_fp)))
+			next_fp = LIST_NEXT(next_fp, if_exdata->io_link);
 		atomic_rwlock_endread(&all_files_lock);
 		file_decref(fp);
 		if (!next_fp)
@@ -1797,7 +1792,7 @@ WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
 	}
 	if (file_sync(self))
 		return NULL;
-	if (LLIST_ISBOUND(self, if_exdata->io_lnch))
+	if (LIST_ISBOUND(self, if_exdata->io_lnch))
 		changed_linebuffered_remove(self);
 	file_system_close(self);
 	self->if_flag = flags;
@@ -2982,14 +2977,10 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 	FILE *fp;
 again:
 	atomic_rwlock_write(&all_files_lock);
-	fp = all_files;
-	while (fp) {
-		if (!file_tryincref(fp)) {
-			fp = LLIST_NEXT(fp, if_exdata->io_link);
+	LIST_FOREACH(fp, &all_files, if_exdata->io_link) {
+		if (!file_tryincref(fp))
 			continue;
-		}
-		LLIST_UNLINK(fp, if_exdata->io_link);
-		LLIST_UNBIND(fp, if_exdata->io_link);
+		LIST_UNBIND(fp, if_exdata->io_link);
 		atomic_rwlock_endwrite(&all_files_lock);
 		/* !!!WARNING!!!
 		 * This is entirely unsafe, but if you think about it:

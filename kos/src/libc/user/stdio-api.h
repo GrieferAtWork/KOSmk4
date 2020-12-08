@@ -121,9 +121,9 @@ struct iofile_data_novtab {
 	                                       * Pointer to the first character that was
 	                                       * changed since the buffer had been loaded. */
 	size_t                     io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
-	LLIST_NODE(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
+	LIST_ENTRY(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
 	                                       * have changed and must be flushed before another line-buffered file is read. */
-	LLIST_NODE(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry in the global chain of open files. (Used
+	LIST_ENTRY(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry in the global chain of open files. (Used
 	                                       * by `fcloseall()', as well as flushing all open files during `exit()') */
 	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a
 	                                       * global flush. */
