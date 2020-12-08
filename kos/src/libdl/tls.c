@@ -59,18 +59,18 @@ struct dtls_extension {
 
 DECL_END
 
-#define RBTREE_LEFT_LEANING    /* Use left-leaning trees */
-#define RBTREE_NOTHROW         /* nothing */
-#define RBTREE(name)           dtls_extension_tree_##name
-#define RBTREE_T               struct dtls_extension
-#define RBTREE_Tkey            DlModule *
-#define RBTREE_NODEPATH        te_tree
-#define RBTREE_GETKEY          dtls_extension_getmodule
-#define RBTREE_ISRED(self)     ((self)->te_redblack & 1)
-#define RBTREE_SETRED(self)    ((self)->te_redblack |= 1)
-#define RBTREE_SETBLACK(self)  ((self)->te_redblack &= ~1)
-#define RBTREE_KEY_LO(a, b)    ((uintptr_t)(a) < (uintptr_t)(b))
-#define RBTREE_KEY_EQ(a, b)    ((uintptr_t)(a) == (uintptr_t)(b))
+#define RBTREE_LEFT_LEANING   /* Use left-leaning trees */
+#define RBTREE_NOTHROW        /* nothing */
+#define RBTREE(name)          dtls_extension_tree_##name
+#define RBTREE_T              struct dtls_extension
+#define RBTREE_Tkey           DlModule *
+#define RBTREE_NODEPATH       te_tree
+#define RBTREE_GETKEY         dtls_extension_getmodule
+#define RBTREE_ISRED(self)    ((self)->te_redblack & 1)
+#define RBTREE_SETRED(self)   ((self)->te_redblack |= 1)
+#define RBTREE_SETBLACK(self) ((self)->te_redblack &= ~1)
+#define RBTREE_KEY_LO(a, b)   ((uintptr_t)(a) < (uintptr_t)(b))
+#define RBTREE_KEY_EQ(a, b)   ((uintptr_t)(a) == (uintptr_t)(b))
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN
@@ -80,7 +80,7 @@ struct tls_segment {
 	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
 	struct tls_segment                  *ts_self;    /* [1..1][const][== self] Self-pointer
 	                                                  * At offset 0; mandaged by ELF, and a good idea in general. */
-	LLIST_NODE(struct tls_segment)       ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
+	LIST_ENTRY(struct tls_segment)       ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
 	struct atomic_rwlock                 ts_exlock;  /* Lock for `ts_extree' */
 	LLRBTREE_ROOT(struct dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
 };
@@ -88,9 +88,11 @@ struct tls_segment {
 STATIC_ASSERT_MSG(offsetof(struct tls_segment, ts_self) == 0,
                   "The self-pointer being at offset=0 is ABI mandated");
 
+LIST_HEAD(tls_segment_list, tls_segment);
+
 /* List of all allocated static-tls segments (usually 1 for each thread) */
-PRIVATE struct atomic_rwlock static_tls_lock = ATOMIC_RWLOCK_INIT;
-PRIVATE LLIST(struct tls_segment) static_tls_list = LLIST_INIT;
+PRIVATE struct atomic_rwlock static_tls_lock    = ATOMIC_RWLOCK_INIT;
+PRIVATE struct tls_segment_list static_tls_list = LIST_HEAD_INITIALIZER(static_tls_list);
 
 /* Minimum alignment of the static TLS segment. */
 PRIVATE size_t static_tls_align = COMPILER_ALIGNOF(struct tls_segment);
@@ -112,7 +114,7 @@ DlModule_RemoveTLSExtension(DlModule *__restrict self) {
 	chain = NULL;
 again:
 	atomic_rwlock_read(&static_tls_lock);
-	LLIST_FOREACH(iter, static_tls_list, ts_threads) {
+	LIST_FOREACH(iter, &static_tls_list, ts_threads) {
 		if (!atomic_rwlock_trywrite(&iter->ts_exlock)) {
 			atomic_rwlock_endread(&static_tls_lock);
 			sys_sched_yield();
@@ -315,7 +317,7 @@ libdl_dltlsallocseg(void) {
 	atomic_rwlock_init(&result->ts_exlock);
 	result->ts_extree = NULL;
 	atomic_rwlock_write(&static_tls_lock);
-	LLIST_INSERT(static_tls_list, result, ts_threads);
+	LIST_INSERT_HEAD(&static_tls_list, result, ts_threads);
 	atomic_rwlock_endwrite(&static_tls_lock);
 	return result;
 err_nomem:
@@ -379,7 +381,7 @@ libdl_dltlsfreeseg(struct tls_segment *seg) {
 	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badptr;
 	atomic_rwlock_write(&static_tls_lock);
-	LLIST_REMOVE(seg, ts_threads);
+	LIST_REMOVE(seg, ts_threads);
 	atomic_rwlock_endwrite(&static_tls_lock);
 	clear_extension_table(seg);
 	free((byte_t *)seg - static_tls_size_no_segment);
