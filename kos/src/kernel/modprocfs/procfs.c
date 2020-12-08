@@ -108,7 +108,7 @@ INTERN struct superblock ProcFS = {
 	/* .s_mount        = */ LLIST_INIT,
 	/* .s_cblock_next  = */ NULL,
 	/* .s_umount_pend  = */ NULL,
-	/* .s_filesystems  = */ SLIST_INITNODE,
+	/* .s_filesystems  = */ OLD_SLIST_INITNODE,
 	/* .s_features     = */ {
 		/* .sf_symlink_max        = */ (pos_t)-1,
 		/* .sf_link_max           = */ (nlink_t)-1,
@@ -132,7 +132,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ProcFS_Init(void) {
 	register_filesystem_type(&ProcFS_Type);
 	/* Register the procfs filesystem singleton */
 	fs_filesystems_lock_write();
-	SLIST_INSERT(fs_filesystems.f_superblocks, &ProcFS, s_filesystems);
+	OLD_SLIST_INSERT(fs_filesystems.f_superblocks, &ProcFS, s_filesystems);
 	fs_filesystems_lock_endwrite();
 }
 

@@ -107,7 +107,7 @@ PUBLIC struct superblock devfs = {
 	/* .s_mount        = */ LLIST_INIT,
 	/* .s_cblock_next  = */ NULL,
 	/* .s_umount_pend  = */ NULL,
-	/* .s_filesystems  = */ SLIST_INITNODE,
+	/* .s_filesystems  = */ OLD_SLIST_INITNODE,
 	/* .s_features     = */ {
 		/* .sf_symlink_max        = */ (pos_t)-1,
 		/* .sf_link_max           = */ (nlink_t)-1,
@@ -184,7 +184,7 @@ NOTHROW(KCALL kernel_initialize_devfs_driver)(void) {
 	register_filesystem_type(&devfs_type);
 	/* Register the devfs filesystem singleton */
 	fs_filesystems_lock_write();
-	SLIST_INSERT(fs_filesystems.f_superblocks, &devfs, s_filesystems);
+	OLD_SLIST_INSERT(fs_filesystems.f_superblocks, &devfs, s_filesystems);
 	fs_filesystems_lock_endwrite();
 }
 

@@ -1987,7 +1987,7 @@ struct superblock_type {
 	} st_functions;
 
 	/* [lock(fs_filesystem_types.ft_typelock)] Chain of filesystem types. */
-	SLIST_NODE(struct superblock_type) st_chain;
+	OLD_SLIST_NODE(struct superblock_type) st_chain;
 };
 
 #define __private_superblock_type_destroy(self) driver_destroy((self)->st_driver)
@@ -2055,7 +2055,7 @@ struct superblock
 	void                         *s_cblock_next;  /* [?..?] Used internally to chain blocking cleanup operations... */
 	WEAK REF struct path         *s_umount_pend;  /* [0..1] Chain of paths which are pending to be removed from `s_mount'
 	                                               * [CHAIN(->p_mount->mp_pending)] Chain of paths that are pending to be removed from `s_mount'. */
-	SLIST_NODE(struct superblock) s_filesystems;  /* [lock(fs_filesystems.f_superlock)] Chain of known filesystems. */
+	OLD_SLIST_NODE(struct superblock) s_filesystems;  /* [lock(fs_filesystems.f_superlock)] Chain of known filesystems. */
 	struct superblock_features    s_features;     /* [const] Superblock features. */
 	/* Filesystem-specific superblock data goes here! */
 };
@@ -2193,11 +2193,11 @@ superblock_getmountloc(struct superblock *__restrict self,
 struct filesystem_types {
 	/* TODO: Replace with a reference counted vector using `ATOMIC_REF()' */
 	struct atomic_rwlock          ft_typelock; /* Lock for the chain of known filesystem types. */
-	SLIST(struct superblock_type) ft_types;    /* [lock(ft_typelock)][CHAIN(->st_chain)] Chain of known filesystem types. */
+	OLD_SLIST(struct superblock_type) ft_types;    /* [lock(ft_typelock)][CHAIN(->st_chain)] Chain of known filesystem types. */
 };
 struct filesystems {
 	struct rwlock               f_superlock;   /* Lock for the chain of known superblocks. */
-	SLIST(struct superblock)    f_superblocks; /* [lock(f_superlock)][CHAIN(->s_filesystems)][0..1] Chain of known filesystems. */
+	OLD_SLIST(struct superblock)    f_superblocks; /* [lock(f_superlock)][CHAIN(->s_filesystems)][0..1] Chain of known filesystems. */
 };
 
 DATDEF struct filesystem_types fs_filesystem_types; /* Global tracking of known filesystem types. */

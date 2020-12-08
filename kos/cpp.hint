@@ -896,27 +896,6 @@
 #define __CDECLARE_XSC(attr,Treturn,name,param,args) Treturn sys_X##name param;
 #define __CDECLARE_VOID_XSC(attr,name,param,args)    void sys_X##name param;
 
-#define LLIST(T)                  T*
-#define LLIST_NODE(T)             struct{T *ln_next,**ln_pself;}
-#define SLIST(T)                  T*
-#define SLIST_NODE(T)             struct{T *sn_next;}
-#define ATREE_HEAD(T)             T*
-#define ATREE_NODE(T,Tkey)        struct{T *a_min,*a_max;Tkey a_vmin,a_vmax;}
-#define ATREE_NODE_SINGLE(T,Tkey) struct{T *a_min,*a_max;Tkey a_vaddr;}
-#define ATREE_XNODE(T)            struct{T *a_min,*a_max;}
-#define RBTREE_NODE(T)                 struct{T *rb_par,*rb_lhs,*rb_rhs;}
-#define RBTREE_NODE_WITH_KEY(T,Tkey)   struct{T *rb_par,*rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
-#define LLRBTREE_NODE(T)               struct{T *rb_lhs,*rb_rhs;}
-#define LLRBTREE_NODE_WITH_KEY(T,Tkey) struct{T *rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
-#define RBTREE_ROOT(T)   T*
-#define LLRBTREE_ROOT(T) T*
-#define BSEARCH(...) for(;;)
-#define BSEARCH_EX(...) for(;;)
-#define BSEARCHR(...) for(;;)
-#define BSEARCHR_EX(...) for(;;)
-#define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
-#define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
-
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) \
 	refcnt_t handle_##name##_refcnt(T const *restrict self) {} \
 	void handle_##name##_incref(T *restrict self) {} \
@@ -1125,13 +1104,82 @@
 #define MY_ElfW(x) ELF64_##x
 #define MY_ELFW(x) Elf64_##x
 
-#define SLIST_FOREACH(elem,l,key) for(;;)
-#define SLIST_FOREACH_P(elem,l,getpath) for(;;)
-#define SLIST_PFOREACH(pelem,elem,l,key) for(;;)
-#define SLIST_PFOREACH_P(pelem,elem,l,getpath) for(;;)
-#define LLIST_FOREACH(elem,l,key) for(;;)
-#define LLIST_FOREACH_P(elem,l,getpath) for(;;)
-#define LLIST_RFOREACH(T,elem,l,start,key) for(;;)
+#define LIST_FOREACH(...) for(;;)
+#define LIST_FOREACH_P(...) for(;;)
+#define LIST_HEAD(n,t) struct n{struct t *lh_first;}
+#define LIST_HEAD_P(T) struct{T*lh_first;}
+#define LIST_ENTRY(t) struct{struct t*le_next,**le_prev;}
+#define LIST_ENTRY_P(T) struct{T*le_next,**le_prev;}
+
+#define SLIST_FOREACH_P(...) for(;;)
+#define SLIST_HEAD(n,t) struct n{struct t *slh_first;}
+#define SLIST_HEAD_P(T) struct{T*slh_first;}
+#define SLIST_ENTRY(t) struct{struct t*sle_next;}
+#define SLIST_ENTRY_P(T) struct{T*sle_next;}
+
+#define STAILQ_HEAD(n,t) struct n{struct t*stqh_first,**stqh_last;}
+#define STAILQ_ENTRY(t) struct{struct t*stqe_next;}
+#define STAILQ_HEAD_P(T) struct{T*stqh_first,**stqh_last;}
+#define STAILQ_ENTRY_P(T) struct{T*stqe_next;}
+#define STAILQ_FOREACH(...) for(;;)
+#define STAILQ_FOREACH_P(...) for(;;)
+
+#define SIMPLEQ_HEAD(n,t) struct n{struct t*sqh_first,**sqh_last;}
+#define SIMPLEQ_ENTRY(t) struct{struct t*sqe_next;}
+#define SIMPLEQ_HEAD_P(T) struct{T*sqh_first,**sqh_last;}
+#define SIMPLEQ_ENTRY_P(T) struct{T*sqe_next;}
+#define SIMPLEQ_FOREACH(...) for(;;)
+#define SIMPLEQ_FOREACH_P(...) for(;;)
+
+#define _TAILQ_HEAD(n,T,q) struct n{T q*tqh_first,*q*tqh_last;}
+#define _TAILQ_ENTRY(T,q) struct{T q*tqe_next,*q*tqe_prev;}
+#define TAILQ_HEAD(n,t) struct n{struct t*tqh_first,**tqh_last;}
+#define TAILQ_HEAD_P(T) struct{T*tqh_first,**tqh_last;}
+#define TAILQ_ENTRY(t) struct{struct t*tqe_next,**tqe_prev;}
+#define TAILQ_ENTRY_P(T) struct{T*tqe_next,**tqe_prev;}
+#define TAILQ_FOREACH(...) for(;;)
+#define TAILQ_FOREACH_P(...) for(;;)
+#define TAILQ_FOREACH_REVERSE(...) for(;;)
+#define TAILQ_FOREACH_REVERSE_P(...) for(;;)
+
+#define CIRCLEQ_HEAD(n,t) struct n{struct t*cqh_first,*cqh_last;}
+#define CIRCLEQ_HEAD_P(T) struct{T*cqh_first,*cqh_last;}
+#define CIRCLEQ_ENTRY(t) struct{struct t*cqe_next,*cqe_prev;}
+#define CIRCLEQ_ENTRY_P(T) struct{T*cqe_next,*cqe_prev;}
+#define CIRCLEQ_FOREACH(...) for(;;)
+#define CIRCLEQ_FOREACH_P(...) for(;;)
+#define CIRCLEQ_FOREACH_REVERSE(...) for(;;)
+#define CIRCLEQ_FOREACH_REVERSE_P(...) for(;;)
+
+#define RINGQ_ENTRY(t) struct{struct t*rqe_next,*rqe_prev;}
+#define RINGQ_ENTRY_P(T) struct{T*rqe_next,*rqe_prev;}
+
+#define LLIST(T)                  T*
+#define LLIST_NODE(T)             struct{T *ln_next,**ln_pself;}
+#define OLD_SLIST(T)                  T*
+#define OLD_SLIST_NODE(T)             struct{T *sn_next;}
+
+#define ATREE_HEAD(T)             T*
+#define ATREE_NODE(T,Tkey)        struct{T *a_min,*a_max;Tkey a_vmin,a_vmax;}
+#define ATREE_NODE_SINGLE(T,Tkey) struct{T *a_min,*a_max;Tkey a_vaddr;}
+#define ATREE_XNODE(T)            struct{T *a_min,*a_max;}
+#define RBTREE_NODE(T)                 struct{T *rb_par,*rb_lhs,*rb_rhs;}
+#define RBTREE_NODE_WITH_KEY(T,Tkey)   struct{T *rb_par,*rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
+#define LLRBTREE_NODE(T)               struct{T *rb_lhs,*rb_rhs;}
+#define LLRBTREE_NODE_WITH_KEY(T,Tkey) struct{T *rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
+#define RBTREE_ROOT(T)   T*
+#define LLRBTREE_ROOT(T) T*
+#define BSEARCH(...) for(;;)
+#define BSEARCH_EX(...) for(;;)
+#define BSEARCHR(...) for(;;)
+#define BSEARCHR_EX(...) for(;;)
+#define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
+#define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
+
+
+
+
+
 #define AIO_BUFFER_FOREACH(ent,self) for(;;)
 #define AIO_BUFFER_FOREACH_N(ent,self) for(;;)
 #define AIO_PBUFFER_FOREACH(ent,self) for(;;)

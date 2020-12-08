@@ -88,7 +88,7 @@ struct pci_resource {
 #define PD_RESOURCE_COUNT  7
 #ifdef __CC__
 struct pci_device {
-	SLIST_NODE(struct pci_device) pd_chain;      /* Chain of discovered PCI devices. */
+	SLIST_ENTRY(pci_device)       pd_chain;      /* Chain of discovered PCI devices. */
 	struct pci_resource           pd_res[PD_RESOURCE_COUNT]; /* [const] Resources. */
 	pci_addr_t                    pd_base;       /* [const] Base address of this PCI device. */
 	union ATTR_PACKED {
@@ -140,8 +140,9 @@ struct pci_device {
 
 
 #ifdef __CC__
-/* [0..1][const] Linked list of discovered PCI devices. */
-DATDEF SLIST(struct pci_device) pci_list;
+/* [0..N][const] Linked list of discovered PCI devices. */
+SLIST_HEAD(pci_device_list, pci_device);
+DATDEF struct pci_device_list pci_list;
 
 /* Return a PCI device located at the given
  * `address', or NULL if no such device exists. */
@@ -158,7 +159,7 @@ NOTHROW(KCALL pci_getclassname)(u8 classid);
 
 /* Enumerate all PCI devices. */
 #define PCI_FOREACH(dev) \
-	SLIST_FOREACH(dev, pci_list, pd_chain)
+	SLIST_FOREACH(dev, &pci_list, pd_chain)
 
 /* Enumerate all PCI devices matching the given class and subclass ID. */
 #define PCI_FOREACH_CLASS(dev, classid, subclassid) \

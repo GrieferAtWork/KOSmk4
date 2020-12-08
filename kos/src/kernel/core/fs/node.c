@@ -4224,7 +4224,7 @@ register_filesystem_type(struct superblock_type *__restrict type)
 			return;
 		}
 	}
-	SLIST_INSERT(fs_filesystem_types.ft_types, type, st_chain);
+	OLD_SLIST_INSERT(fs_filesystem_types.ft_types, type, st_chain);
 	incref(type->st_driver);
 	sync_endwrite(&fs_filesystem_types.ft_typelock);
 }
@@ -4465,7 +4465,7 @@ superblock_open(struct superblock_type *__restrict type,
 		result->db_pagesize  = (size_t)PAGESIZE >> result->db_pageshift;
 #endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 		/* Add the new superblock to the chain of known file-systems. */
-		SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);
+		OLD_SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);
 	} EXCEPT {
 		fs_filesystems_lock_endwrite();
 		RETHROW();

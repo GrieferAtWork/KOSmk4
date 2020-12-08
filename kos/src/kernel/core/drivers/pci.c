@@ -80,8 +80,8 @@ NOTHROW(KCALL lookup_pci_device)(pci_addr_t address) {
 }
 
 
-/* [0..1][const] Linked list of discovered PCI devices. */
-PUBLIC SLIST(struct pci_device) pci_list = NULL;
+/* [0..N][const] Linked list of discovered PCI devices. */
+PUBLIC struct pci_device_list pci_list = SLIST_HEAD_INITIALIZER(pci_list);
 
 PRIVATE ATTR_COLDRODATA char const pci_class_names[][14] = {
 	/* [PCI_DEV8_CLASS_STORAGE       - PCI_DEV8_CLASS_STORAGE] = */ "storage",
@@ -243,7 +243,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 			       result->pd_progifid,
 			       result->pd_revid);
 		}
-		SLIST_INSERT(pci_list, result, pd_chain);
+		SLIST_INSERT(&pci_list, result, pd_chain);
 		return result;
 	} EXCEPT {
 		if (!was_thrown(E_BADALLOC))
