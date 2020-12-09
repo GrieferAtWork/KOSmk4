@@ -80,7 +80,7 @@ struct tls_segment {
 	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
 	struct tls_segment                  *ts_self;    /* [1..1][const][== self] Self-pointer
 	                                                  * At offset 0; mandaged by ELF, and a good idea in general. */
-	LIST_ENTRY(struct tls_segment)       ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
+	LIST_ENTRY(tls_segment)              ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
 	struct atomic_rwlock                 ts_exlock;  /* Lock for `ts_extree' */
 	LLRBTREE_ROOT(struct dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
 };

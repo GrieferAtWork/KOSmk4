@@ -167,7 +167,8 @@ struct scheduler {
 	                                  * which usually ends up being the infinite timeout, i.e. `(ktime_t)-1') */
 };
 
-#define scheduler_s_waiting(self)    FORTASK((self)->s_running_last, this_sched_link.ln_next)
+#define scheduler_s_waiting(self) \
+	FORTASK((self)->s_running_last, this_sched_link.ln_next)
 
 
 /* [lock(PRIVATE(THIS_CPU))] The scheduler for the associated CPU */
@@ -230,7 +231,7 @@ DATDEF ATTR_PERCPU WEAK REF struct task *thiscpu_sched_pending;
 	     (iter) = KEY_thiscpu_pending__next(iter))
 
 /* Add `thread' to the chain of threads that are pending to be loaded by `target_cpu'
- * The caller should follow this by with a call to `cpu_wake(target_cpu)' in order to
+ * The caller should follow this up with a call to `cpu_wake(target_cpu)' in order to
  * request that `target_cpu' load its chain of pending threads. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL sched_intern_addpending)(struct cpu *__restrict target_cpu,

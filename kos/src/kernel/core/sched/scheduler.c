@@ -296,7 +296,7 @@ PUBLIC ATTR_PERCPU struct task *thiscpu_sched_override = NULL;
 PUBLIC ATTR_PERCPU WEAK REF struct task *thiscpu_sched_pending = NULL;
 
 /* Add `thread' to the chain of threads that are pending to be loaded by `target_cpu'
- * The caller should follow this by with a call to `cpu_wake(target_cpu)' in order to
+ * The caller should follow this up with a call to `cpu_wake(target_cpu)' in order to
  * request that `target_cpu' load its chain of pending threads. */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL sched_intern_addpending)(struct cpu *__restrict target_cpu,
@@ -1448,6 +1448,11 @@ again:
 			 * deadline-expired interrupt from changing our custom deadline. */
 			FORCPU(me, thiscpu_sched_override) = caller;
 
+			/* TODO: Somehow tell other CPUs that we don't have anything to do.
+			 *       Other CPUs could then make use of that info, and off-load
+			 *       threads with a lot of active-time to us, allowing load to
+			 *       be balanced automatically! */
+
 			/* Wait for the deadline to expire, but still handle sporadic
 			 * interrupts in the mean time. If new work arrives before we
 			 * get there, roll back everything and resume normal execution. */
@@ -1644,7 +1649,7 @@ NOTHROW(FCALL sched_override_end)(void) {
 	assert(sched_override == caller);
 	was = PREEMPTION_PUSHOFF();
 	ATOMIC_WRITE(sched_override, NULL);
-	tsc_now        = tsc_get(me);
+	tsc_now = tsc_get(me);
 	/* Reload the TSC deadline for the calling thread, thus accounting for
 	 * the additional time it spent being an active scheduler override. */
 	next = sched_intern_reload_deadline(me, caller, sched_stoptime(caller),
@@ -1701,12 +1706,14 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread) {
 DEFINE_PUBLIC_ALIAS(sched_super_override_start, sched_override_start);
 DEFINE_PUBLIC_ALIAS(sched_super_override_end, sched_override_end);
 
-PUBLIC NOBLOCK WUNUSED bool NOTHROW(FCALL sched_super_override_trystart)(void) {
+PUBLIC NOBLOCK WUNUSED bool
+NOTHROW(FCALL sched_super_override_trystart)(void) {
 	sched_override_start();
 	return true;
 }
 
-PUBLIC NOBLOCK ATTR_PURE bool NOTHROW(FCALL sched_super_override_active)(void) {
+PUBLIC NOBLOCK ATTR_PURE bool
+NOTHROW(FCALL sched_super_override_active)(void) {
 	return FORCPU(&_bootcpu, thiscpu_sched_override) != NULL;
 }
 #endif /* !CONFIG_NO_SMP */

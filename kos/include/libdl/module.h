@@ -274,19 +274,22 @@ struct dlmodule {
 #ifdef __BUILDING_LIBDL
 INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(DlModule *__restrict self);
 #else /* __BUILDING_LIBDL */
-#define DlModule_Destroy(self) DL_API_SYMBOL(DlModule_Destroy)(self)
+#define DlModule_Destroy(self) (DL_API_SYMBOL(DlModule_Destroy)(self))
 #endif /* !__BUILDING_LIBDL */
 __DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 
 /* Dl Module reference control. */
 #ifdef __INTELLISENSE__
-INTDEF NONNULL((1)) void LIBDL_CC DlModule_Incref(DlModule *__restrict self);
-INTDEF NONNULL((1)) bool LIBDL_CC DlModule_Decref(DlModule *__restrict self);
-INTDEF NONNULL((1)) void LIBDL_CC DlModule_DecrefNoKill(DlModule *__restrict self);
+NONNULL((1)) void DlModule_Incref(DlModule *__restrict self);
+NONNULL((1)) bool DlModule_Decref(DlModule *__restrict self);
+NONNULL((1)) void DlModule_DecrefNoKill(DlModule *__restrict self);
 #else /* __INTELLISENSE__ */
-#define DlModule_Incref(self)       __hybrid_atomic_inc((self)->dm_refcnt, __ATOMIC_SEQ_CST)
-#define DlModule_Decref(self)       (__hybrid_atomic_decfetch((self)->dm_refcnt, __ATOMIC_SEQ_CST) || (DlModule_Destroy(self),0))
-#define DlModule_DecrefNoKill(self) __hybrid_atomic_dec((self)->dm_refcnt, __ATOMIC_SEQ_CST)
+#define DlModule_Incref(self) \
+	__hybrid_atomic_inc((self)->dm_refcnt, __ATOMIC_SEQ_CST)
+#define DlModule_Decref(self) \
+	(__hybrid_atomic_decfetch((self)->dm_refcnt, __ATOMIC_SEQ_CST) || (DlModule_Destroy(self), 0))
+#define DlModule_DecrefNoKill(self) \
+	__hybrid_atomic_dec((self)->dm_refcnt, __ATOMIC_SEQ_CST)
 #endif /* !__INTELLISENSE__ */
 
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC
