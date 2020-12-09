@@ -27,8 +27,8 @@
 /**/
 
 #include <kos/debugtrap.h>
-#include <kos/exec/peb.h>
 #include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
+#include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 
@@ -62,6 +62,16 @@ again_old_flags:
 
 /* [1..1][const] The library path set when the program was started */
 INTERN char *dl_library_path = NULL;
+
+/* This is the prototype by which ELF initializer callbacks are invoked.
+ * For this purpose, calling them is essentially the same as calling the
+ * primary program's main() function, only that these are expected to
+ * return without doing the program's main task! */
+typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]);
+#define CALLINIT(funptr)                        \
+	((*(elf_init_t)(funptr))(root_peb->pp_argc, \
+	                         root_peb->pp_argv, \
+	                         root_peb->pp_envp))
 
 
 /* Run library initializers for `self' */
@@ -105,16 +115,20 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) {
 		}
 	}
 done_dyntag:
-	for (i = 0; i < preinit_array_size; ++i) {
-		(*(void (*)(void))(preinit_array_base[i] /* + self->dm_loadaddr*/))();
-	}
+	/* Apparently, global initializer functions take the same
+	 * arguments as are also passed to main():
+	 * >> void (*)(int argc, char *argv[], char *envp[]);
+	 *
+	 * As such, call them like that, rather than without any arguments!
+	 * HINT: We can take all of the required information from `root_peb' */
+	for (i = 0; i < preinit_array_size; ++i)
+		CALLINIT(preinit_array_base[i] /* + self->dm_loadaddr*/);
 	/* Service a init function, if one was specified. */
 	if (init_func)
-		(*(void (*)(void))(init_func + self->dm_loadaddr))();
+		CALLINIT(init_func + self->dm_loadaddr);
 	/* Service init-array functions in forward order. */
-	for (i = 0; i < init_array_size; ++i) {
-		(*(void (*)(void))(init_array_base[i] /* + self->dm_loadaddr*/))();
-	}
+	for (i = 0; i < init_array_size; ++i)
+		CALLINIT(init_array_base[i] /* + self->dm_loadaddr*/);
 }
 
 /* Invoke the static initializers of all currently loaded modules.
