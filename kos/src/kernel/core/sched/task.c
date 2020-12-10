@@ -331,13 +331,13 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	_bootidle.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FKEEPCORE | TASK_FKERNTHREAD;
 
 	/* Initialize the boot CPU's scheduler. */
-	FORTASK(&_boottask, this_sched_link).ln_pself  = &FORCPU(&_bootcpu, thiscpu_scheduler).s_running;
-	FORTASK(&_boottask, this_sched_link).ln_next   = &_asyncwork;
-	FORTASK(&_asyncwork, this_sched_link).ln_pself = &FORTASK(&_boottask, this_sched_link).ln_next;
+	FORTASK(&_boottask, this_sched_link).le_prev  = &FORCPU(&_bootcpu, thiscpu_scheduler).s_running.lh_first;
+	FORTASK(&_boottask, this_sched_link).le_next  = &_asyncwork;
+	FORTASK(&_asyncwork, this_sched_link).le_prev = &FORTASK(&_boottask, this_sched_link).le_next;
 	/*FORTASK(&_asyncwork, this_sched_link).ln_next = NULL;*/
-	FORCPU(&_bootcpu, thiscpu_scheduler).s_running      = &_boottask;
-	FORCPU(&_bootcpu, thiscpu_scheduler).s_running_last = &_asyncwork;
-	FORCPU(&_bootcpu, thiscpu_scheduler).s_runcount     = 2;
+	FORCPU(&_bootcpu, thiscpu_scheduler).s_running.lh_first = &_boottask;
+	FORCPU(&_bootcpu, thiscpu_scheduler).s_running_last     = &_asyncwork;
+	FORCPU(&_bootcpu, thiscpu_scheduler).s_runcount         = 2;
 
 	_boottask.t_self  = &_boottask;
 	_bootidle.t_self  = &_bootidle;

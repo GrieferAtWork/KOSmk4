@@ -2795,8 +2795,6 @@
 	((*getpath(elem).ln_pself = getpath(elem).ln_next) != __NULLPTR             \
 	 ? (void)(getpath(getpath(elem).ln_next).ln_pself = getpath(elem).ln_pself) \
 	 : (void)0)
-#define LLIST_ISBOUND(elem, key) ((elem)->key.ln_pself != __NULLPTR)
-#define LLIST_UNLINK(elem, key)  (LLIST_REMOVE(elem, key), (elem)->key.ln_pself = __NULLPTR)
 #endif /* !__HYBRID_LIST_WITHOUT_DEPRECATED */
 
 #endif /* __CC__ */

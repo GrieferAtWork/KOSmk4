@@ -97,7 +97,7 @@ DECL_BEGIN
 struct cpu;
 struct task;
 
-typedef LLIST_NODE(struct task) _sched_link_t;
+typedef LIST_ENTRY(task) _sched_link_t;
 
 /* Min/max bounds for how long a quantum can be.
  *
@@ -129,6 +129,7 @@ DATDEF ktime_t sched_shutdown_delay;
 /* [lock(PRIVATE(THIS_CPU))]
  * Linked-list node for other threads. Used internally by scheduling. */
 DATDEF ATTR_PERTASK REF _sched_link_t this_sched_link;
+#define KEY__this_sched_link(thread) FORTASK(thread, this_sched_link)
 
 /* [lock(PRIVATE(THIS_TASK))][valid_if(!TASK_FRUNNING)]
  * Timeout for when this thread should resume execution
@@ -138,6 +139,7 @@ DATDEF ATTR_PERTASK ktime_t this_sched_timeout;
 /* [1..1][lock(PRIVATE(THIS_CPU))] The currently running thread. */
 DATDEF ATTR_PERCPU struct task *thiscpu_sched_current;
 
+LIST_HEAD(task_runlist, REF task);
 struct scheduler {
 	/* Thread chains:
 	 *
@@ -150,25 +152,25 @@ struct scheduler {
 	 * NOTE: Backwards links (via `this_sched_pself')
 	 *       exist everywhere within this chain.
 	 */
-	REF struct task *s_running;      /* [1..1] Chain of running threads (there is always at least 1 running thread!)
-	                                  * This chain is sorted ascendingly by `this_stoptime'. The IDLE thread is
-	                                  * automatically added when no other threads are available.
-	                                  * NOTE: Whenever the IDLE thread is loaded, it's `this_sched_link.ln_pself'
-	                                  *       will be non-NULL (also: when the IDLE thread's TASK_FRUNNING flag is
-	                                  *       set, then you may also assume that the IDLE thread is loaded) */
-	struct task     *s_running_last; /* [1..1] Last thread that is still running (equal to `s_running' when `s_runcount == 1')
-	                                  * The NEXT-pointer of this thread is equal to s_waiting. */
-	size_t           s_runcount;     /* [!0] # of running threads. (== COUNT(s_running->[NEXT...]->s_running_last)) */
+	struct task_runlist s_running;      /* [1..1] Chain of running threads (there is always at least 1 running thread!)
+	                                     * This chain is sorted ascendingly by `this_stoptime'. The IDLE thread is
+	                                     * automatically added when no other threads are available.
+	                                     * NOTE: Whenever the IDLE thread is loaded, it's `this_sched_link.ln_pself'
+	                                     *       will be non-NULL (also: when the IDLE thread's TASK_FRUNNING flag is
+	                                     *       set, then you may also assume that the IDLE thread is loaded) */
+	struct task        *s_running_last; /* [1..1] Last thread that is still running (equal to `s_running' when `s_runcount == 1')
+	                                     * The NEXT-pointer of this thread is equal to s_waiting. */
+	size_t              s_runcount;     /* [!0] # of running threads. (== COUNT(s_running->[NEXT...]->s_running_last)) */
 #if 0 /* Only exits as `FORTASK(s_running_last, this_sched_link)' (use `scheduler_s_waiting' to access!) */
-	struct task     *s_waiting;      /* [0..1][== FORTASK(s_running_last, this_sched_link)] Chain of waiting thread.
-	                                  * This chain is sorted ascendingly by `this_sched_timeout'. */
+	struct task        *s_waiting;      /* [0..1][== FORTASK(s_running_last, this_sched_link)] Chain of waiting thread.
+	                                     * This chain is sorted ascendingly by `this_sched_timeout'. */
 #endif
-	struct task     *s_waiting_last; /* [0..1] Last waiting thread. (i.e. the thread with the greatest timeout,
-	                                  * which usually ends up being the infinite timeout, i.e. `(ktime_t)-1') */
+	struct task        *s_waiting_last; /* [0..1] Last waiting thread. (i.e. the thread with the greatest timeout,
+	                                     * which usually ends up being the infinite timeout, i.e. `(ktime_t)-1') */
 };
 
 #define scheduler_s_waiting(self) \
-	FORTASK((self)->s_running_last, this_sched_link.ln_next)
+	FORTASK((self)->s_running_last, this_sched_link.le_next)
 
 
 /* [lock(PRIVATE(THIS_CPU))] The scheduler for the associated CPU */
@@ -197,38 +199,38 @@ DATDEF struct task _bootidle;
  * WARNING: The CPU's IDLE thread may or may not be enumerated!
  *          The IDLE thread is only enumerated if it was been
  *          scheduled before, but has yet to unschedule itself. */
-#define FOREACH_thiscpu_threads(iter, me)                          \
-	for ((iter) = FORCPU(me, thiscpu_scheduler.s_running); (iter); \
-	     (iter) = FORTASK(iter, this_sched_link.ln_next))
+#define FOREACH_thiscpu_threads(iter, me)                                       \
+	for ((iter) = LIST_FIRST(&FORCPU(me, thiscpu_scheduler.s_running)); (iter); \
+	     (iter) = LIST_NEXT_P(iter, KEY__this_sched_link))
 
 /* Enumerate all running threads of the given CPU */
 #define FOREACH_thiscpu_running(iter, me)                               \
-	for ((iter) = FORCPU(me, thiscpu_scheduler.s_running);              \
+	for ((iter) = LIST_FIRST(&FORCPU(me, thiscpu_scheduler.s_running)); \
 	     (iter) != scheduler_s_waiting(&FORCPU(me, thiscpu_scheduler)); \
-	     (iter) = FORTASK(iter, this_sched_link.ln_next))
+	     (iter) = LIST_NEXT_P(iter, KEY__this_sched_link))
 
 /* Enumerate all sleeping threads of the given CPU */
 #define FOREACH_thiscpu_waiting(iter, me)                                      \
 	for ((iter) = scheduler_s_waiting(&FORCPU(me, thiscpu_scheduler)); (iter); \
-	     (iter) = FORTASK(iter, this_sched_link.ln_next))
+	     (iter) = LIST_NEXT_P(iter, KEY__this_sched_link))
 
 
 
 #ifndef CONFIG_NO_SMP
 /* [0..1][lock(APPEND(ATOMIC), CLEAR(ATOMIC && THIS_CPU))]
- * [CHAIN(KEY_thiscpu_pending__next)]
+ * [CHAIN(KEY__thiscpu_pending_next)]
  * Chain of tasks that are pending for being executed.
  * This chain is loaded by the CPU itself, which can be
  * provoked by another CPU calling `cpu_wake()' */
 DATDEF ATTR_PERCPU WEAK REF struct task *thiscpu_sched_pending;
 
 /* Key for iterating a chain of pending threads. */
-#define KEY_thiscpu_pending__next(thread) FORTASK(thread, this_sched_link.ln_next)
+#define KEY__thiscpu_pending_next(thread) FORTASK(thread, this_sched_link.le_next)
 
 /* Enumerate all pending threads of the given CPU */
 #define FOREACH_thiscpu_sched_pending(iter, me)              \
 	for ((iter) = FORCPU(me, thiscpu_sched_pending); (iter); \
-	     (iter) = KEY_thiscpu_pending__next(iter))
+	     (iter) = KEY__thiscpu_pending_next(iter))
 
 /* Add `thread' to the chain of threads that are pending to be loaded by `target_cpu'
  * The caller should follow this up with a call to `cpu_wake(target_cpu)' in order to

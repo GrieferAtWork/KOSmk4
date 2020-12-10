@@ -500,11 +500,11 @@ i386_allocate_secondary_cores(void) {
 		altidle->t_cpu                         = altcore;
 		altidle->t_self                        = altidle;
 		altidle->t_flags                       = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL;
-		FORCPU(altcore, thiscpu_scheduler).s_runcount     = 1;
-		FORCPU(altcore, thiscpu_scheduler).s_running      = altidle;
-		FORCPU(altcore, thiscpu_scheduler).s_running_last = altidle;
+		FORCPU(altcore, thiscpu_scheduler).s_runcount         = 1;
+		FORCPU(altcore, thiscpu_scheduler).s_running.lh_first = altidle;
+		FORCPU(altcore, thiscpu_scheduler).s_running_last     = altidle;
 		/*FORCPU(altcore, thiscpu_scheduler).s_waiting_last = NULL;*/
-		FORTASK(altidle, this_sched_link).ln_pself = &FORCPU(altcore, thiscpu_scheduler).s_running;
+		FORTASK(altidle, this_sched_link).le_prev = &FORCPU(altcore, thiscpu_scheduler).s_running.lh_first;
 		/*FORTASK(altidle, this_sched_link).ln_next = NULL;*/
 
 		/* Insert the new task into the kernel VM's task user list. */

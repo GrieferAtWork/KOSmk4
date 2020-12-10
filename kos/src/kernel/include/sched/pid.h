@@ -152,7 +152,7 @@ struct ttybase_device;
 struct rpc_entry;
 
 LIST_HEAD(taskpid_list, REF taskpid);
-LIST_HEAD(task_list, WEAK task);
+LIST_HEAD(task_proclist, WEAK task);
 
 struct taskgroup {
 	/* Controller structure for tracing task association within/between
@@ -219,7 +219,7 @@ struct taskgroup {
 	struct process_sigqueue      tg_proc_signals;        /* Pending signals that are being delivered to this process. */
 	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
-	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this process group (excluding the calling process)
+	struct task_proclist         tg_pgrp_processes;      /* [0..1] Chain of processes within this process group (excluding the calling process)
 	                                                      * NOTE: This list of processes is chained using the `tg_proc_group_siblings' list node. */
 #define KEY__this_taskgroup__tg_proc_group_siblings(thread) \
 	FORTASK(thread, this_taskgroup).tg_proc_group_siblings

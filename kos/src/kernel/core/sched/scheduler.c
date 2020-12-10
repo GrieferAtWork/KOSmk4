@@ -69,7 +69,7 @@ PUBLIC ktime_t sched_shutdown_delay = (ktime_t)10 * NSEC_PER_SEC;
 #define prev_task_from_pself(pself)                 \
 	((struct task *)((byte_t *)(pself) -            \
 	                 ((uintptr_t)&this_sched_link + \
-	                  offsetof(_sched_link_t, ln_next))))
+	                  offsetof(_sched_link_t, le_next))))
 
 /* Helper macros. */
 #define sched                    FORCPU(me, thiscpu_scheduler)
@@ -77,12 +77,13 @@ PUBLIC ktime_t sched_shutdown_delay = (ktime_t)10 * NSEC_PER_SEC;
 #define sched_s_waiting          scheduler_s_waiting(&sched)
 #define sched_override           FORCPU(me, thiscpu_sched_override)
 #define sched_link(thread)       FORTASK(thread, this_sched_link)
-#define sched_pself(thread)      FORTASK(thread, this_sched_link.ln_pself)
-#define sched_next(thread)       FORTASK(thread, this_sched_link.ln_next)
+#define sched_pself(thread)      FORTASK(thread, this_sched_link.le_prev)
+#define sched_next(thread)       FORTASK(thread, this_sched_link.le_next)
 #define sched_prev(thread)       prev_task_from_pself(sched_pself(thread))
 #define sched_stoptime(thread)   FORTASK(thread, this_stoptime)
 #define sched_activetime(thread) FORTASK(thread, this_activetime)
 #define sched_timeout(thread)    FORTASK(thread, this_sched_timeout)
+#define sched_s_running_first    sched.s_running.lh_first
 
 #define LINK2(first, second)         \
 	(sched_next(first)   = (second), \
@@ -100,18 +101,18 @@ NOTHROW(FCALL _sched_assert)(struct cpu *__restrict me) {
 	        "Preemption wasn't disabled");
 	assertf(sched.s_runcount,
 	        "Error: No running threads");
-	assertf(sched.s_running,
+	assertf(!LIST_EMPTY(&sched.s_running),
 	        "Inconsistency: runcount=%" PRIuSIZ ", but s_running=NULL",
 	        sched.s_runcount);
 	assertf(sched.s_running_last,
 	        "Inconsistency: s_running_last is NULL when s_running=%p (runcount=%" PRIuSIZ ")",
-	        sched.s_running, sched.s_runcount);
+	        sched_s_running_first, sched.s_runcount);
 	assertf((sched_s_waiting != NULL) ==
 	        (sched.s_waiting_last != NULL),
 	        "Inconsistency: s_waiting=%p, but s_waiting_last=%p",
 	        sched_s_waiting, sched.s_waiting_last);
 	num_running = 0;
-	pself = &sched.s_running;
+	pself = &sched_s_running_first;
 	prev_time = 0;
 	/* Enumerate running threads. */
 	for (;;) {
@@ -256,7 +257,7 @@ again:
 
 /* [lock(PRIVATE(THIS_CPU))]
  * Linked-list node for other threads. Used internally by scheduling. */
-PUBLIC ATTR_PERTASK REF _sched_link_t this_sched_link = LLIST_INITNODE;
+PUBLIC ATTR_PERTASK REF _sched_link_t this_sched_link = LIST_ENTRY_UNBOUND_INITIALIZER;
 
 /* [lock(PRIVATE(THIS_TASK))][valid_if(!TASK_FRUNNING)]
  * Timeout for when this thread should resume execution
@@ -268,7 +269,7 @@ PUBLIC ATTR_PERCPU struct task *thiscpu_sched_current = NULL;
 
 /* [lock(PRIVATE(THIS_CPU))] The scheduler for the associated CPU */
 PUBLIC ATTR_PERCPU struct scheduler thiscpu_scheduler = {
-	/* .s_running      = */ NULL,
+	/* .s_running      = */ LIST_HEAD_INITIALIZER(thiscpu_scheduler.s_running),
 	/* .s_running_last = */ NULL,
 	/* .s_runcount     = */ 1,
 	/* .s_waiting_last = */ NULL
@@ -289,7 +290,7 @@ PUBLIC ATTR_PERCPU struct task *thiscpu_sched_override = NULL;
 
 #ifndef CONFIG_NO_SMP
 /* [0..1][lock(APPEND(ATOMIC), CLEAR(ATOMIC && THIS_CPU))]
- * [CHAIN(KEY_thiscpu_pending__next)]
+ * [CHAIN(KEY__thiscpu_pending_next)]
  * Chain of tasks that are pending for being executed.
  * This chain is loaded by the CPU itself, which can be
  * provoked by another CPU calling `cpu_wake()' */
@@ -306,7 +307,7 @@ NOTHROW(FCALL sched_intern_addpending)(struct cpu *__restrict target_cpu,
 	assert(thread->t_flags & TASK_FRUNNING);
 	do {
 		next = ATOMIC_READ(FORCPU(target_cpu, thiscpu_sched_pending));
-		ATOMIC_WRITE(KEY_thiscpu_pending__next(thread), next);
+		ATOMIC_WRITE(KEY__thiscpu_pending_next(thread), next);
 	} while (!ATOMIC_CMPXCH_WEAK(FORCPU(target_cpu, thiscpu_sched_pending),
 	                             next, thread));
 }
@@ -318,7 +319,7 @@ NOTHROW(FCALL sched_intern_loadpending)(struct cpu *__restrict me,
                                         /*inherit*/ REF struct task *__restrict chain) {
 	struct task *next;
 	for (;;) {
-		next = KEY_thiscpu_pending__next(chain);
+		next = KEY__thiscpu_pending_next(chain);
 		/* Locally add each of the threads to our CPU */
 		caller = sched_intern_localadd(me, caller, chain, false);
 		if (!next)
@@ -345,10 +346,12 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 	thread_stoptime = sched_stoptime(thread);
 	if (thread_stoptime >= sched_stoptime(neighbor)) {
 		/* Append at the very end. */
-		LLIST_INSERT_AFTER_P(neighbor, thread, sched_link);
+		LIST_INSERT_AFTER_P(/* predecessor: */ neighbor,
+		                    /* elem:        */ thread,
+		                    /* key:         */ sched_link);
 		sched.s_running_last = thread;
 	} else {
-		neighbor = sched.s_running;
+		neighbor = sched_s_running_first;
 		/* Append before some other thread prior to the last running thread.
 		 * NOTE: At this point, we already know that `thread' should be inserted
 		 *       before the last running thread, since it has a higher priority
@@ -356,7 +359,9 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 		while (thread_stoptime >= sched_stoptime(neighbor))
 			neighbor = sched_next(neighbor);
 		/* Insert the new thread before its neighbor. */
-		LLIST_INSERT_BEFORE_P(thread, neighbor, sched_link);
+		LIST_INSERT_BEFORE_P(/* successor: */ neighbor,
+		                     /* elem:      */ thread,
+		                     /* key:       */ sched_link);
 	}
 	++sched.s_runcount;
 	sched_assert_in_runqueue(thread);
@@ -392,7 +397,9 @@ NOTHROW(FCALL sched_intern_add_to_waitqueue)(struct cpu *__restrict me,
 			 * property. */
 			while (!(timeout < sched_timeout(first_waiting)))
 				first_waiting = sched_next(first_waiting);
-			LLIST_INSERT_BEFORE_P(thread, first_waiting, sched_link);
+			LIST_INSERT_BEFORE_P(/* successor: */ first_waiting,
+			                     /* elem:      */ thread,
+			                     /* key:       */ sched_link);
 		}
 	} else {
 		/* Special case: first waiting thread. */
@@ -452,12 +459,12 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 		struct task *waiting;
 		/* Special case: Set the running queue to `{ caller, thread }' */
 		waiting = sched_s_waiting;
-		sched.s_running      = caller;
-		sched.s_running_last = thread;
-		sched_next(caller)   = thread;
-		sched_pself(caller)  = &sched.s_running;
-		sched_next(thread)   = waiting;
-		sched_pself(thread)  = &sched_next(caller);
+		sched_s_running_first = caller;
+		sched.s_running_last  = thread;
+		sched_next(caller)    = thread;
+		sched_pself(caller)   = &sched_s_running_first;
+		sched_next(thread)    = waiting;
+		sched_pself(thread)   = &sched_next(caller);
 		if (waiting)
 			sched_pself(waiting) = &sched_next(thread);
 	} else {
@@ -466,10 +473,10 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 		/* Unlink `thread' and `caller' from somewhere within the running queue. */
 		if unlikely(sched.s_running_last == thread)
 			sched.s_running_last = sched_prev(thread);
-		LLIST_REMOVE_P(thread, sched_link);
+		LIST_REMOVE_P(thread, sched_link);
 		if unlikely(sched.s_running_last == caller)
 			sched.s_running_last = sched_prev(caller);
-		LLIST_REMOVE_P(caller, sched_link);
+		LIST_REMOVE_P(caller, sched_link);
 		LINK2(caller, thread);
 		last_running = sched.s_running_last;
 		assert(last_running != thread && last_running != caller);
@@ -484,7 +491,7 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 			sched.s_running_last = thread;
 		} else {
 			struct task *first_running;
-			first_running = sched.s_running;
+			first_running = sched_s_running_first;
 			/* Unlikely case: There is a thread in the runqueue with a stop-time
 			 * that is located in the future from our point of view. - This is
 			 * something that is allowed, but not something that would normally
@@ -494,8 +501,8 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 				/* All threads except for `caller'+`thread' have stopped in the future...
 				 * In this case, re-insert caller+thread at the front. */
 				LINK2(thread, first_running);
-				sched_pself(caller) = &sched.s_running;
-				sched.s_running     = caller;
+				sched_pself(caller)   = &sched_s_running_first;
+				sched_s_running_first = caller;
 			} else {
 				/* Find the thread after which we should insert caller+thread */
 				struct task *after_last_running;
@@ -523,9 +530,9 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 	sched_assert_in_runqueue(thread);
 	/* Update stop timestamp of `thread' */
 	if unlikely(sched.s_runcount == 1) {
-		assert(sched.s_running == thread);
-		assert(sched.s_running_last == thread);
-		assert(sched_pself(thread) == &sched.s_running);
+		assert(thread == sched_s_running_first);
+		assert(thread == sched.s_running_last);
+		assert(sched_pself(thread) == &sched_s_running_first);
 	} else {
 		struct task *last_running;
 		assert(sched.s_runcount >= 2);
@@ -535,7 +542,7 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 			assert(last_running != thread);
 			sched.s_running_last = last_running;
 		}
-		LLIST_REMOVE_P(thread, sched_link);
+		LIST_REMOVE_P(thread, sched_link);
 		/* Re-insert `thread' */
 		if likely(new_stop_time >= sched_stoptime(last_running)) {
 			struct task *first_waiting;
@@ -548,7 +555,7 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 			sched.s_running_last = thread;
 		} else {
 			struct task *first_running;
-			first_running = sched.s_running;
+			first_running = sched_s_running_first;
 			/* Unlikely case: There is a thread in the runqueue with a stop-time
 			 * that is located in the future from our point of view. - This is
 			 * something that is allowed, but not something that would normally
@@ -558,15 +565,17 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 				/* All threads except for `thread' have stopped in the future...
 				 * In this case, re-insert thread at the front. */
 				LINK2(thread, first_running);
-				sched_pself(thread) = &sched.s_running;
-				sched.s_running     = thread;
+				sched_pself(thread)   = &sched_s_running_first;
+				sched_s_running_first = thread;
 			} else {
 				/* Find the thread after which we should insert our's */
 				do {
 					last_running = sched_prev(last_running);
 				} while (new_stop_time < sched_stoptime(last_running));
 				/* NOTE: new_stop_time >= sched_stoptime(last_running) */
-				LLIST_INSERT_AFTER_P(last_running, thread, sched_link);
+				LIST_INSERT_AFTER_P(/* predecessor: */ last_running,
+				                    /* elem:        */ thread,
+				                    /* key:         */ sched_link);
 			}
 		}
 	}
@@ -802,7 +811,7 @@ NOTHROW(FCALL sched_intern_yield)(struct cpu *__restrict me,
 	sched_assert();
 	result = sched_override;
 	if likely(!result) {
-		result = sched.s_running;
+		result = sched_s_running_first;
 		if (result != caller) {
 			tsc_t tsc_now;
 do_switch_to_result:
@@ -839,15 +848,15 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 	/* Unlink the thread from the run queue. */
 	if unlikely(sched.s_runcount == 1) {
 		struct task *first_waiting_thread;
-		assert(caller == sched.s_running);
+		assert(caller == sched_s_running_first);
 		assert(caller == sched.s_running_last);
-		assert(sched_pself(caller) == &sched.s_running);
+		assert(sched_pself(caller) == &sched_s_running_first);
 		/* Special case: Must switch to the IDLE thread. */
 		result = &sched_idle;
-		sched.s_running      = result;
-		sched.s_running_last = result;
-		sched_pself(result)  = &sched.s_running;
-		first_waiting_thread = sched_next(caller);
+		sched_s_running_first = result;
+		sched.s_running_last  = result;
+		sched_pself(result)   = &sched_s_running_first;
+		first_waiting_thread  = sched_next(caller);
 		assert((first_waiting_thread != NULL) ==
 		       (sched.s_waiting_last != NULL));
 		if ((sched_next(result) = first_waiting_thread) != NULL)
@@ -859,10 +868,10 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 		assert(sched.s_runcount >= 2);
 		if (sched.s_running_last == caller)
 			sched.s_running_last = sched_prev(caller);
-		LLIST_REMOVE_P(caller, sched_link);
+		LIST_REMOVE_P(caller, sched_link);
 		--sched.s_runcount;
 		/* Just switch to whatever thread comes next. */
-		result = sched.s_running;
+		result = sched_s_running_first;
 	}
 	/* Perform something similar to a high-priority switch */
 	assert(caller != result);
@@ -989,9 +998,9 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	if unlikely(sched.s_runcount == 1) {
 		struct task *first_waiting_thread;
 		first_waiting_thread = sched_next(caller);
-		assert(caller == sched.s_running);
+		assert(caller == sched_s_running_first);
 		assert(caller == sched.s_running_last);
-		assert(sched_pself(caller) == &sched.s_running);
+		assert(sched_pself(caller) == &sched_s_running_first);
 		if unlikely(caller == &sched_idle) {
 			/* Special case: wait within the IDLE thread, when no other
 			 *               threads exist to which we can switch.
@@ -1009,9 +1018,9 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		}
 		/* Special case: Must switch to the IDLE thread. */
 		next = &sched_idle;
-		sched.s_running      = next;
-		sched.s_running_last = next;
-		sched_pself(next)    = &sched.s_running;
+		sched_s_running_first = next;
+		sched.s_running_last  = next;
+		sched_pself(next)     = &sched_s_running_first;
 		if ((sched_next(next) = first_waiting_thread) != NULL)
 			sched_pself(first_waiting_thread) = &sched_next(next);
 		assert(!(next->t_flags & TASK_FRUNNING));
@@ -1022,10 +1031,10 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		assert(sched.s_runcount >= 2);
 		if (sched.s_running_last == caller)
 			sched.s_running_last = sched_prev(caller);
-		LLIST_REMOVE_P(caller, sched_link);
+		LIST_REMOVE_P(caller, sched_link);
 		--sched.s_runcount;
 		/* Just switch to whatever thread comes next. */
-		next = sched.s_running;
+		next = sched_s_running_first;
 		sched_assert();
 	}
 	/* Perform something similar to a high-priority switch */
@@ -1129,7 +1138,7 @@ again_with_tsc_now:
 	now = tsc_now_to_ktime(me, tsc_now);
 again:
 	/* Select the thread with the lowest stop-time as successor. */
-	next          = sched.s_running;
+	next          = sched_s_running_first;
 	next_priority = sched_stoptime(next);
 	/* Check the timeouts of sleeping threads. */
 	FOREACH_thiscpu_waiting(thread, me) {
@@ -1255,7 +1264,7 @@ NOTHROW(FCALL idle_unload_and_switch_to)(struct cpu *__restrict me,
 	/* Remove caller (the IDLE thread) from the run queue */
 	if (sched.s_running_last == caller)
 		sched.s_running_last = sched_prev(caller);
-	LLIST_REMOVE_P(caller, sched_link);
+	LIST_REMOVE_P(caller, sched_link);
 	--sched.s_runcount;
 	ATOMIC_AND(caller->t_flags, ~TASK_FRUNNING);
 	/* Mark the IDLE thread as unloaded, as documented in,
@@ -1372,7 +1381,7 @@ again:
 	/* First check: Are there any running threads we can switch to? */
 	if (sched.s_runcount >= 2) {
 		struct task *next;
-		next = sched.s_running;
+		next = sched_s_running_first;
 		if (next == caller)
 			next = sched_next(next);
 		assert(next != caller);
