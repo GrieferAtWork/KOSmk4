@@ -2762,38 +2762,19 @@
 #define LLIST_NEXT(elem, key)    ((elem)->key.ln_next)
 #define LLIST_PREV(T, elem, key) __COMPILER_CONTAINER_OF((elem)->key.ln_pself, T, key.ln_next)
 #define LLIST_HEAD(l)            (l)
-#define LLIST_FOREACH(elem, l, key) \
-	for ((elem) = (l); (elem); (elem) = (elem)->key.ln_next)
 #define LLIST_INSERT(l, elem, key)                            \
 	(void)(((elem)->key.ln_next = (l)) != __NULLPTR           \
 	       ? (void)((l)->key.ln_pself = &(elem)->key.ln_next) \
 	       : (void)0,                                         \
 	       *((elem)->key.ln_pself = &(l)) = (elem))
-#define LLIST_INSERT_P(l, elem, getpath)                            \
-	(void)((getpath(elem).ln_next = (l)) != __NULLPTR               \
-	       ? (void)(getpath((l)).ln_pself = &getpath(elem).ln_next) \
-	       : (void)0,                                               \
-	       *(getpath(elem).ln_pself = &(l)) = (elem))
-#define LLIST_INSERT_BEFORE_P(elem, successor, getpath)                      \
-	(void)(*(getpath(elem).ln_pself = getpath(successor).ln_pself) = (elem), \
-	       *(getpath(successor).ln_pself = &getpath(elem).ln_next) = (successor))
 #define LLIST_INSERT_AFTER(predecessor, elem, key)                                                    \
 	(void)(((elem)->key.ln_next = *((elem)->key.ln_pself = &(predecessor)->key.ln_next)) != __NULLPTR \
 	       ? (void)((elem)->key.ln_next->key.ln_pself = &(elem)->key.ln_next)                         \
 	       : (void)0,                                                                                 \
 	       (predecessor)->key.ln_next = (elem))
-#define LLIST_INSERT_AFTER_P(predecessor, elem, getpath)                                                    \
-	(void)((getpath(elem).ln_next = *(getpath(elem).ln_pself = &getpath(predecessor).ln_next)) != __NULLPTR \
-	       ? (void)(getpath(getpath(elem).ln_next).ln_pself = &getpath(elem).ln_next)                       \
-	       : (void)0,                                                                                       \
-	       getpath(predecessor).ln_next = (elem))
 #define LLIST_REMOVE(elem, key)                                         \
 	((*(elem)->key.ln_pself = (elem)->key.ln_next) != __NULLPTR         \
 	 ? (void)((elem)->key.ln_next->key.ln_pself = (elem)->key.ln_pself) \
-	 : (void)0)
-#define LLIST_REMOVE_P(elem, getpath)                                           \
-	((*getpath(elem).ln_pself = getpath(elem).ln_next) != __NULLPTR             \
-	 ? (void)(getpath(getpath(elem).ln_next).ln_pself = getpath(elem).ln_pself) \
 	 : (void)0)
 #endif /* !__HYBRID_LIST_WITHOUT_DEPRECATED */
 
