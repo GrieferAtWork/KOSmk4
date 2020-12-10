@@ -495,7 +495,7 @@ task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
 		THROWS(E_WOULDBLOCK) {
 	ssize_t temp, result;
 	struct taskgroup *group;
-	struct taskpid *threadlist;
+	struct taskpid *tpid;
 	/* Retrieve the process leader of `proc' */
 	proc = task_getprocess_of(proc);
 
@@ -513,22 +513,19 @@ task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
 	group = &FORTASK(proc, this_taskgroup);
 	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
 	/* Enumerate threads. */
-	threadlist = group->tg_proc_threads;
-	if (threadlist != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-		for (; threadlist; threadlist = threadlist->tp_siblings.ln_next) {
-			REF struct task *thread;
-			thread = taskpid_gettask(threadlist);
-			if (!thread)
-				continue;
-			/* Only enumerate threads. - Don't enumerate child processes. */
-			temp = task_getprocess_of(thread) == proc
-			       ? (*cb)(arg, thread, threadlist)
-			       : 0;
-			decref_unlikely(thread);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
-		}
+	FOREACH_taskgroup__proc_threads(tpid, group) {
+		REF struct task *thread;
+		thread = taskpid_gettask(tpid);
+		if (!thread)
+			continue;
+		/* Only enumerate threads. - Don't enumerate child processes. */
+		temp = task_getprocess_of(thread) == proc
+		       ? (*cb)(arg, thread, tpid)
+		       : 0;
+		decref_unlikely(thread);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
 	}
 	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 done:
@@ -546,7 +543,7 @@ task_enum_process_worker_threads_nb(task_enum_cb_t cb, void *arg,
 		THROWS(E_WOULDBLOCK) {
 	ssize_t temp, result = 0;
 	struct taskgroup *group;
-	struct taskpid *threadlist;
+	struct taskpid *tpid;
 	/* Retrieve the process leader of `proc' */
 	proc = task_getprocess_of(proc);
 
@@ -559,22 +556,19 @@ task_enum_process_worker_threads_nb(task_enum_cb_t cb, void *arg,
 	group = &FORTASK(proc, this_taskgroup);
 	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
 	/* Enumerate threads. */
-	threadlist = group->tg_proc_threads;
-	if (threadlist != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-		for (; threadlist; threadlist = threadlist->tp_siblings.ln_next) {
-			REF struct task *thread;
-			thread = taskpid_gettask(threadlist);
-			if (!thread)
-				continue;
-			/* Only enumerate threads. - Don't enumerate child processes. */
-			temp = task_getprocess_of(thread) == proc
-			       ? (*cb)(arg, thread, threadlist)
-			       : 0;
-			decref_unlikely(thread);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
-		}
+	FOREACH_taskgroup__proc_threads(tpid, group) {
+		REF struct task *thread;
+		thread = taskpid_gettask(tpid);
+		if (!thread)
+			continue;
+		/* Only enumerate threads. - Don't enumerate child processes. */
+		temp = task_getprocess_of(thread) == proc
+		       ? (*cb)(arg, thread, tpid)
+		       : 0;
+		decref_unlikely(thread);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
 	}
 	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 	return result;
@@ -597,7 +591,7 @@ task_enum_process_children_nb(task_enum_cb_t cb, void *arg,
 		THROWS(E_WOULDBLOCK) {
 	ssize_t temp, result = 0;
 	struct taskgroup *group;
-	struct taskpid *threadlist;
+	struct taskpid *tpid;
 	/* Retrieve the process leader of `proc' */
 	proc = task_getprocess_of(proc);
 
@@ -609,17 +603,14 @@ task_enum_process_children_nb(task_enum_cb_t cb, void *arg,
 	group = &FORTASK(proc, this_taskgroup);
 	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
 	/* Enumerate threads. */
-	threadlist = group->tg_proc_threads;
-	if (threadlist != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-		for (; threadlist; threadlist = threadlist->tp_siblings.ln_next) {
-			REF struct task *thread;
-			thread = taskpid_gettask(threadlist);
-			temp = (*cb)(arg, thread, threadlist);
-			xdecref_unlikely(thread);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
-		}
+	FOREACH_taskgroup__proc_threads(tpid, group) {
+		REF struct task *thread;
+		thread = taskpid_gettask(tpid);
+		temp = (*cb)(arg, thread, tpid);
+		xdecref_unlikely(thread);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
 	}
 	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 done:
@@ -636,7 +627,7 @@ task_enum_procgroup_processes_nb(task_enum_cb_t cb, void *arg,
 		THROWS(E_WOULDBLOCK) {
 	ssize_t temp, result;
 	struct taskgroup *group;
-	struct task *threadlist;
+	struct task *grp_proc;
 	/* Retrieve the process group leader of `proc' */
 	proc = task_getprocessgroupleader_of(proc);
 	FINALLY_DECREF_UNLIKELY(proc);
@@ -655,10 +646,9 @@ task_enum_procgroup_processes_nb(task_enum_cb_t cb, void *arg,
 	group = &FORTASK(proc, this_taskgroup);
 	sync_read_if_not_dbg(&group->tg_pgrp_processes_lock);
 	/* Enumerate process group member processes. */
-	for (threadlist = group->tg_pgrp_processes; threadlist;
-	     threadlist = FORTASK(threadlist, this_taskgroup).tg_proc_group_siblings.ln_next) {
-		ASSERT_POISON(threadlist != proc);
-		CB_THREAD(threadlist);
+	FOREACH_taskgroup__pgrp_processes(grp_proc, group) {
+		ASSERT_POISON(grp_proc != proc);
+		CB_THREAD(grp_proc);
 	}
 	sync_endread_if_not_dbg(&group->tg_pgrp_processes_lock);
 done:

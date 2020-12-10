@@ -52,15 +52,14 @@
  * [      1      ]   *_CONCAT(dst, src, key)
  * [1 1 1 1 1   1]   *_EMPTY(self)
  * [1 1 1 1 1   1]   *_FIRST(self)
- * [1 1          ]   *_PFIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
+ * [  1          ]   *_P_FIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
  * [      1 1    ]   *_LAST(self)
  * [1 1 1 1 1 1 1]   *_NEXT(elem, key)
  * [      1      ]   *_PREV(elem, [headname], key)
  * [        1 1 1]   *_PREV(elem, key)
  * [1            ]   *_PREV(elem, [type], key)                       (Return predecessor (undef if no prev-elem exists))
  * [  1          ]   *_P_PREV(p_elem, [type], key)                   (Return predecessor (undef if no prev-elem exists))
- * [1 1          ]   *_PNEXT(elem, key)                              (Return pointer to the pointer to the next item; use with *_P_* functions)
- * [1            ]   *_PPREV(elem, key)                              (Return pointer to the pointer to the prev item; use with *_P_* functions)
+ * [  1          ]   *_P_NEXT(elem, key)                             (Return pointer to the pointer to the next item; use with *_P_* functions)
  * [        1    ]   *_LOOP_NEXT(self, elem, key)                    (NOTE: *_NEXT(elem, key) for RINGQ)
  * [        1    ]   *_LOOP_PREV(self, elem, key)                    (NOTE: *_PREV(elem, key) for RINGQ)
  * [1 1 1     1 1]   *_INSERT_AFTER(predecessor, elem, key)
@@ -116,7 +115,7 @@
  * [  N N        ]   *_TRYREPLACE(self, old_elem, new_elem, [type], key, on_failure)
  * [  N N        ]   *_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_failure)
  * [N N N N N   N]   *_FOREACH(elem, self, key)
- * [N N N        ]   *_P_FOREACH(p_elem, self, key)
+ * [  N N        ]   *_P_FOREACH(p_elem, self, key)
  * [        N    ]   *_FOREACH_REVERSE(elem, self, key)
  * [      N      ]   *_FOREACH_REVERSE(elem, self, [headname], key)
  * [=============]   -- Sub-API: Check if an element is contained within a list,
@@ -145,12 +144,16 @@
 #else /* NDEBUG */
 #include "../typecore.h"
 #if __SIZEOF_POINTER__ == 4
+#define __HYBRID_Q_BADPTRVAL     __UINT32_C(0xcccccccc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT32_C(0xcccccccc))
 #elif __SIZEOF_POINTER__ == 8
+#define __HYBRID_Q_BADPTRVAL     __UINT64_C(0xcccccccccccccccc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT64_C(0xcccccccccccccccc))
 #elif __SIZEOF_POINTER__ == 2
+#define __HYBRID_Q_BADPTRVAL     __UINT16_C(0xcccc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT16_C(0xcccc))
 #elif __SIZEOF_POINTER__ == 1
+#define __HYBRID_Q_BADPTRVAL     __UINT8_C(0xcc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT8_C(0xcc))
 #elif defined(__KOS_SYSTEM_HEADERS__)
 #include <libc/string.h>
@@ -194,7 +197,7 @@
 	{ __NULLPTR }
 #define LIST_INIT(self)  (void)((self)->lh_first = __NULLPTR)
 #define LIST_EMPTY(self) ((self)->lh_first == __NULLPTR)
-#if defined(__INTELLISENSE__) && defined(__COMPILER_HAVE_TYPEOF) /* Prevent code like `&LIST_FIRST()' (use `LIST_PFIRST()' instead) */
+#if defined(__INTELLISENSE__) && defined(__COMPILER_HAVE_TYPEOF) /* Prevent code like `&LIST_FIRST()' (use `LIST_P_FIRST()' instead) */
 #define LIST_FIRST(self) ((__typeof__((self)->lh_first))(self)->lh_first)
 #else /* __INTELLISENSE__ && __COMPILER_HAVE_TYPEOF */
 #define LIST_FIRST(self) (self)->lh_first
@@ -218,8 +221,8 @@
 #define LIST_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
 #define LIST_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
-#define LIST_ENTRY_UNBOUND_INIT(elem, key)                            (void)((elem)->key.le_prev = __NULLPTR)
-#define LIST_ENTRY_UNBOUND_INIT_P(elem, getpath)                      (void)(getpath(elem).le_prev = __NULLPTR)
+#define LIST_ENTRY_UNBOUND_INIT(elem, key)                            (void)(__HYBRID_Q_BADPTR((elem)->key.le_next), (elem)->key.le_prev = __NULLPTR)
+#define LIST_ENTRY_UNBOUND_INIT_P(elem, getpath)                      (void)(__HYBRID_Q_BADPTR(getpath(elem).le_next), getpath(elem).le_prev = __NULLPTR)
 #define LIST_CLEAR(self)                                              (void)((self)->lh_first = __NULLPTR)
 #define LIST_ISBOUND(elem, key)                                       ((elem)->key.le_prev != __NULLPTR)
 #define LIST_ISBOUND_P(elem, getpath)                                 (getpath(elem).le_prev != __NULLPTR)
@@ -355,16 +358,9 @@
 #define LIST_REPLACE_R_P(old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_LIST_REPLACE_R(old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
 #define LIST_REMOVE_P(elem, getpath)                                                  __HYBRID_LIST_REMOVE(elem, __HYBRID_Q_PTH, getpath)
 #define LIST_FOREACH_P(elem, self, getpath)                                           __HYBRID_LIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
-#define LIST_P_FOREACH(p_elem, self, key)                                             __HYBRID_LIST_P_FOREACH(p_elem, self, __HYBRID_Q_KEY, key)
-#define LIST_P_FOREACH_P(p_elem, self, getpath)                                       __HYBRID_LIST_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
 #define LIST_NEXT_P(elem, getpath)                                                    __HYBRID_LIST_NEXT(elem, __HYBRID_Q_PTH, getpath)
-#define LIST_PNEXT(elem, key)                                                         (&(elem)->key.le_next)
-#define LIST_PNEXT_P(elem, getpath)                                                   (&getpath(elem).le_next)
-#define LIST_PPREV(elem, key)                                                         ((elem)->key.le_prev)
-#define LIST_PPREV_P(elem, getpath)                                                   (getpath(elem).le_prev)
 #define LIST_REMOVE_R(lo_elem, hi_elem, key)                                          __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define LIST_REMOVE_R_P(lo_elem, hi_elem, getpath)                                    __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
-#define LIST_PFIRST(self)                                                             (&(self)->lh_first)
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
 #define __HYBRID_LIST_PREV3(elem, T, key)  __COMPILER_CONTAINER_OF((elem)->key.le_prev, T, key.le_next)
@@ -813,9 +809,9 @@
 #define SLIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)       __HYBRID_SLIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_KEY, key)
 #define SLIST_P_REPLACE_R_P(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_SLIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_NEXT_P(elem, getpath)                                                        __HYBRID_SLIST_NEXT(elem, __HYBRID_Q_PTH, getpath)
-#define SLIST_PNEXT(elem, key)                                                             (&(elem)->key.sle_next)
-#define SLIST_PNEXT_P(elem, getpath)                                                       (&getpath(elem).sle_next)
-#define SLIST_PFIRST(self)                                                                 (&(self)->slh_first)
+#define SLIST_P_NEXT(elem, key)                                                            (&(elem)->key.sle_next)
+#define SLIST_P_NEXT_P(elem, getpath)                                                      (&getpath(elem).sle_next)
+#define SLIST_P_FIRST(self)                                                                (&(self)->slh_first)
 #define SLIST_ATOMIC_INSERT(self, elem, key)                                               __HYBRID_SLIST_ATOMIC_INSERT(self, elem, __HYBRID_Q_KEY, key)
 #define SLIST_ATOMIC_INSERT_P(self, elem, getpath)                                         __HYBRID_SLIST_ATOMIC_INSERT(self, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)                                 __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -2799,9 +2795,8 @@
 	((*getpath(elem).ln_pself = getpath(elem).ln_next) != __NULLPTR             \
 	 ? (void)(getpath(getpath(elem).ln_next).ln_pself = getpath(elem).ln_pself) \
 	 : (void)0)
-#define LLIST_UNBIND(elem, key)  (void)((elem)->key.ln_pself = __NULLPTR)
 #define LLIST_ISBOUND(elem, key) ((elem)->key.ln_pself != __NULLPTR)
-#define LLIST_UNLINK(elem, key)  (LLIST_REMOVE(elem, key), LLIST_UNBIND(elem, key))
+#define LLIST_UNLINK(elem, key)  (LLIST_REMOVE(elem, key), (elem)->key.ln_pself = __NULLPTR)
 #endif /* !__HYBRID_LIST_WITHOUT_DEPRECATED */
 
 #endif /* __CC__ */

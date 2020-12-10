@@ -790,8 +790,7 @@ NOTHROW(FCALL GDBThread_StopProcess)(struct task *__restrict thread,
 	 *        holding this lock. */
 again_threads:
 	sync_read(&group->tg_proc_threads_lock);
-	for (iter = group->tg_proc_threads;
-	     iter; iter = iter->tp_siblings.ln_next) {
+	FOREACH_taskgroup__proc_threads(iter, group) {
 		REF struct task *pt;
 		pt = taskpid_gettask(iter);
 		if (!pt)

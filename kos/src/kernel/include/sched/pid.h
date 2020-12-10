@@ -59,7 +59,7 @@ struct taskpid {
 	union wait                      tp_status;   /* [const_if(!tp_thread || wasdestroyed(tp_thread) || tp_thread->t_flags & TASK_FTERMINATING)]
 	                                              * Current thread status / thread exit status. */
 	struct sig                      tp_changed;  /* Signal broadcast when the thread changes state (WSTOPPED, WCONTINUED, WEXITED) */
-	LLIST_NODE(REF struct taskpid)  tp_siblings; /* [0..1][valid_if(tp_thread && !wasdestroyed(tp_thread))]
+	LIST_ENTRY(REF taskpid)         tp_siblings; /* [0..1][valid_if(tp_thread && !wasdestroyed(tp_thread))]
 	                                              * Chain of sibling tasks:
 	                                              *  - If `tp_thread' is a process-leader:
 	                                              *    - Chain of sibling processes spawned by the parent process of `tp_thread'
@@ -151,6 +151,9 @@ DATDEF ATTR_PERTASK struct sigqueue this_sigqueue;
 struct ttybase_device;
 struct rpc_entry;
 
+LIST_HEAD(taskpid_list, REF taskpid);
+LIST_HEAD(task_list, WEAK task);
+
 struct taskgroup {
 	/* Controller structure for tracing task association within/between
 	 * processes, process groups, as well as sessions. */
@@ -175,12 +178,17 @@ struct taskgroup {
 	};
 	union {
 #define TASKGROUP_TG_PROC_THREADS_TERMINATED ((REF struct taskpid *)-1)
-		LLIST(REF struct taskpid) tg_proc_threads;       /* [0..1][lock(tg_proc_threads_lock)][valid_if(tg_process == THIS_TASK)]
+		struct taskpid_list      tg_proc_threads;        /* [0..1][lock(tg_proc_threads_lock)][valid_if(tg_process == THIS_TASK)]
 		                                                  * Chain of threads & child processes of this process (excluding the calling (aka. leader) thread)
 		                                                  * Child processes are removed from this chain, either by being `detach(2)'ed, or by being `wait(2)'ed on.
 		                                                  * NOTE: This chain is set to `TASKGROUP_TG_PROC_THREADS_TERMINATED' once the associated
 		                                                  *       process terminates, in order to prevent any new threads from being added.
 		                                                  * NOTE: When a thread is detached, the `tg_thread_detached' field is updated */
+#define FOREACH_taskgroup__proc_threads(taskpid_elem, group)                                              \
+	if (((taskpid_elem) = LIST_FIRST(&(group)->tg_proc_threads)) == TASKGROUP_TG_PROC_THREADS_TERMINATED) \
+		;                                                                                                 \
+	else                                                                                                  \
+		for (; (taskpid_elem); (taskpid_elem) = LIST_NEXT(taskpid_elem, tp_siblings))
 #define TASKGROUP_TG_THREAD_DETACHED_NO         0 /* The thread is not detached */
 #define TASKGROUP_TG_THREAD_DETACHED_YES        1 /* The thread is detached */
 #define TASKGROUP_TG_THREAD_DETACHED_TERMINATED 2 /* The thread has terminated */
@@ -203,7 +211,7 @@ struct taskgroup {
 	                                                      * @assume(tg_proc_procgroup == FORTASK(taskpid_gettask(tg_proc_procgroup), this_taskgroup).tg_proc_procgroup)
 	                                                      * The leader of the associated process group.
 	                                                      * When set to `THIS_TASKPID', then the calling thread is a process group leader. */
-	LLIST_NODE(WEAK struct task) tg_proc_group_siblings; /* [0..1][lock(tg_proc_group->tg_pgrp_processes_lock)]
+	LIST_ENTRY(WEAK task)        tg_proc_group_siblings; /* [0..1][lock(tg_proc_group->tg_pgrp_processes_lock)]
 	                                                      * [valid_if(THIS_TASKPID != tg_proc_group &&
 	                                                      *           taskpid_gettask(tg_proc_group) != NULL)]
 	                                                      * Chain of sibling processes within the same process group.
@@ -211,8 +219,12 @@ struct taskgroup {
 	struct process_sigqueue      tg_proc_signals;        /* Pending signals that are being delivered to this process. */
 	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
-	LLIST(WEAK struct task)      tg_pgrp_processes;      /* [0..1] Chain of processes within this process group (excluding the calling process)
+	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this process group (excluding the calling process)
 	                                                      * NOTE: This list of processes is chained using the `tg_proc_group_siblings' list node. */
+#define KEY__this_taskgroup__tg_proc_group_siblings(thread) \
+	FORTASK(thread, this_taskgroup).tg_proc_group_siblings
+#define FOREACH_taskgroup__pgrp_processes(proc, group) \
+	LIST_FOREACH_P(proc, &(group)->tg_pgrp_processes, KEY__this_taskgroup__tg_proc_group_siblings)
 	struct atomic_rwlock         tg_pgrp_session_lock;   /* Lock for `tg_pgrp_session' */
 	REF struct taskpid          *tg_pgrp_session;        /* [1..1][const_if(== THIS_TASKPID)][lock(tg_pgrp_session_lock)]
 	                                                      * @assume(tg_pgrp_session == FORTASK(taskpid_gettask(tg_pgrp_session), this_taskgroup).tg_pgrp_session)
@@ -437,7 +449,8 @@ struct pidns {
 	struct pidns_entry  *pn_list;        /* [1..pn_mask+1][owned_if(!= INTERNAL(empty_pidns_list))]
 	                                      * Hash-vector of PIDs. */
 	WEAK struct taskpid *pn_dead;        /* [0..1] Chain of dead task PIDs that are pending removal.
-	                                      * NOTE: Chained via `tp_siblings.ln_next' */
+	                                      * NOTE: Chained via `tp_siblings.le_next' */
+#define KEY__pidns_dead_next(elem) (elem)->tp_siblings.le_next
 	upid_t               pn_nextpid;     /* [lock(pn_lock)] Next PID to hand out. */
 };
 
@@ -633,18 +646,18 @@ NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self) {
 LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL task_isorphan)(void) {
 	struct taskpid *proc = task_getprocesspid();
-	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == __NULLPTR;
+	return __hybrid_atomic_load(proc->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread) {
 	struct taskpid *proc = task_getprocesspid_of(thread);
-	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == __NULLPTR;
+	return __hybrid_atomic_load(proc->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self) {
-	return __hybrid_atomic_load(self->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == __NULLPTR;
+	return __hybrid_atomic_load(self->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL WUNUSED REF struct task *KCALL

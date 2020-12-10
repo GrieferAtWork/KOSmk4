@@ -2137,13 +2137,7 @@ find_thread_in_process_with_unmasked_signal(struct task *__restrict process_lead
 		return incref(process_leader);
 	group = &FORTASK(process_leader, this_taskgroup);
 	sync_read(&group->tg_proc_threads_lock);
-	cpid = ATOMIC_READ(group->tg_proc_threads);
-	if unlikely(cpid == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-		sync_endread(&group->tg_proc_threads_lock);
-		/* Terminated thread... */
-		return NULL;
-	}
-	for (; cpid; cpid = cpid->tp_siblings.ln_next) {
+	FOREACH_taskgroup__proc_threads(cpid, group) {
 		REF struct task *child;
 		child = cpid->tp_thread.get();
 		if (!child)
@@ -2186,13 +2180,7 @@ find_thread_in_process_with_unmasked_signal_and_gather_maybe_maskers(struct task
 	has_maybe_masked = is_masked == SIGMASK_ISMASKED_MAYBE ? 1 : 0;
 	group = &FORTASK(process_leader, this_taskgroup);
 	sync_read(&group->tg_proc_threads_lock);
-	cpid = ATOMIC_READ(group->tg_proc_threads);
-	if unlikely(cpid == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-		sync_endread(&group->tg_proc_threads_lock);
-		/* Terminated thread... */
-		return NULL;
-	}
-	for (; cpid; cpid = cpid->tp_siblings.ln_next) {
+	FOREACH_taskgroup__proc_threads(cpid, group) {
 		REF struct task *child;
 		child = cpid->tp_thread.get();
 		if (!child)
@@ -2236,14 +2224,7 @@ again_search_for_maybe_maskers:
 			taskref_pointer_set_fini(pmaybe_maskers);
 			RETHROW();
 		}
-		cpid = ATOMIC_READ(group->tg_proc_threads);
-		if unlikely(cpid == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-			sync_endread(&group->tg_proc_threads_lock);
-			taskref_pointer_set_fini(pmaybe_maskers);
-			/* Terminated thread... */
-			return NULL;
-		}
-		for (; cpid; cpid = cpid->tp_siblings.ln_next) {
+		FOREACH_taskgroup__proc_threads(cpid, group) {
 			REF struct task *child;
 			int is_masked;
 			int insert_error;
@@ -2292,6 +2273,7 @@ again_search_for_maybe_maskers:
 			 * a reference to `child', meaning that we mustn't decref it here! */
 			/*decref_unlikely(child);*/
 		}
+		taskref_pointer_set_fini(pmaybe_maskers);
 	}
 	sync_endread(&group->tg_proc_threads_lock);
 	/* The signal is being masked everywhere. */
@@ -2508,8 +2490,7 @@ load_more_threads:
 		pending_delivery_procc = 0;
 		there_are_more_procs = false;
 		sync_read(&pgroup_group->tg_pgrp_processes_lock);
-		for (iter = pgroup_group->tg_pgrp_processes; iter;
-		     iter = FORTASK(iter, this_taskgroup).tg_proc_group_siblings.ln_next) {
+		FOREACH_taskgroup__pgrp_processes(iter, pgroup_group) {
 			assert(iter != pgroup);
 			if (pointer_set_contains(&ps, iter))
 				continue;
