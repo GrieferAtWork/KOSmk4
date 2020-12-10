@@ -1154,6 +1154,12 @@
 #define RINGQ_ENTRY(t) struct{struct t*rqe_next,*rqe_prev;}
 #define RINGQ_ENTRY_P(T) struct{T*rqe_next,*rqe_prev;}
 
+#define DLIST_HEAD(n,t) struct n{struct t*dlh_first;}
+#define DLIST_ENTRY(t) struct{struct t*dle_next,*dle_prev;}
+#define DLIST_ENTRY_P(T) struct{T*dle_next,*dle_prev;}
+#define DLIST_FOREACH(...) for(;;)
+#define DLIST_FOREACH_P(...) for(;;)
+
 #define LLIST(T)                  T*
 #define LLIST_NODE(T)             struct{T *ln_next,**ln_pself;}
 #define OLD_SLIST(T)                  T*
