@@ -107,62 +107,44 @@ INTDEF NONNULL((1)) void CC
 dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self);
 
 /* [1..1] List of global modules / pointer to the root binary. */
-INTDEF LLIST(DlModule) DlModule_GlobalList;
+LIST_HEAD(dlmodule_list, dlmodule);
+INTDEF struct dlmodule_list DlModule_GlobalList;
 INTDEF struct atomic_rwlock DlModule_GlobalLock;
 
 /* [1..1] List of all loaded modules. */
-INTDEF DlModule *DlModule_AllList;
+DLIST_HEAD(dlmodule_dlist, dlmodule);
+INTDEF struct dlmodule_dlist DlModule_AllList;
 INTDEF struct atomic_rwlock DlModule_AllLock;
 
 #define DlModule_GlobalList_FOREACH(mod) \
-	for ((mod) = DlModule_GlobalList; (mod); (mod) = (mod)->dm_globals.ln_next)
+	LIST_FOREACH(mod, &DlModule_GlobalList, dm_globals)
 #define DlModule_AllList_FOREACH(mod) \
-	for ((mod) = DlModule_AllList; (mod); (mod) = (mod)->dm_modules_next)
+	DLIST_FOREACH(mod, &DlModule_AllList, dm_modules)
 
 /* The module describing the RTLD library itself. */
 INTDEF DlModule dl_rtld_module;
 
 LOCAL NONNULL((1)) void CC
 DlModule_AddToGlobals(DlModule *__restrict self) {
-	DlModule **plist, *next;
-	plist = &DlModule_GlobalList;
-	while ((next = *plist) != NULL)
-		plist = &next->dm_globals.ln_next;
-	self->dm_globals.ln_pself = plist;
-	self->dm_globals.ln_next  = NULL;
-	*plist                    = self;
-}
-
-LOCAL NONNULL((1)) void CC
-DlModule_RemoveFromGlobals(DlModule *__restrict self) {
-	assert(self != &dl_rtld_module);
-	*self->dm_globals.ln_pself = self->dm_globals.ln_next;
+	/* XXX: This right here is a O(n) operation for something that
+	 *      could also be done in O(1) when using other list types.
+	 *      However, all list types currently defined in <hybrid/sequence/list.h>
+	 *      that offer O(1) INSERT_TAIL, would also require a static initializer
+	 *      that contains a relocation... */
+	LIST_INSERT_TAIL(&DlModule_GlobalList, self, dm_globals);
 }
 
 LOCAL NONNULL((1)) void CC
 DlModule_AddToAll(DlModule *__restrict self) {
-	DlModule *prev;
-	assert(self);
-	assert(!self->dm_modules_prev);
-	prev = DlModule_AllList;
-	assert(prev);
-	while (prev->dm_modules_next)
-		prev = prev->dm_modules_next;
-	prev->dm_modules_next = self;
-	self->dm_modules_prev = prev;
-	self->dm_modules_next = NULL;
+	assert(!DLIST_EMPTY(&DlModule_AllList));
+	DLIST_INSERT_TAIL(&DlModule_AllList, self, dm_modules);
 }
 
 LOCAL NONNULL((1)) void CC
 DlModule_RemoveFromAll(DlModule *__restrict self) {
 	assert(self != &dl_rtld_module);
-	assert(self->dm_modules_prev);
-	if ((self->dm_modules_prev->dm_modules_next = self->dm_modules_next) != NULL)
-		self->dm_modules_next->dm_modules_prev = self->dm_modules_prev;
-#ifndef NDEBUG
-	memset(&self->dm_modules_next, 0xcc, sizeof(self->dm_modules_next));
-	memset(&self->dm_modules_prev, 0xcc, sizeof(self->dm_modules_prev));
-#endif /* !NDEBUG */
+	assert(DLIST_PREV(self, dm_modules) != NULL);
+	DLIST_REMOVE(&DlModule_AllList, self, dm_modules);
 }
 
 

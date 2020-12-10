@@ -50,12 +50,12 @@ DECL_BEGIN
 
 /* [1..1] Global chain of loaded modules.
  * WARNING: Contained modules may have a reference counter of ZERO(0)! */
-INTERN LLIST(DlModule) DlModule_GlobalList = LLIST_INIT;
+INTERN struct dlmodule_list DlModule_GlobalList = LIST_HEAD_INITIALIZER(DlModule_GlobalList);
 INTERN struct atomic_rwlock DlModule_GlobalLock = ATOMIC_RWLOCK_INIT;
 
 /* [1..1] List of all loaded modules. */
-INTERN DlModule *DlModule_AllList = NULL;
-INTERN struct atomic_rwlock DlModule_AllLock = ATOMIC_RWLOCK_INIT;
+INTERN struct dlmodule_dlist DlModule_AllList = DLIST_HEAD_INITIALIZER(DlModule_AllList);
+INTERN struct atomic_rwlock DlModule_AllLock  = ATOMIC_RWLOCK_INIT;
 
 
 INTERN WUNUSED fd_t CC reopen_bigfd(fd_t fd) {
@@ -161,9 +161,9 @@ again_old_flags:
 			atomic_rwlock_endwrite(&DlModule_GlobalLock);
 			goto again_old_flags;
 		}
-		assert(!self->dm_globals.ln_pself);
+		assert(!LIST_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
-		assert(self->dm_globals.ln_pself);
+		assert(LIST_ISBOUND(self, dm_globals));
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 }
@@ -467,15 +467,17 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 	/* Register the module as globally loaded (if RTLD_GLOBAL is set). */
 	if (self->dm_flags & RTLD_GLOBAL) {
 		atomic_rwlock_write(&DlModule_GlobalLock);
-		if (!self->dm_globals.ln_pself)
+		if (!LIST_ISBOUND(self, dm_globals))
 			DlModule_AddToGlobals(self);
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 
-	if (!self->dm_modules_prev) {
+	if (!DLIST_PREV(self, dm_modules)) {
 		atomic_rwlock_write(&DlModule_AllLock);
-		if likely(!ATOMIC_READ(self->dm_modules_prev))
+		COMPILER_READ_BARRIER();
+		if likely(!DLIST_PREV(self, dm_modules))
 			DlModule_AddToAll(self);
+		COMPILER_READ_BARRIER();
 		atomic_rwlock_endwrite(&DlModule_AllLock);
 	}
 

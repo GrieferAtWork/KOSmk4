@@ -52,9 +52,9 @@ again_old_flags:
 			atomic_rwlock_endwrite(&DlModule_GlobalLock);
 			goto again_old_flags;
 		}
-		assert(!self->dm_globals.ln_pself);
+		assert(!LIST_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
-		assert(self->dm_globals.ln_pself);
+		assert(LIST_ISBOUND(self, dm_globals));
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 }
@@ -99,7 +99,8 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) {
 			break;
 
 		case DT_PREINIT_ARRAYSZ:
-			preinit_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			preinit_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val /
+			                     sizeof(elf_init_t);
 			break;
 
 		case DT_INIT_ARRAY:
@@ -108,7 +109,8 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) {
 			break;
 
 		case DT_INIT_ARRAYSZ:
-			init_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			init_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val /
+			                  sizeof(elf_init_t);
 			break;
 
 		default: break;
@@ -123,9 +125,11 @@ done_dyntag:
 	 * HINT: We can take all of the required information from `root_peb' */
 	for (i = 0; i < preinit_array_size; ++i)
 		CALLINIT(preinit_array_base[i] /* + self->dm_loadaddr*/);
-	/* Service a init function, if one was specified. */
+
+	/* Service an init function, if one was specified. */
 	if (init_func)
 		CALLINIT(init_func + self->dm_loadaddr);
+
 	/* Service init-array functions in forward order. */
 	for (i = 0; i < init_array_size; ++i)
 		CALLINIT(init_array_base[i] /* + self->dm_loadaddr*/);
@@ -141,20 +145,24 @@ done_dyntag:
 INTERN void CC DlModule_RunAllStaticInitializers(void) {
 	REF DlModule *primary;
 	DlModule *last;
-	primary = DlModule_GlobalList;
+	primary = LIST_FIRST(&DlModule_GlobalList);
 	assert(primary != &dl_rtld_module);
 	DlModule_Incref(primary);
 again_search_noinit:
 	atomic_rwlock_read(&DlModule_GlobalLock);
-	last = primary;
-	while (last->dm_globals.ln_next != NULL)
-		last = last->dm_globals.ln_next;
+	/* XXX: last = LIST_LAST(&DlModule_GlobalList);
+	 *      Change this code if we ever change the list
+	 *      type used by `DlModule_GlobalList' to something
+	 *      that allows for O(1) lookup of the last element. */
+	last = LIST_FIRST(&DlModule_GlobalList);
+	while (LIST_NEXT(last, dm_globals) != NULL)
+		last = LIST_NEXT(last, dm_globals);
 	while (!(last->dm_flags & RTLD_NOINIT)) {
 		if (last == primary) {
 			atomic_rwlock_endread(&DlModule_GlobalLock);
 			goto done;
 		}
-		last = LLIST_PREV(DlModule, last, dm_globals);
+		last = LIST_PREV(last, dm_globals);
 	}
 	assert(last != &dl_rtld_module);
 	last->dm_flags &= ~RTLD_NOINIT;
@@ -359,7 +367,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 				if (!(self->dm_flags & RTLD_GLOBAL)) {
 					atomic_rwlock_write(&DlModule_GlobalLock);
 					self->dm_flags |= RTLD_GLOBAL;
-					if (!self->dm_globals.ln_pself)
+					if (!LIST_ISBOUND(self, dm_globals))
 						DlModule_AddToGlobals(self);
 					atomic_rwlock_endwrite(&DlModule_GlobalLock);
 				}

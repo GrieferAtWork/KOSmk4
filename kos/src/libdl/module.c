@@ -45,8 +45,8 @@ DECL_BEGIN
 STATIC_ASSERT(offsetof(struct link_map, l_addr) == offsetof(DlModule, dm_loadaddr));
 STATIC_ASSERT(offsetof(struct link_map, l_name) == offsetof(DlModule, dm_filename));
 STATIC_ASSERT(offsetof(struct link_map, l_ld) == offsetof(DlModule, dm_dynhdr));
-STATIC_ASSERT(offsetof(struct link_map, l_next) == offsetof(DlModule, dm_modules_next));
-STATIC_ASSERT(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules_prev));
+STATIC_ASSERT(offsetof(struct link_map, l_next) == offsetof(DlModule, dm_modules.dle_next));
+STATIC_ASSERT(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules.dle_prev));
 
 
 INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
@@ -96,12 +96,11 @@ DlModule_Destroy(DlModule *__restrict self) {
 	}
 
 	/* Unbind the module from the global symbol table. */
-	assert(LLIST_ISBOUND(self, dm_globals) ==
+	assert(LIST_ISBOUND(self, dm_globals) ==
 	       ((self->dm_flags & RTLD_GLOBAL) != 0));
-	if (LLIST_ISBOUND(self, dm_globals)) {
+	if (LIST_ISBOUND(self, dm_globals)) {
 		atomic_rwlock_write(&DlModule_GlobalLock);
-		DlModule_RemoveFromGlobals(self);
-		LLIST_UNBIND(self, dm_globals);
+		LIST_UNBIND(self, dm_globals);
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 

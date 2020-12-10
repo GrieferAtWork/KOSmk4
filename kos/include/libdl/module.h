@@ -212,8 +212,7 @@ struct dlmodule {
 	                                            * WARNING: This field is ELF-only! Other module formats must keep this
 	                                            *          field set to NULL (it only has to be ~here~ because of binary
 	                                            *          compatibility with GNU's `struct link_map') */
-	__WEAK DlModule          *dm_modules_next; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
-	__WEAK DlModule          *dm_modules_prev; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
+	DLIST_ENTRY(dlmodule)     dm_modules;      /* [lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
 	/* --- End of `struct link_map' emulation --- */
 
 	/* TLS variables (PT_TLS). */
@@ -236,7 +235,7 @@ struct dlmodule {
 	__WEAK refcnt_t           dm_refcnt;     /* Reference counter. */
 
 	/* Module global binding. */
-	LLIST_NODE(__WEAK DlModule) dm_globals;    /* [lock(DlModule_GlobalLock)][valid_if(dm_flags & RTLD_GLOBAL)]
+	LIST_ENTRY(__WEAK dlmodule) dm_globals;  /* [lock(DlModule_GlobalLock)][valid_if(dm_flags & RTLD_GLOBAL)]
 	                                          * Link entry in the chain of global modules. */
 
 	/* Module identification / data accessor. */

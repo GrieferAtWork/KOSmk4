@@ -242,12 +242,12 @@ search_external_symbol:
 		/* Search the symbol tables of already loaded modules. */
 		hash_elf = hash_gnu = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
 		atomic_rwlock_read(&DlModule_GlobalLock);
-		iter = DlModule_GlobalList;
+		iter = LIST_FIRST(&DlModule_GlobalList);
 		for (;;) {
 again_search_globals_next:
 			assert(iter);
 			if (iter == self || unlikely(!DlModule_TryIncref(iter))) {
-				iter = iter->dm_globals.ln_next;
+				iter = LIST_NEXT(iter, dm_globals);
 				if unlikely(!iter) {
 					atomic_rwlock_endread(&DlModule_GlobalLock);
 					break;
@@ -282,7 +282,7 @@ again_search_globals_module:
 							weak_symbol.ds_sym = (ElfW(Sym) const *)symbol_addr;
 							weak_symbol.ds_siz = symbol_size;
 							atomic_rwlock_read(&DlModule_GlobalLock);
-							iter = iter->dm_globals.ln_next;
+							iter = LIST_NEXT(iter, dm_globals);
 							if unlikely(!iter) {
 								atomic_rwlock_endread(&DlModule_GlobalLock);
 								break;
@@ -313,7 +313,7 @@ again_search_globals_module:
 							weak_symbol.ds_mod = iter; /* Inherit reference */
 							weak_symbol.ds_sym = symbol;
 							atomic_rwlock_read(&DlModule_GlobalLock);
-							iter = iter->dm_globals.ln_next;
+							iter = LIST_NEXT(iter, dm_globals);
 							if unlikely(!iter) {
 								atomic_rwlock_endread(&DlModule_GlobalLock);
 								break;
@@ -346,9 +346,9 @@ again_search_globals_module:
 				}
 			}
 			atomic_rwlock_read(&DlModule_GlobalLock);
-			next = iter->dm_globals.ln_next;
+			next = LIST_NEXT(iter, dm_globals);
 			while (likely(next) && (next == self || unlikely(!DlModule_TryIncref(next))))
-				next = next->dm_globals.ln_next;
+				next = LIST_NEXT(next, dm_globals);
 			atomic_rwlock_endread(&DlModule_GlobalLock);
 			DlModule_Decref(iter);
 			if unlikely(!next)

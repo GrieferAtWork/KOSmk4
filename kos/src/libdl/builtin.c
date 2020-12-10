@@ -214,9 +214,9 @@ again_old_flags:
 			atomic_rwlock_endwrite(&DlModule_GlobalLock);
 			goto again_old_flags;
 		}
-		assert(!self->dm_globals.ln_pself);
+		assert(!LIST_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
-		assert(self->dm_globals.ln_pself);
+		assert(LIST_ISBOUND(self, dm_globals));
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 }
@@ -227,7 +227,7 @@ libdl_dlopen(char const *filename, int mode) {
 	REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *result;
 	if unlikely(!filename) {
 		/* ... If filename is NULL, then the returned handle is for the main program... */
-		result = DlModule_GlobalList;
+		result = LIST_FIRST(&DlModule_GlobalList);
 		assert(result);
 		assert(result->dm_flags & RTLD_NODELETE);
 		/* Don't incref() the returned module for this case:
@@ -425,12 +425,12 @@ libdl_dlsym(DlModule *self, char const *__restrict name) {
 	if (self == RTLD_DEFAULT) {
 		/* Search all modules in order of being loaded. */
 		atomic_rwlock_read(&DlModule_GlobalLock);
-		symbol.ds_mod = DlModule_GlobalList;
+		symbol.ds_mod = LIST_FIRST(&DlModule_GlobalList);
 		assert(symbol.ds_mod);
 		for (;;) {
 			if unlikely(!DlModule_TryIncref(symbol.ds_mod)) {
 again_search_globals_next_noref:
-				symbol.ds_mod = symbol.ds_mod->dm_globals.ln_next;
+				symbol.ds_mod = LIST_NEXT(symbol.ds_mod, dm_globals);
 				if unlikely(!symbol.ds_mod) {
 					atomic_rwlock_endread(&DlModule_GlobalLock);
 					break;
@@ -511,9 +511,9 @@ again_search_globals_module:
 				}
 			}
 			atomic_rwlock_read(&DlModule_GlobalLock);
-			next_module = symbol.ds_mod->dm_globals.ln_next;
+			next_module = LIST_NEXT(symbol.ds_mod, dm_globals);
 			while (likely(next_module) && unlikely(!DlModule_TryIncref(next_module)))
-				next_module = next_module->dm_globals.ln_next;
+				next_module = LIST_NEXT(next_module, dm_globals);
 			atomic_rwlock_endread(&DlModule_GlobalLock);
 			DlModule_Decref(symbol.ds_mod);
 			if unlikely(!next_module)
@@ -1760,9 +1760,10 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 	default:
 		break;
 	}
-	if (!self)
-		self = DlModule_GlobalList;
-	else if unlikely(!DL_VERIFY_MODULE_HANDLE(self)) {
+	if (!self) {
+		self = LIST_FIRST(&DlModule_GlobalList);
+		assert(self);
+	} else if unlikely(!DL_VERIFY_MODULE_HANDLE(self)) {
 		dl_seterror_badmodule(self);
 		goto err;
 	}
@@ -2010,10 +2011,10 @@ libdl_iterate_phdr(__dl_iterator_callback callback, void *arg) {
 	int result = 0;
 	REF DlModule *current, *next;
 	atomic_rwlock_read(&DlModule_AllLock);
-	current = DlModule_AllList;
+	current = DLIST_FIRST(&DlModule_AllList);
 	while (current) {
 		if (!tryincref(current)) {
-			current = current->dm_modules_next;
+			current = DLIST_NEXT(current, dm_modules);
 			continue;
 		}
 		atomic_rwlock_endread(&DlModule_AllLock);
@@ -2030,9 +2031,9 @@ got_current:
 		}
 		/* Try to lock the next module. */
 		atomic_rwlock_read(&DlModule_AllLock);
-		next = current->dm_modules_next;
+		next = DLIST_NEXT(current, dm_modules);
 		while (next && !tryincref(next))
-			next = next->dm_modules_next;
+			next = DLIST_NEXT(next, dm_modules);
 		atomic_rwlock_endread(&DlModule_AllLock);
 		/* Continue enumerating the next module. */
 		decref_unlikely(current);

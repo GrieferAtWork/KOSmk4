@@ -58,8 +58,7 @@ INTERN DlModule dl_rtld_module = {
 	.dm_loadaddr      = 0,
 	.dm_filename      = NULL,
 	.dm_dynhdr        = NULL,
-	.dm_modules_next  = NULL,
-	.dm_modules_prev  = NULL,
+	.dm_modules       = { NULL, NULL },
 	.dm_tlsoff        = 0,
 	.dm_tlsinit       = NULL,
 	.dm_tlsfsize      = 0,
@@ -151,7 +150,7 @@ linker_main(struct elfexec_info *__restrict info,
 	dl_rtld_module.dm_loadend  += info->ei_rtldaddr;
 	dl_rtld_module.dm_elf.de_phdr[0].p_filesz = (ElfW(Word))rtld_size;
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
-	DlModule_AllList = &dl_rtld_module;
+	DlModule_AllList.dlh_first = &dl_rtld_module;
 
 	/* Return a pointer to `&info->ed_entry' */
 	filename = elfexec_info_getfilename(info);
@@ -189,9 +188,9 @@ linker_main(struct elfexec_info *__restrict info,
 			goto err;
 		WR_TLS_BASE_REGISTER(tls);
 	}
-	assert(DlModule_GlobalList == base_module);
-	assert(DlModule_AllList == &dl_rtld_module);
-	assert(dl_rtld_module.dm_modules_next == base_module);
+	assert(LIST_FIRST(&DlModule_GlobalList) == base_module);
+	assert(DLIST_FIRST(&DlModule_AllList) == &dl_rtld_module);
+	assert(DLIST_NEXT(&dl_rtld_module, dm_modules) == base_module);
 
 	/*DlModule_Decref(base_module);*/ /* Intentionally left dangling! */
 
