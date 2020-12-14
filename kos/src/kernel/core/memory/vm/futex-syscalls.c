@@ -100,7 +100,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		validate_user(uaddr, sizeof(*uaddr));
 		f = vm_getfutex(THIS_VM, uaddr);
 		FINALLY_DECREF(f);
-		task_connect(&f->f_signal);
+		task_connect(&f->vmf_signal);
 		TRY {
 			result = 0;
 			if (ATOMIC_READ(*uaddr) == val) {
@@ -125,10 +125,10 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		result = 0;
 		if (f) {
 			if (val == (uint32_t)-1) {
-				result = sig_broadcast(&f->f_signal);
+				result = sig_broadcast(&f->vmf_signal);
 			} else {
 				/* Only signal at most `val' connected threads. */
-				result = sig_sendmany(&f->f_signal, (size_t)val);
+				result = sig_sendmany(&f->vmf_signal, (size_t)val);
 			}
 			decref_unlikely(f);
 		}

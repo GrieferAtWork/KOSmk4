@@ -28,6 +28,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
@@ -41,6 +42,12 @@
 #include <string.h>
 
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
 /* Free/destroy a given mem-node */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -90,9 +97,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 		} else {
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
-
-			/* Mark our part as being destroyed in the eyes of others. */
-			ATOMIC_WRITE(self->mn_part, NULL);
+			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
 
 			/* Insert into the dead-nodes list of `part'
 			 * The act of doing this is what essentially causes
@@ -156,19 +161,13 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
 	if (!mman_lock_tryacquire(mm)) {
 		result = MNODE_CLEAR_WRITE_WOULDBLOCK;
 	} else {
-		if unlikely(self->mn_part == NULL) {
-			/* Special case: deleted node.
-			 * This must be checked _after_ we've acquired the lock. */
-			result = MNODE_CLEAR_WRITE_SUCCESS;
-		} else {
-			/* Do the thing! */
-			result = mnode_clear_write_locked(self, mm);
-			if likely(result == MNODE_CLEAR_WRITE_SUCCESS) {
-				/* Sync the memory mamanger. */
-				mman_sync_p(mm,
-				            mnode_getaddr(self),
-				            mnode_getsize(self));
-			}
+		/* Do the thing! */
+		result = mnode_clear_write_locked(self, mm);
+		if likely(result == MNODE_CLEAR_WRITE_SUCCESS) {
+			/* Sync the memory mamanger. */
+			mman_sync_p(mm,
+			            mnode_getaddr(self),
+			            mnode_getsize(self));
 		}
 		mman_lock_release(mm);
 	}
@@ -262,7 +261,7 @@ DECL_END
 #define RBTREE_WANT_PREV_NEXT_NODE
 #define RBTREE(name)           mnode_tree_##name
 #define RBTREE_T               struct mnode
-#define RBTREE_Tkey            pos_t
+#define RBTREE_Tkey            void const *
 #define RBTREE_GETNODE(self)   (self)->mn_mement
 #define RBTREE_GETMINKEY(self) mnode_getminaddr(self)
 #define RBTREE_GETMAXKEY(self) mnode_getmaxaddr(self)

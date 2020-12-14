@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
@@ -35,10 +36,15 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
 	/* TODO */
+	heap_free(&kernel_locked_heap,
+	          self,
+	          self->mm_heapsize,
+	          GFP_NORMAL);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
+	pagedir_fini2(&self->mm_pagedir, self->mm_pdir_phys);
 	/* TODO */
 	weakdecref(self);
 }
@@ -72,72 +78,6 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mman_reap)(struct mman *__restrict self) {
 	/* TODO */
-}
-
-
-/* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
- * may succeed when re-attempted.
- * @return: * : The # of leading bytes that this function managed to fault. For
- *              this purpose, any non-zero value means that `*(byte_t *)addr'
- *              was made accessible for at least one moment before this function
- *              returns. Note though that memory may have already been unloaded
- *              by the time this function returns (unlikely), so the caller must
- *              still be ready to deal with the possibility that another attempt
- *              at doing nopf access at `*(byte_t *)addr' might immediatly fail
- *              again.
- *              Also note that for any memory that had already been faulted within
- *              the given address range, this function acts as though it had been
- *              the one to fault that range, meaning that the return value doesn't
- *              actually represent how much memory had just been faulted, but rather
- *              how much continuous memory (starting at `addr' and limited by at
- *              most `num_bytes') was faulted simultaneously at some point before
- *              this function returns.
- * @return: 0 : Nothing could be faulted. This might be because `addr' doesn't
- *              point into mapped memory, or the memory that is pointed-to by it
- *              is backed by VIO storage.
- *              The caller should handle this case by attempting direct memory
- *              access to the affected region (i.e. using `memcpy' rather than 
- *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error. */
-PUBLIC size_t FCALL
-mman_prefault(USER CHECKED void const *addr,
-              size_t num_bytes, bool for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	/* TODO */
-}
-
-/* Enumerate segments from `buffer', and prefault up to `num_bytes' of pointed-to
- * memory, after skipping the first `offset' bytes. The return value is the sum
- * of successfully faulted segments, however faulting also stops on the first
- * segment that cannot be fully faulted. */
-PUBLIC size_t FCALL
-mman_prefaultv(struct aio_buffer const *__restrict buffer,
-               size_t offset, size_t num_bytes, bool for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct aio_buffer_entry ent;
-	size_t temp, result = 0;
-	AIO_BUFFER_FOREACH(ent, buffer) {
-		if (offset != 0) {
-			if (offset >= ent.ab_size) {
-				offset -= ent.ab_size;
-				continue;
-			}
-			ent.ab_base += offset;
-			ent.ab_size -= offset;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		/* Prefault this part. */
-		temp = mman_prefault(ent.ab_base, ent.ab_size, for_writing);
-		result += temp;
-		/* Stop upon the first partial error (iow: once reaching
-		 * the first byte that could not be faulted) */
-		if (temp < ent.ab_size)
-			break;
-		if (ent.ab_size >= num_bytes)
-			break;
-		num_bytes -= ent.ab_size;
-	}
-	return result;
 }
 
 

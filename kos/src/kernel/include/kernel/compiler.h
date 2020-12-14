@@ -51,6 +51,21 @@
 #endif
 
 
+#ifdef CONFIG_USE_NEW_VM
+#define vm_datapart         mpart
+#define vm_datablock        mfile
+#define vm_datablock_type   mfile_ops
+#define vm_node             mnode
+#define vm                  mman
+#define vm_futex_controller mpartmeta
+#define vm_ramblock         mchunk
+#define vm_swpblock         mchunk
+#define ln_pself            le_prev
+#define ln_next             le_next
+#endif /* CONFIG_USE_NEW_VM */
+
+
+
 
 #if defined(__CC__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"

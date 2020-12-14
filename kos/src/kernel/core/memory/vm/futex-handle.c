@@ -52,7 +52,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		struct handle hnd;
 		REF struct vm_datapart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		part = self->f_part.get();
+		part = self->vmf_part.get();
 		if (!part)
 			return -EOWNERDEAD;
 		FINALLY_DECREF_UNLIKELY(part);
@@ -67,7 +67,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		REF struct vm_datablock *block;
 		REF struct vm_datapart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		part = self->f_part.get();
+		part = self->vmf_part.get();
 		if (!part)
 			return -EOWNERDEAD;
 		{
@@ -84,10 +84,10 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 	}	break;
 
 	case HOP_FUTEX_ISWAITING:
-		return sig_iswaiting(&self->f_signal) ? 1 : 0;
+		return sig_iswaiting(&self->vmf_signal) ? 1 : 0;
 
 	case HOP_FUTEX_BROADCAST:
-		return sig_broadcast(&self->f_signal);
+		return sig_broadcast(&self->vmf_signal);
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

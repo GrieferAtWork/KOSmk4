@@ -44,8 +44,8 @@ NOTHROW(KCALL vm_futextree_prlocate_at_at_not_destroyed)(struct vm_futex **__res
 	 * ranges of the underlying sb_min/sb_max branches. */
 	while ((root = *proot) != NULL) {
 		/* Check if the given key lies within this branch. */
-		if (key_min <= root->f_tree.a_vaddr &&
-		    key_max >= root->f_tree.a_vaddr) {
+		if (key_min <= root->vmf_tree.a_vaddr &&
+		    key_max >= root->vmf_tree.a_vaddr) {
 			if (!wasdestroyed(root)) {
 				*paddr_semi  = addr_semi;
 				*paddr_level = addr_level;
@@ -69,7 +69,7 @@ NOTHROW(KCALL vm_futextree_prlocate_at_at_not_destroyed)(struct vm_futex **__res
 				uintptr_t temp_semi = addr_semi;
 				unsigned int temp_level = addr_level;
 				ATREE_WALKMAX(uintptr_t, temp_semi, temp_level);
-				result = vm_futextree_prlocate_at_at_not_destroyed(&root->f_tree.a_max,
+				result = vm_futextree_prlocate_at_at_not_destroyed(&root->vmf_tree.a_max,
 				                                                   key_min, key_max,
 				                                                   &temp_semi, &temp_level);
 				if (result != NULL) {
@@ -80,11 +80,11 @@ NOTHROW(KCALL vm_futextree_prlocate_at_at_not_destroyed)(struct vm_futex **__res
 			}
 			/* Continue with min-branch */
 			ATREE_WALKMIN(uintptr_t, addr_semi, addr_level);
-			proot = &root->f_tree.a_min;
+			proot = &root->vmf_tree.a_min;
 		} else {
 			/* Continue with max-branch */
 			ATREE_WALKMAX(uintptr_t, addr_semi, addr_level);
-			proot = &root->f_tree.a_max;
+			proot = &root->vmf_tree.a_max;
 		}
 	}
 	return NULL;
@@ -121,13 +121,13 @@ NOTHROW(KCALL vm_futextree_tryincref_all_and_collect_minmax)(struct vm_futex *__
 	bool result = true;
 again:
 #ifndef NDEBUG
-	assert(tree->f_part.m_pointer == expected_part);
+	assert(tree->vmf_part.m_pointer == expected_part);
 #endif /* !NDEBUG */
 	/* Try to acquire a reference (Only update min/max or alive futex objects) */
 	if (tryincref(tree)) {
 		/* Keep track of the lowest and greatest address
 		 * that is bound to a futex that is still alive. */
-		uintptr_t addr = tree->f_tree.a_vaddr;
+		uintptr_t addr = tree->vmf_tree.a_vaddr;
 		if (*pminaddr > addr)
 			*pminaddr = addr;
 		if (*pmaxaddr < addr)
@@ -135,9 +135,9 @@ again:
 	} else {
 		result = false;
 	}
-	if (tree->f_tree.a_min) {
-		if (tree->f_tree.a_max) {
-			result &= vm_futextree_tryincref_all_and_collect_minmax(tree->f_tree.a_max,
+	if (tree->vmf_tree.a_min) {
+		if (tree->vmf_tree.a_max) {
+			result &= vm_futextree_tryincref_all_and_collect_minmax(tree->vmf_tree.a_max,
 			                                                        pminaddr,
 			                                                        pmaxaddr
 #ifndef NDEBUG
@@ -146,11 +146,11 @@ again:
 #endif /* !NDEBUG */
 			                                                        );
 		}
-		tree = tree->f_tree.a_min;
+		tree = tree->vmf_tree.a_min;
 		goto again;
 	}
-	if (tree->f_tree.a_max) {
-		tree = tree->f_tree.a_max;
+	if (tree->vmf_tree.a_max) {
+		tree = tree->vmf_tree.a_max;
 		goto again;
 	}
 	return result;
@@ -167,12 +167,12 @@ NOTHROW(KCALL vm_futextree_subtract_addr_and_reform_tree)(struct vm_futex *__res
                                                           unsigned int new_tree_level0) {
 	struct vm_futex *lo, *hi;
 again:
-	lo = tree->f_tree.a_min;
-	hi = tree->f_tree.a_max;
+	lo = tree->vmf_tree.a_min;
+	hi = tree->vmf_tree.a_max;
 	assert(!wasdestroyed(tree));
-	assert(tree->f_tree.a_vaddr >= bytes_to_subtract);
+	assert(tree->vmf_tree.a_vaddr >= bytes_to_subtract);
 	/* Update the leaf's address. */
-	tree->f_tree.a_vaddr -= bytes_to_subtract;
+	tree->vmf_tree.a_vaddr -= bytes_to_subtract;
 	/* Insert the leaf into the new tree. */
 	vm_futextree_insert_at(pnew_tree, tree,
 	                       new_tree_semi0,
@@ -210,24 +210,24 @@ NOTHROW(KCALL vm_futextree_decref_all_if_not_destroyed)(struct vm_futex *__restr
 	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
 again:
 #ifndef NDEBUG
-	assert(tree->f_part.m_pointer == expected_part);
+	assert(tree->vmf_part.m_pointer == expected_part);
 #endif /* !NDEBUG */
 	if (!wasdestroyed(tree))
 		decref_unlikely(tree);
-	if (tree->f_tree.a_min) {
-		if (tree->f_tree.a_max) {
-			vm_futextree_decref_all_if_not_destroyed(tree->f_tree.a_max
+	if (tree->vmf_tree.a_min) {
+		if (tree->vmf_tree.a_max) {
+			vm_futextree_decref_all_if_not_destroyed(tree->vmf_tree.a_max
 #ifndef NDEBUG
 			                                         ,
 			                                         expected_part
 #endif /* !NDEBUG */
 			                                         );
 		}
-		tree = tree->f_tree.a_min;
+		tree = tree->vmf_tree.a_min;
 		goto again;
 	}
-	if (tree->f_tree.a_max) {
-		tree = tree->f_tree.a_max;
+	if (tree->vmf_tree.a_max) {
+		tree = tree->vmf_tree.a_max;
 		goto again;
 	}
 }
@@ -246,15 +246,15 @@ NOTHROW(KCALL vm_futextree_set_part_pointer_and_decref_all)(struct vm_futex *__r
 	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
 again:
 #ifndef NDEBUG
-	assert(tree->f_part.m_pointer == expected_part);
+	assert(tree->vmf_part.m_pointer == expected_part);
 #endif /* !NDEBUG */
 	assert(!wasdestroyed(tree));
 	/* Set the new part pointer (such that it now points to the upper-half datapart) */
-	tree->f_part.set(new_part_pointer);
+	tree->vmf_part.set(new_part_pointer);
 	decref_unlikely(tree);
-	if (tree->f_tree.a_min) {
-		if (tree->f_tree.a_max) {
-			vm_futextree_set_part_pointer_and_decref_all(tree->f_tree.a_max,
+	if (tree->vmf_tree.a_min) {
+		if (tree->vmf_tree.a_max) {
+			vm_futextree_set_part_pointer_and_decref_all(tree->vmf_tree.a_max,
 			                                             new_part_pointer
 #ifndef NDEBUG
 			                                             ,
@@ -262,11 +262,11 @@ again:
 #endif /* !NDEBUG */
 			                                             );
 		}
-		tree = tree->f_tree.a_min;
+		tree = tree->vmf_tree.a_min;
 		goto again;
 	}
-	if (tree->f_tree.a_max) {
-		tree = tree->f_tree.a_max;
+	if (tree->vmf_tree.a_max) {
+		tree = tree->vmf_tree.a_max;
 		goto again;
 	}
 }
@@ -942,19 +942,19 @@ again_incref_futexes:
 				if (dead != NULL) {
 					struct vm_futex *next;
 					do {
-						next = dead->f_ndead;
+						next = dead->vmf_ndead;
 #ifdef NDEBUG
-						vm_futextree_remove(&lofc->fc_tree, dead->f_tree.a_vaddr,
+						vm_futextree_remove(&lofc->fc_tree, dead->vmf_tree.a_vaddr,
 						                    lofc->fc_semi0, lofc->fc_leve0);
 #else /* NDEBUG */
 						{
 							struct vm_futex *removed;
 							removed = vm_futextree_remove_at(&lofc->fc_tree,
-							                                 dead->f_tree.a_vaddr,
+							                                 dead->vmf_tree.a_vaddr,
 							                                 lofc->fc_semi0,
 							                                 lofc->fc_leve0);
 							assertf(removed == dead, "%p != %p (addr: %p)",
-							        removed, dead, dead->f_tree.a_vaddr);
+							        removed, dead, dead->vmf_tree.a_vaddr);
 						}
 #endif /* !NDEBUG */
 						vm_futex_free(dead);
@@ -1022,8 +1022,8 @@ again_incref_futexes:
 		                                                               lofc_maxaddr + 1, (uintptr_t)-1,
 		                                                               lofc->fc_semi0,
 		                                                               lofc->fc_leve0)) != NULL) {
-			assert(transfer_futex->f_tree.a_vaddr > lofc_maxaddr);
-			transfer_futex->f_tree.a_vaddr -= lofc_maxaddr + 1;
+			assert(transfer_futex->vmf_tree.a_vaddr > lofc_maxaddr);
+			transfer_futex->vmf_tree.a_vaddr -= lofc_maxaddr + 1;
 			vm_futextree_insert_at(&hifc->fc_tree, transfer_futex,
 			                       hifc->fc_semi0, hifc->fc_leve0);
 		}

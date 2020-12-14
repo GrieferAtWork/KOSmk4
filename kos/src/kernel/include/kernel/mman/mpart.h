@@ -339,12 +339,34 @@ FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
+/* Acquire a lock to the given mem-part for the purpose of later
+ * making a call to `mpart_mmap()', where the part will be mapped for
+ * the purpose of reading its memory. This function will ensure that:
+ *  - MPART_ST_INCORE(self->mp_state);
+ *  - FOREACH_BLOCK_IN(i, partrel_offset, num_bytes)
+ *        mpart_getblockstate(self, i) in [MPART_BLOCK_ST_LOAD,
+ *                                         MPART_BLOCK_ST_CHNG];
+ * NOTE: If (at least some part) of the given address range is located
+ *       outside of the bounds of `self', then this function will
+ *       not acquire a lock to `self' and return `false'. */
+FUNDEF WUNUSED NONNULL((1)) bool FCALL
+mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
+                                        mpart_reladdr_t partrel_offset,
+                                        size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that `LIST_EMPTY(&self->mp_copy)',
  * meaning that all copy-on-write mappings of the part have been unshared. This must
  * be done before the contents of the part can be written to directly, or be mapped
  * as writable for MAP_SHARED mappings of the part itself. */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* The combination of `mpart_lock_acquire_and_setcore_loadall()'
+ * and `mpart_lock_acquire_and_setcore_unsharecow()' */
+FUNDEF NONNULL((1)) void FCALL
+mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that all shared

@@ -48,11 +48,6 @@ LIST_HEAD(mnode_list, mnode);
 LIST_HEAD(task_list, WEAK task);
 #endif /* !__task_list_defined */
 
-#ifndef __mnode_slist_defined
-#define __mnode_slist_defined 1
-SLIST_HEAD(mnode_slist, mnode);
-#endif /* !__mnode_slist_defined */
-
 struct mdeadram {
 	SLIST_ENTRY(PAGEDIR_PAGEALIGNED mdeadram) mdr_link; /* [lock(ATOMIC)] Next dead-ram area. */
 	PAGEDIR_PAGEALIGNED size_t                mdr_size; /* Total size (in bytes) of the dead-ram area.
@@ -75,9 +70,6 @@ struct mman {
 #ifndef CONFIG_NO_SMP
 	struct atomic_lock             mm_threadslock; /* SMP-lock for `mm_threads' */
 #endif /* !CONFIG_NO_SMP */
-	struct mnode_slist            _mm_unmapped;    /* [0..n][lock(ATOMIC)] List of nodes that have been unmapped,
-	                                                * but yet to be removed from the `mm_mappings' tree. (or destroyed
-	                                                * in any other form for that matter) */
 	union {
 		struct mnode               mm_kernreserve; /* A special RESERVED-like node that is used by user-space mmans
 		                                            * to cover the entire kernel-space, preventing user-space from
@@ -127,9 +119,8 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 /* Reap dead ram regions of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mman_reap)(struct mman *__restrict self);
-#define mman_mustreap(self)                                                               \
-	(__hybrid_atomic_load((self)->mm_deadram.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR || \
-	 __hybrid_atomic_load((self)->_mm_unmapped.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define mman_mustreap(self) \
+	(__hybrid_atomic_load((self)->mm_deadram.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
 #define mman_reap(self) _mman_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
@@ -150,70 +141,6 @@ __DEFINE_SYNC_MUTEX(struct mman,
                     mman_lock_release,
                     mman_lock_acquired,
                     mman_lock_available)
-
-
-/* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
- * may succeed when re-attempted.
- * @return: * : The # of leading bytes that this function managed to fault. For
- *              this purpose, any non-zero value means that `*(byte_t *)addr'
- *              was made accessible for at least one moment before this function
- *              returns. Note though that memory may have already been unloaded
- *              by the time this function returns (unlikely), so the caller must
- *              still be ready to deal with the possibility that another attempt
- *              at doing nopf access at `*(byte_t *)addr' might immediatly fail
- *              again.
- *              Also note that for any memory that had already been faulted within
- *              the given address range, this function acts as though it had been
- *              the one to fault that range, meaning that the return value doesn't
- *              actually represent how much memory had just been faulted, but rather
- *              how much continuous memory (starting at `addr' and limited by at
- *              most `num_bytes') was faulted simultaneously at some point before
- *              this function returns.
- * @return: 0 : Nothing could be faulted. This might be because `addr' doesn't
- *              point into mapped memory, or the memory that is pointed-to by it
- *              is backed by VIO storage.
- *              The caller should handle this case by attempting direct memory
- *              access to the affected region (i.e. using `memcpy' rather than 
- *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error. */
-FUNDEF size_t FCALL
-mman_prefault(USER CHECKED void const *addr,
-              size_t num_bytes, bool for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* Enumerate segments from `buffer', and prefault up to `num_bytes' of pointed-to
- * memory, after skipping the first `offset' bytes. The return value is the sum
- * of successfully faulted segments, however faulting also stops on the first
- * segment that cannot be fully faulted. */
-FUNDEF size_t FCALL
-mman_prefaultv(struct aio_buffer const *__restrict buffer,
-               size_t offset, size_t num_bytes, bool for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-
-/* High-level page directory syncing functions. */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_sync_p)(struct mman *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_syncone_p)(struct mman *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_syncall_p)(struct mman *__restrict self);
-
-#ifndef CONFIG_NO_SMP
-/* Same as `mman_sync_p(THIS_MMAN, ...)' (The sync is done on every CPU that uses the caller's VM) */
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_syncall)(void);
-
-/* Same as `mman_sync_p(&mman_kernel, ...)' (The sync is performed on every CPU, for any VM) */
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_supersyncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_supersyncall)(void);
-#else /* !CONFIG_NO_SMP */
-#define mman_sync(addr, num_bytes) pagedir_sync(addr, num_bytes)
-#define mman_syncone(addr)         pagedir_syncone(addr)
-FUNDEF NOBLOCK void NOTHROW(FCALL mman_syncall)(void);
-#define mman_supersync(addr, num_bytes) pagedir_sync(addr, num_bytes)
-#define mman_supersyncone(addr)         pagedir_syncone(addr)
-#define mman_supersyncall()             pagedir_syncall()
-#endif /* CONFIG_NO_SMP */
-
 
 
 

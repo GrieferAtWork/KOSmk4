@@ -33,26 +33,27 @@
 #include <hybrid/sync/atomic-rwlock.h>
 #endif /* ARCH_VM_HAVE_RTM */
 
+#ifndef CONFIG_USE_NEW_VM
 DECL_BEGIN
 
 struct vm_futex;
 struct vm_datapart;
 
 struct vm_futex {
-	WEAK refcnt_t        f_refcnt; /* Futex reference counter. */
+	WEAK refcnt_t        vmf_refcnt; /* Futex reference counter. */
 	XATOMIC_WEAKLYREF(struct vm_datapart)
-	                     f_part;   /* [0..1] The data part associated with this futex.
+	                     vmf_part;   /* [0..1] The data part associated with this futex.
 	                                * Note that this part may change at any time in order to deal
 	                                * with the part being split. Additionally, if the part is destroyed,
 	                                * then this pointer is cleared, meaning that a NULL-value indicate
-	                                * that the futex is dangling and that `f_tree' has become invalid. */
+	                                * that the futex is dangling and that `vmf_tree' has become invalid. */
 	ATREE_NODE_SINGLE(struct vm_futex, uintptr_t)
-	                     f_tree;   /* [lock(f_part->dp_lock)][valid_if(!wasdestroyed(f_tree))]
+	                     vmf_tree;   /* [lock(vmf_part->dp_lock)][valid_if(!wasdestroyed(vmf_tree))]
 	                                * The tree of futex objects that exist within the data part.
-	                                * The associated tree-root can be found under `f_part->dp_futex->fc_tree' */
+	                                * The associated tree-root can be found under `vmf_part->dp_futex->fc_tree' */
 	union {
-		struct sig       f_signal; /* [valid_if(f_refcnt != 0)] The signal used to implement the futex. */
-		struct vm_futex *f_ndead;  /* [valid_if(f_refcnt == 0)] Next dead futex pointer. */
+		struct sig       vmf_signal; /* [valid_if(vmf_refcnt != 0)] The signal used to implement the futex. */
+		struct vm_futex *vmf_ndead;  /* [valid_if(vmf_refcnt == 0)] Next dead futex pointer. */
 	};
 };
 
@@ -64,7 +65,7 @@ struct vm_futex {
 /* Destroy the given futex due to its reference counter having reached zero. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct vm_futex, f_refcnt, vm_futex_destroy)
+DEFINE_REFCOUNT_FUNCTIONS(struct vm_futex, vmf_refcnt, vm_futex_destroy)
 
 
 struct vm_futex_controller {
@@ -75,7 +76,7 @@ struct vm_futex_controller {
 	                                            *       a lock to `dp_lock' is being held. */
 	uintptr_t                        fc_semi0; /* [lock(:dp_lock)] Futex tree SEMI0 value. */
 	unsigned int                     fc_leve0; /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
-	WEAK struct vm_futex            *fc_dead;  /* [0..1][LINK(->f_ndead)] Chain of dead futex objects.
+	WEAK struct vm_futex            *fc_dead;  /* [0..1][LINK(->vmf_ndead)] Chain of dead futex objects.
 	                                            * This chain is serviced at the same time as `dp_stale' */
 #ifdef ARCH_VM_HAVE_RTM
 	/* We keep the RTM version and lock fields in the futex controller, such that
@@ -173,5 +174,6 @@ vm_futex_broadcast(UNCHECKED void *futex_address)
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_FUTEX_H */

@@ -65,7 +65,7 @@
 #define ATREE_NOTHROW            NOTHROW
 #define Tkey                     uintptr_t
 #define T                        struct vm_futex
-#define N_NODEPATH               f_tree
+#define N_NODEPATH               vmf_tree
 #define ATREE_HEADER_ONLY 1
 #define ATREE_SINGLE 1
 #include <hybrid/sequence/atree-abi.h>

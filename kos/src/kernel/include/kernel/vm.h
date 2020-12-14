@@ -25,160 +25,168 @@
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mm-fault.h>
+#include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 
-#define vm_datapart                            mpart
-#define vm_datablock                           mfile
-#define vm_datablock_type                      mfile_ops
-#define vm_node                                mnode
-#define vm                                     mman
-#define vm_futex_controller                    mpartmeta
-#define vm_ramblock                            mchunk
-#define vm_swpblock                            mchunk
-#define VM_DATAPART_PPP_UNINITIALIZED          MPART_BLOCK_ST_NDEF
-#define VM_DATAPART_PPP_INITIALIZING           MPART_BLOCK_ST_INIT
-#define VM_DATAPART_PPP_INITIALIZED            MPART_BLOCK_ST_LOAD
-#define VM_DATAPART_PPP_HASCHANGED             MPART_BLOCK_ST_CHNG
-#define VM_DATAPART_PPP_BITS                   MPART_BLOCK_STBITS
-#define VM_DATAPART_FLAG_NORMAL                MPART_F_NORMAL
-#define VM_DATAPART_FLAG_LOCKED                MPART_F_MLOCK
-#define VM_DATAPART_FLAG_CHANGED               MPART_F_CHANGED
-#define VM_DATAPART_FLAG_KEEPRAM               MPART_F_DONT_FREE
-#define VM_DATAPART_FLAG_COREPRT               MPART_F_COREPART
-#define VM_DATAPART_FLAG_KERNPRT               MPART_F_DONT_SPLIT
-#define VM_DATAPART_STATE_ABSENT               MPART_ST_VOID
-#define VM_DATAPART_STATE_INCORE               MPART_ST_MEM
-#define VM_DATAPART_STATE_INSWAP               MPART_ST_SWP
-#define VM_DATAPART_STATE_VIOPRT               MPART_ST_VIO
-#define dp_refcnt                              mp_refcnt
-#define dp_crefs                               mp_copy
-#define dp_srefs                               mp_share
-#define dp_stale                               mp_deadnodes.slh_first
-#define dp_block                               mp_file
-#define dp_flags                               mp_flags
-#define dp_state                               mp_state
-#define dp_pprop                               mp_blkst_inl
-#define dp_pprop_p                             mp_blkst_ptr
-#define dp_futex                               mp_meta
-#define vm_datapart_free                       mpart_free
-#define vm_datapart_destroy                    mpart_destroy
-#define vm_datapart_numbytes                   mpart_getsize
-#define vm_datapart_minbyte                    mpart_getminaddr
-#define vm_datapart_maxbyte                    mpart_getmaxaddr
-#define vm_datapart_startbyte                  mpart_getminaddr
-#define vm_datapart_endbyte                    mpart_getendaddr
-#define vm_datapart_read                       mpart_read
-#define vm_datapart_write                      mpart_write
-#define vm_datapart_read_phys                  mpart_read_p
-#define vm_datapart_write_phys                 mpart_write_p
-#define vm_datapart_readv                      mpart_readv
-#define vm_datapart_writev                     mpart_writev
-#define vm_datapart_readv_phys                 mpart_readv_p
-#define vm_datapart_writev_phys                mpart_writev_p
-#define vm_datapart_split                      mpart_split
-#define vm_datapart_getstate                   mpart_getblockstate
-#define vm_datapart_setstate                   mpart_setblockstate
-#define vm_datapart_isstatewritable            mpart_hasblockstate
-#define VM_DATABLOCK_ANONPARTS                 MFILE_PARTS_ANONYMOUS
-#define VM_DATABLOCK_ANONPARTS_INIT            MFILE_PARTS_ANONYMOUS
-#define db_refcnt                              mf_refcnt
-#define db_lock                                mf_lock
-#define db_type                                mf_ops
-#define db_vio                                 mf_ops->mo_vio
-#define db_parts                               mf_parts
-#define vm_datablock_destroy                   mfile_destroy
-#define vm_datablock_anonymize                 mfile_makeanon
-#define vm_datablock_isanonymous               mfile_isanon
-#define vm_datablock_sync                      mfile_sync
-#define vm_datablock_locatepart                mfile_getpart
-#define vm_datablock_read                      mfile_read
-#define vm_datablock_write                     mfile_write
-#define vm_datablock_read_phys                 mfile_read_p
-#define vm_datablock_write_phys                mfile_write_p
-#define vm_datablock_readv                     mfile_readv
-#define vm_datablock_writev                    mfile_writev
-#define vm_datablock_readv_phys                mfile_readv_p
-#define vm_datablock_writev_phys               mfile_writev_p
-#define vm_datablock_vio_read                  mfile_vio_read
-#define vm_datablock_vio_write                 mfile_vio_write
-#define vm_datablock_vio_read_phys             mfile_vio_read_p
-#define vm_datablock_vio_write_phys            mfile_vio_write_p
-#define vm_datablock_vio_readv                 mfile_vio_readv
-#define vm_datablock_vio_writev                mfile_vio_writev
-#define vm_datablock_vio_readv_phys            mfile_vio_readv_p
-#define vm_datablock_vio_writev_phys           mfile_vio_writev_p
-#define vm_datablock_physical                  mfile_phys
-#define vm_datablock_physical_type             mfile_phys_ops
-#define vm_datablock_anonymous                 mfile_ndef
-#define vm_datablock_anonymous_type            mfile_ndef_ops
-#define vm_datablock_anonymous_zero            mfile_zero
-#define vm_datablock_anonymous_zero_type       mfile_zero_ops
-#define vm_datablock_anonymous_zero_vec        mfile_anon
-#define vm_datablock_anonymous_zero_type_vec   mfile_anon_ops
-#define VM_PROT_NONE                           MNODE_F_NORMAL
-#define VM_PROT_EXEC                           MNODE_F_PEXEC
-#define VM_PROT_WRITE                          MNODE_F_PWRITE
-#define VM_PROT_READ                           MNODE_F_PREAD
-#define VM_PROT_PRIVATE                        MNODE_F_NORMAL
-#define VM_PROT_SHARED                         MNODE_F_SHARED
-#define vn_prot                                mn_flags
-#define vn_flags                               mn_flags
-#define vn_vm                                  mn_mman
-#define vn_part                                mn_part
-#define vn_block                               mn_part->mp_file
-#define vn_fspath                              mn_fspath
-#define vn_fsname                              mn_fsname
-#define vn_link                                mn_link
-#define vm_node_free                           mnode_free
-#define vm_node_destroy                        mnode_destory
-#define vm_node_update_write_access            mnode_clear_write
-#define vm_node_update_write_access_locked_vm  mnode_clear_write_locked
-#define VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS    MNODE_CLEAR_WRITE_SUCCESS
-#define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK MNODE_CLEAR_WRITE_WOULDBLOCK
-#define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC   MNODE_CLEAR_WRITE_BADALLOC
-#define vm_node_getmin                         mnode_getminaddr
-#define vm_node_getmax                         mnode_getmaxaddr
-#define vm_node_getstart                       mnode_getaddr
-#define vm_node_getend                         mnode_getendaddr
-#define vm_node_getsize                        mnode_getsize
-#define vm_node_isuserspace                    mnode_iskern
-#define vm_node_iskernelspace                  mnode_isuser
-#define VM_NODE_HASNEXT(self, vm)              (mnode_tree_nextnode(self) != __NULLPTR)
-#define VM_NODE_HASPREV(self, vm)              (mnode_tree_prevnode(self) != __NULLPTR)
-#define VM_NODE_NEXT(self)                     mnode_tree_nextnode(self)
-#define VM_NODE_PREV(self)                     mnode_tree_prevnode(self)
-#define v_pagedir                              mm_pagedir
-#define v_pdir_phys                            mm_pdir_phys
-#define v_refcnt                               mm_refcnt
-#define v_weakrefcnt                           mm_weakrefcnt
-#define v_tree                                 mm_mappings
-#define v_heap_size                            mm_heapsize
-#define v_treelock                             mm_lock
-#define v_tasks                                mm_threads.lh_first
-#define v_tasklock                             mm_threadslock
-#define v_kernreserve                          mm_kernreserve
-#define vm_kernel                              mman_kernel
-#define this_vm                                this_mman
-#define THIS_VM                                THIS_MMAN
-#define PERVM                                  PERMMAN
-#define vm_free                                mman_free
-#define vm_destroy                             mman_destroy
-#define vm_alloc                               mman_new
-#define vm_clone                               mman_fork
-#define task_setvm                             task_setmman
-#define task_getvm                             task_getmman
-#define vm_sync                                mman_sync_p
-#define vm_syncone                             mman_syncone_p
-#define vm_syncall                             mman_syncall_p
-#define this_vm_sync                           mman_sync
-#define this_vm_syncone                        mman_syncone
-#define this_vm_syncall                        mman_syncall
-#define vm_supersync                           mman_supersync
-#define vm_supersyncone                        mman_supersyncone
-#define vm_supersyncall                        mman_supersyncall
-
+#define VM_DATAPART_PPP_UNINITIALIZED             MPART_BLOCK_ST_NDEF
+#define VM_DATAPART_PPP_INITIALIZING              MPART_BLOCK_ST_INIT
+#define VM_DATAPART_PPP_INITIALIZED               MPART_BLOCK_ST_LOAD
+#define VM_DATAPART_PPP_HASCHANGED                MPART_BLOCK_ST_CHNG
+#define VM_DATAPART_PPP_BITS                      MPART_BLOCK_STBITS
+#define VM_DATAPART_FLAG_NORMAL                   MPART_F_NORMAL
+#define VM_DATAPART_FLAG_LOCKED                   MPART_F_MLOCK
+#define VM_DATAPART_FLAG_CHANGED                  MPART_F_CHANGED
+#define VM_DATAPART_FLAG_KEEPRAM                  MPART_F_DONT_FREE
+#define VM_DATAPART_FLAG_COREPRT                  MPART_F_COREPART
+#define VM_DATAPART_FLAG_KERNPRT                  MPART_F_DONT_SPLIT
+#define VM_DATAPART_STATE_ABSENT                  MPART_ST_VOID
+#define VM_DATAPART_STATE_INCORE                  MPART_ST_MEM
+#define VM_DATAPART_STATE_INSWAP                  MPART_ST_SWP
+#define VM_DATAPART_STATE_VIOPRT                  MPART_ST_VIO
+#define dp_refcnt                                 mp_refcnt
+#define dp_crefs                                  mp_copy.lh_first
+#define dp_srefs                                  mp_share.lh_first
+#define dp_stale                                  mp_deadnodes.slh_first
+#define dp_block                                  mp_file
+#define dp_flags                                  mp_flags
+#define dp_state                                  mp_state
+#define dp_pprop                                  mp_blkst_inl
+#define dp_pprop_p                                mp_blkst_ptr
+#define dp_futex                                  mp_meta
+#define vm_datapart_free                          mpart_free
+#define vm_datapart_destroy                       mpart_destroy
+#define vm_datapart_numbytes                      mpart_getsize
+#define vm_datapart_minbyte                       mpart_getminaddr
+#define vm_datapart_maxbyte                       mpart_getmaxaddr
+#define vm_datapart_startbyte                     mpart_getminaddr
+#define vm_datapart_endbyte                       mpart_getendaddr
+#define vm_datapart_read                          mpart_read
+#define vm_datapart_write                         mpart_write
+#define vm_datapart_read_phys                     mpart_read_p
+#define vm_datapart_write_phys                    mpart_write_p
+#define vm_datapart_readv                         mpart_readv
+#define vm_datapart_writev                        mpart_writev
+#define vm_datapart_readv_phys                    mpart_readv_p
+#define vm_datapart_writev_phys                   mpart_writev_p
+#define vm_datapart_split                         mpart_split
+#define vm_datapart_getstate                      mpart_getblockstate
+#define vm_datapart_setstate                      mpart_setblockstate
+#define vm_datapart_isstatewritable               mpart_hasblockstate
+#define VM_DATABLOCK_ANONPARTS                    MFILE_PARTS_ANONYMOUS
+#define VM_DATABLOCK_ANONPARTS_INIT               MFILE_PARTS_ANONYMOUS
+#define db_refcnt                                 mf_refcnt
+#define db_lock                                   mf_lock
+#define db_type                                   mf_ops
+#define db_vio                                    mf_ops->mo_vio
+#define db_parts                                  mf_parts
+#define vm_datablock_destroy                      mfile_destroy
+#define vm_datablock_anonymize                    mfile_makeanon
+#define vm_datablock_isanonymous                  mfile_isanon
+#define vm_datablock_sync                         mfile_sync
+#define vm_datablock_locatepart                   mfile_getpart
+#define vm_datablock_read                         mfile_read
+#define vm_datablock_write                        mfile_write
+#define vm_datablock_read_phys                    mfile_read_p
+#define vm_datablock_write_phys                   mfile_write_p
+#define vm_datablock_readv                        mfile_readv
+#define vm_datablock_writev                       mfile_writev
+#define vm_datablock_readv_phys                   mfile_readv_p
+#define vm_datablock_writev_phys                  mfile_writev_p
+#define vm_datablock_vio_read                     mfile_vio_read
+#define vm_datablock_vio_write                    mfile_vio_write
+#define vm_datablock_vio_read_phys                mfile_vio_read_p
+#define vm_datablock_vio_write_phys               mfile_vio_write_p
+#define vm_datablock_vio_readv                    mfile_vio_readv
+#define vm_datablock_vio_writev                   mfile_vio_writev
+#define vm_datablock_vio_readv_phys               mfile_vio_readv_p
+#define vm_datablock_vio_writev_phys              mfile_vio_writev_p
+#define vm_datablock_physical                     mfile_phys
+#define vm_datablock_physical_type                mfile_phys_ops
+#define vm_datablock_anonymous                    mfile_ndef
+#define vm_datablock_anonymous_type               mfile_ndef_ops
+#define vm_datablock_anonymous_zero               mfile_zero
+#define vm_datablock_anonymous_zero_type          mfile_zero_ops
+#define vm_datablock_anonymous_zero_vec           mfile_anon
+#define vm_datablock_anonymous_zero_type_vec      mfile_anon_ops
+#define VM_PROT_NONE                              MNODE_F_NORMAL
+#define VM_PROT_EXEC                              MNODE_F_PEXEC
+#define VM_PROT_WRITE                             MNODE_F_PWRITE
+#define VM_PROT_READ                              MNODE_F_PREAD
+#define VM_PROT_PRIVATE                           MNODE_F_NORMAL
+#define VM_PROT_SHARED                            MNODE_F_SHARED
+#define vn_prot                                   mn_flags
+#define vn_flags                                  mn_flags
+#define vn_vm                                     mn_mman
+#define vn_part                                   mn_part
+#define vn_block                                  mn_part->mp_file
+#define vn_fspath                                 mn_fspath
+#define vn_fsname                                 mn_fsname
+#define vn_link                                   mn_link
+#define vm_node_free                              mnode_free
+#define vm_node_destroy                           mnode_destory
+#define vm_node_update_write_access               mnode_clear_write
+#define vm_node_update_write_access_locked_vm     mnode_clear_write_locked
+#define VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS       MNODE_CLEAR_WRITE_SUCCESS
+#define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK    MNODE_CLEAR_WRITE_WOULDBLOCK
+#define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC      MNODE_CLEAR_WRITE_BADALLOC
+#define vm_node_getmin                            mnode_getminaddr
+#define vm_node_getmax                            mnode_getmaxaddr
+#define vm_node_getstart                          mnode_getaddr
+#define vm_node_getend                            mnode_getendaddr
+#define vm_node_getsize                           mnode_getsize
+#define vm_node_isuserspace                       mnode_iskern
+#define vm_node_iskernelspace                     mnode_isuser
+#define VM_NODE_HASNEXT(self, vm)                 (mnode_tree_nextnode(self) != __NULLPTR)
+#define VM_NODE_HASPREV(self, vm)                 (mnode_tree_prevnode(self) != __NULLPTR)
+#define VM_NODE_NEXT(self)                        mnode_tree_nextnode(self)
+#define VM_NODE_PREV(self)                        mnode_tree_prevnode(self)
+#define v_pagedir                                 mm_pagedir
+#define v_pdir_phys                               mm_pdir_phys
+#define v_refcnt                                  mm_refcnt
+#define v_weakrefcnt                              mm_weakrefcnt
+#define v_tree                                    mm_mappings
+#define v_heap_size                               mm_heapsize
+#define v_treelock                                mm_lock
+#define v_tasks                                   mm_threads.lh_first
+#define v_tasklock                                mm_threadslock
+#define v_kernreserve                             mm_kernreserve
+#define vm_kernel                                 mman_kernel
+#define this_vm                                   this_mman
+#define THIS_VM                                   THIS_MMAN
+#define PERVM                                     PERMMAN
+#define vm_free                                   mman_free
+#define vm_destroy                                mman_destroy
+#define vm_alloc                                  mman_new
+#define vm_clone                                  mman_fork
+#define task_setvm                                task_setmman
+#define task_getvm                                task_getmman
+#define vm_sync                                   mman_sync_p
+#define vm_syncone                                mman_syncone_p
+#define vm_syncall                                mman_syncall_p
+#define this_vm_sync                              mman_sync
+#define this_vm_syncone                           mman_syncone
+#define this_vm_syncall                           mman_syncall
+#define vm_supersync                              mman_supersync
+#define vm_supersyncone                           mman_supersyncone
+#define vm_supersyncall                           mman_supersyncall
+#define fc_tree                                   mpm_ftx
+#define fc_dead                                   mpm_ftx_dead.slh_first
+#define fc_rtm_vers                               mpm_rtm_vers
+#define vm_futex                                  mfutex
+#define vmf_refcnt                                mfu_refcnt
+#define vmf_part                                  mfu_part
+#define vmf_tree                                  mfu_mtaent
+#define vmf_signal                                mfu_signal
+#define vmf_ndead                                 _mfu_dead.sle_next
+#define VM_FORCEFAULT_FLAG_READ                   MMAN_FAULT_F_NORMAL
+#define VM_FORCEFAULT_FLAG_WRITE                  MMAN_FAULT_F_WRITE
+#define VM_FORCEFAULT_FLAG_NOVIO                  MMAN_FAULT_F_NOVIO
+#define vm_prefault(addr, num_bytes, for_writing) mman_prefault(addr, num_bytes, (for_writing) ? MMAN_FAULT_F_WRITE : MMAN_FAULT_F_NORMAL)
+#define vm_forcefault                             mman_forcefault
+#define vm_forcefault_p                           mman_forcefault
 
 #else /* CONFIG_USE_NEW_VM */
 #include <kernel/driver-callbacks.h>
@@ -457,12 +465,12 @@ struct vm_datapart {
 	                                            * NOTE: For the duration of at least one futex object existing,
 	                                            *       this field can be considered `[1..1][const]'
 	                                            *       However, you still may not dereference this field from
-	                                            *      `struct vm_futex::f_part' without first acquiring `dp_lock',
+	                                            *      `struct vm_futex::vmf_part' without first acquiring `dp_lock',
 	                                            *       since there exists a chance that the associated is currently
 	                                            *       being split, and that the futex is currently being moved
 	                                            *       to the data part then responsible for the upper half of memory.
 	                                            *       The only case where this does not apply is you dereference the
-	                                            *      `f_part' pointer of a futex object with a reference counter of
+	                                            *      `vmf_part' pointer of a futex object with a reference counter of
 	                                            *       ZERO(0), since this would guaranty that the futex will not be
 	                                            *       carried over during a potential data-part split, as the process
 	                                            *       of splitting a data part containing futex objects also involves

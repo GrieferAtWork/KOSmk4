@@ -30,6 +30,7 @@
 #include <asm/pageid.h>
 #include <compat/config.h> /* __ARCH_HAVE_COMPAT */
 
+#ifndef CONFIG_USE_NEW_VM
 DECL_BEGIN
 
 /* A small, helper-type for safely constructing and applying a VM state.
@@ -380,5 +381,6 @@ vmb_overlay(struct vmb *__restrict self,
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_BUILDER_H */

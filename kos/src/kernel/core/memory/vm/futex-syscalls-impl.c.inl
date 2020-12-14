@@ -125,9 +125,9 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		result = 0;
 		if (f) {
 			if (count == (size_t)-1) {
-				result = sig_broadcast(&f->f_signal);
+				result = sig_broadcast(&f->vmf_signal);
 			} else {
-				result = sig_sendmany(&f->f_signal, count);
+				result = sig_sendmany(&f->vmf_signal, count);
 			}
 			decref_unlikely(f);
 		}
@@ -184,7 +184,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			 * that we're interlocked with `APPLY_MASK()' */
 			f = vm_getfutex_existing(THIS_VM, uaddr);
 			if unlikely(f) {
-				result = sig_broadcast(&f->f_signal);
+				result = sig_broadcast(&f->vmf_signal);
 				decref_unlikely(f);
 				if ((size_t)result > count)
 					result = (syscall_slong_t)count;
@@ -195,15 +195,15 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 				/* Since we're doing a broadcast, no need to wait
 				 * with the signal application until later! */
 				APPLY_MASK();
-				result = sig_broadcast(&f->f_signal);
+				result = sig_broadcast(&f->vmf_signal);
 			} else {
 				/* Only signal at most `count' connected threads. */
 				while (count) {
-					if (!sig_send(&f->f_signal)) {
+					if (!sig_send(&f->vmf_signal)) {
 						size_t temp;
 						APPLY_MASK();
 						/* Broadcast again after modifying the memory location. */
-						temp = sig_broadcast(&f->f_signal);
+						temp = sig_broadcast(&f->vmf_signal);
 						if unlikely(temp > count)
 							temp = count;
 						result += temp;
@@ -229,7 +229,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		validate_user(uaddr, 1);
 		f = vm_getfutex(THIS_VM, uaddr);
 		FINALLY_DECREF(f);
-		task_connect(&f->f_signal);
+		task_connect(&f->vmf_signal);
 		TRY {
 			/* NOTE: The futex `f' must be kept alive during the wait,
 			 *       since even though semantics would allow it to be
@@ -264,7 +264,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
 			f = vm_getfutex(THIS_VM, uaddr);
 			FINALLY_DECREF(f);
-			task_connect(&f->f_signal);
+			task_connect(&f->vmf_signal);
 			TRY {
 				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
 					/* Failed to set the locked bit (try again) */
@@ -288,7 +288,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		 * should-wait checked in a manner that is interlocked. */    \
 		f = vm_getfutex(THIS_VM, uaddr);                              \
 		FINALLY_DECREF(f);                                            \
-		task_connect(&f->f_signal);                                   \
+		task_connect(&f->vmf_signal);                                   \
 		/* Read the futex value. */                                   \
 		TRY {                                                         \
 			if (should_wait) {                                        \

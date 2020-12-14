@@ -115,20 +115,20 @@ NOTHROW(KCALL vm_datapart_free)(struct vm_datapart *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_futextree_clear_part_pointers)(struct vm_futex *__restrict self) {
 again:
-	self->f_part.clear();
-	if (self->f_tree.a_min) {
-		if (self->f_tree.a_max)
-			vm_futextree_clear_part_pointers(self->f_tree.a_max);
-		self = self->f_tree.a_min;
+	self->vmf_part.clear();
+	if (self->vmf_tree.a_min) {
+		if (self->vmf_tree.a_max)
+			vm_futextree_clear_part_pointers(self->vmf_tree.a_max);
+		self = self->vmf_tree.a_min;
 		goto again;
 	}
-	if (self->f_tree.a_max) {
-		self = self->f_tree.a_max;
+	if (self->vmf_tree.a_max) {
+		self = self->vmf_tree.a_max;
 		goto again;
 	}
 }
 
-/* Delete the `f_part' pointers of all `struct vm_futex' objects
+/* Delete the `vmf_part' pointers of all `struct vm_futex' objects
  * that can still be reached from the given address tree. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_futex_controller_destroy)(struct vm_futex_controller *__restrict self) {
@@ -230,19 +230,19 @@ NOTHROW(KCALL vm_datapart_service_stale)(struct vm_datapart *__restrict self) {
 		dead = ATOMIC_XCH(fc->fc_dead, NULL);
 		if (dead) {
 			while (dead) {
-				next = dead->f_ndead;
+				next = dead->vmf_ndead;
 #ifdef NDEBUG
-				vm_futextree_remove(&fc->fc_tree, dead->f_tree.a_vaddr,
+				vm_futextree_remove(&fc->fc_tree, dead->vmf_tree.a_vaddr,
 				                    fc->fc_semi0, fc->fc_leve0);
 #else /* NDEBUG */
 				{
 					struct vm_futex *removed;
 					removed = vm_futextree_remove_at(&fc->fc_tree,
-					                                 dead->f_tree.a_vaddr,
+					                                 dead->vmf_tree.a_vaddr,
 					                                 fc->fc_semi0,
 					                                 fc->fc_leve0);
 					assertf(removed == dead, "%p != %p (addr: %p)",
-					        removed, dead, dead->f_tree.a_vaddr);
+					        removed, dead, dead->vmf_tree.a_vaddr);
 				}
 #endif /* !NDEBUG */
 				vm_futex_free(dead);

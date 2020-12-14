@@ -90,14 +90,8 @@ struct mnode {
 	WEAK REF struct mman               *mn_mman;     /* [1..1][const] Associated memory manager.
 	                                                  * NOTE: This only becomes a weak reference when `mnode_wasdestroyed(self)' is true!
 	                                                  *       Before that point, this is just a regular, old pointer! */
-	REF struct mpart                   *mn_part;     /* [0..1][lock(mn_mman->mm_lock)][const_if(mnode_wasdestroyed(self))]
-	                                                  * The bound mem-part. When set to NULL, then this node represents a
-	                                                  * reserved node. Also set to NULL if the node is unmapped without
-	                                                  * holding a lock to the part, such that the pointed-to part will
-	                                                  * automatically remove the node from its copy- or share-list. Note
-	                                                  * that when this mechanism is used, this field must be set to NULL
-	                                                  * _before_ atomically adding the node to the part's deleted-node
-	                                                  * list! */
+	REF struct mpart                   *mn_part;     /* [0..1][const] The bound mem-part.
+	                                                  * When set to NULL, then this node represents a reserved node. */
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)] Entry for `mp_copy' or `mp_share' */
 	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)] Chain of nodes that (may) contain pages that
@@ -117,15 +111,23 @@ struct mnode {
 };
 
 /* Check if the given mem-node was destroyed. */
-#define mnode_wasdestroyed(self) \
-	((self)->mn_part == __NULLPTR || wasdestroyed((self)->mn_mman))
+#define mnode_wasdestroyed(self) wasdestroyed((self)->mn_mman)
 
+#if (PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC && \
+     PAGEDIR_MAP_FREAD == MNODE_F_PREAD && \
+     PAGEDIR_MAP_FWRITE == MNODE_F_PWRITE)
+#define mnode_getperm(self)                                                  \
+	(((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE)) | \
+	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
+#else
+#error TODO
+#endif
 
 /* Get bounds for the given mem-node. */
-#define mnode_getminaddr(self) ((self)->mn_minaddr)
-#define mnode_getmaxaddr(self) ((self)->mn_maxaddr)
-#define mnode_getendaddr(self) ((self)->mn_maxaddr + 1)
-#define mnode_getaddr(self)    ((self)->mn_maxaddr)
+#define mnode_getminaddr(self) ((void *)(self)->mn_minaddr)
+#define mnode_getmaxaddr(self) ((void *)(self)->mn_maxaddr)
+#define mnode_getendaddr(self) ((void *)((self)->mn_maxaddr + 1))
+#define mnode_getaddr(self)    ((void *)(self)->mn_minaddr)
 #define mnode_getsize(self)    ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr) + 1)
 #define mnode_iskern(self)     ADDR_ISKERN((self)->mn_minaddr)
 #define mnode_isuser(self)     ADDR_ISUSER((self)->mn_minaddr)
@@ -195,16 +197,16 @@ struct mnode_tree_minmax {
 	struct mnode *mm_max; /* [0..1] Greatest branch. */
 };
 
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_locate)(/*nullable*/ struct mnode *root, pos_t key);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_rlocate)(/*nullable*/ struct mnode *root, pos_t minkey, pos_t maxkey);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_locate)(/*nullable*/ struct mnode *root, void const *key);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_rlocate)(/*nullable*/ struct mnode *root, void const *minkey, void const *maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_insert)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mnode_tree_tryinsert)(struct mnode **__restrict proot, struct mnode *__restrict node);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_remove)(struct mnode **__restrict proot, pos_t key);
-FUNDEF WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, pos_t minkey, pos_t maxkey);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_remove)(struct mnode **__restrict proot, void const *key);
+FUNDEF WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, void const *minkey, void const *maxkey);
 FUNDEF NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_removenode)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_prevnode)(struct mnode *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_nextnode)(struct mnode *__restrict self);
-FUNDEF NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, pos_t minkey, pos_t maxkey, struct mnode_tree_minmax *__restrict result);
+FUNDEF NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, void const *minkey, void const *maxkey, struct mnode_tree_minmax *__restrict result);
 
 
 DECL_END

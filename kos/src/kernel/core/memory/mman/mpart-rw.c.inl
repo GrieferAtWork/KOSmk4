@@ -23,6 +23,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
+#include <kernel/mman/mm-fault.h> /* mman_prefault(), mman_prefaultv() */
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>

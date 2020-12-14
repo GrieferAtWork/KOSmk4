@@ -42,7 +42,6 @@ DECL_BEGIN
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
 	((a_max) >= (b_min) && (a_min) <= (b_max))
 
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */

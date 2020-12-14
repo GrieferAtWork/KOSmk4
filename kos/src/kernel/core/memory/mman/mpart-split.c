@@ -147,8 +147,7 @@ NOTHROW(FCALL trydecref_mman_of_mnode)(struct mnode *__restrict self) {
 
 /* Increment the reference counter of every (not already-destroyed)
  * mman that can be reached via the `mp_copy' and `mp_share' chains
- * of `self'. For this purpose, non-destroyed mmans pointed-to by
- * mem-nodes with a NULL mn_part-field are also incref'd! */
+ * of `self'. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
 	struct mnode *node;
@@ -891,6 +890,7 @@ relock_with_data:
 			mpart_reladdr_t min, max;
 			if unlikely(mnode_wasdestroyed(lonode))
 				continue; /* Skip nodes that were destroyed. */
+			assert(lonode->mn_part == lopart);
 			min = mnode_getmapminaddr(lonode);
 			max = mnode_getmapmaxaddr(lonode);
 			assert(min <= max);
@@ -935,13 +935,6 @@ relock_with_data:
 				lonode->mn_maxaddr = hinode->mn_minaddr - 1;
 				mnode_tree_insert(&lonode->mn_mman->mm_mappings, lonode);
 				mnode_tree_insert(&lonode->mn_mman->mm_mappings, hinode);
-
-				/* If the lo-node has become pending to-be unmapped, then also mark the hi-node as such. */
-				if unlikely(ATOMIC_READ(lonode->mn_part) == NULL) {
-					ATOMIC_WRITE(hinode->mn_part, NULL);
-					--hipart->mp_refcnt;
-					SLIST_ATOMIC_INSERT(&hinode->mn_mman->_mm_unmapped, hinode, _mn_unmapped);
-				}
 			}
 		}
 	} /* Scope */

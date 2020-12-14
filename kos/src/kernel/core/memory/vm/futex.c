@@ -42,7 +42,7 @@
 #define ATREE_NOTHROW NOTHROW
 #define Tkey          uintptr_t
 #define T             struct vm_futex
-#define N_NODEPATH    f_tree
+#define N_NODEPATH    vmf_tree
 #define ATREE_IMPLEMENTATION_ONLY 1
 #define ATREE_SINGLE 1
 #include <hybrid/sequence/atree-abi.h>
@@ -89,10 +89,10 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	 * with the extension of `struct sig's behavior of allowing task_waitfor()
 	 * on signal objects that may have already been destroyed by the time that
 	 * task_waitfor() gets called. */
-	sig_broadcast_for_fini(&self->f_signal);
+	sig_broadcast_for_fini(&self->vmf_signal);
 
 	/* Try to lock the associated data part. */
-	part = self->f_part.get();
+	part = self->vmf_part.get();
 	if (!part) {
 		/* No associated part
 		 * -> Our atree-leaf was already invalid to begin with,
@@ -122,7 +122,7 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 		struct vm_futex *next;
 		do {
 			next = ATOMIC_READ(fc->fc_dead);
-			self->f_ndead = next;
+			self->vmf_ndead = next;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(fc->fc_dead, next, self));
 		/* Try to service the datapart in case it became available in the mean time,
@@ -138,13 +138,13 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	/* Successfully acquired a lock to the data part.
 	 * -> At this point, we must remove ourself from the tree of known futex objects. */
 #ifdef NDEBUG
-	vm_futextree_remove(&fc->fc_tree, self->f_tree.a_vaddr,
+	vm_futextree_remove(&fc->fc_tree, self->vmf_tree.a_vaddr,
 	                    fc->fc_semi0, fc->fc_leve0);
 #else /* NDEBUG */
 	{
 		struct vm_futex *removed;
 		removed = vm_futextree_remove_at(&fc->fc_tree,
-		                                 self->f_tree.a_vaddr,
+		                                 self->vmf_tree.a_vaddr,
 		                                 fc->fc_semi0,
 		                                 fc->fc_leve0);
 		assert(removed == self);
@@ -348,10 +348,10 @@ do_recheck_existing_futex_and_controller:
 	 *  ... know that a futex controller has been allocated
 	 *  ... are holding a lock to `self'
 	 * In other words, this is the part where we initialize a new futex. */
-	result->f_refcnt = 1; /* The reference we'll eventually return */
-	xatomic_weaklyref_init(&result->f_part, self);
-	result->f_tree.a_vaddr = datapart_offset;
-	sig_init(&result->f_signal);
+	result->vmf_refcnt = 1; /* The reference we'll eventually return */
+	xatomic_weaklyref_init(&result->vmf_part, self);
+	result->vmf_tree.a_vaddr = datapart_offset;
+	sig_init(&result->vmf_signal);
 	/* Insert the new futex into the tree. */
 	vm_futextree_insert_at(&fc->fc_tree,
 	                       result,
@@ -597,7 +597,7 @@ vm_futex_broadcast(UNCHECKED void *futex_address)
 	/* Lookup a futex at the given address. */
 	f = vm_getfutex_existing(effective_vm, futex_address);
 	if (f) {
-		sig_broadcast(&f->f_signal);
+		sig_broadcast(&f->vmf_signal);
 		decref_unlikely(f);
 	}
 }
