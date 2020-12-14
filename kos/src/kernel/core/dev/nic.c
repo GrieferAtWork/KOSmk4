@@ -62,7 +62,7 @@ nic_device_newpacket(struct nic_device const *__restrict self,
 	result->np_refcnt              = 1;
 	result->np_payloads            = payload_size;
 	result->np_payloadc            = 1;
-	result->np_payloadv[0].ab_base = (void *)payload;
+	result->np_payloadv[0].ab_base = (byte_t *)payload;
 	result->np_payloadv[0].ab_size = payload_size;
 	result->np_tail    = (byte_t *)&result->np_payloadv[1] + max_head_size;
 	result->np_head    = result->np_tail;

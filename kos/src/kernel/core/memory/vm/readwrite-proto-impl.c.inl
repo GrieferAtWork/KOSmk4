@@ -134,7 +134,7 @@ throw_segfault:
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* Check for a VIO memory segment */
 		if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
-			struct vio_args args;
+			struct vioargs args;
 			pos_t vio_addr;
 			COMPILER_READ_BARRIER();
 			sync_endread(self);
@@ -144,17 +144,17 @@ throw_segfault:
 				decref(part);
 				RETHROW();
 			}
-			args.va_block = incref(part->dp_block);
+			args.va_file = incref(part->dp_block);
 			args.va_acmap_offset = ((pos_t)(node_vpage_offset + vm_datapart_mindpage(part))
-			                        << VM_DATABLOCK_ADDRSHIFT(args.va_block));
+			                        << VM_DATABLOCK_ADDRSHIFT(args.va_file));
 			/* Figure out the staring VIO address that is being accessed. */
-			vio_addr = ((pos_t)vm_datapart_mindpage(part) << VM_DATABLOCK_ADDRSHIFT(args.va_block)) +
+			vio_addr = ((pos_t)vm_datapart_mindpage(part) << VM_DATABLOCK_ADDRSHIFT(args.va_file)) +
 			            (pos_t)((byte_t *)addr - (byte_t *)vm_node_getmin(node));
 
 			sync_endread(part);
-			args.va_ops = args.va_block->db_vio;
+			args.va_ops = args.va_file->db_vio;
 			if unlikely(!args.va_ops) {
-				decref_unlikely(args.va_block);
+				decref_unlikely(args.va_file);
 				decref_unlikely(part);
 				goto throw_segfault;
 			}
@@ -168,7 +168,7 @@ throw_segfault:
 			if unlikely(!force_accessible && !(node_prot & VM_PROT_WRITE))
 #endif /* !IS_READING */
 			{
-				decref_unlikely(args.va_block);
+				decref_unlikely(args.va_file);
 				decref_unlikely(part);
 #ifdef IS_READING
 				THROW(E_SEGFAULT_NOTREADABLE, addr, 0);
@@ -176,7 +176,7 @@ throw_segfault:
 				THROW(E_SEGFAULT_READONLY, addr, E_SEGFAULT_CONTEXT_WRITING);
 #endif /* !IS_READING */
 			}
-			FINALLY_DECREF_UNLIKELY(args.va_block);
+			FINALLY_DECREF_UNLIKELY(args.va_file);
 			FINALLY_DECREF_UNLIKELY(part);
 #ifdef IS_READING
 			vio_copyfromvio(&args, vio_addr, buf, transfer_bytes);

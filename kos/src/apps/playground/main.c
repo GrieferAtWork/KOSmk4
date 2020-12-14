@@ -660,9 +660,9 @@ int main_yield(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 static u32 volatile viovalue = 0;
 PRIVATE NONNULL((1)) u32 LIBVIO_CC
-myvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
+myvio_readl(struct vioargs *__restrict args, vio_addr_t addr) {
 	/* This function is called synchronously every time our VIO region is read from! */
-	printf("VIO:readl(%p)\n", vio_args_faultaddr(args, addr));
+	printf("VIO:readl(%p)\n", vioargs_faultaddr(args, addr));
 	return viovalue++;
 }
 

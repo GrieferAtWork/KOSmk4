@@ -65,9 +65,9 @@
 
 #define __MAP_SHARED        0x00000001 /* Share changes. */
 #define __MAP_PRIVATE       0x00000002 /* Changes are private. */
-#define __MAP_FIXED         0x00000010 /* Interpret addr exactly. */
 #define __MAP_TYPE          0x0000000f /* Mask for type of mapping. */
 #define __MAP_FILE          0x00000000 /* Do use a file. */
+#define __MAP_FIXED         0x00000010 /* Interpret addr exactly. */
 #define __MAP_ANON          0x00000020 /* Don't use a file. */
 #define __MAP_32BIT         0x00000040 /* Only give out 32-bit addresses. */
 #define __MAP_GROWSDOWN     0x00000100 /* Stack-like segment. */

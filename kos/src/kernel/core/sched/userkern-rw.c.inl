@@ -48,24 +48,24 @@ DECL_BEGIN
 #if USERKERN_WIDTH == 4
 #define VALUE_TYPE   u32
 PRIVATE NONNULL((1)) u32 KCALL
-userkern_segment_readl(struct vio_args *__restrict args,
+userkern_segment_readl(struct vioargs *__restrict args,
                        pos_t addr)
 #elif USERKERN_WIDTH == 8
 #define VALUE_TYPE   u64
 PRIVATE NONNULL((1)) u64 KCALL
-userkern_segment_readq(struct vio_args *__restrict args,
+userkern_segment_readq(struct vioargs *__restrict args,
                        pos_t addr)
 #endif /* USERKERN_WIDTH == ... */
 #elif defined(DEFINE_IO_WRITE)
 #if USERKERN_WIDTH == 4
 #define VALUE_TYPE   u32
 PRIVATE NONNULL((1)) void KCALL
-userkern_segment_writel(struct vio_args *__restrict args,
+userkern_segment_writel(struct vioargs *__restrict args,
                         pos_t addr, u32 value)
 #elif USERKERN_WIDTH == 8
 #define VALUE_TYPE   u64
 PRIVATE NONNULL((1)) void KCALL
-userkern_segment_writeq(struct vio_args *__restrict args,
+userkern_segment_writeq(struct vioargs *__restrict args,
                         pos_t addr, u64 value)
 #endif /* USERKERN_WIDTH == ... */
 #endif /* DEFINE_IO_WRITE */
@@ -239,7 +239,7 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 #endif /* !DEFINE_IO_READ */
 		{
 			if (reladdr < sizeof(USERKERN_STRUCT)) {
-				void *ptr = vio_args_faultaddr(args, addr);
+				void *ptr = vioargs_faultaddr(args, addr);
 #ifdef DEFINE_IO_READ
 				THROW(E_SEGFAULT_NOTREADABLE, ptr,
 				      E_SEGFAULT_CONTEXT_USERCODE);
@@ -259,12 +259,12 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 err_invalid_addr:
 #ifdef DEFINE_IO_READ
 	THROW(E_SEGFAULT_UNMAPPED,
-	      vio_args_faultaddr(args, addr),
+	      vioargs_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_USERCODE);
 #else /* DEFINE_IO_READ */
 	THROW(E_SEGFAULT_UNMAPPED,
-	      vio_args_faultaddr(args, addr),
+	      vioargs_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_WRITING |
 	      E_SEGFAULT_CONTEXT_USERCODE);

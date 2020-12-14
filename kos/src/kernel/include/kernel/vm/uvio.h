@@ -266,7 +266,7 @@ struct kernel_uvio_request {
 #if __SIZEOF_POINTER__ > 4
 	u8                    kur_pad[__SIZEOF_POINTER__ - 4]; /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
-	struct vio_args      *kur_args;        /* [0..1][lock(kur_lock)] VIO arguments.
+	struct vioargs       *kur_args;        /* [0..1][lock(kur_lock)] VIO arguments.
 	                                        * When set to `NULL', the request is considered to be free. */
 	struct task          *kur_orig;        /* [1..1][valid_if(kur_args)][lock(kur_lock)] The sender thread. */
 	union {
@@ -317,7 +317,7 @@ DATDEF struct vio_operators const uvio_operators;
 FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
 
 /* Perform a remove VIO request.
- * @param: args:        VIO arguments (`va_block' must be a `struct uvio')
+ * @param: args:        VIO arguments (`va_file' must be a `struct uvio')
  * @param: addr:        The VIO address being accessed.
  * @param: command:     Constructed using `KERNEL_UVIO_COMMAND()'
  * @param: argv_result: [in]  VIO arguments
@@ -329,43 +329,43 @@ FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
  * @throws: ...:        If user-space returned with `UVIO_OPCODE_EXCEPT',
  *                      that is exception will be re-thrown by this function. */
 FUNDEF NONNULL((1, 4)) void KCALL
-uvio_request(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
              /*in|out*/ union kernel_uvio_argument argv_result[2]) THROWS(...);
 
 
 /* Helper wrappers for `uvio_request()' */
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 1
 FUNDEF NONNULL((1)) uint8_t KCALL
-uvio_requestb(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_requestb(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
               uint8_t arg0 DFL(0), uint8_t arg1 DFL(0)) THROWS(...);
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 1 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 2
 FUNDEF NONNULL((1)) uint16_t KCALL
-uvio_requestw(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_requestw(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
               uint16_t arg0 DFL(0), uint16_t arg1 DFL(0)) THROWS(...);
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 2 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 4
 FUNDEF NONNULL((1)) uint32_t KCALL
-uvio_requestl(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_requestl(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
               uint32_t arg0 DFL(0), uint32_t arg1 DFL(0)) THROWS(...);
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 4 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8
 FUNDEF NONNULL((1)) uint64_t KCALL
-uvio_requestq(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_requestq(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
               uint64_t arg0 DFL(0), uint64_t arg1 DFL(0)) THROWS(...);
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16
 #ifdef __UINT128_TYPE__
 FUNDEF NONNULL((1)) uint128_t KCALL
-uvio_requestx(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_requestx(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
               uint128_t arg0 DFL(0), uint128_t arg1 DFL(0)) THROWS(...);
 #else /* __UINT128_TYPE__ */
 FUNDEF NONNULL((1)) uint128_t KCALL
-uvio_requestx(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_requestx(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
               uint128_t arg0, uint128_t arg1) THROWS(...);
 #endif /* !__UINT128_TYPE__ */
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16 */

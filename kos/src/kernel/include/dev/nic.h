@@ -47,8 +47,8 @@ struct nic_device;
 #ifndef __aio_buffer_entry_defined
 #define __aio_buffer_entry_defined 1
 struct aio_buffer_entry {
-	USER CHECKED void *ab_base; /* [?..ab_size] Virtual base address of the buffer. */
-	size_t             ab_size; /* Buffer size of `ab_base' (in bytes) */
+	USER CHECKED byte_t *ab_base; /* [?..ab_size] Virtual base address of the buffer. */
+	size_t               ab_size; /* Buffer size of `ab_base' (in bytes) */
 };
 #endif /* !__aio_buffer_entry_defined */
 

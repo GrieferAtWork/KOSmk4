@@ -1111,6 +1111,7 @@
 #define LIST_ENTRY(t) struct{struct t*le_next,**le_prev;}
 #define LIST_ENTRY_P(T) struct{T*le_next,**le_prev;}
 
+#define SLIST_FOREACH(...) for(;;)
 #define SLIST_FOREACH_P(...) for(;;)
 #define SLIST_HEAD(n,t) struct n{struct t *slh_first;}
 #define SLIST_HEAD_P(T) struct{T*slh_first;}
@@ -1159,6 +1160,56 @@
 #define DLIST_ENTRY_P(T) struct{T*dle_next,*dle_prev;}
 #define DLIST_FOREACH(...) for(;;)
 #define DLIST_FOREACH_P(...) for(;;)
+
+#define LIST_TRYREMOVE_IF(...)
+#define LIST_TRYREMOVE_IF_P(...)
+#define LIST_REMOVEALL(...)
+#define LIST_REMOVEALL_P(...)
+#define LIST_TRYUNBIND_IF(...)
+#define LIST_TRYUNBIND_IF_P(...)
+#define LIST_UNBINDALL(...)
+#define LIST_UNBINDALL_P(...)
+#define DLIST_TRYREMOVE_IF(...)
+#define DLIST_TRYREMOVE_IF_P(...)
+#define DLIST_REMOVEALL(...)
+#define DLIST_REMOVEALL_P(...)
+#define SLIST_TRYREMOVE(...)
+#define SLIST_TRYREMOVE_P(...)
+#define SLIST_TRYREMOVE_IF(...)
+#define SLIST_TRYREMOVE_IF_P(...)
+#define SLIST_REMOVEALL(...)
+#define SLIST_REMOVEALL_P(...)
+#define SLIST_CONTAINS(...)
+#define SLIST_CONTAINS_P(...)
+#define SLIST_TRYREPLACE(...)
+#define SLIST_TRYREPLACE_P(...)
+#define SLIST_TRYREPLACE_R(...)
+#define SLIST_TRYREPLACE_R_P(...)
+#define STAILQ_TRYREMOVE(...)
+#define STAILQ_TRYREMOVE_P(...)
+#define STAILQ_TRYREMOVE_IF(...)
+#define STAILQ_TRYREMOVE_IF_P(...)
+#define STAILQ_REMOVEALL(...)
+#define STAILQ_REMOVEALL_P(...)
+#define STAILQ_CONTAINS(...)
+#define STAILQ_CONTAINS_P(...)
+#define STAILQ_TRYREPLACE(...)
+#define STAILQ_TRYREPLACE_P(...)
+#define STAILQ_TRYREPLACE_R(...)
+#define STAILQ_TRYREPLACE_R_P(...)
+#define SIMPLEQ_TRYREMOVE(...)
+#define SIMPLEQ_TRYREMOVE_P(...)
+#define SIMPLEQ_TRYREMOVE_IF(...)
+#define SIMPLEQ_TRYREMOVE_IF_P(...)
+#define SIMPLEQ_REMOVEALL(...)
+#define SIMPLEQ_REMOVEALL_P(...)
+#define SIMPLEQ_CONTAINS(...)
+#define SIMPLEQ_CONTAINS_P(...)
+#define SIMPLEQ_TRYREPLACE(...)
+#define SIMPLEQ_TRYREPLACE_P(...)
+#define SIMPLEQ_TRYREPLACE_R(...)
+#define SIMPLEQ_TRYREPLACE_R_P(...)
+
 
 #define LLIST(T)                  T*
 #define LLIST_NODE(T)             struct{T *ln_next,**ln_pself;}

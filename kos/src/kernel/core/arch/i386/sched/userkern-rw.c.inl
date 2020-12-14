@@ -81,24 +81,24 @@ DECL_BEGIN
 #define VALUE_TYPE  u32
 #ifdef DEFINE_IO_READ
 INTERN NONNULL((1)) bool KCALL
-userkern_get_arch_specific_field_compat(struct vio_args *__restrict args,
+userkern_get_arch_specific_field_compat(struct vioargs *__restrict args,
                                         uintptr_t offset,
                                         u32 *__restrict presult)
 #else /* DEFINE_IO_READ */
 INTERN NONNULL((1)) bool KCALL
-userkern_set_arch_specific_field_compat(struct vio_args *__restrict args,
+userkern_set_arch_specific_field_compat(struct vioargs *__restrict args,
                                         uintptr_t offset, u32 value)
 #endif /* !DEFINE_IO_READ */
 #else /* USERKERN_WIDTH == 4 */
 #define VALUE_TYPE  uintptr_t
 #ifdef DEFINE_IO_READ
 INTERN NONNULL((1)) bool KCALL
-userkern_get_arch_specific_field(struct vio_args *__restrict args,
+userkern_get_arch_specific_field(struct vioargs *__restrict args,
                                  uintptr_t offset,
                                  uintptr_t *__restrict presult)
 #else /* DEFINE_IO_READ */
 INTERN NONNULL((1)) bool KCALL
-userkern_set_arch_specific_field(struct vio_args *__restrict args,
+userkern_set_arch_specific_field(struct vioargs *__restrict args,
                                  uintptr_t offset, uintptr_t value)
 #endif /* !DEFINE_IO_READ */
 #endif /* USERKERN_WIDTH != 4 */

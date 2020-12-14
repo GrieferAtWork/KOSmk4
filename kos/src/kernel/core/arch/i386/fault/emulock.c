@@ -264,10 +264,10 @@ handle_vio_or_not_faulted:
 			FINALLY_DECREF_UNLIKELY(block);
 			if (block->db_vio) {
 				/* Handle VIO memory access. */
-				struct vio_args args;
+				struct vioargs args;
 				vio_addr_t vio_addr;
 				args.va_ops             = block->db_vio;
-				args.va_block           = block;
+				args.va_file            = block;
 				args.va_part            = part;
 				args.va_acmap_offset    = vm_datapart_minbyte(part);
 				args.va_acmap_page      = node_minaddr;

@@ -765,13 +765,13 @@ do_handle_iob_node_access:
 #endif /* CONFIG_HAVE_DEBUGGER */
 					/* VIO Emulation */
 					sync_read(part);
-					args.vea_args.va_block        = incref(part->dp_block);
+					args.vea_args.va_file        = incref(part->dp_block);
 					args.vea_args.va_acmap_offset = ((pos_t)(node_vpage_offset + vm_datapart_mindpage(part))
-					                                 << VM_DATABLOCK_ADDRSHIFT(args.vea_args.va_block));
+					                                 << VM_DATABLOCK_ADDRSHIFT(args.vea_args.va_file));
 					sync_endread(part);
-					args.vea_args.va_ops = args.vea_args.va_block->db_vio;
+					args.vea_args.va_ops = args.vea_args.va_file->db_vio;
 					if unlikely(!args.vea_args.va_ops) {
-						decref_unlikely(args.vea_args.va_block);
+						decref_unlikely(args.vea_args.va_file);
 #ifdef CONFIG_HAVE_DEBUGGER
 decref_part_and_pop_connections_and_throw_segfault:
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -789,7 +789,7 @@ decref_part_and_pop_connections_and_throw_segfault:
 							            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
 							                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
 cleanup_vio_and_pop_connections_and_set_exception_pointers2:
-							decref_unlikely(args.vea_args.va_block);
+							decref_unlikely(args.vea_args.va_file);
 							assert(args.vea_args.va_part == part);
 							decref_unlikely(args.vea_args.va_part);
 							goto pop_connections_and_set_exception_pointers2;
@@ -864,7 +864,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 									PERTASK_SET(this_exception_args.e_segfault.s_context, flags);
 								}
 							}
-							decref_unlikely(args.vea_args.va_block);
+							decref_unlikely(args.vea_args.va_file);
 							assert(args.vea_args.va_part == part);
 							/* Directly unwind the exception, since we've got a custom return-pc set-up.
 							 * If we did a normal RETHROW() here, then the (currently correct) return PC
@@ -881,7 +881,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							x86_userexcept_unwind_interrupt(state);
 						}
 						assert(args.vea_args.va_part == part);
-						decref_unlikely(args.vea_args.va_block);
+						decref_unlikely(args.vea_args.va_file);
 						decref_unlikely(args.vea_args.va_part);
 						task_popconnections();
 						return state;
@@ -905,18 +905,18 @@ do_normal_vio:
 					 * access within this range will be dispatched via VIO. */
 					args.vea_ptrlo = (byte_t *)pageaddr - node_vpage_offset * PAGESIZE;
 					args.vea_ptrhi = (byte_t *)args.vea_ptrlo + vm_datapart_numvpages(part) * PAGESIZE - 1;
-					args.vea_addr  = vio_args_vioaddr(&args.vea_args, args.vea_ptrlo);
+					args.vea_addr  = vioargs_vioaddr(&args.vea_args, args.vea_ptrlo);
 					TRY {
 						/* Emulate the current instruction. */
 						viocore_emulate(&args);
 					} EXCEPT {
-						decref_unlikely(args.vea_args.va_block);
+						decref_unlikely(args.vea_args.va_file);
 						assert(args.vea_args.va_part == part);
 						/*decref_unlikely(args.vea_args.va_part);*/ /* Handled by outer EXCEPT */
 						/*task_popconnections();*/ /* Handled by outer EXCEPT */
 						RETHROW();
 					}
-					decref_unlikely(args.vea_args.va_block);
+					decref_unlikely(args.vea_args.va_file);
 					assert(args.vea_args.va_part == part);
 					decref_unlikely(args.vea_args.va_part);
 					task_popconnections();

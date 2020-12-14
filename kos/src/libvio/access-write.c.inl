@@ -72,7 +72,7 @@ DECL_BEGIN
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writeb)(struct vio_operators const *__restrict ops,
-                          struct vio_args *__restrict args,
+                          struct vioargs *__restrict args,
                           vio_addr_t addr, u8 value) {
 	if (ops->WRITE_METHOD.f_byte) {
 		do_writeb(addr, value);
@@ -131,7 +131,7 @@ WRITE_FUNC(libvio_writeb)(struct vio_operators const *__restrict ops,
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writew_aligned)(struct vio_operators const *__restrict ops,
-                                  struct vio_args *__restrict args,
+                                  struct vioargs *__restrict args,
                                   vio_addr_t addr, u16 value) {
 	assert((addr & 1) == 0);
 	if (ops->WRITE_METHOD.f_word) {
@@ -191,7 +191,7 @@ WRITE_FUNC(libvio_writew_aligned)(struct vio_operators const *__restrict ops,
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writew)(struct vio_operators const *__restrict ops,
-                          struct vio_args *__restrict args,
+                          struct vioargs *__restrict args,
                           vio_addr_t addr, u16 value) {
 	if ((addr & 1) == 0) {
 		return WRITE_FUNC(libvio_writew_aligned)(ops, args, addr, value);
@@ -341,7 +341,7 @@ WRITE_FUNC(libvio_writew)(struct vio_operators const *__restrict ops,
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writel_aligned)(struct vio_operators const *__restrict ops,
-                                  struct vio_args *__restrict args,
+                                  struct vioargs *__restrict args,
                                   vio_addr_t addr, u32 value) {
 	assert((addr & 3) == 0);
 	if (ops->WRITE_METHOD.f_dword) {
@@ -402,7 +402,7 @@ WRITE_FUNC(libvio_writel_aligned)(struct vio_operators const *__restrict ops,
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writel)(struct vio_operators const *__restrict ops,
-                          struct vio_args *__restrict args,
+                          struct vioargs *__restrict args,
                           vio_addr_t addr, u32 value) {
 	if ((addr & 3) == 0) {
 		/* assume((addr & 3) == 0); */
@@ -581,7 +581,7 @@ WRITE_FUNC(libvio_writel)(struct vio_operators const *__restrict ops,
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writeq_aligned)(struct vio_operators const *__restrict ops,
-                                  struct vio_args *__restrict args,
+                                  struct vioargs *__restrict args,
                                   vio_addr_t addr, u64 value) {
 	assert((addr & 7) == 0);
 #ifdef HAVE_QWORD
@@ -647,7 +647,7 @@ WRITE_FUNC(libvio_writeq_aligned)(struct vio_operators const *__restrict ops,
 /************************************************************************/
 LOCAL WUNUSED NONNULL((1, 2)) bool CC
 WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
-                          struct vio_args *__restrict args,
+                          struct vioargs *__restrict args,
                           vio_addr_t addr, u64 value) {
 	if ((addr & 7) == 0) {
 		/* assume((addr & 7) == 0); */

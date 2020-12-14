@@ -73,7 +73,7 @@ NOTHROW(KCALL kernel_uvio_request_randuid)(struct kernel_uvio_request *__restric
 PRIVATE NONNULL((1, 2, 3, 6)) void KCALL
 uvio_request_impl(struct uvio *__restrict self,
                   struct kernel_uvio_request *__restrict slot,
-                  /*in|out*/ struct vio_args *__restrict args, 
+                  /*in|out*/ struct vioargs *__restrict args, 
                   vio_addr_t addr, u16 command,
                   /*in|out*/ union kernel_uvio_argument argv_result[2]) THROWS(...) {
 	u8 status;
@@ -163,7 +163,7 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
 
 
 /* Perform a remove VIO request.
- * @param: args:        VIO arguments (`va_block' must be a `struct uvio')
+ * @param: args:        VIO arguments (`va_file' must be a `struct uvio')
  * @param: addr:        The VIO address being accessed.
  * @param: command:     Constructed using `KERNEL_UVIO_COMMAND()'
  * @param: argv_result: [in]  VIO arguments
@@ -175,13 +175,13 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
  * @throws: ...:        If user-space returned with `UVIO_OPCODE_EXCEPT',
  *                      that is exception will be re-thrown by this function. */
 PUBLIC NONNULL((1, 4)) void KCALL
-uvio_request(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
              /*in|out*/ union kernel_uvio_argument argv_result[2]) THROWS(...) {
 	struct uvio *self;
 	unsigned int reqid;
 	struct kernel_uvio_request *slot;
 	assert(!task_wasconnected());
-	self = (struct uvio *)args->va_block;
+	self = (struct uvio *)args->va_file;
 	assert(self->db_type == &uvio_datablock_type);
 	assert(self->db_vio == &uvio_operators);
 
@@ -239,7 +239,7 @@ got_free_slot:
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 1
 PUBLIC NONNULL((1)) uint8_t KCALL
-uvio_requestb(/*in|out*/ struct vio_args *__restrict args,
+uvio_requestb(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint8_t arg0, uint8_t arg1) THROWS(...) {
 	union kernel_uvio_argument argv_result[2];
@@ -254,7 +254,7 @@ uvio_requestb(/*in|out*/ struct vio_args *__restrict args,
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 2
 PUBLIC NONNULL((1)) uint16_t KCALL
-uvio_requestw(/*in|out*/ struct vio_args *__restrict args,
+uvio_requestw(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint16_t arg0, uint16_t arg1) THROWS(...) {
 	union kernel_uvio_argument argv_result[2];
@@ -269,7 +269,7 @@ uvio_requestw(/*in|out*/ struct vio_args *__restrict args,
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 4
 PUBLIC NONNULL((1)) uint32_t KCALL
-uvio_requestl(/*in|out*/ struct vio_args *__restrict args,
+uvio_requestl(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint32_t arg0, uint32_t arg1) THROWS(...) {
 	union kernel_uvio_argument argv_result[2];
@@ -284,7 +284,7 @@ uvio_requestl(/*in|out*/ struct vio_args *__restrict args,
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8
 PUBLIC NONNULL((1)) uint64_t KCALL
-uvio_requestq(/*in|out*/ struct vio_args *__restrict args,
+uvio_requestq(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint64_t arg0, uint64_t arg1) THROWS(...) {
 	union kernel_uvio_argument argv_result[2];
@@ -299,7 +299,7 @@ uvio_requestq(/*in|out*/ struct vio_args *__restrict args,
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16
 PUBLIC NONNULL((1)) uint128_t KCALL
-uvio_requestx(/*in|out*/ struct vio_args *__restrict args,
+uvio_requestx(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint128_t arg0, uint128_t arg1) THROWS(...) {
 	union kernel_uvio_argument argv_result[2];
@@ -316,14 +316,14 @@ uvio_requestx(/*in|out*/ struct vio_args *__restrict args,
 /* Define wrappers for operators from `uvio_operators' */
 #define DEFINE_UNARY_VIO_OPERATOR(name, bwlqx, T, opcode)                          \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                               \
-	name(struct vio_args *__restrict args, vio_addr_t addr) {                      \
+	name(struct vioargs *__restrict args, vio_addr_t addr) {                      \
 		return uvio_request##bwlqx(args, addr,                                     \
 		                           KERNEL_UVIO_COMMAND(opcode,                     \
 		                                               UVIO_REQUEST_FLAG_NORMAL)); \
 	}
 #define DEFINE_BINARY_VIO_OPERATOR_VOID(name, bwlqx, T, opcode)            \
 	PRIVATE NONNULL((1)) void LIBVIO_CC                                    \
-	name(struct vio_args *__restrict args, vio_addr_t addr, T arg0) {      \
+	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0) {      \
 		uvio_request##bwlqx(args, addr,                                    \
 		                    KERNEL_UVIO_COMMAND(opcode,                    \
 		                                        UVIO_REQUEST_FLAG_NORMAL), \
@@ -331,7 +331,7 @@ uvio_requestx(/*in|out*/ struct vio_args *__restrict args,
 	}
 #define DEFINE_BINARY_VIO_OPERATOR_ATOMIC(name, bwlqx, T, opcode)                          \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                                       \
-	name(struct vio_args *__restrict args, vio_addr_t addr, T arg0, bool atomic) {         \
+	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0, bool atomic) {         \
 		return uvio_request##bwlqx(args, addr,                                             \
 		                           KERNEL_UVIO_COMMAND(opcode,                             \
 		                                               atomic ? UVIO_REQUEST_FLAG_ATOMIC   \
@@ -341,7 +341,7 @@ uvio_requestx(/*in|out*/ struct vio_args *__restrict args,
 
 #define DEFINE_TRINARY_VIO_OPERATOR_ATOMIC(name, bwlqx, T, opcode)                         \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                                       \
-	name(struct vio_args *__restrict args, vio_addr_t addr, T arg0, T arg1, bool atomic) { \
+	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0, T arg1, bool atomic) { \
 		return uvio_request##bwlqx(args, addr,                                             \
 		                           KERNEL_UVIO_COMMAND(opcode,                             \
 		                                               atomic ? UVIO_REQUEST_FLAG_ATOMIC   \
@@ -539,7 +539,7 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 		{
 			void *acmap_page;
 			vio_addr_t acmap_offset;
-			struct vio_args *args;
+			struct vioargs *args;
 			pid_t sender_pid;
 			COMPILER_READ_BARRIER();
 			sync_read(&slot->kur_lock);

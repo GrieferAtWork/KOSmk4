@@ -75,23 +75,23 @@ NOTHROW(KCALL swap_free)(swappage_t start, physpagecnt_t num_pages) {
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
 PUBLIC void KCALL
-swap_read(swappage_t start,
-          physpage_t buffer,
-          physpagecnt_t num_pages) {
+swap_read(swapaddr_t start,
+          physaddr_t buffer,
+          size_t num_bytes) {
 	(void)start;
 	(void)buffer;
-	(void)num_pages;
+	(void)num_bytes;
 	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 PUBLIC void KCALL
-swap_write(swappage_t start,
-           physpage_t buffer,
-           physpagecnt_t num_pages) {
+swap_write(swapaddr_t start,
+           physaddr_t buffer,
+           size_t num_bytes) {
 	(void)start;
 	(void)buffer;
-	(void)num_pages;
+	(void)num_bytes;
 	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }

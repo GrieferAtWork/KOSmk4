@@ -43,8 +43,8 @@ struct vm_futex {
 	XATOMIC_WEAKLYREF(struct vm_datapart)
 	                     f_part;   /* [0..1] The data part associated with this futex.
 	                                * Note that this part may change at any time in order to deal
-	                                * with the part being split. Additionally, if the part is destroyed
-	                                * the this pointer is cleared, meaning that a NULL-value indicate
+	                                * with the part being split. Additionally, if the part is destroyed,
+	                                * then this pointer is cleared, meaning that a NULL-value indicate
 	                                * that the futex is dangling and that `f_tree' has become invalid. */
 	ATREE_NODE_SINGLE(struct vm_futex, uintptr_t)
 	                     f_tree;   /* [lock(f_part->dp_lock)][valid_if(!wasdestroyed(f_tree))]

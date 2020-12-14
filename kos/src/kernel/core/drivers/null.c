@@ -315,37 +315,37 @@ kmsg_polltest(struct character_device *__restrict UNUSED(self),
 
 #ifdef LIBVIO_CONFIG_ENABLED
 PRIVATE u8 KCALL
-port_rdb(struct vio_args *__restrict UNUSED(args),
+port_rdb(struct vioargs *__restrict UNUSED(args),
          vio_addr_t addr) {
 	return inb((port_t)addr);
 }
 
 PRIVATE u16 KCALL
-port_rdw(struct vio_args *__restrict UNUSED(args),
+port_rdw(struct vioargs *__restrict UNUSED(args),
          vio_addr_t addr) {
 	return inw((port_t)addr);
 }
 
 PRIVATE u32 KCALL
-port_rdl(struct vio_args *__restrict UNUSED(args),
+port_rdl(struct vioargs *__restrict UNUSED(args),
          vio_addr_t addr) {
 	return inl((port_t)addr);
 }
 
 PRIVATE void KCALL
-port_wrb(struct vio_args *__restrict UNUSED(args),
+port_wrb(struct vioargs *__restrict UNUSED(args),
          vio_addr_t addr, u8 value) {
 	outb((port_t)addr, value);
 }
 
 PRIVATE void KCALL
-port_wrw(struct vio_args *__restrict UNUSED(args),
+port_wrw(struct vioargs *__restrict UNUSED(args),
          vio_addr_t addr, u16 value) {
 	outw((port_t)addr, value);
 }
 
 PRIVATE void KCALL
-port_wrl(struct vio_args *__restrict UNUSED(args),
+port_wrl(struct vioargs *__restrict UNUSED(args),
          vio_addr_t addr, u32 value) {
 	outl((port_t)addr, value);
 }
@@ -369,26 +369,26 @@ port_mmap(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE u8 KCALL
-random_rdb(struct vio_args *__restrict UNUSED(args),
+random_rdb(struct vioargs *__restrict UNUSED(args),
            pos_t UNUSED(addr)) {
 	return krand8_nondeterministic();
 }
 
 PRIVATE u16 KCALL
-random_rdw(struct vio_args *__restrict UNUSED(args),
+random_rdw(struct vioargs *__restrict UNUSED(args),
            pos_t UNUSED(addr)) {
 	return krand16_nondeterministic();
 }
 
 PRIVATE u32 KCALL
-random_rdl(struct vio_args *__restrict UNUSED(args),
+random_rdl(struct vioargs *__restrict UNUSED(args),
            pos_t UNUSED(addr)) {
 	return krand32_nondeterministic();
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL
-random_rdq(struct vio_args *__restrict UNUSED(args),
+random_rdq(struct vioargs *__restrict UNUSED(args),
            pos_t UNUSED(addr)) {
 	return ((u64)krand32_nondeterministic()) |
 	       ((u64)krand32_nondeterministic() << 32);
@@ -415,23 +415,23 @@ random_mmap(struct character_device *__restrict UNUSED(self),
 }
 
 PRIVATE u8 KCALL
-urandom_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+urandom_rdb(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return (u8)krand32();
 }
 
 PRIVATE u16 KCALL
-urandom_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+urandom_rdw(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return (u16)krand32();
 }
 
 PRIVATE u32 KCALL
-urandom_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+urandom_rdl(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand32();
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL
-urandom_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+urandom_rdq(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand64();
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */

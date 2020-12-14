@@ -248,7 +248,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		}
 #ifdef LIBVIO_CONFIG_ENABLED
 		if (self->db_vio) {
-			struct vio_args args;
+			struct vioargs args;
 			args.va_ops = self->i_type->it_file.f_vio;
 			assertf(args.va_ops,
 			        "self         = %p\n"
@@ -257,7 +257,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			        self,
 			        self->db_vio,
 			        self->i_type);
-			args.va_block        = self;
+			args.va_file         = self;
 			args.va_part         = NULL;
 			args.va_acmap_page   = 0;
 			args.va_acmap_offset = 0;

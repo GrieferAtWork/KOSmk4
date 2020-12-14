@@ -36,7 +36,7 @@ DECL_BEGIN
 #define COMPONENT        COMPONENT2(DEFINE_VIO_NAME)
 
 INTERN NONNULL((1)) u8 CC
-FUNC(b)(struct vio_args *__restrict args, vio_addr_t addr, u8 value, bool atomic) {
+FUNC(b)(struct vioargs *__restrict args, vio_addr_t addr, u8 value, bool atomic) {
 	struct vio_operators const *ops = args->va_ops;
 	u8 result, new_result;
 	if (ops->COMPONENT.f_byte)
@@ -50,7 +50,7 @@ FUNC(b)(struct vio_args *__restrict args, vio_addr_t addr, u8 value, bool atomic
 }
 
 INTERN NONNULL((1)) u16 CC
-FUNC(w)(struct vio_args *__restrict args, vio_addr_t addr, u16 value, bool atomic) {
+FUNC(w)(struct vioargs *__restrict args, vio_addr_t addr, u16 value, bool atomic) {
 	struct vio_operators const *ops = args->va_ops;
 	u16 result, new_result;
 	if (ops->COMPONENT.f_word && ((uintptr_t)addr & 1) == 0)
@@ -64,7 +64,7 @@ FUNC(w)(struct vio_args *__restrict args, vio_addr_t addr, u16 value, bool atomi
 }
 
 INTERN NONNULL((1)) u32 CC
-FUNC(l)(struct vio_args *__restrict args, vio_addr_t addr, u32 value, bool atomic) {
+FUNC(l)(struct vioargs *__restrict args, vio_addr_t addr, u32 value, bool atomic) {
 	struct vio_operators const *ops = args->va_ops;
 	u32 result, new_result;
 	if (ops->COMPONENT.f_dword && ((uintptr_t)addr & 3) == 0)
@@ -79,7 +79,7 @@ FUNC(l)(struct vio_args *__restrict args, vio_addr_t addr, u32 value, bool atomi
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 INTERN NONNULL((1)) u64 CC
-FUNC(q)(struct vio_args *__restrict args, vio_addr_t addr, u64 value, bool atomic) {
+FUNC(q)(struct vioargs *__restrict args, vio_addr_t addr, u64 value, bool atomic) {
 	struct vio_operators const *ops = args->va_ops;
 	u64 result, new_result;
 	if (ops->COMPONENT.f_qword && ((uintptr_t)addr & 7) == 0)

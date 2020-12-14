@@ -74,13 +74,13 @@ union qword {
 #endif /* __BYTE_ORDER__ == ... */
 
 
-/* TODO: vio_args_getstate()  (implement through use of custom hop() operations that
- *                             can be used to get/set the CPU state of a waiting
- *                             thread by use of UVIO request ids `req.uq_reqid') */
+/* TODO: vioargs_getstate()  (implement through use of custom hop() operations that
+ *                            can be used to get/set the CPU state of a waiting
+ *                            thread by use of UVIO request ids `req.uq_reqid') */
 
 PRIVATE void *uvio_service_thread(void *cookie) {
 	fd_t fd;
-	struct vio_args args;
+	struct vioargs args;
 	{
 		struct uvio_service_startup_args *ptr;
 		ptr = (struct uvio_service_startup_args *)cookie;
@@ -205,7 +205,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 #else /* ... */
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
-					      vio_args_faultaddr(&args, req.uq_addr),
+					      vioargs_faultaddr(&args, req.uq_addr),
 					      0,
 					      8,
 					      libvio_readl(&args, req.uq_addr + 4 * LSW),
@@ -275,7 +275,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				newval.q    = oldval.q op req.uq_args[0].ura_q;     \
 				if (FORCE_ATOMIC()) {                               \
 					THROW(E_SEGFAULT_NOTATOMIC,                     \
-					      vio_args_faultaddr(&args, req.uq_addr),   \
+					      vioargs_faultaddr(&args, req.uq_addr),    \
 					      0,                                        \
 					      8,                                        \
 					      oldval.l[0 + LSW],                        \
@@ -335,7 +335,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD && !LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
-					      vio_args_faultaddr(&args, req.uq_addr),
+					      vioargs_faultaddr(&args, req.uq_addr),
 					      0,
 					      8,
 					      (uintptr_t)req.uq_args[0].ura_q_as_l[LSW],
@@ -354,7 +354,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 #else /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 				if (FORCE_ATOMIC()) {
 					THROW(E_SEGFAULT_NOTATOMIC,
-					      vio_args_faultaddr(&args, req.uq_addr),
+					      vioargs_faultaddr(&args, req.uq_addr),
 					      0,
 					      16,
 					      (uintptr_t)req.uq_args[0].ura_x_as_q[LSW],

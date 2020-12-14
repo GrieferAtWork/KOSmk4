@@ -80,6 +80,7 @@ DerivePointerAlignment: false
 DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
+ForEachMacros: ['LIST_FOREACH', 'SLIST_FOREACH', 'SLIST_P_FOREACH', 'STAILQ_FOREACH', 'STAILQ_P_FOREACH', 'SIMPLEQ_FOREACH', 'SIMPLEQ_P_FOREACH', 'TAILQ_FOREACH', 'TAILQ_FOREACH_REVERSE', 'CIRCLEQ_FOREACH', 'CIRCLEQ_FOREACH_REVERSE', 'DLIST_FOREACH']
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '\"api.h\"'

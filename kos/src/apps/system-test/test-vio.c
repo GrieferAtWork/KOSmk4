@@ -57,14 +57,14 @@ PRIVATE u32 volatile num_vio_write = 0;
 PRIVATE u32 volatile sink;
 
 PRIVATE NONNULL((1)) u32 LIBVIO_CC
-myvio_readl(struct vio_args *__restrict UNUSED(args),
+myvio_readl(struct vioargs *__restrict UNUSED(args),
             vio_addr_t UNUSED(addr)) {
 	/* This function is called synchronously every time our VIO region is read from! */
 	return num_vio_read++;
 }
 
 PRIVATE NONNULL((1)) void LIBVIO_CC
-myvio_writel(struct vio_args *__restrict UNUSED(args),
+myvio_writel(struct vioargs *__restrict UNUSED(args),
              vio_addr_t UNUSED(addr),
              u32 UNUSED(value)) {
 	/* This function is called synchronously every time our VIO region is written to! */

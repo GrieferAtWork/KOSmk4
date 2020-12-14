@@ -107,7 +107,11 @@ BEGIN
 		"debugger/*.c",
 		"debugger-apps/*.c",
 		"memory/*.c",
+#if 1 /* TODO: CONFIG_USE_NEW_VM */
+		"memory/mman/*.c",
+#else
 		"memory/vm/*.c",
+#endif
 		"dev/*.c",
 		"fs/*.c",
 		"misc/*.c",

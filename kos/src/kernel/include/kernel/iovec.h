@@ -171,7 +171,9 @@ FUNDEF NONNULL((1)) void KCALL aio_buffer_memset(struct aio_buffer const *__rest
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copyfrommem(struct aio_buffer const *__restrict self, uintptr_t dst_offset, USER CHECKED void const *__restrict src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copytomem(struct aio_buffer const *__restrict self, USER CHECKED void *__restrict dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copyfromphys(struct aio_buffer const *__restrict self, uintptr_t dst_offset, physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((1)) size_t NOTHROW(KCALL aio_buffer_copyfromphys_nopf)(struct aio_buffer const *__restrict self, uintptr_t dst_offset, physaddr_t src, size_t num_bytes);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copytophys(struct aio_buffer const *__restrict self, physaddr_t dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((1)) size_t NOTHROW(KCALL aio_buffer_copytophys_nopf)(struct aio_buffer const *__restrict self, physaddr_t dst, uintptr_t src_offset, size_t num_bytes);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copytovphys(struct aio_buffer const *__restrict src, struct aio_pbuffer const *__restrict dst, uintptr_t dst_offset, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_memset)(struct aio_pbuffer const *__restrict self, uintptr_t dst_offset, int byte, size_t num_bytes);
 FUNDEF NONNULL((1)) void KCALL aio_pbuffer_copyfrommem(struct aio_pbuffer const *__restrict self, uintptr_t dst_offset, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);

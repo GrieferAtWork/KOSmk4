@@ -343,9 +343,9 @@ KCALL vm_datablock_vio_write
 	}
 	pagedir_pop_mapone(tramp, backup);
 #else
-	struct vio_args args;
+	struct vioargs args;
 	args.va_ops          = self->db_vio;
-	args.va_block        = self;
+	args.va_file        = self;
 	args.va_part         = NULL;
 	args.va_acmap_page   = 0;
 	args.va_acmap_offset = 0;

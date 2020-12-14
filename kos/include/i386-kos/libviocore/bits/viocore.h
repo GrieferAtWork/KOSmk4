@@ -33,10 +33,10 @@
 __DECL_BEGIN
 
 struct vio_emulate_args {
-	struct vio_args vea_args;  /* [OVERRIDE(.va_state, [1..1])] Underlying VIO arguments. */
-	vio_addr_t      vea_addr;  /* == vio_args_vioaddr(&.vea_args, .vea_ptrlo) */
-	void           *vea_ptrlo; /* Lower virtual address at which the VIO fault happened. */
-	void           *vea_ptrhi; /* Upper virtual address at which the VIO fault happened. */
+	struct vioargs vea_args;  /* [OVERRIDE(.va_state, [1..1])] Underlying VIO arguments. */
+	vio_addr_t     vea_addr;  /* == vioargs_vioaddr(&.vea_args, .vea_ptrlo) */
+	void          *vea_ptrlo; /* Lower virtual address at which the VIO fault happened. */
+	void          *vea_ptrhi; /* Upper virtual address at which the VIO fault happened. */
 #if defined(__KERNEL__) && !defined(__x86_64__)
 	/* Because `struct icpustate32' doesn't contain dedicated fields for the
 	 * %esp and %ss registers when describing kernel-space register states,

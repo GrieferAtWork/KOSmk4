@@ -32,6 +32,7 @@ DECL_BEGIN
 #ifndef CONFIG_NO_SWAP
 
 typedef physpage_t swappage_t;
+typedef physaddr_t swapaddr_t;
 #define SWAPPTR_INVALID ((swappage_t)-1)
 
 /* Allocate SWAP memory.
@@ -52,8 +53,8 @@ NOTHROW(KCALL swap_free)(swappage_t start, physpagecnt_t num_pages);
  * NOTE: By default, swap reads/writes are performed using DMA, which
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
-FUNDEF void (KCALL swap_read)(swappage_t start, physpage_t buffer, physpagecnt_t num_pages);
-FUNDEF void (KCALL swap_write)(swappage_t start, physpage_t buffer, physpagecnt_t num_pages);
+FUNDEF void (KCALL swap_read)(swapaddr_t start, physaddr_t buffer, size_t num_bytes);
+FUNDEF void (KCALL swap_write)(swapaddr_t start, physaddr_t buffer, size_t num_bytes);
 
 /* Wait for all out-standing swap reads/writes to be completed.
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */

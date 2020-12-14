@@ -964,16 +964,16 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	args.vea_ptrhi = vm_node_getmax(&myvm->v_kernreserve);
 
 	/* Load VM component pointers. */
-	args.vea_args.va_block = myvm->v_kernreserve.vn_block;
+	args.vea_args.va_file = myvm->v_kernreserve.vn_block;
 	args.vea_args.va_part  = myvm->v_kernreserve.vn_part;
-	assert(args.vea_args.va_block);
+	assert(args.vea_args.va_file);
 	assert(args.vea_args.va_part);
-	assert(args.vea_args.va_part->dp_block == args.vea_args.va_block);
+	assert(args.vea_args.va_part->dp_block == args.vea_args.va_file);
 	assert(args.vea_args.va_part->dp_state == VM_DATAPART_STATE_VIOPRT);
-	assert(args.vea_args.va_block->db_vio);
+	assert(args.vea_args.va_file->db_vio);
 
 	/* Load the VIO dispatch table */
-	args.vea_args.va_ops = args.vea_args.va_block->db_vio;
+	args.vea_args.va_ops = args.vea_args.va_file->db_vio;
 
 	/* Setup meta-data for where VIO is mapped
 	 * Since we know that the USERKERN VIO mapping consists of

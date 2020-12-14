@@ -57,21 +57,21 @@ DECL_BEGIN
 
 /* These 2 functions must be overwritten to implement arch-specific behavior.
  * Mainly: To implement access to the register identity map structure. */
-INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field(struct vio_args *__restrict args, uintptr_t offset, uintptr_t *__restrict presult);
-INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field(struct vio_args *__restrict args, uintptr_t offset, uintptr_t value);
+INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field(struct vioargs *__restrict args, uintptr_t offset, uintptr_t *__restrict presult);
+INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field(struct vioargs *__restrict args, uintptr_t offset, uintptr_t value);
 #ifdef __ARCH_HAVE_COMPAT
-INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field_compat(struct vio_args *__restrict args, uintptr_t offset, __ARCH_COMPAT_UINTPTR_TYPE *__restrict presult);
-INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field_compat(struct vio_args *__restrict args, uintptr_t offset, __ARCH_COMPAT_UINTPTR_TYPE value);
+INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field_compat(struct vioargs *__restrict args, uintptr_t offset, __ARCH_COMPAT_UINTPTR_TYPE *__restrict presult);
+INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field_compat(struct vioargs *__restrict args, uintptr_t offset, __ARCH_COMPAT_UINTPTR_TYPE value);
 #endif /* __ARCH_HAVE_COMPAT */
 
 #ifdef __INTELLISENSE__
 #if __SIZEOF_POINTER__ == 4 || defined(__ARCH_HAVE_COMPAT)
-PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vio_args *__restrict args, vio_addr_t addr);
-PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vio_args *__restrict args, vio_addr_t addr, u32 value);
+PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vioargs *__restrict args, vio_addr_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vioargs *__restrict args, vio_addr_t addr, u32 value);
 #endif /* __SIZEOF_POINTER__ == 4 || __ARCH_HAVE_COMPAT */
 #if __SIZEOF_POINTER__ == 8 || defined(__ARCH_HAVE_COMPAT)
-PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vio_args *__restrict args, vio_addr_t addr);
-PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vio_args *__restrict args, vio_addr_t addr, u64 value);
+PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vioargs *__restrict args, vio_addr_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vioargs *__restrict args, vio_addr_t addr, u64 value);
 #endif /* __SIZEOF_POINTER__ == 8 || __ARCH_HAVE_COMPAT */
 #else /* __INTELLISENSE__ */
 DECL_END
@@ -111,7 +111,7 @@ DECL_BEGIN
 
 
 PRIVATE void KCALL
-userkern_segment_call(struct vio_args *__restrict args,
+userkern_segment_call(struct vioargs *__restrict args,
                       vio_addr_t addr) {
 	uintptr_t reladdr;
 	uintptr_t base = get_userkern_base();
@@ -132,7 +132,7 @@ userkern_segment_call(struct vio_args *__restrict args,
 	return;
 err_invalid_addr:
 	THROW(E_SEGFAULT_UNMAPPED,
-	      vio_args_faultaddr(args, addr),
+	      vioargs_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_EXEC |
 	      E_SEGFAULT_CONTEXT_USERCODE);
@@ -263,7 +263,7 @@ PUBLIC struct vm_datablock userkern_segment_block = {
 
 
 PRIVATE void KCALL
-userkern_segment_call_compat(struct vio_args *__restrict args,
+userkern_segment_call_compat(struct vioargs *__restrict args,
                              vio_addr_t addr) {
 	uintptr_t reladdr;
 	uintptr_t base = get_compat_userkern_base();
@@ -284,7 +284,7 @@ userkern_segment_call_compat(struct vio_args *__restrict args,
 	return;
 err_invalid_addr:
 	THROW(E_SEGFAULT_UNMAPPED,
-	      vio_args_faultaddr(args, addr),
+	      vioargs_faultaddr(args, addr),
 	      E_SEGFAULT_CONTEXT_FAULT |
 	      E_SEGFAULT_CONTEXT_USERCODE);
 }

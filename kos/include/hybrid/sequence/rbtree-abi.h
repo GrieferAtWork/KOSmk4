@@ -163,12 +163,14 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 /* Return the next node with a key-range located below `node'
- * If no such node exists, return `RBTREE_NULL' instead. */
+ * If no such node exists, return `RBTREE_NULL' instead.
+ * NOTE: This function takes O(log(N)) to execute. */
 RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node);
 
 /* Return the next node with a key-range located above `node'
- * If no such node exists, return `RBTREE_NULL' instead. */
+ * If no such node exists, return `RBTREE_NULL' instead.
+ * NOTE: This function takes O(log(N)) to execute. */
 RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node);
 #endif /* RBTREE_WANT_PREV_NEXT_NODE */
@@ -1332,15 +1334,11 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
 
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 /* Return the next node with a key-range located below `node'
- * If no such node exists, return `RBTREE_NULL' instead. */
+ * If no such node exists, return `RBTREE_NULL' instead.
+ * NOTE: This function takes O(log(N)) to execute. */
 RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 	RBTREE_T *result;
-	/* NOTE: Because RBTREEs are self-balancing, we should be able to
-	 *       reach the neighboring node in at most 3 steps (when the
-	 *       given `node' is a red leaf-node, meaning we might have to
-	 *       walk up 2 parent, and down 1 child), making this function
-	 *       an O(1) operation. */
 	result = RBTREE_GETLHS(node);
 	if (result == RBTREE_NULL) {
 		/* Keep going up until we reach the ROOT (NULL),
@@ -1362,15 +1360,11 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 }
 
 /* Return the next node with a key-range located above `node'
- * If no such node exists, return `RBTREE_NULL' instead. */
+ * If no such node exists, return `RBTREE_NULL' instead.
+ * NOTE: This function takes O(log(N)) to execute. */
 RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node) {
 	RBTREE_T *result;
-	/* NOTE: Because RBTREEs are self-balancing, we should be able to
-	 *       reach the neighboring node in at most 3 steps (when the
-	 *       given `node' is a red leaf-node, meaning we might have to
-	 *       walk up 2 parent, and down 1 child), making this function
-	 *       an O(1) operation. */
 	result = RBTREE_GETRHS(node);
 	if (result == RBTREE_NULL) {
 		/* Keep going up until we reach the ROOT (NULL),
@@ -1496,6 +1490,8 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 			}
 			break;
 		}
+		result->mm_min = min_node;
+		result->mm_max = max_node;
 		return;
 	}
 	/* There aren't any node that are in-bounds. */

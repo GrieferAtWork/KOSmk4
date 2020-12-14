@@ -76,6 +76,30 @@ aio_buffer_copyfromphys(struct aio_buffer const *__restrict self,
 	}
 }
 
+PUBLIC NONNULL((1)) size_t
+NOTHROW(KCALL aio_buffer_copyfromphys_nopf)(struct aio_buffer const *__restrict self,
+                                            uintptr_t dst_offset, physaddr_t src, size_t num_bytes) {
+	size_t error;
+	struct aio_buffer_entry ent;
+	AIO_BUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ab_size) {
+			dst_offset -= ent.ab_size;
+			continue;
+		}
+		if (ent.ab_size > num_bytes)
+			ent.ab_size = num_bytes;
+		error = vm_copyfromphys_nopf(ent.ab_base + dst_offset, src, ent.ab_size);
+		if unlikely(error != 0)
+			return error + (num_bytes - ent.ab_size);
+		if (ent.ab_size >= num_bytes)
+			break;
+		src += ent.ab_size;
+		num_bytes -= ent.ab_size;
+		dst_offset = 0;
+	}
+	return 0;
+}
+
 PUBLIC NONNULL((1)) void KCALL
 aio_buffer_copytophys(struct aio_buffer const *__restrict self,
                       physaddr_t dst, uintptr_t src_offset, size_t num_bytes)
@@ -95,6 +119,30 @@ aio_buffer_copytophys(struct aio_buffer const *__restrict self,
 		num_bytes -= ent.ab_size;
 		src_offset = 0;
 	}
+}
+
+PUBLIC NONNULL((1)) size_t
+NOTHROW(KCALL aio_buffer_copytophys_nopf)(struct aio_buffer const *__restrict self,
+                                          physaddr_t dst, uintptr_t src_offset, size_t num_bytes) {
+	size_t error;
+	struct aio_buffer_entry ent;
+	AIO_BUFFER_FOREACH_N(ent, self) {
+		if (src_offset >= ent.ab_size) {
+			src_offset -= ent.ab_size;
+			continue;
+		}
+		if (ent.ab_size > num_bytes)
+			ent.ab_size = num_bytes;
+		error = vm_copytophys_nopf(dst, ent.ab_base + src_offset, ent.ab_size);
+		if unlikely(error != 0)
+			return error + (num_bytes - ent.ab_size);
+		if (ent.ab_size >= num_bytes)
+			break;
+		dst += ent.ab_size;
+		num_bytes -= ent.ab_size;
+		src_offset = 0;
+	}
+	return 0;
 }
 
 PUBLIC NONNULL((1)) void KCALL
