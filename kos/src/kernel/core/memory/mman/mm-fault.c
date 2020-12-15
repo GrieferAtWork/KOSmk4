@@ -19,11 +19,13 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_FAULT_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_FAULT_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-fault.h>
@@ -38,8 +40,16 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
+
+#ifdef NDEBUG
+#define DBG_memset(ptr, byte, num_bytes) (void)0
+#else /* NDEBUG */
+#define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
+#endif /* !NDEBUG */
+#define DBG_inval(obj) DBG_memset(&(obj), 0xcc, sizeof(obj))
 
 
 
@@ -316,6 +326,18 @@ mman_forcefaultv(struct mman *__restrict self,
 }
 
 
+struct unlock_mman_info {
+	struct mpart_unlockinfo umi_unlock; /* Unlock info */
+	struct mman            *umi_mman;   /* [1..1][const] The mman that should be unlocked. */
+};
+
+NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL unlock_mman_cb)(struct mpart_unlockinfo *__restrict self) {
+	struct unlock_mman_info *me;
+	me = container_of(self, struct unlock_mman_info, umi_unlock);
+	mman_lock_release(me->umi_mman);
+}
+
 
 /* (Try to) acquire locks, and load/split/unshare/... backing memory,
  * as well as mem-parts and mem-nodes in order to prepare everything
@@ -335,24 +357,27 @@ mman_forcefaultv(struct mman *__restrict self,
  * >>         // Missing: NULL- and safety-checks; VIO support
  * >>         if (!mfault_or_unlock(&mf, is_write ? MMAN_FAULT_F_WRITE : 0))
  * >>             goto again;
- * >>         if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
  * >>     } EXCEPT {
  * >>         mfault_fini(&mf);
  * >>         RETHROW();
  * >>     }
+ * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
  * >>     mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
  * >>                mf.mfl_offs, mnode_getperm(mf.mfl_node));
  * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
  * >>     mman_lock_release(mf.mfl_mman);
- * >>     mfault_fini(&mf);
+ * >>     // NOTE: Don't call `mfault_fini(&mf)' here!
+ * >>     //       Internal data of `mf' is left in an undefined state
+ * >>     //       following a successful call to `mfault_or_unlock()'!
  * >> }
  *
  * Locking logic:
  *   - return == true:   mpart_lock_acquire(self->mfl_part);
- *   - return == false:  sync_end(self->mfl_mman);
- *   - EXCEPT:           sync_end(self->mfl_mman);
+ *                       undefined(out(INTERNAL_DATA(self)))
+ *   - return == false:  mman_lock_release(self->mfl_mman);
+ *   - EXCEPT:           mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.
  * @param: flags:  Set of `MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE'
@@ -360,11 +385,19 @@ mman_forcefaultv(struct mman *__restrict self,
  * @return: false: The lock to `self->mfl_mman' was lost, but the goal
  *                 of faulting memory has gotten closer, and the caller
  *                 should re-attempt the call after re-acquiring locks.
- */
+ * @return: false: `mpart_lock_acquire_and_setcore_loadsome()' would have
+ *                 had to be called, but the accessed address range lies
+ *                 outside the bounds of the associated mem-part.
+ *                 Resolve this issue by simply trying again (this
+ *                 inconsistency can result from someone else splitting
+ *                 the associated mem-part) */
 PUBLIC NONNULL((1)) bool FCALL
 mfault_or_unlock(struct mfault *__restrict self,
                  unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	struct unlock_mman_info unlock;
+
+	/* Validate input arguments. */
 	assert(self->mfl_node);
 	assert(self->mfl_part);
 	assert(self->mfl_mman == self->mfl_node->mn_mman);
@@ -373,6 +406,51 @@ mfault_or_unlock(struct mfault *__restrict self,
 	assert(IS_ALIGNED((uintptr_t)self->mfl_addr, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)self->mfl_size, PAGESIZE));
 	assert(self->mfl_size != 0);
+	assert(!wasdestroyed(self->mfl_part));
+	assert(!wasdestroyed(self->mfl_mman));
+
+	/* First off: Try to acquire a lock to the associated data-part.
+	 * XXX: Maybe change the ABI so this is also done by other caller?
+	 * After all: Our function name doesn't really suggest that we
+	 *            do this; only the function doc tell about this... */
+	if unlikely(!mpart_lock_tryacquire(self->mfl_part)) {
+		incref(self->mfl_part);
+		mman_lock_release(self->mfl_mman);
+		FINALLY_DECREF_UNLIKELY(self->mfl_part);
+		/* Wait for the part's lock to become available. */
+		while (!mpart_lock_available(self->mfl_part))
+			task_yield();
+		goto nope;
+	}
+
+	/* Set-up our extended unlock controller. */
+	/* TODO: Make the unlock controller be apart of `struct mfault'.
+	 *       That way, we wouldn't have to initialize it here, and
+	 *       `unlock_mman_cb()' could still gain access to the mman
+	 *       it's supposed to unlock by using `container_of()' */
+	unlock.umi_unlock.ui_unlock = &unlock_mman_cb;
+	unlock.umi_mman             = self->mfl_mman;
+
+	if (!(flags & MMAN_FAULT_F_WRITE)) {
+		mpart_reladdr_t partrel_offset;
+		size_t num_bytes;
+		/* Simple case: Only need to lock+load the accessed address range. */
+		if (!mpart_setcore_or_unlock(self->mfl_part,
+		                             &unlock.umi_unlock,
+		                             &self->mfl_ucdat.ucd_scmem))
+			goto nope;
+		partrel_offset = 42; /* TODO */
+		num_bytes      = 42; /* TODO */
+		if (!mpart_loadsome_or_unlock(self->mfl_part,
+		                              &unlock.umi_unlock,
+		                              partrel_offset,
+		                              num_bytes))
+			goto nope;
+		self->mfl_offs = partrel_offset;
+		self->mfl_size = num_bytes;
+		DBG_inval(self->mfl_ucdat);
+		return true;
+	}
 
 	/* TODO: As many of those `mpart_lock_acquire_and_...' functions as
 	 *       possible need to have their internal dothing_or_unlock()
@@ -389,6 +467,9 @@ mfault_or_unlock(struct mfault *__restrict self,
 
 	/* TODO */
 
+	return true;
+nope:
+	return false;
 }
 
 

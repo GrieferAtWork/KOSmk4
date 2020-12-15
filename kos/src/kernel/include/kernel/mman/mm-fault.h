@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/mman/mpart.h> /* struct mpart_unsharecow_data */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -189,14 +190,16 @@ struct mfault {
 	 * though may also be modified when `mfault_or_unlock()' returns `false'
 	 * Leave them alone. - They're needed to make `mfault_or_unlock()'
 	 * fully re-entrant following a lock re-acquisition. */
-	/* TODO: Internal work fields would go here */
+	struct mpart_unsharecow_data        mfl_ucdat; /* Load-data for unshare, and setcore. */
 };
 
 #define mfault_init(self, mm, addr, size) \
 	((self)->mfl_mman = (mm),             \
 	 (self)->mfl_addr = (addr),           \
-	 (self)->mfl_size = (size))
-#define mfault_fini(self) (void)0
+	 (self)->mfl_size = (size),           \
+	 mpart_unsharecow_data_init(&(self)->mfl_ucdat))
+#define mfault_fini(self) \
+	mpart_unsharecow_data_fini(&(self)->mfl_ucdat)
 
 
 
@@ -218,24 +221,27 @@ struct mfault {
  * >>         // Missing: NULL- and safety-checks; VIO support
  * >>         if (!mfault_or_unlock(&mf, is_write ? MMAN_FAULT_F_WRITE : 0))
  * >>             goto again;
- * >>         if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
  * >>     } EXCEPT {
  * >>         mfault_fini(&mf);
  * >>         RETHROW();
  * >>     }
+ * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
  * >>     mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
  * >>                mf.mfl_offs, mnode_getperm(mf.mfl_node));
  * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
  * >>     mman_lock_release(mf.mfl_mman);
- * >>     mfault_fini(&mf);
+ * >>     // NOTE: Don't call `mfault_fini(&mf)' here!
+ * >>     //       Internal data of `mf' is left in an undefined state
+ * >>     //       following a successful call to `mfault_or_unlock()'!
  * >> }
  *
  * Locking logic:
  *   - return == true:   mpart_lock_acquire(self->mfl_part);
- *   - return == false:  sync_end(self->mfl_mman);
- *   - EXCEPT:           sync_end(self->mfl_mman);
+ *                       undefined(out(INTERNAL_DATA(self)))
+ *   - return == false:  mman_lock_release(self->mfl_mman);
+ *   - EXCEPT:           mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.
  * @param: flags:  Set of `MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE'
@@ -243,7 +249,12 @@ struct mfault {
  * @return: false: The lock to `self->mfl_mman' was lost, but the goal
  *                 of faulting memory has gotten closer, and the caller
  *                 should re-attempt the call after re-acquiring locks.
- */
+ * @return: false: `mpart_lock_acquire_and_setcore_loadsome()' would have
+ *                 had to be called, but the accessed address range lies
+ *                 outside the bounds of the associated mem-part.
+ *                 Resolve this issue by simply trying again (this
+ *                 inconsistency can result from someone else splitting
+ *                 the associated mem-part) */
 FUNDEF NONNULL((1)) __BOOL FCALL
 mfault_or_unlock(struct mfault *__restrict self,
                  unsigned int flags)

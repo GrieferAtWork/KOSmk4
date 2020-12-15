@@ -322,43 +322,168 @@ FUNDEF NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct mpart *ro
 /* MPart API to lock a part, alongside doing some other operations.     */
 /************************************************************************/
 
-/* Acquire a lock to `self', and ensure that `MPART_ST_INCORE(self->mp_state)' */
-FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
+/************************************************************************
+ * Lock-less mem-part status assertion/goal-approaching functions
+ * All of these work on the principle:
+ *   #1: Check if the wanted condition has already been met
+ *       If so, return `true'
+ *   #2: Check if we've (additional) data needed to meet the
+ *       condition has been given to us by the caller (via
+ *       the `data' argument, and as allocated during previous
+ *       attempts)
+ *   #3: If any (needed) data is missing, try to allocate that data.
+ *       Do this using non-except GFP_ATOMIC and other non-blocking
+ *       operations.
+ *   #4: If data cannot be allocated using non-blocking operations,
+ *       release the lock that is held by `self' and re-attempt the
+ *       allocation with exception-enabled, blocking operations.
+ *       Remember the freshly allocated data (so that it may be used
+ *       during another attempt) and return `false'
+ *   #5: With all required data allocated, and the lock to the
+ *       given mem-part still held, satisfy the requested goal
+ *       in a non-blocking (and thus: atomic) fashion.
+ *   #6: Return true, indicating that the goal has been met.
+ *
+ * Usage:
+ * >> struct mpart_CONDITION_data data;
+ * >> mpart_lock_acquire(self);
+ * >> if (CONDITION(self))
+ * >>     return;
+ * >> mpart_setcore_data_init(&data);
+ * >> TRY {
+ * >>     while (!mpart_CONDITION_or_unlock(self, &data))
+ * >>         mpart_lock_acquire(self);
+ * >> } EXCEPT {
+ * >>     mpart_CONDITION_data_fini(&data);
+ * >>     RETHROW();
+ * >> }
+ * >> // NOTE: Don't call `mpart_CONDITION_data_fini(&data);' here!
+ * >> //       s.a.: `undefined(out(data))'
+ *
+ * As such, all of these functions follow the locking logic:
+ *   - return == true:   assume(REQUESTED_CONDITION_MET);
+ *                       assume(mpart_lock_acquired(self));
+ *                       undefined(out(data));        (If a `data' argument is present)
+ *   - return == false:  mpart_lock_release_f(self);  // Meaning that dead nodes may not have been reaped!
+ *   - EXCEPT:           mpart_lock_release(self);
+ ************************************************************************/
+struct mpart_unlockinfo {
+	/* [1..1] Callback that is invoked after releasing the lock
+	 *        to the associated mem-part inside of one of the
+	 *        `mpart_*_or_unlock()' functions below.
+	 * This callback may then be used to release additional atomic
+	 * locks which the caller may be holding, and it guarantied to
+	 * be called on all `return == false' and `EXCEPT' braches. */
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct mpart_unlockinfo *__restrict self);
+};
+/* When `self' is non-NULL, invoke it's `ui_unlock'-callback. */
+#define mpart_unlockinfo_xunlock(self) \
+	(void)(!(self) || ((*(self)->ui_unlock)(self), 0))
+
+
+/* Ensure that `!mpart_hasblocksstate_init(self)' */
+FUNDEF NONNULL((1)) __BOOL FCALL
+mpart_initdone_or_unlock(struct mpart *__restrict self,
+                         struct mpart_unlockinfo *unlock);
+
+struct mpart_setcore_data {
+	uintptr_t           *scd_bitset;      /* [0..1][owned] Block-status bitset. */
+	unsigned int         scd_copy_state;  /* One of `MPART_ST_VOID', `MPART_ST_MEM' or `MPART_ST_MEM_SC' */
+	union {
+		struct mchunk    scd_copy_mem;    /* [valid_if(scd_copy_state == MPART_ST_MEM)][owned] */
+		struct mchunkvec scd_copy_mem_sc; /* [valid_if(scd_copy_state == MPART_ST_MEM_SC)][owned] */
+	};
+};
+#define mpart_setcore_data_init(self)          \
+	(void)((self)->scd_bitset     = __NULLPTR, \
+	       (self)->scd_copy_state = MPART_ST_VOID)
+
+/* Finalize data needed for `mpart_setcore_or_unlock()' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict self);
+
+/* Ensure that `MPART_ST_INCORE(self->mp_state)' */
+FUNDEF NONNULL((1, 3)) __BOOL FCALL
+mpart_setcore_or_unlock(struct mpart *__restrict self,
+                        struct mpart_unlockinfo *unlock,
+                        struct mpart_setcore_data *__restrict data);
+
+/* Ensure that all blocks (within the given range of blocks)
+ * are either `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG'
+ * The caller must ensure that...
+ *   - ... the given address range is in-bounds!
+ *   - ... MPART_ST_INCORE(self->mp_state)
+ * If they don't, then this function will cause an assertion failure! */
+FUNDEF NONNULL((1)) bool FCALL
+mpart_loadsome_or_unlock(struct mpart *__restrict self,
+                         struct mpart_unlockinfo *unlock,
+                         mpart_reladdr_t partrel_offset,
+                         size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock to `self', and ensure that `MPART_F_MAYBE_BLK_INIT' isn't set. */
+/* Ensure that all blocks are either `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG' */
+#define mpart_loadall_or_unlock(self, unlock) \
+	mpart_loadsome_or_unlock(self, unlock, 0, mpart_getsize(self))
+
+struct mpart_unsharecow_data {
+	struct mpart_setcore_data ucd_scmem; /* Data for setcore. */
+	struct mpart_setcore_data ucd_ucmem; /* Data for unshare. */
+	struct mpart             *ucd_copy;  /* [0..1] The duplicate of the original mem-part. */
+};
+#define mpart_unsharecow_data_init(self)                \
+	(void)(mpart_setcore_data_init(&(self)->ucd_scmem), \
+	       mpart_setcore_data_init(&(self)->ucd_ucmem), \
+	       (self)->ucd_copy = __NULLPTR)
+#define mpart_unsharecow_data_fini(self)          \
+	(kfree((self)->ucd_copy),                     \
+	 mpart_setcore_data_fini(&(self)->ucd_scmem), \
+	 mpart_setcore_data_fini(&(self)->ucd_ucmem))
+
+/* Ensure that `MPART_ST_INCORE(self->mp_state) && LIST_EMPTY(&self->mp_copy)'
+ * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
+ *       the list is still allowed to contain dead nodes that are about to,
+ *       or have already been added to the dead nodes list.
+ *       However, the mmans of all nodes still apart of the mp_copy list have
+ *       already been destroyed, such that no alive copy-nodes still exist! */
+FUNDEF NONNULL((1, 2)) __BOOL FCALL
+mpart_setcore_and_unsharecow_or_unlock(struct mpart *__restrict self,
+                                       struct mpart_unlockinfo *unlock,
+                                       struct mpart_unsharecow_data *__restrict data);
+
+/* Ensure that:
+ * >> LIST_FOREACH(node, &self->mp_copy, mn_link)
+ * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
+FUNDEF NONNULL((1)) __BOOL FCALL
+mpart_unwrite_or_unlock(struct mpart *__restrict self,
+                        struct mpart_unlockinfo *unlock);
+/************************************************************************/
+
+
+/* Acquire a lock until `mpart_initdone_or_unlock()' */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_noinitblocks(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that _all_ blocks
- * of `self' are fully loaded (that is: no block exists with its state set to
- * either `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT'). */
+/* Acquire a lock until `mpart_setcore_or_unlock()' */
+FUNDEF NONNULL((1)) void FCALL
+mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadall_or_unlock()' */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock to the given mem-part for the purpose of later
- * making a call to `mpart_mmap()', where the part will be mapped for
- * the purpose of reading its memory. This function will ensure that:
- *  - MPART_ST_INCORE(self->mp_state);
- *  - FOREACH_BLOCK_IN(i, partrel_offset, num_bytes)
- *        mpart_getblockstate(self, i) in [MPART_BLOCK_ST_LOAD,
- *                                         MPART_BLOCK_ST_CHNG];
- * NOTE: If (at least some part) of the given address range is located
- *       outside of the bounds of `self', then this function will
- *       not acquire a lock to `self' and return `false'. */
-FUNDEF WUNUSED NONNULL((1)) bool FCALL
+/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
+ * If the given address range ends up not fully contained within the
+ * bounds of `self', then no lock is acquired, and `false' is returned. */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
                                         mpart_reladdr_t partrel_offset,
                                         size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that `LIST_EMPTY(&self->mp_copy)',
- * meaning that all copy-on-write mappings of the part have been unshared. This must
- * be done before the contents of the part can be written to directly, or be mapped
- * as writable for MAP_SHARED mappings of the part itself. */
+/* Acquire a lock until `mpart_setcore_and_unsharecow_or_unlock()' */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);

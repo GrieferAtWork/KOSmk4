@@ -37,6 +37,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
 
 #include <kos/except.h>
 
@@ -70,6 +71,7 @@ DECL_BEGIN
 #else /* NDEBUG */
 #define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
 #endif /* !NDEBUG */
+#define DBG_inval(obj) DBG_memset(&(obj), 0xcc, sizeof(obj))
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mchunk_freemem)(struct mchunk *__restrict self) {
@@ -108,20 +110,54 @@ typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
 /* MPart API to lock a part, alongside doing some other operations.     */
 /************************************************************************/
 
-struct setcore_data {
-	unsigned int         scd_copy_state;  /* One of `MPART_ST_VOID', `MPART_ST_MEM' or `MPART_ST_MEM_SC' */
-	union {
-		struct mchunk    scd_copy_mem;    /* [valid_if(scd_copy_state == MPART_ST_MEM)] */
-		struct mchunkvec scd_copy_mem_sc; /* [valid_if(scd_copy_state == MPART_ST_MEM_SC)] */
-	};
-};
+/* Ensure that none of the blocks of `self' are set to `MPART_BLOCK_ST_INIT'.
+ * If such blocks exist, then unlock `self', wait for them to go away, and
+ * return `false'. Otherwise, keep the lock to `self' and return `true' */
+PUBLIC NONNULL((1)) bool FCALL
+mpart_initdone_or_unlock(struct mpart *__restrict self,
+                         struct mpart_unlockinfo *unlock) {
+	if unlikely(mpart_hasblocksstate_init(self)) {
+		incref(self);
+		FINALLY_DECREF_UNLIKELY(self);
+		TRY {
+			/* Wait for init-done to be signaled. */
+			REF struct mfile *file;
+			file = incref(self->mp_file);
+			mpart_lock_release_f(self);
+			mpart_unlockinfo_xunlock(unlock);
+			{
+				FINALLY_DECREF_UNLIKELY(file);
+				task_connect(&file->mf_initdone);
+			}
+			TRY {
+				mpart_lock_acquire(self);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
+			/* Check for init-parts once again. */
+			if unlikely(!mpart_hasblocksstate_init(self)) {
+				mpart_lock_release_f(self);
+				task_disconnectall();
+				return false;
+			}
+			mpart_lock_release_f(self);
+			task_waitfor();
+		} EXCEPT {
+			mpart_deadnodes_reap(self);
+			RETHROW();
+		}
+		return false;
+	}
+	return true;
+}
 
-#define setcore_data_init(self) \
-	memset(self, 0, sizeof(struct setcore_data))
-STATIC_ASSERT(MPART_ST_VOID == 0);
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL setcore_data_fini)(struct setcore_data *__restrict self) {
+
+/* Finalize data needed for `mpart_setcore_or_unlock()' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict self) {
+	kfree(self->scd_bitset);
 	switch (self->scd_copy_state) {
 
 	case MPART_ST_MEM:
@@ -141,66 +177,67 @@ NOTHROW(FCALL setcore_data_fini)(struct setcore_data *__restrict self) {
 
 
 
-/* Allocate physical memory for exactly `self->scd_partsize' bytes of
+/* Allocate physical memory for exactly `data->scd_partsize' bytes of
  * memory, and store the results in:
- *   - self->scd_copy_state
- *   - self->scd_copy_mem
- *   - self->scd_copy_mem_sc
+ *   - data->scd_copy_state
+ *   - data->scd_copy_mem
+ *   - data->scd_copy_mem_sc
  * Throws an exception on error.
  * @return: true:  Success
- * @return: false: Success, but the lock to `part' was lost */
-PRIVATE NONNULL((1, 2)) bool FCALL
-setcore_makememdat_or_unlock(struct setcore_data *__restrict self,
-                             struct mpart *__restrict part,
-                             size_t total_pages) {
+ * @return: false: Success, but the lock to `self' was lost */
+PRIVATE NONNULL((1, 3)) bool FCALL
+mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
+                                   struct mpart_unlockinfo *unlock,
+                                   struct mpart_setcore_data *__restrict data,
+                                   size_t total_pages) {
 	struct mchunk chunk, *vec;
 	size_t done;
-	if unlikely(self->scd_copy_state != MPART_ST_VOID) {
+	if unlikely(data->scd_copy_state != MPART_ST_VOID) {
 		/* Re-use already-allocated buffers. */
-		assert(self->scd_copy_state == MPART_ST_MEM ||
-		       self->scd_copy_state == MPART_ST_MEM_SC);
-		if (self->scd_copy_state == MPART_ST_MEM) {
-			if (total_pages == self->scd_copy_mem.mc_size)
+		assert(data->scd_copy_state == MPART_ST_MEM ||
+		       data->scd_copy_state == MPART_ST_MEM_SC);
+		if (data->scd_copy_state == MPART_ST_MEM) {
+			if (total_pages == data->scd_copy_mem.mc_size)
 				return true; /* Unchanged */
-			if (total_pages < self->scd_copy_mem.mc_size) {
-				page_ccfree(self->scd_copy_mem.mc_start + total_pages,
-				            self->scd_copy_mem.mc_size - total_pages);
-				self->scd_copy_mem.mc_size = total_pages;
+			if (total_pages < data->scd_copy_mem.mc_size) {
+				page_ccfree(data->scd_copy_mem.mc_start + total_pages,
+				            data->scd_copy_mem.mc_size - total_pages);
+				data->scd_copy_mem.mc_size = total_pages;
 				return true;
 			}
 			/* Must allocate more memory. (try re-try from the start) */
-			page_ccfree(self->scd_copy_mem.mc_start,
-			            self->scd_copy_mem.mc_size);
-			self->scd_copy_state = MPART_ST_VOID;
+			page_ccfree(data->scd_copy_mem.mc_start,
+			            data->scd_copy_mem.mc_size);
+			data->scd_copy_state = MPART_ST_VOID;
 		} else {
 			/* A scatter-list had already been allocated in the past. */
 			size_t i, old_total = 0;
-			assert(self->scd_copy_mem_sc.ms_c != 0);
-			for (i = 0; i < self->scd_copy_mem_sc.ms_c; ++i)
-				old_total += self->scd_copy_mem_sc.ms_v[i].mc_size;
+			assert(data->scd_copy_mem_sc.ms_c != 0);
+			for (i = 0; i < data->scd_copy_mem_sc.ms_c; ++i)
+				old_total += data->scd_copy_mem_sc.ms_v[i].mc_size;
 			if (total_pages == old_total)
 				return true; /* Unchanged */
 			if (total_pages < old_total) {
 				size_t too_many = old_total - total_pages;
-				i = self->scd_copy_mem_sc.ms_c - 1;
+				i = data->scd_copy_mem_sc.ms_c - 1;
 				/* Trim tailing pages. */
 				while (too_many) {
 				}
-				assert(i <= self->scd_copy_mem_sc.ms_c);
+				assert(i <= data->scd_copy_mem_sc.ms_c);
 				if (i == 0) {
-					chunk = self->scd_copy_mem_sc.ms_v[0];
-					kfree(self->scd_copy_mem_sc.ms_v);
+					chunk = data->scd_copy_mem_sc.ms_v[0];
+					kfree(data->scd_copy_mem_sc.ms_v);
 					/* Transform into a single chunk. */
-					self->scd_copy_mem   = chunk;
-					self->scd_copy_state = MPART_ST_MEM;
-				} else if (i < self->scd_copy_mem_sc.ms_c - 1) {
+					data->scd_copy_mem   = chunk;
+					data->scd_copy_state = MPART_ST_MEM;
+				} else if (i < data->scd_copy_mem_sc.ms_c - 1) {
 					struct mchunk *newvec;
-					newvec = (struct mchunk *)krealloc_nx(self->scd_copy_mem_sc.ms_v,
+					newvec = (struct mchunk *)krealloc_nx(data->scd_copy_mem_sc.ms_v,
 					                                      (i + 1) * sizeof(struct mchunk),
 					                                      GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 					if likely(newvec)
-						self->scd_copy_mem_sc.ms_v = newvec;
-					self->scd_copy_mem_sc.ms_c = i + 1;
+						data->scd_copy_mem_sc.ms_v = newvec;
+					data->scd_copy_mem_sc.ms_c = i + 1;
 				}
 				return true;
 			}
@@ -210,38 +247,44 @@ setcore_makememdat_or_unlock(struct setcore_data *__restrict self,
 		}
 	}
 	/* Try to allocate everything in a single page. */
-	self->scd_copy_mem.mc_start = mfile_alloc_physmem(part->mp_file,
+	data->scd_copy_mem.mc_start = mfile_alloc_physmem(self->mp_file,
 	                                                  total_pages,
-	                                                  &self->scd_copy_mem.mc_size);
-	if unlikely(self->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
+	                                                  &data->scd_copy_mem.mc_size);
+	if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 		goto err_badalloc; /* Insufficient physical memory. */
-	assert(self->scd_copy_mem.mc_size != 0);
-	assert(self->scd_copy_mem.mc_size <= total_pages);
-	if likely(self->scd_copy_mem.mc_size >= total_pages) {
+	assert(data->scd_copy_mem.mc_size != 0);
+	assert(data->scd_copy_mem.mc_size <= total_pages);
+	if likely(data->scd_copy_mem.mc_size >= total_pages) {
 		/* Done: We've managed to allocate everything within a single chunk. */
-		self->scd_copy_state = MPART_ST_MEM;
+		data->scd_copy_state = MPART_ST_MEM;
 		return true;
 	}
 	/* Must allocate as scattered memory. */
-	chunk = self->scd_copy_mem;
+	chunk = data->scd_copy_mem;
 	vec = (struct mchunk *)kmalloc_nx(4 * sizeof(struct mchunk),
 	                                  GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 	if unlikely(!vec) {
 		vec = (struct mchunk *)kmalloc_nx(2 * sizeof(struct mchunk),
 		                                  GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 		if unlikely(!vec) {
-			mpart_lock_release_f(part);
+			mpart_lock_release_f(self);
+			mpart_unlockinfo_xunlock(unlock);
 			/* Must do the allocation with blocking */
 			vec = (struct mchunk *)kmalloc_nx(4 * sizeof(struct mchunk),
 			                                  GFP_LOCKED | GFP_PREFLT);
 			if unlikely(!vec) {
-				vec = (struct mchunk *)kmalloc(2 * sizeof(struct mchunk),
-				                               GFP_LOCKED | GFP_PREFLT);
+				TRY {
+					vec = (struct mchunk *)kmalloc(2 * sizeof(struct mchunk),
+					                               GFP_LOCKED | GFP_PREFLT);
+				} EXCEPT {
+					mpart_deadnodes_reap(self);
+					RETHROW();
+				}
 			}
 			vec;
-			self->scd_copy_mem_sc.ms_v = vec;
-			self->scd_copy_mem_sc.ms_c = 1;
-			self->scd_copy_state       = MPART_ST_MEM_SC;
+			data->scd_copy_mem_sc.ms_v = vec;
+			data->scd_copy_mem_sc.ms_c = 1;
+			data->scd_copy_state       = MPART_ST_MEM_SC;
 			vec[0]                     = chunk;
 			done                       = chunk.mc_size;
 			for (;;) {
@@ -249,37 +292,42 @@ setcore_makememdat_or_unlock(struct setcore_data *__restrict self,
 				assert(done < total_pages);
 				missing_pages = total_pages - done;
 				/* Make sure that there is sufficient space for one additional chunk. */
-				avail = kmalloc_usable_size(self->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
-				assert(avail >= self->scd_copy_mem_sc.ms_c);
-				if (avail <= self->scd_copy_mem_sc.ms_c) {
+				avail = kmalloc_usable_size(data->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
+				assert(avail >= data->scd_copy_mem_sc.ms_c);
+				if (avail <= data->scd_copy_mem_sc.ms_c) {
 do_realloc_in_extend_after_unlock:
-					vec = (struct mchunk *)krealloc(self->scd_copy_mem_sc.ms_v,
-					                                (self->scd_copy_mem_sc.ms_c + 1) *
-					                                sizeof(struct mchunk),
-					                                GFP_LOCKED | GFP_PREFLT);
-					self->scd_copy_mem_sc.ms_v = vec;
+					TRY {
+						vec = (struct mchunk *)krealloc(data->scd_copy_mem_sc.ms_v,
+						                                (data->scd_copy_mem_sc.ms_c + 1) *
+						                                sizeof(struct mchunk),
+						                                GFP_LOCKED | GFP_PREFLT);
+					} EXCEPT {
+						mpart_deadnodes_reap(self);
+						RETHROW();
+					}
+					data->scd_copy_mem_sc.ms_v = vec;
 				}
 				/* Allocate the new chunk. */
-				chunk.mc_start = mfile_alloc_physmem(part->mp_file, total_pages, &chunk.mc_size);
-				if unlikely(self->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
+				chunk.mc_start = mfile_alloc_physmem(self->mp_file, total_pages, &chunk.mc_size);
+				if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 					goto err_badalloc_after_unlock; /* Insufficient physical memory. */
-				self->scd_copy_mem_sc.ms_v[self->scd_copy_mem_sc.ms_c] = chunk;
-				++self->scd_copy_mem_sc.ms_c;
+				data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
+				++data->scd_copy_mem_sc.ms_c;
 			}
 		
 			/* Try to truncate unused memory. */
-			vec = (struct mchunk *)krealloc_nx(self->scd_copy_mem_sc.ms_v,
-			                                   self->scd_copy_mem_sc.ms_c *
+			vec = (struct mchunk *)krealloc_nx(data->scd_copy_mem_sc.ms_v,
+			                                   data->scd_copy_mem_sc.ms_c *
 			                                   sizeof(struct mchunk),
 			                                   GFP_LOCKED | GFP_PREFLT);
 			if likely(vec != NULL)
-				self->scd_copy_mem_sc.ms_v = vec;
+				data->scd_copy_mem_sc.ms_v = vec;
 			return false;
 		}
 	}
-	self->scd_copy_mem_sc.ms_v = vec;
-	self->scd_copy_mem_sc.ms_c = 1;
-	self->scd_copy_state       = MPART_ST_MEM_SC;
+	data->scd_copy_mem_sc.ms_v = vec;
+	data->scd_copy_mem_sc.ms_c = 1;
+	data->scd_copy_state       = MPART_ST_MEM_SC;
 	vec[0]                     = chunk;
 	done                       = chunk.mc_size;
 extend_vector:
@@ -288,128 +336,91 @@ extend_vector:
 		assert(done < total_pages);
 		missing_pages = total_pages - done;
 		/* Make sure that there is sufficient space for one additional chunk. */
-		avail = kmalloc_usable_size(self->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
-		assert(avail >= self->scd_copy_mem_sc.ms_c);
-		if (avail <= self->scd_copy_mem_sc.ms_c) {
+		avail = kmalloc_usable_size(data->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
+		assert(avail >= data->scd_copy_mem_sc.ms_c);
+		if (avail <= data->scd_copy_mem_sc.ms_c) {
 			/* Extend the vector. */
-			vec = (struct mchunk *)krealloc_nx(self->scd_copy_mem_sc.ms_v,
-			                                   (self->scd_copy_mem_sc.ms_c + 1) *
+			vec = (struct mchunk *)krealloc_nx(data->scd_copy_mem_sc.ms_v,
+			                                   (data->scd_copy_mem_sc.ms_c + 1) *
 			                                   sizeof(struct mchunk),
 			                                   GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 			if unlikely(!vec) {
 				/* Must do the thing with blocking. */
-				mpart_lock_release_f(part);
+				mpart_lock_release_f(self);
+				mpart_unlockinfo_xunlock(unlock);
 				goto do_realloc_in_extend_after_unlock;
 			}
-			self->scd_copy_mem_sc.ms_v = vec;
+			data->scd_copy_mem_sc.ms_v = vec;
 		}
 		/* Allocate the new chunk. */
-		chunk.mc_start = mfile_alloc_physmem(part->mp_file, total_pages, &chunk.mc_size);
-		if unlikely(self->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
+		chunk.mc_start = mfile_alloc_physmem(self->mp_file, total_pages, &chunk.mc_size);
+		if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 			goto err_badalloc; /* Insufficient physical memory. */
-		self->scd_copy_mem_sc.ms_v[self->scd_copy_mem_sc.ms_c] = chunk;
-		++self->scd_copy_mem_sc.ms_c;
+		data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
+		++data->scd_copy_mem_sc.ms_c;
 	}
 
 	/* Try to truncate unused memory. */
-	vec = (struct mchunk *)krealloc_nx(self->scd_copy_mem_sc.ms_v,
-	                                   self->scd_copy_mem_sc.ms_c *
+	vec = (struct mchunk *)krealloc_nx(data->scd_copy_mem_sc.ms_v,
+	                                   data->scd_copy_mem_sc.ms_c *
 	                                   sizeof(struct mchunk),
 	                                   GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 	if likely(vec != NULL)
-		self->scd_copy_mem_sc.ms_v = vec;
+		data->scd_copy_mem_sc.ms_v = vec;
 	return true;
 err_badalloc:
-	mpart_lock_release_f(part);
+	mpart_lock_release_f(self);
+	mpart_unlockinfo_xunlock(unlock);
 err_badalloc_after_unlock:
+	mpart_deadnodes_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, total_pages);
 }
 
 
-
-/* Ensure that none of the blocks of `self' are set to `MPART_BLOCK_ST_INIT'.
- * If such blocks exist, then unlock `self', wait for them to go away, and
- * return `false'. Otherwise, keep the lock to `self' and return `true' */
-PRIVATE NONNULL((1)) bool FCALL
-mpart_ensure_no_init_blocks_or_unlock_and_wait(struct mpart *__restrict self) {
-	if unlikely(mpart_hasblocksstate_init(self)) {
-		/* Wait for init-done to be signaled. */
-		REF struct mfile *file;
-		file = incref(self->mp_file);
-		mpart_lock_release_f(self);
-		{
-			FINALLY_DECREF_UNLIKELY(file);
-			task_connect(&file->mf_initdone);
-		}
-		TRY {
-			mpart_lock_acquire(self);
-		} EXCEPT {
-			task_disconnectall();
-			RETHROW();
-		}
-		/* Check for init-parts once again. */
-		if unlikely(!mpart_hasblocksstate_init(self)) {
-			mpart_lock_release_f(self);
-			task_disconnectall();
-			return false;
-		}
-		mpart_lock_release_f(self);
-		task_waitfor();
-		return false;
-	}
-	return true;
-}
-
-
-struct setcore_ex_data {
-	struct setcore_data scxd_mem;    /* Memory information. */
-	bitset_word_t      *scxd_bitset; /* [0..1] Block-status bitset. */
-};
 
 #define bitset_getstate(base, partrel_block_index)                              \
 	(((base)[(partrel_block_index) / BITSET_ITEMS_PER_WORD] >>                  \
 	  (((partrel_block_index) % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS)) & \
 	 (((bitset_word_t)1 << MPART_BLOCK_STBITS) - 1))
 #define setcore_ex_bitset_getstate(self, partrel_block_index) \
-	bitset_getstate((self)->scxd_bitset, partrel_block_index)
+	bitset_getstate((self)->scd_bitset, partrel_block_index)
 
-#define setcore_ex_data_init(self) \
-	memset(self, 0, sizeof(struct setcore_ex_data))
-STATIC_ASSERT(MPART_ST_VOID == 0);
-#define setcore_ex_data_fini(self)         \
-	(setcore_data_fini(&(self)->scxd_mem), \
-	 kfree((self)->scxd_bitset))
-
-
-PRIVATE NONNULL((1, 2)) bool FCALL
-setcore_ex_makebitset_or_unlock(struct setcore_ex_data *__restrict self,
-                                struct mpart *__restrict part,
+PRIVATE NONNULL((1, 3)) bool FCALL
+setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
+                                struct mpart_unlockinfo *unlock,
+                                struct mpart_setcore_data *__restrict data,
                                 size_t num_blocks,
                                 gfp_t gfp_flags) {
 	size_t avl_size, req_size;
 	bitset_word_t *new_bitset;
 	/* Must actually allocate the block-status bitset! */
-	avl_size = kmalloc_usable_size(self->scxd_bitset);
+	avl_size = kmalloc_usable_size(data->scd_bitset);
 	req_size = CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD);
 	if likely(req_size > avl_size) {
 		/* Must allocate a larger bitset. */
-		new_bitset = (bitset_word_t *)krealloc_nx(self->scxd_bitset, req_size,
+		new_bitset = (bitset_word_t *)krealloc_nx(data->scd_bitset, req_size,
 		                                          GFP_LOCKED | GFP_ATOMIC |
 		                                          GFP_PREFLT | gfp_flags);
 		if unlikely(!new_bitset) {
 			/* Must allocate the bitset while blocking. */
-			mpart_lock_release_f(part);
-			self->scxd_bitset = (bitset_word_t *)krealloc(self->scxd_bitset, req_size,
-			                                              GFP_LOCKED | GFP_PREFLT | gfp_flags);
+			mpart_lock_release_f(self);
+			mpart_unlockinfo_xunlock(unlock);
+			TRY {
+				data->scd_bitset = (bitset_word_t *)krealloc(data->scd_bitset, req_size,
+				                                             GFP_LOCKED | GFP_PREFLT | gfp_flags);
+			} EXCEPT {
+				mpart_deadnodes_reap(self);
+				RETHROW();
+			}
 			return false;
 		}
-		self->scxd_bitset = new_bitset;
+		data->scd_bitset = new_bitset;
 	} else if (req_size < avl_size) {
-		new_bitset = (bitset_word_t *)krealloc_nx(self->scxd_bitset, req_size,
+		new_bitset = (bitset_word_t *)krealloc_nx(data->scd_bitset, req_size,
 		                                          GFP_LOCKED | GFP_ATOMIC |
 		                                          GFP_PREFLT | gfp_flags);
 		if likely(new_bitset != NULL)
-			self->scxd_bitset = new_bitset;
+			data->scd_bitset = new_bitset;
 	}
 	return true;
 }
@@ -496,277 +507,268 @@ setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
 }
 
 
-/* Acquire a lock to `self', and ensure that `MPART_ST_INCORE(self->mp_state)' */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+/* Ensure that `MPART_ST_INCORE(self->mp_state)' */
+PUBLIC NONNULL((1, 3)) bool FCALL
+mpart_setcore_or_unlock(struct mpart *__restrict self,
+                        struct mpart_unlockinfo *unlock,
+                        struct mpart_setcore_data *__restrict data) {
 	size_t num_bytes, num_pages, num_blocks;
 	struct mfile *file;
-	struct setcore_ex_data data;
-	mpart_lock_acquire(self);
 	/* Quick check: is the part already in the expected state? */
 	if (MPART_ST_INCORE(self->mp_state))
-		return; /* Already done! */
+		return true; /* Already done! */
 	num_bytes = mpart_getsize(self);
 	assert(IS_ALIGNED(num_bytes, PAGESIZE));
 	file       = self->mp_file;
 	num_pages  = num_bytes / PAGESIZE;
 	num_blocks = num_bytes >> file->mf_blockshift;
-	setcore_data_init(&data);
-	TRY {
-again_init_data:
-		/* Allocate physical memory. */
-		if (!setcore_makememdat_or_unlock(&data.scxd_mem, self, num_pages)) {
-			/* Lock was lost... */
-reacquire_lock:
-			mpart_lock_acquire(self);
-			if unlikely(MPART_ST_INCORE(self->mp_state)) {
-				setcore_ex_data_fini(&data);
-				return; /* Already done! */
+
+	/* Allocate physical memory. */
+	if (!mpart_setcore_makememdat_or_unlock(self, unlock, data, num_pages))
+		goto nope;
+
+	/* Fill in memory information for `self'. */
+	assert(!MPART_ST_INCORE(self->mp_state));
+	switch (__builtin_expect(self->mp_state, MPART_ST_VOID)) {
+
+	case MPART_ST_VOID:
+		/* Make sure that we've got sufficient space for the block-state bitset. */
+		if (num_blocks <= BITSET_ITEMS_PER_WORD) {
+			/* Can use the inline bitset. */
+			if unlikely(data->scd_bitset != NULL) {
+				kfree(data->scd_bitset);
+				DBG_inval(data->scd_bitset);
 			}
-			num_bytes = mpart_getsize(self);
-			assert(IS_ALIGNED(num_bytes, PAGESIZE));
-			file       = self->mp_file;
-			num_pages  = num_bytes / PAGESIZE;
-			num_blocks = num_bytes >> file->mf_blockshift;
-			goto again_init_data;
+			/* All blocks are undefined by default! */
+			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
+			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
+		} else {
+			/* Must actually allocate the block-status bitset! */
+			if (!setcore_ex_makebitset_or_unlock(self, unlock, data, num_blocks, GFP_CALLOC))
+				goto nope;
+			/* NOTE: Because we've used GFP_CALLOC, all blocks will have
+			 *       already been initialized to `MPART_BLOCK_ST_NDEF'! */
+			self->mp_blkst_ptr = data->scd_bitset;
+			ATOMIC_AND(self->mp_flags, ~MPART_F_BLKST_INL);
+			DBG_inval(data->scd_bitset);
+		}
+		break;
+
+	case MPART_ST_SWP:
+	case MPART_ST_SWP_SC: {
+		size_t i;
+		bool did_set_init_parts;
+		assert(mpart_hasblockstate(self));
+		/* Load data from swap.
+		 * For this purpose, we must ensure that there aren't any pre-existing
+		 * INIT-blocks, which might happen if someone else is still in the
+		 * process of writing data _to_ swap (in which case they will make the
+		 * INIT-blocks go away once they're done) */
+		if (!mpart_initdone_or_unlock(self, unlock))
+			goto nope;
+
+		/* In order to (safely) remember which parts we've set to INIT (as opposed
+		 * to someone else setting them), we have to allocate sufficient heap memory
+		 * in order to store a copy of the bitset of `self' */
+		if (!setcore_ex_makebitset_or_unlock(self, unlock, data, num_blocks, 0))
+			goto nope;
+
+		/* Now we must switch all `MPART_BLOCK_ST_CHNG' parts (i.e. all parts that
+		 * have been written to swap) over to `MPART_BLOCK_ST_INIT', thus preventing
+		 * anyone else from changing the contents of the part.
+		 *
+		 * NOTE: And while we're at it, also change all `MPART_BLOCK_ST_LOAD' parts
+		 *       back to `MPART_BLOCK_ST_NDEF', since their contents have gotten
+		 *       lost when memory was written to swap. */
+		did_set_init_parts = false;
+		for (i = 0; i < num_blocks; ++i) {
+			unsigned int st;
+			st = mpart_getblockstate(self, i);
+			if (st == MPART_BLOCK_ST_LOAD) {
+				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
+			} else if (st == MPART_BLOCK_ST_CHNG) {
+				mpart_setblockstate(self, i, MPART_BLOCK_ST_INIT);
+				did_set_init_parts = true;
+			}
 		}
 
-		/* Fill in memory information for `self'. */
-		assert(!MPART_ST_INCORE(self->mp_state));
-		switch (__builtin_expect(self->mp_state, MPART_ST_VOID)) {
+		/* Special (but _really_ unlikely) case: The swap area wasn't actually used. */
+		if unlikely(!did_set_init_parts)
+			goto done_swap;
 
-		case MPART_ST_VOID:
-			/* Make sure that we've got sufficient space for the block-state bitset. */
-			if (num_blocks <= BITSET_ITEMS_PER_WORD) {
-				/* Can use the inline bitset. */
-				if unlikely(data.scxd_bitset != NULL) {
-					kfree(data.scxd_bitset);
-					DBG_memset(&data.scxd_bitset, 0xcc, sizeof(data.scxd_bitset));
-				}
-				/* All blocks are undefined by default! */
-				self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
-				ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
+		/* Set the flag to indicate that there are INIT-blocks! */
+		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
+
+		/* At this point, we know that _all_ INIT-entries within the bitset
+		 * of `self' originate from our doing. As such, copy the constants
+		 * of the bitset into our local heap-copy, so we still know which
+		 * parts we're supposed to initialize from swap once we're done here! */
+		{
+			bitset_word_t *src = self->mp_blkst_ptr;
+			if (self->mp_flags & MPART_F_BLKST_INL)
+				src = &self->mp_blkst_inl;
+			memcpy(data->scd_bitset, src,
+			       CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD),
+			       sizeof(bitset_word_t));
+		}
+		/* Release our lock to `self' so we can safely invoke swap-callbacks. */
+		incref(self);
+		incref(file);
+		mpart_lock_release_f(self);
+		mpart_unlockinfo_xunlock(unlock);
+		TRY {
+			struct mchunkvec mem_data;
+			struct mchunkvec swp_data;
+			/* NOTE: We can still access fields of `self' that are marked as
+			 *       [const_if(EXISTS(MPART_BLOCK_ST_INIT))]
+			 *       because we know that ST_INIT blocks exist (since we've
+			 *       created them) */
+			if (self->mp_state == MPART_ST_SWP) {
+				swp_data.ms_c = 1;
+				swp_data.ms_v = &self->mp_swp;
 			} else {
-				/* Must actually allocate the block-status bitset! */
-				if (!setcore_ex_makebitset_or_unlock(&data, self, num_blocks, GFP_CALLOC))
-					goto reacquire_lock;
-				/* NOTE: Because we've used GFP_CALLOC, all blocks will have
-				 *       already been initialized to `MPART_BLOCK_ST_NDEF'! */
-				self->mp_blkst_ptr = data.scxd_bitset;
-				ATOMIC_AND(self->mp_flags, ~MPART_F_BLKST_INL);
-				DBG_memset(&data.scxd_bitset, 0xcc, sizeof(data.scxd_bitset));
+				swp_data.ms_c = self->mp_swp_sc.ms_c;
+				swp_data.ms_v = self->mp_swp_sc.ms_v;
 			}
-			break;
-
-		case MPART_ST_SWP:
-		case MPART_ST_SWP_SC: {
-			size_t i;
-			bool did_set_init_parts;
-			assert(mpart_hasblockstate(self));
-			/* Load data from swap.
-			 * For this purpose, we must ensure that there aren't any pre-existing
-			 * INIT-blocks, which might happen if someone else is still in the
-			 * process of writing data _to_ swap (in which case they will make the
-			 * INIT-blocks go away once they're done) */
-			if (!mpart_ensure_no_init_blocks_or_unlock_and_wait(self))
-				goto reacquire_lock;
-
-			/* In order to (safely) remember which parts we've set to INIT (as opposed
-			 * to someone else setting them), we have to allocate sufficient heap memory
-			 * in order to store a copy of the bitset of `self' */
-			if (!setcore_ex_makebitset_or_unlock(&data, self, num_blocks, 0))
-				goto reacquire_lock;
-
-			/* Now we must switch all `MPART_BLOCK_ST_CHNG' parts (i.e. all parts that
-			 * have been written to swap) over to `MPART_BLOCK_ST_INIT', thus preventing
-			 * anyone else from changing the contents of the part.
-			 *
-			 * NOTE: And while we're at it, also change all `MPART_BLOCK_ST_LOAD' parts
-			 *       back to `MPART_BLOCK_ST_NDEF', since their contents have gotten
-			 *       lost when memory was written to swap. */
-			did_set_init_parts = false;
-			for (i = 0; i < num_blocks; ++i) {
-				unsigned int st;
-				st = mpart_getblockstate(self, i);
-				if (st == MPART_BLOCK_ST_LOAD) {
-					mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
-				} else if (st == MPART_BLOCK_ST_CHNG) {
-					mpart_setblockstate(self, i, MPART_BLOCK_ST_INIT);
-					did_set_init_parts = true;
-				}
+			if (data->scd_copy_state == MPART_ST_MEM) {
+				mem_data.ms_c = 1;
+				mem_data.ms_v = &data->scd_copy_mem;
+			} else {
+				mem_data.ms_c = data->scd_copy_mem_sc.ms_c;
+				mem_data.ms_v = data->scd_copy_mem_sc.ms_v;
 			}
 
-			/* Special (but _really_ unlikely) case: The swap area wasn't actually used. */
-			if unlikely(!did_set_init_parts)
-				goto done_swap;
+			/* Actually load data from swap. */
+			setcore_ex_load_from_swap(&mem_data, &swp_data,
+			                          data->scd_bitset,
+			                          file->mf_blockshift,
+			                          num_blocks);
 
-			/* Set the flag to indicate that there are INIT-blocks! */
-			ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
-
-			/* At this point, we know that _all_ INIT-entries within the bitset
-			 * of `self' originate from our doing. As such, copy the constants
-			 * of the bitset into our local heap-copy, so we still know which
-			 * parts we're supposed to initialize from swap once we're done here! */
-			{
-				bitset_word_t *src = self->mp_blkst_ptr;
-				if (self->mp_flags & MPART_F_BLKST_INL)
-					src = &self->mp_blkst_inl;
-				memcpy(data.scxd_bitset, src,
-				       CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD),
-				       sizeof(bitset_word_t));
-			}
-			/* Release our lock to `self' so we can safely invoke swap-callbacks. */
-			incref(file);
-			mpart_lock_release_f(self);
-			TRY {
-				struct mchunkvec mem_data;
-				struct mchunkvec swp_data;
-				/* NOTE: We can still access fields of `self' that are marked as
-				 *       [const_if(EXISTS(MPART_BLOCK_ST_INIT))]
-				 *       because we know that ST_INIT blocks exist (since we've
-				 *       created them) */
-				if (self->mp_state == MPART_ST_SWP) {
-					swp_data.ms_c = 1;
-					swp_data.ms_v = &self->mp_swp;
-				} else {
-					swp_data.ms_c = self->mp_swp_sc.ms_c;
-					swp_data.ms_v = self->mp_swp_sc.ms_v;
-				}
-				if (data.scxd_mem.scd_copy_state == MPART_ST_MEM) {
-					mem_data.ms_c = 1;
-					mem_data.ms_v = &data.scxd_mem.scd_copy_mem;
-				} else {
-					mem_data.ms_c = data.scxd_mem.scd_copy_mem_sc.ms_c;
-					mem_data.ms_v = data.scxd_mem.scd_copy_mem_sc.ms_v;
-				}
-
-				/* Actually load data from swap. */
-				setcore_ex_load_from_swap(&mem_data, &swp_data,
-				                          data.scxd_bitset,
-				                          file->mf_blockshift,
-				                          num_blocks);
-
-				/* Re-acquire our lock to `self' */
-				mpart_lock_acquire(self);
-			} EXCEPT {
-				/* Change the INIT-blocks we've set above to `CHNG' */
-				for (i = 0; i < num_blocks; ++i) {
-					unsigned int st;
-					st = setcore_ex_bitset_getstate(&data, i); /* Read from the local bitset! */
-					if (st == MPART_BLOCK_ST_INIT)
-						mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
-				}
-				sig_broadcast(&file->mf_initdone);
-				decref_unlikely(file);
-				RETHROW();
-			}
-
-			/* Assert that nothing changed about `self' that should have
-			 * been protected by us having set INIT-blocks above. */
-			assert(self->mp_state == MPART_ST_SWP ||
-			       self->mp_state == MPART_ST_SWP_SC);
-			assert(self->mp_file == file);
-			assert(num_bytes == mpart_getsize(self));
-
+			/* Re-acquire our lock to `self' */
+			mpart_lock_acquire(self);
+		} EXCEPT {
 			/* Change the INIT-blocks we've set above to `CHNG' */
 			for (i = 0; i < num_blocks; ++i) {
 				unsigned int st;
-				st = setcore_ex_bitset_getstate(&data, i); /* Read from the local bitset! */
+				st = setcore_ex_bitset_getstate(data, i); /* Read from the local bitset! */
 				if (st == MPART_BLOCK_ST_INIT)
 					mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
 			}
-
-			/* Now that all of (our) INIT-blocks are gone, broadcast
-			 * the init-done signal of our file to tell other thread
-			 * that INIT blocks may possible be all gone now. */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-
-			/* And with that, all required data has been read from swap,
-			 * and we can safely transition to on of the MEM-states. */
-done_swap:
-			kfree(data.scxd_bitset);
-			DBG_memset(&data.scxd_bitset, 0xcc, sizeof(data.scxd_bitset));
-
-			/* Free the swap storage area used by this part. */
-			if (self->mp_state == MPART_ST_SWP) {
-				mchunk_freeswp(&self->mp_swp);
-			} else {
-				mchunkvec_freeswp(self->mp_swp_sc.ms_v,
-				                  self->mp_swp_sc.ms_c);
-				kfree(self->mp_swp_sc.ms_v);
-			}
-		}	break;
-
-		default: __builtin_unreachable();
+			mpart_deadnodes_reap(self);
+			decref_unlikely(self);
+			RETHROW();
 		}
-	} EXCEPT {
-		setcore_ex_data_fini(&data);
-		mpart_deadnodes_reap(self);
-		RETHROW();
+
+		/* Assert that nothing changed about `self' that should have
+		 * been protected by us having set INIT-blocks above. */
+		assert(self->mp_state == MPART_ST_SWP ||
+		       self->mp_state == MPART_ST_SWP_SC);
+		assert(self->mp_file == file);
+		assert(num_bytes == mpart_getsize(self));
+
+		/* Change the INIT-blocks we've set above to `CHNG' */
+		for (i = 0; i < num_blocks; ++i) {
+			unsigned int st;
+			st = setcore_ex_bitset_getstate(data, i); /* Read from the local bitset! */
+			if (st == MPART_BLOCK_ST_INIT)
+				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
+		}
+
+		/* Now that all of (our) INIT-blocks are gone, broadcast
+		 * the init-done signal of our file to tell other thread
+		 * that INIT blocks may possible be all gone now. */
+		sig_broadcast(&file->mf_initdone);
+		decref_unlikely(file);
+
+		/* And with that, all required data has been read from swap,
+		 * and we can safely transition to on of the MEM-states. */
+done_swap:
+		kfree(data->scd_bitset);
+		DBG_inval(data->scd_bitset);
+
+		/* Free the swap storage area used by this part. */
+		if (self->mp_state == MPART_ST_SWP) {
+			mchunk_freeswp(&self->mp_swp);
+		} else {
+			mchunkvec_freeswp(self->mp_swp_sc.ms_v,
+			                  self->mp_swp_sc.ms_c);
+			kfree(self->mp_swp_sc.ms_v);
+		}
+
+		/* Fill in information on the backing storage. */
+		self->mp_state = data->scd_copy_state;
+		DBG_inval(data->scd_copy_state);
+		memcpy(&self->mp_mem, &data->scd_copy_mem,
+		       MAX_C(sizeof(struct mchunk),
+		             sizeof(struct mchunkvec)));
+		DBG_memset(&data->scd_copy_mem, 0xcc,
+		           MAX_C(sizeof(struct mchunk),
+		                 sizeof(struct mchunkvec)));
+
+		/* Even though we _did_ manage to load the part from swap,
+		 * we _did_ have to release _all_ locks to do so, meaning
+		 * that we can't actually indicate success to our caller.
+		 *
+		 * However, the next time around, our part is probably
+		 * still going to be loaded in-core, so we'll succeed then! */
+		mpart_lock_release_f(self);
+		decref_unlikely(self);
+
+		/* Ensure a consistent state when returning `false' */
+		mpart_setcore_data_init(data);
+		return false;
+	}	break;
+
+	default: __builtin_unreachable();
 	}
 
 	/* Fill in information on the backing storage. */
-	self->mp_state = data.scxd_mem.scd_copy_state;
-	memcpy(&self->mp_mem, &data.scxd_mem.scd_copy_mem,
+	self->mp_state = data->scd_copy_state;
+	DBG_inval(data->scd_copy_state);
+	memcpy(&self->mp_mem, &data->scd_copy_mem,
 	       MAX_C(sizeof(struct mchunk),
 	             sizeof(struct mchunkvec)));
+	DBG_memset(&data->scd_copy_mem, 0xcc,
+	           MAX_C(sizeof(struct mchunk),
+	                 sizeof(struct mchunkvec)));
+	return true;
+nope:
+	return false;
 }
 
-/* Acquire a lock to `self', and ensure that `MPART_F_MAYBE_BLK_INIT' isn't set. */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_noinitblocks(struct mpart *__restrict self)
+
+
+/* Ensure that all blocks (within the given range of blocks)
+ * are either `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG'
+ * The caller must ensure that...
+ *   - ... the given address range is in-bounds!
+ *   - ... MPART_ST_INCORE(self->mp_state)
+ * If they don't, then this function will cause an assertion failure! */
+PUBLIC NONNULL((1)) bool FCALL
+mpart_loadsome_or_unlock(struct mpart *__restrict self,
+                         struct mpart_unlockinfo *unlock,
+                         mpart_reladdr_t partrel_offset,
+                         size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-again:
-	mpart_lock_acquire(self);
-	if unlikely(mpart_hasblocksstate_init(self)) {
-		REF struct mfile *file;
-		file = incref(self->mp_file);
-		mpart_lock_release(self);
-		/* Connect the the INIT-done signal. */
-		{
-			FINALLY_DECREF_UNLIKELY(file);
-			task_connect(&file->mf_initdone);
-		}
-		TRY {
-			mpart_lock_acquire(self);
-		} EXCEPT {
-			task_disconnectall();
-			RETHROW();
-		}
-		/* Check for race condition: INIT-parts went away in the mean time. */
-		if unlikely(!mpart_hasblocksstate_init(self)) {
-			task_disconnectall();
-			return;
-		}
-		mpart_lock_release(self);
-		task_waitfor();
-		goto again;
-	}
-}
-
-
-/* Ensure that there aren't any blocks with `MPART_BLOCK_ST_NDEF'
- * or `MPART_BLOCK_ST_INIT' as state, by manually loading undefined
- * blocks into memory, and waiting until INIT-parts go away to get
- * rid of INIT.
- *  - If it could be asserted that no such parts exist without needing
- *    to release the lock of `self', return `true'.
- *  - If something was done to get closer to the goal of loading all
- *    blocks of the part, then unlock `self' (to get closer to said
- *    goal), and eventually return `false' (such that the caller may
- *    re-acquire the lock to `self')
- *  - If something else goes wrong, an exception is thrown, and the
- *    lock to `self' will have already been released.
- */
-PRIVATE NONNULL((1)) bool FCALL
-mpart_loadrange_or_unlock(struct mpart *__restrict self,
-                          size_t blocks_start,
-                          size_t blocks_end) {
 	size_t i;
 	struct mfile *file = self->mp_file;
 	bool has_init = false;
+	unsigned int shift;
+	size_t blocks_start, blocks_end;
+	assert(MPART_ST_INCORE(self->mp_state));
+	shift        = self->mp_file->mf_blockshift;
+	blocks_start = partrel_offset >> shift;
+	blocks_end   = ((partrel_offset + num_bytes - 1) >> shift) + 1;
+	assert(blocks_start <= blocks_end);
+	assert(blocks_end <= (mpart_getsize(self) >> shift));
+
+	/* Check for simple case: Without a proper block-state,
+	 * everything is implicitly marked as CHNG, meaning
+	 * everything has already been loaded! */
+	if unlikely(!mpart_hasblockstate(self))
+		return true;
 
 	/* Check for parts that have yet to be loaded. */
 	for (i = blocks_start; i < blocks_end; ++i) {
@@ -802,11 +804,13 @@ mpart_loadrange_or_unlock(struct mpart *__restrict self,
 			++end;
 		}
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
+		incref(self);
 		incref(file);
 		/* Release the lock from the part, so we can load
 		 * blocks without holding that non-recursive, and
 		 * non-preemptive lock! */
 		mpart_lock_release_f(self);
+		mpart_unlockinfo_xunlock(unlock);
 		TRY {
 			/* Actually do the load. */
 			if likely(file->mf_ops->mo_loadblocks) {
@@ -820,6 +824,8 @@ mpart_loadrange_or_unlock(struct mpart *__restrict self,
 				mpart_setblockstate(self, end, MPART_BLOCK_ST_NDEF);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
+			mpart_deadnodes_reap(self);
+			decref_unlikely(self);
 			RETHROW();
 		}
 		/* Set loaded states back to LOAD */
@@ -827,103 +833,40 @@ mpart_loadrange_or_unlock(struct mpart *__restrict self,
 			mpart_setblockstate(self, end, MPART_BLOCK_ST_LOAD);
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
+		decref_unlikely(self);
 		return false;
 	}
 	if (has_init) {
 		/* Wait for init-parts to go away! */
-		incref(file);
-		mpart_lock_release_f(self);
-		{
-			FINALLY_DECREF_UNLIKELY(file);
-			task_connect(&file->mf_initdone);
-		}
+		incref(self);
+		FINALLY_DECREF_UNLIKELY(self);
 		TRY {
-			mpart_lock_acquire(self);
+			incref(file);
+			mpart_lock_release_f(self);
+			mpart_unlockinfo_xunlock(unlock);
+			{
+				FINALLY_DECREF_UNLIKELY(file);
+				task_connect(&file->mf_initdone);
+			}
+			TRY {
+				mpart_lock_acquire(self);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
+			/* Check for init-parts once again. */
+			if unlikely(!mpart_hasblocksstate_init(self)) {
+				mpart_lock_release_f(self);
+				task_disconnectall();
+				return false;
+			}
+			mpart_lock_release_f(self);
+			task_waitfor();
 		} EXCEPT {
-			task_disconnectall();
+			mpart_deadnodes_reap(self);
 			RETHROW();
 		}
-		/* Check for init-parts once again. */
-		if unlikely(!mpart_hasblocksstate_init(self)) {
-			mpart_lock_release_f(self);
-			task_disconnectall();
-			return false;
-		}
-		mpart_lock_release_f(self);
-		task_waitfor();
 		return false;
-	}
-	return true;
-}
-
-
-
-PRIVATE NONNULL((1)) bool FCALL
-mpart_loadall_or_unlock(struct mpart *__restrict self) {
-	size_t block_count;
-	block_count = mpart_getblockcount(self, self->mp_file);
-	return mpart_loadrange_or_unlock(self, 0, block_count);
-}
-
-
-
-/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that _all_ blocks
- * of `self' are fully loaded (that is: no block exists with its state set to
- * either `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT'). */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-again:
-	mpart_lock_acquire_and_setcore(self);
-	if unlikely(!mpart_hasblockstate(self))
-		return;
-	TRY {
-		if (!mpart_loadall_or_unlock(self))
-			goto again;
-	} EXCEPT {
-		mpart_deadnodes_reap(self);
-		RETHROW();
-	}
-}
-
-
-
-/* Acquire a lock to the given mem-part for the purpose of later
- * making a call to `mpart_mmap()', where the part will be mapped for
- * the purpose of reading its memory. This function will ensure that:
- *  - MPART_ST_INCORE(self->mp_state);
- *  - FOREACH_BLOCK_IN(i, partrel_offset, num_bytes)
- *        mpart_getblockstate(self, i) in [MPART_BLOCK_ST_LOAD,
- *                                         MPART_BLOCK_ST_CHNG]; */
-PUBLIC NONNULL((1)) bool FCALL
-mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
-                                        mpart_reladdr_t partrel_offset,
-                                        size_t num_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	unsigned int shift;
-	size_t blocks_start, blocks_end, block_count;
-again:
-	mpart_lock_acquire_and_setcore(self);
-	if unlikely(!mpart_hasblockstate(self))
-		return true;
-	shift        = self->mp_file->mf_blockshift;
-	blocks_start = partrel_offset >> shift;
-	blocks_end   = ((partrel_offset + num_bytes - 1) >> shift) + 1;
-	block_count  = mpart_getsize(self) >> shift;
-	if (blocks_end > block_count) {
-		/* Out-of-bounds... */
-		mpart_lock_release(self);
-		return false;
-	}
-	TRY {
-		/* Ensure that the given range has been loaded. */
-		if (!mpart_loadrange_or_unlock(self,
-		                               blocks_start,
-		                               blocks_end))
-			goto again;
-	} EXCEPT {
-		mpart_deadnodes_reap(self);
-		RETHROW();
 	}
 	return true;
 }
@@ -933,11 +876,13 @@ again:
 /* Same as `mpart_loadall_or_unlock()', but only ensure no INIT-blocks when
  * the file used by `self' describes zero-initialized, anonymous memory. */
 PRIVATE NONNULL((1)) bool FCALL
-mpart_maybe_loadall_or_unlock(struct mpart *__restrict self) {
+mpart_maybe_loadall_or_unlock(struct mpart *__restrict self,
+                              struct mpart_unlockinfo *unlock) {
 	/* Check for special case: Without a block-state-bitset,
 	 * there can't be any INIT or LOAD-parts. */
 	if unlikely(!mpart_hasblockstate(self))
 		return true;
+
 	/* This is where it gets complicated, since we need to create a new,
 	 * anonymous, and fully initialized (i.e. no `MPART_BLOCK_ST_NDEF'
 	 * blocks) version of our mem-part.
@@ -953,12 +898,9 @@ mpart_maybe_loadall_or_unlock(struct mpart *__restrict self) {
 	    self->mp_file < COMPILER_ENDOF(mfile_anon)) {
 		/* No need to prevent `MPART_BLOCK_ST_NDEF' parts.
 		 * We only need to get rid of `MPART_BLOCK_ST_INIT' parts! */
-		return mpart_ensure_no_init_blocks_or_unlock_and_wait(self);
-	} else {
-		if (!mpart_loadall_or_unlock(self))
-			return false;
+		return mpart_initdone_or_unlock(self, unlock);
 	}
-	return true;
+	return mpart_loadall_or_unlock(self, unlock);
 }
 
 
@@ -1084,69 +1026,52 @@ next_src_chunk:
 
 
 
-
-struct unsharecow_data {
-	struct mpart                           *ucd_copy;    /* [0..1] The duplicate of the original mem-part. */
-	bitset_word_t                          *ucd_blk_ext; /* [0..1] Dynamically allocated block-extension bitset. (if needed) */
-	/*PAGEDIR_PAGEALIGNED*/ mpart_reladdr_t ucd_mapmin;  /* The lowest (part-relative) address mapped by copy-on-write nodes. */
-	mpart_reladdr_t                         ucd_mapmax;  /* The greatest (part-relative) address mapped by copy-on-write nodes. */
-	/*PAGEDIR_PAGEALIGNED*/ size_t          ucd_mapsize; /* == (ucd_mapmax - ucd_mapmin) + 1. */
-	struct setcore_data                     ucs_mem;     /* Memory data. */
+struct unsharecow_bounds {
+	/*PAGEDIR_PAGEALIGNED*/ mpart_reladdr_t ucb_mapmin;  /* The lowest (part-relative) address mapped by copy-on-write nodes. */
+	mpart_reladdr_t                         ucb_mapmax;  /* The greatest (part-relative) address mapped by copy-on-write nodes. */
+	/*PAGEDIR_PAGEALIGNED*/ size_t          ucb_mapsize; /* == (ucb_mapmax - ucb_mapmin) + 1. */
 };
 
-#define unsharecow_data_init(self) \
-	memset(self, 0, sizeof(struct unsharecow_data))
-STATIC_ASSERT(MPART_ST_VOID == 0);
 
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL unsharecow_data_fini)(struct unsharecow_data *__restrict self) {
-	kfree(self->ucd_copy);
-	kfree(self->ucd_blk_ext);
-	setcore_data_fini(&self->ucs_mem);
-}
-
-/* Calculate the max-size needed to represent `self'. Stores the results in:
- *   - self->ucd_mapmin
- *   - self->ucd_mapmax
- *   - self->ucd_mapsize */
+/* Calculate the max-size needed to represent `part'. */
 PRIVATE NONNULL((1, 2)) void
-NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_data *__restrict self,
+NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restrict self,
                                               struct mpart *__restrict part) {
 	struct mnode *node;
-	self->ucd_mapmin = (mpart_reladdr_t)-1;
-	self->ucd_mapmax = 0;
+	self->ucb_mapmin = (mpart_reladdr_t)-1;
+	self->ucb_mapmax = 0;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
 		mpart_reladdr_t min, max;
 		if (mnode_wasdestroyed(node))
 			continue;
 		min = mnode_getmapminaddr(node);
 		max = mnode_getmapmaxaddr(node);
-		if (self->ucd_mapmin > min)
-			self->ucd_mapmin = min;
-		if (self->ucd_mapmax < max)
-			self->ucd_mapmax = max;
+		if (self->ucb_mapmin > min)
+			self->ucb_mapmin = min;
+		if (self->ucb_mapmax < max)
+			self->ucb_mapmax = max;
 	}
-	assert(self->ucd_mapmin < self->ucd_mapmax);
-	assert(IS_ALIGNED(self->ucd_mapmin, PAGESIZE));
-	assert(IS_ALIGNED(self->ucd_mapmax + 1, PAGESIZE));
-	self->ucd_mapsize = 1 + (self->ucd_mapmax - self->ucd_mapmin);
+	assert(self->ucb_mapmin < self->ucb_mapmax);
+	assert(IS_ALIGNED(self->ucb_mapmin, PAGESIZE));
+	assert(IS_ALIGNED(self->ucb_mapmax + 1, PAGESIZE));
+	self->ucb_mapsize = 1 + (self->ucb_mapmax - self->ucb_mapmin);
 }
 
 
-/* Ensure that `self->ucd_copy' has been allocated.
+/* Ensure that `data->ucd_copy' has been allocated.
  * If it hasn't been allocated yet, and doing so cannot be done
- * without blocking, then the lock to `part' is released, and the
+ * without blocking, then the lock to `self' is released, and the
  * allocation is performed with blocking. Stores the results in:
- *   - self->ucd_copy
+ *   - data->ucd_copy
  * Throws an exception on error.
  * @return: true:  Success
- * @return: false: Success, but the lock to `part' was lost */
-PRIVATE NONNULL((1, 2)) bool FCALL
-unsharecow_makecopy_or_unlock(struct unsharecow_data *__restrict self,
-                              struct mpart *__restrict part) {
+ * @return: false: Success, but the lock to `self' was lost */
+PRIVATE NONNULL((1, 3)) bool FCALL
+unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
+                              struct mpart_unlockinfo *unlock,
+                              struct mpart_unsharecow_data *__restrict data) {
 	struct mpart *copy;
-	if unlikely(self->ucd_copy != NULL)
+	if unlikely(data->ucd_copy != NULL)
 		goto done;
 	/* Try to allocate the copy. */
 	copy = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
@@ -1154,67 +1079,87 @@ unsharecow_makecopy_or_unlock(struct unsharecow_data *__restrict self,
 	                                  GFP_PREFLT);
 	if unlikely(!copy) {
 		/* Must allocate while blocking. */
-		mpart_lock_release_f(part);
-		copy = (struct mpart *)kmalloc(sizeof(struct mpart),
-		                               GFP_LOCKED | GFP_PREFLT);
-		self->ucd_copy = copy;
+		mpart_lock_release_f(self);
+		mpart_unlockinfo_xunlock(unlock);
+		TRY {
+			copy = (struct mpart *)kmalloc(sizeof(struct mpart),
+			                               GFP_LOCKED | GFP_PREFLT);
+		} EXCEPT {
+			mpart_deadnodes_reap(self);
+			RETHROW();
+		}
+		data->ucd_copy = copy;
 		return false;
 	}
-	self->ucd_copy = copy;
+	data->ucd_copy = copy;
 done:
 	return true;
 }
 
 /* If necessary, allocate an extended block-status bitset needed to hold
- * the data for a copy of `part'. If such a bitset isn't necessary, then
+ * the data for a copy of `self'. If such a bitset isn't necessary, then
  * don't do anything. Stores the results in:
- *   - self->ucd_blk_ext
+ *   - data->ucd_ucmem.scd_bitset
  * Throws an exception on error.
  * @return: true:  Success
- * @return: false: Success, but the lock to `part' was lost */
-PRIVATE NONNULL((1, 2)) bool FCALL
-unsharecow_makeblkext_or_unlock(struct unsharecow_data *__restrict self,
-                                struct mpart *__restrict part) {
+ * @return: false: Success, but the lock to `self' was lost */
+PRIVATE NONNULL((1, 3, 4)) bool FCALL
+unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
+                                struct mpart_unlockinfo *unlock,
+                                struct mpart_unsharecow_data *__restrict data,
+                                struct unsharecow_bounds const *__restrict bounds) {
 	size_t block_count, reqsize;
 	bitset_word_t *bitset;
 	/* We need to copy the block-status bitset. */
-	block_count = self->ucd_mapsize >> part->mp_file->mf_blockshift;
+	block_count = bounds->ucb_mapsize >> self->mp_file->mf_blockshift;
 	if (block_count <= BITSET_ITEMS_PER_WORD)
 		return true; /* A single word is enough! */
-	if (part->mp_blkst_ptr == NULL)
+	if (self->mp_blkst_ptr == NULL)
 		return true; /* We can just mirror the NULL-bitset. */
 	/* This is the case where we need the dynamically allocated block-status bitset. */
 	reqsize = CEILDIV(block_count, BITSET_ITEMS_PER_WORD) * sizeof(bitset_word_t);
-	bitset  = (bitset_word_t *)krealloc_nx(self->ucd_blk_ext, reqsize,
+	bitset  = (bitset_word_t *)krealloc_nx(data->ucd_ucmem.scd_bitset, reqsize,
 	                                       GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 	if unlikely(!bitset) {
 		/* Must allocate while blocking. */
-		mpart_lock_release_f(part);
-		bitset = (bitset_word_t *)krealloc(self->ucd_blk_ext, reqsize,
-		                                   GFP_LOCKED | GFP_PREFLT);
-		self->ucd_blk_ext = bitset;
+		mpart_lock_release_f(self);
+		mpart_unlockinfo_xunlock(unlock);
+		TRY {
+			bitset = (bitset_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
+			                                   GFP_LOCKED | GFP_PREFLT);
+		} EXCEPT {
+			mpart_deadnodes_reap(self);
+			RETHROW();
+		}
+		data->ucd_ucmem.scd_bitset = bitset;
 		return false;
 	}
-	self->ucd_blk_ext = bitset;
+	data->ucd_ucmem.scd_bitset = bitset;
 	return true;
 }
 
 
-/* Allocate physical memory for exactly `self->ucd_partsize' bytes of
+/* Allocate physical memory for exactly `data->ucd_partsize' bytes of
  * memory, and store the results in:
- *   - self->ucd_copy_state
- *   - self->ucd_copy_mem
- *   - self->ucd_copy_mem_sc
+ *   - data->ucd_copy_state
+ *   - data->ucd_copy_mem
+ *   - data->ucd_copy_mem_sc
  * Throws an exception on error.
  * @return: true:  Success
- * @return: false: Success, but the lock to `part' was lost */
-PRIVATE NONNULL((1, 2)) bool FCALL
-unsharecow_makememdat_or_unlock(struct unsharecow_data *__restrict self,
-                                struct mpart *__restrict part) {
+ * @return: false: Success, but the lock to `self' was lost */
+PRIVATE NONNULL((1, 3, 4)) bool FCALL
+unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
+                                struct mpart_unlockinfo *unlock,
+                                struct mpart_unsharecow_data *__restrict data,
+                                struct unsharecow_bounds const *__restrict bounds) {
+	bool result;
 	size_t total_pages;
-	assert(IS_ALIGNED(self->ucd_mapsize, PAGESIZE));
-	total_pages = self->ucd_mapsize / PAGESIZE;
-	return setcore_makememdat_or_unlock(&self->ucs_mem, part, total_pages);
+	assert(IS_ALIGNED(bounds->ucb_mapsize, PAGESIZE));
+	total_pages = bounds->ucb_mapsize / PAGESIZE;
+	result = mpart_setcore_makememdat_or_unlock(self, unlock,
+	                                            &data->ucd_ucmem,
+	                                            total_pages);
+	return result;
 }
 
 
@@ -1296,9 +1241,10 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part
 	}
 }
 
-/* Acquire locks to all of the memory-managers in use by copy-on-write nodes of `self' */
+/* Acquire locks to all of the memory-managers in use by copy-on-write nodes of `part' */
 PRIVATE NONNULL((1)) bool FCALL
-unsharecow_lock_unique_mmans(struct mpart *__restrict part) {
+unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
+                                       struct mpart_unlockinfo *unlock) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
 		struct mman *mm;
@@ -1315,10 +1261,16 @@ unsharecow_lock_unique_mmans(struct mpart *__restrict part) {
 
 			/* Drop our lock to the original part. */
 			mpart_lock_release_f(part);
+			mpart_unlockinfo_xunlock(unlock);
 
 			/* Wait until the lock of this mman becomes available. */
-			while (!sync_canwrite(mm))
-				task_yield();
+			TRY {
+				while (!sync_canwrite(mm))
+					task_yield();
+			} EXCEPT {
+				mpart_deadnodes_reap(part);
+				RETHROW();
+			}
 			return false;
 		}
 	}
@@ -1341,10 +1293,11 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
  * such that those regions may atomically be replaced with different bindings.
  * If this cannot be done, release all locks and throw an exception. */
 PRIVATE NONNULL((1)) bool FCALL
-prepare_mmans_or_unlock(struct mpart *__restrict part) {
+try_prepare_mmans_or_throw(struct mpart *__restrict self,
+                           struct mpart_unlockinfo *unlock) {
 	struct mnode *node;
 	bool result = false;
-	LIST_FOREACH (node, &part->mp_copy, mn_link) {
+	LIST_FOREACH (node, &self->mp_copy, mn_link) {
 		if unlikely(mnode_wasdestroyed(node))
 			continue; /* Skip dead nodes. */
 		/* Prepare the page directory. */
@@ -1359,113 +1312,83 @@ err_badalloc:
 	/* Insufficient physical memory...
 	 * -> Unprepare everything we've already prepared thus far,
 	 *    then proceed by throwing an exception! */
-	unprepare_mmans_until(LIST_FIRST(&part->mp_copy), node);
-	unsharecow_unlock_unique_mmans(part);
-	mpart_lock_release_f(part);
+	unprepare_mmans_until(LIST_FIRST(&self->mp_copy), node);
+	unsharecow_unlock_unique_mmans(self);
+	mpart_lock_release_f(self);
+	mpart_unlockinfo_xunlock(unlock);
+	mpart_deadnodes_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 }
 
 
 
 
-/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that `LIST_EMPTY(&self->mp_copy)',
- * meaning that all copy-on-write mappings of the part have been unshared. This must
- * be done before the contents of the part can be written to directly, or be mapped
- * as writable for MAP_SHARED mappings of the part itself. */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+/* Ensure that `MPART_ST_INCORE(self->mp_state) && LIST_EMPTY(&self->mp_copy)'
+ * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
+ *       the list is still allowed to contain dead nodes that are about to,
+ *       or have already been added to the dead nodes list.
+ *       However, the mmans of all nodes still apart of the mp_copy list have
+ *       already been destroyed, such that no alive copy-nodes still exist! */
+PUBLIC NONNULL((1, 3)) bool FCALL
+mpart_setcore_and_unsharecow_or_unlock(struct mpart *__restrict self,
+                                       struct mpart_unlockinfo *unlock,
+                                       struct mpart_unsharecow_data *__restrict data) {
+	struct mpart *copy;
 	struct mnode *node;
-	struct unsharecow_data data;
 	size_t block_count;
-again:
-	mpart_lock_acquire_and_setcore(self);
+	struct unsharecow_bounds bounds;
+	if (!mpart_setcore_or_unlock(self, unlock, &data->ucd_scmem))
+		goto nope_setcore;
+
 	/* Quick check: If there aren't any copy-on-write mappings, then
 	 *              we don't actually need to do anything else! */
 	if (LIST_EMPTY(&self->mp_copy))
-		return;
-
-#ifndef __OPTIMIZE_SIZE__
-	/* Make sure that none of the remaining copy-nodes are actually dead. */
-	if unlikely(mpart_deadnodes_mustreap(self)) {
-		mpart_lock_release_f(self);
-		mpart_deadnodes_reap(self);
-		goto again;
-	}
-#endif /* !__OPTIMIZE_SIZE__ */
+		goto done;
 
 	/* Make sure to load all blocks (if necessary), and also make sure
 	 * that there aren't any INIT-blocks left */
-	if (!mpart_maybe_loadall_or_unlock(self))
-		goto again;
+	if (!mpart_maybe_loadall_or_unlock(self, unlock))
+		goto nope;
 	assert(!LIST_EMPTY(&self->mp_copy));
 
 	/* Try to acquire references to all of the mmans from the copy-on-write list.
 	 * If we fail to do this for all of them, then we're already done, since there
 	 * are no (alive) copy-on-write mappings present! */
 	if (!unsharecow_incref_mmans(self))
-		return;
+		goto done;
 
-	unsharecow_data_init(&data);
-again_alloc_data:
 	/* Calculate the max-address needed to represent `self' */
-	unsharecow_calculate_mapbounds(&data, self);
-again_alloc_data_after_partsize:
+	unsharecow_calculate_mapbounds(&bounds, self);
 	TRY {
 
-		if (!unsharecow_makecopy_or_unlock(&data, self)) {
-restart_with_init_data:
-			mpart_lock_acquire_and_setcore(self);
-			if unlikely(LIST_EMPTY(&self->mp_copy)) {
-				unsharecow_data_fini(&data);
-				return;
-			}
-#ifndef __OPTIMIZE_SIZE__
-			/* Make sure that none of the remaining copy-nodes are actually dead. */
-			if unlikely(mpart_deadnodes_mustreap(self)) {
-				mpart_lock_release_f(self);
-				mpart_deadnodes_reap(self);
-				goto restart_with_init_data;
-			}
-#endif /* !__OPTIMIZE_SIZE__ */
-		
-			/* Make sure to load all blocks (if necessary), and also make sure
-			 * that there aren't any INIT-blocks left */
-			if (!mpart_maybe_loadall_or_unlock(self))
-				goto restart_with_init_data;
-			assert(!LIST_EMPTY(&self->mp_copy));
-			goto again_alloc_data;
-		}
+		if (!unsharecow_makecopy_or_unlock(self, unlock, data))
+			goto nope_decref_mmans;
 
 		/* Allocate the block-extension bitset. */
-		if (!unsharecow_makeblkext_or_unlock(&data, self))
-			goto restart_with_init_data;
+		if (!unsharecow_makeblkext_or_unlock(self, unlock, data, &bounds))
+			goto nope_decref_mmans;
 
 		/* Allocate low-level ram data. */
-		if (!unsharecow_makememdat_or_unlock(&data, self))
-			goto restart_with_init_data;
+		if (!unsharecow_makememdat_or_unlock(self, unlock, data, &bounds))
+			goto nope_decref_mmans;
 
 		/* (almost) lastly, acquire references & locks to all of the memory-managers
 		 * associated with nodes from the copy-on-write mappings list. */
-		if (!unsharecow_lock_unique_mmans(self))
-			goto restart_with_init_data;
+		if (!unsharecow_lock_unique_mmans_or_unlock(self, unlock))
+			goto nope_decref_mmans;
 
 		/* And finally, make sure that we'll be able to re-map the backing
 		 * page directory mappings of all of the copy-on-write nodes. After
 		 * all: we _do_ intend to replace them with our new copy. */
-		if (!prepare_mmans_or_unlock(self)) {
+		if (!try_prepare_mmans_or_throw(self, unlock)) {
 			/* Special case: All nodes had been destroyed! */
 			unsharecow_unlock_unique_mmans(self);
 			mpart_lock_release_f(self);
-			unsharecow_data_fini(&data);
-			unsharecow_decref_mmans(self);
-			mpart_deadnodes_reap(self);
-			goto again;
+			mpart_unlockinfo_xunlock(unlock);
+			goto nope_decref_mmans;
 		}
 	} EXCEPT {
-		unsharecow_data_fini(&data);
 		unsharecow_decref_mmans(self);
-		mpart_deadnodes_reap(self);
 		RETHROW();
 	}
 
@@ -1480,37 +1403,39 @@ restart_with_init_data:
 	/* Step #1: Gather up all of the copy-on-write nodes. (and skip nodes
 	 *          that belong to dead mmans) */
 	assert(!LIST_EMPTY(&self->mp_copy));
-	data.ucd_copy->mp_refcnt = 0;
-	LIST_INIT(&data.ucd_copy->mp_copy);
+	copy = data->ucd_copy;
+	DBG_inval(data->ucd_copy);
+	copy->mp_refcnt = 0;
+	LIST_INIT(&copy->mp_copy);
 	for (node = LIST_FIRST(&self->mp_copy); node;) {
 		struct mnode *next_node;
 		next_node = LIST_NEXT(node, mn_link);
 		if likely(!wasdestroyed(node->mn_mman)) {
 			/* Transfer this node to the new mem-part. */
 			assert(node->mn_part == self);
-			LIST_INSERT_HEAD(&data.ucd_copy->mp_copy, node, mn_link);
-			++data.ucd_copy->mp_refcnt; /* New reference (to-be) held by `node->mn_part' */
+			LIST_INSERT_HEAD(&copy->mp_copy, node, mn_link);
+			++copy->mp_refcnt; /* New reference (to-be) held by `node->mn_part' */
 			decref_nokill(self);        /* Old reference held by `node->mn_part' */
 		}
 		node = next_node;
 	}
-	assert(!LIST_EMPTY(&data.ucd_copy->mp_copy));
-	assert(data.ucd_copy->mp_refcnt != 0);
-	assert(data.ucd_mapsize != 0);
+	assert(!LIST_EMPTY(&copy->mp_copy));
+	assert(copy->mp_refcnt != 0);
+	assert(bounds.ucb_mapsize != 0);
 
 	/* Initialize misc. fields of the mem-part copy. */
-	data.ucd_copy->mp_flags = (self->mp_flags & MPART_F_MLOCK) | MPART_F_NO_GLOBAL_REF | MPART_F_LOCKBIT;
-	data.ucd_copy->mp_file  = incref(&mfile_anon[self->mp_file->mf_blockshift]);
-	LIST_INIT(&data.ucd_copy->mp_share);
-	SLIST_INIT(&data.ucd_copy->mp_deadnodes);
-	DBG_memset(&data.ucd_copy->mp_changed, 0xcc, sizeof(data.ucd_copy->mp_changed));
-	data.ucd_copy->mp_minaddr = self->mp_minaddr + data.ucd_mapmin;
-	data.ucd_copy->mp_maxaddr = self->mp_minaddr + data.ucd_mapmax;
-	assert(data.ucd_copy->mp_maxaddr <= self->mp_maxaddr);
-	DBG_memset(&data.ucd_copy->mp_filent, 0xcc, sizeof(data.ucd_copy->mp_filent));
+	copy->mp_flags = (self->mp_flags & MPART_F_MLOCK) | MPART_F_NO_GLOBAL_REF | MPART_F_LOCKBIT;
+	copy->mp_file  = incref(&mfile_anon[self->mp_file->mf_blockshift]);
+	LIST_INIT(&copy->mp_share);
+	SLIST_INIT(&copy->mp_deadnodes);
+	DBG_inval(copy->mp_changed);
+	copy->mp_minaddr = self->mp_minaddr + bounds.ucb_mapmin;
+	copy->mp_maxaddr = self->mp_minaddr + bounds.ucb_mapmax;
+	assert(copy->mp_maxaddr <= self->mp_maxaddr);
+	DBG_inval(copy->mp_filent);
 
 	/* We need to copy the block-status bitset. */
-	block_count = data.ucd_mapsize >> data.ucd_copy->mp_file->mf_blockshift;
+	block_count = bounds.ucb_mapsize >> copy->mp_file->mf_blockshift;
 	if (block_count <= BITSET_ITEMS_PER_WORD) {
 		/* A single word is enough! */
 		bitset_word_t word;
@@ -1520,49 +1445,55 @@ restart_with_init_data:
 			if (self->mp_blkst_ptr != NULL)
 				word = self->mp_blkst_ptr[0];
 		}
-		data.ucd_copy->mp_blkst_inl = word;
-		data.ucd_copy->mp_flags |= MPART_F_BLKST_INL;
+		copy->mp_blkst_inl = word;
+		copy->mp_flags |= MPART_F_BLKST_INL;
 free_unused_block_status:
-		if unlikely(data.ucd_blk_ext)
-			kfree(data.ucd_blk_ext);
+		if unlikely(data->ucd_ucmem.scd_bitset)
+			kfree(data->ucd_ucmem.scd_bitset);
+		DBG_inval(data->ucd_ucmem.scd_bitset);
 	} else if (self->mp_blkst_ptr == NULL) {
-		data.ucd_copy->mp_blkst_ptr = NULL;
+		copy->mp_blkst_ptr = NULL;
 		goto free_unused_block_status;
 	} else {
 		/* This is the case where we need the dynamically allocated block-status bitset. */
-		assert(data.ucd_blk_ext != NULL);
-		assert((kmalloc_usable_size(data.ucd_blk_ext) *
+		assert(data->ucd_ucmem.scd_bitset != NULL);
+		assert((kmalloc_usable_size(data->ucd_ucmem.scd_bitset) *
 		        BITSET_ITEMS_PER_WORD) >= block_count);
 		assert(block_count <= mpart_getblockcount(self, self->mp_file));
-		/* Copy over block-status bitset data. */
-		data.ucd_copy->mp_blkst_ptr = (bitset_word_t *)memcpy(data.ucd_blk_ext,
-		                                                      self->mp_blkst_ptr,
-		                                                      block_count / BITSET_ITEMS_PER_WORD,
-		                                                      sizeof(bitset_word_t));
+		/* Copy over block-status bitset data-> */
+		copy->mp_blkst_ptr = (bitset_word_t *)memcpy(data->ucd_ucmem.scd_bitset,
+		                                             self->mp_blkst_ptr,
+		                                             block_count / BITSET_ITEMS_PER_WORD,
+		                                             sizeof(bitset_word_t));
+		DBG_inval(data->ucd_ucmem.scd_bitset);
 	}
 
 	/* Fill in information on the backing storage. */
-	data.ucd_copy->mp_state = data.ucs_mem.scd_copy_state;
-	memcpy(&data.ucd_copy->mp_mem,
-	       &data.ucs_mem.scd_copy_mem,
+	copy->mp_state = data->ucd_ucmem.scd_copy_state;
+	DBG_inval(data->ucd_ucmem.scd_bitset);
+	memcpy(&copy->mp_mem,
+	       &data->ucd_ucmem.scd_copy_mem,
 	       MAX_C(sizeof(struct mchunk),
 	             sizeof(struct mchunkvec)));
+	DBG_memset(&data->ucd_ucmem.scd_copy_mem, 0xcc,
+	           MAX_C(sizeof(struct mchunk),
+	                 sizeof(struct mchunkvec)));
 
-	/* For now, we don't copy mem-part meta-data. */
-	data.ucd_copy->mp_meta = NULL;
+	/* For now, we don't copy mem-part meta-data-> */
+	copy->mp_meta = NULL;
 
 	/* With that, the new mem-part has been initialized, however we must
 	 * still copy over the contents of the old part into the new one! */
-	mpart_copyram(data.ucd_copy, self,
-	              data.ucd_mapmin,
-	              data.ucd_mapsize);
+	mpart_copyram(copy, self,
+	              bounds.ucb_mapmin,
+	              bounds.ucb_mapsize);
 
 	/* Tell all of the pre-existing nodes about the new backing part!
 	 * We do this only now, so-as to ensure that we directly jump from
 	 * one completely valid node to another. */
-	LIST_FOREACH (node, &data.ucd_copy->mp_copy, mn_link) {
-		node->mn_partoff -= data.ucd_mapmin;
-		node->mn_part = data.ucd_copy;
+	LIST_FOREACH (node, &copy->mp_copy, mn_link) {
+		node->mn_partoff -= bounds.ucb_mapmin;
+		node->mn_part = copy;
 	}
 
 	/* With all of the software-structures updated to describe the new,
@@ -1570,11 +1501,11 @@ free_unused_block_status:
 	 * underlying page directories. */
 	{
 		u16 prot_mask = PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD;
-		assert(!LIST_EMPTY(&data.ucd_copy->mp_copy));
+		assert(!LIST_EMPTY(&copy->mp_copy));
 		/* We can map as writable if only a single copy-on-write node exists! */
-		if (LIST_NEXT(LIST_FIRST(&data.ucd_copy->mp_copy), mn_link) != NULL)
+		if (LIST_NEXT(LIST_FIRST(&copy->mp_copy), mn_link) != NULL)
 			prot_mask &= ~PAGEDIR_MAP_FWRITE;
-		LIST_FOREACH (node, &data.ucd_copy->mp_copy, mn_link) {
+		LIST_FOREACH (node, &copy->mp_copy, mn_link) {
 			struct mman *mm;
 			void *addr;
 			size_t size;
@@ -1592,7 +1523,7 @@ free_unused_block_status:
 			if (ADDR_ISUSER(addr))
 				prot |= PAGEDIR_MAP_FUSER; /* XXX: Maybe get rid of this eventually? */
 
-			mpart_mmap_p(data.ucd_copy, mm->mm_pdir_phys,
+			mpart_mmap_p(copy, mm->mm_pdir_phys,
 			             addr, size, node->mn_partoff, prot);
 
 			/* Unlink the node from the writable-chain. */
@@ -1609,7 +1540,7 @@ free_unused_block_status:
 		}
 		if (prot_mask & PAGEDIR_MAP_FWRITE) {
 			/* Insert the (only) writable node into it's mman's writable chain. */
-			node = LIST_FIRST(&data.ucd_copy->mp_copy);
+			node = LIST_FIRST(&copy->mp_copy);
 			if (node->mn_flags & MNODE_F_PWRITE)
 				LIST_INSERT_HEAD(&node->mn_mman->mm_writable, node, mn_writable);
 		}
@@ -1621,20 +1552,187 @@ free_unused_block_status:
 	 *
 	 * In other words: We need to be damn sure we've finished initializing it! */
 	COMPILER_WRITE_BARRIER();
-	mpart_all_list_insert(data.ucd_copy);
+	mpart_all_list_insert(copy);
 
 	/* Drop locks to all of the new part's copy-on-write nodes.
 	 * Note that we still have to be careful here to only unlock each
 	 * unique mman once, since a single mman may have mapped our part
 	 * multiple times. */
-	unsharecow_unlock_unique_mmans_fast(data.ucd_copy);
+	unsharecow_unlock_unique_mmans_fast(copy);
 
 	/* Drop all of the mman-references that we were still holding on to. */
-	unsharecow_decref_mmans_fast(data.ucd_copy);
+	unsharecow_decref_mmans_fast(copy);
 
 	/* Finally, release one last lock from the new mem-part
 	 * (but keep on holding onto our lock to the original part!) */
-	mpart_lock_release(data.ucd_copy);
+	mpart_lock_release(copy);
+
+done:
+	assert(LIST_EMPTY(&self->mp_copy));
+	return true;
+nope_decref_mmans:
+	unsharecow_decref_mmans(self);
+nope:
+	mpart_setcore_data_init(&data->ucd_scmem);
+nope_setcore:
+	mpart_deadnodes_reap(self);
+	return false;
+}
+
+/* Ensure that:
+ * >> LIST_FOREACH(node, &self->mp_copy, mn_link)
+ * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
+PUBLIC NONNULL((1)) bool FCALL
+mpart_unwrite_or_unlock(struct mpart *__restrict self,
+                        struct mpart_unlockinfo *unlock) {
+	struct mnode *node;
+	/* Enumerate all shared nodes in order to delete write-access from them. */
+	LIST_FOREACH (node, &self->mp_share, mn_link) {
+		unsigned int error;
+again_try_clear_write:
+		error = mnode_clear_write(node);
+		if likely(error == MNODE_CLEAR_WRITE_SUCCESS)
+			continue;
+		if (error == MNODE_CLEAR_WRITE_WOULDBLOCK) {
+			REF struct mman *mm;
+			/* Must wait for the node's mman to become available */
+			mm = node->mn_mman;
+			if unlikely(!tryincref(mm))
+				goto again_try_clear_write;
+			mpart_lock_release_f(self);
+			mpart_unlockinfo_xunlock(unlock);
+			TRY {
+				while (!sync_canwrite(mm))
+					task_yield();
+			} EXCEPT {
+				decref_unlikely(mm);
+				mpart_deadnodes_reap(self);
+				RETHROW();
+			}
+			decref_unlikely(mm);
+			return false;
+		}
+		/* Hard error: bad allocation :( */
+		assert(error == MNODE_CLEAR_WRITE_BADALLOC);
+		mpart_lock_release_f(self);
+		mpart_unlockinfo_xunlock(unlock);
+		mpart_deadnodes_reap(self);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+	}
+	return true;
+}
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* Lock acquisition functions                                           */
+/************************************************************************/
+
+/* Acquire a lock until `mpart_initdone_or_unlock()' */
+PUBLIC NONNULL((1)) void FCALL
+mpart_lock_acquire_and_noinitblocks(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	do {
+		mpart_lock_acquire(self);
+	} while (!mpart_initdone_or_unlock(self, NULL));
+}
+
+
+
+/* Acquire a lock until `mpart_setcore_or_unlock()' */
+PUBLIC NONNULL((1)) void FCALL
+mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct mpart_setcore_data data;
+	mpart_lock_acquire(self);
+	/* Quick check: is the part already in the expected state? */
+	if (MPART_ST_INCORE(self->mp_state))
+		return; /* Already done! */
+	mpart_setcore_data_init(&data);
+	TRY {
+		while (!mpart_setcore_or_unlock(self, NULL, &data))
+			mpart_lock_acquire(self);
+	} EXCEPT {
+		mpart_setcore_data_fini(&data);
+		mpart_deadnodes_reap(self);
+		RETHROW();
+	}
+}
+
+
+
+/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadall_or_unlock()' */
+PUBLIC NONNULL((1)) void FCALL
+mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+again:
+	mpart_lock_acquire_and_setcore(self);
+	if unlikely(!mpart_hasblockstate(self))
+		return;
+	TRY {
+		if (!mpart_loadall_or_unlock(self, NULL))
+			goto again;
+	} EXCEPT {
+		mpart_deadnodes_reap(self);
+		RETHROW();
+	}
+}
+
+
+
+/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
+ * If the given address range ends up not fully contained within the
+ * bounds of `self', then no lock is acquired, and `false' is returned. */
+PUBLIC NONNULL((1)) bool FCALL
+mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
+                                        mpart_reladdr_t partrel_offset,
+                                        size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	mpart_reladdr_t endaddr;
+again:
+	mpart_lock_acquire_and_setcore(self);
+	if (OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) ||
+	    endaddr > mpart_getsize(self)) {
+		/* Out-of-bounds... */
+		mpart_lock_release_f(self);
+		return false;
+	}
+	TRY {
+		/* Ensure that the given range has been loaded. */
+		if (!mpart_loadsome_or_unlock(self, NULL, partrel_offset, num_bytes))
+			goto again;
+	} EXCEPT {
+		mpart_deadnodes_reap(self);
+		RETHROW();
+	}
+	return true;
+}
+
+
+
+/* Acquire a lock until `mpart_setcore_and_unsharecow_or_unlock()' */
+PUBLIC NONNULL((1)) void FCALL
+mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct mpart_unsharecow_data data;
+	mpart_lock_acquire_and_setcore(self);
+	/* Quick check: is the part already in the expected state? */
+	if (MPART_ST_INCORE(self->mp_state))
+		return; /* Already done! */
+	mpart_unsharecow_data_init(&data);
+	TRY {
+		while (!mpart_setcore_and_unsharecow_or_unlock(self, NULL, &data))
+			mpart_lock_acquire(self);
+	} EXCEPT {
+		mpart_unsharecow_data_fini(&data);
+		mpart_deadnodes_reap(self);
+		RETHROW();
+	}
 }
 
 
@@ -1644,19 +1742,10 @@ free_unused_block_status:
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-again:
-	mpart_lock_acquire_and_setcore_unsharecow(self);
-	if unlikely(!mpart_hasblockstate(self))
-		return;
-	TRY {
-		if (!mpart_loadall_or_unlock(self))
-			goto again;
-	} EXCEPT {
-		mpart_deadnodes_reap(self);
-		RETHROW();
-	}
+	do {
+		mpart_lock_acquire_and_setcore_unsharecow(self);
+	} while (!mpart_loadall_or_unlock(self, NULL));
 }
-
 
 
 
@@ -1688,39 +1777,9 @@ again:
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unwrite(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct mnode *node;
-again:
-	mpart_lock_acquire_and_setcore(self);
-	/* Enumerate all shared nodes in order to delete write-access from them. */
-	LIST_FOREACH (node, &self->mp_share, mn_link) {
-		unsigned int error;
-again_try_clear_write:
-		error = mnode_clear_write(node);
-		if likely(error == MNODE_CLEAR_WRITE_SUCCESS)
-			continue;
-		if (error == MNODE_CLEAR_WRITE_WOULDBLOCK) {
-			REF struct mman *mm;
-			/* Must wait for the node's mman to become available */
-			mm = node->mn_mman;
-			if unlikely(!tryincref(mm))
-				goto again_try_clear_write;
-			mpart_lock_release_f(self);
-			TRY {
-				while (!sync_canwrite(mm))
-					task_yield();
-			} EXCEPT {
-				decref_unlikely(mm);
-				mpart_deadnodes_reap(self);
-				RETHROW();
-			}
-			decref_unlikely(mm);
-			goto again;
-		}
-		/* Hard error: bad allocation :( */
-		assert(error == MNODE_CLEAR_WRITE_BADALLOC);
-		mpart_lock_release(self);
-		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
-	}
+	do {
+		mpart_lock_acquire_and_setcore(self);
+	} while (!mpart_unwrite_or_unlock(self, NULL));
 }
 
 
