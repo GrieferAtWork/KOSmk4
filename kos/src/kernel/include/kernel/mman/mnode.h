@@ -102,10 +102,6 @@ struct mnode {
 	                                                  * with write-access enabled (which happens lazily upon first access)
 	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
-	SLIST_ENTRY(mnode)                 _mn_unmapped; /* [lock(ATOMIC)] List of nodes that are pending to-be unmapped from their
-	                                                  * associated memory manager. This mechanism is used for lazily unmapping
-	                                                  * nodes whenever a lock held to an MM is released. NOTE: Nodes that are
-	                                                  * pending to-be unmapped are _NOT_ considered as dead! */
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 };
@@ -189,6 +185,19 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self);
 
+/* While holding a lock to `self->mn_mman' and `self->mn_part', try
+ * to merge the given node with its successor/predecessor node, without
+ * releasing any of the locks still held.
+ * @return: * : The new, merged node (which may have a different min-addr
+ *              that the original node `self'). Also note that this node
+ *              may or may not be equal to `self', and that it's min- and
+ *              max-addr fields may be different from those that `self'
+ *              had upon entry, irregardless of `self' being re-returned.
+ *              As a matter of fact `*self' becomes invalid after a call
+ *              to this function! */
+FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
+NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self);
+
 
 /* Mem-node tree API. All of these functions require that the caller
  * be holding a lock to the associated mman. */
@@ -202,11 +211,11 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_rlocate)
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_insert)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mnode_tree_tryinsert)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_remove)(struct mnode **__restrict proot, void const *key);
-FUNDEF WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, void const *minkey, void const *maxkey);
-FUNDEF NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_removenode)(struct mnode **__restrict proot, struct mnode *__restrict node);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, void const *minkey, void const *maxkey);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_removenode)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_prevnode)(struct mnode *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_nextnode)(struct mnode *__restrict self);
-FUNDEF NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, void const *minkey, void const *maxkey, struct mnode_tree_minmax *__restrict result);
+FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, void const *minkey, void const *maxkey, struct mnode_tree_minmax *__restrict result);
 
 
 DECL_END

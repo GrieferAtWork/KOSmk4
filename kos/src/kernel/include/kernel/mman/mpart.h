@@ -25,6 +25,7 @@
 #include <kernel/memory.h>
 #include <kernel/types.h>
 
+#include <hybrid/__minmax.h>
 #include <hybrid/sched/__yield.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -43,6 +44,9 @@
 #define MPART_BLOCK_ST_LOAD 2 /* Backing memory has been loaded. */
 #define MPART_BLOCK_ST_CHNG 3 /* Backing memory has been changed. */
 #define MPART_BLOCK_STBITS  2 /* # of bits needed to hold a single block-status. */
+
+/* Return the common description of 2 block status values. */
+#define MPART_BLOCK_COMMON(a, b) __hybrid_min2(a, b)
 
 
 /* Possible values for `struct mpart::mp_flags' */
@@ -309,11 +313,11 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mpart *NOTHROW(FCALL mpart_tree_rlocate)
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mpart_tree_insert)(struct mpart **__restrict proot, struct mpart *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mpart_tree_tryinsert)(struct mpart **__restrict proot, struct mpart *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_remove)(struct mpart **__restrict proot, pos_t key);
-FUNDEF WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_rremove)(struct mpart **__restrict proot, pos_t minkey, pos_t maxkey);
-FUNDEF NONNULL((1, 2)) void NOTHROW(FCALL mpart_tree_removenode)(struct mpart **__restrict proot, struct mpart *__restrict node);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_rremove)(struct mpart **__restrict proot, pos_t minkey, pos_t maxkey);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mpart_tree_removenode)(struct mpart **__restrict proot, struct mpart *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_prevnode)(struct mpart *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_nextnode)(struct mpart *__restrict self);
-FUNDEF NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct mpart *root, pos_t minkey, pos_t maxkey, struct mpart_tree_minmax *__restrict result);
+FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct mpart *root, pos_t minkey, pos_t maxkey, struct mpart_tree_minmax *__restrict result);
 
 
 
@@ -426,29 +430,28 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 	mpart_loadsome_or_unlock(self, unlock, 0, mpart_getsize(self))
 
 struct mpart_unsharecow_data {
-	struct mpart_setcore_data ucd_scmem; /* Data for setcore. */
 	struct mpart_setcore_data ucd_ucmem; /* Data for unshare. */
 	struct mpart             *ucd_copy;  /* [0..1] The duplicate of the original mem-part. */
 };
 #define mpart_unsharecow_data_init(self)                \
-	(void)(mpart_setcore_data_init(&(self)->ucd_scmem), \
-	       mpart_setcore_data_init(&(self)->ucd_ucmem), \
+	(void)(mpart_setcore_data_init(&(self)->ucd_ucmem), \
 	       (self)->ucd_copy = __NULLPTR)
 #define mpart_unsharecow_data_fini(self)          \
 	(kfree((self)->ucd_copy),                     \
-	 mpart_setcore_data_fini(&(self)->ucd_scmem), \
 	 mpart_setcore_data_fini(&(self)->ucd_ucmem))
 
-/* Ensure that `MPART_ST_INCORE(self->mp_state) && LIST_EMPTY(&self->mp_copy)'
+/* Ensure that `LIST_EMPTY(&self->mp_copy)'
+ * NOTE: The caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
+ *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
  *       the list is still allowed to contain dead nodes that are about to,
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that no alive copy-nodes still exist! */
 FUNDEF NONNULL((1, 2)) __BOOL FCALL
-mpart_setcore_and_unsharecow_or_unlock(struct mpart *__restrict self,
-                                       struct mpart_unlockinfo *unlock,
-                                       struct mpart_unsharecow_data *__restrict data);
+mpart_unsharecow_or_unlock(struct mpart *__restrict self,
+                           struct mpart_unlockinfo *unlock,
+                           struct mpart_unsharecow_data *__restrict data);
 
 /* Ensure that:
  * >> LIST_FOREACH(node, &self->mp_copy, mn_link)
@@ -591,7 +594,7 @@ struct mpart_physloc {
  * @return: MPART_MEMADDR_NOT_LOADED: Error: At least one accessed block has a state that
  *                                           is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT'
  * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-FUNDEF NONNULL((1)) unsigned int
+FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
                                       mpart_reladdr_t partrel_offset, size_t num_bytes,
                                       struct mpart_physloc *__restrict result);
@@ -617,7 +620,7 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
  *                                           of the 0-2 border blocks has a state that is one
  *                                           of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF'
  * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-FUNDEF NONNULL((1)) unsigned int
+FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
                                        mpart_reladdr_t partrel_offset, size_t num_bytes,
                                        struct mpart_physloc *__restrict result);
@@ -648,7 +651,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
  *
  * @return: * : The # of successfully committed bytes.
  *              Usually the same as `num_bytes', but see above */
-FUNDEF NONNULL((1)) size_t
+FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
                                               mpart_reladdr_t partrel_offset,
                                               size_t num_bytes);
@@ -675,10 +678,24 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
  * NOTE: This function may also assume that at least the first byte (that
  *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */
-FUNDEF NONNULL((1)) void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
                                     mpart_reladdr_t partrel_offset,
                                     struct mpart_physloc *__restrict result);
+
+/* Mark all blocks that overlap with the given address range as CHNG.
+ * For this purpose, the caller must ensure that:
+ * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
+ * If any of the blocks within the given range had yet to be marked as CHNG,
+ * and the associated file is not anonymous, and implements the `mo_saveblocks'
+ * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
+ * then set the `MPART_F_CHANGED' flag and add `self' to the list of changed
+ * parts of its associated file.
+ * NOTE: The caller must be holding a lock to `self' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
+                             mpart_reladdr_t partrel_offset,
+                             size_t num_bytes);
 
 
 

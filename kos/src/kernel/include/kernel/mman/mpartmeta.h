@@ -95,9 +95,9 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mfutex *NOTHROW(FCALL mfutex_tree_rlocat
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_insert)(struct mfutex **__restrict proot, struct mfutex *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mfutex_tree_tryinsert)(struct mfutex **__restrict proot, struct mfutex *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mfutex *NOTHROW(FCALL mfutex_tree_remove)(struct mfutex **__restrict proot, mpart_reladdr_t key);
-FUNDEF WUNUSED NONNULL((1)) struct mfutex *NOTHROW(FCALL mfutex_tree_rremove)(struct mfutex **__restrict proot, mpart_reladdr_t minkey, mpart_reladdr_t maxkey);
-FUNDEF NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_removenode)(struct mfutex **__restrict proot, struct mfutex *__restrict node);
-FUNDEF NONNULL((4)) void NOTHROW(FCALL mfutex_tree_minmaxlocate)(struct mfutex *root, mpart_reladdr_t minkey, mpart_reladdr_t maxkey, struct mfutex_tree_minmax *__restrict result);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mfutex *NOTHROW(FCALL mfutex_tree_rremove)(struct mfutex **__restrict proot, mpart_reladdr_t minkey, mpart_reladdr_t maxkey);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_removenode)(struct mfutex **__restrict proot, struct mfutex *__restrict node);
+FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mfutex_tree_minmaxlocate)(struct mfutex *root, mpart_reladdr_t minkey, mpart_reladdr_t maxkey, struct mfutex_tree_minmax *__restrict result);
 
 
 

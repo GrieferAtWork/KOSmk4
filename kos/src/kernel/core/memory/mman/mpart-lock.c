@@ -908,7 +908,7 @@ mpart_maybe_loadall_or_unlock(struct mpart *__restrict self,
 /* Given 2 mem-parts that are both `MPART_ST_MEM' or `MPART_ST_MEM_SC',
  * and are both at least `num_pages' large, copy the contents of those
  * many pages of physical memory from `src' to `dst' */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
+INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_copyram)(struct mpart *__restrict dst,
                              struct mpart *__restrict src,
                              PAGEDIR_PAGEALIGNED mpart_reladdr_t src_offset,
@@ -1066,7 +1066,7 @@ NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restri
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-PRIVATE NONNULL((1, 3)) bool FCALL
+INTERN NONNULL((1, 3)) bool FCALL
 unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
                               struct mpart_unlockinfo *unlock,
                               struct mpart_unsharecow_data *__restrict data) {
@@ -1103,15 +1103,15 @@ done:
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-PRIVATE NONNULL((1, 3, 4)) bool FCALL
+INTERN NONNULL((1, 3)) bool FCALL
 unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
                                 struct mpart_unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
-                                struct unsharecow_bounds const *__restrict bounds) {
+                                PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t block_count, reqsize;
 	bitset_word_t *bitset;
 	/* We need to copy the block-status bitset. */
-	block_count = bounds->ucb_mapsize >> self->mp_file->mf_blockshift;
+	block_count = num_bytes >> self->mp_file->mf_blockshift;
 	if (block_count <= BITSET_ITEMS_PER_WORD)
 		return true; /* A single word is enough! */
 	if (self->mp_blkst_ptr == NULL)
@@ -1147,15 +1147,15 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-PRIVATE NONNULL((1, 3, 4)) bool FCALL
+INTERN NONNULL((1, 3)) bool FCALL
 unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
                                 struct mpart_unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
-                                struct unsharecow_bounds const *__restrict bounds) {
+                                PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	bool result;
 	size_t total_pages;
-	assert(IS_ALIGNED(bounds->ucb_mapsize, PAGESIZE));
-	total_pages = bounds->ucb_mapsize / PAGESIZE;
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	total_pages = num_bytes / PAGESIZE;
 	result = mpart_setcore_makememdat_or_unlock(self, unlock,
 	                                            &data->ucd_ucmem,
 	                                            total_pages);
@@ -1323,22 +1323,23 @@ err_badalloc:
 
 
 
-/* Ensure that `MPART_ST_INCORE(self->mp_state) && LIST_EMPTY(&self->mp_copy)'
+/* Ensure that `LIST_EMPTY(&self->mp_copy)'
+ * NOTE: The caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
+ *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
  *       the list is still allowed to contain dead nodes that are about to,
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that no alive copy-nodes still exist! */
 PUBLIC NONNULL((1, 3)) bool FCALL
-mpart_setcore_and_unsharecow_or_unlock(struct mpart *__restrict self,
-                                       struct mpart_unlockinfo *unlock,
-                                       struct mpart_unsharecow_data *__restrict data) {
+mpart_unsharecow_or_unlock(struct mpart *__restrict self,
+                           struct mpart_unlockinfo *unlock,
+                           struct mpart_unsharecow_data *__restrict data) {
 	struct mpart *copy;
 	struct mnode *node;
 	size_t block_count;
 	struct unsharecow_bounds bounds;
-	if (!mpart_setcore_or_unlock(self, unlock, &data->ucd_scmem))
-		goto nope_setcore;
+	assert(MPART_ST_INCORE(self->mp_state));
 
 	/* Quick check: If there aren't any copy-on-write mappings, then
 	 *              we don't actually need to do anything else! */
@@ -1365,11 +1366,11 @@ mpart_setcore_and_unsharecow_or_unlock(struct mpart *__restrict self,
 			goto nope_decref_mmans;
 
 		/* Allocate the block-extension bitset. */
-		if (!unsharecow_makeblkext_or_unlock(self, unlock, data, &bounds))
+		if (!unsharecow_makeblkext_or_unlock(self, unlock, data, bounds.ucb_mapsize))
 			goto nope_decref_mmans;
 
 		/* Allocate low-level ram data. */
-		if (!unsharecow_makememdat_or_unlock(self, unlock, data, &bounds))
+		if (!unsharecow_makememdat_or_unlock(self, unlock, data, bounds.ucb_mapsize))
 			goto nope_decref_mmans;
 
 		/* (almost) lastly, acquire references & locks to all of the memory-managers
@@ -1460,7 +1461,7 @@ free_unused_block_status:
 		assert((kmalloc_usable_size(data->ucd_ucmem.scd_bitset) *
 		        BITSET_ITEMS_PER_WORD) >= block_count);
 		assert(block_count <= mpart_getblockcount(self, self->mp_file));
-		/* Copy over block-status bitset data-> */
+		/* Copy over block-status bitset data. */
 		copy->mp_blkst_ptr = (bitset_word_t *)memcpy(data->ucd_ucmem.scd_bitset,
 		                                             self->mp_blkst_ptr,
 		                                             block_count / BITSET_ITEMS_PER_WORD,
@@ -1479,14 +1480,14 @@ free_unused_block_status:
 	           MAX_C(sizeof(struct mchunk),
 	                 sizeof(struct mchunkvec)));
 
-	/* For now, we don't copy mem-part meta-data-> */
+	/* For now, we don't copy mem-part meta-data. */
 	copy->mp_meta = NULL;
 
 	/* With that, the new mem-part has been initialized, however we must
 	 * still copy over the contents of the old part into the new one! */
 	mpart_copyram(copy, self,
 	              bounds.ucb_mapmin,
-	              bounds.ucb_mapsize);
+	              bounds.ucb_mapsize / PAGESIZE);
 
 	/* Tell all of the pre-existing nodes about the new backing part!
 	 * We do this only now, so-as to ensure that we directly jump from
@@ -1523,8 +1524,8 @@ free_unused_block_status:
 			if (ADDR_ISUSER(addr))
 				prot |= PAGEDIR_MAP_FUSER; /* XXX: Maybe get rid of this eventually? */
 
-			mpart_mmap_p(copy, mm->mm_pdir_phys,
-			             addr, size, node->mn_partoff, prot);
+			mpart_mmap_p(copy, mm->mm_pdir_phys, addr,
+			             size, node->mn_partoff, prot);
 
 			/* Unlink the node from the writable-chain. */
 			if (LIST_ISBOUND(node, mn_writable))
@@ -1543,6 +1544,10 @@ free_unused_block_status:
 			node = LIST_FIRST(&copy->mp_copy);
 			if (node->mn_flags & MNODE_F_PWRITE)
 				LIST_INSERT_HEAD(&node->mn_mman->mm_writable, node, mn_writable);
+			/* With there being only a single node, there is a chance
+			 * that we might be able to merge this node with one of
+			 * its neighbors... (so try to do this) */
+			mnode_merge(node);
 		}
 	}
 
@@ -1573,9 +1578,6 @@ done:
 nope_decref_mmans:
 	unsharecow_decref_mmans(self);
 nope:
-	mpart_setcore_data_init(&data->ucd_scmem);
-nope_setcore:
-	mpart_deadnodes_reap(self);
 	return false;
 }
 
@@ -1719,17 +1721,17 @@ again:
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct mpart_unsharecow_data data;
+	struct mpart_unsharecow_data uc_data;
 	mpart_lock_acquire_and_setcore(self);
 	/* Quick check: is the part already in the expected state? */
-	if (MPART_ST_INCORE(self->mp_state))
+	if (LIST_EMPTY(&self->mp_copy))
 		return; /* Already done! */
-	mpart_unsharecow_data_init(&data);
+	mpart_unsharecow_data_init(&uc_data);
 	TRY {
-		while (!mpart_setcore_and_unsharecow_or_unlock(self, NULL, &data))
-			mpart_lock_acquire(self);
+		while (!mpart_unsharecow_or_unlock(self, NULL, &uc_data))
+			mpart_lock_acquire_and_setcore(self);
 	} EXCEPT {
-		mpart_unsharecow_data_fini(&data);
+		mpart_unsharecow_data_fini(&uc_data);
 		mpart_deadnodes_reap(self);
 		RETHROW();
 	}

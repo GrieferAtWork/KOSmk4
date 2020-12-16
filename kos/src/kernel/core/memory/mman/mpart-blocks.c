@@ -60,7 +60,7 @@ DECL_BEGIN
  * @return: MPART_MEMADDR_NOT_LOADED: Error: At least one accessed block has a state that
  *                                           is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT'
  * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-PUBLIC NONNULL((1)) unsigned int
+PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
                                       mpart_reladdr_t partrel_offset, size_t num_bytes,
                                       struct mpart_physloc *__restrict result) {
@@ -120,7 +120,7 @@ err_bad_bounds:
  *                                           of the 0-2 border blocks has a state that is one
  *                                           of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF'
  * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-PUBLIC NONNULL((1)) unsigned int
+PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
                                        mpart_reladdr_t partrel_offset, size_t num_bytes,
                                        struct mpart_physloc *__restrict result) {
@@ -208,7 +208,7 @@ err_bad_bounds:
  *
  * @return: * : The # of successfully committed bytes.
  *              Usually the same as `num_bytes', but see above */
-PUBLIC NONNULL((1)) size_t
+PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
                                               mpart_reladdr_t partrel_offset,
                                               size_t num_bytes) {
@@ -408,7 +408,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
  * NOTE: This function may also assume that at least the first byte (that
  *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */
-PUBLIC NONNULL((1)) void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
                                     mpart_reladdr_t partrel_offset,
                                     struct mpart_physloc *__restrict result) {
@@ -431,6 +431,59 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 		}
 		result->mppl_addr = physpage2addr(self->mp_mem_sc.ms_v[i].mc_start) + partrel_offset;
 		result->mppl_size = chunk_size - partrel_offset;
+	}
+}
+
+
+
+/* Mark all blocks that overlap with the given address range as CHNG.
+ * For this purpose, the caller must ensure that:
+ * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
+ * If any of the blocks within the given range had yet to be marked as CHNG,
+ * and the associated file is not anonymous, and implements the `mo_saveblocks'
+ * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
+ * then set the `MPART_F_CHANGED' flag and add `self' to the list of changed
+ * parts of its associated file.
+ * NOTE: The caller must be holding a lock to `self' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
+                             mpart_reladdr_t partrel_offset,
+                             size_t num_bytes) {
+	size_t i, blocks_start, blocks_end;
+	unsigned int shift;
+	struct mfile *file;
+	bool did_change;
+	assert(mpart_lock_acquired(self));
+	assert(partrel_offset + num_bytes >= partrel_offset);
+	assert(partrel_offset + num_bytes <= mpart_getsize(self));
+	if (!mpart_hasblockstate(self))
+		return; /* All parts are already set to CHNG */
+	file         = self->mp_file;
+	shift        = file->mf_blockshift;
+	blocks_start = partrel_offset >> shift;
+	blocks_end   = ((partrel_offset + num_bytes - 1) >> shift) + 1;
+	did_change   = false;
+	for (i = blocks_start; i < blocks_end; ++i) {
+		unsigned int st;
+		st = mpart_getblockstate(self, i);
+		if (st != MPART_BLOCK_ST_CHNG) {
+			mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
+			did_change = true;
+		}
+	}
+
+	/* If we did manage to set at least 1 block to changed that
+	 * wasn't set as such before, then we must mark this mem-part
+	 * as having changed, and possibly add it to the associated
+	 * file's list of changed parts. */
+	if (did_change && file->mf_ops->mo_saveblocks != NULL &&
+	    !mfile_isanon(file) && (self->mp_flags & MPART_F_CHANGED) == 0) {
+
+		/* Mark the part as changed. */
+		ATOMIC_OR(self->mp_flags, MPART_F_CHANGED);
+
+		/* Add the part to its file's changed-list. */
+		SLIST_ATOMIC_INSERT(&file->mf_changed, self, mp_changed);
 	}
 }
 

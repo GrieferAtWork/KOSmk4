@@ -22,12 +22,11 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
-#include <hybrid/sequence/list.h>
-#include <hybrid/sequence/rbtree.h>
+#include <hybrid/sequence/list.h>   /* LIST_HEAD, SLIST_HEAD, ... */
+#include <hybrid/sequence/rbtree.h> /* RBTREE_ROOT */
 #include <hybrid/sync/atomic-lock.h>
 
 #ifdef __CC__
@@ -48,13 +47,6 @@ LIST_HEAD(mnode_list, mnode);
 LIST_HEAD(task_list, WEAK task);
 #endif /* !__task_list_defined */
 
-struct mdeadram {
-	SLIST_ENTRY(PAGEDIR_PAGEALIGNED mdeadram) mdr_link; /* [lock(ATOMIC)] Next dead-ram area. */
-	PAGEDIR_PAGEALIGNED size_t                mdr_size; /* Total size (in bytes) of the dead-ram area.
-	                                                     * This counts from the start of this structure. */
-};
-SLIST_HEAD(mdeadram_slist, mdeadram);
-
 struct mman {
 #ifndef __MMAN_INTERNAL_EXCLUDE_PAGEDIR
 	pagedir_t                      mm_pagedir;     /* [lock(mm_lock)] The page directory associated with the mman. */
@@ -70,24 +62,21 @@ struct mman {
 #ifndef CONFIG_NO_SMP
 	struct atomic_lock             mm_threadslock; /* SMP-lock for `mm_threads' */
 #endif /* !CONFIG_NO_SMP */
-	union {
-		struct mnode               mm_kernreserve; /* A special RESERVED-like node that is used by user-space mmans
-		                                            * to cover the entire kernel-space, preventing user-space from
-		                                            * accidentally overwriting it, without the need of adding too
-		                                            * many special-case exceptions to various mman-related functions.
-		                                            * NOTE: For the kernel-mman itself, this node is unused. */
-		struct {
-			byte_t _mm_pad[__builtin_offsetof(struct mnode, mn_fspath)];
-			struct mdeadram_slist  mm_deadram;     /* Only used by the kernel mman: Linked chain of dead-ram sections
-			                                        * for which an attempt at unmapping should be made whenever the
-			                                        * lock for this mman is released.
-			                                        * This list is situated such that for user-space mmans, it always
-			                                        * appears as an empty list, meaning that the clear-dead-ram check
-			                                        * can simply be performed for every mman, and will simply be a
-			                                        * no-op when done for anything but the kernel mman. */
-		};
-	};
 };
+
+#ifndef FORMMAN
+#if defined(__INTELLISENSE__) && defined(__cplusplus)
+extern "C++" {
+#define FORMMAN FORMMAN
+template<class __T> __T &(FORMMAN)(struct mman *__restrict self, __T &symbol);
+template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T const &symbol);
+} /* extern "C++" */
+#else /* __INTELLISENSE__ && __cplusplus */
+#define FORMMAN(self, symbol) (*(__typeof__(&(symbol)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(symbol)))
+#endif /* !__INTELLISENSE__ || !__cplusplus */
+#endif /* !FORMMAN */
+
+
 
 /* The kernel's own memory manager. */
 DATDEF struct mman mman_kernel;
@@ -103,9 +92,10 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_destroy)(struct mman *__rest
 DEFINE_REFCOUNT_FUNCTIONS(struct mman, mm_refcnt, mman_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mman, mm_weakrefcnt, mman_free)
 
-/* Memory manager construction functions. */
+/* Memory manager construction functions.
+ * NOTE: mman_fork() will fork the current mman. */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_new(void) THROWS(E_BADALLOC, ...);
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_fork(struct mman *__restrict self) THROWS(E_BADALLOC, ...);
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_fork(void) THROWS(E_BADALLOC, ...);
 
 /* Set the mman active within the calling thread, as well as
  * change page directories to make use of the new mman before
@@ -117,21 +107,45 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 
+struct mdeadram {
+	SLIST_ENTRY(PAGEDIR_PAGEALIGNED mdeadram) mdr_link; /* [lock(ATOMIC)] Next dead-ram area. */
+	PAGEDIR_PAGEALIGNED size_t                mdr_size; /* Total size (in bytes) of the dead-ram area.
+	                                                     * This counts from the start of this structure. */
+};
+
+SLIST_HEAD(mdeadram_slist, mdeadram);
+
+
+/* Only used by the kernel mman: Linked chain of dead-ram sections
+ * for which an attempt at unmapping should be made whenever the
+ * lock for this mman is released.
+ * This list is situated such that for user-space mmans, it always
+ * appears as an empty list, meaning that the clear-dead-ram check
+ * can simply be performed for every mman, and will simply be a
+ * no-op when done for anything but the kernel mman. */
+DATDEF ATTR_PERMMAN struct mdeadram_slist thismman_deadram;
+
+/* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_deadram)' */
+DATDEF struct mdeadram_slist mman_kernel_deadram;
+
+
+
 /* Reap dead ram regions of `self' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mman_reap)(struct mman *__restrict self);
-#define mman_mustreap(self) \
-	(__hybrid_atomic_load((self)->mm_deadram.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mman_deadram_reap)(struct mman *__restrict self);
+#define mman_deadram_mustreap(self) \
+	(__hybrid_atomic_load(FORMMAN(self, thismman_deadram.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define mman_reap(self) _mman_reap(self)
+#define mman_deadram_reap(self) _mman_deadram_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
-#define mman_reap(self) (void)(!mman_mustreap(self) || (_mman_reap(self), 0))
+#define mman_deadram_reap(self) (void)(!mman_deadram_mustreap(self) || (_mman_deadram_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
+
 
 /* Lock accessor helpers for `struct mman' */
 #define mman_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->mm_lock)
 #define mman_lock_acquire(self)    atomic_lock_acquire(&(self)->mm_lock)
 #define mman_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->mm_lock)
-#define mman_lock_release(self)    (atomic_lock_release(&(self)->mm_lock), mman_reap(self))
+#define mman_lock_release(self)    (atomic_lock_release(&(self)->mm_lock), mman_deadram_reap(self))
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
 __DEFINE_SYNC_MUTEX(struct mman,

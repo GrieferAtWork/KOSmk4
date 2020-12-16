@@ -172,8 +172,14 @@
 #define FREESTR(s) XBLOCK({ PRIVATE ATTR_FREERODATA ATTR_ALIGNED(1) char const _free_str[] = s; XRETURN _free_str; })
 
 #define ATTR_PERCPU      ATTR_SECTION(".data.percpu")  /* Per-cpu template data. */
-#define ATTR_PERVM       ATTR_SECTION(".data.pervm")   /* Per-virtual-memory template data. */
 #define ATTR_PERTASK     ATTR_SECTION(".data.pertask") /* Per-task template data. */
+#ifdef CONFIG_USE_NEW_VM
+#define ATTR_PERVM       ATTR_SECTION(".data.permman") /* Per-memory-manager template data. */
+#define ATTR_PERMMAN     ATTR_SECTION(".data.permman") /* Per-memory-manager template data. */
+#else /* CONFIG_USE_NEW_VM */
+#define ATTR_PERVM       ATTR_SECTION(".data.pervm")   /* Per-vm template data. */
+#define ATTR_PERMMAN     ATTR_SECTION(".data.pervm")   /* Per-vm template data. */
+#endif /* !CONFIG_USE_NEW_VM */
 
 
 

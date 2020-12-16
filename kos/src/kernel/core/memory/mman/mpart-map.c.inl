@@ -43,6 +43,202 @@ DECL_BEGIN
 #endif /* !vector_getblockstatus */
 
 
+#ifdef DEFINE_mpart_mmap_p
+PRIVATE NOBLOCK void
+NOTHROW(FCALL mpart_mmap_p_impl)(bitset_word_t const *bitset, unsigned int shift,
+                                 physaddr_t baseaddr, PAGEDIR_PAGEALIGNED void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t chunk_size,
+                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t baseaddr_offset,
+                                 u16 perm, pagedir_phys_t pdir)
+#define LOCAL_mpart_mmap_p_impl(bitset, shift, baseaddr, addr, chunk_size, baseaddr_offset, perm) \
+	mpart_mmap_p_impl(bitset, shift, baseaddr, addr, chunk_size, baseaddr_offset, perm, pdir)
+#define LOCAL_pagedir_map(addr, num_bytes, phys, perm) \
+	pagedir_map_p(pdir, addr, num_bytes, phys, perm)
+#elif defined(DEFINE_mpart_mmap)
+/* Same as `mpart_mmap_p()', but always map into the current page directory. */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL mpart_mmap_impl)(bitset_word_t const *bitset, unsigned int shift,
+                               physaddr_t baseaddr, PAGEDIR_PAGEALIGNED void *addr,
+                               PAGEDIR_PAGEALIGNED size_t chunk_size,
+                               PAGEDIR_PAGEALIGNED mpart_reladdr_t baseaddr_offset,
+                               u16 perm)
+#define LOCAL_mpart_mmap_p_impl mpart_mmap_impl
+#define LOCAL_pagedir_map       pagedir_map
+#else /* ... */
+#error "Bad configuration"
+#endif /* !... */
+{
+	size_t i;
+#define getstate(i) vector_getblockstatus(bitset, i)
+#define getstate_smallpages(start_block_index, blocks_per_page, result) \
+	do {                                                                \
+		size_t _i;                                                      \
+		(result) = getstate(start_block_index);                         \
+		for (_i = 1; _i < (blocks_per_page); ++_i) {                    \
+			unsigned int _temp = getstate((start_block_index) + _i);    \
+			(result)           = MPART_BLOCK_COMMON(result, _temp);     \
+		}                                                               \
+	}	__WHILE0
+	if (bitset == NULL) {
+		/* All blocks are implicitly marked CHNG, so we can map with full permissions! */
+		LOCAL_pagedir_map(addr, chunk_size, baseaddr + baseaddr_offset, perm);
+	} else {
+		size_t page_start, page_end;
+		page_start = baseaddr_offset >> PAGESHIFT;
+		page_end   = (baseaddr_offset + chunk_size) >> PAGESHIFT;
+#ifndef __OPTIMIZE_SIZE__
+		if likely(shift == PAGESHIFT) {
+			for (i = page_start; i < page_end;) {
+				unsigned int st = getstate(i);
+				if (st == MPART_BLOCK_ST_LOAD) {
+					size_t addr_offset, endpage;
+do_load_whole_pages_readonly:
+					endpage = i + 1;
+					while (endpage < page_end) {
+						st = getstate(endpage);
+						if (st == MPART_BLOCK_ST_LOAD) {
+							++endpage;
+						} else if (st == MPART_BLOCK_ST_CHNG &&
+						           !(perm & PAGEDIR_MAP_FWRITE)) {
+							++endpage;
+						} else {
+							break;
+						}
+					}
+					/* Load as continuous, read-only memory. */
+					addr_offset = i * PAGESIZE;
+					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
+					                  (endpage - i) * PAGESIZE,
+					                  baseaddr + addr_offset,
+					                  perm & ~PAGEDIR_MAP_FWRITE);
+				} else if (st == MPART_BLOCK_ST_CHNG) {
+					size_t addr_offset, endpage;
+					if (!(perm & PAGEDIR_MAP_FWRITE))
+						goto do_load_whole_pages_readonly;
+					endpage = i + 1;
+					while (endpage < page_end &&
+					       getstate(endpage) == MPART_BLOCK_ST_CHNG)
+						++endpage;
+					/* Load as continuous, read/write memory. */
+					addr_offset = i * PAGESIZE;
+					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
+					                  (endpage - i) * PAGESIZE,
+					                  baseaddr + addr_offset, perm);
+				} else {
+					++i;
+				}
+			}
+		} else
+#endif /* !__OPTIMIZE_SIZE__ */
+		if (shift < PAGESHIFT) {
+			/* Blocks are smaller than a single page */
+			size_t blocks_per_page;
+			unsigned int page_to_block_shift;
+			page_to_block_shift = PAGESHIFT - shift;
+			blocks_per_page     = (size_t)1 << page_to_block_shift;
+			assert(blocks_per_page >= 2);
+			for (i = page_start; i < page_end;) {
+				unsigned int st;
+				getstate_smallpages(i << page_to_block_shift,
+				                    blocks_per_page, st);
+				if (st == MPART_BLOCK_ST_LOAD) {
+					size_t addr_offset, endpage;
+do_load_small_pages_readonly:
+					endpage = i + 1;
+					while (endpage < page_end) {
+						getstate_smallpages(endpage << page_to_block_shift,
+						                    blocks_per_page, st);
+						if (st == MPART_BLOCK_ST_LOAD) {
+							++endpage;
+						} else if (st == MPART_BLOCK_ST_CHNG &&
+						           !(perm & PAGEDIR_MAP_FWRITE)) {
+							++endpage;
+						} else {
+							break;
+						}
+					}
+					/* Load as continuous, read-only memory. */
+					addr_offset = i * PAGESIZE;
+					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
+					                  (endpage - i) * PAGESIZE,
+					                  baseaddr + addr_offset,
+					                  perm & ~PAGEDIR_MAP_FWRITE);
+				} else if (st == MPART_BLOCK_ST_CHNG) {
+					size_t addr_offset, endpage;
+					if (!(perm & PAGEDIR_MAP_FWRITE))
+						goto do_load_small_pages_readonly;
+					endpage = i + 1;
+					while (endpage < page_end) {
+						getstate_smallpages(endpage << page_to_block_shift,
+						                    blocks_per_page, st);
+						if (st != MPART_BLOCK_ST_CHNG)
+							break;
+						++endpage;
+					}
+					/* Load as continuous, read/write memory. */
+					addr_offset = i * PAGESIZE;
+					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
+					                  (endpage - i) * PAGESIZE,
+					                  baseaddr + addr_offset, perm);
+				} else {
+					++i;
+				}
+			}
+		} else {
+			/* Large pages */
+			unsigned int block_to_page_shift;
+#ifdef __OPTIMIZE_SIZE__
+			assert(shift >= PAGESHIFT);
+#else  /* __OPTIMIZE_SIZE__ */
+			assert(shift > PAGESHIFT);
+#endif /* !__OPTIMIZE_SIZE__ */
+			block_to_page_shift = PAGESHIFT - shift;
+			for (i = page_start; i < page_end;) {
+				unsigned int st = getstate(i >> block_to_page_shift);
+				if (st == MPART_BLOCK_ST_LOAD) {
+					size_t addr_offset, endpage;
+do_load_large_pages_readonly:
+					endpage = i + 1;
+					while (endpage < page_end) {
+						st = getstate(endpage >> block_to_page_shift);
+						if (st == MPART_BLOCK_ST_LOAD) {
+							++endpage;
+						} else if (st == MPART_BLOCK_ST_CHNG &&
+						           !(perm & PAGEDIR_MAP_FWRITE)) {
+							++endpage;
+						} else {
+							break;
+						}
+					}
+					/* Load as continuous, read-only memory. */
+					addr_offset = i * PAGESIZE;
+					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
+					                  (endpage - i) * PAGESIZE,
+					                  baseaddr + addr_offset,
+					                  perm & ~PAGEDIR_MAP_FWRITE);
+				} else if (st == MPART_BLOCK_ST_CHNG) {
+					size_t addr_offset, endpage;
+					if (!(perm & PAGEDIR_MAP_FWRITE))
+						goto do_load_large_pages_readonly;
+					endpage = i + 1;
+					while (endpage < page_end &&
+					       getstate(endpage >> block_to_page_shift) == MPART_BLOCK_ST_CHNG)
+						++endpage;
+					/* Load as continuous, read/write memory. */
+					addr_offset = i * PAGESIZE;
+					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
+					                  (endpage - i) * PAGESIZE,
+					                  baseaddr + addr_offset, perm);
+				} else {
+					++i;
+				}
+			}
+		}
+	}
+#undef getstate_smallpages
+#undef getstate
+}
+
 /* (Re-)map the given mem-part into a page directory.
  * The caller must ensure:
  *   - mpart_lock_acquired(self)
@@ -61,8 +257,6 @@ NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
                             PAGEDIR_PAGEALIGNED size_t size,
                             PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                             u16 perm)
-#define LOCAL_pagedir_map(addr, num_bytes, phys, perm) pagedir_map_p(pdir, addr, num_bytes, phys, perm)
-#define LOCAL_pagedir_unmap(addr, num_bytes)           pagedir_unmap_p(pdir, addr, num_bytes)
 #elif defined(DEFINE_mpart_mmap)
 
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
@@ -72,63 +266,80 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
                           PAGEDIR_PAGEALIGNED size_t size,
                           PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                           u16 perm)
-#define LOCAL_pagedir_map(addr, num_bytes, phys, perm) pagedir_map(addr, num_bytes, phys, perm)
-#define LOCAL_pagedir_unmap(addr, num_bytes)           pagedir_unmap(addr, num_bytes)
 #else /* ... */
 #error "Bad configuration"
 #endif /* !... */
 {
-	size_t i, block_size;
 	unsigned int shift;
 	bitset_word_t const *bitset;
 	assert(mpart_lock_acquired(self));
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
 	assert(IS_ALIGNED(size, PAGESIZE));
 	assert(IS_ALIGNED(offset, PAGESIZE));
+	assert((offset + size) >= offset);
 	assert((offset + size) <= mpart_getsize(self));
-	shift      = self->mp_file->mf_blockshift;
-	block_size = (size_t)1 << shift;
-	bitset     = self->mp_blkst_ptr;
+	shift  = self->mp_file->mf_blockshift;
+	bitset = self->mp_blkst_ptr;
 	if (self->mp_flags & MPART_F_BLKST_INL)
 		bitset = &self->mp_blkst_inl;
-#define getstate(i) vector_getblockstatus(bitset, i)
+	__builtin_assume(&self->mp_blkst_inl != NULL);
 	switch (__builtin_expect(self->mp_state, MPART_ST_MEM)) {
 
-	case MPART_ST_MEM:
+	case MPART_ST_MEM: {
 		/* Simplest case: we can just directly map the proper sub-range! */
-		if (bitset == NULL) {
-			/* All blocks are implicitly marked CHNG, so we can map with full permissions! */
-			LOCAL_pagedir_map(addr, size,
-			                  physpage2addr(self->mp_mem.mc_start) + offset,
-			                  perm);
-		} else
-#ifndef __OPTIMIZE_SIZE__
-		if (shift == PAGESHIFT) {
-			/* Simple case: 1 page == 1 block */
-			/* TODO */
-		} else
-#endif /* !__OPTIMIZE_SIZE__ */
-		{
-			/* TODO */
-		}
-		break;
+		physaddr_t baseaddr;
+		baseaddr = physpage2addr(self->mp_mem.mc_start);
+		LOCAL_mpart_mmap_p_impl(bitset, shift, baseaddr,
+		                        addr, size, offset, perm);
+	}	break;
 
-	case MPART_ST_MEM_SC:
-		/* TODO */
-		break;
+	case MPART_ST_MEM_SC: {
+		mpart_reladdr_t chunk_start;
+		mpart_reladdr_t end_offset;
+		size_t i;
+		if unlikely(!size)
+			break;
+		chunk_start = 0;
+		end_offset  = offset + size;
+		for (i = 0;; ++i) {
+			physaddr_t baseaddr;
+			mpart_reladdr_t chunk_end;
+			size_t chunk_size;
+			assert(i < self->mp_mem_sc.ms_c);
+			chunk_size = self->mp_mem_sc.ms_v[i].mc_size * PAGESIZE;
+			chunk_end  = chunk_start + chunk_size;
+			if (chunk_end < offset) {
+				/* Not interested in this chunk! */
+			} else {
+				/* Limit how much of this chunk will actually be mapped. */
+				if (chunk_end > end_offset)
+					chunk_size = end_offset - chunk_start;
+				assert(chunk_start < end_offset);
+				baseaddr = physpage2addr(self->mp_mem_sc.ms_v[i].mc_start);
+				/* Map the requested sub-range in relation to this chunk.
+				 * NOTE: We must subtract `chunk_start' form the chunk's
+				 *       base-address, since `LOCAL_mpart_mmap_p_impl'
+				 *       assumes that the memory it's mapping is actually
+				 *       linear, which we fake by only mapping the portion
+				 *       that should actually be mapped. */
+				LOCAL_mpart_mmap_p_impl(bitset, shift, baseaddr - chunk_start,
+				                        addr, chunk_size, offset, perm);
+				if (chunk_end >= end_offset)
+					break;
+			}
+			chunk_start = chunk_end;
+		}
+	}	break;
+
+	/* Other part-types can't be mapped into memory... */
 
 	default:
-		/* Default case: Cannot map anything specific, so just
-		 * unmap, thus causing a #PF that will do all the correct
-		 * handling of the mapping upon memory being accessed. */
-		LOCAL_pagedir_unmap(addr, size);
 		break;
 	}
-#undef getstate
 }
 
+#undef LOCAL_mpart_mmap_p_impl
 #undef LOCAL_pagedir_map
-#undef LOCAL_pagedir_unmap
 
 DECL_END
 

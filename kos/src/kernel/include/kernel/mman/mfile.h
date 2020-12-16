@@ -320,7 +320,7 @@ struct mfile_map {
 	                                       *  - Each node is holding a lock to its `mn_part' field.
 	                                       * The following fields are uninitialized:
 	                                       *  - mn_flags, mn_mement, mn_mman, mn_link, mn_writable
-	                                       *  - _mn_unmapped, mn_fspath, mn_fsname */
+	                                       *  - mn_fspath, mn_fsname */
 };
 
 /* Lookup/create and lock all parts to span the given address range,
@@ -350,7 +350,7 @@ mfile_map_init(struct mfile_map *__restrict self,
  * holes anywhere along the way, while the the act of holding locks to all of
  * the parts then guaranties that no new holes can possibly pop up out of the
  * blue. */
-FUNDEF NONNULL((1)) void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_unlock)(struct mfile_map *__restrict self);
 FUNDEF NONNULL((1)) void FCALL
 mfile_map_relock(struct mfile_map *__restrict self)

@@ -108,7 +108,6 @@ again_getpart:
 	node->mn_partoff = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
 	DBG_memset(&node->mn_link, 0xcc, sizeof(node->mn_link));
 	DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
-	DBG_memset(&node->_mn_unmapped, 0xcc, sizeof(node->_mn_unmapped));
 	DBG_memset(&node->mn_fspath, 0xcc, sizeof(node->mn_fspath));
 	DBG_memset(&node->mn_fsname, 0xcc, sizeof(node->mn_fsname));
 	/* Check if `part' already contains the whole mapping needed by `node' */
@@ -135,7 +134,7 @@ again_getpart:
  * holes anywhere along the way, while the the act of holding locks to all of
  * the parts then guaranties that no new holes can possibly pop up out of the
  * blue. */
-PUBLIC NONNULL((1)) void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_unlock)(struct mfile_map *__restrict self) {
 	struct mnode *node;
 	SLIST_FOREACH (node, &self->mfm_nodes, _mn_alloc) {

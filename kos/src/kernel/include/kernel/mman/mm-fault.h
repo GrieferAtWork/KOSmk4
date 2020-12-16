@@ -155,7 +155,7 @@ struct mfault {
 	 * >>         // Accessed mfl_node is the only copy-on-write mfl_node in existance
 	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
 	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));
-	 * >>         mpart_lock_acquire_and_setcore_loadall(mfl_part);
+	 * >>         mpart_lock_acquire_and_setcore_loadsome(mfl_part, partrel_addr, mfl_size);
 	 * >>     } else {
 	 * >>         // XXX: This part I've not fully thought through; There may be design flaws...
 	 * >>         //
@@ -178,28 +178,39 @@ struct mfault {
 
 	/* NOTE: All of the [out] fields below are only modified when `mfault_or_unlock()'
 	 *       returns while indicating success! */
-	struct mnode                       *mfl_node; /* [1..1][in|out] The node being accessed. Depending
-	                                               * on how the access is made, this node may be altered */
-	struct mman                        *mfl_mman; /* [1..1][const][== mfl_node->mn_mman] */
-	struct mpart                       *mfl_part; /* [1..1][in|out][== mfl_node->mn_part] The locked part (on success). */
-	PAGEDIR_PAGEALIGNED void           *mfl_addr; /* [const] address where faulting starts */
-	PAGEDIR_PAGEALIGNED size_t          mfl_size; /* [in|out][!0] The # of bytes that should be/were faulted. */
-	PAGEDIR_PAGEALIGNED mpart_reladdr_t mfl_offs; /* [out] Mapping offset into `mfl_part'. */
+	struct mman                        *mfl_mman;  /* [1..1][const][== mfl_node->mn_mman] */
+	PAGEDIR_PAGEALIGNED void           *mfl_addr;  /* [const] address where faulting starts */
+	PAGEDIR_PAGEALIGNED size_t          mfl_size;  /* [in|out][!0] The # of bytes that should be/were faulted. */
+	unsigned int                        mfl_flags; /* [const] Access flags (set of `MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE') */
+	struct mnode                       *mfl_node;  /* [1..1][in|out] The node being accessed. Depending
+	                                                * on how the access is made, this node may be altered */
+	struct mpart                       *mfl_part;  /* [1..1][in|out][== mfl_node->mn_part] The locked part (on success). */
+	PAGEDIR_PAGEALIGNED mpart_reladdr_t mfl_offs;  /* [out] Mapping offset into `mfl_part'. */
 
 	/* All of the below fields should not be touched, and are [in|out],
 	 * though may also be modified when `mfault_or_unlock()' returns `false'
 	 * Leave them alone. - They're needed to make `mfault_or_unlock()'
 	 * fully re-entrant following a lock re-acquisition. */
-	struct mpart_unsharecow_data        mfl_ucdat; /* Load-data for unshare, and setcore. */
+	struct mpart_unlockinfo             mfl_unlck;    /* Unlock controller. */
+	struct mpart_setcore_data           mfl_scdat;    /* Load-data for setcore. */
+	struct mpart_unsharecow_data        mfl_ucdat;    /* Load-data for unshare. */
+	struct mnode                       *mfl_pcopy[2]; /* [0..1][*] Up to 2 additional mem-nodes used for private unsharing. */
 };
 
-#define mfault_init(self, mm, addr, size) \
-	((self)->mfl_mman = (mm),             \
-	 (self)->mfl_addr = (addr),           \
-	 (self)->mfl_size = (size),           \
-	 mpart_unsharecow_data_init(&(self)->mfl_ucdat))
-#define mfault_fini(self) \
-	mpart_unsharecow_data_fini(&(self)->mfl_ucdat)
+#define mfault_init(self, mm, addr, size, flags)           \
+	(void)((self)->mfl_mman  = (mm),                       \
+	       (self)->mfl_addr  = (addr),                     \
+	       (self)->mfl_size  = (size),                     \
+	       (self)->mfl_flags = (flags),                    \
+	       mpart_setcore_data_init(&(self)->mfl_scdat),    \
+	       mpart_unsharecow_data_init(&(self)->mfl_ucdat), \
+	       (self)->mfl_pcopy[0] = __NULLPTR)
+#define mfault_fini(self)                                 \
+	(mpart_setcore_data_fini(&(self)->mfl_scdat),         \
+	 mpart_unsharecow_data_fini(&(self)->mfl_ucdat),      \
+	 (self)->mfl_pcopy[0] ? (kfree((self)->mfl_pcopy[0]), \
+	                         kfree((self)->mfl_pcopy[1])) \
+	                      : (void)0)
 
 
 
@@ -212,14 +223,15 @@ struct mfault {
  * >> void pf_handler(void *addr, bool is_write) {
  * >>     struct mfault mf;
  * >>     mfault_init(&mf, ADDR_ISKERN(addr) ? &mman_kernel : THIS_MMAN,
- * >>                 FLOOR_ALIGN(addr, PAGESIZE), PAGESIZE);
+ * >>                 FLOOR_ALIGN(addr, PAGESIZE), PAGESIZE,
+ * >>                 is_write ? MMAN_FAULT_F_WRITE : 0);
  * >>     TRY {
  * >> again:
  * >>         mman_lock_acquire(mf.mfl_mman);
- * >>         mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings);
- * >>         mf.mfl_part = mf.mfl_node->mn_part;
+ * >>         mf.mfl_node  = mnode_tree_locate(mf.mfl_mman->mm_mappings);
+ * >>         mf.mfl_part  = mf.mfl_node->mn_part;
  * >>         // Missing: NULL- and safety-checks; VIO support
- * >>         if (!mfault_or_unlock(&mf, is_write ? MMAN_FAULT_F_WRITE : 0))
+ * >>         if (!mfault_or_unlock(&mf))
  * >>             goto again;
  * >>     } EXCEPT {
  * >>         mfault_fini(&mf);
@@ -231,6 +243,8 @@ struct mfault {
  * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
+ * >>     if (is_write && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+ * >>         LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
  * >>     mman_lock_release(mf.mfl_mman);
  * >>     // NOTE: Don't call `mfault_fini(&mf)' here!
  * >>     //       Internal data of `mf' is left in an undefined state
@@ -240,24 +254,21 @@ struct mfault {
  * Locking logic:
  *   - return == true:   mpart_lock_acquire(self->mfl_part);
  *                       undefined(out(INTERNAL_DATA(self)))
- *   - return == false:  mman_lock_release(self->mfl_mman);
+ *   - return == false:  mman_lock_release_f(self->mfl_mman);
  *   - EXCEPT:           mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.
- * @param: flags:  Set of `MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE'
  * @return: true:  Successfully faulted memory.
  * @return: false: The lock to `self->mfl_mman' was lost, but the goal
  *                 of faulting memory has gotten closer, and the caller
  *                 should re-attempt the call after re-acquiring locks.
- * @return: false: `mpart_lock_acquire_and_setcore_loadsome()' would have
- *                 had to be called, but the accessed address range lies
- *                 outside the bounds of the associated mem-part.
+ * @return: false: The accessed address range lies outside the bounds
+ *                 of the associated mem-part.
  *                 Resolve this issue by simply trying again (this
  *                 inconsistency can result from someone else splitting
  *                 the associated mem-part) */
 FUNDEF NONNULL((1)) __BOOL FCALL
-mfault_or_unlock(struct mfault *__restrict self,
-                 unsigned int flags)
+mfault_or_unlock(struct mfault *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 

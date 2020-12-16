@@ -27,6 +27,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/swap.h>
 
 #include <hybrid/align.h>

@@ -926,7 +926,6 @@ relock_with_data:
 				LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
 				if (LIST_ISBOUND(lonode, mn_writable))
 					LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);
-				DBG_memset(&hinode->_mn_unmapped, 0xcc, sizeof(hinode->_mn_unmapped));
 				hinode->mn_fspath = xincref(lonode->mn_fspath);
 				hinode->mn_fsname = xincref(lonode->mn_fsname);
 
