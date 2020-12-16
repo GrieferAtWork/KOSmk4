@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x397fad6a */
+/* HASH CRC-32:0x80887b59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -726,7 +726,7 @@
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 #define SYS_mmap                   __NR_mmap                   /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 #define SYS_alarm                  __NR_alarm                  /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define SYS_getpgrp                __NR_getpgrp                /* pid_t getpgrp(void) */

@@ -201,7 +201,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	VALIDATE_FLAGSET(flags,
 	                 MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
 	                 MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
-	                 MAP_DONT_MAP | MAP_DONT_OVERRIDE,
+	                 MAP_DONT_MAP | MAP_FIXED_NOREPLACE,
 	                 E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS);
 	if (flags & MAP_FIXED) {
 		if unlikely(!hdrc)
@@ -413,7 +413,7 @@ unmap_check_overlap_and_find_new_candidate:
 						FUNC(unmap_range)(v, result, hdrv, i);
 						goto find_new_candidate;
 					}
-					if (!(flags & MAP_DONT_OVERRIDE)) {
+					if (!(flags & MAP_FIXED_NOREPLACE)) {
 						vm_unmap(v,
 						         result + addr,
 						         size,
@@ -421,7 +421,8 @@ unmap_check_overlap_and_find_new_candidate:
 						         VM_UNMAP_NOKERNPART);
 						goto again_map_segments;
 					}
-					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, size);
+					/* TODO: These aren't the correct arguments for this exception! */
+					THROW(E_BADALLOC_ADDRESS_ALREADY_EXISTS, size);
 				}
 			}
 			if (filesize) {

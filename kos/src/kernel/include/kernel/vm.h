@@ -72,6 +72,10 @@
 #define vm_datapart_readv_phys                    mpart_readv_p
 #define vm_datapart_writev_phys                   mpart_writev_p
 #define vm_datapart_split                         mpart_split
+#define vm_datapart_lockwrite_setcore             mpart_lock_acquire_and_setcore
+#define vm_datapart_lockwrite_setcore_unsharecow  mpart_lock_acquire_and_setcore_unsharecow
+#define vm_datapart_lockread_setcore              mpart_lock_acquire_and_setcore
+#define vm_datapart_lockread_setcore_unsharecow   mpart_lock_acquire_and_setcore_unsharecow
 #define vm_datapart_getstate                      mpart_getblockstate
 #define vm_datapart_setstate                      mpart_setblockstate
 #define vm_datapart_isstatewritable               mpart_hasblockstate
@@ -187,6 +191,73 @@
 #define vm_prefault(addr, num_bytes, for_writing) mman_prefault(addr, num_bytes, (for_writing) ? MMAN_FAULT_F_WRITE : MMAN_FAULT_F_NORMAL)
 #define vm_forcefault                             mman_forcefault
 #define vm_forcefault_p                           mman_forcefault
+#define vm_kernel_treelock_writef(flags)          (((flags)&GFP_ATOMIC) ? mman_lock_tryacquire(&mman_kernel) : (mman_lock_acquire(&mman_kernel), 1))
+#define vm_kernel_treelock_writef_nx(flags)       (((flags)&GFP_ATOMIC) ? mman_lock_tryacquire(&mman_kernel) : mman_lock_acquire_nx(&mman_kernel))
+#define vm_kernel_treelock_write()                mman_lock_acquire(&mman_kernel)
+#define vm_kernel_treelock_read()                 mman_lock_acquire(&mman_kernel)
+#define vm_kernel_treelock_trywrite()             mman_lock_tryacquire(&mman_kernel)
+#define vm_kernel_treelock_write_nx()             mman_lock_acquire_nx(&mman_kernel)
+#define vm_kernel_treelock_endwrite()             mman_lock_release(&mman_kernel)
+#define vm_kernel_treelock_tryread()              mman_lock_tryacquire(&mman_kernel)
+#define vm_kernel_treelock_read_nx()              mman_lock_acquire_nx(&mman_kernel)
+#define vm_kernel_treelock_endread()              mman_lock_release(&mman_kernel)
+#define vm_kernel_treelock_end()                  mman_lock_release(&mman_kernel)
+#define vm_kernel_treelock_tryservice()           mman_deadram_reap(&mman_kernel)
+#define vm_treelock_write(self)                   mman_lock_acquire(self)
+#define vm_treelock_write_nx(self)                mman_lock_acquire_nx(self)
+#define vm_treelock_trywrite(self)                mman_lock_tryacquire(self)
+#define vm_treelock_endwrite(self)                mman_lock_release(self)
+#define vm_treelock_read(self)                    mman_lock_acquire(self)
+#define vm_treelock_read_nx(self)                 mman_lock_acquire_nx(self)
+#define vm_treelock_tryread(self)                 mman_lock_tryacquire(self)
+#define vm_treelock_endread(self)                 mman_lock_release(self)
+#define vm_treelock_end(self)                     mman_lock_release(self)
+#define vm_treelock_reading(self)                 mman_lock_acquired(self)
+#define vm_treelock_writing(self)                 mman_lock_acquired(self)
+#define vm_treelock_canread(self)                 mman_lock_available(self)
+#define vm_treelock_canwrite(self)                mman_lock_available(self)
+
+/* TODO: vm_mapat() */
+/* TODO: vm_mapat_subrange() */
+/* TODO: vm_mapresat() */
+/* TODO: vm_getfree() */
+/* TODO: vm_get_aslr_disabled() */
+/* TODO: vm_set_aslr_disabled() */
+/* TODO: vm_find_first_node_greater_equal() */
+/* TODO: vm_find_last_node_lower_equal() */
+/* TODO: vm_map() */
+/* TODO: vm_map_subrange() */
+/* TODO: vm_mapres() */
+/* TODO: vm_unmap() */
+/* TODO: vm_protect() */
+/* TODO: vm_unmap_kernel_ram() */
+/* TODO: vm_syncmem() */
+/* TODO: vm_read_nopf() */
+/* TODO: vm_write_nopf() */
+/* TODO: vm_memset_nopf() */
+/* TODO: vm_read() */
+/* TODO: vm_write() */
+/* TODO: vm_memset() */
+/* TODO: struct vm_dmalock */
+/* TODO: vm_dmalock_release() */
+/* TODO: vm_startdma() */
+/* TODO: vm_startdmav() */
+/* TODO: vm_stopdma() */
+/* TODO: vm_exec() */
+/* TODO: vm_exec_assert_regular() */
+/* TODO: struct vm_mapinfo */
+/* TODO: vm_mapinfo_size() */
+/* TODO: vm_enum_callback_t */
+/* TODO: vm_enum() */
+/* TODO: struct vm_kernel_pending_operation */
+/* TODO: vm_kernel_pending_cb_t */
+/* TODO: vm_kernel_pending_operations */
+/* TODO: vm_kernel_locked_operation */
+/* TODO: vm_onexec_callbacks */
+/* TODO: vm_oninit_callbacks */
+/* TODO: vm_onfini_callbacks */
+/* TODO: vm_onclone_callbacks */
+
 
 #else /* CONFIG_USE_NEW_VM */
 #include <kernel/driver-callbacks.h>

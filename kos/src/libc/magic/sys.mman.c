@@ -258,28 +258,26 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 #endif /* __MAP_HUGE_MASK */
 
 
-/* For anonymous mmap, memory could be uninitialized.
- * NOTE: Implied for physical mappings.
- * NOTE: The kernel may initialize memory randomly in sandboxed threads. */
+/* For anonymous mmap, memory could be uninitialized. */
 #ifdef __MAP_UNINITIALIZED
 #define MAP_UNINITIALIZED __MAP_UNINITIALIZED
 #endif /* __MAP_UNINITIALIZED */
+
+/* Don't override existing mappings when `MAP_FIXED' is passed.
+ * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
+#ifdef __MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
+#endif /* __MAP_FIXED_NOREPLACE */
 
 #ifdef __USE_KOS_KERNEL
 /* Don't actually map memory, but test the waters of a memory
  * location hasn't already been mapped, or locate a suitably
  * large free memory range.
  * This flag is usually followed by another call that sets
- * the `MAP_DONT_OVERRIDE' flag. */
+ * the `MAP_FIXED_NOREPLACE' flag. */
 #ifdef __MAP_DONT_MAP
 #define MAP_DONT_MAP __MAP_DONT_MAP
 #endif /* __MAP_DONT_MAP */
-
-/* Don't override existing mappings when `MAP_FIXED' is passed.
- * Instead, TODO:ERROR. */
-#ifdef __MAP_DONT_OVERRIDE
-#define MAP_DONT_OVERRIDE __MAP_DONT_OVERRIDE
-#endif /* __MAP_DONT_OVERRIDE */
 
 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
  * unsigned integer that should actually be used as offset. */
@@ -559,7 +557,7 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@@param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
-@@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE'
+@@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
 [[decl_include("<features.h>")]]
 [[wunused, section(".text.crt{|.dos}.heap.mman"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]

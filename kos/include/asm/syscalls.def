@@ -735,7 +735,7 @@ userviofd:(size_t initial_size, [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK)] sysca
 @@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
 @@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
-@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER'
+@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER'
 mmap:(void *addr, size_t len,
 	[tostr(MMAP_PROT)] syscall_ulong_t prot,
 	[tostr(MMAP_FLAGS)] syscall_ulong_t flags,
@@ -754,7 +754,7 @@ mmap2:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot,
 @@@param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
 @@@param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
 @@                      MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
-@@                      MAP_DONT_OVERRIDE'
+@@                      MAP_FIXED_NOREPLACE'
 @@@param: fd:    A handle for the library file being mapped
 @@               (must be a file or vm_datablock/inode)
 @@@param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'

@@ -119,6 +119,7 @@ struct __exception_badalloc_data64 {
 	union {
 #undef ba_insufficient_heap_memory
 #undef ba_insufficient_virtual_memory
+#undef ba_address_already_exists
 #undef ba_insufficient_physical_memory
 #undef ba_insufficient_swap_space
 #undef ba_insufficient_handle_numbers
@@ -134,6 +135,13 @@ struct __exception_badalloc_data64 {
 		struct {
 			__UINT64_TYPE__ /*size_t*/ ivm_num_pages; /* The number of bytes that could not be mapped */
 		} ba_insufficient_virtual_memory; /* E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
+
+		struct {
+			__UINT64_TYPE__ /*void **/ aae_addr;       /* The starting address that was requested */
+			__UINT64_TYPE__ /*size_t*/ aae_size;       /* The total # of bytes that were requested */
+			__UINT64_TYPE__ /*void **/ aae_inuse_addr; /* The starting address that is already in use */
+			__UINT64_TYPE__ /*size_t*/ aae_inuse_size; /* The total # of bytes that are already in use */
+		} ba_address_already_exists; /* E_BADALLOC_ADDRESS_ALREADY_EXISTS */
 
 		struct {
 			__UINT64_TYPE__ /*size_t*/ ipm_num_pages; /* The number of bytes that could not be allocated */
@@ -175,6 +183,7 @@ struct __exception_badalloc_data64 {
 	_ba_classes
 #define ba_insufficient_heap_memory       _ba_classes.ba_insufficient_heap_memory
 #define ba_insufficient_virtual_memory    _ba_classes.ba_insufficient_virtual_memory
+#define ba_address_already_exists         _ba_classes.ba_address_already_exists
 #define ba_insufficient_physical_memory   _ba_classes.ba_insufficient_physical_memory
 #define ba_insufficient_swap_space        _ba_classes.ba_insufficient_swap_space
 #define ba_insufficient_handle_numbers    _ba_classes.ba_insufficient_handle_numbers

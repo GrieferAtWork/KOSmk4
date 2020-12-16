@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee6a55e2 */
+/* HASH CRC-32:0x3929f3ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,7 @@ DEFINE_PUBLIC_ALIAS(sys_lseek, libc_sys_lseek)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 INTERN_FUNCTION(libc_sys_mmap)
 	movq   $(0x9), %rax
@@ -3533,7 +3533,7 @@ DEFINE_PUBLIC_ALIAS(sys_ksysctl, libc_sys_ksysctl)
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -4363,7 +4363,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xlseek, libc_sys_Xlseek)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 INTERN_FUNCTION(libc_sys_Xmmap)
 	movq   $(0x9), %rax
@@ -8445,7 +8445,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'

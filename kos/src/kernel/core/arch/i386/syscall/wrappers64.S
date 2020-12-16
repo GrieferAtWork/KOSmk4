@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x178b4a23 */
+/* HASH CRC-32:0x50bebde4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -338,7 +338,7 @@ END(__x86_asm64_syscall_lseek)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.x86.asm64_syscall.mmap
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mmap)
@@ -11464,7 +11464,7 @@ END(__x86_asm64_syscall_ksysctl)
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -15961,7 +15961,7 @@ END(__x86_asm32_int80_readdir)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.x86.asm32_syscall_int80.mmap
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
@@ -28511,7 +28511,7 @@ END(__x86_asm32_int80_setitimer64)
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -30545,7 +30545,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readdir, __x86_asm32_int80_readdir
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.x86.asm32_syscall_sysenter.mmap
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
@@ -33975,7 +33975,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_set
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -35605,7 +35605,7 @@ END(__x86_asm32_sysrun32_readdir)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.x86.asm32_syscall_sysrun32.mmap
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mmap)
@@ -40284,7 +40284,7 @@ END(__x86_asm32_sysrun32_setitimer64)
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'

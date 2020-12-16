@@ -172,7 +172,7 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 	                 MAP_GROWSUP | MAP_DENYWRITE | MAP_EXECUTABLE | MAP_LOCKED |
 	                 MAP_NORESERVE | MAP_POPULATE | MAP_NONBLOCK | MAP_STACK |
 	                 MAP_HUGETLB | (MAP_HUGE_MASK << MAP_HUGE_SHIFT) |
-	                 MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE |
+	                 MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE |
 	                 MAP_OFFSET64_POINTER,
 	                 E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG);
 	/* Make sure a known type of mapping was requested. */
@@ -304,7 +304,7 @@ again_mapat:
 				                            prot & (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_LOOSE | PROT_SHARED),
 				                            node_flags,
 				                            guard / PAGESIZE);
-				if (isused && !(flags & MAP_DONT_OVERRIDE)) {
+				if (isused && !(flags & MAP_FIXED_NOREPLACE)) {
 					if (vm_unmap(THIS_VM,
 					             result,
 					             num_bytes + guard,
@@ -321,8 +321,10 @@ again_mapat:
 						goto again_mapat;
 				}
 			}
-			if unlikely(isused)
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
+			if unlikely(isused) {
+				/* TODO: These aren't the correct arguments for this exception! */
+				THROW(E_BADALLOC_ADDRESS_ALREADY_EXISTS, num_bytes);
+			}
 		} else {
 			PAGEDIR_PAGEALIGNED UNCHECKED void *hint;
 			unsigned int getfree_mode;

@@ -63,31 +63,31 @@
 #endif /* __KOS_VERSION__ < 400 */
 #endif /* __KOS__ */
 
-#define __MAP_SHARED        0x00000001 /* Share changes. */
-#define __MAP_PRIVATE       0x00000002 /* Changes are private. */
-#define __MAP_TYPE          0x0000000f /* Mask for type of mapping. */
-#define __MAP_FILE          0x00000000 /* Do use a file. */
-#define __MAP_FIXED         0x00000010 /* Interpret addr exactly. */
-#define __MAP_ANON          0x00000020 /* Don't use a file. */
-#define __MAP_32BIT         0x00000040 /* Only give out 32-bit addresses. */
-#define __MAP_GROWSDOWN     0x00000100 /* Stack-like segment. */
-#define __MAP_GROWSUP       0x00000200 /* Stack-like segment growing upwards. */
-#define __MAP_DENYWRITE     0x00000800 /* Ignored. */
-#define __MAP_EXECUTABLE    0x00001000 /* Ignored. */
-#define __MAP_LOCKED        0x00002000 /* Lock the mapping. */
-#define __MAP_NORESERVE     0x00004000 /* Don't check for reservations. */
-#define __MAP_POPULATE      0x00008000 /* Populate (prefault) pagetables. */
-#define __MAP_NONBLOCK      0x00010000 /* Do not block on IO. */
-#define __MAP_STACK         0x00020000 /* Allocation is for a stack.
-                                        * NOTE: KOS uses this flag to determine where
-                                        *       automatic memory mappings are allocated at. */
-#define __MAP_SYNC          0x00000000 /* XXX: Implement me? */
-#define __MAP_HUGETLB       0x00040000 /* Create huge page mapping. */
-#define __MAP_HUGE_SHIFT    26
-#define __MAP_HUGE_MASK     0x3f
-#define __MAP_UNINITIALIZED 0x04000000 /* For anonymous mmap, memory could be uninitialized.
-                                        * NOTE: Implied for physical mappings.
-                                        * NOTE: The kernel may initialize memory randomly in sandboxed threads. */
+#define __MAP_SHARED           0x00000001 /* Share changes. */
+#define __MAP_PRIVATE          0x00000002 /* Changes are private. */
+#define __MAP_TYPE             0x0000000f /* Mask for type of mapping. */
+#define __MAP_FILE             0x00000000 /* Do use a file. */
+#define __MAP_FIXED            0x00000010 /* Interpret addr exactly. */
+#define __MAP_ANON             0x00000020 /* Don't use a file. */
+#define __MAP_32BIT            0x00000040 /* Only give out 32-bit addresses. */
+#define __MAP_GROWSDOWN        0x00000100 /* Stack-like segment. */
+#define __MAP_GROWSUP          0x00000200 /* Stack-like segment growing upwards. */
+#define __MAP_DENYWRITE        0x00000800 /* Ignored. */
+#define __MAP_EXECUTABLE       0x00001000 /* Ignored. */
+#define __MAP_LOCKED           0x00002000 /* Lock the mapping. */
+#define __MAP_NORESERVE        0x00004000 /* Don't check for reservations. */
+#define __MAP_POPULATE         0x00008000 /* Populate (prefault) pagetables. */
+#define __MAP_NONBLOCK         0x00010000 /* Do not block on IO. */
+#define __MAP_STACK            0x00020000 /* Allocation is for a stack.
+                                           * NOTE: KOS uses this flag to determine where
+                                           *       automatic memory mappings are allocated at. */
+#define __MAP_SYNC             0x00000000 /* XXX: Implement me? */
+#define __MAP_HUGETLB          0x00040000 /* Create huge page mapping. */
+#define __MAP_FIXED_NOREPLACE  0x00100000 /* Don't override existing mappings when `MAP_FIXED' is passed.
+                                           * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
+#define __MAP_HUGE_SHIFT       26
+#define __MAP_HUGE_MASK        0x3f
+#define __MAP_UNINITIALIZED    0x04000000 /* For anonymous mmap, memory could be uninitialized. */
 
 #ifdef __KOS__
 #define __MAP_AUTOMATIC        0x00000000 /* Use sharing behavior specified by `PROT_SHARED'. */
@@ -96,9 +96,8 @@
                                            * location hasn't already been mapped, or locate a suitably
                                            * large free memory range.
                                            * This flag is usually followed by another call that sets
-                                           * the `MAP_DONT_OVERRIDE' flag. */
-#define __MAP_DONT_OVERRIDE    0x40000000 /* Don't override existing mappings when `MAP_FIXED' is passed.
-                                           * Instead, TODO:ERROR. */
+                                           * the `MAP_FIXED_NOREPLACE' flag. */
+#define __MAP_NO_ASLR          0x40000000 /* Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
 #define __MAP_OFFSET64_POINTER 0x80000000 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
                                            * unsigned integer that should actually be used as offset. */
 #endif /* __KOS_VERSION__ >= 400 */

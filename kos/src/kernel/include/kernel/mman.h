@@ -157,7 +157,6 @@ __DEFINE_SYNC_MUTEX(struct mman,
                     mman_lock_available)
 
 
-
 DECL_END
 #endif /* __CC__ */
 

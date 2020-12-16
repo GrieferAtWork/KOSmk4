@@ -630,7 +630,7 @@ DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
 		}
 	}
 	/* Use a dedicated system call for mapping the library into memory.
-	 * This functionality could technically be implemented via `MAP_DONT_OVERRIDE',
+	 * This functionality could technically be implemented via `MAP_FIXED_NOREPLACE',
 	 * however using this method, we leave it entirely up to the kernel to decide
 	 * how it is going to map the library, and more importantly: where. */
 	{

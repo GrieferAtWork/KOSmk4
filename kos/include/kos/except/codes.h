@@ -158,37 +158,44 @@
 #define E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY    (E_BADALLOC, 0x0002) /* [msg("Insufficient virtual address space")]
                                                                         * [fld(num_pages: size_t, "The number of bytes that could not be mapped")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
+#ifndef E_BADALLOC_ADDRESS_ALREADY_EXISTS
+#define E_BADALLOC_ADDRESS_ALREADY_EXISTS         (E_BADALLOC, 0x0003) /* [msg("Virtual address already in use")]
+                                                                        * [fld(addr:       void *, "The starting address that was requested")]
+                                                                        * [fld(size:       size_t, "The total # of bytes that were requested")]
+                                                                        * [fld(inuse_addr: void *, "The starting address that is already in use")]
+                                                                        * [fld(inuse_size: size_t, "The total # of bytes that are already in use")] */
+#endif /* !E_BADALLOC_ADDRESS_ALREADY_EXISTS */
 #ifndef E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY
-#define E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY   (E_BADALLOC, 0x0003) /* [msg("Insufficient physical memory")]
+#define E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY   (E_BADALLOC, 0x0004) /* [msg("Insufficient physical memory")]
                                                                         * [fld(num_pages: size_t, "The number of bytes that could not be allocated")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY */
 #ifndef E_BADALLOC_INSUFFICIENT_SWAP_SPACE
-#define E_BADALLOC_INSUFFICIENT_SWAP_SPACE        (E_BADALLOC, 0x0004) /* [msg("Insufficient swap space")]
+#define E_BADALLOC_INSUFFICIENT_SWAP_SPACE        (E_BADALLOC, 0x0005) /* [msg("Insufficient swap space")]
                                                                         * [fld(num_pages: size_t, "The number of bytes that could not be allocated")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_SWAP_SPACE */
 #ifndef E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS
-#define E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS    (E_BADALLOC, 0x0005) /* [errno(EMFILE), msg("Too many open file handles")]
+#define E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS    (E_BADALLOC, 0x0006) /* [errno(EMFILE), msg("Too many open file handles")]
                                                                         * [fld(num_handles: unsigned int, "The number of handles that were attempted to be allocated (usually 1)")]
                                                                         * [fld(cur_handles: unsigned int, "The number of handles currently allocated")]
                                                                         * [fld(max_handles: unsigned int, "The max number of handles that may be allocated by the caller")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS */
 #ifndef E_BADALLOC_INSUFFICIENT_HANDLE_RANGE
-#define E_BADALLOC_INSUFFICIENT_HANDLE_RANGE      (E_BADALLOC, 0x0006) /* [errno(ENFILE), msg("File handle too great")]
+#define E_BADALLOC_INSUFFICIENT_HANDLE_RANGE      (E_BADALLOC, 0x0007) /* [errno(ENFILE), msg("File handle too great")]
                                                                         * [fld(req_handle: unsigned int, "The requested handle number, past which no more unused handles exist.")]
                                                                         * [fld(cur_max:    unsigned int, "The max handle id that is currently in use")]
                                                                         * [fld(cur_limit:  unsigned int, "The set handle id which may not be exceeded")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_HANDLE_RANGE */
 #ifndef E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS
-#define E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS    (E_BADALLOC, 0x0007) /* [msg("No suitable, free device numbers are available")]
+#define E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS    (E_BADALLOC, 0x0008) /* [msg("No suitable, free device numbers are available")]
                                                                         * [fld(dev_kind: unsigned int, "The kind of device number lacking (One of `E_NO_DEVICE_KIND_*')")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS */
 #ifndef E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS
-#define E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS (E_BADALLOC, 0x0008) /* [msg("The given, or all interrupt vectors are already in use")]
+#define E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS (E_BADALLOC, 0x0009) /* [msg("The given, or all interrupt vectors are already in use")]
                                                                         * [fld(vector: uintptr_t, "The given vector (if that specific vector is already in use),\n"
                                                                         *                         "or (uintptr_t)-1 when all vectors are already in use.")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS */
 #ifndef E_BADALLOC_INSUFFICIENT_PORT_NUMBERS
-#define E_BADALLOC_INSUFFICIENT_PORT_NUMBERS      (E_BADALLOC, 0x0009) /* [errno(EADDRNOTAVAIL), msg("Failed to dynamically allocate a socket port number")]
+#define E_BADALLOC_INSUFFICIENT_PORT_NUMBERS      (E_BADALLOC, 0x000a) /* [errno(EADDRNOTAVAIL), msg("Failed to dynamically allocate a socket port number")]
                                                                         * [fld(address_family: syscall_ulong_t, "The socket's address family (one of `AF_*')")]
                                                                         * [fld(socket_type:    syscall_ulong_t, "The socket's type (one of `SOCK_*')")]
                                                                         * [fld(protocol:       syscall_ulong_t, "The socket's protocol (dependent on `address_family' and `socket_type')")] */

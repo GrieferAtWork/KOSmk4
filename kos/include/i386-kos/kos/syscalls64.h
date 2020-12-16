@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6acf60fa */
+/* HASH CRC-32:0xe5bc425d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1147,7 +1147,7 @@ __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -1205,7 +1205,7 @@ __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 __CDECLARE_SC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_SC(mmap) */
 #if __CRT_HAVE_SC(modify_ldt)
@@ -3265,7 +3265,7 @@ __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
+ *                       MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -3323,7 +3323,7 @@ __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
 __CDECLARE_XSC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_XSC(mmap) */
 #if __CRT_HAVE_XSC(modify_ldt)
