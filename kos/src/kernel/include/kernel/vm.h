@@ -86,6 +86,7 @@
 #define db_type                                   mf_ops
 #define db_vio                                    mf_ops->mo_vio
 #define db_parts                                  mf_parts
+#define db_addrshift                              mf_blockshift
 #define vm_datablock_destroy                      mfile_destroy
 #define vm_datablock_anonymize                    mfile_makeanon
 #define vm_datablock_isanonymous                  mfile_isanon

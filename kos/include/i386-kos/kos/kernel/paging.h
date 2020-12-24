@@ -106,6 +106,7 @@
 #define KERNEL_VMHINT_DRIVER       __KERNEL_VMHINT(0xd0000000, 0xffffffffd0000000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
 #define KERNEL_VMHINT_DEVICE       __KERNEL_VMHINT(0xf0000000, 0xfffffffff0000000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
 #define KERNEL_VMHINT_TEMPORARY    __KERNEL_VMHINT(0xf0000000, 0xfffffffff0000000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
+#define KERNEL_VMHINT_USER_MINADDR __KERNEL_VMHINT(0x00010000, 0x0000000000010000, 0)                /* Default value for `mman_getunmapped_user_minaddr'. */
 #define KERNEL_VMHINT_USER_HEAP    __KERNEL_VMHINT(0x10000000, 0x0000000010000000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
 #define KERNEL_VMHINT_USER_STACK   __KERNEL_VMHINT(0x80000000, 0x0000000080000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
 #define KERNEL_VMHINT_USER_LIBRARY __KERNEL_VMHINT(0x0e000000, 0x000000000e000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */

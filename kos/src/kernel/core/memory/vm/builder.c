@@ -337,7 +337,7 @@ vmb_paged_map(struct vmb *__restrict self,
 	                     min_alignment_in_pages,
 	                     getfree_mode);
 	if unlikely(result == VM_PAGED_GETFREE_ERROR)
-		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_pages);
+		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_pages * PAGESIZE);
 	vmb_do_mapat(self,
 	             result,
 	             num_pages,

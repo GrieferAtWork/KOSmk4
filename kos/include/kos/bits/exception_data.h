@@ -80,14 +80,14 @@ struct exception_badalloc_data {
 		} ba_insufficient_heap_memory; /* E_BADALLOC_INSUFFICIENT_HEAP_MEMORY */
 
 		struct {
-			__syscall_ulong_t /*size_t*/ ivm_num_pages; /* The number of bytes that could not be mapped */
+			__syscall_ulong_t /*size_t*/ ivm_num_bytes; /* The number of bytes that could not be mapped */
 		} ba_insufficient_virtual_memory; /* E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
 
 		struct {
-			__syscall_ulong_t /*void **/ aae_addr;       /* The starting address that was requested */
-			__syscall_ulong_t /*size_t*/ aae_size;       /* The total # of bytes that were requested */
-			__syscall_ulong_t /*void **/ aae_inuse_addr; /* The starting address that is already in use */
-			__syscall_ulong_t /*size_t*/ aae_inuse_size; /* The total # of bytes that are already in use */
+			__syscall_ulong_t /*void **/ aae_minaddr;       /* Lowest address that was requested */
+			__syscall_ulong_t /*void **/ aae_maxaddr;       /* Greatest address that was requested */
+			__syscall_ulong_t /*void **/ aae_inuse_minaddr; /* Lowest address already in use */
+			__syscall_ulong_t /*void **/ aae_inuse_maxaddr; /* Greatest address already in use */
 		} ba_address_already_exists; /* E_BADALLOC_ADDRESS_ALREADY_EXISTS */
 
 		struct {

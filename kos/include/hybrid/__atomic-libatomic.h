@@ -461,10 +461,10 @@ template<class __T, class __TN> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1
 	})
 #endif /* !__NO_XBLOCK */
 
-}
-#define __hybrid_atomic_load(x, order)     (__NAMESPACE_INT_SYM __hybrid_atomic_load)(&(x), order)
-#define __hybrid_atomic_store(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_store)(&(x), v, order)
-#define __hybrid_atomic_xch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_exchange)(&(x), v, order)
+} /* extern "C++" */
+#define __hybrid_atomic_load(x, order)         (__NAMESPACE_INT_SYM __hybrid_atomic_load)(&(x), order)
+#define __hybrid_atomic_store(x, v, order)     (__NAMESPACE_INT_SYM __hybrid_atomic_store)(&(x), v, order)
+#define __hybrid_atomic_xch(x, v, order)       (__NAMESPACE_INT_SYM __hybrid_atomic_exchange)(&(x), v, order)
 #define __hybrid_atomic_addfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_add_fetch)(&(x), v, order)
 #define __hybrid_atomic_subfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_sub_fetch)(&(x), v, order)
 #define __hybrid_atomic_andfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_and_fetch)(&(x), v, order)

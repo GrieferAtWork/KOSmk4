@@ -156,14 +156,14 @@
 #endif /* !E_BADALLOC_INSUFFICIENT_HEAP_MEMORY */
 #ifndef E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY
 #define E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY    (E_BADALLOC, 0x0002) /* [msg("Insufficient virtual address space")]
-                                                                        * [fld(num_pages: size_t, "The number of bytes that could not be mapped")] */
+                                                                        * [fld(num_bytes: size_t, "The number of bytes that could not be mapped")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
 #ifndef E_BADALLOC_ADDRESS_ALREADY_EXISTS
 #define E_BADALLOC_ADDRESS_ALREADY_EXISTS         (E_BADALLOC, 0x0003) /* [msg("Virtual address already in use")]
-                                                                        * [fld(addr:       void *, "The starting address that was requested")]
-                                                                        * [fld(size:       size_t, "The total # of bytes that were requested")]
-                                                                        * [fld(inuse_addr: void *, "The starting address that is already in use")]
-                                                                        * [fld(inuse_size: size_t, "The total # of bytes that are already in use")] */
+                                                                        * [fld(minaddr:       void *, "Lowest address that was requested")]
+                                                                        * [fld(maxaddr:       void *, "Greatest address that was requested")]
+                                                                        * [fld(inuse_minaddr: void *, "Lowest address already in use")]
+                                                                        * [fld(inuse_maxaddr: void *, "Greatest address already in use")] */
 #endif /* !E_BADALLOC_ADDRESS_ALREADY_EXISTS */
 #ifndef E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY
 #define E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY   (E_BADALLOC, 0x0004) /* [msg("Insufficient physical memory")]

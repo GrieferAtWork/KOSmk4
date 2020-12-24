@@ -133,14 +133,14 @@ struct __exception_badalloc_data64 {
 		} ba_insufficient_heap_memory; /* E_BADALLOC_INSUFFICIENT_HEAP_MEMORY */
 
 		struct {
-			__UINT64_TYPE__ /*size_t*/ ivm_num_pages; /* The number of bytes that could not be mapped */
+			__UINT64_TYPE__ /*size_t*/ ivm_num_bytes; /* The number of bytes that could not be mapped */
 		} ba_insufficient_virtual_memory; /* E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
 
 		struct {
-			__UINT64_TYPE__ /*void **/ aae_addr;       /* The starting address that was requested */
-			__UINT64_TYPE__ /*size_t*/ aae_size;       /* The total # of bytes that were requested */
-			__UINT64_TYPE__ /*void **/ aae_inuse_addr; /* The starting address that is already in use */
-			__UINT64_TYPE__ /*size_t*/ aae_inuse_size; /* The total # of bytes that are already in use */
+			__UINT64_TYPE__ /*void **/ aae_minaddr;       /* Lowest address that was requested */
+			__UINT64_TYPE__ /*void **/ aae_maxaddr;       /* Greatest address that was requested */
+			__UINT64_TYPE__ /*void **/ aae_inuse_minaddr; /* Lowest address already in use */
+			__UINT64_TYPE__ /*void **/ aae_inuse_maxaddr; /* Greatest address already in use */
 		} ba_address_already_exists; /* E_BADALLOC_ADDRESS_ALREADY_EXISTS */
 
 		struct {

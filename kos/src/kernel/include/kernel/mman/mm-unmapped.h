@@ -25,29 +25,43 @@
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
-#include <asm/os/mman.h>
+#include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
+
+#include <asm/os/mman.h> /* __MAP_* constants */
 
 #ifdef __CC__
 DECL_BEGIN
 
+
 /* Flags for `mman_getunmapped()' and friends */
-#define MMAN_GETUNMAPPED_F_CLOSEBY         0x0000                /* Same as `MMAN_GETUNMAPPED_F_ABOVE | MMAN_GETUNMAPPED_F_BELOW' (Try to return an address that is close to `addr') */
+#define MMAN_GETUNMAPPED_F_CLOSEBY         0x0000                /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address that is close to `addr' */
 #define MMAN_GETUNMAPPED_F_ABOVE           __MAP_GROWSUP         /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address `return >= addr' (but also allow returning anything else) */
 #define MMAN_GETUNMAPPED_F_BELOW           __MAP_GROWSDOWN       /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address `return + num_bytes <= addr' (but also allow returning anything else) */
 #define MMAN_GETUNMAPPED_F_STACK           __MAP_STACK           /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Allocate stack memory:
                                                                   *  - When `MMAN_GETUNMAPPED_F_CLOSEBY' is given, use the proper stack
                                                                   *    growth direction `MMAN_GETUNMAPPED_F_(ABOVE|BELOW)' instead.
-                                                                  *  - The given `addr' is ignored, and `mman_getunmapped_user_stkbase' is used instead.
+                                                                  *  - The default for `addr' is `mman_getunmapped_user_stkbase' instead of `mman_getunmapped_user_defbase'
                                                                   *  - Try to leave a gap of at least 1 page between the returned, and some
                                                                   *    adjacent memory mapping. (preventing 1 thread's stack from overflowing
                                                                   *    onto the stack of another thread, rather than crashing immediately) */
 #define MMAN_GETUNMAPPED_F_FIXED           __MAP_FIXED           /* Always re-return `FLOOR_ALIGN(addr, PAGESIZE)' (but see `MMAN_GETUNMAPPED_F_FIXED_NOREPLACE')
                                                                   * NOTE: An error (either `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY' or `E_BADALLOC_ADDRESS_ALREADY_EXISTS')
                                                                   *       is still returned if the address range `return...+=num_bytes-1' attempts to cross the user-kernel
-                                                                  *       address space boundary. */
+                                                                  *       address space boundary, or user-space attempts to map into kernel-space. */
 #define MMAN_GETUNMAPPED_F_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE /* [valid_if(MMAN_GETUNMAPPED_F_FIXED)] Throw `E_BADALLOC_ADDRESS_ALREADY_EXISTS' if range is already in-use */
 #define MMAN_GETUNMAPPED_F_32BIT           __MAP_32BIT           /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Only return addresses such that `return + num_bytes - 1 <= (void *)0xffffffff' */
 #define MMAN_GETUNMAPPED_F_NO_ASLR         __MAP_NO_ASLR         /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
+
+/* Check if the initial search should only be performed above/below.
+ * When both of these are false, the initial search is performed in
+ * in both directions. */
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+#define MMAN_GETUNMAPPED_ISBELOW(x) ((x) & (MMAN_GETUNMAPPED_F_BELOW | MMAN_GETUNMAPPED_F_STACK))
+#define MMAN_GETUNMAPPED_ISABOVE(x) ((x) & MMAN_GETUNMAPPED_F_ABOVE)
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+#define MMAN_GETUNMAPPED_ISBELOW(x) ((x) & MMAN_GETUNMAPPED_F_BELOW)
+#define MMAN_GETUNMAPPED_ISABOVE(x) ((x) & (MMAN_GETUNMAPPED_F_ABOVE | MMAN_GETUNMAPPED_F_STACK))
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 
 /* Error return value for mman_getunmapped[_aligned]_nx */
 #define MMAN_GETUNMAPPED_ERROR ((void *)-1)
@@ -64,7 +78,17 @@ DECL_BEGIN
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
 DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
 
-/* Base address from where user-space stack mappings originate from. */
+/* Default base address for user-space memory mappings. When trying to
+ * find an unmapped area within a user-space mman, the FIXED flag isn't
+ * given, and the given hint-address is less than `mman_getunmapped_user_minaddr'
+ * then MAX(mman_getunmapped_user_minaddr, mman_getunmapped_user_defbase)
+ * will be used as initial hint instead.
+ * Afterwards, the actual address to-be returned will be calculated normally.
+ * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
+DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
+
+/* Same as `mman_getunmapped_user_defbase', but used instead when
+ * the `MMAN_GETUNMAPPED_F_STACK' flag is given. */
 DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
 
 /* [lock(ATOMIC)]
@@ -78,19 +102,10 @@ DATDEF unsigned int mman_getunmapped_extflags;
 
 
 /* Try to find a suitable, unmapped address range:
+ * @param: self:      The mman in which to create the mapping. For this purpose,
+ *                    any mman other than `mman_kernel' will always cause an
+ *                    error when trying to map to a kernel-space address.
  * @param: addr:      A hint for where to search for free memory.
- *                    This argument also controls if this function should return
- *                    addresses from from `THIS_MMAN' or `mman_kernel', the later
- *                    being used when `ADDR_ISKERN(addr)' (in which case you may
- *                    also assume that `ADDRRANGE_ISKERN(return, num_bytes)'), and
- *                    the former being used when `ADDR_ISUSER(addr)' (in which case
- *                    you may also assume that `ADDRRANGE_ISUSER(return, num_bytes)')
- *                    As such, the caller must something like a call to mmap(2)
- *                    will not allow the user to attempt to map something into
- *                    kernel memory!
- *                    Also note that (unless `MMAN_GETUNMAPPED_F_FIXED' is used),
- *                    the return value when `ADDR_ISUSER(addr)' is given will always
- *                    be `>= mman_getunmapped_user_minaddr'!
  * @param: num_bytes: The min. number of bytes that should not already be in use,
  *                    starting at the returned address. For this purpose, you may
  *                    assume that this function actually guaranties that at least
@@ -106,8 +121,9 @@ DATDEF unsigned int mman_getunmapped_extflags;
  *                          with those from the `flags' argument of `mmap(2)'
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MMAN_GETUNMAPPED_ERROR: Error. */
-FUNDEF NOBLOCK WUNUSED void *
-NOTHROW(FCALL mman_getunmapped_nx)(void *addr, size_t num_bytes, unsigned int flags,
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
+NOTHROW(FCALL mman_getunmapped_nx)(struct mman *__restrict self,
+                                   void *addr, size_t num_bytes, unsigned int flags,
                                    PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE));
 
 /* Same as above, but never return `MMAN_GETUNMAPPED_ERROR'. Instead,
@@ -119,8 +135,9 @@ NOTHROW(FCALL mman_getunmapped_nx)(void *addr, size_t num_bytes, unsigned int fl
  *                                                  given, and a pre-existing mapping already
  *                                                  exists within the given address range.
  */
-FUNDEF NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED void *FCALL
-mman_getunmapped_or_unlock(void *addr, size_t num_bytes, unsigned int flags,
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
+mman_getunmapped_or_unlock(struct mman *__restrict self,
+                           void *addr, size_t num_bytes, unsigned int flags,
                            PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);

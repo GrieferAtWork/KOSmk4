@@ -51,11 +51,11 @@ struct mman {
 #ifndef __MMAN_INTERNAL_EXCLUDE_PAGEDIR
 	pagedir_t                      mm_pagedir;     /* [lock(mm_lock)] The page directory associated with the mman. */
 #endif /* !__MMAN_INTERNAL_EXCLUDE_PAGEDIR */
-	PHYS pagedir_phys_t            mm_pdir_phys;   /* [1..1][const] Physical pointer of the page directory */
 	WEAK refcnt_t                  mm_refcnt;      /* Reference counter. */
 	WEAK refcnt_t                  mm_weakrefcnt;  /* Weak reference counter */
 	struct atomic_lock             mm_lock;        /* Lock for this mman. */
 	RBTREE_ROOT(struct mnode)      mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
+	PHYS pagedir_phys_t            mm_pdir_phys;   /* [1..1][const] Physical pointer of the page directory */
 	struct mnode_list              mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
 	size_t                         mm_heapsize;    /* [const] Size of the heap pointer used to allocated this mman. */
 	struct task_list               mm_threads;     /* [0..n][lock(!PREEMPTION && SMP_LOCK(mm_threadslock))] */
@@ -122,7 +122,9 @@ SLIST_HEAD(mdeadram_slist, mdeadram);
  * This list is situated such that for user-space mmans, it always
  * appears as an empty list, meaning that the clear-dead-ram check
  * can simply be performed for every mman, and will simply be a
- * no-op when done for anything but the kernel mman. */
+ * no-op when done for anything but the kernel mman.
+ * However, you still mustn't add anything into it for a user-space
+ * memory manager! */
 DATDEF ATTR_PERMMAN struct mdeadram_slist thismman_deadram;
 
 /* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_deadram)' */
