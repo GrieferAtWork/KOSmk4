@@ -243,9 +243,9 @@ typedef __blksize_t blksize_t;
 
 #ifndef S_ISSOCK
 #if ((defined(__USE_UNIX98) || defined(__USE_XOPEN2K)) && defined(__S_ISSOCK))
-#define S_ISSOCK(mode) __S_ISSOCK(x) /* Socket. */
+#define S_ISSOCK(mode) __S_ISSOCK(mode) /* Socket. */
 #elif defined(__USE_XOPEN2K)
-#define S_ISSOCK(mode) 0             /* Socket. */
+#define S_ISSOCK(mode) 0                /* Socket. */
 #endif /* ... */
 #endif /* !S_ISSOCK */
 

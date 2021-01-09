@@ -39,7 +39,7 @@ typedef __UINT16_TYPE__ __wctype_t;
 typedef __WCHAR16_TYPE__ __wctrans_t;
 #else /* __CRT_DOS_PRIMARY */
 typedef __ULONGPTR_TYPE__ __wctype_t;
-typedef __int32_t const *__wctrans_t;
+typedef __INT32_TYPE__ const *__wctrans_t;
 #endif /* !__CRT_DOS_PRIMARY */
 
 __DECL_END

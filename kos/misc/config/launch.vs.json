@@ -60,18 +60,9 @@
 			 *          Studio to connect to a GDB server and client
 			 * Our server: Provided by "qemu -s -S"
 			 * Our client: Apart of the i386-kos toolchain (any unmodified i386-elf-gdb
-			 *             client would do) /binutils/i386-kos/bin/i386-elf-gdb.exe
-			 * NOTE: Start deemon via cmd, so-as to allow users any of the
-			 *       following methods for providing deemon to our build system:
-			 *  - Adding deemon directly to %PATH%
-			 *  - Placing a `deemon.cmd' shell-script in %PATH% that redirects to
-			 *    deemon (that's what I'm doing; i.e. having one folder containing
-			 *    a whole bunch of programs redirected like this)
-			 *    >> @echo off
-			 *    >> "D:\FULL\PATH\TO\PROGRAM\PROGRAM.exe" %*
-			 */
-			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			 *             client would do) /binutils/i386-kos/bin/i386-elf-gdb.exe */
+			"debugServerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\binutils\\deemon\\deemon.exe",
+			"debugServerArgs": "\"ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee\" --run-only --emulator=qemu --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -124,8 +115,8 @@
 				{ "text": "set schedule-multiple on", "ignoreFailures": false },
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
-			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\binutils\\deemon\\deemon.exe",
+			"debugServerArgs": "\"ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee\" --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -179,8 +170,8 @@
 				{ "text": "set schedule-multiple on", "ignoreFailures": false },
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
-			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\binutils\\deemon\\deemon.exe",
+			"debugServerArgs": "\"ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee\" --run-only --emulator=qemu --gdb=server --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -234,8 +225,8 @@
 				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true }
 			],
-			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --emulator=vbox --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerPath": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\binutils\\deemon\\deemon.exe",
+			"debugServerArgs": "\"ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee\" --run-only --emulator=vbox --gdb=emulator --emulator-started-pattern=EMULATOR_STARTED --emulator-setopt=redirect.stdout=gdb.exe --target=${env.TARGET} --config=${env.CONFIG}",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,

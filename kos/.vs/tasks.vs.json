@@ -8,7 +8,7 @@
 			"contextType": "build",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--format-error-messages",
@@ -24,7 +24,7 @@
 			"contextType": "rebuild",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--format-error-messages",
@@ -42,7 +42,7 @@
 			"contextType": "build",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--target=${env.TARGET}",
@@ -57,7 +57,7 @@
 			"contextType": "rebuild",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--target=${env.TARGET}",
@@ -74,7 +74,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--target=${env.TARGET}",
@@ -91,7 +91,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--target=${env.TARGET}",
@@ -108,7 +108,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${workspaceRoot}\\..",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [
 				"magic.dee",
 				"--target=${env.TARGET}",
@@ -125,7 +125,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "${file}" ]
 		},
 
@@ -136,7 +136,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "-F", "${file}" ]
 		},
 
@@ -147,7 +147,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "-F", "${file}" ]
 		},
 
@@ -158,7 +158,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "-F", "${file}" ]
 		},
 
@@ -169,7 +169,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "-F", "${file}" ]
 		},
 
@@ -180,7 +180,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
 		},
 
@@ -191,7 +191,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
 		},
 
@@ -202,7 +202,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "${workspaceRoot}\\misc\\libgen\\autogen.dee", "${file}" ]
 		},
 
@@ -213,7 +213,7 @@
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
-			"command": "deemon",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
 			"args": [ "${workspaceRoot}\\misc\\libgen\\autogen.dee", "${file}" ]
 		}
 	]

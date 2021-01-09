@@ -75,7 +75,7 @@ validate_sysroot_argument(char const *filename,
 	if (filename_len == CSTRLEN(KOS_ROOT) - 1 &&
 	    memcmp(filename, KOS_ROOT, (CSTRLEN(KOS_ROOT) - 1) * sizeof(char)) == 0)
 		return 0; /* Special case: Allow the KOS root itself w/o a trailing '/' */
-	format = "%s: warning: filename %s%s outside of KOS root\n";
+	format = "%s: warning: filename `%s' (`%s%s') outside of KOS root\n";
 	if (isatty(STDOUT_FILENO)) {
 		format = "%s: "
 		         "\033[96m" /* AC_FG(ANSITTY_CL_AQUA) */

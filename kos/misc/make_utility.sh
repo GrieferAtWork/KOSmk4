@@ -91,18 +91,23 @@ done
 
 if (($# != 2)); then
 	echo "Usage: ./make_utility.sh [OPTIONS...] <TARGET_NAME> <UTILITY_NAME>"
-	echo "    OPTIONS:"
-	echo "        --force-configure     Force configure to be re-executed"
-	echo "        --force-make          Force make to be re-executed"
-	echo "        --force-disk          Force on-disk files to be updated"
-	echo "    TARGET_NAME should be one of:"
-	echo "        i386"
-	echo "        x86_64"
-	echo "    UTILITY_NAME should be one of:"
+	echo "OPTIONS:"
+	echo "    --force-configure     Force configure to be re-executed"
+	echo "    --force-make          Force make to be re-executed"
+	echo "    --force-disk          Force on-disk files to be updated"
+	echo ""
+	echo "TARGET_NAME should be one of:"
+	echo "i386 x86_64"
+	echo ""
+	echo "UTILITY_NAME should be one of:"
 	cd "$(dirname $(readlink -f "$0"))/utilities"
 	for name in *.sh; do
-		echo "        ${name::-3}"
+		echo -n "${name::-3} "
 	done
+	for name in Xorg/*.sh; do
+		echo -n "${name::-3} "
+	done
+	echo ""
 	exit 1
 fi
 
@@ -493,13 +498,8 @@ install_path_hardcopy() {
 #>> rundeemon <ARGS...>
 # Invoke `deemon $*`
 rundeemon() {
-	if which deemon > /dev/null 2>&1; then
-		deemon $*
-		return $?
-	else
-		"${KOS_ROOT}/binutils/deemon/deemon" $*
-		return $?
-	fi
+	"${KOS_ROOT}/binutils/deemon/deemon" $*
+	return $?
 }
 
 

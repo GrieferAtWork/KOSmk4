@@ -316,37 +316,37 @@ require_program make
 # If the user doesn't have deemon installed, download, configure,
 # and build a version that can be used to drive the KOS toolchain.
 echo "Check if deemon is installed on the machine"
-if ! which deemon > /dev/null 2>&1; then
-	echo "    'deemon' is not in PATH"
-	echo "Check if deemon was installed under '$KOS_BINUTILS/deemon'"
-	if [ -f "$KOS_BINUTILS/deemon/deemon" ] || [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
-		echo "    Found deemon in '$KOS_BINUTILS/deemon'"
-	else
-		echo "    Deemon is missing (now downloading, configuring and building a local copy)"
-		if ! [ -f "$KOS_BINUTILS/deemon/configure" ]; then
-			require_program git
-			rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1
-			cmd mkdir -p "$KOS_BINUTILS/deemon"
-			cmd cd "$KOS_BINUTILS/deemon"
-			# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset
-			cmd git init
-			cmd git remote add origin https://github.com/GrieferAtWork/deemon.git
-			cmd git fetch origin $DEEMON_VERSION
-			cmd git reset --hard FETCH_HEAD
-		fi
-		cmd cd "$KOS_BINUTILS/deemon"
-		echo "Configuring deemon..."
-		cmd bash ./configure
-		echo "Making deemon..."
-		cmd make -j $MAKE_PARALLEL_COUNT
-		cmd cd "$KOS_BINUTILS"
-		echo "Adding '$KOS_BINUTILS/deemon' to PATH"
-		echo "    NOTE: In order to run magic.dee later one, you may use '$KOS_BINUTILS/deemon/deemon' as driver"
-		# Update $PATH such that deemon becomes apart of it.
-		export PATH="$KOS_BINUTILS/deemon:$PATH"
-	fi
+echo "Check if deemon was installed under '$KOS_BINUTILS/deemon'"
+if [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
+	DEEMON="$KOS_BINUTILS/deemon/deemon.exe"
+	echo "    Found deemon in '$KOS_BINUTILS/deemon/deemon.exe'"
+elif [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
+	DEEMON="$KOS_BINUTILS/deemon/deemon"
+	echo "    Found deemon in '$KOS_BINUTILS/deemon/deemon'"
 else
-	echo "    'deemon' is apart of PATH"
+	echo "    Deemon is missing (now downloading, configuring and building a local copy)"
+	if ! [ -f "$KOS_BINUTILS/deemon/configure" ]; then
+		require_program git
+		rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1
+		cmd mkdir -p "$KOS_BINUTILS/deemon"
+		cmd cd "$KOS_BINUTILS/deemon"
+		# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset
+		cmd git init
+		cmd git remote add origin https://github.com/GrieferAtWork/deemon.git
+		cmd git fetch origin $DEEMON_VERSION
+		cmd git reset --hard FETCH_HEAD
+	fi
+	cmd cd "$KOS_BINUTILS/deemon"
+	echo "Configuring deemon..."
+	cmd bash ./configure
+	echo "Making deemon..."
+	cmd make -j $MAKE_PARALLEL_COUNT
+	cmd cd "$KOS_BINUTILS"
+	if [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
+		DEEMON="$KOS_BINUTILS/deemon/deemon.exe"
+	else
+		DEEMON="$KOS_BINUTILS/deemon/deemon"
+	fi
 fi
 
 
@@ -527,7 +527,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
    ! [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.1" ]; then
 	echo "    Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
 	cmd cd "$KOS_ROOT"
-	cmd deemon "magic.dee" \
+	cmd "$DEEMON" "magic.dee" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
 		--target="$TARGET_NAME" \
@@ -549,7 +549,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 		# Now try to build our libc.so (and also libm.so just to be safe)
 		cmd cd "$KOS_ROOT"
 		remove_bad_fixinclude
-		cmd deemon "magic.dee" \
+		cmd "$DEEMON" "magic.dee" \
 			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libc.so" \
 			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libm.so" \
 			--target="$TARGET_NAME" \
@@ -593,7 +593,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 	# Build our own libc.so and libm.so before building libstdc++, so GCC can link against our code!
 	echo "    Making libc.so and libm.so for $GCC_VERSION:libstdc++"
 	cmd cd "$KOS_ROOT"
-	cmd deemon "magic.dee" \
+	cmd "$DEEMON" "magic.dee" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libc.so" \
@@ -779,10 +779,7 @@ if [[ `uname -s` == *CYGWIN* ]]; then
 	     [ "$KOS_MISC/gdbridge/gdbridge.exe" -ot "$KOS_MISC/gdbridge/gdbridge.c" ]; then
 		echo "Building GDBridge wrapper"
 		GDBRIDGE_FLAGS="-g -Wall"
-		GDBRIDGE_CMDLINE="deemon "
-		if [ -f "$KOS_BINUTILS/deemon/deemon" ] || [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
-			GDBRIDGE_CMDLINE="$(cygpath -w "$KOS_BINUTILS/deemon/deemon.exe")"
-		fi
+		GDBRIDGE_CMDLINE="$(cygpath -w "$DEEMON")"
 		GDBRIDGE_SCRIPT="$(cygpath -w "$KOS_MISC/gdbridge/gdbridge.dee")"
 		GDBRIDGE_CMDLINE="$GDBRIDGE_CMDLINE \"${GDBRIDGE_SCRIPT}\""
 		GDBRIDGE_CMDLINE="${GDBRIDGE_CMDLINE//\\/\\\\}"

@@ -488,6 +488,12 @@ Requirements:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 - qemu: qemu-system-i386[.exe] (preferrably in `$PATH`. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
 - On windows: Cygwin
+	- You will need to have the following (non-default) packages pre-installed:
+		- `make` (obviously...)
+		- `wget` (to download 3rd party packages, including binutils and gcc)
+		- `mpfr`, `gmp`, `mpclib` (needed for building gcc)
+		- `patch` (for patching 3rd party packages to better understand KOS)
+		- `gdb` (if you wish to debug KOS)
 - On linux: Should work out of the box, but it's not my usual test environment (so no promises made)
 	
 Building KOS (from $PROJPATH):
