@@ -1,5 +1,5 @@
-/* HASH CRC-32:0x87526bf5 */
-/* Copyright (c) 2019-2020 Griefer@Work                                       *
+/* HASH CRC-32:0x8d658806 */
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -13,7 +13,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -99,6 +99,7 @@
 #define HAVE_SC_REPR_SCHED_POLICY
 #define HAVE_SC_REPR_SCHED_PRIORITY_WHICH
 #define HAVE_SC_REPR_SEEK_WHENCE
+#define HAVE_SC_REPR_SIGHANDLER_T
 #define HAVE_SC_REPR_SIGNALFD4_FLAGS
 #define HAVE_SC_REPR_SIGNO_T
 #define HAVE_SC_REPR_SIGPROCMASK_HOW
@@ -254,6 +255,7 @@ __SYSCALL_REPR(SC_REPR_RPC_SCHEDULE_FLAGS)
 __SYSCALL_REPR(SC_REPR_SCHED_POLICY)
 __SYSCALL_REPR(SC_REPR_SCHED_PRIORITY_WHICH)
 __SYSCALL_REPR(SC_REPR_SEEK_WHENCE)
+__SYSCALL_REPR(SC_REPR_SIGHANDLER_T)
 __SYSCALL_REPR(SC_REPR_SIGNALFD4_FLAGS)
 __SYSCALL_REPR(SC_REPR_SIGNO_T)
 __SYSCALL_REPR(SC_REPR_SIGPROCMASK_HOW)
