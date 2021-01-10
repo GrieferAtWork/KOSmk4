@@ -52,6 +52,8 @@ if ! which xkbcomp > /dev/null 2>&1; then
 						cmd ln -s "$KOS_ROOT/kos/include/xorg" "$OPTPATH_LIBXKBFILE/X11-include/xorg"
 						cmd cd "$OPTPATH_LIBXKBFILE"
 						(
+							unset PKG_CONFIG_PATH
+							unset PKG_CONFIG_LIBDIR
 							export CFLAGS="-I$OPTPATH_LIBXKBFILE/X11-include"
 							export CXXFLAGS="-I$OPTPATH_LIBXKBFILE/X11-include"
 							cmd bash "../../../src/Xorg/libxkbfile-$VERSION_LIBXKBFILE/configure" \
@@ -81,6 +83,8 @@ if ! which xkbcomp > /dev/null 2>&1; then
 				cmd ln -s "$KOS_ROOT/kos/include/xorg" "$OPTPATH_XKBCOMP/X11-include/xorg"
 				cmd cd "$OPTPATH_XKBCOMP"
 				(
+					unset PKG_CONFIG_PATH
+					unset PKG_CONFIG_LIBDIR
 					export CFLAGS="-I$OPTPATH_XKBCOMP/X11-include"
 					export CXXFLAGS="-I$OPTPATH_XKBCOMP/X11-include"
 					export LDFLAGS="-L$OPTPATH_LIBXKBFILE/src/.libs -Wl,-rpath=$OPTPATH_XKBCOMP/bin"

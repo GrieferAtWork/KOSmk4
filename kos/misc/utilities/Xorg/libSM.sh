@@ -23,8 +23,6 @@ require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 require_utility Xorg/xtrans    "$PKG_CONFIG_PATH/xtrans.pc"
 require_utility libuuid        "$PKG_CONFIG_PATH/uuid.pc"
 
-require_program xsltproc
-
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz"
 
 CONFIGURE=""

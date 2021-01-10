@@ -20,7 +20,6 @@
 
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/renderproto.pc"
 require_utility Xorg/libX11    "$PKG_CONFIG_PATH/x11.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXrender-0.9.10.tar.gz"
 

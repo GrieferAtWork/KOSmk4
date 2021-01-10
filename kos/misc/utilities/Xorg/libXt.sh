@@ -23,7 +23,6 @@ require_utility Xorg/libICE    "$PKG_CONFIG_PATH/ice.pc"
 require_utility Xorg/libX11    "$PKG_CONFIG_PATH/x11.pc"
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/kbproto.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXt-1.2.0.tar.gz"
 

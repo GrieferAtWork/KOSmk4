@@ -55,6 +55,7 @@ CONFIGURE="$CONFIGURE --disable-weak-symbols"
 CONFIGURE="$CONFIGURE --disable-reentrant"
 CONFIGURE="$CONFIGURE --disable-stripping"
 #CONFIGURE="$CONFIGURE --enable-assertions"
+CONFIGURE="$CONFIGURE --enable-widec"
 
 INSTALL_SKIP=""
 INSTALL_SKIP="$INSTALL_SKIP /bin/ncurses6-config"
@@ -62,6 +63,28 @@ INSTALL_SKIP="$INSTALL_SKIP /bin/ncursesw6-config"
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
+
+# Install the non-*w-suffixed libraries as symlinks to the wide-enabled ones
+# Note that the wide-enabled libraries still contain all of the functions that
+# are exposed by system headers, and are expected by non-wide-enabled programs.
+# Binary compatibility between the wide-enabled and non-wide-enabled libncurses
+# doesn't matter here, because we never build the non-wide-enabled one, and
+# link everything against the one with wide-character support built-in
+for name in form menu ncurses++ ncurses panel; do
+	install_symlink /$TARGET_LIBPATH/lib${name}.a      lib${name}w.a
+	install_symlink /$TARGET_LIBPATH/lib${name}.so     lib${name}w.so
+	install_symlink /$TARGET_LIBPATH/lib${name}.so.6   lib${name}w.so.6
+	install_symlink /$TARGET_LIBPATH/lib${name}.so.6.1 lib${name}w.so.6.1
+	install_symlink /$TARGET_LIBPATH/lib${name}_g.a    lib${name}w_g.a
+	if test x"$MODE_DRYRUN" != xno; then
+		echo "> pkg_config '/usr/share/pkgconfig/${name}.pc' (alias for '/usr/share/pkgconfig/${name}w.pc')"
+	else
+		dst_filename="$PKG_CONFIG_PATH/${name}.pc"
+		echo "Installing pkg_config file $dst_filename"
+		unlink "$dst_filename" > /dev/null 2>&1
+		cmd ln -s "${name}w.pc" "$dst_filename"
+	fi
+done
 
 # Install convenience headers and headers that may have been missing
 cmd mkdir -p "$KOS_ROOT/kos/include/ncurses"

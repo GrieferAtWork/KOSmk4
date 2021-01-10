@@ -266,7 +266,6 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					done
 				fi
 			else
-				_CONFHELP="$(bash $SRCPATH/configure --help 2>&1)"
 				# Auto-detect supported, but unset options
 				if ! [ -f "$SRCPATH/._configure_help" ]; then
 					echo "Creating file: '$SRCPATH/._configure_help'"
@@ -611,6 +610,14 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						   ! [[ "$CONFIGURE" == *--disable-lint-library* ]]; then
 							echo "	option: --disable-lint-library"
 							CONFIGURE="$CONFIGURE --disable-lint-library"
+						fi
+						;;
+
+					*--with-xsltproc* | *--without-xsltproc*)
+						if ! [[ "$CONFIGURE" == *--with-xsltproc* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-xsltproc* ]]; then
+							echo "	option: --without-xsltproc"
+							CONFIGURE="$CONFIGURE --without-xsltproc"
 						fi
 						;;
 

@@ -25,7 +25,6 @@ require_utility Xorg/libXext   "$PKG_CONFIG_PATH/xext.pc"
 require_utility Xorg/libXt     "$PKG_CONFIG_PATH/xt.pc"
 require_utility Xorg/libXmu    "$PKG_CONFIG_PATH/xmu.pc"
 require_utility Xorg/libXpm    "$PKG_CONFIG_PATH/xpm.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXaw-1.0.13.tar.gz"
 

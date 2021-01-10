@@ -19,7 +19,6 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXau-1.0.9.tar.gz"
 

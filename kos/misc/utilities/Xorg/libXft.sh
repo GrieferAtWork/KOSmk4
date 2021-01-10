@@ -22,7 +22,6 @@ require_utility Xorg/libXrender "$PKG_CONFIG_PATH/xrender.pc"
 require_utility Xorg/libX11     "$PKG_CONFIG_PATH/x11.pc"
 require_utility libfreetype2    "$PKG_CONFIG_PATH/freetype2.pc"
 require_utility fontconfig      "$PKG_CONFIG_PATH/fontconfig.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXft-2.3.3.tar.gz"
 

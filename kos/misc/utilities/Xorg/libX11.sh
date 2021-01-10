@@ -20,10 +20,10 @@
 
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xextproto.pc"
-#equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xtrans.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/kbproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/inputproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xf86bigfontproto.pc"
+require_utility Xorg/xtrans    "$PKG_CONFIG_PATH/xtrans.pc"
 require_utility Xorg/libxcb    "$PKG_CONFIG_PATH/xcb.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libX11-1.6.12.tar.gz"

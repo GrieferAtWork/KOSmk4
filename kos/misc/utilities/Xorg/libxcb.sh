@@ -20,7 +20,6 @@
 
 require_utility Xorg/xcb-proto "$PKG_CONFIG_PATH/xcb-proto.pc"
 require_utility Xorg/libXau    "$PKG_CONFIG_PATH/xau.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libxcb-1.14.tar.gz"
 

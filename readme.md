@@ -20,6 +20,7 @@ In general, KOS isn't designed to re-invent the wheel (no square wheels here), b
 - [Building KOS](#building)
 	- [Getting a Shell](#shell)
 	- [Recommended Build Environment](#build-env)
+	- [Building 3rd party programs](#building_3rd_party_programs)
 	- [`deemon magic.dee`](#magic)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
@@ -539,6 +540,25 @@ That's it. That last command will download, build & install busybox into every i
 The plan is to add more software to `make_utility.sh` in the future, so that you'll be able to install select third-party software with this easy-to-use method of building them.
 
 If you have any suggestions for software (or even better: code snippets for use in `make_utility.sh` alongside any required patch files), feel free to send them to me and I might add them so that everyone can use them.
+
+
+
+
+<a name="building_3rd_party_programs"></a>
+## Building 3rd party programs
+
+Like already mentioned in [Ported Applications](#applications), building 3rd party programs/libraries for use with KOS is done by invoking the `$PROJPATH/kos/misc/make_utility.sh` script.
+
+I'd also like to recommend that you *dont* run `make_utility.sh` as root. While I'm doing my best to get utilities to behave and not try to copy files into host system paths, given that these aren't my projects, I can't guaranty that some of them might still try to do this in certain situations. As such, running `make_utility.sh` as a normal user, 3rd party configure+make scripts won't be able to modify/write files in host system paths.
+
+However, building 3rd party programs sometimes requires additional utilities to be installed. In most cases, these utilities can be read from error messages, however here's a list of some that you'll be needing for quite a few of them:
+
+- `autoconf` + `automake` + `libtool` (for projects that don't come with a ready-made `./configure` script, but instead the raw `configure.ac`)
+- `cmake` (for cmake-based projects)
+- `gperf` (currently only needed by `fontconfig`)
+- `perl` (currently only needed by `openssl`)
+- `xsltproc` (Needed for building a number of Xorg utilities)
+
 
 
 

@@ -22,6 +22,7 @@ require_program autoreconf
 require_program autoconf
 require_program libtool
 
+# TODO: All of these are deprecated and should be removed
 XORG_CONFIGURE_PREFIX="/"
 XORG_CONFIGURE_EXEC_PREFIX="/"
 XORG_CONFIGURE_BINDIR="/bin"
@@ -135,3 +136,9 @@ Version: $XORG_MACROS_VERSION
 EOF
 fi
 
+echo "xorg-macros: Add '$XORG_MACROS_OPTPATH' to \$ACLOCAL_PATH"
+if test -z "$ACLOCAL_PATH"; then
+	export ACLOCAL_PATH="$XORG_MACROS_OPTPATH"
+else
+	export ACLOCAL_PATH="$XORG_MACROS_OPTPATH:$ACLOCAL_PATH"
+fi

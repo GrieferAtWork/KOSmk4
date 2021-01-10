@@ -105,7 +105,7 @@ EOF
 	# the actual `libffi`. Problem here is that ffi_convenience only comes as
 	# a static library, so if we let python see it, we'd end up linking libffi
 	# statically (which would completely counteract the whole idea behind using
-	# the system libffi, rather than python's builtin, static one)
+	# the system libffi, rather than python's builtin, already-static one)
 	mv	"$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/libffi_convenience.a" \
 		"$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/.libffi_convenience.a" \
 		2>&1 > /dev/null

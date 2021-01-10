@@ -21,7 +21,6 @@
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xextproto.pc"
 require_utility Xorg/libX11    "$PKG_CONFIG_PATH/x11.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXext-1.3.4.tar.gz"
 

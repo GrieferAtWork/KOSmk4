@@ -23,7 +23,6 @@ require_utility Xorg/libX11    "$PKG_CONFIG_PATH/x11.pc"
 require_utility Xorg/libXt     "$PKG_CONFIG_PATH/xt.pc"
 require_utility Xorg/libXext   "$PKG_CONFIG_PATH/xext.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xextproto.pc"
-require_program xsltproc
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXpm-3.5.13.tar.gz"
 
