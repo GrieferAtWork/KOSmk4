@@ -101,6 +101,9 @@ BEGIN
 		/* Required for: disk I/O */
 		"../modide/*.c",
 
+		/* Required for: disk file access */
+		"../modfat/*.c",
+
 		"../moddbx/*.c", /* TODO: Remove me */
 
 		/* Pull in the actual kernel sources */

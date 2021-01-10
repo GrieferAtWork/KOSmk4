@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_DRIVERS_FAT_H
-#define GUARD_KERNEL_INCLUDE_DRIVERS_FAT_H 1
+#ifndef GUARD_MODFAT_FAT_H
+#define GUARD_MODFAT_FAT_H 1
 
 #include <kernel/compiler.h>
 
@@ -514,4 +514,4 @@ Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos) THROWS(...);
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_DRIVERS_FAT_H */
+#endif /* !GUARD_MODFAT_FAT_H */

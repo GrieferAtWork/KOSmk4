@@ -19,11 +19,13 @@
  */
 #ifdef __INTELLISENSE__
 #include "fat.c"
+
+/* TODO: Refactor this to use the newer `#define DEFINE_<funcname>' format */
 #define DEFINE_IO_READ 1
 //#define DEFINE_IO_WRITE 1
 //#define DEFINE_IO_PHYS 1
 //#define DEFINE_IO_VECTOR 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <kernel/aio.h>
 #include <kernel/iovec.h>

@@ -17,14 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_DRIVERS_FAT_C
-#define GUARD_KERNEL_CORE_DRIVERS_FAT_C 1
+#ifndef GUARD_MODFAT_FAT_C
+#define GUARD_MODFAT_FAT_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
+#include "fat.h"
+
+/* TODO: Add (optional, runtime-disable-able) support for cygwin's symlink format. */
+
 #include <kernel/compiler.h>
 
-#include <drivers/fat.h>
 #include <fs/node.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -2833,8 +2836,12 @@ PRIVATE struct superblock_type Fat_SuperblockType = {
 	}
 };
 
-INTERN ATTR_FREETEXT void
-NOTHROW(KCALL kernel_initialize_fat_driver)(void) {
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+INTERN ATTR_FREETEXT void KCALL kernel_initialize_fat_driver(void)
+#else  /* CONFIG_BUILDING_KERNEL_CORE */
+PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL fat_init(void)
+#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+{
 	register_filesystem_type(&Fat_SuperblockType);
 }
 
@@ -2876,4 +2883,4 @@ DECL_END
 
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_KERNEL_CORE_DRIVERS_FAT_C */
+#endif /* !GUARD_MODFAT_FAT_C */
