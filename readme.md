@@ -557,7 +557,6 @@ However, building 3rd party programs sometimes requires additional utilities to 
 - `cmake` (for cmake-based projects)
 - `gperf` (currently only needed by `fontconfig`)
 - `perl` (currently only needed by `openssl`)
-- `xsltproc` (Needed for building a number of Xorg utilities)
 
 
 
