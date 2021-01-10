@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7518b278 */
+/* HASH CRC-32:0x84dd4b88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,17 +393,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL v
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads! */
 #ifdef __USE_MISC
+#undef __PRIVATE_bzero_2
 #undef __PRIVATE_bzero_3
-#undef __PRIVATE_bzero_4
 #ifdef __USE_KOS
-#define __PRIVATE_bzero_4   bzeroc
+#define __PRIVATE_bzero_3   bzeroc
 #else /* __USE_KOS */
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
-#define __PRIVATE_bzero_4   __libc_bzeroc
+#define __PRIVATE_bzero_3   __libc_bzeroc
 #endif /* !__USE_KOS */
-#define __PRIVATE_bzero_3   (bzero)
+#define __PRIVATE_bzero_2   (bzero)
 #undef bzero
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)

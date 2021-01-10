@@ -187,7 +187,7 @@ function setBinTargetLink(target_arch: string, target_name: string) {
 			}
 		}
 		print("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
-		local p = ipc.Process("bash", [ "-c",
+		local p = ipc.Process(HOST_EXE("bash"), [ "-c",
 			"ln -s {!r} {!r}".format({ target_name, selConfigFile })
 		]);
 		p.start();

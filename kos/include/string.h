@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36748195 */
+/* HASH CRC-32:0x2e8f49bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8295,17 +8295,17 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
  * >> void bzero(void *dst, size_t num_bytes);
  * >> void bzero(void *dst, size_t elem_count, size_t elem_size); */
 #ifdef __USE_MISC
+#undef __PRIVATE_bzero_2
 #undef __PRIVATE_bzero_3
-#undef __PRIVATE_bzero_4
 #ifdef __USE_KOS
-#define __PRIVATE_bzero_4   bzeroc
+#define __PRIVATE_bzero_3   bzeroc
 #else /* __USE_KOS */
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
-#define __PRIVATE_bzero_4   __libc_bzeroc
+#define __PRIVATE_bzero_3   __libc_bzeroc
 #endif /* !__USE_KOS */
-#define __PRIVATE_bzero_3   (bzero)
+#define __PRIVATE_bzero_2   (bzero)
 #undef bzero
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)

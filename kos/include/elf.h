@@ -732,7 +732,6 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define __PRIVATE_EM_NAME_166    _EN(STXP7X)
 #define __PRIVATE_EM_NAME_167    _EN(NDS32)
 #define __PRIVATE_EM_NAME_168    _EN(ECOG1)
-#define __PRIVATE_EM_NAME_168    _EN(ECOG1X)
 #define __PRIVATE_EM_NAME_169    _EN(MAXQ30)
 #define __PRIVATE_EM_NAME_170    _EN(XIMO16)
 #define __PRIVATE_EM_NAME_171    _EN(MANIK)

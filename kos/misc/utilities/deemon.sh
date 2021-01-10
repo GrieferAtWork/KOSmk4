@@ -19,16 +19,14 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 SRCPATH="$KOS_ROOT/binutils/src/deemon-git/deemon"
+OPTPATH="$BINUTILS_SYSROOT/opt/deemon"
+
 if ! [ -f "$SRCPATH/configure" ]; then
 	rm -rf "$KOS_ROOT/binutils/src/deemon-git" > /dev/null 2>&1
 	cmd mkdir -p "$KOS_ROOT/binutils/src/deemon-git"
 	cmd cd "$KOS_ROOT/binutils/src/deemon-git"
 	cmd git clone "https://github.com/GrieferAtWork/deemon.git"
 fi
-
-cmd cd "$SRCPATH"
-DEEMON_VERSION=$(git rev-parse HEAD)
-OPTPATH="$BINUTILS_SYSROOT/opt/deemon-git-$DEEMON_VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/deemon" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then

@@ -3,7 +3,7 @@
 
 ### Portability Notes
 
-KOS system headers are designed and written to maximize portability with existing systems, and to aid programmers using the KOS system header suite in knowing which headers exist in which platforms.
+KOS system headers are designed and written to maximize portability with existing systems, and to aid programmers using the KOS system header suite in knowing which headers exist on which platforms.
 
 For this purpose, many System headers begin with (after the leading copyright notice) lines such as (from `<string.h>`):  
 
