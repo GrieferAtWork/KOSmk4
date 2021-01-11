@@ -127,7 +127,7 @@ if [ "$TARGET_CPUNAME" == "x86_64" ]; then
 fi
 
 
-KOS_MISC="$(dirname $(readlink -f "$0"))"
+KOS_MISC="$(dirname "$(readlink -f "$0")")"
 KOS_PATCHES="${KOS_MISC}/patches"
 cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
@@ -541,6 +541,8 @@ export CROSS_TARGET="$TARGET_NAME-elf"
 export CROSS_PREFIX="$KOS_ROOT/binutils/$TARGET_NAME-kos/bin/$TARGET_CPUNAME-kos-"
 export CROSS_COMPILE="$CROSS_PREFIX"
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
+HOST_SYSROOT="$KOS_ROOT/binutils/misc"
+
 
 UTILITY_SCRIPT="${KOS_ROOT}/kos/misc/utilities/${UTILITY_NAME}.sh"
 if ! [ -f "$UTILITY_SCRIPT" ]; then

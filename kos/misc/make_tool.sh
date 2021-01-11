@@ -19,11 +19,41 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 
+#>> cmd <ARGV...>
 cmd() {
 	$* || {
 		local error=$?
 		echo "ERROR: Command failed '$*' -> '$error'"
 		exit $error
+	}
+}
+
+#>> xcmd <ARGV...>
+xcmd() {
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		return $error
+	}
+}
+
+#>> vcmd <ARGV...>
+vcmd() {
+	echo "run: $*"
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		exit $error
+	}
+}
+
+#>> vxcmd <ARGV...>
+vxcmd() {
+	echo "run: $*"
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		return $error
 	}
 }
 
@@ -61,11 +91,14 @@ fi
 
 TOOL_NAME="$1"
 
-KOS_MISC="$(dirname $(readlink -f "$0"))"
+KOS_MISC="$(dirname "$(readlink -f "$0")")"
+KOS_PATCHES="${KOS_MISC}/patches"
 cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
-KOS_BINUTILS="${KOS_ROOT}/binutils"
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
+SYSROOT="$KOS_ROOT/binutils/misc"
+
+
 
 # download_file  <DST_FILE>  <URL>
 download_file() {
@@ -93,17 +126,38 @@ apply_patch() {
 }
 
 
+require_program() {
+	which $1 > /dev/null 2>&1 || {
+		local error=$?
+		echo "ERROR: Required program not found '$1' -> '$error'"
+		echo "       Check if this program is installed, and make sure that it's in \$PATH"
+		exit $error
+	}
+}
+
+# require_tool <TOOL_NAME> <INDICATOR_FILE>
+require_tool() {
+	if ! [ -f "$2" ]; then
+		echo "Required tool not installed: $1 (file '$2' does't exist)"
+		echo "Resolve this issue by running:"
+		echo "\$ bash make_tool.sh $1"
+		exit 1
+	fi
+}
+
+
+
 case $TOOL_NAME in
 
 	bochs | bochs-2.6.11)
 		BOCHS_VERSION="2.6.11"
-		cmd mkdir -p "$KOS_BINUTILS/src"
-		BOCHS_BUILDPATH="$KOS_BINUTILS/build-bochs-$BOCHS_VERSION"
-		BOCHS_SRCPATH="$KOS_BINUTILS/src/bochs-$BOCHS_VERSION"
+		cmd mkdir -p "$SYSROOT"
+		BOCHS_BUILDPATH="$SYSROOT/opt/bochs-$BOCHS_VERSION"
+		BOCHS_SRCPATH="$KOS_ROOT/binutils/src/bochs-$BOCHS_VERSION"
 		if [ "$MODE_FORCE_MAKE" == yes ] || (! [ -f "$BOCHS_BUILDPATH/bochs" ] && ! [ -f "$BOCHS_BUILDPATH/bochs.exe" ]); then
 			if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$BOCHS_BUILDPATH/Makefile" ]; then
 				if ! [ -f "$BOCHS_SRCPATH/configure" ]; then
-					cmd cd "$KOS_BINUTILS/src"
+					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
 						"bochs-$BOCHS_VERSION.tar.gz" \
 						"https://downloads.sourceforge.net/project/bochs/bochs/$BOCHS_VERSION/bochs-$BOCHS_VERSION.tar.gz"
@@ -128,7 +182,7 @@ case $TOOL_NAME in
 				#                     one for i386 and one for x86_64 (and
 				#                     we sadly can't use the same for both)
 				# --enable-protection-keys  (requires --enable-x86-64)
-				cmd bash "../src/bochs-$BOCHS_VERSION/configure" \
+				cmd bash "$KOS_ROOT/binutils/src/bochs-$BOCHS_VERSION/configure" \
 					--enable-cpu-level=6 \
 					--enable-a20-pin \
 					--enable-gdb-stub \

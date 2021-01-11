@@ -181,7 +181,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							exit 1
 						fi
 					elif ! test -z "$PACKAGE_GIT_URL"; then
-						# Figure out the directory name that 
+						# Figure out the directory name that
 						cmd mkdir -p "$SRCPATH"
 						cmd cd "$SRCPATH"
 						cmd git clone "$PACKAGE_GIT_URL"
@@ -640,12 +640,14 @@ EOF
 				fi
 				${GM_HOOK_BEFORE_CONFIGURE:-:}
 				cmd cd "$OPTPATH"
+				echo "gnu_make: Now running $PACKAGE_NAME: ./configure..."
 				cmd bash "$SRCPATH/configure" $CONFIGURE
 			) || exit $?
 			${GM_HOOK_AFTER_CONFIGURE:-:}
 		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];
 		${GM_HOOK_BEFORE_MAKE:-:}
 		cmd cd "$OPTPATH"
+		echo "gnu_make: Now running $PACKAGE_NAME: make..."
 		cmd make -j $MAKE_PARALLEL_COUNT
 		${GM_HOOK_AFTER_MAKE:-:}
 		> "$OPTPATH/_didmake"
@@ -654,6 +656,7 @@ EOF
 	# Don't directly install to $DESTDIR to prevent a successful install
 	# from being detected when "make install" fails, or get interrupted.
 	rm -r "$DESTDIR-temp" > /dev/null 2>&1
+	echo "gnu_make: Now running $PACKAGE_NAME: make install..."
 	(
 		export DESTDIR="$DESTDIR-temp"
 		${GM_HOOK_BEFORE_INSTALL:-:}
@@ -665,170 +668,178 @@ EOF
 fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
 
 
-# Go over all all of the files that got installed, and select
-# which of them we want to put on the KOS disk image(s).
-cmd cd "$DESTDIR"
-while IFS= read -r line; do
-	line="${line#.}"
-	if ! test -z "$line"; then
-		if ! test -z "$INSTALL_SKIP"; then
-			if [[ " $INSTALL_SKIP " == *" $line "* ]]; then
-				continue
+if test -z "$INSTALL_NONE"; then
+	# Go over all all of the files that got installed, and select
+	# which of them we want to put on the KOS disk image(s).
+	cmd cd "$DESTDIR"
+	while IFS= read -r line; do
+		line="${line#.}"
+		if ! test -z "$line"; then
+			if ! test -z "$INSTALL_SKIP"; then
+				if [[ " $INSTALL_SKIP " == *" $line "* ]]; then
+					continue
+				fi
 			fi
-		fi
-		src_filename="${DESTDIR}$line"
-		case "$line" in
+			src_filename="${DESTDIR}$line"
+			case "$line" in
 
-		# Ignored files (Don't install documentation on disk images (for now))
-		$PACKAGE_INFODIR/* | \
-		$PACKAGE_MANDIR/* | $PACKAGE_DOCDIR/* | $PACKAGE_HTMLDIR/* | \
-		$PACKAGE_DVIDIR/* | $PACKAGE_PDFDIR/* | $PACKAGE_PSDIR/*)
-			;;
+			# Ignored files (Don't install documentation on disk images (for now))
+			$PACKAGE_INFODIR/* | \
+			$PACKAGE_MANDIR/* | $PACKAGE_DOCDIR/* | $PACKAGE_HTMLDIR/* | \
+			$PACKAGE_DVIDIR/* | $PACKAGE_PDFDIR/* | $PACKAGE_PSDIR/*)
+				;;
 
-		$PACKAGE_LIBDIR/*.la)
-			# Skip libtool instruction files
-			;;
+			$PACKAGE_LIBDIR/*.la)
+				# Skip libtool instruction files
+				;;
 
-		$PACKAGE_LIBDIR/*.a)
-			# Don't install static libraries on-disk. - Only install them in the lib-path
-			install_file_nodisk "$line" "$src_filename"
-			;;
+			$PACKAGE_LIBDIR/*.a)
+				# Don't install static libraries on-disk. - Only install them in the lib-path
+				install_file_nodisk "$line" "$src_filename"
+				;;
 
-		*.so.*)
-			# NOTE: All of the following is a work-around to get shared library symlinks
-			#       working properly, as KOS's disk images currently don't support symbolic
-			#       links due to the fact that they're using FAT
-			dst_path="${line%/*}"
-			src_name="${line##*/}"
-			raw_name="${src_name%.so.*}.so"
-			# Versioned shared libraries are kind-of special:
-			#    lrwxrwxrwx [...] libuuid.so -> libuuid.so.1.0.0
-			#    lrwxrwxrwx [...] libuuid.so.1 -> libuuid.so.1.0.0
-			#    -rwxr-xr-x [...] libuuid.so.1.0.0
-			# Since we're only enumerating regular files, we'll only get here once for "libuuid.so.1.0.0".
-			# To install this file correctly, we must do the following:
-			# $ install_file    /$TARGET_LIBPATH/libuuid.so.1      libuuid.so.1.0.0
-			# $ install_symlink /$TARGET_LIBPATH/libuuid.so.1.0.0  libuuid.so.1
-			# $ install_symlink /$TARGET_LIBPATH/libuuid.so        libuuid.so.1
-			so_name=""
-			while IFS= read -r readelf_line; do
-				if [[ "$readelf_line" == *"Library soname: ["* ]]; then
-					readelf_line="${readelf_line##*Library soname: [}"
-					if [[ "$readelf_line" == *"]"* ]]; then
-						so_name="${readelf_line%]*}"
+			*.so.*)
+				# NOTE: All of the following is a work-around to get shared library symlinks
+				#       working properly, as KOS's disk images currently don't support symbolic
+				#       links due to the fact that they're using FAT
+				dst_path="${line%/*}"
+				src_name="${line##*/}"
+				raw_name="${src_name%.so.*}.so"
+				# Versioned shared libraries are kind-of special:
+				#    lrwxrwxrwx [...] libuuid.so -> libuuid.so.1.0.0
+				#    lrwxrwxrwx [...] libuuid.so.1 -> libuuid.so.1.0.0
+				#    -rwxr-xr-x [...] libuuid.so.1.0.0
+				# Since we're only enumerating regular files, we'll only get here once for "libuuid.so.1.0.0".
+				# To install this file correctly, we must do the following:
+				# $ install_file    /$TARGET_LIBPATH/libuuid.so.1      libuuid.so.1.0.0
+				# $ install_symlink /$TARGET_LIBPATH/libuuid.so.1.0.0  libuuid.so.1
+				# $ install_symlink /$TARGET_LIBPATH/libuuid.so        libuuid.so.1
+				so_name=""
+				while IFS= read -r readelf_line; do
+					if [[ "$readelf_line" == *"Library soname: ["* ]]; then
+						readelf_line="${readelf_line##*Library soname: [}"
+						if [[ "$readelf_line" == *"]"* ]]; then
+							so_name="${readelf_line%]*}"
+						fi
 					fi
+				done < <(readelf -d -W "$src_filename")
+				if test -z "$so_name"; then so_name="$src_name"; fi
+				if [ -L "${DESTDIR}$dst_path/$so_name" ]; then
+					# Install the shared library under its SO_NAME
+					install_file "$dst_path/$so_name" "$src_filename"
+					if [[ "$so_name" != "$src_name" ]]; then
+						install_symlink "$line" "$so_name";
+					fi
+				else
+					# Install the shared library under its original name
+					install_file "$line" "$src_filename"
 				fi
-			done < <(readelf -d -W "$src_filename")
-			if test -z "$so_name"; then so_name="$src_name"; fi
-			if [ -L "${DESTDIR}$dst_path/$so_name" ]; then
-				# Install the shared library under its SO_NAME
-				install_file "$dst_path/$so_name" "$src_filename"
-				if [[ "$so_name" != "$src_name" ]]; then
-					install_symlink "$line" "$so_name";
+				if [[ "$so_name" != "$raw_name" ]] && [ -L "${DESTDIR}$dst_path/$raw_name" ]; then
+					# install_symlink /$TARGET_LIBPATH/libuuid.so libuuid.so.1
+					install_symlink "$dst_path/$raw_name" "$so_name"
 				fi
-			else
-				# Install the shared library under its original name
+				;;
+
+			$PACKAGE_INCLUDEDIR/* | $PACKAGE_OLDINCLUDEDIR/*)
+				if [[ "$line" == "$PACKAGE_INCLUDEDIR/"* ]]; then
+					rel_filename="${line:${#PACKAGE_INCLUDEDIR}}"
+				else
+					rel_filename="${line:${#PACKAGE_OLDINCLUDEDIR}}"
+				fi
+				# Install a 3rd party header file
+				install_rawfile "$KOS_ROOT/kos/include$rel_filename" "$src_filename"
+				;;
+
+
+			*/aclocal/*.m4)
+				m4_filename="${line##*/}"
+				dst_filename="$BINUTILS_SYSROOT/usr/local/share/aclocal/$m4_filename"
+				if test x"$MODE_DRYRUN" != xno; then
+					echo "> aclocal_m4_config '$src_filename'"
+				elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+					echo "Installing aclocal_m4_config file $dst_filename"
+					unlink "$dst_filename" > /dev/null 2>&1
+					cmd mkdir -p "$BINUTILS_SYSROOT/usr/local/share/aclocal"
+					cmd cp "$src_filename" "$dst_filename"
+				else
+					echo "Installing aclocal_m4_config file $dst_filename (up to date)"
+				fi
+				;;
+
+			*/pkgconfig/*.pc)
+				pc_filename="${line##*/}"
+				dst_filename="$PKG_CONFIG_PATH/$pc_filename"
+				if test x"$MODE_DRYRUN" != xno; then
+					echo "> pkg_config '$src_filename'"
+				elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+					echo "Installing pkg_config file $dst_filename"
+					unlink "$dst_filename" > /dev/null 2>&1
+					while IFS= read -r pc_line; do
+						case "$pc_line" in
+
+						prefix=*)              pc_line="prefix=$PACKAGE_PREFIX" ;;
+						exec_prefix=*)         pc_line="exec_prefix=$PACKAGE_EPREFIX" ;;
+						libdir=*)              pc_line="libdir=$KOS_ROOT/bin/$TARGET_NAME-kos$PACKAGE_LIBDIR" ;;
+						includedir=*)          pc_line="includedir=$KOS_ROOT/kos/include" ;;
+
+						# These are needed for Xorg
+						sdkdir=/include)       pc_line="sdkdir=$KOS_ROOT/kos/include" ;;
+						sdkdir=/include/*)     pc_line="sdkdir=$KOS_ROOT/kos/include/${pc_line:16}" ;;
+						sdkdir=/usr/include)   pc_line="sdkdir=$KOS_ROOT/kos/include" ;;
+						sdkdir=/usr/include/*) pc_line="sdkdir=$KOS_ROOT/kos/include/${pc_line:20}" ;;
+
+						Cflags:*)
+							pc_line="${pc_line:7}"
+							new_pc_line=""
+							for arg in $pc_line; do
+								case "$arg" in
+								-I\${includedir})
+									arg=""
+									;;
+								-I\${includedir}/*)
+									arg="-I$KOS_ROOT/kos/include/${arg:16}"
+									;;
+								*)
+									;;
+								esac
+								if ! test -z "$arg"; then
+									new_pc_line="$new_pc_line $arg"
+								fi
+							done
+							pc_line="Cflags:$new_pc_line"
+							;;
+
+						Libs:*)
+							pc_line="${pc_line:5}"
+							new_pc_line=""
+							for arg in $pc_line; do
+								case "$arg" in
+								-L\${libdir})
+									arg=""
+									;;
+								*)
+									;;
+								esac
+								if ! test -z "$arg"; then
+									new_pc_line="$new_pc_line $arg"
+								fi
+							done
+							pc_line="Libs:$new_pc_line"
+							;;
+
+						*) ;;
+						esac
+						echo "$pc_line" >> "$dst_filename"
+					done < "$src_filename"
+				else
+					echo "Installing pkg_config file $dst_filename (up to date)"
+				fi
+				;;
+
+			*)
+				# Fallback: Install the file normally
 				install_file "$line" "$src_filename"
-			fi
-			if [[ "$so_name" != "$raw_name" ]] && [ -L "${DESTDIR}$dst_path/$raw_name" ]; then
-				# install_symlink /$TARGET_LIBPATH/libuuid.so libuuid.so.1
-				install_symlink "$dst_path/$raw_name" "$so_name"
-			fi
-			;;
-
-		$PACKAGE_INCLUDEDIR/* | $PACKAGE_OLDINCLUDEDIR/*)
-			if [[ "$line" == "$PACKAGE_INCLUDEDIR/"* ]]; then
-				rel_filename="${line:${#PACKAGE_INCLUDEDIR}}"
-			else
-				rel_filename="${line:${#PACKAGE_OLDINCLUDEDIR}}"
-			fi
-			# Install a 3rd party header file
-			install_rawfile "$KOS_ROOT/kos/include$rel_filename" "$src_filename"
-			;;
-
-
-		*/aclocal/*.m4)
-			m4_filename="${line##*/}"
-			dst_filename="$BINUTILS_SYSROOT/usr/local/share/aclocal/$m4_filename"
-			if test x"$MODE_DRYRUN" != xno; then
-				echo "> aclocal_m4_config '$src_filename'"
-			elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
-				echo "Installing aclocal_m4_config file $dst_filename"
-				unlink "$dst_filename" > /dev/null 2>&1
-				cmd mkdir -p "$BINUTILS_SYSROOT/usr/local/share/aclocal"
-				cmd cp "$src_filename" "$dst_filename"
-			else
-				echo "Installing aclocal_m4_config file $dst_filename (up to date)"
-			fi
-			;;
-
-		*/pkgconfig/*.pc)
-			pc_filename="${line##*/}"
-			dst_filename="$PKG_CONFIG_PATH/$pc_filename"
-			if test x"$MODE_DRYRUN" != xno; then
-				echo "> pkg_config '$src_filename'"
-			elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
-				echo "Installing pkg_config file $dst_filename"
-				unlink "$dst_filename" > /dev/null 2>&1
-				while IFS= read -r pc_line; do
-					case "$pc_line" in
-
-					prefix=*)      pc_line="prefix=$PACKAGE_PREFIX" ;;
-					exec_prefix=*) pc_line="exec_prefix=$PACKAGE_EPREFIX" ;;
-					libdir=*)      pc_line="libdir=$KOS_ROOT/bin/$TARGET_NAME-kos$PACKAGE_LIBDIR" ;;
-					includedir=*)  pc_line="includedir=$KOS_ROOT/kos/include" ;;
-
-					Cflags:*)
-						pc_line="${pc_line:7}"
-						new_pc_line=""
-						for arg in $pc_line; do
-							case "$arg" in
-							-I\${includedir})
-								arg=""
-								;;
-							-I\${includedir}/*)
-								arg="-I$KOS_ROOT/kos/include/${arg:16}"
-								;;
-							*)
-								;;
-							esac
-							if ! test -z "$arg"; then
-								new_pc_line="$new_pc_line $arg"
-							fi
-						done
-						pc_line="Cflags:$new_pc_line"
-						;;
-
-					Libs:*)
-						pc_line="${pc_line:5}"
-						new_pc_line=""
-						for arg in $pc_line; do
-							case "$arg" in
-							-L\${libdir})
-								arg=""
-								;;
-							*)
-								;;
-							esac
-							if ! test -z "$arg"; then
-								new_pc_line="$new_pc_line $arg"
-							fi
-						done
-						pc_line="Libs:$new_pc_line"
-						;;
-
-					*) ;;
-					esac
-					echo "$pc_line" >> "$dst_filename"
-				done < "$src_filename"
-			else
-				echo "Installing pkg_config file $dst_filename (up to date)"
-			fi
-			;;
-
-		*)
-			# Fallback: Install the file normally
-			install_file "$line" "$src_filename"
-		esac
-	fi
-done < <(find . -type f 2>&1)
+			esac
+		fi
+	done < <(find . -type f 2>&1)
+fi

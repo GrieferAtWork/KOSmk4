@@ -17,11 +17,6 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_program aclocal
-require_program autoreconf
-require_program autoconf
-require_program libtool
-
 # TODO: All of these are deprecated and should be removed
 XORG_CONFIGURE_PREFIX="/"
 XORG_CONFIGURE_EXEC_PREFIX="/"
@@ -46,31 +41,6 @@ XORG_CONFIGURE_DVIDIR_PREFIX="$XORG_CONFIGURE_DATADIR/doc"
 XORG_CONFIGURE_PDFDIR_PREFIX="$XORG_CONFIGURE_DATADIR/doc"
 XORG_CONFIGURE_PSDIR_PREFIX="$XORG_CONFIGURE_DATADIR/doc"
 XORG_CONFIGURE_LOCALE_LIB_DIR="$XORG_CONFIGURE_LIBDIR/X11/locale"
-
-
-# For copy & pasting:
-#				--prefix="$XORG_CONFIGURE_PREFIX" \
-#				--exec-prefix="$XORG_CONFIGURE_EXEC_PREFIX" \
-#				--bindir="$XORG_CONFIGURE_BINDIR" \
-#				--sbindir="$XORG_CONFIGURE_SBINDIR" \
-#				--libexecdir="$XORG_CONFIGURE_LIBEXECDIR" \
-#				--sysconfdir="$XORG_CONFIGURE_SYSCONFDIR" \
-#				--sharedstatedir="$XORG_CONFIGURE_SHAREDSTATEDIR" \
-#				--localstatedir="$XORG_CONFIGURE_LOCALSTATEDIR" \
-#				--libdir="$XORG_CONFIGURE_LIBDIR" \
-#				--includedir="$XORG_CONFIGURE_INCLUDEDIR" \
-#				--oldincludedir="$XORG_CONFIGURE_OLDINCLUDEDIR" \
-#				--datarootdir="$XORG_CONFIGURE_DATAROOTDIR" \
-#				--datadir="$XORG_CONFIGURE_DATADIR" \
-#				--infodir="$XORG_CONFIGURE_INFODIR" \
-#				--localedir="$XORG_CONFIGURE_LOCALEDIR" \
-#				--mandir="$XORG_CONFIGURE_MANDIR" \
-#				--docdir="$XORG_CONFIGURE_DOCDIR_PREFIX/$NAME" \
-#				--htmldir="$XORG_CONFIGURE_HTMLDIR_PREFIX/$NAME" \
-#				--dvidir="$XORG_CONFIGURE_DVIDIR_PREFIX/$NAME" \
-#				--pdfdir="$XORG_CONFIGURE_PDFDIR_PREFIX/$NAME" \
-#				--psdir="$XORG_CONFIGURE_PSDIR_PREFIX/$NAME" \
-# ...
 
 
 XORG_MACROS_VERSION="1.19.2"

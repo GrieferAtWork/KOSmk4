@@ -50,8 +50,8 @@ done
 
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/xtrans.pc" <<EOF
-prefix=$XORG_CONFIGURE_PREFIX
-exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
+prefix=/
+exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 includedir=$KOS_ROOT/kos/include
 

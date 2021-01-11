@@ -24,18 +24,10 @@ require_utility Xorg/xkbcomp "$PKG_CONFIG_PATH/xkbcomp.pc"
 # On cygwin, they're found in:
 #    - intltool-update: intltool-0.51.0-1
 #    - iconv:           libiconv-1.14-2
+#    - xkbcomp:         xkbcomp-1.4.3-1
 require_program intltool-update
 require_program iconv
-
-# We need a secondary version of "/bin/xkbcomp" that is compiled
-# for the host machine, as the process of making xkeyboard-config
-# files inbokes the xkbcomp compiler.
-# This is where we download+configure+make that second variant,
-# as well as modify our $PATH such that it can be found below.
-# Note that despite this, KOS still needs a secondary xkbcomp
-# compiler at runtime, as xorg-server will execv("/bin/xkbcomp")
-# in order to compile keyboard maps.
-. "$KOS_MISC/utilities/Xorg/misc/host-xkbcomp.sh"
+require_program xkbcomp
 
 PACKAGE_URL="https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.31.tar.gz"
 
