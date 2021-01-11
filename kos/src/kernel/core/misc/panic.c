@@ -47,6 +47,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
@@ -66,9 +67,20 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-DATDEF bool const _kernel_poisoned;
-DATDEF bool __kernel_poisoned ASMNAME("_kernel_poisoned");
-PUBLIC bool __kernel_poisoned = false;
+DATDEF uint8_t const _kernel_poisoned;
+DATDEF uint8_t __kernel_poisoned ASMNAME("_kernel_poisoned");
+PUBLIC uint8_t __kernel_poisoned = false;
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DBG_COMMAND(unpoison,
+            "unpoison\n"
+            "\tClears the PANIC bit after kernel panic\n"
+            "\tThe NO_WARRANTY bit is not altered") {
+	ATOMIC_AND(__kernel_poisoned, ~_KERNEL_POISON_PANIC);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 #undef LOG_STACK_REMAINDER
@@ -130,7 +142,7 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	 * inconsistent, and can no longer be trusted to sporadically
 	 * crash and burn) */
 	COMPILER_WRITE_BARRIER();
-	__kernel_poisoned = true;
+	ATOMIC_STORE(__kernel_poisoned, 0xff); /* Set all of the poison bits! */
 	COMPILER_WRITE_BARRIER();
 #ifdef CONFIG_HAVE_POISON_HEAP
 	/* Redirect heap functions to use the poison heap */

@@ -24,6 +24,8 @@
 
 #include <debugger/config.h>
 
+#include <hybrid/typecore.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -34,12 +36,39 @@ struct icpustate;
 struct scpustate;
 struct fcpustate;
 
+/* Set of kernel poison flags. When the kernel panics, all bits
+ * of this variable are set to 1, but some can be cleared once
+ * again as the result of certain actions being performed. */
+DATDEF __UINT8_TYPE__ const _kernel_poisoned;
+#define _KERNEL_POISON_PANIC       0x01 /* Kernel poison bit: Use this to restrict system functions
+                                         *                    and select less error-prone code path.
+                                         * This bit can be cleared by the debugger `unpanic' command. */
+#define _KERNEL_POISON_NO_WARRANTY 0x80 /* System warranty expired. Don't use this to restrict access,
+                                         * but do use it if you're looking for reasons why something
+                                         * about your code failed. If this bit is set, the system was
+                                         * in an unstable state to begin with, and stuff breaking may
+                                         * not be your fault.
+                                         * Unlike other bits, this one _cannot_ be cleared (or at least
+                                         * isn't meant to ever be cleared once set), and should be used
+                                         * to choose more-stable/free-standing algorithms over others
+                                         * that may be faster/more-integrated.
+                                         * But DONT use this bit to turn an optional function into a
+                                         * no-op! Use `_KERNEL_POISON_PANIC' for that purpose! */
+
 /* Returns non-zero if the kernel has been poisoned.
  * This is the case after any of the panic functions have been called,
  * or an assertion failure/check was triggered. - Basically, it is non-
  * zero when the kernel may be in an inconsistent state. */
-#define kernel_poisoned() _kernel_poisoned
-DATDEF bool const _kernel_poisoned;
+#define kernel_poisoned() (_kernel_poisoned & _KERNEL_POISON_PANIC)
+
+/* Check if system warranty has expired. Warranty expires the first
+ * time the kernel panics and cannot (or rather: should not) be re-
+ * enabled.
+ * In most cases, you should use `kernel_poisoned()' instead!
+ * @return: true:  System warranty is still OK
+ * @return: false: At one point, the system experienced a panic. */
+#define kernel_warranty() (!(_kernel_poisoned & _KERNEL_POISON_NO_WARRANTY))
+
 
 /* Poison the kernel.
  * This operation cannot be undone and may (under rare circumstances)
