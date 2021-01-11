@@ -161,9 +161,8 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
 	if (__LOCAL_error_one_per_line != 0 &&
-	    line == last_line &&
-	    (filename == last_filename ||
-	     strcmp(filename, last_filename) == 0)) {
+	    line == last_line && filename && last_filename &&
+	    (filename == last_filename || strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
 @@pp_endif@@

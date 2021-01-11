@@ -3530,14 +3530,10 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
 		return 1;
 @@pp_endif@@
 	}
-	if (buflen < wcstombs(NULL, src, maxlen)) {
-@@pp_ifdef ERANGE@@
-		return ERANGE;
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
-	*presult = wcstombs(buf, src, maxlen);
+	if (buflen > maxlen)
+		buflen = maxlen;
+	*presult = wcstombs(buf, src, buflen);
+	/* TODO: if (__buflen < *presult) return ERANGE; */
 	return 0;
 }
 

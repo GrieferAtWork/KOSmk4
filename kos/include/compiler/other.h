@@ -207,10 +207,10 @@
 #define __ATTR_THREAD /* Nothing */
 #define __NO_ATTR_DEPRECATED
 #define __ATTR_DEPRECATED(text) /* Nothing */
-#define __NO_ATTR_WARNING
+#define __NO_ATTR_ERROR
 #define __ATTR_ERROR(text) /* Nothing */
 #define __NO_ATTR_WARNING
-#define __ATTR_ERROR(text) /* Nothing */
+#define __ATTR_WARNING(text) /* Nothing */
 #define __NO_ATTR_SECTION
 #define __ATTR_SECTION(name) /* Nothing */
 #define __NO_ATTR_NOTHROW

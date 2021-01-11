@@ -657,7 +657,7 @@ NOTHROW_NCX(LIBCCALL libc_listen)(fd_t sockfd,
 }
 /*[[[end:libc_listen]]]*/
 
-/*[[[head:libc_accept,hash:CRC-32=0x1ffa34bd]]]*/
+/*[[[head:libc_accept,hash:CRC-32=0xbc202b11]]]*/
 /* >> accept(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -672,7 +672,7 @@ NOTHROW_NCX(LIBCCALL libc_listen)(fd_t sockfd,
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) fd_t
+INTERN ATTR_SECTION(".text.crt.net.socket") fd_t
 NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd,
                                   __SOCKADDR_ARG addr,
                                   socklen_t *__restrict addr_len)
@@ -707,7 +707,7 @@ NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd,
 }
 /*[[[end:libc_shutdown]]]*/
 
-/*[[[head:libc_accept4,hash:CRC-32=0xe7c65f3b]]]*/
+/*[[[head:libc_accept4,hash:CRC-32=0x98e75da5]]]*/
 /* >> accept4(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -723,7 +723,7 @@ NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd,
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) fd_t
+INTERN ATTR_SECTION(".text.crt.net.socket") fd_t
 NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd,
                                    __SOCKADDR_ARG addr,
                                    socklen_t *__restrict addr_len,

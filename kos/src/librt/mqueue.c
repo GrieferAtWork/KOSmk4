@@ -145,7 +145,7 @@ NOTHROW_NCX(CC librt_mq_notify)(mqd_t mqdes, struct sigevent const *notification
 	return error;
 }
 
-PRIVATE NONNULL((2, 5)) ssize_t
+PRIVATE NONNULL((2)) ssize_t
 NOTHROW_RPC(CC mq_timedreceive_impl32)(mqd_t mqdes, char *__restrict msg_ptr,
                                        size_t msg_len, unsigned int *pmsg_prio,
                                        struct timespec32 const *__restrict abs_timeout) {
@@ -168,7 +168,7 @@ NOTHROW_RPC(CC mq_timedreceive_impl32)(mqd_t mqdes, char *__restrict msg_ptr,
 }
 
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-PRIVATE NONNULL((2, 5)) ssize_t
+PRIVATE NONNULL((2)) ssize_t
 NOTHROW_RPC(CC mq_timedreceive_impl64)(mqd_t mqdes, char *__restrict msg_ptr,
                                        size_t msg_len, unsigned int *pmsg_prio,
                                        struct timespec64 const *__restrict abs_timeout) {

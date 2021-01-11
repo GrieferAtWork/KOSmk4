@@ -358,7 +358,7 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data c
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space signal handler once user-space execution
  *                  resumes. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
                            struct rpc_syscall_info const *sc_info,
                            siginfo_t const *__restrict siginfo,

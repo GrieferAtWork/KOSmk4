@@ -1174,7 +1174,7 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp]]
-$fd_t accept($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
+$fd_t accept($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
              socklen_t *__restrict addr_len);
 
 @@>> shutdown(2)
@@ -1205,7 +1205,7 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<features.h>")]]
-$fd_t accept4($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
+$fd_t accept4($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
               socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 
 @@>> sendmmsg(2)

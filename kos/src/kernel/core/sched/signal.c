@@ -685,7 +685,7 @@ again_read_target_cons:
 	goto again;
 }
 
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL sig_intern_send)(struct sig *self,
                                struct sig *sender,
                                struct task *__restrict caller,

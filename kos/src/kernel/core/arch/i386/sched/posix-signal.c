@@ -560,10 +560,7 @@ raiseat32_impl(struct icpustate *__restrict state,
 		      si.si_signo);
 	}
 	/* By passing sc_info as NULL, we can guaranty that raiseat() isn't restarted. */
-	state = x86_userexcept_raisesignal(state,
-	                                   NULL,
-	                                   &si,
-	                                   NULL);
+	state = x86_userexcept_raisesignal(state, NULL, &si, NULL);
 	return state;
 }
 
@@ -614,10 +611,7 @@ raiseat64_impl(struct icpustate *__restrict state,
 		      si.si_signo);
 	}
 	/* By passing sc_info as NULL, we can guaranty that raiseat() isn't restarted. */
-	state = x86_userexcept_raisesignal(state,
-	                                   NULL,
-	                                   &si,
-	                                   NULL);
+	state = x86_userexcept_raisesignal(state, NULL, &si, NULL);
 	return state;
 }
 

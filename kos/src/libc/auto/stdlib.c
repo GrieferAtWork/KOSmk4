@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8249ef3a */
+/* HASH CRC-32:0xa13ddfb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2276,14 +2276,10 @@ NOTHROW_NCX(LIBDCALL libd_wcstombs_s)(size_t *presult,
 		return 1;
 #endif /* !EINVAL */
 	}
-	if (buflen < libd_wcstombs(NULL, src, maxlen)) {
-#ifdef ERANGE
-		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
-	}
-	*presult = libd_wcstombs(buf, src, maxlen);
+	if (buflen > maxlen)
+		buflen = maxlen;
+	*presult = libd_wcstombs(buf, src, buflen);
+	/* TODO: if (__buflen < *presult) return ERANGE; */
 	return 0;
 }
 #include <libc/errno.h>
@@ -2300,14 +2296,10 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs_s)(size_t *presult,
 		return 1;
 #endif /* !EINVAL */
 	}
-	if (buflen < libc_wcstombs(NULL, src, maxlen)) {
-#ifdef ERANGE
-		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
-	}
-	*presult = libc_wcstombs(buf, src, maxlen);
+	if (buflen > maxlen)
+		buflen = maxlen;
+	*presult = libc_wcstombs(buf, src, buflen);
+	/* TODO: if (__buflen < *presult) return ERANGE; */
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap") ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) void *

@@ -126,6 +126,9 @@ CC_FLAGS({
 	 * Maybe one day I'll add this support to the gcc patch... */
 	"-Wno-format",
 
+	/* For some reason, "Wno-format" disables this, so turn it back on... */
+	"-Wnonnull",
+
 	"-Wsuggest-attribute=pure",
 	"-Wsuggest-attribute=const",
 	"-Wsuggest-attribute=malloc",

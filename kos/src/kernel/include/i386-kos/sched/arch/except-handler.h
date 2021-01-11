@@ -83,7 +83,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
  *                  user-space signal handler once user-space execution
  *                  resumes. */
 struct __siginfo_struct;
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
                            struct rpc_syscall_info const *sc_info,
                            struct __siginfo_struct const *__restrict siginfo,

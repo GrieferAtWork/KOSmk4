@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee80c5d4 */
+/* HASH CRC-32:0x2bbbd078 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,9 +220,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
 	if (__LOCAL_error_one_per_line != 0 &&
-	    line == last_line &&
-	    (filename == last_filename ||
-	     libc_strcmp(filename, last_filename) == 0)) {
+	    line == last_line && filename && last_filename &&
+	    (filename == last_filename || libc_strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
 #endif /* __LOCAL_error_one_per_line */
@@ -317,9 +316,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
 	if (__LOCAL_error_one_per_line != 0 &&
-	    line == last_line &&
-	    (filename == last_filename ||
-	     libc_strcmp(filename, last_filename) == 0)) {
+	    line == last_line && filename && last_filename &&
+	    (filename == last_filename || libc_strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
 #endif /* __LOCAL_error_one_per_line */

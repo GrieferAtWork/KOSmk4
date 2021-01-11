@@ -175,7 +175,8 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	}
 	ctest_subtestf("Pipe(NULL) breaks");
 	TRY {
-		Pipe(NULL);
+		int *volatile null = NULL;
+		Pipe(null);
 		assert_failed("syscall:libc: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);

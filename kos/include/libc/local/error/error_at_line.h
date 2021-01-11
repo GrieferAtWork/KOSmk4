@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa36b36c6 */
+/* HASH CRC-32:0xe78118f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,9 +301,8 @@ __LOCAL_LIBC(error_at_line) __ATTR_LIBC_PRINTF(5, 6) void
 	static char const *__last_filename = __NULLPTR;
 	static unsigned int __last_line = 0;
 	if (__LOCAL_error_one_per_line != 0 &&
-	    __line == __last_line &&
-	    (__filename == __last_filename ||
-	     __localdep_strcmp(__filename, __last_filename) == 0)) {
+	    __line == __last_line && __filename && __last_filename &&
+	    (__filename == __last_filename || __localdep_strcmp(__filename, __last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
 #endif /* __LOCAL_error_one_per_line */

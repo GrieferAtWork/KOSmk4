@@ -80,8 +80,9 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	static Tu const xblob[]   = { 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
 	Tu const *volatile vblob  = blob;
 	Tu const *volatile vxblob = xblob;
+	void *volatile null = NULL;
 
-	ASSERT_EQ_PTR(FUNC(memchr)((void *)NULL, 0, 0), NULL);
+	ASSERT_EQ_PTR(FUNC(memchr)(null, 0, 0), NULL);
 	ASSERT_EQ_PTR(FUNC(memchr)(blob, 0, 0), NULL);
 	ASSERT_EQ_PTR(FUNC(memchr)(blob, 0, COMPILER_LENOF(blob)), blob + 0);
 	ASSERT_EQ_PTR(FUNC(memchr)(blob, 1, COMPILER_LENOF(blob)), blob + 1);
@@ -108,7 +109,7 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 9, COMPILER_LENOF(blob)), blob + 9);
 	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 10, COMPILER_LENOF(blob)), NULL);
 
-	ASSERT_EQ_PTR(FUNC(memrchr)((void *)NULL, 0, 0), NULL);
+	ASSERT_EQ_PTR(FUNC(memrchr)(null, 0, 0), NULL);
 	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 0, 0), NULL);
 	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 0, COMPILER_LENOF(blob)), blob + 18);
 	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 1, COMPILER_LENOF(blob)), blob + 17);
@@ -191,7 +192,7 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 9, COMPILER_LENOF(blob)), blob + 9);
 	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 10, COMPILER_LENOF(blob)), vblob - 1);
 
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(NULL, 0, 0), 0);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(null, 0, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 0, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 10, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 0, COMPILER_LENOF(blob)), 0);
@@ -206,7 +207,7 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 9, COMPILER_LENOF(blob)), 9);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 10, COMPILER_LENOF(blob)), COMPILER_LENOF(blob));
 
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(NULL, 0, 0), (size_t)-1);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(null, 0, 0), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 0, 0), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 10, 0), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 0, COMPILER_LENOF(blob)), 18);

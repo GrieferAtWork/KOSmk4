@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9288f3fa */
+/* HASH CRC-32:0x60976d23 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,7 +225,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_listen)(fd_t sockfd, __STDC_INT_AS_UINT_T m
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBDCALL libd_accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+INTDEF fd_t NOTHROW_RPC(LIBDCALL libd_accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* >> shutdown(2)
  * Disallow further reception of data (causing `recv(2)' to return `0' as soon
  * as all currently queued data has been read), and/or further transmission
@@ -249,7 +249,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBDCALL libd_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
+INTDEF fd_t NOTHROW_RPC(LIBDCALL libd_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
  * messages (datagrams) with a single system call.
