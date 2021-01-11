@@ -525,9 +525,6 @@ INTERN void KCALL
 Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 	char *text;
 	size_t textlen;
-	/* Make sure that INode attributes have been loaded.
-	 * -> Required for the `a_size' field. */
-	inode_loadattr(self);
 	textlen = (size_t)self->i_filesize;
 	text    = (char *)kmalloc(textlen * sizeof(char), FS_GFP);
 	TRY {
@@ -556,12 +553,12 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 			/* Read the symlink text. */
 			Ext2_VReadFromINode(self, text, textlen, 0);
 		}
-		/* Save the symlink text in its designated location. */
-		self->sl_text = text;
 	} EXCEPT {
 		kfree(text);
 		RETHROW();
 	}
+	/* Save the symlink text in its designated location. */
+	self->sl_text = text;
 }
 
 

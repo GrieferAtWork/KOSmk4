@@ -716,9 +716,10 @@ struct inode_type {
 			 * Load the link text of the given symlink node.
 			 * This operator must fill in the following members of `self':
 			 *   - sl_text
-			 *   - i_filesize  (to the intended `strlen(sl_text)')
 			 * NOTE: When this operator isn't implemented, `sl_readlink_dynamic'
 			 *       _MUST_ be implemented instead.
+			 * NOTE: This operator may assume that attributes of `self' have
+			 *       already been loaded.
 			 * @throw: E_BADALLOC: Insufficient memory to allocate the node text.
 			 * @throw: E_IOERROR:  Failed to read data from disk. */
 			NONNULL((1))
@@ -800,7 +801,6 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
                                    * to the list of changed nodes found in the superblock. (s.a. `i_changed_next') */
 #define INODE_FATTRLOADED  0x0008 /* [lock(WRITE_ONCE)] The node's attributes have been loaded. */
 #define INODE_FDIRLOADED   0x0010 /* [lock(WRITE_ONCE)] The entires of a directory INode has been fully loaded. */
-#define INODE_FLNKLOADED   0x0010 /* [lock(WRITE_ONCE)] A symbolic link node's text has been loaded. */
 #define INODE_FLNK_DONT_FOLLOW_FINAL_LINK 0x2000 /* - Don't follow the symlink of this INode if it's the final link of some given path.
                                                   * - Skip the `if (!(oflags & O_SYMLINK)) THROW(E_FSERROR_IS_A_SYMBOLIC_LINK);' check during open.
                                                   * This flag is used to implement open() for procfs's `/proc/[pid]/fd/[no]' files. */
@@ -1052,14 +1052,14 @@ struct symlink_node
 {
 	/* Symbolic link INode (When `S_ISLNK(a_mode)' is true) */
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-	struct inode          sl_node; /* [OVERRIDE(.i_filemode,[S_ISLNK(.)])]
-	                                * [OVERRIDE(.i_filesize,[const])]
-	                                * [OVERRIDE(.i_filerdev,[== 0])]
-	                                * The underlying node. */
+	struct inode           sl_node; /* [OVERRIDE(.i_filemode,[S_ISLNK(.)])]
+	                                 * [OVERRIDE(.i_filesize,[const])]
+	                                 * [OVERRIDE(.i_filerdev,[== 0])]
+	                                 * The underlying node. */
 #endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 	KERNEL /*utf-8*/ char *sl_text; /* [0..i_filesize][owned_if(!= sl_stext)]
-	                                * [valid_if(INODE_FLNKLOADED)] Symbolic link text.
-	                                * NOTE: Not required to be NUL-terminated! */
+	                                 * Symbolic link text.
+	                                 * NOTE: Not required to be NUL-terminated! */
 	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char,sl_stext); /* Inline-text. */
 };
 

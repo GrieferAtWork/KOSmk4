@@ -211,7 +211,7 @@ ramfs_symlink(struct directory_node *__restrict UNUSED(target_directory),
 	link_node->i_fileatime = realtime();
 	link_node->i_filemtime = link_node->i_fileatime;
 	link_node->i_filectime = link_node->i_fileatime;
-	link_node->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT | INODE_FLNKLOADED);
+	link_node->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT);
 }
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL

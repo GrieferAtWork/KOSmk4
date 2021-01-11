@@ -4521,10 +4521,11 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 		}
 		xdecref(me->d_parent);
 	} else if (INODE_ISLNK(self)) {
+		struct symlink_node *me;
 		assert(self->i_heapsize >= sizeof(struct symlink_node));
-		if (self->i_flags & INODE_FLNKLOADED &&
-		    ((struct symlink_node *)self)->sl_text != ((struct symlink_node *)self)->sl_stext)
-			kfree(((struct symlink_node *)self)->sl_text);
+		me = (struct symlink_node *)self;
+		if (me->sl_text != me->sl_stext)
+			kfree(me->sl_text);
 	}
 	if (INODE_ISSUPER(self)) {
 		struct superblock *me;

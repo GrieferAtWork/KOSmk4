@@ -400,8 +400,8 @@ INTERN struct inode_type ProcFS_PerProc_DynamicSymlink_Type = {
 	},
 	{
 		.it_symlink = {
-			/* .sl_readlink = */ NULL,
-			/* .sl_readlink = */ &ProcFS_PerProc_DynamicSymlink_Readlink,
+			/* .sl_readlink         = */ NULL,
+			/* .sl_readlink_dynamic = */ &ProcFS_PerProc_DynamicSymlink_Readlink,
 		}
 	}
 };

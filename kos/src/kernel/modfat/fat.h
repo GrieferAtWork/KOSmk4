@@ -26,6 +26,18 @@
 #include <kernel/types.h>
 #include <sched/rwlock.h>
 
+
+/* Configuration option: Support cygwin-style symbolic links. */
+#ifdef CONFIG_NO_FAT_CYGWIN_SYMLINKS
+#undef CONFIG_FAT_CYGWIN_SYMLINKS
+#elif !defined(CONFIG_FAT_CYGWIN_SYMLINKS)
+#define CONFIG_FAT_CYGWIN_SYMLINKS 1
+#elif (CONFIG_FAT_CYGWIN_SYMLINKS + 0) == 0
+#undef CONFIG_FAT_CYGWIN_SYMLINKS
+#define CONFIG_NO_FAT_CYGWIN_SYMLINKS 1
+#endif /* ... */
+
+
 DECL_BEGIN
 
 /* NOTE: This implementation uses the absolute on-disk location of a
@@ -335,10 +347,13 @@ struct fat_superblock
 	uid_t                   f_uid;         /* [valid_if(!(f_features & FAT_FEATURE_UGID))] Owner UID for every file on this filesystem (Defaults to 0). */
 	gid_t                   f_gid;         /* [valid_if(!(f_features & FAT_FEATURE_UGID))] Owner GID for every file on this filesystem (Defaults to 0). */
 	FatType                 f_type;        /* [const] Fat type. */
-#define FAT_FEATURE_SEC32 0x0000 /* FatFile+0x14: High 16 bits of the 32-bit starting sector number */
-#define FAT_FEATURE_ARB   0x0001 /* FatFile+0x14: 16-bit access rights bitmap (set of `FAT_ARB_NO_*') */
-#define FAT_FEATURE_ATIME 0x0000 /* FatFile+0x12: 16-bit last-access timestamp */
-#define FAT_FEATURE_UGID  0x0002 /* FatFile+0x12: 8-bit user/group IDs */
+#define FAT_FEATURE_SEC32             0x0000 /* FatFile+0x14: High 16 bits of the 32-bit starting sector number */
+#define FAT_FEATURE_ARB               0x0001 /* FatFile+0x14: 16-bit access rights bitmap (set of `FAT_ARB_NO_*') */
+#define FAT_FEATURE_ATIME             0x0000 /* FatFile+0x12: 16-bit last-access timestamp */
+#define FAT_FEATURE_UGID              0x0002 /* FatFile+0x12: 8-bit user/group IDs */
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#define FAT_FEATURE_NO_CYGWIN_SYMLINK 0x8000 /* Disable cygwin symlink support */
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 	u16                     f_features;    /* [const] Fat features (Set of `FAT_FEATURE_*'). */
 	char                    f_oem[9];      /* [const] OEM identifier. */
 	char                    f_label[12];   /* [const] Volume label string (zero-terminated). */

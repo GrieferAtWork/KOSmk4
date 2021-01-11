@@ -417,8 +417,8 @@ INTERN struct inode_type ProcFS_Singleton_DynamicSymlink_Type = {
 	},
 	{
 		.it_symlink = {
-			/* .sl_readlink = */ NULL,
-			/* .sl_readlink = */ &ProcFS_SingleTon_DynamicSymlink_Readlink,
+			/* .sl_readlink         = */ NULL,
+			/* .sl_readlink_dynamic = */ &ProcFS_SingleTon_DynamicSymlink_Readlink,
 		}
 	}
 };
