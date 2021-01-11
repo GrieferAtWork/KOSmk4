@@ -1276,12 +1276,11 @@ NOTHROW(KCALL Fat_SaveINodeToFatFile)(struct inode const *__restrict self,
 		/* 32-bit clusters */
 		file->f_clusterhi = HTOLE16((u16)(cluster >> 16));
 	}
+	file->f_size = HTOLE32((u32)self->i_filesize);
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-	if (!INODE_ISLNK(self))
+	if (INODE_ISLNK(self))
+		file->f_size = HTOLE32((u32)self->i_filesize + sizeof(Fat_CygwinSymlinkMagic) + 1);
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
-	{
-		file->f_size = HTOLE32((u32)self->i_filesize);
-	}
 	/* Implement the read-only attribute. */
 	if (!(self->i_filemode & 0222))
 		file->f_attr |= FAT_ATTR_READONLY;
@@ -1867,7 +1866,17 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		                ? data->i_clusterv[0]
 		                : super->f_cluster_eof_marker;
 		files[file_count - 1].f_clusterlo = HTOLE16((u16)first_cluster);
-		files[file_count - 1].f_size      = HTOLE32((u32)new_node->i_filesize);
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+		if (INODE_ISLNK(new_node)) {
+			/* Must account for the magic header and the trailing NUL character! */
+			files[file_count - 1].f_size = HTOLE32((u32)new_node->i_filesize +
+			                                       sizeof(Fat_CygwinSymlinkMagic) + 1);
+			files[file_count - 1].f_attr |= FAT_ATTR_SYSTEM;
+		} else
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+		{
+			files[file_count - 1].f_size = HTOLE32((u32)new_node->i_filesize);
+		}
 		if (super->f_features & FAT_FEATURE_ARB) {
 			u16 arb = data->i_file.f_arb;
 			mode_t unix_perm = new_node->i_filemode;
@@ -1965,7 +1974,6 @@ Fat_CreateFileInDirectory(struct directory_node *__restrict target_directory,
 		       E_IOERROR, ...) {
 	struct inode_data *node;
 	FatSuperblock *super;
-	VERIFY_INODE_FSDATA((struct inode *)new_node);
 	new_node->i_type = &Fat_FileNodeOperators;
 	super = (FatSuperblock *)target_directory->i_super;
 	/* Allocate FS-specific INode data for the new file. */
@@ -2016,7 +2024,6 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		       E_IOERROR, ...) {
 	struct inode_data *node;
 	FatSuperblock *super;
-	VERIFY_INODE_FSDATA((struct inode *)new_node);
 	new_node->i_type = &Fat_DirectoryNodeOperators;
 	super            = (FatSuperblock *)target_directory->i_super;
 	/* Allocate FS-specific INode data for the new file. */
@@ -2029,7 +2036,6 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		node->i_clusterv    = (FatClusterIndex *)kmalloc(2 * sizeof(FatClusterIndex), FS_GFP);
 		node->i_clustera    = 2;
 		node->i_clusterc    = 1;
-		node->i_clusterv[0] = super->f_cluster_eof_marker;
 		/* Allocate the initial contents of the directory. */
 		memcpy(pattern, new_directory_pattern, sizeof(pattern));
 		pattern[0].f_atime             = Fat_EncodeFileDate(new_node->i_fileatime.tv_sec);
@@ -2062,6 +2068,7 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		                           FAT_GETCLUSTER_MODE_FNOZERO |
 		                           FAT_GETCLUSTER_MODE_FNCHNGE);
 		TRY {
+			node->i_clusterv[0]    = index;
 			pattern[0].f_clusterlo = HTOLE16(index & 0xffff);
 			pattern[0].f_clusterhi = HTOLE16((u16)(index >> 16));
 			/* Write the directory content into the new directory node. */
@@ -2132,6 +2139,70 @@ Fat_CygwinReadlink(struct symlink_node *__restrict self)
 	}
 	/* Save the symlink text in its designated location. */
 	self->sl_text = text;
+}
+
+PRIVATE NONNULL((1, 2, 3)) void KCALL
+Fat_CygwinSymlinkCreate(struct directory_node *__restrict target_directory,
+                        struct directory_entry *__restrict target_dirent,
+                        struct symlink_node *__restrict link_node)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
+		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
+		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
+		       E_IOERROR, ...) {
+	struct inode_data *node;
+	FatSuperblock *super;
+	assert(link_node->sl_text);
+	link_node->i_type = &Fat_CygwinSymlinkNodeOperators;
+	super             = (FatSuperblock *)target_directory->i_super;
+	/* Allocate FS-specific INode data for the new file. */
+	node = (struct inode_data *)kmalloc(sizeof(struct inode_data),
+	                                    FS_GFP | GFP_CALLOC);
+	TRY {
+		link_node->i_fsdata = node;
+		node->i_clusterv    = (FatClusterIndex *)kmalloc(sizeof(FatClusterIndex), FS_GFP);
+		node->i_clustera    = 1;
+		node->i_clusterc    = 1;
+		node->i_clusterv[0] = super->f_cluster_eof_marker;
+		TRY {
+			/* Write the symlink file contents. */
+			char *text  = link_node->sl_text;
+			size_t size = (size_t)link_node->i_filesize;
+			Fat32_VWriteToINode(link_node, (byte_t const *)Fat_CygwinSymlinkMagic,
+			                    sizeof(Fat_CygwinSymlinkMagic), 0);
+#ifndef __OPTIMIZE_SIZE__
+			if ((text == link_node->sl_stext &&
+			     (link_node->i_heapsize > offsetof(struct symlink_node, sl_stext) + size)) ||
+			    (kmalloc_usable_size(text) > size)) {
+				/* Small optimization: Write the trailing NUL alongside the symlink text itself! */
+				text[size] = '\0';
+				Fat32_VWriteToINode(link_node, (byte_t const *)text, size + 1,
+				                    (pos_t)sizeof(Fat_CygwinSymlinkMagic));
+#ifndef NDEBUG
+				text[size] = 0xcc;
+#endif /* !NDEBUG */
+			} else
+#endif /* !__OPTIMIZE_SIZE__ */
+			{
+				Fat32_VWriteToINode(link_node, (byte_t const *)text, size,
+				                    (pos_t)sizeof(Fat_CygwinSymlinkMagic));
+				Fat32_VWriteToINode(link_node, (byte_t const *)"", 1, /* Trailing NUL */
+				                    (pos_t)sizeof(Fat_CygwinSymlinkMagic) + size);
+			}
+
+			/* Add the new directory to its parent's directory. */
+			Fat_AddFileToDirectory(target_directory, target_dirent, link_node);
+		} EXCEPT {
+			/* Try to free the already-written (and allocated) new-directory pattern. */
+			Fat_DeleteClusterChain((FatSuperblock *)target_directory->i_super,
+			                       link_node->i_fsdata->i_clusterv[0]);
+			RETHROW();
+		}
+	} EXCEPT {
+		kfree(link_node->i_fsdata->i_clusterv);
+		kfree(link_node->i_fsdata);
+		RETHROW();
+	}
+	link_node->i_filenlink = (nlink_t)1;
 }
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 
@@ -2213,7 +2284,7 @@ INTERN struct inode_type Fat_DirectoryNodeOperators = {
 			.d_creat   = &Fat_CreateFileInDirectory,
 			.d_mkdir   = &Fat_CreateDirectoryInDirectory,
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-			.d_symlink = NULL, /* TODO */
+			.d_symlink = &Fat_CygwinSymlinkCreate,
 #else /* CONFIG_FAT_CYGWIN_SYMLINKS */
 			.d_symlink = NULL,
 #endif /* !CONFIG_FAT_CYGWIN_SYMLINKS */
@@ -2254,7 +2325,7 @@ INTERN struct inode_type Fat16_RootDirectoryNodeOperators = {
 			.d_creat   = &Fat_CreateFileInDirectory,
 			.d_mkdir   = &Fat_CreateDirectoryInDirectory,
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-			.d_symlink = NULL, /* TODO */
+			.d_symlink = &Fat_CygwinSymlinkCreate,
 #else /* CONFIG_FAT_CYGWIN_SYMLINKS */
 			.d_symlink = NULL,
 #endif /* !CONFIG_FAT_CYGWIN_SYMLINKS */
@@ -2295,7 +2366,7 @@ INTERN struct inode_type Fat32_RootDirectoryNodeOperators = {
 			.d_creat   = &Fat_CreateFileInDirectory,
 			.d_mkdir   = &Fat_CreateDirectoryInDirectory,
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-			.d_symlink = NULL, /* TODO */
+			.d_symlink = &Fat_CygwinSymlinkCreate,
 #else /* CONFIG_FAT_CYGWIN_SYMLINKS */
 			.d_symlink = NULL,
 #endif /* !CONFIG_FAT_CYGWIN_SYMLINKS */

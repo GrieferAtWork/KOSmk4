@@ -27,7 +27,12 @@
 #include <sched/rwlock.h>
 
 
-/* Configuration option: Support cygwin-style symbolic links. */
+/* Configuration option: Support cygwin-style symbolic links.
+ * NOTE: Those weird wide-character symlinks referenced by the
+ *       cygwin source code aren't supported. Only regular symlinks
+ *       are, and those are always assumed to represent UTF-8 text.
+ *       But also note that I've never seen cygwin actually create
+ *       one of those wide-character symlinks... */
 #ifdef CONFIG_NO_FAT_CYGWIN_SYMLINKS
 #undef CONFIG_FAT_CYGWIN_SYMLINKS
 #elif !defined(CONFIG_FAT_CYGWIN_SYMLINKS)
