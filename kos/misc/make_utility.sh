@@ -198,9 +198,9 @@ mtools_install_path() {
 # link itself, followed by a NUL-byte. Furthermore, the symlink file itself
 # must have the FAT SYSTEM file attribute set.
 mtools_install_symlink() {
-	if ! echo -e "!<symlink>$3\0" | "$MTOOLS" -c mcopy -i "$1" -S -s -n -D o /dev/stdin "::/$2" > /dev/null 2>&1; then
+	if ! echo -n -e "!<symlink>$3\0" | "$MTOOLS" -c mcopy -i "$1" -S -s -n -D o /dev/stdin "::/$2" > /dev/null 2>&1; then
 		mtools_makedir "$1" "$(dirname "/$2")"
-		echo -e "!<symlink>$3\0" | "$MTOOLS" -c mcopy -i "$1" -S -s -n -D o /dev/stdin "::/$2" || {
+		echo -n -e "!<symlink>$3\0" | "$MTOOLS" -c mcopy -i "$1" -S -s -n -D o /dev/stdin "::/$2" || {
 			local error=$?
 			echo "ERROR: Command failed 'echo -e !<symlink>$3\0 | $MTOOLS -c mcopy -i $1 -s -n -D o /dev/stdin ::/$2' -> '$error'"
 			exit $error

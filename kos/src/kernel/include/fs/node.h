@@ -1060,7 +1060,7 @@ struct symlink_node
 	KERNEL /*utf-8*/ char *sl_text; /* [0..i_filesize][owned_if(!= sl_stext)]
 	                                 * Symbolic link text.
 	                                 * NOTE: Not required to be NUL-terminated! */
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char,sl_stext); /* Inline-text. */
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, sl_stext); /* Inline-text. */
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)

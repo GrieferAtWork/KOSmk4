@@ -302,14 +302,15 @@ check_result_inode_for_symlink:
 								REF struct directory_node *new_result_containing_directory;
 								REF struct directory_entry *new_result_containing_dirent;
 								/* Traverse the symlink text. */
-								new_result_containing_path = path_traverse_ex(filesystem,
-								                                              result_containing_path,
-								                                              root,
-								                                              sl_node->sl_text,
-								                                              &last_seg,
-								                                              &last_seglen,
-								                                              fsmode,
-								                                              &max_remaining_links);
+								new_result_containing_path = path_traversen_ex(filesystem,
+								                                               result_containing_path,
+								                                               root,
+								                                               sl_node->sl_text,
+								                                               (size_t)sl_node->i_filesize,
+								                                               &last_seg,
+								                                               &last_seglen,
+								                                               fsmode,
+								                                               &max_remaining_links);
 								decref(result_containing_path);
 								result_containing_path = new_result_containing_path;
 

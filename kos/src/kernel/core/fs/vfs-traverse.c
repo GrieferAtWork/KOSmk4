@@ -214,6 +214,8 @@ path_expandchild(struct path *__restrict parent_path,
 		char *buffer;
 		REF struct path *result;
 		size_t reqlen, new_reqlen;
+		struct symlink_node *lnk_child_node;
+		lnk_child_node = (struct symlink_node *)child_node;
 		/* Keep track of the number of allowed symbolic links.
 		 * If no more links are allowed, throw an exception. */
 		if unlikely(!*premaining_links)
@@ -221,26 +223,25 @@ path_expandchild(struct path *__restrict parent_path,
 		--*premaining_links;
 
 		/* Traverse symbolic links! */
-		if (symlink_node_load((struct symlink_node *)child_node)) {
+		if (symlink_node_load(lnk_child_node)) {
 			return path_expandchild_symlink(parent_path, root_path,
-			                                ((struct symlink_node *)child_node)->sl_text,
-			                                (size_t)((struct symlink_node *)child_node)->i_filesize,
+			                                lnk_child_node->sl_text,
+			                                (size_t)lnk_child_node->i_filesize,
 			                                premaining_links);
 		}
 		/* Dynamically managed symbolic link. */
 		result = path_expand_dynamic_symlink(parent_path, root_path,
-		                                     (struct symlink_node *)child_node,
-		                                     premaining_links,
-		                                     &reqlen);
+		                                     lnk_child_node,
+		                                     premaining_links, &reqlen);
 		if likely(result)
 			return result;
 		/* Must allocate a larger, heap-based buffer. */
 		buffer = (char *)kmalloc(reqlen, FS_GFP);
 		TRY {
 again_readlink:
-			new_reqlen = (*child_node->i_type->it_symlink.sl_readlink_dynamic)((struct symlink_node *)child_node,
-			                                                                   buffer,
-			                                                                   reqlen);
+			new_reqlen = (*lnk_child_node->i_type->it_symlink.sl_readlink_dynamic)(lnk_child_node,
+			                                                                       buffer,
+			                                                                       reqlen);
 			if unlikely(new_reqlen > reqlen) {
 				buffer = (char *)krealloc(buffer, new_reqlen, FS_GFP);
 				reqlen = new_reqlen;

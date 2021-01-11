@@ -696,14 +696,15 @@ again_follow_symlink:
 							REF struct directory_node *new_containing_directory;
 							REF struct path *new_containing_path;
 							uintptr_t symlink_hash;
-							new_containing_path = path_traverse_ex_recent(filesystem,
-							                                              containing_path,
-							                                              root,
-							                                              sl_node->sl_text,
-							                                              &last_seg,
-							                                              &last_seglen,
-							                                              mode | FS_MODE_FIGNORE_TRAILING_SLASHES,
-							                                              &remaining_symlinks);
+							new_containing_path = path_traversen_ex_recent(filesystem,
+							                                               containing_path,
+							                                               root,
+							                                               sl_node->sl_text,
+							                                               (size_t)sl_node->i_filesize,
+							                                               &last_seg,
+							                                               &last_seglen,
+							                                               mode | FS_MODE_FIGNORE_TRAILING_SLASHES,
+							                                               &remaining_symlinks);
 							decref(containing_path);
 							containing_path = new_containing_path;
 							if unlikely(!last_seglen) {

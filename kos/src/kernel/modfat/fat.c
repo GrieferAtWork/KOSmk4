@@ -24,8 +24,6 @@
 
 #include "fat.h"
 
-/* TODO: Add (optional, runtime-disable-able) support for cygwin's symlink format. */
-
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
@@ -2543,7 +2541,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		sector_size = LETOH16(disk_header.bpb.bpb_bytes_per_sector);
 #if PAGESIZE < 512
 #error "System page size is too small to support any FAT variation"
-#endif
+#endif /* PAGESIZE < 512 */
 		if (sector_size == 512) {
 			STATIC_ASSERT(1 << 9 == 512);
 			self->db_pageshift = PAGESHIFT - 9;
@@ -2564,7 +2562,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		self->db_pagealign = (size_t)1 << self->db_pageshift;
 		self->db_pagemask  = self->db_pagealign - 1;
 		self->db_pagesize  = sector_size;
-#endif
+#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 	}
 	/* Extract some common information. */
 	self->f_fat_start   = (FatSectorIndex)LETOH16(disk_header.bpb.bpb_reserved_sectors);
