@@ -475,6 +475,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	pertask_fini_t *iter;
 	assert(self->t_refcnt == 0);
+	assert(self->t_self == self);
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
 	/* Run task finalizers. */

@@ -60,7 +60,8 @@
 #include <dlfcn.h>
 #include <malloc.h>
 #else /* !__KERNEL__ */
-#include <sched/task.h> /* get_stack_avail() */
+#include <debugger/rt.h> /* dbg_active, dbg_current */
+#include <sched/task.h>  /* get_stack_avail() */
 #endif /* !__KERNEL__ */
 
 
@@ -1534,6 +1535,10 @@ do_read_bit_pieces:
 			if (self->ue_tlsbase == (byte_t *)-1) {
 #ifdef __KERNEL__
 				self->ue_tlsbase = (byte_t *)RD_TLS_BASE_REGISTER();
+#ifdef CONFIG_HAVE_DEBUGGER
+				if unlikely(dbg_active)
+					self->ue_tlsbase = (byte_t *)dbg_current;
+#endif /* CONFIG_HAVE_DEBUGGER */
 #else /* __KERNEL__ */
 				{
 					/* Try to use the TLS-base of the associated module */
