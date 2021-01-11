@@ -2245,6 +2245,10 @@ again_search_for_maybe_maskers:
 				return child;
 			}
 			if (is_masked != SIGMASK_ISMASKED_MAYBE) {
+				/* We know that this child _is_ masking the signal, so ignore it. */
+				assert(is_masked == SIGMASK_ISMASKED_YES);
+				decref_unlikely(child);
+				continue;
 			}
 			/* Add this thread to the pointer set.
 			 * If the set is full, and we can't increase its size atomically,
@@ -2273,7 +2277,9 @@ again_search_for_maybe_maskers:
 			 * a reference to `child', meaning that we mustn't decref it here! */
 			/*decref_unlikely(child);*/
 		}
-		taskref_pointer_set_fini(pmaybe_maskers);
+		/* We'll be returning NULL, so don't destroy the set of maybe-masker
+		 * threads, since it's our caller responsibility to deal with that one! */
+		/*taskref_pointer_set_fini(pmaybe_maskers);*/
 	}
 	sync_endread(&group->tg_proc_threads_lock);
 	/* The signal is being masked everywhere. */

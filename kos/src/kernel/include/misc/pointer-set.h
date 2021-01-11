@@ -21,9 +21,13 @@
 #define GUARD_KERNEL_INCLUDE_MISC_POINTER_SET_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <kernel/malloc.h>
+#include <kernel/types.h>
+
 #include <hybrid/__assert.h>
+
+#include <libc/string.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -84,16 +88,14 @@ LOCAL NOBLOCK void
 NOTHROW(KCALL pointer_set_fini)(struct pointer_set *__restrict self) {
 	if (self->ps_list != self->ps_buf)
 		kfree(self->ps_list);
+#ifndef NDEBUG
+	__libc_memset(self, 0xcc, sizeof(*self));
+#endif /* !NDEBUG */
 }
+
 LOCAL NOBLOCK void
 NOTHROW(KCALL pointer_set_clear)(struct pointer_set *__restrict self) {
-#if __SIZEOF_POINTER__ == 8
-	memsetq(self->ps_list, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#elif __SIZEOF_POINTER__ == 4
-	memsetl(self->ps_list, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#else /* __SIZEOF_POINTER__ == ... */
-	memset(self->ps_list, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
-#endif /* __SIZEOF_POINTER__ != ... */
+	__libc_memsetc(self->ps_list, POINTER_SET_SENTINAL, self->ps_mask + 1, __SIZEOF_POINTER__);
 	self->ps_size = 0;
 }
 
@@ -262,13 +264,7 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 		                                flags);
 	}
 	/* NULL-out pointers from the already-allocated pointer set area. */
-#if __SIZEOF_POINTER__ == 8
-	memsetq(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#elif __SIZEOF_POINTER__ == 4
-	memsetl(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#else /* __SIZEOF_POINTER__ == ... */
-	memset(new_map, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
-#endif /* __SIZEOF_POINTER__ != ... */
+	__libc_memsetc(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1, __SIZEOF_POINTER__);
 #ifndef NDEBUG
 	{
 		size_t i;
@@ -317,13 +313,7 @@ NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict se
 			return false;
 	}
 	/* NULL-out pointers from the already-allocated pointer set area. */
-#if __SIZEOF_POINTER__ == 8
-	memsetq(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#elif __SIZEOF_POINTER__ == 4
-	memsetl(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
-#else /* __SIZEOF_POINTER__ == ... */
-	memset(new_map, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
-#endif /* __SIZEOF_POINTER__ != ... */
+	__libc_memsetc(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1, __SIZEOF_POINTER__);
 #ifndef NDEBUG
 	{
 		size_t i;
