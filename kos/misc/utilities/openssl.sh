@@ -70,25 +70,25 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libssl.so.$SO_VERSION" ]; t
 fi
 
 # Install libraries:
-install_file /bin/c_rehash "$OPTPATH/tools/c_rehash"
-install_file /bin/openssl "$OPTPATH/apps/openssl"
-install_file /$TARGET_LIBPATH/engines-$SO_VERSION/capi.so "$OPTPATH/engines/capi.so"
-install_file /$TARGET_LIBPATH/engines-$SO_VERSION/padlock.so "$OPTPATH/engines/padlock.so"
-install_file /$TARGET_LIBPATH/libcrypto.so.$SO_VERSION "$OPTPATH/libcrypto.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libcrypto.so libcrypto.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libcrypto.a "$OPTPATH/libcrypto.a"
-install_file /$TARGET_LIBPATH/libssl.so.$SO_VERSION "$OPTPATH/libssl.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libssl.so libssl.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libssl.a "$OPTPATH/libssl.a"
+install_file        /bin/c_rehash                                   "$OPTPATH/tools/c_rehash"
+install_file        /bin/openssl                                    "$OPTPATH/apps/openssl"
+install_file        /$TARGET_LIBPATH/engines-$SO_VERSION/capi.so    "$OPTPATH/engines/capi.so"
+install_file        /$TARGET_LIBPATH/engines-$SO_VERSION/padlock.so "$OPTPATH/engines/padlock.so"
+install_file        /$TARGET_LIBPATH/libcrypto.so.$SO_VERSION       "$OPTPATH/libcrypto.so.$SO_VERSION"
+install_symlink_nodisk  /$TARGET_LIBPATH/libcrypto.so                   libcrypto.so.$SO_VERSION_MAJOR
+install_file_nodisk /$TARGET_LIBPATH/libcrypto.a                    "$OPTPATH/libcrypto.a"
+install_file        /$TARGET_LIBPATH/libssl.so.$SO_VERSION          "$OPTPATH/libssl.so.$SO_VERSION"
+install_symlink_nodisk  /$TARGET_LIBPATH/libssl.so                      libssl.so.$SO_VERSION_MAJOR
+install_file_nodisk /$TARGET_LIBPATH/libssl.a                       "$OPTPATH/libssl.a"
 
 # Install config files:
-install_file $OPENSSLDIR/ct_log_list.cnf  "$SRCPATH/apps/ct_log_list.cnf"
-install_file $OPENSSLDIR/ct_log_list.cnf.dist  "$SRCPATH/apps/ct_log_list.cnf"
-install_file $OPENSSLDIR/misc/CA.pl  "$OPTPATH/apps/CA.pl"
-install_symlink $OPENSSLDIR/misc/tsget  tsget.pl
-install_file $OPENSSLDIR/misc/tsget.pl  "$OPTPATH/apps/tsget.pl"
-install_file $OPENSSLDIR/openssl.cnf  "$SRCPATH/apps/openssl.cnf"
-install_file $OPENSSLDIR/openssl.cnf.dist  "$SRCPATH/apps/openssl.cnf"
+install_file    $OPENSSLDIR/ct_log_list.cnf       "$SRCPATH/apps/ct_log_list.cnf"
+install_file    $OPENSSLDIR/ct_log_list.cnf.dist  "$SRCPATH/apps/ct_log_list.cnf"
+install_file    $OPENSSLDIR/misc/CA.pl            "$OPTPATH/apps/CA.pl"
+install_symlink $OPENSSLDIR/misc/tsget            "tsget.pl"
+install_file    $OPENSSLDIR/misc/tsget.pl         "$OPTPATH/apps/tsget.pl"
+install_file    $OPENSSLDIR/openssl.cnf           "$SRCPATH/apps/openssl.cnf"
+install_file    $OPENSSLDIR/openssl.cnf.dist      "$SRCPATH/apps/openssl.cnf"
 
 
 # Install headers:

@@ -54,10 +54,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libz.so.$ZLIB_VERSION" ]; t
 fi
 
 # Install libraries
-install_file /$TARGET_LIBPATH/libz.so "$OPTPATH/libz.so.$ZLIB_VERSION"
-install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION libz.so
-install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION_MAJOR libz.so
-install_file_nodisk /$TARGET_LIBPATH/libz.a "$OPTPATH/libz.a"
+install_file           /$TARGET_LIBPATH/libz.so                     "$OPTPATH/libz.so.$ZLIB_VERSION"
+install_symlink_nodisk /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION       libz.so
+install_symlink_nodisk /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION_MAJOR libz.so
+install_file_nodisk    /$TARGET_LIBPATH/libz.a                      "$OPTPATH/libz.a"
 
 # Install headers
 install_rawfile "$KOS_ROOT/kos/include/zconf.h" "$OPTPATH/zconf.h"

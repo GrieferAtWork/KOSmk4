@@ -36,7 +36,7 @@ INSTALL_SKIP="$INSTALL_SKIP /usr/include/libpng${VERSION}/pnglibconf.h"
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
 
 # Install the non-suffixed .so library name
-install_symlink /$TARGET_LIBPATH/libpng.so libpng16.so.16
+install_symlink_nodisk /$TARGET_LIBPATH/libpng.so libpng16.so.16
 
 # Install headers in a more portable way
 install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/libpng${VERSION}/pnglibconf.h" "$DESTDIR/usr/include/libpng${VERSION}/pnglibconf.h"

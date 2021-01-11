@@ -163,6 +163,19 @@ patch_gcc() {
 	fi
 }
 
+patch_mtools() {
+	echo "Checking if $MTOOLS_VERSION has been patched"
+	if ! [ -f "$KOS_PATCHES/$MTOOLS_VERSION.patch" ]; then
+		echo "    No patch file found: $KOS_PATCHES/$MTOOLS_VERSION.patch"
+	elif ! [ -f "src/$MTOOLS_VERSION/.kos_patched" ]; then
+		echo "    Applying patch: $KOS_PATCHES/$MTOOLS_VERSION.patch to src/$MTOOLS_VERSION"
+		cmd patch -d "src/$MTOOLS_VERSION" -p1 < "$KOS_PATCHES/$MTOOLS_VERSION.patch"
+		> "src/$MTOOLS_VERSION/.kos_patched"
+	else
+		echo "    Already patched"
+	fi
+}
+
 
 
 ############################################################################################
@@ -358,6 +371,7 @@ download_mtool
 # Patch sources
 patch_binutils
 patch_gcc
+patch_mtools
 
 
 do_mkdir() {

@@ -46,9 +46,30 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "${OPTPATH}/busybox_unstripped" ]; th
 		unlink ".config" > /dev/null 2>&1
 		cmd cp "$KOS_PATCHES/busybox.config" ".config"
 	fi
-	cmd make -j $MAKE_PARALLEL_COUNT CROSS_COMPILE="$CROSS_PREFIX"
+	cmd make -j $MAKE_PARALLEL_COUNT CONFIG_PREFIX=. CROSS_COMPILE="$CROSS_PREFIX"
+fi
+if ! [ -f "${OPTPATH}/busybox.links" ]; then
+	cmd cd "${OPTPATH}"
+	echo "Asking make to generate: '${OPTPATH}/busybox.links'"
+	cmd make -j $MAKE_PARALLEL_COUNT CROSS_COMPILE="$CROSS_PREFIX" busybox.links
 fi
 
-# Install busybox in KOS
+# Install busybox in KOS. Note that we install the unstripped
+# version, so-as to have debug information included, allowing
+# KOS to display tracebacks through busybox!
 install_file /bin/busybox "${OPTPATH}/busybox_unstripped"
+
+# Install symbolic links
+while read line; do
+	text="/bin/busybox"
+	if [[ "$line" == "/bin/"* ]] && ! [[ "$line" == "/bin/"*/ ]]; then
+		text="busybox";
+	elif [[ "$line" == "/sbin/"* ]] && ! [[ "$line" == "/sbin/"*/ ]]; then
+		text="../bin/busybox";
+	elif [[ "$line" == "/"* ]] && ! [[ "$line" == "/"*/ ]]; then
+		text="bin/busybox";
+	fi
+	install_symlink "$line" "$text"
+done < "${OPTPATH}/busybox.links"
+
 

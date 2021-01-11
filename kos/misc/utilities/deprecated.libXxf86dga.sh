@@ -106,8 +106,8 @@ fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libXxf86dga.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libXxf86dga.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libXxf86dga.so.$SO_VERSION libXxf86dga.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libXxf86dga.so libXxf86dga.so.$SO_VERSION_MAJOR
+install_symlink_nodisk /$TARGET_LIBPATH/libXxf86dga.so.$SO_VERSION libXxf86dga.so.$SO_VERSION_MAJOR
+install_symlink_nodisk /$TARGET_LIBPATH/libXxf86dga.so libXxf86dga.so.$SO_VERSION_MAJOR
 install_file_nodisk /$TARGET_LIBPATH/libXxf86dga.a "$OPTPATH/src/.libs/libXxf86dga.a"
 
 # Install headers

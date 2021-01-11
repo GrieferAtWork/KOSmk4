@@ -173,9 +173,9 @@ fi
 install_file /bin/python "$PYTHON_EXE"
 PYTHON_LIB="libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 
-install_file /$TARGET_LIBPATH/${PYTHON_LIB}.so.1.0 "$OPTPATH/${PYTHON_LIB}.so.1.0"
-install_symlink /$TARGET_LIBPATH/${PYTHON_LIB}.so ${PYTHON_LIB}.so.1.0
-install_file_nodisk /$TARGET_LIBPATH/${PYTHON_LIB}.a "$OPTPATH/${PYTHON_LIB}.a"
+install_file           /$TARGET_LIBPATH/${PYTHON_LIB}.so.1.0 "$OPTPATH/${PYTHON_LIB}.so.1.0"
+install_symlink_nodisk /$TARGET_LIBPATH/${PYTHON_LIB}.so     "${PYTHON_LIB}.so.1.0"
+install_file_nodisk    /$TARGET_LIBPATH/${PYTHON_LIB}.a      "$OPTPATH/${PYTHON_LIB}.a"
 
 # Install modules under `/lib/python2.7/[os.py...]'
 install_path_hardcopy /$TARGET_LIBPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR} "${SRCPATH}/Lib"

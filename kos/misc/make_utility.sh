@@ -192,6 +192,27 @@ mtools_install_path() {
 	fi
 }
 
+#>> mtools_install_symlink <DISKIMAGE> <ABSOLUTE_DISK_PATH> <LINK_TEXT>
+# The installed symlink uses cygwin's old format for symbolic links, that
+# is: the ascii-byte-sequence "!<symlink>", followed by the text of the
+# link itself, followed by a NUL-byte. Furthermore, the symlink file itself
+# must have the FAT SYSTEM file attribute set.
+mtools_install_symlink() {
+	if ! echo -e "!<symlink>$3\0" | "$MTOOLS" -c mcopy -i "$1" -S -s -n -D o /dev/stdin "::/$2" > /dev/null 2>&1; then
+		mtools_makedir "$1" "$(dirname "/$2")"
+		echo -e "!<symlink>$3\0" | "$MTOOLS" -c mcopy -i "$1" -S -s -n -D o /dev/stdin "::/$2" || {
+			local error=$?
+			echo "ERROR: Command failed 'echo -e !<symlink>$3\0 | $MTOOLS -c mcopy -i $1 -s -n -D o /dev/stdin ::/$2' -> '$error'"
+			exit $error
+		}
+	fi
+	# We're using a custom version of mtools, where mcopy accepts an
+	# argument "-S" that already does the job of setting the system flag!
+#	cmd "$MTOOLS" -c mattrib -i "$1" +S "::/$2"
+}
+
+
+
 #>> install_rawfile <DEST> <SOURCE>
 install_rawfile() {
 	if test x"$MODE_DRYRUN" != xno; then
@@ -282,7 +303,63 @@ install_file() {
 #>> install_symlink <ABSOLUTE_DISK_PATH> <TEXT>
 install_symlink() {
 	if test x"$MODE_DRYRUN" != xno; then
-		echo "> install_symlink '$1' '$2'"
+		echo "> install_symlink_nodisk '$1' '$2'"
+	else
+		DISPATH="${1#/}"
+		TARGET_DISPATH="$TARGET_SYSROOT/$DISPATH"
+		DIDUPDATE="no"
+		HOST_LINKTEXT="$2"
+		if [[ "$2" == "/"* ]]; then
+			HOST_LINKTEXT="${TARGET_SYSROOT}$2"
+		fi
+		if ! [ -f "$TARGET_DISPATH" ] || \
+		     [ "$(readlink "$TARGET_DISPATH")" != "$HOST_LINKTEXT" ]; then
+			unlink "$TARGET_DISPATH" > /dev/null 2>&1
+			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (ln -s \"$HOST_LINKTEXT\")"
+			DIDUPDATE="yes"
+			if ! ln -s "$HOST_LINKTEXT" "$TARGET_DISPATH" > /dev/null 2>&1; then
+				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
+				cmd ln -s "$HOST_LINKTEXT" "$TARGET_DISPATH"
+			fi
+		else
+			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+		fi
+		local OLDPWD="$(pwd)"
+		cmd cd "${KOS_ROOT}/bin"
+		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$OLDPWD"
+		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
+			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
+				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+				if [ -f "$DISKIMAGE" ]; then
+					if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ]; then
+						echo "    Conf: '$CONFIG_SYSROOT'"
+						unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+						if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+							cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+							cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
+						fi
+						echo "        Disk: '$DISKIMAGE'"
+						mtools_install_symlink "$DISKIMAGE" "$DISPATH" "$2"
+					else
+						echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+						if [ "$MODE_FORCE_DISK" == "yes" ]; then
+							echo "        Disk: '$DISKIMAGE' (forced)"
+							mtools_install_symlink "$DISKIMAGE" "$DISPATH" "$2"
+						fi
+					fi
+				fi
+			fi
+		done
+	fi
+}
+
+#>> install_symlink_nodisk <ABSOLUTE_DISK_PATH> <TEXT>
+install_symlink_nodisk() {
+	if test x"$MODE_DRYRUN" != xno; then
+		echo "> install_symlink_nodisk '$1' '$2'"
 	else
 		DISPATH="${1#/}"
 		TARGET_DISPATH="$TARGET_SYSROOT/$DISPATH"
@@ -290,14 +367,14 @@ install_symlink() {
 		if ! [ -f "$TARGET_DISPATH" ] || \
 		     [ "$(readlink "$TARGET_DISPATH")" != "$2" ]; then
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
-			echo "Installing link ${TARGET_NAME}-kos:/$DISPATH (ln -s \"$2\")"
+			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (ln -s \"$2\")"
 			DIDUPDATE="yes"
 			if ! ln -s "$2" "$TARGET_DISPATH" > /dev/null 2>&1; then
 				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 				cmd ln -s "$2" "$TARGET_DISPATH"
 			fi
 		else
-			echo "Installing link ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
 		cmd cd "${KOS_ROOT}/bin"

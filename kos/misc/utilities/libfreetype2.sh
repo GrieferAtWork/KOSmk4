@@ -103,10 +103,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/objs/.libs/libfreetype.so.$
 fi
 
 # Install libraries
-install_file /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION_MAJOR "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION libfreetype.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libfreetype.so libfreetype.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libfreetype.a "$OPTPATH/objs/.libs/libfreetype.a"
+install_file           /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION_MAJOR "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"
+install_symlink_nodisk /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION       "libfreetype.so.$SO_VERSION_MAJOR"
+install_symlink_nodisk /$TARGET_LIBPATH/libfreetype.so                   "libfreetype.so.$SO_VERSION_MAJOR"
+install_file_nodisk    /$TARGET_LIBPATH/libfreetype.a                    "$OPTPATH/objs/.libs/libfreetype.a"
 
 # Install headers
 if ! [ -f "$KOS_ROOT/kos/include/freetype/freetype.h" ]; then

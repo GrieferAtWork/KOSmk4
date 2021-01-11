@@ -57,10 +57,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libjson-c.so.$SHLIB_VERSION
 fi
 
 # Install libraries
-install_file        /$TARGET_LIBPATH/libjson-c.so.$SHLIB_VERSION_MAJOR "$OPTPATH/libjson-c.so.$SHLIB_VERSION"
-install_symlink     /$TARGET_LIBPATH/libjson-c.so.$SHLIB_VERSION       libjson-c.so.$SHLIB_VERSION_MAJOR
-install_symlink     /$TARGET_LIBPATH/libjson-c.so                      libjson-c.so.$SHLIB_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libjson-c.a                       "$OPTPATH/libjson-c.a"
+install_file           /$TARGET_LIBPATH/libjson-c.so.$SHLIB_VERSION_MAJOR "$OPTPATH/libjson-c.so.$SHLIB_VERSION"
+install_symlink_nodisk /$TARGET_LIBPATH/libjson-c.so.$SHLIB_VERSION       libjson-c.so.$SHLIB_VERSION_MAJOR
+install_symlink_nodisk /$TARGET_LIBPATH/libjson-c.so                      libjson-c.so.$SHLIB_VERSION_MAJOR
+install_file_nodisk    /$TARGET_LIBPATH/libjson-c.a                       "$OPTPATH/libjson-c.a"
 
 # Install headers
 install_rawfile "$KOS_ROOT/kos/include/json-c/json_config.h"          "$OPTPATH/json_config.h"

@@ -76,11 +76,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libffi.so.$SHLIB_VERS
 fi
 
 # Install libraries
-install_file        /$TARGET_LIBPATH/libffi.so.$SHLIB_VERSION_MAJOR "$OPTPATH/.libs/libffi.so.$SHLIB_VERSION"
-install_symlink     /$TARGET_LIBPATH/libffi.so.$SHLIB_VERSION       libffi.so.$SHLIB_VERSION_MAJOR
-install_symlink     /$TARGET_LIBPATH/libffi.so                      libffi.so.$SHLIB_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libffi.a                       "$OPTPATH/.libs/libffi.a"
-install_file_nodisk /$TARGET_LIBPATH/libffi_convenience.a           "$OPTPATH/.libs/libffi_convenience.a"
+install_file           /$TARGET_LIBPATH/libffi.so.$SHLIB_VERSION_MAJOR "$OPTPATH/.libs/libffi.so.$SHLIB_VERSION"
+install_symlink_nodisk /$TARGET_LIBPATH/libffi.so.$SHLIB_VERSION       "libffi.so.$SHLIB_VERSION_MAJOR"
+install_symlink_nodisk /$TARGET_LIBPATH/libffi.so                      "libffi.so.$SHLIB_VERSION_MAJOR"
+install_file_nodisk    /$TARGET_LIBPATH/libffi.a                       "$OPTPATH/.libs/libffi.a"
+install_file_nodisk    /$TARGET_LIBPATH/libffi_convenience.a           "$OPTPATH/.libs/libffi_convenience.a"
 
 # Install headers
 if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then

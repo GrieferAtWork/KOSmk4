@@ -711,9 +711,9 @@ if test -z "$INSTALL_NONE"; then
 				#    -rwxr-xr-x [...] libuuid.so.1.0.0
 				# Since we're only enumerating regular files, we'll only get here once for "libuuid.so.1.0.0".
 				# To install this file correctly, we must do the following:
-				# $ install_file    /$TARGET_LIBPATH/libuuid.so.1      libuuid.so.1.0.0
-				# $ install_symlink /$TARGET_LIBPATH/libuuid.so.1.0.0  libuuid.so.1
-				# $ install_symlink /$TARGET_LIBPATH/libuuid.so        libuuid.so.1
+				# $ install_file           /$TARGET_LIBPATH/libuuid.so.1      libuuid.so.1.0.0
+				# $ install_symlink_nodisk /$TARGET_LIBPATH/libuuid.so.1.0.0  libuuid.so.1
+				# $ install_symlink_nodisk /$TARGET_LIBPATH/libuuid.so        libuuid.so.1
 				so_name=""
 				while IFS= read -r readelf_line; do
 					if [[ "$readelf_line" == *"Library soname: ["* ]]; then
@@ -728,15 +728,15 @@ if test -z "$INSTALL_NONE"; then
 					# Install the shared library under its SO_NAME
 					install_file "$dst_path/$so_name" "$src_filename"
 					if [[ "$so_name" != "$src_name" ]]; then
-						install_symlink "$line" "$so_name";
+						install_symlink_nodisk "$line" "$so_name";
 					fi
 				else
 					# Install the shared library under its original name
 					install_file "$line" "$src_filename"
 				fi
 				if [[ "$so_name" != "$raw_name" ]] && [ -L "${DESTDIR}$dst_path/$raw_name" ]; then
-					# install_symlink /$TARGET_LIBPATH/libuuid.so libuuid.so.1
-					install_symlink "$dst_path/$raw_name" "$so_name"
+					# install_symlink_nodisk /$TARGET_LIBPATH/libuuid.so libuuid.so.1
+					install_symlink_nodisk "$dst_path/$raw_name" "$so_name"
 				fi
 				;;
 
