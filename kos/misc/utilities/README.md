@@ -98,7 +98,7 @@ xinit /bin/xclock -- -dumbSched
 
 And after a while you should see this:
 
-![Xorg-first-time.png](kos/misc/gallery/Xorg-first-time.png)
+![Xorg-first-time.png](../gallery/Xorg-first-time.png)
 
 
 ### TODO
