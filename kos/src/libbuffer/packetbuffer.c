@@ -252,15 +252,15 @@ allocate_buffer_extension:
 				goto again_locked;
 			}
 		}
-		if (self->pb_rptr == self->pb_wptr) {
+		/* NOTE: The following can happen even when `HEAP_REALLOC_UNX' is defined,
+		 *       since another thread may have previously been reading from a packet
+		 *       of the current buffer (s.a. `are_packets_from_the_current_buffer_in_use'
+		 *       above), but has since finished reading by calling `lib_pb_buffer_canread'
+		 *       That last call doesn't acquire any locks, so we must deal with the chance
+		 *       that the read-pointer has changed in the mean time! */
+		if (ATOMIC_READ(self->pb_rptr) == self->pb_wptr) {
 			/* Special case: old buffer was empty. */
 			self->pb_rptr = (struct pb_packet *)HEAPPTR_BASE(buf);
-#ifdef HEAP_REALLOC_UNX
-			assertf(self->pb_bend == self->pb_bbas,
-			        "The case of a pre-allocated, but currently empty buffer "
-			        "should have already been handled by the HEAP_REALLOC_UNX-case "
-			        "further down below!");
-#else /* HEAP_REALLOC_UNX */
 			if (self->pb_bend != self->pb_bbas) {
 				/* free() the previous buffer now, since it wouldn't make sense
 				 * to have the unread packet chain start out with a bufctl link
@@ -280,9 +280,7 @@ allocate_buffer_extension:
 				pb_buffer_blob_free(oldbuf, oldsiz);
 				goto again;
 			}
-#endif /* !HEAP_REALLOC_UNX */
-		} else
-		{
+		} else {
 			struct pb_packet *link_packet;
 			link_packet          = self->pb_wptr;
 			link_packet->p_total = 0;

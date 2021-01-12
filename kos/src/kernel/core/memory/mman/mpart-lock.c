@@ -959,6 +959,7 @@ NOTHROW(FCALL mpart_copyram)(struct mpart *__restrict dst,
 					src_offset -= (count * PAGESIZE);
 					continue;
 				}
+				count -= src_offset / PAGESIZE;
 			}
 			if (count > num_pages)
 				count = num_pages;

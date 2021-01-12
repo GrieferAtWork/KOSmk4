@@ -106,18 +106,22 @@ aio_buffer_copytophys(struct aio_buffer const *__restrict self,
 		THROWS(E_SEGFAULT) {
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
+		if (src_offset != 0) {
+			if (src_offset >= ent.ab_size) {
+				src_offset -= ent.ab_size;
+				continue;
+			}
+			ent.ab_base += src_offset;
+			ent.ab_size -= src_offset;
+			src_offset = 0;
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copytophys(dst, ent.ab_base + src_offset, ent.ab_size);
+		vm_copytophys(dst, ent.ab_base, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst += ent.ab_size;
 		num_bytes -= ent.ab_size;
-		src_offset = 0;
 	}
 }
 
@@ -127,20 +131,24 @@ NOTHROW(KCALL aio_buffer_copytophys_nopf)(struct aio_buffer const *__restrict se
 	size_t error;
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
+		if (src_offset != 0) {
+			if (src_offset >= ent.ab_size) {
+				src_offset -= ent.ab_size;
+				continue;
+			}
+			ent.ab_base += src_offset;
+			ent.ab_size -= src_offset;
+			src_offset = 0;
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		error = vm_copytophys_nopf(dst, ent.ab_base + src_offset, ent.ab_size);
+		error = vm_copytophys_nopf(dst, ent.ab_base, ent.ab_size);
 		if unlikely(error != 0)
 			return error + (num_bytes - ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst += ent.ab_size;
 		num_bytes -= ent.ab_size;
-		src_offset = 0;
 	}
 	return 0;
 }
@@ -236,18 +244,22 @@ aio_buffer_copytomem(struct aio_buffer const *__restrict self,
 		THROWS(E_SEGFAULT) {
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
+		if (src_offset != 0) {
+			if (src_offset >= ent.ab_size) {
+				src_offset -= ent.ab_size;
+				continue;
+			}
+			ent.ab_base += src_offset;
+			ent.ab_size -= src_offset;
+			src_offset = 0;
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		memcpy(dst, ent.ab_base + src_offset, ent.ab_size);
+		memcpy(dst, ent.ab_base, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst = (byte_t *)dst + ent.ab_size;
 		num_bytes -= ent.ab_size;
-		src_offset = 0;
 	}
 }
 
@@ -258,18 +270,22 @@ aio_pbuffer_copytomem(struct aio_pbuffer const *__restrict self,
        THROWS(E_SEGFAULT) {
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
+		if (src_offset != 0) {
+			if (src_offset >= ent.ab_size) {
+				src_offset -= ent.ab_size;
+				continue;
+			}
+			ent.ab_base += src_offset;
+			ent.ab_size -= src_offset;
+			src_offset = 0;
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copyfromphys(dst, (physaddr_t)(ent.ab_base + src_offset), ent.ab_size);
+		vm_copyfromphys(dst, ent.ab_base, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst = (byte_t *)dst + ent.ab_size;
 		num_bytes -= ent.ab_size;
-		src_offset = 0;
 	}
 }
 
@@ -279,18 +295,22 @@ NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict sel
                                         physaddr_t src, size_t num_bytes) {
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
-			continue;
+		if (dst_offset != 0) {
+			if (dst_offset >= ent.ab_size) {
+				dst_offset -= ent.ab_size;
+				continue;
+			}
+			ent.ab_base += dst_offset;
+			ent.ab_size -= dst_offset;
+			dst_offset = 0;
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copyinphys(ent.ab_base + dst_offset, src, ent.ab_size);
+		vm_copyinphys(ent.ab_base, src, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		src += ent.ab_size;
 		num_bytes -= ent.ab_size;
-		dst_offset = 0;
 	}
 }
 
@@ -300,18 +320,22 @@ NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self,
                                       uintptr_t src_offset, size_t num_bytes) {
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
+		if (src_offset != 0) {
+			if (src_offset >= ent.ab_size) {
+				src_offset -= ent.ab_size;
+				continue;
+			}
+			ent.ab_base += src_offset;
+			ent.ab_size -= src_offset;
+			src_offset = 0;
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copyinphys(dst, ent.ab_base + src_offset, ent.ab_size);
+		vm_copyinphys(dst, ent.ab_base, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst += ent.ab_size;
 		num_bytes -= ent.ab_size;
-		src_offset = 0;
 	}
 }
 

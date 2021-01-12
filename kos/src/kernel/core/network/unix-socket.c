@@ -43,7 +43,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/net.h>
 #include <network/unix-socket.h>
-#include <sys/un.h> /* sockaddr_un  */
+#include <sys/un.h> /* sockaddr_un */
 
 #include <assert.h>
 #include <limits.h>
@@ -799,8 +799,10 @@ UnixSocket_Connect(struct socket *__restrict self,
 			client->uc_status = UNIX_CLIENT_STATUS_PENDING;
 			sig_init(&client->uc_status_sig);
 			/* Initialize the client/server packet buffers. */
-			pb_buffer_init(&client->uc_fromclient);
-			pb_buffer_init(&client->uc_fromserver);
+
+			/* FIXME: using a super-large packet buffer here is a hacky work-around */
+			pb_buffer_init_ex(&client->uc_fromclient, PB_BUFFER_DEFAULT_LIMIT * 16);
+			pb_buffer_init_ex(&client->uc_fromserver, PB_BUFFER_DEFAULT_LIMIT * 16);
 	
 			TRY {
 				/* Construct an async worker for informing the server of our
