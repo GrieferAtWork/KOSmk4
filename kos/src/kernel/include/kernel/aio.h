@@ -372,13 +372,14 @@ NOTHROW(KCALL aio_handle_init)(struct aio_handle *__restrict self,
 
 /* Helper wrapper for:
  * >> aio_handle_init(self, &aio_noop_type);
- * >> aio_handle_complete(self, AIO_COMPLETION_SUCCESS); */
-#define aio_handle_init_noop(self)          \
+ * >> aio_handle_complete(self, status); */
+#define aio_handle_init_noop(self, status)  \
 	(aio_handle_init(self, &aio_noop_type), \
-	 aio_handle_complete(self, AIO_COMPLETION_SUCCESS))
+	 aio_handle_complete(self, status))
 
 /* Helper wrapper for:
- * >> aio_handle_init(self, &aio_noop_type);
+ * >> aio_handle_init(self, &aio_noop_retval_type);
+ * >> self->ah_data[0] = (void *)(uintptr_t)(size_t)val;
  * >> aio_handle_complete(self, AIO_COMPLETION_SUCCESS); */
 #define aio_handle_init_noop_retval(self, val)              \
 	(aio_handle_init(self, &aio_noop_retval_type),          \

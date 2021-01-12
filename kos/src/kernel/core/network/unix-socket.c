@@ -1403,7 +1403,7 @@ again_start_packet:
 	pb_buffer_endwrite_commit(pbuf, packet);
 
 	/* Setup AIO to indicate that we're already done. */
-	aio_handle_init_noop(aio);
+	aio_handle_init_noop(aio, AIO_COMPLETION_SUCCESS);
 }
 
 

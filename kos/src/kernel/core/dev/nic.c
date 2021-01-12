@@ -174,8 +174,7 @@ NOTHROW(KCALL nic_device_send_nx)(struct nic_device *__restrict self,
 	TRY {
 		nic_device_send(self, packet, aio);
 	} EXCEPT {
-		aio_handle_init(aio, &aio_noop_type);
-		aio_handle_complete(aio, AIO_COMPLETION_FAILURE);
+		aio_handle_init_noop(aio, AIO_COMPLETION_FAILURE);
 	}
 }
 

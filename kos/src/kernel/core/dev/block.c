@@ -1008,8 +1008,7 @@ _block_device_sync(struct block_device *__restrict self)
 				                          handle);
 				++result;
 			} EXCEPT {
-				aio_handle_init(handle, &aio_noop_type);
-				aio_handle_complete(handle, AIO_COMPLETION_FAILURE);
+				aio_handle_init_noop(handle, AIO_COMPLETION_FAILURE);
 				break;
 			}
 		}
@@ -1092,8 +1091,7 @@ again:
 			(*self->bd_type.dt_write)(self, cache_addr, 1,
 			                          sector_id, &handle);
 		} EXCEPT {
-			aio_handle_init(&handle, &aio_noop_type);
-			aio_handle_complete(&handle, AIO_COMPLETION_FAILURE);
+			aio_handle_init_noop(&handle, AIO_COMPLETION_FAILURE);
 		}
 		/* Search for additional sectors which may need saving, so we can improve
 		 * performance by saving a whole bunch of different blocks at once. */
@@ -1125,8 +1123,7 @@ again:
 				(*self->bd_type.dt_write)(self, cache_addr, 1,
 				                          sector_id, my_handle);
 			} EXCEPT {
-				aio_handle_init(my_handle, &aio_noop_type);
-				aio_handle_complete(my_handle, AIO_COMPLETION_FAILURE);
+				aio_handle_init_noop(my_handle, AIO_COMPLETION_FAILURE);
 			}
 			++ex_handles_count;
 		}
@@ -1206,8 +1203,7 @@ check_handle_state_for_save:
 		                         addr,
 		                         &handle);
 	} EXCEPT {
-		aio_handle_init(&handle, &aio_noop_type);
-		aio_handle_complete(&handle, AIO_COMPLETION_FAILURE);
+		aio_handle_init_noop(&handle, AIO_COMPLETION_FAILURE);
 	}
 	COMPILER_BARRIER();
 	TRY {

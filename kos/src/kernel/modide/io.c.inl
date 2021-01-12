@@ -465,8 +465,7 @@ again_service_io:
 	}
 	AtaBus_UnlockPIO(bus);
 	/* Indicate AIO completion to the caller. */
-	aio_handle_init(aio, &aio_noop_type);
-	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+	aio_handle_init_noop(aio, AIO_COMPLETION_SUCCESS);
 	return;
 err_io_error:
 	/* Always reset the bus (even if merely done for the next access) */

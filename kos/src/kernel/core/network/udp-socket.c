@@ -216,8 +216,7 @@ udp_connect(struct socket *__restrict self,
 	if unlikely(!(me->us_state & UDP_SOCKET_STATE_F_BOUND))
 		udp_autobind(me);
 	/* Indicate successful AIO completion. */
-	aio_handle_init(aio, &aio_noop_type);
-	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+	aio_handle_init_noop(aio, AIO_COMPLETION_SUCCESS);
 }
 
 

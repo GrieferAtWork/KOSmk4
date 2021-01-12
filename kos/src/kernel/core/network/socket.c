@@ -628,8 +628,7 @@ connect_and_send_work(async_job_t self) {
 		}
 		task_setvm(oldvm);
 	} EXCEPT {
-		aio_handle_init(&me->cas_aio, &aio_noop_type);
-		aio_handle_complete(&me->cas_aio, AIO_COMPLETION_FAILURE);
+		aio_handle_init_noop(&me->cas_aio, AIO_COMPLETION_FAILURE);
 		decref_unlikely(me->cas_socket);
 		RETHROW();
 	}

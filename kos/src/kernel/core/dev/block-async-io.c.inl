@@ -315,14 +315,12 @@ NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
 			}
 			INVOKE_IO(self, buf, num_sectors, addr, aio);
 		} EXCEPT {
-			aio_handle_init(aio, &aio_noop_type);
-			aio_handle_complete(aio, AIO_COMPLETION_FAILURE);
+			aio_handle_init_noop(aio, AIO_COMPLETION_FAILURE);
 		}
 	}
 	return;
 done_success:
-	aio_handle_init(aio, &aio_noop_type);
-	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+	aio_handle_init_noop(aio, AIO_COMPLETION_SUCCESS);
 #else /* DEFINE_IO_SECTOR */
 	pos_t end_addr;
 	lba_t device_lba;
@@ -460,13 +458,11 @@ done_success:
 			goto done_success;
 		}
 	} EXCEPT {
-		aio_handle_init(aio, &aio_noop_type);
-		aio_handle_complete(aio, AIO_COMPLETION_FAILURE);
+		aio_handle_init_noop(aio, AIO_COMPLETION_FAILURE);
 	}
 	return;
 done_success:
-	aio_handle_init(aio, &aio_noop_type);
-	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+	aio_handle_init_noop(aio, AIO_COMPLETION_SUCCESS);
 #endif /* !DEFINE_IO_SECTOR */
 }
 
