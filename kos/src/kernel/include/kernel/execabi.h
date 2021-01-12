@@ -169,9 +169,8 @@ struct execabi {
 	byte_t                  ea_magic[CONFIG_EXECABI_MAXHEADER]; /* ABI ~magic~ */
 
 	/* [1..1] ABI execution callback.
-	 * @param: args:  Exec arguments
-	 * @return: * :   One of `EXECABI_EXEC_*'
-	 * @return: NULL: 
+	 * @param: args: Exec arguments
+	 * @return: * :  One of `EXECABI_EXEC_*'
 	 * @throw: E_NOT_EXECUTABLE_NOT_A_BINARY: Same as returning `NULL'. */
 	WUNUSED unsigned int
 	(NONNULL((1)) FCALL *ea_exec)(/*in|out*/ struct execargs *__restrict args)

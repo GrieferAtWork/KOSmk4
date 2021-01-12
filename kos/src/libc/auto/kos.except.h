@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0f743fa */
+/* HASH CRC-32:0x87364fb6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,30 @@
 
 DECL_BEGIN
 
+/* Make use of inline optimizations when possible! */
+#ifndef __INTELLISENSE__
+#ifdef __arch_error_data
+#define libc_error_data() __arch_error_data()
+#endif /* __arch_error_data */
+#ifdef __arch_error_code
+#define libc_error_code() __arch_error_code()
+#endif /* __arch_error_code */
+#ifdef __arch_error_active
+#define libc_error_active() __arch_error_active()
+#endif /* __arch_error_active */
+#ifdef __arch_error_class
+#define libc_error_class() __arch_error_class()
+#endif /* __arch_error_class */
+#ifdef __arch_error_subclass
+#define libc_error_subclass() __arch_error_subclass()
+#endif /* __arch_error_subclass */
+#ifdef __arch_error_register_state
+#define libc_error_register_state() __arch_error_register_state()
+#endif /* __arch_error_register_state */
+#ifdef __arch_error_info
+#define libc_error_info() __arch_error_info()
+#endif /* __arch_error_info */
+#endif /* !__INTELLISENSE__ */
 /* Transform the given exception into a posix errno value */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_error_as_errno)(struct exception_data const *__restrict self);
 /* Transform the given exception into a posix signal.
@@ -41,7 +65,7 @@ INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_error_as_signal)(s
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_error_name)(error_code_t code);
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultanious
+ * lower priorities in situations where multiple simultaneous
  * errors can't be prevented. */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_error_priority)(error_code_t code);
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */

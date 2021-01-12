@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51522719 */
+/* HASH CRC-32:0xcf01ef47 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,14 +167,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifdef __CRT_HAVE_error_priority
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultanious
+ * lower priorities in situations where multiple simultaneous
  * errors can't be prevented. */
 __LIBC __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) __CASMNAME_SAME("error_priority");
 #else /* __CRT_HAVE_error_priority */
 #include <libc/local/kos.except/error_priority.h>
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultanious
+ * lower priorities in situations where multiple simultaneous
  * errors can't be prevented. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_priority, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_priority))(__code); })
 #endif /* !__CRT_HAVE_error_priority */

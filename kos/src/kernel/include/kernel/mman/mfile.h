@@ -94,6 +94,9 @@ struct mfile_ops {
 struct mfile {
 	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */
 	struct mfile_ops           *mf_ops;        /* [1..1][const] File operators. */
+	/* TODO: Use an atomic rwlock here! Higher-level components
+	 *       built on-top of `struct mfile' (such as `struct inode')
+	 *       should provide their own locking mechanism! */
 	struct rwlock               mf_lock;       /* Lock for this file. */
 	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the

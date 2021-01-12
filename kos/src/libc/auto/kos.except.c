@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc94271e7 */
+/* HASH CRC-32:0x18c680c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1065,7 +1065,7 @@ non_linear_prefix:
 }
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultanious
+ * lower priorities in situations where multiple simultaneous
  * errors can't be prevented. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {

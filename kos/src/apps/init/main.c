@@ -268,7 +268,7 @@ done_tmpfs:
 		 * Note that kill(-1, ...) will never kill a process with pid=1,
 		 * meaning that we (the process with pid=1) won't get killed
 		 * by this! */
-		/* TODO: Send SIGQUIT and wait for a configurable timeout until all
+		/* TODO: Send SIGTERM and wait for a configurable timeout until all
 		 *       processes except for our own have died. Only once the timeout
 		 *       expires with different processes still alive should we send
 		 *       SIGKILL. - That way, other processes still get a chance to

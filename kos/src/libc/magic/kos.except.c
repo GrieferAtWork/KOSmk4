@@ -24,6 +24,33 @@
 #include <signal.h>
 }
 
+%(auto_header){
+/* Make use of inline optimizations when possible! */
+#ifndef __INTELLISENSE__
+#ifdef __arch_error_data
+#define libc_error_data() __arch_error_data()
+#endif /* __arch_error_data */
+#ifdef __arch_error_code
+#define libc_error_code() __arch_error_code()
+#endif /* __arch_error_code */
+#ifdef __arch_error_active
+#define libc_error_active() __arch_error_active()
+#endif /* __arch_error_active */
+#ifdef __arch_error_class
+#define libc_error_class() __arch_error_class()
+#endif /* __arch_error_class */
+#ifdef __arch_error_subclass
+#define libc_error_subclass() __arch_error_subclass()
+#endif /* __arch_error_subclass */
+#ifdef __arch_error_register_state
+#define libc_error_register_state() __arch_error_register_state()
+#endif /* __arch_error_register_state */
+#ifdef __arch_error_info
+#define libc_error_info() __arch_error_info()
+#endif /* __arch_error_info */
+#endif /* !__INTELLISENSE__ */
+}
+
 
 %{
 #include <features.h>
@@ -1258,7 +1285,7 @@ non_linear_prefix:
 
 @@Return the priority for a given error code, where exceptions
 @@with greater priorities should take the place of ones with
-@@lower priorities in situations where multiple simultanious
+@@lower priorities in situations where multiple simultaneous
 @@errors can't be prevented.
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[wunused, const, nothrow]]
