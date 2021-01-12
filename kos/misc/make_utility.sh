@@ -621,6 +621,30 @@ MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 HOST_SYSROOT="$KOS_ROOT/binutils/misc"
 
 
+# Handle the case where the utility name contains a "*"
+case "$UTILITY_NAME" in
+*\**)
+	RARGS=""
+	if test x"$MODE_FORCE_CONF" == xyes; then RARGS="$RARGS --force-configure"; fi
+	if test x"$MODE_FORCE_MAKE" == xyes; then RARGS="$RARGS --force-make"; fi
+	if test x"$MODE_FORCE_DISK" == xyes; then RARGS="$RARGS --force-disk"; fi
+	if test x"$MODE_DRYRUN" == xyes; then RARGS="$RARGS --dry-run"; fi
+	RARGS="$RARGS $TARGET_NAME"
+	cmd cd "${KOS_ROOT}/kos/misc/utilities"
+	for util in $UTILITY_NAME; do
+		if [[ "$util" == *".sh" ]] && [ -f "$util" ]; then
+			util="${util::-3}"
+			echo ">>> Now making: $util <<<"
+			cmd bash "$KOS_MISC/make_utility.sh" $RARGS $util
+			echo ""
+		fi
+	done
+	exit 0
+	;;
+*)
+	;;
+esac
+
 UTILITY_SCRIPT="${KOS_ROOT}/kos/misc/utilities/${UTILITY_NAME}.sh"
 if ! [ -f "$UTILITY_SCRIPT" ]; then
 	echo "Unknown utility '$UTILITY_NAME'"
