@@ -1351,6 +1351,11 @@ again_start_packet:
 			aio_handle_init_noop_retval(aio, offset);
 			return;
 		}
+		/* Optional optimization: Pre-cancel the AIO operation in non-blocking mode. */
+		if (msg_flags & MSG_DONTWAIT) {
+			aio_handle_init_noop(aio, AIO_COMPLETION_CANCEL);
+			return;
+		}
 		{
 			/* Must enqueue an async job to send data once some packets were read. */
 			REF async_job_t aj;

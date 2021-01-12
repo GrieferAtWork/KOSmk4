@@ -298,11 +298,35 @@ struct socket_ops {
 	 *       Otherwise, the caller may assume that all data was sent, so-long
 	 *       as this function returns normally, and `aio' completes without
 	 *       and errors.
+	 * NOTE: When `MSG_DONTWAIT' is given, this function may (but isn't required to)
+	 *       initialize `aio' as `aio_handle_init_noop(aio, AIO_COMPLETION_CANCEL)'
+	 *       instead of what would normally have to be done when the send could not
+	 *       be performed without blocking.
+	 *       This can be done to optimize memory usage and speed when performing
+	 *       a non-blocking send, by never actually starting an async send job, but
+	 *       simply indicating that sending right now is impossible.
+	 *       In order to implement non-blocking send, the caller always does:
+	 *       >> socket_asend(..., msg_flags | MSG_DONTWAIT, &aio);
+	 *       >> aio_handle_cancel(&aio);
+	 *       >> if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+	 *       >>     aio_handle_generic_fini(&aio);
+	 *       >>     THROW(E_WOULDBLOCK);
+	 *       >> }
+	 *       >> result = bufsize;
+	 *       >> if (aio.ah_type->ht_retsize)
+	 *       >>     result = (*aio.ah_type->ht_retsize)(&aio);
+	 *       >> aio_handle_generic_fini(&aio);
+	 *       So even if the socket-specific send operator does start an async send
+	 *       operation, that operation will immediately be canceled once again, meaning
+	 *       that it is much more efficient if the operation was never started to begin
+	 *       with.
 	 * @param: msg_control: When non-NULL, contains pointers to ancillary data buffer and resulting
 	 *                      length. Note that this function must copy the contents of this structure
 	 *                      if it needs to be accessed after returning. (i.e. AIO needs to use its
 	 *                      own copy of this structure)
 	 * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR | MSG_MORE | MSG_OOB'
+	 *                      Additionally, the `MSG_DONTWAIT' may be passed (though implementers
+	 *                      of this operator are allowed to ignore that flag; see above)
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED: [...]
 	 * @throws: E_NET_MESSAGE_TOO_LONG:                                                     [...]
 	 * @throws: E_NET_CONNECTION_RESET:                                                     [...]

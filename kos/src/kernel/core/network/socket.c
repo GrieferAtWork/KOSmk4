@@ -474,9 +474,10 @@ socket_send(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
+		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+			msg_flags |= MSG_DONTWAIT;
 		socket_asend(self, buf, bufsize, msg_control, msg_flags, &aio);
-		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
+		if (msg_flags & MSG_DONTWAIT) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -519,9 +520,10 @@ socket_sendv(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
+		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+			msg_flags |= MSG_DONTWAIT;
 		socket_asendv(self, buf, bufsize, msg_control, msg_flags, &aio);
-		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
+		if (msg_flags & MSG_DONTWAIT) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -822,9 +824,10 @@ socket_sendto(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
+		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+			msg_flags |= MSG_DONTWAIT;
 		socket_asendto(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
-		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
+		if (msg_flags & MSG_DONTWAIT) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
@@ -868,9 +871,10 @@ socket_sendtov(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
+		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+			msg_flags |= MSG_DONTWAIT;
 		socket_asendtov(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
-		if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-		    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
+		if (msg_flags & MSG_DONTWAIT) {
 			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
 			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
