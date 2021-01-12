@@ -1013,7 +1013,7 @@ again_receive:
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
- * @throws: E_NET_TIMEOUT: The given `timeout expired' */
+ * @throws: E_NET_TIMEOUT: The given `timeout' expired */
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
             USER CHECKED void *buf, size_t bufsize,

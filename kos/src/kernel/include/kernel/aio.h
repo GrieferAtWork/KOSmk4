@@ -350,6 +350,11 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 /* No-op AIO handle type (intended for synchronous operations) */
 DATDEF struct aio_handle_type aio_noop_type;
 
+/* No-op AIO handle type (intended for synchronous operations)
+ * Just like `aio_noop_type', but this one implements the retval
+ * operator, which unconditionally returns `(size_t)ah_data[0]' */
+DATDEF struct aio_handle_type aio_noop_retval_type;
+
 
 /* Initialize the given AIO handle with a type-specific v-table.
  * Must be called by all functions taking an `/ *out* / struct aio_handle *...'
@@ -364,6 +369,22 @@ NOTHROW(KCALL aio_handle_init)(struct aio_handle *__restrict self,
 #endif /* !NDEBUG */
 	self->ah_type = typ;
 }
+
+/* Helper wrapper for:
+ * >> aio_handle_init(self, &aio_noop_type);
+ * >> aio_handle_complete(self, AIO_COMPLETION_SUCCESS); */
+#define aio_handle_init_noop(self)          \
+	(aio_handle_init(self, &aio_noop_type), \
+	 aio_handle_complete(self, AIO_COMPLETION_SUCCESS))
+
+/* Helper wrapper for:
+ * >> aio_handle_init(self, &aio_noop_type);
+ * >> aio_handle_complete(self, AIO_COMPLETION_SUCCESS); */
+#define aio_handle_init_noop_retval(self, val)              \
+	(aio_handle_init(self, &aio_noop_retval_type),          \
+	 (self)->ah_data[0] = (void *)(uintptr_t)(size_t)(val), \
+	 aio_handle_complete(self, AIO_COMPLETION_SUCCESS))
+
 
 /* Finalize a fully initialized AIO handle.
  * WARNING: The caller must ensure that the AIO handle's completion function

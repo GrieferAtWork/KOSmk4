@@ -798,12 +798,11 @@ UnixSocket_Connect(struct socket *__restrict self,
 			client->uc_refcnt = 2; /* +1: unix_server_append_acceptme(), +1: con->aw_client */
 			client->uc_status = UNIX_CLIENT_STATUS_PENDING;
 			sig_init(&client->uc_status_sig);
-			/* Initialize the client/server packet buffers. */
 
-			/* FIXME: using a super-large packet buffer here is a hacky work-around */
-			pb_buffer_init_ex(&client->uc_fromclient, PB_BUFFER_DEFAULT_LIMIT * 16);
-			pb_buffer_init_ex(&client->uc_fromserver, PB_BUFFER_DEFAULT_LIMIT * 16);
-	
+			/* Initialize the client/server packet buffers. */
+			pb_buffer_init(&client->uc_fromclient);
+			pb_buffer_init(&client->uc_fromserver);
+
 			TRY {
 				/* Construct an async worker for informing the server of our
 				 * presence, as well as to wait for it to accept(2) us. */
@@ -1343,6 +1342,15 @@ again_start_packet:
 		} else {
 			assert(packet == PB_BUFFER_STARTWRITE_READSOME);
 		}
+		if (offset != 0) {
+			/* We _did_ manage to send ~some~ data successfully, so we
+			 * must tell our caller about that fact and _not_ enqueue
+			 * an async job to send the rest, because if that job ends
+			 * up being canceled, then our caller would have no way of
+			 * knowing how much we've already succeeded in sending! */
+			aio_handle_init_noop_retval(aio, offset);
+			return;
+		}
 		{
 			/* Must enqueue an async job to send data once some packets were read. */
 			REF async_job_t aj;
@@ -1395,8 +1403,7 @@ again_start_packet:
 	pb_buffer_endwrite_commit(pbuf, packet);
 
 	/* Setup AIO to indicate that we're already done. */
-	aio_handle_init(aio, &aio_noop_type);
-	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+	aio_handle_init_noop(aio);
 }
 
 

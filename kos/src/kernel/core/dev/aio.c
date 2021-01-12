@@ -47,8 +47,25 @@ NOTHROW(KCALL aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
 
 /* No-op AIO handle type (intended for synchronous operations) */
 PUBLIC struct aio_handle_type aio_noop_type = {
-	/* .ht_fini   = */ &aio_noop_noarg,
-	/* .ht_cancel = */ &aio_noop_noarg
+	/* .ht_fini     = */ &aio_noop_noarg,
+	/* .ht_cancel   = */ &aio_noop_noarg,
+	/* .ht_progress = */ NULL,
+	/* .ht_retsize  = */ NULL
+};
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
+NOTHROW(KCALL aio_noop_retval_retsize)(struct aio_handle *__restrict self) {
+	return (size_t)(uintptr_t)self->ah_data[0];
+}
+
+/* No-op AIO handle type (intended for synchronous operations)
+ * Just like `aio_noop_type', but this one implements the retval
+ * operator, which unconditionally returns `(size_t)ah_data[0]' */
+PUBLIC struct aio_handle_type aio_noop_retval_type = {
+	/* .ht_fini     = */ &aio_noop_noarg,
+	/* .ht_cancel   = */ &aio_noop_noarg,
+	/* .ht_progress = */ NULL,
+	/* .ht_retsize  = */ &aio_noop_retval_retsize
 };
 
 

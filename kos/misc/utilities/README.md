@@ -99,17 +99,3 @@ xinit /bin/xclock -- -dumbSched
 And after a while you should see this:
 
 ![Xorg-first-time.png](../gallery/Xorg-first-time.png)
-
-
-### TODO
-
-Right now, this only works because of a hacky work-around in `unix-socket.c`:
-
-```c
-			/* FIXME: using a super-large packet buffer here is a hacky work-around */
-			pb_buffer_init_ex(&client->uc_fromclient, PB_BUFFER_DEFAULT_LIMIT * 16);
-			pb_buffer_init_ex(&client->uc_fromserver, PB_BUFFER_DEFAULT_LIMIT * 16);
-```
-
-Because there seems to be a problem with how KOS splits data on a STREAM-socket that are too large to fit into a single packet.
-
