@@ -216,7 +216,7 @@ nic_device_write(struct character_device *__restrict self,
 
 	/* Wait for the send to finish. */
 	TRY {
-		aio_handle_generic_waitfor_tms(&aio);
+		aio_handle_generic_waitfor(&aio);
 		aio_handle_generic_checkerror(&aio);
 	} EXCEPT {
 		aio_handle_generic_fini(&aio);

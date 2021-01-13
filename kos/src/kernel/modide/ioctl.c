@@ -29,6 +29,7 @@
 #include <kernel/compat.h>
 #include <kernel/user.h>
 #include <sched/signal.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -126,10 +127,10 @@ do_compat_hdio_getgeo:
 						THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
 					}
 					{
-						struct timespec timeout;
-						timeout = realtime();
-						timeout.tv_sec += 2;
-						signal = task_waitfor_tms(&timeout);
+						ktime_t timeout;
+						timeout = ktime();
+						timeout += relktime_from_seconds(2);
+						signal = task_waitfor(timeout);
 					}
 					if (!signal)
 						THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);

@@ -318,7 +318,7 @@ do_blocking_connect:
 		aio_handle_generic_init(&aio);
 		(*self->sk_ops->so_connect)(self, addr, addr_len, &aio);
 		TRY {
-			aio_handle_generic_waitfor_tms(&aio);
+			aio_handle_generic_waitfor(&aio);
 			aio_handle_generic_checkerror(&aio);
 		} EXCEPT {
 			aio_handle_generic_fini(&aio);
@@ -507,7 +507,7 @@ waitfor_send_aio(struct socket *__restrict self,
 				THROW(E_NET_TIMEOUT);
 		}
 	} else {
-		aio_handle_generic_waitfor_tms(aio);
+		aio_handle_generic_waitfor(aio);
 	}
 }
 

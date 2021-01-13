@@ -29,6 +29,7 @@
 #include <kernel/isr.h>
 #include <kernel/printk.h>
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -142,7 +143,7 @@ again:
 	COMPILER_WRITE_BARRIER();
 	ps2_write_data(portno, command);
 	for (;;) {
-		struct timespec tmo;
+		ktime_t tmo;
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (status != 0)
 			break;
@@ -152,9 +153,9 @@ again:
 			task_disconnectall();
 			break;
 		}
-		tmo = realtime();
-		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor_tms(&tmo))
+		tmo = ktime();
+		tmo += relktime_from_milliseconds(ps2_command_timeout);
+		if (!task_waitfor(tmo))
 			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 	}
 	if (status & PS2_PROBE_STATUS_FACK)
@@ -176,7 +177,7 @@ again:
 	COMPILER_WRITE_BARRIER();
 	ps2_write_data(portno, command);
 	for (;;) {
-		struct timespec tmo;
+		ktime_t tmo;
 		state  = ATOMIC_READ(probe_data[portno].pd_state);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
@@ -188,9 +189,9 @@ again:
 			task_disconnectall();
 			break;
 		}
-		tmo = realtime();
-		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor_tms(&tmo)) {
+		tmo = ktime();
+		tmo += relktime_from_milliseconds(ps2_command_timeout);
+		if (!task_waitfor(tmo)) {
 			state  = ATOMIC_READ(probe_data[portno].pd_state);
 			status = ATOMIC_READ(probe_data[portno].pd_status);
 			if (status & PS2_PROBE_STATUS_FRESEND)
@@ -219,7 +220,7 @@ again:
 	COMPILER_WRITE_BARRIER();
 	ps2_write_data(portno, PS2_KEYBOARD_CMD_IDENTIFY);
 	for (;;) {
-		struct timespec tmo;
+		ktime_t tmo;
 		state  = ATOMIC_READ(probe_data[portno].pd_state);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
@@ -231,9 +232,9 @@ again:
 			task_disconnectall();
 			break;
 		}
-		tmo = realtime();
-		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor_tms(&tmo)) {
+		tmo = ktime();
+		tmo += relktime_from_milliseconds(ps2_command_timeout);
+		if (!task_waitfor(tmo)) {
 			state  = ATOMIC_READ(probe_data[portno].pd_state);
 			status = ATOMIC_READ(probe_data[portno].pd_status);
 			if (status & PS2_PROBE_STATUS_FRESEND)

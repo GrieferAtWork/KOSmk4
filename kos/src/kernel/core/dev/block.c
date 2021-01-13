@@ -1017,7 +1017,7 @@ _block_device_sync(struct block_device *__restrict self)
 		aio_multihandle_fail(&hand);
 	}
 	TRY {
-		aio_multihandle_generic_waitfor_tms(&hand);
+		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);
 	} EXCEPT {
 		aio_multihandle_generic_fini(&hand);
@@ -1134,7 +1134,7 @@ again:
 					struct aio_handle_generic *my_handle;
 					--ex_handles_count;
 					my_handle = &ex_handles[ex_handles_count].sh_handle;
-					aio_handle_generic_waitfor_tms(my_handle);
+					aio_handle_generic_waitfor(my_handle);
 					/* Mark this handle as having been successfully saved. */
 					if likely(my_handle->hg_status == AIO_COMPLETION_SUCCESS)
 						block_unset_modified(self, ex_handles[ex_handles_count].sh_index);
@@ -1175,7 +1175,7 @@ check_handle_state_for_save:
 				break;
 	
 			default:
-				aio_handle_generic_waitfor_tms(&handle);
+				aio_handle_generic_waitfor(&handle);
 				goto check_handle_state_for_save;
 			}
 		} EXCEPT {
@@ -1227,7 +1227,7 @@ check_handle_state_for_load:
 			break;
 	
 		default:
-			aio_handle_generic_waitfor_tms(&handle);
+			aio_handle_generic_waitfor(&handle);
 			goto check_handle_state_for_load;
 		}
 	} EXCEPT {

@@ -30,6 +30,7 @@
 
 #include <kernel/iovec.h>
 #include <kernel/vm/phys.h>
+#include <sched/tsc.h>
 
 #include <sys/io.h>
 
@@ -144,10 +145,10 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 			assert(num_sectors);
 			signal = task_trywait();
 			if (!signal) {
-				struct timespec timeout;
-				timeout = realtime();
-				timeout.add_nanoseconds(bus->ab_timeout_dat);
-				signal = task_waitfor_tms(&timeout);
+				ktime_t timeout;
+				timeout = ktime();
+				timeout += relktime_from_nanoseconds(bus->ab_timeout_dat);
+				signal = task_waitfor(timeout);
 				if unlikely(!signal)
 					return ATA_ERROR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_SECTOR_WAIT);
 			}

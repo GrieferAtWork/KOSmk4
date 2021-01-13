@@ -2155,21 +2155,4 @@ DECL_END
 #include "signal-waitfor.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-
-/* Deprecated task waiting functions. */
-#include <sched/tsc.h>
-
-DECL_BEGIN
-
-PUBLIC struct sig *FCALL
-task_waitfor_tms(struct timespec const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	ktime_t ktime_abs_timeout = KTIME_INFINITE;
-	if (abs_timeout != NULL)
-		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
-	return task_waitfor(ktime_abs_timeout);
-}
-
-DECL_END
-
-
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_C */

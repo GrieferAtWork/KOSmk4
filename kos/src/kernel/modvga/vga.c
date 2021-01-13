@@ -31,7 +31,7 @@
 #include <kernel/printk.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <sched/cpu.h>
+#include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -1085,9 +1085,9 @@ NOTHROW(KCALL invert_current_line_colors)(VGA *__restrict self) {
 }
 
 PRIVATE void KCALL do_flash_screen_pause(void) THROWS(E_WOULDBLOCK, ...) {
-	struct timespec tmo = realtime();
-	tmo.add_milliseconds(50);
-	task_waitfor_tms(&tmo);
+	ktime_t tmo = ktime();
+	tmo += relktime_from_milliseconds(50);
+	task_sleep_until(tmo);
 }
 
 

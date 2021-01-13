@@ -572,31 +572,6 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 	return true;
 }
 
-struct timespec;
-LOCAL NONNULL((1)) bool KCALL
-aio_handle_generic_waitfor_tms(struct aio_handle_generic *__restrict self,
-                               struct timespec const *timeout DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
-	while (!aio_handle_generic_hascompleted(self)) {
-		TRY {
-			aio_handle_generic_connect_for_poll(self);
-			if unlikely(aio_handle_generic_hascompleted(self)) {
-				task_disconnectall();
-				break;
-			}
-			if (!task_waitfor_tms(timeout)) {
-				__hybrid_assert(timeout);
-				aio_handle_cancel(self);
-				return false;
-			}
-		} EXCEPT {
-			aio_handle_cancel(self);
-			RETHROW();
-		}
-	}
-	return true;
-}
 
 
 
@@ -717,7 +692,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
  * >> }
  * >> aio_multihandle_done(&multihandle);
  * >> TRY {
- * >>     aio_multihandle_generic_waitfor_tms(&multihandle);
+ * >>     aio_multihandle_generic_waitfor(&multihandle);
  * >>     aio_multihandle_generic_checkerror(&multihandle);
  * >> } EXCEPT {
  * >>     aio_multihandle_generic_fini(&multihandle);
@@ -824,32 +799,6 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
 				break;
 			}
 			if (!task_waitfor(abs_timeout)) {
-				aio_multihandle_cancel(self);
-				return false;
-			}
-		} EXCEPT {
-			aio_multihandle_cancel(self);
-			RETHROW();
-		}
-	}
-	return true;
-}
-
-struct timespec;
-LOCAL NONNULL((1)) bool KCALL
-aio_multihandle_generic_waitfor_tms(struct aio_multihandle_generic *__restrict self,
-                                    struct timespec const *timeout DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
-	while (!aio_multihandle_generic_hascompleted(self)) {
-		TRY {
-			aio_multihandle_generic_connect(self);
-			if unlikely(aio_multihandle_generic_hascompleted(self)) {
-				task_disconnectall();
-				break;
-			}
-			if (!task_waitfor_tms(timeout)) {
-				__hybrid_assert(timeout);
 				aio_multihandle_cancel(self);
 				return false;
 			}

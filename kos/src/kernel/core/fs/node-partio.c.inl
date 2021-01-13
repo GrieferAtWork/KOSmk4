@@ -153,7 +153,7 @@ inode_do_load_datapart_pages_sync(struct inode *__restrict self,
 		aio_multihandle_fail(&hand);
 	}
 	TRY {
-		aio_multihandle_generic_waitfor_tms(&hand);
+		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);
 	} EXCEPT {
 		aio_multihandle_generic_fini(&hand);

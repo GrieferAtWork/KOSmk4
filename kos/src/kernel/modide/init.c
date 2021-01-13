@@ -30,6 +30,7 @@
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/isr.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -184,10 +185,10 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 					goto reset_bus_and_fail;
 				}
 				{
-					struct timespec timeout;
-					timeout = realtime();
-					timeout.tv_sec += 2;
-					signal = task_waitfor_tms(&timeout);
+					ktime_t timeout;
+					timeout = ktime();
+					timeout += relktime_from_seconds(2);
+					signal = task_waitfor(timeout);
 				}
 				if (!signal) {
 					printk(FREESTR(KERN_ERR "[ata] Timeout while waiting for ATA_COMMAND_IDENTIFY "

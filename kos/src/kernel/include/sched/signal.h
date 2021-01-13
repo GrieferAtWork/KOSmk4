@@ -627,10 +627,6 @@ NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 FUNDEF struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
-/* Deprecated task waiting functions. */
-FUNDEF struct sig *FCALL task_waitfor_tms(struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK, ...);
-
-
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
@@ -685,7 +681,7 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >>         task_disconnectall();
  * >>         RETHROW();
  * >>     }
- * >>     if (!task_waitfor_tms(TIMEOUT))
+ * >>     if (!task_waitfor(TIMEOUT))
  * >>         return false;
  * >> }
  * >> return true;
