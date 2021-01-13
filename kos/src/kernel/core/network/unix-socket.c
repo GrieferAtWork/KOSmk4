@@ -35,6 +35,8 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <sched/async.h>
+#include <sched/cred.h>
+#include <sched/pid.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -798,6 +800,11 @@ UnixSocket_Connect(struct socket *__restrict self,
 			client->uc_refcnt = 2; /* +1: unix_server_append_acceptme(), +1: con->aw_client */
 			client->uc_status = UNIX_CLIENT_STATUS_PENDING;
 			sig_init(&client->uc_status_sig);
+
+			/* Remember credentials of the process that originally did the connect(). */
+			client->uc_cred.pid = task_getpid(); /* XXX: What about PID namespaces? */
+			client->uc_cred.uid = (__uid_t)cred_geteuid();
+			client->uc_cred.gid = (__gid_t)cred_getegid();
 
 			/* Initialize the client/server packet buffers. */
 			pb_buffer_init(&client->uc_fromclient);
@@ -1666,6 +1673,57 @@ UnixSocket_Shutdown(struct socket *__restrict self,
 		pb_buffer_close(me->us_sendbuf);
 }
 
+PRIVATE ATTR_RETNONNULL struct unix_client *KCALL
+UnixSocket_GetClient(struct unix_socket *__restrict self,
+					 unsigned int error_context)
+		THROWS(TODO) {
+	struct unix_client *result;
+	struct socket_node *server_node;
+	server_node = ATOMIC_READ(self->us_node);
+	COMPILER_READ_BARRIER();
+	/* Verify that we've been bound. */
+	if unlikely(!server_node || server_node == (struct socket_node *)-1) {
+not_connected:
+		THROW(E_INVALID_ARGUMENT_BAD_STATE, error_context);
+	}
+	result = self->us_client;
+	if unlikely(result == NULL)
+		goto not_connected;
+	return result;
+}
+
+PRIVATE NONNULL((1)) socklen_t KCALL
+UnixSocket_GetSockOpt(struct socket *__restrict self,
+                      syscall_ulong_t level, syscall_ulong_t optname,
+                      USER CHECKED void *optval,
+                      socklen_t optlen, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
+	struct unix_socket *me;
+	me = (struct unix_socket *)self;
+	if (level == SOL_SOCKET) {
+		switch (optname) {
+
+		case SO_PEERCRED: {
+			struct unix_client *client;
+			if (optlen != sizeof(struct ucred))
+				THROW(E_BUFFER_TOO_SMALL, sizeof(struct ucred), optlen);
+			client = UnixSocket_GetClient(me, E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED);
+			memcpy(optval, &client->uc_cred, sizeof(struct ucred));
+			return sizeof(struct ucred);
+		}	break;
+
+		/* TODO: SO_PASSCRED */
+		/* TODO: SO_PASSSEC */
+		/* TODO: SO_PEEK_OFF */
+		/* TODO: SO_PEERSEC */
+
+		default:
+			break;
+		}
+	}
+	return 0;
+}
+
 
 
 
@@ -1690,7 +1748,7 @@ PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_listen      = */ &UnixSocket_Listen,
 	/* .so_accept      = */ &UnixSocket_Accept,
 	/* .so_shutdown    = */ &UnixSocket_Shutdown,
-	/* .so_getsockopt  = */ NULL, /* XXX: Implement me? */
+	/* .so_getsockopt  = */ &UnixSocket_GetSockOpt,
 	/* .so_setsockopt  = */ NULL, /* XXX: Implement me? */
 	/* .so_ioctl       = */ NULL, /* XXX: Implement me? */
 	/* .so_free        = */ NULL,

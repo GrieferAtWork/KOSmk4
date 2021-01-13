@@ -17,19 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_MMSGHDR_H
-#define _BITS_OS_MMSGHDR_H 1
+#ifndef _BITS_OS_UCRED_H
+#define _BITS_OS_UCRED_H 1
 
 /* File:
- *    <bits/os/mmsghdr.h>
+ *    <bits/os/ucred.h>
  * 
  * Definitions:
- *    - struct mmsghdr { ... };
+ *    - struct ucred { ... };
  */
 
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/mmsghdr.h>
+#if defined(__KOS__) || defined(__linux__)
+#include <bits/os/kos/ucred.h>
+#endif /* ... */
 
-#endif /* !_BITS_OS_MMSGHDR_H */
+#endif /* !_BITS_OS_UCRED_H */

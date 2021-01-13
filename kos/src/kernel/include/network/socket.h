@@ -505,6 +505,13 @@ struct socket_ops {
 
 	/* [0..1]
 	 * Get the value of the named socket option `level:optname' and store it in `optval'
+	 * In particular, sockets should implement the following options:
+	 *  - level: SOL_SOCKET, optname: SO_BINDTODEVICE   (If applicable to the socket type)
+	 *  - level: SOL_SOCKET, optname: SO_ACCEPTCONN     (socket_getsockopt() writes back `int:0' if not supported)
+	 *  - level: SOL_SOCKET, optname: SO_BROADCAST      (socket_getsockopt() writes back `int:0' if not supported)
+	 *  - level: SOL_SOCKET, optname: SO_DEBUG          (socket_getsockopt() writes back `int:0' if not supported)
+	 *  - level: SOL_SOCKET, optname: SO_KEEPALIVE      (socket_getsockopt() writes back `int:0' if not supported)
+	 * @return: 0 : Same as `THROW(E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT)'
 	 * @return: * : The required buffer size.
 	 * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT: [...] */
 	NONNULL((1)) socklen_t
@@ -516,9 +523,11 @@ struct socket_ops {
 
 	/* [0..1]
 	 * Set the value of the named socket option `level:optname' from what is given in `optval'
+	 * @return: true:  Success
+	 * @return: false: Same as `THROW(E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT)'
 	 * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT: [...]
 	 * @throws: E_BUFFER_TOO_SMALL: The specified `optlen' is invalid for the given option. */
-	NONNULL((1)) void
+	NONNULL((1)) __BOOL
 	(KCALL *so_setsockopt)(struct socket *__restrict self,
 	                       syscall_ulong_t level, syscall_ulong_t optname,
 	                       USER CHECKED void const *optval,
@@ -536,6 +545,20 @@ struct socket_ops {
 	/* [0..1] Optional free function. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *so_free)(struct socket *__restrict self);
+
+	/* TODO: Callbacks to get/set the send/receive buffer size.
+	 *       Having dedicated callbacks for this feels more correct
+	 *       that forcing socket implementors to do this via the
+	 *       so_setsockopt() operator. Also: by having dedicated
+	 *       callbacks for this, all of the permission/limit checks
+	 *       don't have to be performed by the implementation layer!
+	 * XXX:  How are these operators supposed to behave when the socket
+	 *       hasn't been connected, yet? Should they remember the config
+	 *       and apply it during the connect? But then what happens if
+	 *       the socket isn't connected, but is set to bound+listen?
+	 * NOTE: Looking at the linux kernel, it doesn't care about the
+	 *       socket's actual state. It _always_ allows one to read/write
+	 *       the send/recv buffer limits... */
 };
 
 struct socket_connect_aio {
@@ -574,6 +597,8 @@ struct socket {
 	                                                       * NOTE: Socket implementation should not touch this field!
 	                                                       * HINT: `POLLOUTMASK' is indicated when this is `NULL', or when contained AIO has completed! */
 	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
+	/* TODO: SO_RCVTIMEO and SO_SNDTIMEO can be implemented right here! */
+
 	/* Socket-specific data goes here... */
 };
 
@@ -621,7 +646,7 @@ socket_create(syscall_ulong_t family,
  * WARNING: This function may clobber the currently set exception
  * @return: true:  The socket is connected
  * @return: false: The socket isn't connected */
-FUNDEF WUNUSED NONNULL((1)) bool KCALL
+FUNDEF WUNUSED NONNULL((1)) __BOOL KCALL
 socket_isconnected(struct socket *__restrict self);
 
 

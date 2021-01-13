@@ -17,19 +17,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_MMSGHDR_H
-#define _BITS_OS_MMSGHDR_H 1
-
-/* File:
- *    <bits/os/mmsghdr.h>
- * 
- * Definitions:
- *    - struct mmsghdr { ... };
- */
+#ifndef _BITS_OS_KOS_UCRED_H
+#define _BITS_OS_KOS_UCRED_H 1
 
 #include <__stdinc.h>
 
-/**/
-#include <bits/os/kos/mmsghdr.h>
+#include <bits/types.h>
 
-#endif /* !_BITS_OS_MMSGHDR_H */
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("pid")
+#pragma push_macro("uid")
+#pragma push_macro("gid")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef pid
+#undef uid
+#undef gid
+
+/* User visible structure for SCM_CREDENTIALS message */
+struct ucred {
+	__pid_t pid; /* PID of sending process. */
+	__uid_t uid; /* UID of sending process. */
+	__gid_t gid; /* GID of sending process. */
+};
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("gid")
+#pragma pop_macro("uid")
+#pragma pop_macro("pid")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_OS_KOS_UCRED_H */

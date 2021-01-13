@@ -17,19 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_MMSGHDR_H
-#define _BITS_OS_MMSGHDR_H 1
-
-/* File:
- *    <bits/os/mmsghdr.h>
- * 
- * Definitions:
- *    - struct mmsghdr { ... };
- */
+#ifndef _BITS_OS_GENERIC_LINGER_H
+#define _BITS_OS_GENERIC_LINGER_H 1
 
 #include <__stdinc.h>
 
-/**/
-#include <bits/os/kos/mmsghdr.h>
+#ifdef __CC__
+__DECL_BEGIN
 
-#endif /* !_BITS_OS_MMSGHDR_H */
+struct linger {
+	int l_onoff;  /* Nonzero to linger on close. */
+	int l_linger; /* Time to linger. */
+};
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_OS_GENERIC_LINGER_H */

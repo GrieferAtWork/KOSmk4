@@ -1245,6 +1245,8 @@ socket_getsockopt_default(struct socket *__restrict self,
 
 		case SO_ACCEPTCONN:
 		case SO_DEBUG:
+		case SO_BROADCAST:
+		case SO_KEEPALIVE:
 			/* Default all of these to 0 */
 			GETSOCKOPT_RETURN_INT(0);
 			break;
@@ -1368,7 +1370,10 @@ again_read_ncon:
 			}
 			RETHROW();
 		}
+		if (!result)
+			goto do_default_getsockopt;
 	} else {
+do_default_getsockopt:
 		result = socket_getsockopt_default(self, level, optname,
 		                                   optval, optlen, mode);
 		if (result != 0)
@@ -1442,9 +1447,10 @@ socket_setsockopt(struct socket *__restrict self,
 		}
 	}
 	if (self->sk_ops->so_setsockopt) {
+		bool ok;
 		TRY {
-			(*self->sk_ops->so_setsockopt)(self, level, optname,
-			                               optval, optlen, mode);
+			ok = (*self->sk_ops->so_setsockopt)(self, level, optname,
+			                                    optval, optlen, mode);
 		} EXCEPT {
 			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
@@ -1462,7 +1468,10 @@ socket_setsockopt(struct socket *__restrict self,
 			}
 			RETHROW();
 		}
+		if unlikely(!ok)
+			goto err_unknown_socket_option;
 	} else {
+err_unknown_socket_option:
 		THROW(E_INVALID_ARGUMENT_SOCKET_OPT,
 		      E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT,
 		      level, optname,

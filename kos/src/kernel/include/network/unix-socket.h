@@ -25,6 +25,7 @@
 #include <kernel/types.h>
 #include <sched/signal.h>
 
+#include <bits/os/ucred.h>
 #include <network/socket.h>
 
 #include <libbuffer/packetbuffer.h>
@@ -68,6 +69,7 @@ struct unix_client {
 	                                        * Next client in the chain of clients to-be accepted. */
 	syscall_ulong_t         uc_status;     /* [lock(ATOMIC)] Client status (one of `UNIX_CLIENT_STATUS_*') */
 	struct sig              uc_status_sig; /* Signal broadcast when `uc_status' changes. */
+	struct ucred            uc_cred;       /* [const] Credentials of the process that originally connected (s.a. `SO_PEERCRED') */
 	/* Full-duplex packet-buffers for messages send to/from the server.
 	 * Note that we need special buffers for this, as file descriptors
 	 * must be received in the same order as the associated data-stream.
@@ -149,7 +151,7 @@ struct unix_socket
 	REF struct path            *us_nodepath; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
 	REF struct directory_entry *us_nodename; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
 	REF struct unix_client     *us_client;   /* [0..1][valid_if(us_node)][lock(WRITE_ONCE)]
-	                                          * Set during bind(==NULL) and connect(!= NULL)
+	                                          * Set during bind(== NULL) and connect(!= NULL)
 	                                          * When non-NULL, this is a connected client socket.
 	                                          * Otherwise, if `us_node' is valid, this is a bound
 	                                          * server socket. */

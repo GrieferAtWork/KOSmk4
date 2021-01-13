@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53d47c79 */
+/* HASH CRC-32:0x33f908f8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,16 +44,18 @@
 #include <asm/os/socket-ioctls.h>
 #include <asm/os/socket.h>
 #include <bits/os/cmsghdr.h>
+#include <bits/os/linger.h>
 #include <bits/os/msghdr.h>
-#include <bits/os/timespec.h>
 #include <bits/os/sockaddr.h>
 #include <bits/os/sockaddr_storage.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 #include <sys/uio.h>
 
 #ifdef __USE_GNU
 #include <bits/os/mmsghdr.h>
 #include <bits/os/sigset.h>
+#include <bits/os/ucred.h>
 #endif /* __USE_GNU */
 
 #if defined(__KOS__) && defined(__USE_KOS_KERNEL)
@@ -552,40 +554,6 @@ __SYSDECL_BEGIN
 
 
 
-#ifdef __CC__
-#ifdef __USE_GNU
-#ifndef __ucred_defined
-#define __ucred_defined 1
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("pid")
-#pragma push_macro("uid")
-#pragma push_macro("gid")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef pid
-#undef uid
-#undef gid
-/* User visible structure for SCM_CREDENTIALS message */
-struct ucred {
-	__pid_t pid; /* PID of sending process. */
-	__uid_t uid; /* UID of sending process. */
-	__gid_t gid; /* GID of sending process. */
-};
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("gid")
-#pragma pop_macro("uid")
-#pragma pop_macro("pid")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !__ucred_defined */
-#endif /* __USE_GNU */
-
-#ifndef __linger_defined
-#define __linger_defined 1
-struct linger {
-	int l_onoff;  /* Nonzero to linger on close. */
-	int l_linger; /* Time to linger. */
-};
-#endif /* !__linger_defined */
-#endif /* __CC__ */
 
 
 /* Option codes for `SOL_SOCKET' */

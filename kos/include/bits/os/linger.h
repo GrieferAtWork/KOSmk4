@@ -17,19 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_MMSGHDR_H
-#define _BITS_OS_MMSGHDR_H 1
+#ifndef _BITS_OS_LINGER_H
+#define _BITS_OS_LINGER_H 1
 
 /* File:
- *    <bits/os/mmsghdr.h>
+ *    <bits/os/linger.h>
  * 
  * Definitions:
- *    - struct mmsghdr { ... };
+ *    - struct linger { ... };
  */
 
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/mmsghdr.h>
+#include <bits/os/generic/linger.h>
 
-#endif /* !_BITS_OS_MMSGHDR_H */
+#endif /* !_BITS_OS_LINGER_H */
