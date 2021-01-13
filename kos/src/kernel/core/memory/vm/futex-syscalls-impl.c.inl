@@ -75,7 +75,7 @@ FUNC(task_waitfor_futex)(syscall_ulong_t flags,
 	 * current quantum time to the given timeout. */
 	if (flags & LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE)
 		tmo += realtime();
-	if (!task_waitfor(&tmo))
+	if (!task_waitfor_tms(&tmo))
 		return -ETIMEDOUT;
 	return 0;
 }

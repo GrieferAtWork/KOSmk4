@@ -1749,7 +1749,7 @@ again:
 		return result;
 	}
 	/* Wait for something to happen */
-	if (!task_waitfor(timeout))
+	if (!task_waitfor_tms(timeout))
 		return 0; /* Timeout */
 	/* Check to see what happened. */
 	goto again;
@@ -1851,7 +1851,7 @@ again:
 		return result;
 	}
 	/* Wait for something to happen */
-	if (!task_waitfor(timeout))
+	if (!task_waitfor_tms(timeout))
 		return 0; /* Timeout */
 	/* Check to see what happened. */
 	goto again;

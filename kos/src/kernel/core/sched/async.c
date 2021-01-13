@@ -387,7 +387,7 @@ again:
 			/* Also wait for async workers to have changed. */
 			TRY {
 				task_connect_for_poll(&awork_changed);
-				received_signal = task_waitfor(asyncmain_timeout_p);
+				received_signal = task_waitfor_tms(asyncmain_timeout_p);
 			} EXCEPT {
 				task_disconnectall();
 				error_printf("_asyncmain:task_waitfor()");

@@ -240,7 +240,7 @@ LOCAL NONNULL((1)) void
 			task_disconnectall();
 			break;
 		}
-		task_waitfor(abs_timeout);
+		task_waitfor_tms(abs_timeout);
 	}
 success:
 	COMPILER_READ_BARRIER();
@@ -261,7 +261,7 @@ LOCAL NONNULL((1)) void
 			task_disconnectall();
 			break;
 		}
-		task_waitfor(abs_timeout);
+		task_waitfor_tms(abs_timeout);
 	}
 success:
 	COMPILER_BARRIER();
@@ -281,7 +281,7 @@ NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
 			task_disconnectall();
 			break;
 		}
-		if (!task_waitfor_nx(abs_timeout))
+		if (!task_waitfor_tms_nx(abs_timeout))
 			return false;
 	}
 success:
@@ -303,7 +303,7 @@ NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
 			task_disconnectall();
 			break;
 		}
-		if (!task_waitfor_nx(abs_timeout))
+		if (!task_waitfor_tms_nx(abs_timeout))
 			return false;
 	}
 success:

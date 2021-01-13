@@ -37,7 +37,7 @@ DECL_BEGIN
 /* Wait for the first signal to be delivered, unconditionally
  * disconnecting all connected signals thereafter.
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
- * @param: abs_timeout:  The `realtime()' timeout for the wait.
+ * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
  * @throw: * :           [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
@@ -48,13 +48,13 @@ DECL_BEGIN
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
 PUBLIC struct sig *FCALL
-task_waitfor(struct timespec const *abs_timeout)
+task_waitfor(ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK, ...)
 #elif defined(DEFINE_task_waitfor_norpc)
 #define HAVE_NORPC 1
 /* Same as `task_waitfor', but don't serve RPC functions. */
 PUBLIC struct sig *FCALL
-task_waitfor_norpc(struct timespec const *abs_timeout)
+task_waitfor_norpc(ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK)
 #elif defined(DEFINE_task_waitfor_nx)
 #define HAVE_NX 1
@@ -62,14 +62,14 @@ task_waitfor_norpc(struct timespec const *abs_timeout)
  * there are pending RPCs that are allowed to throw exception, or if preemption
  * was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
-NOTHROW(FCALL task_waitfor_nx)(struct timespec const *abs_timeout)
+NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout)
 #elif defined(DEFINE_task_waitfor_norpc_nx)
 #define HAVE_NORPC 1
 #define HAVE_NX    1
 /* Same as `task_waitfor', but don't serve RPC functions, and return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
-NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *abs_timeout)
+NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)
 #endif /* ... */
 {
 	struct sig *result;

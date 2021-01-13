@@ -35,6 +35,9 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
+
 #include <assert.h>
 #include <int128.h>
 #include <inttypes.h>
@@ -44,6 +47,10 @@
 #define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
 
 DECL_BEGIN
+typedef __CRT_PRIVATE_UINT(__SIZEOF_TIME64_T__) unsigned_time_t;
+typedef __CRT_PRIVATE_UINT(__SIZEOF_SUSECONDS_T__) unsigned_suseconds_t;
+
+
 
 /* [const] Initial timestamp of when this thread started. */
 PUBLIC ATTR_PERTASK ktime_t this_starttime = 0;
@@ -653,18 +660,18 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 
 /* Convert a given `struct timespec' into a ktime timestamp.
  * This is done by subtracting `boottime' from the given value.
- * NOTE: When the given timestamp `t' points at, or before `boottime',
- *       then this function will return `0', as it is impossible to
- *       represent a ktime-timestamp that happened before the system
+ * NOTE: When the given timestamp `abs_timestamp' points at, or before
+ *       `boottime', then this function will return `0', as it is impossible
+ *       to represent a ktime-timestamp that happened before the system
  *       goto booted.
- * NOTE: When the given `t' is located so far ahead of `boottime' that
- *       the return value would overflow, the value is clamed to the
+ * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
+ *       that the return value would overflow, the value is clamed to the
  *       maximum possible value of `(ktime_t)-1' */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
-NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict t) {
+NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp) {
 	ktime_t result;
 	struct timespec diff;
-	diff = *t - boottime;
+	diff = *abs_timestamp - boottime;
 
 	/* Check for special case: negative second value,
 	 * meaning that the given `t' happened before the
@@ -708,6 +715,296 @@ PUBLIC NOBLOCK WUNUSED struct timespec
 NOTHROW(KCALL realtime)(void) {
 	return ktime_to_timespec(ktime());
 }
+
+
+/* Similar to the functions above, but return a relative time.
+ * e.g. When `rel_time->tv_sec = 1, rel_time->tv_nsec = 7',
+ * then this function simply return `1 * USEC_PER_SEC + 7'.
+ * Note however that if `rel_time->tv_sec < 0', or the result
+ * of the multiplication+addition above would overflow, then
+ * this function will clamp the return value to `(ktime_t)-1'. */
+PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
+NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time) {
+	ktime_t result;
+	/* NOTE: No need to check for negative `rel_time->tv_sec'. If that
+	 *       is the case, then we can be sure that an unsigned multiply
+	 *       with a value as large as `NSEC_PER_SEC' will always overflow. */
+	if (OVERFLOW_UMUL((unsigned_time_t)rel_time->tv_sec,
+	                  NSEC_PER_SEC, &result))
+		goto overflow;
+	if (OVERFLOW_UADD(result, rel_time->tv_nsec, &result))
+		goto overflow;
+	return result;
+overflow:
+	return (ktime_t)-1;
+}
+
+/* Do the inverse of `reltimespec_to_relktime' */
+PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
+NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t) {
+	struct timespec result;
+	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);
+	result.tv_nsec = (syscall_ulong_t)(t % NSEC_PER_SEC);
+	return result;
+}
+
+
+
+/* Low-level, type-independent timespec loader functions. */
+LOCAL NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_timespec_impl(time_t tv_sec, syscall_ulong_t tv_nsec)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+	ktime_t result;
+	if unlikely(tv_nsec >= NSEC_PER_SEC) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,
+		      tv_nsec);
+	}
+	if unlikely(tv_sec <= boottime.tv_sec) {
+		if (tv_sec < boottime.tv_sec)
+			goto zero;
+		if (tv_nsec <= boottime.tv_nsec)
+			goto zero;
+	}
+	tv_sec -= boottime.tv_sec;
+	if (OVERFLOW_UMUL(tv_sec, NSEC_PER_SEC, &result))
+		goto overflow;
+	if (OVERFLOW_UADD(result, tv_nsec, &result)) {
+		if (tv_nsec < boottime.tv_nsec) {
+			--tv_sec;
+			tv_nsec += NSEC_PER_SEC;
+		}
+		tv_nsec -= boottime.tv_nsec;
+		result = (ktime_t)tv_sec * NSEC_PER_SEC;
+		if (OVERFLOW_UADD(result, tv_nsec, &result))
+			goto overflow;
+	} else {
+		result -= boottime.tv_nsec;
+	}
+	return result;
+zero:
+	return 0;
+overflow:
+	return (ktime_t)-1;
+}
+
+LOCAL NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_timeval_impl(time_t tv_sec, unsigned_suseconds_t tv_usec)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+	ktime_t result;
+	unsigned_suseconds_t boottime_tv_usec;
+	if unlikely(tv_usec >= USEC_PER_SEC) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,
+		      tv_usec);
+	}
+	boottime_tv_usec = boottime.tv_nsec / NSEC_PER_USEC;
+	if unlikely(tv_sec <= boottime.tv_sec) {
+		if (tv_sec < boottime.tv_sec)
+			goto zero;
+		if (tv_usec <= boottime_tv_usec)
+			goto zero;
+	}
+	tv_sec -= boottime.tv_sec;
+	if (OVERFLOW_UMUL(tv_sec, USEC_PER_SEC, &result))
+		goto overflow;
+	if (OVERFLOW_UADD(result, tv_usec * NSEC_PER_USEC, &result)) {
+		if (tv_usec < boottime_tv_usec) {
+			--tv_sec;
+			tv_usec += NSEC_PER_SEC;
+		}
+		tv_usec -= boottime_tv_usec;
+		result = (ktime_t)tv_sec * USEC_PER_SEC;
+		if (OVERFLOW_UADD(result, tv_usec * NSEC_PER_USEC, &result))
+			goto overflow;
+	} else {
+		result -= boottime_tv_usec;
+	}
+	return result;
+zero:
+	return 0;
+overflow:
+	return (ktime_t)-1;
+}
+
+LOCAL NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_reltimespec_impl(time_t tv_sec, syscall_ulong_t tv_nsec)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+	ktime_t result, addend;
+	if unlikely(tv_nsec >= NSEC_PER_SEC) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,
+		      tv_nsec);
+	}
+	if (OVERFLOW_UMUL(tv_sec, NSEC_PER_SEC, &addend))
+		goto overflow;
+	if (OVERFLOW_UADD(addend, tv_nsec, &addend))
+		goto overflow;
+	result = ktime();
+	if (OVERFLOW_UADD(result, addend, &result))
+		goto overflow;
+	return result;
+overflow:
+	return (ktime_t)-1;
+}
+
+LOCAL NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_reltimeval_impl(time_t tv_sec, unsigned_suseconds_t tv_usec)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+	ktime_t result, addend;
+	if unlikely(tv_usec >= USEC_PER_SEC) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,
+		      tv_usec);
+	}
+	if (OVERFLOW_UMUL(tv_sec, USEC_PER_SEC, &addend))
+		goto overflow;
+	if (OVERFLOW_UADD(addend, tv_usec * NSEC_PER_USEC, &addend))
+		goto overflow;
+	result = ktime();
+	if (OVERFLOW_UADD(result, addend, &result))
+		goto overflow;
+	return result;
+overflow:
+	return (ktime_t)-1;
+}
+
+
+
+/* Load absolute ktime values from various user-space sources
+ * @throw: E_SEGFAULT:                                                                ...
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC:  ...
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC: ... */
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_timespec32(USER CHECKED struct __timespec32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
+	                                     (syscall_ulong_t)reltime->tv_nsec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_reltimespec32(USER CHECKED struct __timespec32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
+	                                        (syscall_ulong_t)reltime->tv_nsec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_timeval32(USER CHECKED struct __timeval32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
+	                                    (unsigned_suseconds_t)reltime->tv_usec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_reltimeval32(USER CHECKED struct __timeval32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
+	                                       (unsigned_suseconds_t)reltime->tv_usec);
+}
+
+#ifndef __HAVE_TIMESPEC32_IS_TIMESPEC64
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_timespec64(USER CHECKED struct __timespec64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
+	                                     (syscall_ulong_t)reltime->tv_nsec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_reltimespec64(USER CHECKED struct __timespec64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
+	                                        (syscall_ulong_t)reltime->tv_nsec);
+}
+#endif /* !__HAVE_TIMESPEC32_IS_TIMESPEC64 */
+
+#ifndef __HAVE_TIMEVAL32_IS_TIMEVAL64
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_timeval64(USER CHECKED struct __timeval64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
+	                                    (unsigned_suseconds_t)reltime->tv_usec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_reltimeval64(USER CHECKED struct __timeval64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
+	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
+	                                       (unsigned_suseconds_t)reltime->tv_usec);
+}
+#endif /* !__HAVE_TIMEVAL32_IS_TIMEVAL64 */
+
+#ifdef __ARCH_HAVE_COMPAT
+#if !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64)
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_timespec32(USER CHECKED struct compat_timespec32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
+	                                     (syscall_ulong_t)reltime->tv_nsec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_reltimespec32(USER CHECKED struct compat_timespec32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
+	                                        (syscall_ulong_t)reltime->tv_nsec);
+}
+#endif /* !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64 */
+
+#ifndef __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
+#if !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_timespec64(USER CHECKED struct compat_timespec64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
+	                                     (syscall_ulong_t)reltime->tv_nsec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_reltimespec64(USER CHECKED struct compat_timespec64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
+	                                        (syscall_ulong_t)reltime->tv_nsec);
+}
+#endif /* !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64 */
+#endif /* !__HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
+
+#if !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64)
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_timeval32(USER CHECKED struct compat_timeval32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
+	                                    (unsigned_suseconds_t)reltime->tv_usec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_reltimeval32(USER CHECKED struct compat_timeval32 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
+	                                       (unsigned_suseconds_t)reltime->tv_usec);
+}
+#endif /* !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64 */
+
+#ifndef __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
+#if !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_timeval64(USER CHECKED struct compat_timeval64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
+	                                    (unsigned_suseconds_t)reltime->tv_usec);
+}
+
+PUBLIC NOBLOCK WUNUSED ktime_t FCALL
+ktime_from_user_compat_reltimeval64(USER CHECKED struct compat_timeval64 const *__restrict reltime)
+		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
+	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
+	                                       (unsigned_suseconds_t)reltime->tv_usec);
+}
+#endif /* !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64 */
+#endif /* !__HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
+#endif /* __ARCH_HAVE_COMPAT */
+
 
 
 DECL_END

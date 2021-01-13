@@ -2633,7 +2633,7 @@ NOTHROW(FCALL sleep_milli)(unsigned int n) {
 	struct timespec then = realtime();
 	then.add_milliseconds(n);
 	do {
-		task_sleep(&then);
+		task_sleep_tms(&then);
 	} while (realtime() < then);
 }
 

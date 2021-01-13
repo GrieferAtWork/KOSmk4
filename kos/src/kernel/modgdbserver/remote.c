@@ -137,7 +137,7 @@ INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 		}
 		timeout = realtime();
 		timeout.add_milliseconds(GDBRemote_Timeout);
-		if (!task_waitfor_norpc_nx(&timeout))
+		if (!task_waitfor_tms_norpc_nx(&timeout))
 			task_disconnectall();
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)

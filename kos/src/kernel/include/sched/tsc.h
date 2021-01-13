@@ -25,6 +25,14 @@
 #include <kernel/types.h>
 
 #include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
+#include <compat/config.h>
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/os/timespec.h>
+#include <compat/bits/os/timeval.h>
+#include <compat/bits/types.h>
+#endif /* __ARCH_HAVE_COMPAT */
+
 
 #define __SIZEOF_TSC_T__    8
 #define __SIZEOF_TSC_HZ_T__ 8
@@ -46,12 +54,6 @@ typedef u64 tsc_t;
  *       If this value also fits into 32-bit, then change `tsc_hz_t' to be
  *       a 32-bit value on x86! */
 typedef u64 tsc_hz_t;
-
-/* Time (in Nano seconds == 1/1000000000 (1/1_000_000_000) seconds)
- * since the system was booted (s.a. `boottime')
- * NOTE: 64 bits is enough to keep this counter from overflowing for
- *       almost 600 years (so don't worry too much about overflows) */
-typedef u64 ktime_t;
 
 /* The best approximation currently known in regards to the TSC
  * frequency of this CPU. This frequency should approximately be
@@ -245,23 +247,281 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t);
 
 /* Convert a given `struct timespec' into a ktime timestamp.
  * This is done by subtracting `boottime' from the given value.
- * NOTE: When the given timestamp `t' points at, or before `boottime',
- *       then this function will return `0', as it is impossible to
- *       represent a ktime-timestamp that happened before the system
+ * NOTE: When the given timestamp `abs_timestamp' points at, or before
+ *       `boottime', then this function will return `0', as it is impossible
+ *       to represent a ktime-timestamp that happened before the system
  *       goto booted.
- * NOTE: When the given `t' is located so far ahead of `boottime' that
- *       the return value would overflow, the value is clamed to the
+ * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
+ *       that the return value would overflow, the value is clamed to the
  *       maximum possible value of `(ktime_t)-1' */
 FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
-NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict t);
+NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp);
+
+/* Similar to the functions above, but return a relative time.
+ * e.g. When `rel_time->tv_sec = 1, rel_time->tv_nsec = 7',
+ * then this function simply return `1 * USEC_PER_SEC + 7'.
+ * Note however that if `rel_time->tv_sec < 0', or the result
+ * of the multiplication+addition above would overflow, then
+ * this function will clamp the return value to `(ktime_t)-1'. */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
+NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time);
+
+/* Do the inverse of `reltimespec_to_relktime' */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec
+NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t);
+
 
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF NOBLOCK WUNUSED ATTR_PURE ktime_t
-NOTHROW(FCALL timespec_to_ktime)(struct timespec const &__restrict t)
+NOTHROW(FCALL timespec_to_ktime)(struct timespec const &__restrict abs_timestamp)
 	ASMNAME("timespec_to_ktime");
+FUNDEF NOBLOCK WUNUSED ATTR_PURE ktime_t
+NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const &__restrict rel_time)
+	ASMNAME("reltimespec_to_relktime");
 } /* extern "C++" */
 #endif /* __cplusplus */
+
+#if (__SIZEOF_TIMESPEC32 == __SIZEOF_TIMESPEC64 &&         \
+     __OFFSET_TIMESPEC32_SEC == __OFFSET_TIMESPEC64_SEC && \
+     __OFFSET_TIMESPEC32_NSEC == __OFFSET_TIMESPEC64_NSEC)
+#define __HAVE_TIMESPEC32_IS_TIMESPEC64
+#endif /* ... */
+
+#if (__SIZEOF_TIMEVAL32 == __SIZEOF_TIMEVAL64 &&         \
+     __OFFSET_TIMEVAL32_SEC == __OFFSET_TIMEVAL64_SEC && \
+     __OFFSET_TIMEVAL32_NSEC == __OFFSET_TIMEVAL64_NSEC)
+#define __HAVE_TIMEVAL32_IS_TIMEVAL64
+#endif /* ... */
+
+#ifdef __ARCH_HAVE_COMPAT
+#if (__SIZEOF_COMPAT_TIMESPEC32 == __SIZEOF_COMPAT_TIMESPEC64 &&         \
+     __OFFSET_COMPAT_TIMESPEC32_SEC == __OFFSET_COMPAT_TIMESPEC64_SEC && \
+     __OFFSET_COMPAT_TIMESPEC32_NSEC == __OFFSET_COMPAT_TIMESPEC64_NSEC)
+#define __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMEVAL32 == __SIZEOF_COMPAT_TIMEVAL64 &&         \
+     __OFFSET_COMPAT_TIMEVAL32_SEC == __OFFSET_COMPAT_TIMEVAL64_SEC && \
+     __OFFSET_COMPAT_TIMEVAL32_NSEC == __OFFSET_COMPAT_TIMEVAL64_NSEC)
+#define __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
+#endif /* ... */
+#if __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T == __SIZEOF_SYSCALL_LONG_T__
+#if (__SIZEOF_COMPAT_TIMESPEC32 == __SIZEOF_TIMESPEC32 &&         \
+     __OFFSET_COMPAT_TIMESPEC32_SEC == __OFFSET_TIMESPEC32_SEC && \
+     __OFFSET_COMPAT_TIMESPEC32_NSEC == __OFFSET_TIMESPEC32_NSEC)
+#define __HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMESPEC32 == __SIZEOF_TIMESPEC64 &&         \
+     __OFFSET_COMPAT_TIMESPEC32_SEC == __OFFSET_TIMESPEC64_SEC && \
+     __OFFSET_COMPAT_TIMESPEC32_NSEC == __OFFSET_TIMESPEC64_NSEC)
+#define __HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMESPEC64 == __SIZEOF_TIMESPEC32 &&         \
+     __OFFSET_COMPAT_TIMESPEC64_SEC == __OFFSET_TIMESPEC32_SEC && \
+     __OFFSET_COMPAT_TIMESPEC64_NSEC == __OFFSET_TIMESPEC32_NSEC)
+#define __HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMESPEC64 == __SIZEOF_TIMESPEC64 &&         \
+     __OFFSET_COMPAT_TIMESPEC64_SEC == __OFFSET_TIMESPEC64_SEC && \
+     __OFFSET_COMPAT_TIMESPEC64_NSEC == __OFFSET_TIMESPEC64_NSEC)
+#define __HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64
+#endif /* ... */
+#endif /* __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T == __SIZEOF_SYSCALL_LONG_T__ */
+#if __ARCH_COMPAT_SIZEOF_SUSECONDS_T == __SIZEOF_SUSECONDS_T__
+#if (__SIZEOF_COMPAT_TIMEVAL32 == __SIZEOF_TIMEVAL32 &&         \
+     __OFFSET_COMPAT_TIMEVAL32_SEC == __OFFSET_TIMEVAL32_SEC && \
+     __OFFSET_COMPAT_TIMEVAL32_NSEC == __OFFSET_TIMEVAL32_NSEC)
+#define __HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMEVAL32 == __SIZEOF_TIMEVAL64 &&         \
+     __OFFSET_COMPAT_TIMEVAL32_SEC == __OFFSET_TIMEVAL64_SEC && \
+     __OFFSET_COMPAT_TIMEVAL32_NSEC == __OFFSET_TIMEVAL64_NSEC)
+#define __HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMEVAL64 == __SIZEOF_TIMEVAL32 &&         \
+     __OFFSET_COMPAT_TIMEVAL64_SEC == __OFFSET_TIMEVAL32_SEC && \
+     __OFFSET_COMPAT_TIMEVAL64_NSEC == __OFFSET_TIMEVAL32_NSEC)
+#define __HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32
+#endif /* ... */
+#if (__SIZEOF_COMPAT_TIMEVAL64 == __SIZEOF_TIMEVAL64 &&         \
+     __OFFSET_COMPAT_TIMEVAL64_SEC == __OFFSET_TIMEVAL64_SEC && \
+     __OFFSET_COMPAT_TIMEVAL64_NSEC == __OFFSET_TIMEVAL64_NSEC)
+#define __HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64
+#endif /* ... */
+#endif /* __ARCH_COMPAT_SIZEOF_SUSECONDS_T == __SIZEOF_SUSECONDS_T__ */
+#endif /* __ARCH_HAVE_COMPAT */
+
+#ifdef __HAVE_TIMESPEC32_IS_TIMESPEC64
+#define __ASMNAME_ktime_from_user_timespec32    "ktime_from_user_timespec"
+#define __ASMNAME_ktime_from_user_timespec64    "ktime_from_user_timespec"
+#define __ASMNAME_ktime_from_user_reltimespec32 "ktime_from_user_reltimespec"
+#define __ASMNAME_ktime_from_user_reltimespec64 "ktime_from_user_reltimespec"
+#else /* __HAVE_TIMESPEC32_IS_TIMESPEC64 */
+#define __ASMNAME_ktime_from_user_timespec32    "ktime_from_user_timespec32"
+#define __ASMNAME_ktime_from_user_timespec64    "ktime_from_user_timespec64"
+#define __ASMNAME_ktime_from_user_reltimespec32 "ktime_from_user_reltimespec32"
+#define __ASMNAME_ktime_from_user_reltimespec64 "ktime_from_user_reltimespec64"
+#endif /* !__HAVE_TIMESPEC32_IS_TIMESPEC64 */
+
+#ifdef __HAVE_TIMEVAL32_IS_TIMEVAL64
+#define __ASMNAME_ktime_from_user_timeval32    "ktime_from_user_timeval"
+#define __ASMNAME_ktime_from_user_timeval64    "ktime_from_user_timeval"
+#define __ASMNAME_ktime_from_user_reltimeval32 "ktime_from_user_reltimeval"
+#define __ASMNAME_ktime_from_user_reltimeval64 "ktime_from_user_reltimeval"
+#else /* __HAVE_TIMEVAL32_IS_TIMEVAL64 */
+#define __ASMNAME_ktime_from_user_timeval32    "ktime_from_user_timeval32"
+#define __ASMNAME_ktime_from_user_timeval64    "ktime_from_user_timeval64"
+#define __ASMNAME_ktime_from_user_reltimeval32 "ktime_from_user_reltimeval32"
+#define __ASMNAME_ktime_from_user_reltimeval64 "ktime_from_user_reltimeval64"
+#endif /* !__HAVE_TIMEVAL32_IS_TIMEVAL64 */
+
+
+#ifdef __ARCH_HAVE_COMPAT
+#ifdef __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
+#if defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32) || defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32)
+#define __ASMNAME_ktime_from_user_compat_timespec32    __ASMNAME_ktime_from_user_timespec32
+#define __ASMNAME_ktime_from_user_compat_timespec64    __ASMNAME_ktime_from_user_timespec32
+#define __ASMNAME_ktime_from_user_compat_reltimespec32 __ASMNAME_ktime_from_user_reltimespec32
+#define __ASMNAME_ktime_from_user_compat_reltimespec64 __ASMNAME_ktime_from_user_reltimespec32
+#elif defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64) || defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
+#define __ASMNAME_ktime_from_user_compat_timespec32    __ASMNAME_ktime_from_user_timespec64
+#define __ASMNAME_ktime_from_user_compat_timespec64    __ASMNAME_ktime_from_user_timespec64
+#define __ASMNAME_ktime_from_user_compat_reltimespec32 __ASMNAME_ktime_from_user_reltimespec64
+#define __ASMNAME_ktime_from_user_compat_reltimespec64 __ASMNAME_ktime_from_user_reltimespec64
+#else /* ... */
+#define __ASMNAME_ktime_from_user_compat_timespec32    "ktime_from_user_compat_timespec"
+#define __ASMNAME_ktime_from_user_compat_timespec64    "ktime_from_user_compat_timespec"
+#define __ASMNAME_ktime_from_user_compat_reltimespec32 "ktime_from_user_compat_reltimespec"
+#define __ASMNAME_ktime_from_user_compat_reltimespec64 "ktime_from_user_compat_reltimespec"
+#endif /* !... */
+#else  /* __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
+#if defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32)
+#define __ASMNAME_ktime_from_user_compat_timespec32    __ASMNAME_ktime_from_user_timespec32
+#define __ASMNAME_ktime_from_user_compat_reltimespec32 __ASMNAME_ktime_from_user_reltimespec32
+#elif defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64)
+#define __ASMNAME_ktime_from_user_compat_timespec32    __ASMNAME_ktime_from_user_timespec64
+#define __ASMNAME_ktime_from_user_compat_reltimespec32 __ASMNAME_ktime_from_user_reltimespec64
+#else /* ... */
+#define __ASMNAME_ktime_from_user_compat_timespec32    "ktime_from_user_compat_timespec32"
+#define __ASMNAME_ktime_from_user_compat_reltimespec32 "ktime_from_user_compat_reltimespec32"
+#endif /* !... */
+#if defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32)
+#define __ASMNAME_ktime_from_user_compat_timespec64    __ASMNAME_ktime_from_user_timespec32
+#define __ASMNAME_ktime_from_user_compat_reltimespec64 __ASMNAME_ktime_from_user_reltimespec32
+#elif defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
+#define __ASMNAME_ktime_from_user_compat_timespec64    __ASMNAME_ktime_from_user_timespec64
+#define __ASMNAME_ktime_from_user_compat_reltimespec64 __ASMNAME_ktime_from_user_reltimespec64
+#else /* ... */
+#define __ASMNAME_ktime_from_user_compat_timespec64    "ktime_from_user_compat_timespec64"
+#define __ASMNAME_ktime_from_user_compat_reltimespec64 "ktime_from_user_compat_reltimespec64"
+#endif /* !... */
+#endif /* !__HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
+
+#ifdef __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
+#if defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32) || defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32)
+#define __ASMNAME_ktime_from_user_compat_timeval32    __ASMNAME_ktime_from_user_timeval32
+#define __ASMNAME_ktime_from_user_compat_timeval64    __ASMNAME_ktime_from_user_timeval32
+#define __ASMNAME_ktime_from_user_compat_reltimeval32 __ASMNAME_ktime_from_user_reltimeval32
+#define __ASMNAME_ktime_from_user_compat_reltimeval64 __ASMNAME_ktime_from_user_reltimeval32
+#elif defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64) || defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
+#define __ASMNAME_ktime_from_user_compat_timeval32    __ASMNAME_ktime_from_user_timeval64
+#define __ASMNAME_ktime_from_user_compat_timeval64    __ASMNAME_ktime_from_user_timeval64
+#define __ASMNAME_ktime_from_user_compat_reltimeval32 __ASMNAME_ktime_from_user_reltimeval64
+#define __ASMNAME_ktime_from_user_compat_reltimeval64 __ASMNAME_ktime_from_user_reltimeval64
+#else /* ... */
+#define __ASMNAME_ktime_from_user_compat_timeval32    "ktime_from_user_compat_timeval"
+#define __ASMNAME_ktime_from_user_compat_timeval64    "ktime_from_user_compat_timeval"
+#define __ASMNAME_ktime_from_user_compat_reltimeval32 "ktime_from_user_compat_reltimeval"
+#define __ASMNAME_ktime_from_user_compat_reltimeval64 "ktime_from_user_compat_reltimeval"
+#endif /* !... */
+#else  /* __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
+#if defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32)
+#define __ASMNAME_ktime_from_user_compat_timeval32    __ASMNAME_ktime_from_user_timeval32
+#define __ASMNAME_ktime_from_user_compat_reltimeval32 __ASMNAME_ktime_from_user_reltimeval32
+#elif defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64)
+#define __ASMNAME_ktime_from_user_compat_timeval32    __ASMNAME_ktime_from_user_timeval64
+#define __ASMNAME_ktime_from_user_compat_reltimeval32 __ASMNAME_ktime_from_user_reltimeval64
+#else /* ... */
+#define __ASMNAME_ktime_from_user_compat_timeval32    "ktime_from_user_compat_timeval32"
+#define __ASMNAME_ktime_from_user_compat_reltimeval32 "ktime_from_user_compat_reltimeval32"
+#endif /* !... */
+#if defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32)
+#define __ASMNAME_ktime_from_user_compat_timeval64    __ASMNAME_ktime_from_user_timeval32
+#define __ASMNAME_ktime_from_user_compat_reltimeval64 __ASMNAME_ktime_from_user_reltimeval32
+#elif defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
+#define __ASMNAME_ktime_from_user_compat_timeval64    __ASMNAME_ktime_from_user_timeval64
+#define __ASMNAME_ktime_from_user_compat_reltimeval64 __ASMNAME_ktime_from_user_reltimeval64
+#else /* ... */
+#define __ASMNAME_ktime_from_user_compat_timeval64    "ktime_from_user_compat_timeval64"
+#define __ASMNAME_ktime_from_user_compat_reltimeval64 "ktime_from_user_compat_reltimeval64"
+#endif /* !... */
+#endif /* !__HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
+#endif /* __ARCH_HAVE_COMPAT */
+
+
+/* Load absolute ktime values from various user-space sources
+ * @throw: E_SEGFAULT:                                                                ...
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC:  ...
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC: ... */
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timespec32(USER CHECKED struct __timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timespec64(USER CHECKED struct __timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_reltimespec32(USER CHECKED struct __timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_reltimespec64(USER CHECKED struct __timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timeval32(USER CHECKED struct __timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timeval64(USER CHECKED struct __timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_reltimeval32(USER CHECKED struct __timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_reltimeval64(USER CHECKED struct __timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimeval64);
+#ifdef __ARCH_HAVE_COMPAT
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timespec32(USER CHECKED struct compat_timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timespec64(USER CHECKED struct compat_timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_reltimespec32(USER CHECKED struct compat_timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_reltimespec64(USER CHECKED struct compat_timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timeval32(USER CHECKED struct compat_timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timeval64(USER CHECKED struct compat_timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_reltimeval32(USER CHECKED struct compat_timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_reltimeval64(USER CHECKED struct compat_timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimeval64);
+#endif /* __ARCH_HAVE_COMPAT */
+
+
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct __timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct __timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimeval32);
+#ifndef __HAVE_TIMESPEC32_IS_TIMESPEC64
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct __timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimespec64);
+#endif /* !__HAVE_TIMESPEC32_IS_TIMESPEC64 */
+#ifndef __HAVE_TIMEVAL32_IS_TIMEVAL64
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct __timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_reltimeval64);
+#endif /* !__HAVE_TIMEVAL32_IS_TIMEVAL64 */
+#ifdef __ARCH_HAVE_COMPAT
+#if !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64)
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct compat_timespec32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimespec32);
+#endif /* !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64 */
+#ifndef __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
+#if !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct compat_timespec64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimespec64);
+#endif /* !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64 */
+#endif /* !__HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
+#if !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64)
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct compat_timeval32 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimeval32);
+#endif /* !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64 */
+#ifndef __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
+#if !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_rel(USER CHECKED struct compat_timeval64 const *__restrict reltime) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_reltimeval64);
+#endif /* !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64 */
+#endif /* !__HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
+#endif /* __ARCH_HAVE_COMPAT */
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 
 #ifndef __realtime_defined

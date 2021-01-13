@@ -187,7 +187,7 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 					struct timespec timeout;
 					timeout = realtime();
 					timeout.tv_sec += 2;
-					signal = task_waitfor(&timeout);
+					signal = task_waitfor_tms(&timeout);
 				}
 				if (!signal) {
 					printk(FREESTR(KERN_ERR "[ata] Timeout while waiting for ATA_COMMAND_IDENTIFY "

@@ -154,7 +154,7 @@ again:
 		}
 		tmo = realtime();
 		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor(&tmo))
+		if (!task_waitfor_tms(&tmo))
 			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 	}
 	if (status & PS2_PROBE_STATUS_FACK)
@@ -190,7 +190,7 @@ again:
 		}
 		tmo = realtime();
 		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor(&tmo)) {
+		if (!task_waitfor_tms(&tmo)) {
 			state  = ATOMIC_READ(probe_data[portno].pd_state);
 			status = ATOMIC_READ(probe_data[portno].pd_status);
 			if (status & PS2_PROBE_STATUS_FRESEND)
@@ -233,7 +233,7 @@ again:
 		}
 		tmo = realtime();
 		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor(&tmo)) {
+		if (!task_waitfor_tms(&tmo)) {
 			state  = ATOMIC_READ(probe_data[portno].pd_state);
 			status = ATOMIC_READ(probe_data[portno].pd_status);
 			if (status & PS2_PROBE_STATUS_FRESEND)

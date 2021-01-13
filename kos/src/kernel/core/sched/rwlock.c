@@ -612,7 +612,7 @@ acquire_read_lock:
 				}
 				break;
 			}
-			if (!task_waitfor(abs_timeout)) {
+			if (!task_waitfor_tms(abs_timeout)) {
 				/* Timeout... (delete the read-descriptor) */
 				rwlock_delete_readlock(desc);
 				return false;
@@ -688,7 +688,7 @@ acquire_read_lock:
 				}
 				break;
 			}
-			if (!task_waitfor_nx(abs_timeout)) {
+			if (!task_waitfor_tms_nx(abs_timeout)) {
 				/* Timeout... (delete the read-descriptor) */
 				rwlock_delete_readlock(desc);
 				return false;
@@ -789,7 +789,7 @@ wait_for_endwrite:
 			goto again;
 		}
 		/* Wait for the lock to become available. */
-		if (!task_waitfor(abs_timeout))
+		if (!task_waitfor_tms(abs_timeout))
 			return false; /* Timeout... */
 		goto again;
 
@@ -851,7 +851,7 @@ wait_for_unshare:
 					task_disconnectall();
 					goto got_lock;
 				}
-				if (!task_waitfor(abs_timeout)) {
+				if (!task_waitfor_tms(abs_timeout)) {
 					/* Our timeout expired. - Re-acquire the read-lock (if we had one),
 					 * switch back to read-mode, and return `false' */
 					do {
@@ -918,7 +918,7 @@ wait_for_endwrite:
 			goto again;
 		}
 		/* Wait for the lock to become available. */
-		if (!task_waitfor_nx(abs_timeout))
+		if (!task_waitfor_tms_nx(abs_timeout))
 			return false; /* Timeout... */
 		goto again;
 
@@ -979,7 +979,7 @@ wait_for_unshare:
 				task_disconnectall();
 				goto got_lock;
 			}
-			if (!task_waitfor_nx(abs_timeout)) {
+			if (!task_waitfor_tms_nx(abs_timeout)) {
 				/* Our timeout expired. - Re-acquire the read-lock (if we had one),
 				 * switch back to read-mode, and return `false' */
 				do {
@@ -1111,7 +1111,7 @@ wait_for_endwrite:
 			goto again;
 		}
 		/* Wait for the lock to become available. */
-		if (!task_waitfor(abs_timeout))
+		if (!task_waitfor_tms(abs_timeout))
 			return false; /* Timeout... */
 		goto again;
 
@@ -1195,7 +1195,7 @@ wait_for_unshare:
 				{
 					struct timespec tmo = realtime();
 					tmo.add_milliseconds(200);
-					task_waitfor(&tmo);
+					task_waitfor_tms(&tmo);
 				}
 			} EXCEPT {
 				/* Something went wrong. - Re-acquire the read-lock
@@ -1352,7 +1352,7 @@ wait_for_unshare:
 				task_disconnectall();
 				goto got_lock;
 			}
-			if (!task_waitfor(abs_timeout)) {
+			if (!task_waitfor_tms(abs_timeout)) {
 				/* Our timeout expired. - Re-acquire the read-lock,
 				 * switch back to read-mode, and return `false' */
 				do {
@@ -1490,7 +1490,7 @@ wait_for_unshare:
 			task_disconnectall();
 			goto got_lock;
 		}
-		if (!task_waitfor_nx(abs_timeout)) {
+		if (!task_waitfor_tms_nx(abs_timeout)) {
 			/* Our timeout expired. - Re-acquire the read-lock,
 			 * switch back to read-mode, and return `false' */
 			do {

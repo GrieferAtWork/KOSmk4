@@ -114,7 +114,7 @@ again_waitfor:
 				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 				break;
 			}
-			if (timeout_sec ? !task_waitfor(ptimeout)
+			if (timeout_sec ? !task_waitfor_tms(ptimeout)
 			                : !task_trywait()) {
 				task_disconnectall();
 				ATOMIC_WRITE(data->tj_status, 0);

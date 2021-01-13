@@ -23,8 +23,16 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #include <bits/os/timespec.h>
-#define compat_timespec32 __timespec32
-#define compat_timespec64 __timespec64
+#define __OFFSET_COMPAT_TIMESPEC32_SEC  __OFFSET_TIMESPEC32_SEC
+#define __OFFSET_COMPAT_TIMESPEC32_NSEC __OFFSET_TIMESPEC32_NSEC
+#define __SIZEOF_COMPAT_TIMESPEC32      __SIZEOF_TIMESPEC32
+#define __ALIGNOF_COMPAT_TIMESPEC32     __ALIGNOF_TIMESPEC32
+#define __OFFSET_COMPAT_TIMESPEC64_SEC  __OFFSET_TIMESPEC64_SEC
+#define __OFFSET_COMPAT_TIMESPEC64_NSEC __OFFSET_TIMESPEC64_NSEC
+#define __SIZEOF_COMPAT_TIMESPEC64      __SIZEOF_TIMESPEC64
+#define __ALIGNOF_COMPAT_TIMESPEC64     __ALIGNOF_TIMESPEC64
+#define compat_timespec32               __timespec32
+#define compat_timespec64               __timespec64
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_GENERIC_TIMESPEC_H */

@@ -1087,7 +1087,7 @@ NOTHROW(KCALL invert_current_line_colors)(VGA *__restrict self) {
 PRIVATE void KCALL do_flash_screen_pause(void) THROWS(E_WOULDBLOCK, ...) {
 	struct timespec tmo = realtime();
 	tmo.add_milliseconds(50);
-	task_waitfor(&tmo);
+	task_waitfor_tms(&tmo);
 }
 
 

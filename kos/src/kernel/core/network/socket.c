@@ -1436,50 +1436,50 @@ return_u64(USER CHECKED void *optval, socklen_t optlen, u64 value) {
 PRIVATE socklen_t KCALL
 return_timeval(USER CHECKED void *optval, socklen_t optlen,
                struct timespec const *__restrict value) {
-	if (optlen == sizeof(struct timeval32)) {
+	if (optlen == __SIZEOF_TIMEVAL32) {
 		USER CHECKED struct timeval32 *res;
 		res = (struct timeval32 *)optval;
 		res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
 		res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
-		return sizeof(struct timeval32);
+		return __SIZEOF_TIMEVAL32;
 	}
 #if __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64
-	if (optlen == sizeof(struct timeval64)) {
+	if (optlen == __SIZEOF_TIMEVAL64) {
 		USER CHECKED struct timeval64 *res;
 		res = (struct timeval64 *)optval;
 		res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
 		res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
-		return sizeof(struct timeval64);
+		return __SIZEOF_TIMEVAL64;
 	}
 #endif /* __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64 */
 #ifdef __ARCH_HAVE_COMPAT
-	__STATIC_IF(sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL32 &&
-	            sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL64) {
-		if (optlen == sizeof(struct compat_timeval32)) {
-			USER CHECKED struct compat_timeval32 *res;
-			res = (struct compat_timeval32 *)optval;
-			res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
-			res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
-			return sizeof(struct compat_timeval32);
-		}
+#if (__SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL32 && \
+     __SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL64)
+	if (optlen == __SIZEOF_COMPAT_TIMEVAL32) {
+		USER CHECKED struct compat_timeval32 *res;
+		res = (struct compat_timeval32 *)optval;
+		res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
+		res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
+		return __SIZEOF_COMPAT_TIMEVAL32;
 	}
-	__STATIC_IF(sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL32 &&
-	            sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL64 &&
-	            sizeof(struct compat_timeval64) != sizeof(struct compat_timeval32)) {
-		if (optlen == sizeof(struct compat_timeval64)) {
-			USER CHECKED struct compat_timeval64 *res;
-			res = (struct compat_timeval64 *)optval;
-			res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
-			res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
-			return sizeof(struct compat_timeval64);
-		}
+#endif /* __SIZEOF_COMPAT_TIMEVAL32... */
+#if (__SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL32 && \
+     __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL64 && \
+     __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_COMPAT_TIMEVAL32)
+	if (optlen == __SIZEOF_COMPAT_TIMEVAL64) {
+		USER CHECKED struct compat_timeval64 *res;
+		res = (struct compat_timeval64 *)optval;
+		res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
+		res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
+		return __SIZEOF_COMPAT_TIMEVAL64;
 	}
-	__STATIC_IF(sizeof(struct compat_timeval64) != sizeof(struct timeval)) {
-		if (syscall_iscompat())
-			return sizeof(struct compat_timeval64);
-	}
+#endif /* __SIZEOF_COMPAT_TIMEVAL64... */
+#if __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL
+	if (syscall_iscompat())
+		return __SIZEOF_COMPAT_TIMEVAL64;
+#endif /* __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL */
 #endif /* __ARCH_HAVE_COMPAT */
-	return sizeof(struct timeval);
+	return __SIZEOF_TIMEVAL;
 }
 
 
@@ -1701,7 +1701,7 @@ extract_size_t_dfl_int(USER CHECKED void const *optval,
 PRIVATE void KCALL
 extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
                 struct timeval *__restrict result) {
-	if (optlen == sizeof(struct timeval32)) {
+	if (optlen == __SIZEOF_TIMEVAL32) {
 		USER CHECKED struct timeval32 const *val;
 		val = (struct timeval32 const *)optval;
 		result->tv_sec  = (time_t)val->tv_sec;
@@ -1709,7 +1709,7 @@ extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
 		return;
 	}
 #if __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64
-	if (optlen == sizeof(struct timeval64)) {
+	if (optlen == __SIZEOF_TIMEVAL64) {
 		USER CHECKED struct timeval64 const *val;
 		val = (struct timeval64 const *)optval;
 		result->tv_sec  = (time_t)val->tv_sec;
@@ -1718,33 +1718,33 @@ extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
 	}
 #endif /* __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64 */
 #ifdef __ARCH_HAVE_COMPAT
-	__STATIC_IF(sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL32 &&
-	            sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL64) {
-		if (optlen == sizeof(struct compat_timeval32)) {
-			USER CHECKED struct compat_timeval32 const *val;
-			val = (struct compat_timeval32 const *)optval;
-			result->tv_sec  = (time_t)val->tv_sec;
-			result->tv_usec = (suseconds_t)val->tv_usec;
-			return;
-		}
+#if (__SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL32 && \
+     __SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL64)
+	if (optlen == __SIZEOF_COMPAT_TIMEVAL32) {
+		USER CHECKED struct compat_timeval32 const *val;
+		val = (struct compat_timeval32 const *)optval;
+		result->tv_sec  = (time_t)val->tv_sec;
+		result->tv_usec = (suseconds_t)val->tv_usec;
+		return;
 	}
-	__STATIC_IF(sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL32 &&
-	            sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL64 &&
-	            sizeof(struct compat_timeval64) != sizeof(struct compat_timeval32)) {
-		if (optlen == sizeof(struct compat_timeval64)) {
-			USER CHECKED struct compat_timeval64 const *val;
-			val = (struct compat_timeval64 const *)optval;
-			result->tv_sec  = (time_t)val->tv_sec;
-			result->tv_usec = (suseconds_t)val->tv_usec;
-			return;
-		}
+#endif /* __SIZEOF_COMPAT_TIMEVAL32... */
+#if (__SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL32 && \
+     __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL64 && \
+     __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_COMPAT_TIMEVAL32)
+	if (optlen == __SIZEOF_COMPAT_TIMEVAL64) {
+		USER CHECKED struct compat_timeval64 const *val;
+		val = (struct compat_timeval64 const *)optval;
+		result->tv_sec  = (time_t)val->tv_sec;
+		result->tv_usec = (suseconds_t)val->tv_usec;
+		return;
 	}
-	__STATIC_IF(sizeof(struct compat_timeval64) != sizeof(struct timeval)) {
-		if (syscall_iscompat())
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct compat_timeval64), optlen);
-	}
+#endif /* __SIZEOF_COMPAT_TIMEVAL64... */
+#if __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL
+	if (syscall_iscompat())
+		THROW(E_BUFFER_TOO_SMALL, __SIZEOF_COMPAT_TIMEVAL64, optlen);
+#endif /* __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL */
 #endif /* __ARCH_HAVE_COMPAT */
-	THROW(E_BUFFER_TOO_SMALL, sizeof(struct timeval), optlen);
+	THROW(E_BUFFER_TOO_SMALL, __SIZEOF_TIMEVAL, optlen);
 }
 
 PRIVATE void KCALL

@@ -39,6 +39,7 @@
 #include <sched/rpc.h>
 #include <sched/signal.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
@@ -51,6 +52,7 @@
 #include <errno.h>
 #include <sched.h>
 #include <stddef.h>
+#include <time.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/timeb.h>
@@ -323,23 +325,19 @@ DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
 DEFINE_SYSCALL2(errno_t, nanosleep,
                 USER UNCHECKED struct timespec32 const *, req,
                 USER UNCHECKED struct timespec32 *, rem) {
-	struct timespec tmo;
+	ktime_t timeout;
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tmo.tv_sec  = (time_t)req->tv_sec;
-	tmo.tv_nsec = req->tv_nsec;
+	timeout = ktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
-	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
-		return -EOK;
-	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
 			/* Service RPC functions */
 			if (task_serve())
 				continue;
-			if (!task_sleep(&tmo))
+			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
 	} EXCEPT {
@@ -349,10 +347,14 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem = realtime() - tmo;
+			ktime_t now = ktime();
+			struct timespec tsrem;
+			if (now > timeout)
+				now = timeout;
+			tsrem = relktime_to_reltimespec(timeout - now);
 			COMPILER_WRITE_BARRIER();
-			rem->tv_sec  = (time32_t)tsrem.tv_sec;
-			rem->tv_nsec = tsrem.tv_nsec;
+			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
+			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
 			COMPILER_WRITE_BARRIER();
 		}
 		RETHROW();
@@ -365,23 +367,19 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 DEFINE_SYSCALL2(errno_t, nanosleep64,
                 USER UNCHECKED struct timespec64 const *, req,
                 USER UNCHECKED struct timespec64 *, rem) {
-	struct timespec tmo;
+	ktime_t timeout;
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tmo.tv_sec  = (time_t)req->tv_sec;
-	tmo.tv_nsec = req->tv_nsec;
+	timeout = ktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
-	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
-		return -EOK;
-	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
 			/* Service RPC functions */
 			if (task_serve())
 				continue;
-			if (!task_sleep(&tmo))
+			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
 	} EXCEPT {
@@ -391,10 +389,14 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem = realtime() - tmo;
+			ktime_t now = ktime();
+			struct timespec tsrem;
+			if (now > timeout)
+				now = timeout;
+			tsrem = relktime_to_reltimespec(timeout - now);
 			COMPILER_WRITE_BARRIER();
-			rem->tv_sec  = (time64_t)tsrem.tv_sec;
-			rem->tv_nsec = tsrem.tv_nsec;
+			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
+			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
 			COMPILER_WRITE_BARRIER();
 		}
 		RETHROW();
@@ -407,23 +409,19 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
                        USER UNCHECKED struct compat_timespec32 const *, req,
                        USER UNCHECKED struct compat_timespec32 *, rem) {
-	struct timespec tmo;
+	ktime_t timeout;
 	compat_validate_readable(req, sizeof(*req));
 	compat_validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tmo.tv_sec  = (time_t)req->tv_sec;
-	tmo.tv_nsec = req->tv_nsec;
+	timeout = ktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
-	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
-		return -EOK;
-	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
 			/* Service RPC functions */
 			if (task_serve())
 				continue;
-			if (!task_sleep(&tmo))
+			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
 	} EXCEPT {
@@ -433,10 +431,14 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem = realtime() - tmo;
+			ktime_t now = ktime();
+			struct timespec tsrem;
+			if (now > timeout)
+				now = timeout;
+			tsrem = relktime_to_reltimespec(timeout - now);
 			COMPILER_WRITE_BARRIER();
-			rem->tv_sec  = (compat_time32_t)tsrem.tv_sec;
-			rem->tv_nsec = tsrem.tv_nsec;
+			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
+			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
 			COMPILER_WRITE_BARRIER();
 		}
 		RETHROW();
@@ -449,23 +451,19 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
                        USER UNCHECKED struct compat_timespec64 const *, req,
                        USER UNCHECKED struct compat_timespec64 *, rem) {
-	struct timespec tmo;
+	ktime_t timeout;
 	compat_validate_readable(req, sizeof(*req));
 	compat_validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tmo.tv_sec  = (time_t)req->tv_sec;
-	tmo.tv_nsec = req->tv_nsec;
+	timeout = ktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
-	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
-		return -EOK;
-	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
 			/* Service RPC functions */
 			if (task_serve())
 				continue;
-			if (!task_sleep(&tmo))
+			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
 	} EXCEPT {
@@ -475,10 +473,14 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem = realtime() - tmo;
+			ktime_t now = ktime();
+			struct timespec tsrem;
+			if (now > timeout)
+				now = timeout;
+			tsrem = relktime_to_reltimespec(timeout - now);
 			COMPILER_WRITE_BARRIER();
-			rem->tv_sec  = (compat_time64_t)tsrem.tv_sec;
-			rem->tv_nsec = tsrem.tv_nsec;
+			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
+			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
 			COMPILER_WRITE_BARRIER();
 		}
 		RETHROW();

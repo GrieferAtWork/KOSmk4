@@ -3506,7 +3506,7 @@ copy_and_free_ent_info:
 			RETHROW();
 		}
 		/* Wait for new signals to be delivered. */
-		if (!task_waitfor(abs_timeout)) {
+		if (!task_waitfor_tms(abs_timeout)) {
 			result = 0;
 			break;
 		}

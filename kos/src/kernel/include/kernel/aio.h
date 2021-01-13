@@ -560,7 +560,7 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 				task_disconnectall();
 				break;
 			}
-			if (!task_waitfor(timeout)) {
+			if (!task_waitfor_tms(timeout)) {
 				__hybrid_assert(timeout);
 				aio_handle_cancel(self);
 				return false;
@@ -799,7 +799,7 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
 				task_disconnectall();
 				break;
 			}
-			if (!task_waitfor(timeout)) {
+			if (!task_waitfor_tms(timeout)) {
 				__hybrid_assert(timeout);
 				aio_multihandle_cancel(self);
 				return false;

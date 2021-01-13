@@ -1261,7 +1261,7 @@ again:
 			task_disconnectall();
 			RETHROW();
 		}
-		if (!task_waitfor(timeout))
+		if (!task_waitfor_tms(timeout))
 			return 0; /* Nothing became available in the mean time... */
 		goto again;
 	}

@@ -369,7 +369,7 @@ again:
 		}
 		tmo = realtime();
 		tmo.add_milliseconds(ps2_command_timeout);
-		if (!task_waitfor(&tmo)) {
+		if (!task_waitfor_tms(&tmo)) {
 			errors = ATOMIC_READ(self->pk_errors);
 			if (errors != 0)
 				break;

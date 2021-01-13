@@ -147,7 +147,7 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 				struct timespec timeout;
 				timeout = realtime();
 				timeout.add_nanoseconds(bus->ab_timeout_dat);
-				signal = task_waitfor(&timeout);
+				signal = task_waitfor_tms(&timeout);
 				if unlikely(!signal)
 					return ATA_ERROR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_SECTOR_WAIT);
 			}

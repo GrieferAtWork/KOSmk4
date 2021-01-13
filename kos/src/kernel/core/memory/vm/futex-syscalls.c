@@ -107,7 +107,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 				/* `FUTEX_WAIT' takes a relative timeout, while `FUTEX_WAIT_BITSET' takes an absolute one. */
 				if (timeout && (futex_op & 127) == FUTEX_WAIT)
 					*timeout += realtime();
-				if (!task_waitfor(timeout))
+				if (!task_waitfor_tms(timeout))
 					result = -ETIMEDOUT;
 			} else {
 				task_disconnectall();

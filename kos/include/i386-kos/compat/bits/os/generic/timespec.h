@@ -24,8 +24,16 @@
 
 #ifdef __x86_64__
 #include <bits/os/generic/timespec32.h>
-#define compat_timespec32 __timespecx32
-#define compat_timespec64 __timespecx32_64
+#define __OFFSET_COMPAT_TIMESPEC32_SEC  __OFFSET_TIMESPECX32_SEC
+#define __OFFSET_COMPAT_TIMESPEC32_NSEC __OFFSET_TIMESPECX32_NSEC
+#define __SIZEOF_COMPAT_TIMESPEC32      __SIZEOF_TIMESPECX32
+#define __ALIGNOF_COMPAT_TIMESPEC32     __ALIGNOF_TIMESPECX32
+#define __OFFSET_COMPAT_TIMESPEC64_SEC  __OFFSET_TIMESPECX32_64_SEC
+#define __OFFSET_COMPAT_TIMESPEC64_NSEC __OFFSET_TIMESPECX32_64_NSEC
+#define __SIZEOF_COMPAT_TIMESPEC64      __SIZEOF_TIMESPECX32_64
+#define __ALIGNOF_COMPAT_TIMESPEC64     __ALIGNOF_TIMESPECX32_64
+#define compat_timespec32               __timespecx32
+#define compat_timespec64               __timespecx32_64
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_OS_GENERIC_TIMESPEC_H */

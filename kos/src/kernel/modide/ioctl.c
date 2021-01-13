@@ -129,7 +129,7 @@ do_compat_hdio_getgeo:
 						struct timespec timeout;
 						timeout = realtime();
 						timeout.tv_sec += 2;
-						signal = task_waitfor(&timeout);
+						signal = task_waitfor_tms(&timeout);
 					}
 					if (!signal)
 						THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);

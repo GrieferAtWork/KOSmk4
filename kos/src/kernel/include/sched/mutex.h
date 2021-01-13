@@ -105,7 +105,7 @@ again:
 			task_connect(&self->m_unlock);
 			old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
 			if likely(old_task) {
-				if unlikely(!task_waitfor(abs_timeout))
+				if unlikely(!task_waitfor_tms(abs_timeout))
 					return false;
 				goto again;
 			}
@@ -149,7 +149,7 @@ again:
 			task_connect(&self->m_unlock);
 			old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
 			if likely(old_task) {
-				if unlikely(!task_waitfor_nx(abs_timeout))
+				if unlikely(!task_waitfor_tms_nx(abs_timeout))
 					return false;
 				goto again;
 			}

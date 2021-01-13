@@ -942,8 +942,11 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
 	return waitfor_tsc_deadline_or_interrupt(me, tsc_deadline_value);
 }
 
-/* Enter a sleeping state and return once being woken (true),
- * or once the given `abs_timeout' (which must be global) expires (false)
+/* Enter a sleeping state and return once being woken (true), or
+ * once the given `abs_timeout' (which must be global) expires (false)
+ * NOTE: Special values for `abs_timeout' are:
+ *    - 0 (or anything `< ktime()'): Essentially does the same as task_yield()
+ *    - (ktime_t)-1:                 Never times out
  * WARNING: Even if the caller has disabled preemption prior to the call,
  *          it will be re-enabled once this function returns.
  * NOTE: This function is the bottom-most (and still task-level) API
@@ -975,24 +978,21 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
  * >> task_wake(waiting_thread); */
-PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
+PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	struct task *next;
 	struct task *caller;
 	struct cpu *me;
-	ktime_t now, timeout, quantum_start, priority_boost;
+	ktime_t now, quantum_start, priority_boost;
 	tsc_t tsc_now;
 	caller = THIS_TASK;
 	PREEMPTION_DISABLE();
 	me = caller->t_cpu;
 	sched_assert();
 	assert(caller->t_flags & TASK_FRUNNING);
-	/* TODO: Change the task_sleep() API to use `ktime_t' instead of timespec! */
-	timeout = abs_timeout ? timespec_to_ktime(abs_timeout)
-	                      : (ktime_t)-1;
 	if unlikely(sched_override) {
 		/* Scheduler override has been set.
 		 * -> Wait for the given timeout to expire, or a sporadic interrupt to take place */
-		return waitfor_ktime_or_interrupt(me, timeout);
+		return waitfor_ktime_or_interrupt(me, abs_timeout);
 	}
 	/* Unlink the thread from the run queue. */
 	if unlikely(sched.s_runcount == 1) {
@@ -1004,9 +1004,9 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		if unlikely(caller == &sched_idle) {
 			/* Special case: wait within the IDLE thread, when no other
 			 *               threads exist to which we can switch.
-			 * In this case, we must wait until either `timeout', or the
+			 * In this case, we must wait until either `abs_timeout', or the
 			 * timeout of our CPU's first waiting thread (if any) expires. */
-			ktime_t used_timeout = timeout;
+			ktime_t used_timeout = abs_timeout;
 			if (first_waiting_thread) {
 				ktime_t other_timeout;
 				other_timeout = sched_timeout(first_waiting_thread);
@@ -1065,7 +1065,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 
 	/* Insert `caller' into the queue of waiting threads. */
 	ATOMIC_AND(caller->t_flags, ~TASK_FRUNNING);
-	sched_intern_add_to_waitqueue(me, caller, timeout);
+	sched_intern_add_to_waitqueue(me, caller, abs_timeout);
 
 	/* Reload the current deadline. */
 	next = sched_intern_reload_deadline(me, next, quantum_start,
@@ -1103,10 +1103,21 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 
 	/* Check if we got timed out. */
 	if (ATOMIC_FETCHAND(caller->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
-		assertf(abs_timeout, "TASK_FTIMEOUT set, but no timeout given?");
+		assertf(abs_timeout != (ktime_t)-1,
+		        "TASK_FTIMEOUT set, but no timeout given?");
 		return false; /* Timeout... */
 	}
 	return true;
+}
+
+
+/* Deprecated variant of `task_sleep()' */
+PUBLIC bool
+NOTHROW(FCALL task_sleep_tms)(struct timespec const *abs_timeout) {
+	ktime_t ktime_abs_timeout = (ktime_t)-1;
+	if (abs_timeout != NULL)
+		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
+	return task_sleep(ktime_abs_timeout);
 }
 
 
@@ -1143,7 +1154,9 @@ again:
 	/* Check the timeouts of sleeping threads. */
 	FOREACH_thiscpu_waiting(thread, me) {
 		assert(!(thread->t_flags & TASK_FRUNNING));
-		if (sched_timeout(thread) > now)
+		/* Must compare `TIMEOUT >= NOW' such that TIMEOUT=-1 isn't
+		 * considered as something that could actually time out. */
+		if (sched_timeout(thread) >= now)
 			break; /* No more threads that have timed out. */
 		if unlikely(sched_stoptime(thread) > next_priority)
 			break; /* Thread priority too low for a wake-up */
@@ -1205,7 +1218,9 @@ do_timeout_thread:
 		if (thrd_priorty_then > next_priorty_then) {
 do_use_sleeping_thread_timeout:
 			deadline = sched_timeout(thread);
-			if unlikely(deadline <= now) {
+			/* Must compare `TIMEOUT < NOW' such that TIMEOUT=-1 isn't
+			 * considered as something that could actually time out. */
+			if unlikely(deadline < now) {
 				caller = next;
 				goto do_timeout_thread;
 			}

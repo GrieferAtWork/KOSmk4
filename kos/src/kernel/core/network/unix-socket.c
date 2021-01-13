@@ -1503,7 +1503,7 @@ again_read_packet:
 			goto done; /* EOF */
 		}
 		/* Wait for a packet to become available. */
-		if (!task_waitfor(timeout))
+		if (!task_waitfor_tms(timeout))
 			THROW(E_NET_TIMEOUT);
 	}
 	TRY {

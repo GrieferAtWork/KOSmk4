@@ -230,17 +230,24 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * =============================================================================
  * -> Used to implement everything else there is about scheduling. */
 
-/* Enter a sleeping state and return once being woken (true),
- * or once the given `abs_timeout' (which must be global) expires (false)
- * WARNING: Even if the caller has disabled preemption prior to the call,
- *          it will be re-enabled once this function returns.
- * NOTE: This function is the bottom-most (and still task-level) API
- *       for conserving CPU cycles using preemption, in that this
- *       function is even used to implement `task_waitfor()'.
- *       The functions used to implement this one no longer work on tasks, but on CPUs!
- * NOTE: If the thread is transferred to a different CPU while sleeping, a
- *       sporadic wakeup will be triggered, causing `task_sleep()' to return
- *      `true'.
+/* Enter a sleeping state and return once being woken (true), or
+ * once the given `abs_timeout' (which must be global) expires (false)
+ * NOTES:
+ *   - Special values for `abs_timeout' are:
+ *     - 0 (or anything `< ktime()'): Essentially does the same as task_yield()
+ *     - (ktime_t)-1:                 Never times out
+ *   - Even if the caller has disabled preemption prior to the call,
+ *     it will be re-enabled once this function returns.
+ *   - This function is the bottom-most (and still task-level) API
+ *     for conserving CPU cycles using preemption, in that this
+ *     function is even used to implement `task_waitfor()'.
+ *     The functions used to implement this one no longer work on tasks, but on CPUs!
+ *   - If the thread is transferred to a different CPU while sleeping, a sporadic
+ *     wakeup will be triggered, causing `task_sleep()' to return `true'.
+ *   - When this function returns as the result of a timeout, then you may
+ *     act as though that `ktime() > abs_timeout' (but note that this isn't
+ *     actually an invariant, as your task may have been moved to a different
+ *     CPU after waking up, at which point `ktime()' may have a slight offset)
  * The proper way of using this function is as follows:
  * >> while (SHOULD_WAIT()) { // Test some condition for which to wait
  * >>     PREEMPTION_DISABLE();
@@ -263,7 +270,9 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
  * >> task_wake(waiting_thread); */
-FUNDEF __BOOL NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout DFL(__NULLPTR));
+FUNDEF __BOOL NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL((ktime_t)-1));
+/* Deprecated variant of `task_sleep()' */
+FUNDEF __BOOL NOTHROW(FCALL task_sleep_tms)(struct timespec const *abs_timeout DFL(__NULLPTR));
 
 #define TASK_WAKE_FNORMAL   0x0000 /* Normal wake-up flags. */
 #define TASK_WAKE_FWAITFOR  0x1000 /* When sending an IPI to a different CPU, wait for that CPU to acknowledge
