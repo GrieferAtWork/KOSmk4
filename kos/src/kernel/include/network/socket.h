@@ -634,25 +634,33 @@ struct socket {
 	                                                       * NOTE: Socket implementation should not touch this field!
 	                                                       * HINT: `POLLOUTMASK' is indicated when this is `NULL', or when contained AIO has completed! */
 	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
-	/* TODO: SO_RCVTIMEO and SO_SNDTIMEO can be implemented right here! */
-
+	WEAK struct timespec                   sk_rcvtimeo;   /* Default (relative) receive timeout (for `SO_RCVTIMEO') */
+	WEAK struct timespec                   sk_sndtimeo;   /* Default (relative) send timeout (for `SO_SNDTIMEO') */
 	/* Socket-specific data goes here... */
 };
 
 #define __socket_init_common(self, ops, type, protocol) \
-	((self)->sk_refcnt     = 1,                         \
-	 (self)->sk_weakrefcnt = 1,                         \
-	 (self)->sk_ops        = (ops),                     \
-	 (self)->sk_type       = (type),                    \
-	 (self)->sk_prot       = (protocol))
+	((self)->sk_refcnt           = 1,                   \
+	 (self)->sk_weakrefcnt       = 1,                   \
+	 (self)->sk_ops              = (ops),               \
+	 (self)->sk_type             = (type),              \
+	 (self)->sk_prot             = (protocol))
 #define socket_init(self, ops, type, protocol)        \
 	(__socket_init_common(self, ops, type, protocol), \
 	 xatomic_ref_init(&(self)->sk_ncon),              \
-	 (self)->sk_msgflags = 0)
-#define socket_cinit(self, ops, type, protocol)       \
-	(__socket_init_common(self, ops, type, protocol), \
-	 xatomic_ref_cinit(&(self)->sk_ncon, __NULLPTR),  \
-	 __hybrid_assert((self)->sk_msgflags == 0))
+	 (self)->sk_msgflags         = 0,                 \
+	 (self)->sk_rcvtimeo.tv_sec  = 0,                 \
+	 (self)->sk_rcvtimeo.tv_nsec = 0,                 \
+	 (self)->sk_sndtimeo.tv_sec  = 0,                 \
+	 (self)->sk_sndtimeo.tv_nsec = 0)
+#define socket_cinit(self, ops, type, protocol)         \
+	(__socket_init_common(self, ops, type, protocol),   \
+	 xatomic_ref_cinit(&(self)->sk_ncon, __NULLPTR),    \
+	 __hybrid_assert((self)->sk_msgflags == 0),         \
+	 __hybrid_assert((self)->sk_rcvtimeo.tv_sec == 0),  \
+	 __hybrid_assert((self)->sk_rcvtimeo.tv_nsec == 0), \
+	 __hybrid_assert((self)->sk_sndtimeo.tv_sec == 0),  \
+	 __hybrid_assert((self)->sk_sndtimeo.tv_nsec == 0))
 
 
 /* Destroy a given socket object, and decrement its weak reference counter. */
@@ -913,10 +921,11 @@ socket_sendtov(struct socket *__restrict self,
  * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
  *                        that no data could be received up until that point. Ignored when already
  *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ *                        When `NULL', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
- * @throws: E_NET_TIMEOUT: The given `timeout' expired */
+ * @throws: E_NET_TIMEOUT: The given `timeout' (or default SO_RCVTIMEO-timeout) expired */
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
             USER CHECKED void *buf, size_t bufsize,
@@ -952,6 +961,7 @@ socket_recvv(struct socket *__restrict self,
  * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
  *                        that no data could be received up until that point. Ignored when already
  *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ *                        When `NULL', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */

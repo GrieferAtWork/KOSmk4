@@ -108,21 +108,32 @@
 #endif /* !ARCH_ENUMERATE_PROC_SYS_NET_CORE */
 
 
+/* /proc/self */
 ROOT_DIRECTORY_ENTRY("self", DT_LNK, self)
 DYNAMIC_SYMLINK(self, 0777, ProcFS_Self_Printer)
 
+
+/* /proc/thread-self */
 ROOT_DIRECTORY_ENTRY("thread-self", DT_LNK, thread_self)
 DYNAMIC_SYMLINK(thread_self, 0777, ProcFS_ThreadSelf_Printer)
 
+
+/* /proc/kcore */
 ROOT_DIRECTORY_ENTRY("kcore", DT_REG, kcore)
 MKREG_RO(kcore, 0400, ProcFS_KCore_Printer)
 
+
+/* /proc/cmdline */
 ROOT_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
 MKREG_RO(cmdline, 0444, ProcFS_Cmdline_Printer)
 
+
+/* /proc/filesystems */
 ROOT_DIRECTORY_ENTRY("filesystems", DT_REG, filesystems)
 MKREG_RO(filesystems, 0444, ProcFS_Filesystems_Printer)
 
+
+/* /proc/kos */
 ROOT_DIRECTORY_ENTRY("kos", DT_DIR, kos)
 MKDIR(kos, 0555,
       F(kos, "raminfo", DT_REG, kos_raminfo) /* /proc/kos/raminfo */
@@ -130,8 +141,9 @@ MKDIR(kos, 0555,
       F_END)
 MKREG_RO(kos_raminfo, 0444, ProcFS_Kos_RamInfo_Printer)
 
-ROOT_DIRECTORY_ENTRY("sys", DT_DIR, sys)
 
+/* /proc/sys */
+ROOT_DIRECTORY_ENTRY("sys", DT_DIR, sys)
 MKDIR(sys, 0555,
       F(sys, "fs", DT_DIR, sys_fs)         /* /proc/sys/fs */
       F(sys, "kernel", DT_DIR, sys_kernel) /* /proc/sys/kernel */
@@ -139,13 +151,16 @@ MKDIR(sys, 0555,
       ARCH_ENUMERATE_PROC_SYS
       F_END)
 
+
+/* /proc/sys/fs */
 MKDIR(sys_fs, 0555,
       F(sys_fs, "pipe-max-size", DT_REG, sys_fs_pipe_max_size) /* /proc/sys/fs/pipe-max-size */
       ARCH_ENUMERATE_PROC_SYS_FS
       F_END)
-
 MKREG_RW(sys_fs_pipe_max_size, 0622, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys_Fs_PipeMaxSize_Write)
 
+
+/* /proc/sys/kernel */
 MKDIR(sys_kernel, 0555,
       F(sys_kernel, "cap_last_cap", DT_REG, sys_kernel_cap_last_cap)
       F(sys_kernel, "hostname", DT_REG, sys_kernel_hostname)
@@ -157,21 +172,6 @@ MKDIR(sys_kernel, 0555,
       F(sys_kernel, "sched_child_runs_first", DT_REG, sys_kernel_sched_child_runs_first)
       ARCH_ENUMERATE_PROC_SYS_KERNEL
       F_END)
-
-MKDIR(sys_net, 0555,
-      F(sys_net, "core", DT_DIR, sys_net_core)       /* /proc/sys/net/core */
-      ARCH_ENUMERATE_PROC_SYS_NET
-      F_END)
-
-MKDIR(sys_net_core, 0555,
-      F(sys_net_core, "rmem_default", DT_REG, sys_net_core_rmem_default)
-      F(sys_net_core, "rmem_max", DT_REG, sys_net_core_rmem_max)
-      F(sys_net_core, "wmem_default", DT_REG, sys_net_core_wmem_default)
-      F(sys_net_core, "wmem_max", DT_REG, sys_net_core_wmem_max)
-      ARCH_ENUMERATE_PROC_SYS_NET_CORE
-      F_END)
-
-
 MKREG_TXT(sys_kernel_cap_last_cap, 0222, PP_STR(CAP_LAST_CAP) "\n")
 MKREG_RW(sys_kernel_hostname, 0622, ProcFS_Sys_Kernel_Hostname_Print, ProcFS_Sys_Kernel_Hostname_Write)
 MKREG_RW(sys_kernel_domainname, 0622, ProcFS_Sys_Kernel_Domainname_Print, ProcFS_Sys_Kernel_Domainname_Write)
@@ -181,6 +181,22 @@ MKREG_EXT(sys_kernel_ostype, 0222, kernel_uname.sysname)
 MKREG_RW(sys_kernel_randomize_va_space, 0622, ProcFS_Sys_Kernel_RandomizeVaSpace_Print, ProcFS_Sys_Kernel_RandomizeVaSpace_Write)
 MKREG_RW(sys_kernel_sched_child_runs_first, 0622, ProcFS_Sys_Kernel_SchedChildRunsFirst_Print, ProcFS_Sys_Kernel_SchedChildRunsFirst_Write)
 
+
+/* /proc/sys/net */
+MKDIR(sys_net, 0555,
+      F(sys_net, "core", DT_DIR, sys_net_core)       /* /proc/sys/net/core */
+      ARCH_ENUMERATE_PROC_SYS_NET
+      F_END)
+
+
+/* /proc/sys/net/core */
+MKDIR(sys_net_core, 0555,
+      F(sys_net_core, "rmem_default", DT_REG, sys_net_core_rmem_default)
+      F(sys_net_core, "rmem_max", DT_REG, sys_net_core_rmem_max)
+      F(sys_net_core, "wmem_default", DT_REG, sys_net_core_wmem_default)
+      F(sys_net_core, "wmem_max", DT_REG, sys_net_core_wmem_max)
+      ARCH_ENUMERATE_PROC_SYS_NET_CORE
+      F_END)
 MKREG_RW(sys_net_core_rmem_default, 0622, ProcFS_Sys_Net_Core_RmemDefault_Print, ProcFS_Sys_Net_Core_RmemDefault_Write)
 MKREG_RW(sys_net_core_wmem_default, 0622, ProcFS_Sys_Net_Core_WmemDefault_Print, ProcFS_Sys_Net_Core_WmemDefault_Write)
 MKREG_RW(sys_net_core_rmem_max, 0622, ProcFS_Sys_Net_Core_RmemMax_Print, ProcFS_Sys_Net_Core_RmemMax_Write)

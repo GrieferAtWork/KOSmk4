@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_NETWORK_SOCKET_C
 #define GUARD_KERNEL_SRC_NETWORK_SOCKET_C 1
 #define _KOS_SOURCE 1
+#define _TIME64_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -32,6 +33,7 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <sched/async.h>
+#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/posix-signal.h>
 #include <sched/signal.h>
@@ -40,6 +42,8 @@
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <bits/os/timeval.h>
+#include <compat/config.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/net.h>
@@ -52,6 +56,13 @@
 #include <stdalign.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <kernel/compat.h>
+
+#include <compat/bits/os/timeval.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -474,6 +485,33 @@ PRIVATE void KCALL raise_sigpipe(void) {
 }
 
 
+PRIVATE NONNULL((1, 2)) void KCALL
+waitfor_send_aio(struct socket *__restrict self,
+                 struct aio_handle_generic *__restrict aio) {
+	struct timespec timeout;
+	COMPILER_READ_BARRIER();
+	timeout.tv_sec  = self->sk_sndtimeo.tv_sec;
+	timeout.tv_nsec = self->sk_sndtimeo.tv_nsec;
+	COMPILER_READ_BARRIER();
+	/* Allow for send timeouts. */
+	if (timeout.tv_sec || timeout.tv_nsec) {
+		timeout += realtime();
+		if (!aio_handle_generic_waitfor(aio, &timeout)) {
+			aio_handle_cancel(aio); /* Force AIO completion one way or another... */
+			COMPILER_READ_BARRIER();
+			/* Only throw an error if we did actually manage to cancel the AIO
+			 * There is the small race condition where the send succeeded between
+			 * the waitfor function timing out, and us canceling the operation.
+			 * If that happened, then we mustn't indicate a timeout, since the
+			 * operation actually succeeded. */
+			if (aio->hg_status == AIO_COMPLETION_CANCEL)
+				THROW(E_NET_TIMEOUT);
+		}
+	} else {
+		aio_handle_generic_waitfor(aio);
+	}
+}
+
 
 /* Send helper functions for blocking and non-blocking operations.
  * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
@@ -504,7 +542,7 @@ socket_send(struct socket *__restrict self,
 			}
 		} else {
 			TRY {
-				aio_handle_generic_waitfor(&aio);
+				waitfor_send_aio(self, &aio);
 				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
@@ -550,7 +588,7 @@ socket_sendv(struct socket *__restrict self,
 			}
 		} else {
 			TRY {
-				aio_handle_generic_waitfor(&aio);
+				waitfor_send_aio(self, &aio);
 				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
@@ -854,7 +892,7 @@ socket_sendto(struct socket *__restrict self,
 			}
 		} else {
 			TRY {
-				aio_handle_generic_waitfor(&aio);
+				waitfor_send_aio(self, &aio);
 				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
@@ -901,7 +939,7 @@ socket_sendtov(struct socket *__restrict self,
 			}
 		} else {
 			TRY {
-				aio_handle_generic_waitfor(&aio);
+				waitfor_send_aio(self, &aio);
 				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
@@ -1030,10 +1068,11 @@ again_receive:
  * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
  *                        that no data could be received up until that point. Ignored when already
  *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ *                        When `NULL', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
- * @throws: E_NET_TIMEOUT: The given `timeout' expired */
+ * @throws: E_NET_TIMEOUT: The given `timeout' (or default SO_RCVTIMEO-timeout) expired */
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
             USER CHECKED void *buf, size_t bufsize,
@@ -1044,6 +1083,18 @@ socket_recv(struct socket *__restrict self,
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+	struct timespec default_timeout;
+	/* Use the default receive timeout if the caller didn't specify one. */
+	if (!timeout) {
+		COMPILER_READ_BARRIER();
+		default_timeout.tv_sec  = self->sk_rcvtimeo.tv_sec;
+		default_timeout.tv_nsec = self->sk_rcvtimeo.tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (default_timeout.tv_sec || default_timeout.tv_nsec) {
+			default_timeout += realtime();
+			timeout = &default_timeout;
+		}
+	}
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recv) {
 		result = (*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
@@ -1072,6 +1123,18 @@ socket_recvv(struct socket *__restrict self,
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+	struct timespec default_timeout;
+	/* Use the default receive timeout if the caller didn't specify one. */
+	if (!timeout) {
+		COMPILER_READ_BARRIER();
+		default_timeout.tv_sec  = self->sk_rcvtimeo.tv_sec;
+		default_timeout.tv_nsec = self->sk_rcvtimeo.tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (default_timeout.tv_sec || default_timeout.tv_nsec) {
+			default_timeout += realtime();
+			timeout = &default_timeout;
+		}
+	}
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvv) {
 		result = (*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
@@ -1099,6 +1162,7 @@ socket_recvv(struct socket *__restrict self,
  * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
  *                        that no data could be received up until that point. Ignored when already
  *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ *                        When `NULL', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
@@ -1113,6 +1177,18 @@ socket_recvfrom(struct socket *__restrict self,
                 struct timespec const *timeout)
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+	struct timespec default_timeout;
+	/* Use the default receive timeout if the caller didn't specify one. */
+	if (!timeout) {
+		COMPILER_READ_BARRIER();
+		default_timeout.tv_sec  = self->sk_rcvtimeo.tv_sec;
+		default_timeout.tv_nsec = self->sk_rcvtimeo.tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (default_timeout.tv_sec || default_timeout.tv_nsec) {
+			default_timeout += realtime();
+			timeout = &default_timeout;
+		}
+	}
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvfrom) {
 		result = (*self->sk_ops->so_recvfrom)(self, buf, bufsize, addr, addr_len,
@@ -1153,6 +1229,18 @@ socket_recvfromv(struct socket *__restrict self,
                  struct timespec const *timeout)
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+	struct timespec default_timeout;
+	/* Use the default receive timeout if the caller didn't specify one. */
+	if (!timeout) {
+		COMPILER_READ_BARRIER();
+		default_timeout.tv_sec  = self->sk_rcvtimeo.tv_sec;
+		default_timeout.tv_nsec = self->sk_rcvtimeo.tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (default_timeout.tv_sec || default_timeout.tv_nsec) {
+			default_timeout += realtime();
+			timeout = &default_timeout;
+		}
+	}
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvfromv) {
 		result = (*self->sk_ops->so_recvfromv)(self, buf, bufsize, addr, addr_len,
@@ -1345,6 +1433,54 @@ return_u64(USER CHECKED void *optval, socklen_t optlen, u64 value) {
 	return_u64(optval, optlen, (u64)(unsigned int)(value))
 #endif /* __SIZEOF_INT__ > 4 */
 
+PRIVATE socklen_t KCALL
+return_timeval(USER CHECKED void *optval, socklen_t optlen,
+               struct timespec const *__restrict value) {
+	if (optlen == sizeof(struct timeval32)) {
+		USER CHECKED struct timeval32 *res;
+		res = (struct timeval32 *)optval;
+		res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
+		res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
+		return sizeof(struct timeval32);
+	}
+#if __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64
+	if (optlen == sizeof(struct timeval64)) {
+		USER CHECKED struct timeval64 *res;
+		res = (struct timeval64 *)optval;
+		res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
+		res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
+		return sizeof(struct timeval64);
+	}
+#endif /* __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64 */
+#ifdef __ARCH_HAVE_COMPAT
+	__STATIC_IF(sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL32 &&
+	            sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL64) {
+		if (optlen == sizeof(struct compat_timeval32)) {
+			USER CHECKED struct compat_timeval32 *res;
+			res = (struct compat_timeval32 *)optval;
+			res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
+			res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
+			return sizeof(struct compat_timeval32);
+		}
+	}
+	__STATIC_IF(sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL32 &&
+	            sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL64 &&
+	            sizeof(struct compat_timeval64) != sizeof(struct compat_timeval32)) {
+		if (optlen == sizeof(struct compat_timeval64)) {
+			USER CHECKED struct compat_timeval64 *res;
+			res = (struct compat_timeval64 *)optval;
+			res->tv_sec  = (typeof(res->tv_sec))(value->tv_sec);
+			res->tv_usec = (typeof(res->tv_usec))(value->tv_nsec / NSEC_PER_USEC);
+			return sizeof(struct compat_timeval64);
+		}
+	}
+	__STATIC_IF(sizeof(struct compat_timeval64) != sizeof(struct timeval)) {
+		if (syscall_iscompat())
+			return sizeof(struct compat_timeval64);
+	}
+#endif /* __ARCH_HAVE_COMPAT */
+	return sizeof(struct timeval);
+}
 
 
 /* Get the value of the named socket option and store it in `optval'
@@ -1442,6 +1578,14 @@ return_intval:
 			result = return_size_t(optval, optlen, retval);
 			goto done;
 		}	break;
+
+		case SO_RCVTIMEO:
+			result = return_timeval(optval, optlen, &self->sk_rcvtimeo);
+			goto done;
+
+		case SO_SNDTIMEO:
+			result = return_timeval(optval, optlen, &self->sk_sndtimeo);
+			goto done;
 
 		default:
 			break;
@@ -1554,6 +1698,72 @@ extract_size_t_dfl_int(USER CHECKED void const *optval,
 	return result;
 }
 
+PRIVATE void KCALL
+extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
+                struct timeval *__restrict result) {
+	if (optlen == sizeof(struct timeval32)) {
+		USER CHECKED struct timeval32 const *val;
+		val = (struct timeval32 const *)optval;
+		result->tv_sec  = (time_t)val->tv_sec;
+		result->tv_usec = (suseconds_t)val->tv_usec;
+		return;
+	}
+#if __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64
+	if (optlen == sizeof(struct timeval64)) {
+		USER CHECKED struct timeval64 const *val;
+		val = (struct timeval64 const *)optval;
+		result->tv_sec  = (time_t)val->tv_sec;
+		result->tv_usec = (suseconds_t)val->tv_usec;
+		return;
+	}
+#endif /* __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64 */
+#ifdef __ARCH_HAVE_COMPAT
+	__STATIC_IF(sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL32 &&
+	            sizeof(struct compat_timeval32) != __SIZEOF_TIMEVAL64) {
+		if (optlen == sizeof(struct compat_timeval32)) {
+			USER CHECKED struct compat_timeval32 const *val;
+			val = (struct compat_timeval32 const *)optval;
+			result->tv_sec  = (time_t)val->tv_sec;
+			result->tv_usec = (suseconds_t)val->tv_usec;
+			return;
+		}
+	}
+	__STATIC_IF(sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL32 &&
+	            sizeof(struct compat_timeval64) != __SIZEOF_TIMEVAL64 &&
+	            sizeof(struct compat_timeval64) != sizeof(struct compat_timeval32)) {
+		if (optlen == sizeof(struct compat_timeval64)) {
+			USER CHECKED struct compat_timeval64 const *val;
+			val = (struct compat_timeval64 const *)optval;
+			result->tv_sec  = (time_t)val->tv_sec;
+			result->tv_usec = (suseconds_t)val->tv_usec;
+			return;
+		}
+	}
+	__STATIC_IF(sizeof(struct compat_timeval64) != sizeof(struct timeval)) {
+		if (syscall_iscompat())
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct compat_timeval64), optlen);
+	}
+#endif /* __ARCH_HAVE_COMPAT */
+	THROW(E_BUFFER_TOO_SMALL, sizeof(struct timeval), optlen);
+}
+
+PRIVATE void KCALL
+extract_timeval_as_timespec(USER CHECKED void const *optval, socklen_t optlen,
+                            struct timespec *__restrict result) {
+	struct timeval tv;
+	extract_timeval(optval, optlen, &tv);
+	if ((u32)tv.tv_usec >= USEC_PER_SEC) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,
+		      tv.tv_usec);
+	}
+	COMPILER_WRITE_BARRIER();
+	result->tv_sec  = tv.tv_sec;
+	result->tv_nsec = tv.tv_usec * NSEC_PER_USEC;
+	COMPILER_WRITE_BARRIER();
+}
+
+
 
 /* Set the value of the named socket option from what is given in `optval'
  * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT: [...]
@@ -1619,6 +1829,14 @@ socket_setsockopt(struct socket *__restrict self,
 			socket_setsndbuf(self, newsiz);
 			goto done;
 		}	break;
+
+		case SO_SNDTIMEO:
+			extract_timeval_as_timespec(optval, optlen, &self->sk_sndtimeo);
+			goto done;
+
+		case SO_RCVTIMEO:
+			extract_timeval_as_timespec(optval, optlen, &self->sk_rcvtimeo);
+			goto done;
 
 		default:
 			break;

@@ -196,6 +196,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS,          /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 	E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED,          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,                   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -367,6 +369,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 #define E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -535,6 +539,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       147 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          148 /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 #define E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          149 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   150 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  151 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
