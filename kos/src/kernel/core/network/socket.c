@@ -32,10 +32,12 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <sched/async.h>
+#include <sched/cred.h>
 #include <sched/posix-signal.h>
 #include <sched/signal.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/except/reason/fs.h>
@@ -48,9 +50,24 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdalign.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN
+
+/* Default recv buffer size            (/proc/sys/net/core/rmem_default) */
+PUBLIC size_t socket_default_rcvbufsiz = 8192;
+
+/* Max (unprivileged) recv buffer size (/proc/sys/net/core/rmem_max) */
+PUBLIC size_t socket_default_rcvbufmax = 65536;
+
+/* Default send buffer size            (/proc/sys/net/core/wmem_default) */
+PUBLIC size_t socket_default_sndbufsiz = 8192;
+
+/* Max (unprivileged) send buffer size (/proc/sys/net/core/wmem_max) */
+PUBLIC size_t socket_default_sndbufmax = 65536;
+
+
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_buffer_init)(struct aio_buffer *__restrict self,
@@ -1264,6 +1281,72 @@ done:
 	return result;
 }
 
+
+
+PRIVATE socklen_t KCALL
+return_u32(USER CHECKED void *optval, socklen_t optlen, u32 value) {
+	if (optlen >= 4) {
+		UNALIGNED_SET32((u32 *)optval, value);
+		return 4;
+	}
+	if (value > UINT32_C(0xffff))
+		return 4;
+	if (optlen >= 2) {
+		UNALIGNED_SET16((u16 *)optval, (u16)value);
+		return 2;
+	}
+	if (value > UINT32_C(0xff))
+		return 2;
+	if (optlen >= 1) {
+		*(u8 *)optval = (u8)value;
+		return 1;
+	}
+	return 1;
+}
+
+#if __SIZEOF_SIZE_T__ <= 4
+#define return_size_t return_u32
+#elif __SIZEOF_SIZE_T__ > 4
+#define return_size_t return_u64
+
+PRIVATE socklen_t KCALL
+return_u64(USER CHECKED void *optval, socklen_t optlen, u64 value) {
+	if (optlen >= 8) {
+		UNALIGNED_SET64((u64 *)optval, value);
+		return 8;
+	}
+	if (value > UINT64_C(0xffffffff))
+		return 8;
+	if (optlen >= 4) {
+		UNALIGNED_SET32((u32 *)optval, (u32)value);
+		return 4;
+	}
+	if (value > UINT64_C(0xffff))
+		return 4;
+	if (optlen >= 2) {
+		UNALIGNED_SET16((u16 *)optval, (u16)value);
+		return 2;
+	}
+	if (value > UINT64_C(0xff))
+		return 2;
+	if (optlen >= 1) {
+		*(u8 *)optval = (u8)value;
+		return 1;
+	}
+	return 1;
+}
+#endif /* __SIZEOF_SIZE_T__ > 4 */
+
+#if __SIZEOF_INT__ <= 4
+#define return_int(optval, optlen, value) \
+	return_u32(optval, optlen, (u32)(unsigned int)(value))
+#else /* __SIZEOF_INT__ <= 4 */
+#define return_int(optval, optlen, value) \
+	return_u64(optval, optlen, (u64)(unsigned int)(value))
+#endif /* __SIZEOF_INT__ > 4 */
+
+
+
 /* Get the value of the named socket option and store it in `optval'
  * @return: * : The required buffer size.
  * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT: [...] */
@@ -1276,11 +1359,12 @@ socket_getsockopt(struct socket *__restrict self,
 	socklen_t result;
 	/* Builtin socket options. */
 	if (level == SOL_SOCKET) {
+		int intval;
 		switch (optname) {
 
 		case SO_ERROR: {
-			errno_t value = EPERM;
 			REF struct socket_connect_aio *ah;
+			intval = EPERM;
 again_read_ncon:
 			ah = self->sk_ncon.get();
 			if (ah) {
@@ -1288,15 +1372,15 @@ again_read_ncon:
 				if (!aio_handle_generic_hascompleted(&ah->sca_aio)) {
 					/* Don't consume before the operation has completed! */
 					decref_unlikely(ah);
-					value = EINPROGRESS;
+					intval = EINPROGRESS;
 				} else {
 					/* If the operation failed, return the exit error errno. */
 					if (ah->sca_aio.hg_status == AIO_COMPLETION_FAILURE) {
-						value = error_as_errno(&ah->sca_aio.hg_error);
+						intval = error_as_errno(&ah->sca_aio.hg_error);
 					} else if (ah->sca_aio.hg_status == AIO_COMPLETION_CANCEL) {
-						value = ECANCELED;
+						intval = ECANCELED;
 					} else {
-						value = EOK;
+						intval = EOK;
 					}
 					/* Consume the completion status. */
 					xch_ok = self->sk_ncon.cmpxch_inherit_new(ah, NULL);
@@ -1305,41 +1389,59 @@ again_read_ncon:
 						goto again_read_ncon;
 				}
 			}
-			GETSOCKOPT_RETURN_INT(value);
+return_intval:
+			result = return_int(optval, optlen, intval);
+			goto done;
 		}	break;
 
 		case SO_TYPE:
-			GETSOCKOPT_RETURN_INT(socket_gettype(self));
-			break;
+			intval = socket_gettype(self);
+			goto return_intval;
 
 		case SO_PROTOCOL:
-			GETSOCKOPT_RETURN_INT(socket_getprotocol(self));
-			break;
+			intval = socket_getprotocol(self);
+			goto return_intval;
 
 		case SO_DOMAIN:
-			GETSOCKOPT_RETURN_INT(socket_getfamily(self));
-			break;
+			intval = socket_getfamily(self);
+			goto return_intval;
 
 		case SO_NOSIGPIPE:
-			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL ? 1 : 0);
-			break;
+			intval = ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL ? 1 : 0;
+			goto return_intval;
 
 		case SO_DONTROUTE:
-			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_DONTROUTE ? 1 : 0);
-			break;
+			intval = ATOMIC_READ(self->sk_msgflags) & MSG_DONTROUTE ? 1 : 0;
+			goto return_intval;
 
 		case SO_OOBINLINE:
-			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_OOB ? 1 : 0);
-			break;
+			intval = ATOMIC_READ(self->sk_msgflags) & MSG_OOB ? 1 : 0;
+			goto return_intval;
 
 		case SO_DONTWAIT:
-			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT ? 1 : 0);
-			break;
+			intval = ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT ? 1 : 0;
+			goto return_intval;
 
 		case SO_PEERNAME:
 			/* seems to be an alias for `getpeername()' */
 			result = socket_getpeername(self, (USER CHECKED struct sockaddr *)optval, optlen);
 			goto done;
+
+		case SO_RCVBUF:
+		case SO_RCVBUFFORCE: {
+			size_t retval;
+			retval = socket_getrcvbuf(self);
+			result = return_size_t(optval, optlen, retval);
+			goto done;
+		}	break;
+
+		case SO_SNDBUF:
+		case SO_SNDBUFFORCE: {
+			size_t retval;
+			retval = socket_getsndbuf(self);
+			result = return_size_t(optval, optlen, retval);
+			goto done;
+		}	break;
 
 		default:
 			break;
@@ -1389,6 +1491,70 @@ done:
 	return result;
 }
 
+
+PRIVATE bool KCALL
+extract_bool(USER CHECKED void const *optval,
+             socklen_t optlen) {
+	socklen_t i;
+#ifndef __OPTIMIZE_SIZE__
+	if likely(optlen == sizeof(int))
+		return *(int const *)optval != 0;
+#endif /* !__OPTIMIZE_SIZE__ */
+	for (i = 0; i < optlen; ++i) {
+		byte_t b = ((byte_t const *)optval)[i];
+		if (b != 0)
+			return true;
+	}
+	return false;
+}
+
+PRIVATE void KCALL
+set_message_flag(struct socket *__restrict self,
+                 USER CHECKED void const *optval,
+                 socklen_t optlen, uintptr_t flag) {
+	if (extract_bool(optval, optlen)) {
+		ATOMIC_OR(self->sk_msgflags, flag);
+	} else {
+		ATOMIC_AND(self->sk_msgflags, ~flag);
+	}
+}
+
+PRIVATE size_t KCALL
+extract_size_t_dfl_int(USER CHECKED void const *optval,
+                       socklen_t optlen) {
+	size_t result;
+	switch (optlen) {
+
+#if __SIZEOF_SIZE_T__ >= 8
+	case 8:
+		result = (size_t)UNALIGNED_GET64((u64 const *)optval);
+		break;
+#endif /* __SIZEOF_SIZE_T__ >= 8 */
+
+#if __SIZEOF_SIZE_T__ >= 4
+	case 4:
+		result = (size_t)UNALIGNED_GET32((u32 const *)optval);
+		break;
+#endif /* __SIZEOF_SIZE_T__ >= 4 */
+
+#if __SIZEOF_SIZE_T__ >= 2
+	case 2:
+		result = (size_t)UNALIGNED_GET16((u16 const *)optval);
+		break;
+#endif /* __SIZEOF_SIZE_T__ >= 2 */
+
+	case 1:
+		result = (size_t)*(u8 const *)optval;
+		break;
+
+	default:
+		THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
+		break;
+	}
+	return result;
+}
+
+
 /* Set the value of the named socket option from what is given in `optval'
  * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT: [...]
  * @throws: E_BUFFER_TOO_SMALL: The specified `optlen' is invalid for the given option. */
@@ -1403,44 +1569,56 @@ socket_setsockopt(struct socket *__restrict self,
 		switch (optname) {
 
 		case SO_NOSIGPIPE:
-			if (optlen != sizeof(int))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
-			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_OR(self->sk_msgflags, MSG_NOSIGNAL);
-			} else {
-				ATOMIC_AND(self->sk_msgflags, ~MSG_NOSIGNAL);
-			}
-			return;
+			set_message_flag(self, optval, optlen, MSG_NOSIGNAL);
+			goto done;
 
 		case SO_DONTROUTE:
-			if (optlen != sizeof(int))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
-			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_OR(self->sk_msgflags, MSG_DONTROUTE);
-			} else {
-				ATOMIC_AND(self->sk_msgflags, ~MSG_DONTROUTE);
-			}
-			return;
+			set_message_flag(self, optval, optlen, MSG_DONTROUTE);
+			goto done;
 
 		case SO_OOBINLINE:
-			if (optlen != sizeof(int))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
-			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_OR(self->sk_msgflags, MSG_OOB);
-			} else {
-				ATOMIC_AND(self->sk_msgflags, ~MSG_OOB);
-			}
-			break;
+			set_message_flag(self, optval, optlen, MSG_OOB);
+			goto done;
 
 		case SO_DONTWAIT:
-			if (optlen != sizeof(int))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
-			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_OR(self->sk_msgflags, MSG_DONTWAIT);
-			} else {
-				ATOMIC_AND(self->sk_msgflags, ~MSG_DONTWAIT);
+			set_message_flag(self, optval, optlen, MSG_DONTWAIT);
+			goto done;
+
+		case SO_RCVBUF:
+		case SO_RCVBUFFORCE: {
+			size_t newsiz, maxsiz;
+			newsiz = extract_size_t_dfl_int(optval, optlen);
+			if (OVERFLOW_UMUL(newsiz, 2, &newsiz)) /* Also done by linux */
+				newsiz = (size_t)-1;
+			if (newsiz < SOCKET_RCVBUFMIN)
+				newsiz = SOCKET_RCVBUFMIN;
+			maxsiz = ATOMIC_READ(socket_default_rcvbufmax);
+			if (newsiz > maxsiz) {
+				if (optname != SO_RCVBUFFORCE || !capable(CAP_NET_ADMIN))
+					newsiz = maxsiz;
 			}
-			break;
+			/* Set the new buffer size. */
+			socket_setrcvbuf(self, newsiz);
+			goto done;
+		}	break;
+
+		case SO_SNDBUF:
+		case SO_SNDBUFFORCE: {
+			size_t newsiz, maxsiz;
+			newsiz = extract_size_t_dfl_int(optval, optlen);
+			if (OVERFLOW_UMUL(newsiz, 2, &newsiz)) /* Also done by linux */
+				newsiz = (size_t)-1;
+			if (newsiz < SOCKET_SNDBUFMIN)
+				newsiz = SOCKET_SNDBUFMIN;
+			maxsiz = ATOMIC_READ(socket_default_sndbufmax);
+			if (newsiz > maxsiz) {
+				if (optname != SO_SNDBUFFORCE || !capable(CAP_NET_ADMIN))
+					newsiz = maxsiz;
+			}
+			/* Set the new buffer size. */
+			socket_setsndbuf(self, newsiz);
+			goto done;
+		}	break;
 
 		default:
 			break;
@@ -1479,6 +1657,8 @@ err_unknown_socket_option:
 		      socket_gettype(self),
 		      socket_getprotocol(self));
 	}
+done:
+	;
 }
 
 
@@ -1501,13 +1681,73 @@ socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
 	return result;
 }
 
+/* Get/Set socket buffer sizes.
+ * This functionality can also be accessed through `socket_(get|set)sockopt'.
+ * For more information, see the documentation of the associated operators
+ * within `struct socket_ops' above. But note that that interface also includes
+ * restriction of buffer sizes in accordance to the `socket_default_*' globals.
+ * NOTE: When calling the setters, the caller is responsible to ensure that
+ *       the specified buffer size is allowed, and may do this through use
+ *       of the `socket_default_*' globals.
+ * NOTE: No default exceptions are defined for these callbacks, and normally
+ *       these should never result in any exceptions, however implementations
+ *       are still allowed to throw anything (which may be necessary in case
+ *       reading/writing buffer sizes requires a lock, meaning that acquiring
+ *       said lock might result in E_WOULDBLOCK) */
+PUBLIC size_t KCALL
+socket_getrcvbuf(struct socket *__restrict self) {
+	size_t result = SOCKET_RCVBUFMIN;
+	if (self->sk_ops->so_getrcvbuf)
+		result = (*self->sk_ops->so_getrcvbuf)(self);
+	return result;
+}
+
+PUBLIC void KCALL
+socket_setrcvbuf(struct socket *__restrict self, size_t bufsiz) {
+	if (self->sk_ops->so_setrcvbuf) {
+		assertf(self->sk_ops->so_getrcvbuf, "Setter, but no getter?");
+		(*self->sk_ops->so_setrcvbuf)(self, bufsiz);
+	}
+}
+
+PUBLIC size_t KCALL
+socket_getsndbuf(struct socket *__restrict self) {
+	size_t result = 0;
+	if (self->sk_ops->so_getsndbuf)
+		result = (*self->sk_ops->so_getsndbuf)(self);
+	return result;
+}
+
+PUBLIC void KCALL
+socket_setsndbuf(struct socket *__restrict self, size_t bufsiz) {
+	if (self->sk_ops->so_setsndbuf) {
+		assertf(self->sk_ops->so_getsndbuf, "Setter, but no getter?");
+		(*self->sk_ops->so_setsndbuf)(self, bufsiz);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* Handle operators                                                     */
+/************************************************************************/
+
 /* Define the socket ioctl() handle operator */
 DEFINE_INTERN_ALIAS(handle_socket_ioctl, socket_ioctl);
-
-
-
-
-
 
 /* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
 DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(socket, struct socket);

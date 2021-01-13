@@ -25,6 +25,8 @@
 #include <kernel/types.h>
 #include <sched/signal.h>
 
+#include <hybrid/__atomic.h>
+
 #include <bits/os/ucred.h>
 #include <network/socket.h>
 
@@ -102,26 +104,26 @@ DEFINE_REFCOUNT_FUNCTIONS(struct unix_client, uc_refcnt, unix_client_destroy)
 
 struct unix_server {
 	/* HINT: This structure is in-lined in `struct socket_node' INode objects! */
-	syscall_ulong_t         us_max_backlog; /* [lock(READ(ATOMIC), WRITE(PRIVATE(SERVER)))]
-	                                         * The max # of clients that may be in-queue as
-	                                         * pending sockets to-be accept(2)-ed
-	                                         * When this field is ZERO(0), that means that
-	                                         * the server isn't listening at the moment. */
+	syscall_ulong_t         us_max_backlog;  /* [lock(READ(ATOMIC), WRITE(PRIVATE(SERVER)))]
+	                                          * The max # of clients that may be in-queue as
+	                                          * pending sockets to-be accept(2)-ed
+	                                          * When this field is ZERO(0), that means that
+	                                          * the server isn't listening at the moment. */
 #define UNIX_SERVER_ACCEPTME_SHUTDOWN ((REF struct unix_client *)-1)
-	REF struct unix_client *us_acceptme;    /* [lock(ATOMIC)] Chain of clients that want to
-	                                         * be accept(2)-ed. When the server shuts down, this
-	                                         * field is set to `UNIX_SERVER_ACCEPTME_SHUTDOWN',
-	                                         * which cannot be reverted, and means that the server
-	                                         * will never again accept new connections. Prior to
-	                                         * the server's first call to listen(2), `us_max_backlog'
-	                                         * will have been set to `0' */
-	struct sig              us_acceptme_sig;/* Signal broadcast when new clients are added to `us_acceptme' */
+	REF struct unix_client *us_acceptme;     /* [lock(ATOMIC)] Chain of clients that want to
+	                                          * be accept(2)-ed. When the server shuts down, this
+	                                          * field is set to `UNIX_SERVER_ACCEPTME_SHUTDOWN',
+	                                          * which cannot be reverted, and means that the server
+	                                          * will never again accept new connections. Prior to
+	                                          * the server's first call to listen(2), `us_max_backlog'
+	                                          * will have been set to `0' */
+	struct sig              us_acceptme_sig; /* Signal broadcast when new clients are added to `us_acceptme' */
 };
 
 /* Initialize the given Unix domain server */
-#define unix_server_init(self)           \
-	((self)->us_max_backlog = 0,         \
-	 (self)->us_acceptme    = __NULLPTR, \
+#define unix_server_init(self)                                                                  \
+	((self)->us_max_backlog = 0,                                                                \
+	 (self)->us_acceptme    = __NULLPTR,                                                        \
 	 sig_init(&(self)->us_acceptme_sig))
 
 /* Finalize the given Unix domain server */
@@ -155,15 +157,24 @@ struct unix_socket
 	                                          * When non-NULL, this is a connected client socket.
 	                                          * Otherwise, if `us_node' is valid, this is a bound
 	                                          * server socket. */
-	/* Need to differentiate between client-side-sockets and server-side-sockets.
-	 * Aside from this, the sockets returned by accept() are set-up identical to those
-	 * produced as the result of socket()+connect(), but when it comes to actually
-	 * sending data, we need to make a difference between the two, such that recv
-	 * and send read/write to/from the correct packet buffers! */
-	struct pb_buffer           *us_recvbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
-	                                          * One of `us_client->uc_bufs' (used for `recv()') */
-	struct pb_buffer           *us_sendbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
-	                                          * One of `us_client->uc_bufs' (used for `send()') */
+	union {
+		struct {
+			/* Need to differentiate between client-side-sockets and server-side-sockets.
+			 * Aside from this, the sockets returned by accept() are set-up identical to those
+			 * produced as the result of socket()+connect(), but when it comes to actually
+			 * sending data, we need to make a difference between the two, such that recv
+			 * and send read/write to/from the correct packet buffers! */
+			struct pb_buffer           *us_recvbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
+			                                          * One of `us_client->uc_bufs' (used for `recv()') */
+			struct pb_buffer           *us_sendbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
+			                                          * One of `us_client->uc_bufs' (used for `send()') */
+		};
+		/* The following are only valid until `us_client' is set! */
+		struct {
+			size_t us_rcvbufsiz; /* [valid_if(!us_client)] Initial receive buffer size */
+			size_t us_sndbufsiz; /* [valid_if(!us_client)] Initial send buffer size */
+		};
+	};
 };
 
 /* Socket operators for UNIX sockets. */

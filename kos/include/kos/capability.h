@@ -88,6 +88,7 @@ enum {
 	CAP_SETUID          = 7,                /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
 	CAP_SETPCAP         = 8,                /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
 	CAP_LINUX_IMMUTABLE = 9,                /* TODO: For now, only here as placeholder for fsuid-root transitions */
+	CAP_NET_ADMIN       = 12,               /* Allow exceeding `socket_default_(rcv|snd)bufmax' */
 	CAP_SYS_MODULE      = 16,               /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
 	CAP_SYS_RAWIO       = 17,               /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
 	CAP_SYS_PTRACE      = 19,               /* Inspect data of arbitrary processes that you're not the parent of. */
@@ -127,6 +128,7 @@ enum {
 #define CAP_SETUID             CAP_SETUID             /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
 #define CAP_SETPCAP            CAP_SETPCAP            /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
 #define CAP_LINUX_IMMUTABLE    CAP_LINUX_IMMUTABLE    /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_NET_ADMIN          CAP_NET_ADMIN          /* Allow exceeding `socket_default_(rcv|snd)bufmax' */
 #define CAP_SYS_MODULE         CAP_SYS_MODULE         /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
 #define CAP_SYS_RAWIO          CAP_SYS_RAWIO          /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
 #define CAP_SYS_PTRACE         CAP_SYS_PTRACE         /* Inspect data of arbitrary processes that you're not the parent of. */
@@ -163,6 +165,7 @@ enum {
 #define CAP_SETUID             7    /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
 #define CAP_SETPCAP            8    /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
 #define CAP_LINUX_IMMUTABLE    9    /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_NET_ADMIN          12   /* Allow exceeding `socket_default_(rcv|snd)bufmax' */
 #define CAP_SYS_MODULE         16   /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
 #define CAP_SYS_RAWIO          17   /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
 #define CAP_SYS_PTRACE         19   /* Inspect data of arbitrary processes that you're not the parent of. */

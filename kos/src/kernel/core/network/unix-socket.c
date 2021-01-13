@@ -806,9 +806,16 @@ UnixSocket_Connect(struct socket *__restrict self,
 			client->uc_cred.uid = (__uid_t)cred_geteuid();
 			client->uc_cred.gid = (__gid_t)cred_getegid();
 
-			/* Initialize the client/server packet buffers. */
-			pb_buffer_init(&client->uc_fromclient);
-			pb_buffer_init(&client->uc_fromserver);
+			/* Initialize the client/server packet buffers.
+			 * WARNING: Changes made to the send/recv buffer sizes after this point,
+			 *          and before we've been accepted by the server will be lost.
+			 * Also note that the buffer size limits set here may be increased when
+			 * the server accepts us, since the effective buffer size limits of an
+			 * established unix socket connection are MAX(client, server), which we
+			 * implement by allowing the server to increase the limit before accepting
+			 * our connection. */
+			pb_buffer_init_ex(&client->uc_fromclient, ATOMIC_READ(me->us_sndbufsiz));
+			pb_buffer_init_ex(&client->uc_fromserver, ATOMIC_READ(me->us_rcvbufsiz));
 
 			TRY {
 				/* Construct an async worker for informing the server of our
@@ -900,6 +907,19 @@ socket_is_not_bound:
 }
 
 
+/* Ensure that the limit of `self' is `>= lower_bound' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL raise_pb_buffer_limit)(struct pb_buffer *__restrict self,
+                                     size_t lower_bound) {
+	size_t old_limit;
+	for (;;) {
+		old_limit = ATOMIC_READ(self->pb_limt);
+		if (old_limit >= lower_bound)
+			break;
+		if (ATOMIC_CMPXCH_WEAK(self->pb_limt, old_limit, lower_bound))
+			break;
+	}
+}
 
 
 PRIVATE NONNULL((1)) REF struct socket *KCALL
@@ -966,6 +986,12 @@ again_wait_for_client:
 			/* Wait for clients. */
 			task_waitfor();
 		}
+
+		/* Update the packet buffer limits so we're use the greater of our
+		 * own limit configuration, and the limits already set by the client. */
+		raise_pb_buffer_limit(&result_client->uc_fromserver, me->us_sndbufsiz);
+		raise_pb_buffer_limit(&result_client->uc_fromclient, me->us_rcvbufsiz);
+
 		/* Tell the client that their connection has been accepted. */
 		if (!unix_client_accept_connection(result_client)) {
 			/* This can happen if the client aborted before we were able to accept them.
@@ -1696,7 +1722,7 @@ PRIVATE NONNULL((1)) socklen_t KCALL
 UnixSocket_GetSockOpt(struct socket *__restrict self,
                       syscall_ulong_t level, syscall_ulong_t optname,
                       USER CHECKED void *optval,
-                      socklen_t optlen, iomode_t mode)
+                      socklen_t optlen, iomode_t UNUSED(mode))
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
 	struct unix_socket *me;
 	me = (struct unix_socket *)self;
@@ -1723,6 +1749,74 @@ UnixSocket_GetSockOpt(struct socket *__restrict self,
 	}
 	return 0;
 }
+
+
+PRIVATE size_t KCALL
+UnixSocket_GetRcvBuf(struct socket *__restrict self) {
+	struct unix_socket *me;
+	size_t result;
+	me     = (struct unix_socket *)self;
+	result = ATOMIC_READ(me->us_rcvbufsiz);
+	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
+		/* We're a connected client socket, meaning that we must
+		 * actually return the buffer limit from `us_recvbuf' */
+		COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
+		result = ATOMIC_READ(me->us_recvbuf->pb_limt);
+	}
+	return result;
+}
+
+PRIVATE void KCALL
+UnixSocket_SetRcvBuf(struct socket *__restrict self, size_t bufsiz) {
+	struct unix_socket *me;
+	size_t old_rcv_bufsiz;
+	me = (struct unix_socket *)self;
+again:
+	old_rcv_bufsiz = ATOMIC_READ(me->us_rcvbufsiz);
+	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
+		/* We're a connected client socket, meaning that we must
+		 * actually write the buffer limit to `us_recvbuf' */
+		COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
+		ATOMIC_WRITE(me->us_recvbuf->pb_limt, bufsiz);
+		return;
+	}
+	if (!ATOMIC_CMPXCH_WEAK(me->us_rcvbufsiz, old_rcv_bufsiz, bufsiz))
+		goto again;
+}
+
+PRIVATE size_t KCALL
+UnixSocket_GetSndBuf(struct socket *__restrict self) {
+	struct unix_socket *me;
+	size_t result;
+	me     = (struct unix_socket *)self;
+	result = ATOMIC_READ(me->us_sndbufsiz);
+	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
+		/* We're a connected client socket, meaning that we must
+		 * actually return the buffer limit from `us_sendbuf' */
+		COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
+		result = ATOMIC_READ(me->us_sendbuf->pb_limt);
+	}
+	return result;
+}
+
+PRIVATE void KCALL
+UnixSocket_SetSndBuf(struct socket *__restrict self, size_t bufsiz) {
+	struct unix_socket *me;
+	size_t old_snd_bufsiz;
+	me = (struct unix_socket *)self;
+again:
+	old_snd_bufsiz = ATOMIC_READ(me->us_sndbufsiz);
+	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
+		/* We're a connected client socket, meaning that we must
+		 * actually write the buffer limit to `us_sendbuf' */
+		COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
+		ATOMIC_WRITE(me->us_sendbuf->pb_limt, bufsiz);
+		return;
+	}
+	if (!ATOMIC_CMPXCH_WEAK(me->us_sndbufsiz, old_snd_bufsiz, bufsiz))
+		goto again;
+}
+
 
 
 
@@ -1752,6 +1846,10 @@ PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_setsockopt  = */ NULL, /* XXX: Implement me? */
 	/* .so_ioctl       = */ NULL, /* XXX: Implement me? */
 	/* .so_free        = */ NULL,
+	/* .so_getrcvbuf   = */ &UnixSocket_GetRcvBuf,
+	/* .so_setrcvbuf   = */ &UnixSocket_SetRcvBuf,
+	/* .so_getsndbuf   = */ &UnixSocket_GetSndBuf,
+	/* .so_setsndbuf   = */ &UnixSocket_SetSndBuf,
 };
 
 
@@ -1761,6 +1859,8 @@ unix_socket_create(void) {
 	REF UnixSocket *result;
 	result = (REF UnixSocket *)kmalloc(sizeof(UnixSocket), GFP_CALLOC);
 	socket_cinit(result, &unix_socket_ops, SOCK_STREAM, PF_UNIX);
+	result->us_rcvbufsiz = ATOMIC_READ(socket_default_rcvbufsiz);
+	result->us_sndbufsiz = ATOMIC_READ(socket_default_sndbufsiz);
 	return result;
 }
 

@@ -546,20 +546,57 @@ struct socket_ops {
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *so_free)(struct socket *__restrict self);
 
-	/* TODO: Callbacks to get/set the send/receive buffer size.
-	 *       Having dedicated callbacks for this feels more correct
-	 *       that forcing socket implementors to do this via the
-	 *       so_setsockopt() operator. Also: by having dedicated
-	 *       callbacks for this, all of the permission/limit checks
-	 *       don't have to be performed by the implementation layer!
-	 * XXX:  How are these operators supposed to behave when the socket
-	 *       hasn't been connected, yet? Should they remember the config
-	 *       and apply it during the connect? But then what happens if
-	 *       the socket isn't connected, but is set to bound+listen?
-	 * NOTE: Looking at the linux kernel, it doesn't care about the
-	 *       socket's actual state. It _always_ allows one to read/write
-	 *       the send/recv buffer limits... */
+	/* [0..1] Get/Set the size of the send/receive buffer. These
+	 * functions are supposed to work correctly, no matter what
+	 * the given socket is, or what state it is in:
+	 *  - If `self' is an unconnected/unbound socket, get/set the
+	 *    buffer size as it will be initialized as once the socket
+	 *    becomes connected/bound.
+	 *  - If `self' is already connected/bound, get the current
+	 *    settings and/or change them immediately.
+	 *  - If `self' is in a listen-state, then these functions should
+	 *    get/set the initial buffer limits of sockets that will be
+	 *    returned by `so_accept()'. For this purpose, it is undefined
+	 *    if already-received, but yet-to-be-accepted sockets use the
+	 *    old, or the new send/receive buffer sizes.
+	 *    Also: In the case of unix domain sockets, where the send/recv
+	 *    buffers of the accept(2)-ed socket are the same as the recv/send
+	 *    buffers of the client socket (the one that connect(2)-ed), then
+	 *    the initial buffers sizes used are the greater of those configured
+	 *    within the server-socket, and a previously given override within
+	 *    the client socket.
+	 * NOTE: These function need not concern themself with buffer limits.
+	 *       The caller already ensures that the request is valid, and that
+	 *       set buffer sizes are (like in linux) already doubled, as well
+	 *       as fall into the bounds set by `SOCKET_(RCV|SND)BUFMIN' and
+	 *       `socket_default_(rcv|snd)bufmax'
+	 *
+	 * When `so_getsndbuf' isn't implemented or returns `0', it is assumed
+	 * that no send buffer exists, and that outgoing packets are immediately
+	 * put on the wire, as they are sent. In this case, `so_setsndbuf' may
+	 * be left as NULL, or be implemented as a no-op.
+	 *
+	 * When `so_getrcvbuf' isn't implemented, it is assumed that some fixed
+	 * length buffer is used internally, and a user-space query will result
+	 * in `SOCKET_RCVBUFMIN' being returned. When `so_setrcvbuf' isn't implemented,
+	 * a user-space request to set the receive buffer size becomes a no-op. */
+	size_t (KCALL *so_getrcvbuf)(struct socket *__restrict self);
+	void (KCALL *so_setrcvbuf)(struct socket *__restrict self, size_t bufsiz);
+	size_t (KCALL *so_getsndbuf)(struct socket *__restrict self);
+	void (KCALL *so_setsndbuf)(struct socket *__restrict self, size_t bufsiz);
 };
+
+
+/* Runtime configurable (via /proc) socket buffer size limits. */
+DATDEF size_t socket_default_rcvbufsiz; /* Default recv buffer size            (/proc/sys/net/core/rmem_default) */
+DATDEF size_t socket_default_rcvbufmax; /* Max (unprivileged) recv buffer size (/proc/sys/net/core/rmem_max) */
+DATDEF size_t socket_default_sndbufsiz; /* Default send buffer size            (/proc/sys/net/core/wmem_default) */
+DATDEF size_t socket_default_sndbufmax; /* Max (unprivileged) send buffer size (/proc/sys/net/core/wmem_max) */
+
+/* Lower bounds for socket buffer limits. */
+#define SOCKET_RCVBUFMIN 256
+#define SOCKET_SNDBUFMIN 256 /* Linux uses `2048' for this... */
+
 
 struct socket_connect_aio {
 	WEAK refcnt_t             sca_refcnt; /* Reference counter. */
@@ -997,6 +1034,26 @@ FUNDEF NONNULL((1)) syscall_slong_t KCALL
 socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
              USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
+
+/* Get/Set socket buffer sizes.
+ * This functionality can also be accessed through `socket_(get|set)sockopt'.
+ * For more information, see the documentation of the associated operators
+ * within `struct socket_ops' above. But note that that interface also includes
+ * restriction of buffer sizes in accordance to the `socket_default_*' globals.
+ * NOTE: When calling the setters, the caller is responsible to ensure that
+ *       the specified buffer size is allowed, and may do this through use
+ *       of the `socket_default_*' globals.
+ * NOTE: No default exceptions are defined for these callbacks, and normally
+ *       these should never result in any exceptions, however implementations
+ *       are still allowed to throw anything (which may be necessary in case
+ *       reading/writing buffer sizes requires a lock, meaning that acquiring
+ *       said lock might result in E_WOULDBLOCK) */
+FUNDEF size_t KCALL socket_getrcvbuf(struct socket *__restrict self);
+FUNDEF void KCALL socket_setrcvbuf(struct socket *__restrict self, size_t bufsiz);
+FUNDEF size_t KCALL socket_getsndbuf(struct socket *__restrict self);
+FUNDEF void KCALL socket_setsndbuf(struct socket *__restrict self, size_t bufsiz);
+
 
 
 
