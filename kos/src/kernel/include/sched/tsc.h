@@ -38,6 +38,28 @@
 #define __SIZEOF_TSC_HZ_T__ 8
 #define __SIZEOF_KTIME_T__  8
 
+
+/************************************************************************/
+/* Generate relative ktime values from known factors.                   */
+
+/* seconds */
+#define relktime_from_seconds(n) \
+	(__CCAST(ktime_t)(n) * __UINT32_C(1000000000))
+
+/* Add milliseconds (1/1_000 seconds) */
+#define relktime_from_milliseconds(n) \
+	(__CCAST(ktime_t)(n) * __UINT32_C(1000000))
+
+/* microseconds (1/1_000_000 seconds) (aka. usec (s.a. `struct timeval')) */
+#define relktime_from_microseconds(n) \
+	(__CCAST(ktime_t)(n) * __UINT32_C(1000))
+
+/* nanoseconds (1/1_000_000_000 seconds) (aka. nsec (s.a. `struct timespec')) */
+#define relktime_from_nanoseconds(n) \
+	(__CCAST(ktime_t)(n))
+/************************************************************************/
+
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -253,7 +275,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t);
  *       goto booted.
  * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
  *       that the return value would overflow, the value is clamed to the
- *       maximum possible value of `(ktime_t)-1' */
+ *       maximum possible value of `KTIME_INFINITE' */
 FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp);
 
@@ -262,7 +284,7 @@ NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp
  * then this function simply return `1 * USEC_PER_SEC + 7'.
  * Note however that if `rel_time->tv_sec < 0', or the result
  * of the multiplication+addition above would overflow, then
- * this function will clamp the return value to `(ktime_t)-1'. */
+ * this function will clamp the return value to `KTIME_INFINITE'. */
 FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time);
 

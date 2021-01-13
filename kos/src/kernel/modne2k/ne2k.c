@@ -35,6 +35,7 @@
 #include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -556,7 +557,7 @@ Ne2k_HandleSendTimeout(void *__restrict arg) {
 	 * There is a chance that we got here due to a previous send
 	 * operation that didn't time out, before once again finding
 	 * ourselves waiting for (another) packet to be sent. */
-	if (realtime() < me->nk_cursendtmo)
+	if (ktime() < me->nk_cursendtmo)
 		return;
 	printk(KERN_ERR "[ne2k] Watchdog send timeout (TODO)\n");
 	/* TODO: Do the equivalent of aio_cancel() for Ne2k,
@@ -590,7 +591,7 @@ Ne2k_AsyncPoll(void *__restrict arg,
 		return true;
 	if (state.ns_state == NE2K_STATE_TX_PKSEND) {
 		/* Setup a timeout for packet sending. */
-		async_worker_timeout(&me->nk_cursendtmo, cookie,
+		async_worker_timeout(me->nk_cursendtmo, cookie,
 		                     &Ne2k_HandleSendTimeout);
 	}
 	return false;
@@ -606,9 +607,9 @@ NOTHROW(KCALL Ne2k_SwitchToTxPkSendMode)(Ne2kDevice *__restrict self) {
 		new_state.ns_state = NE2K_STATE_TX_PKSEND;
 		new_state.ns_flags = old_state.ns_flags;
 		{
-			struct timespec send_timeout;
-			send_timeout = realtime();
-			send_timeout.tv_sec += 2; /* TODO: Make this configurable! */
+			ktime_t send_timeout;
+			send_timeout = ktime();
+			send_timeout += relktime_from_seconds(2); /* TODO: Make this configurable! */
 			COMPILER_WRITE_BARRIER();
 			self->nk_cursendtmo = send_timeout;
 			COMPILER_WRITE_BARRIER();

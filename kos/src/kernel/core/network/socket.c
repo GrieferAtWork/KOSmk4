@@ -640,7 +640,7 @@ NOTHROW(ASYNC_CALLBACK_CC connect_and_send_fini)(async_job_t self) {
 }
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
-connect_and_send_poll(async_job_t self, struct timespec *__restrict UNUSED(timeout)) {
+connect_and_send_poll(async_job_t self, ktime_t *__restrict UNUSED(timeout)) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	if (aio_handle_generic_poll(&me->cas_aio))

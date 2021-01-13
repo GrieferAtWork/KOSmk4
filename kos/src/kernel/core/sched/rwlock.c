@@ -29,12 +29,12 @@
 #include <kernel/printk.h>
 #include <kernel/selftest.h> /* DEFINE_TEST */
 #include <kernel/types.h>
-#include <sched/cpu.h>
 #include <sched/pertask.h>
 #include <sched/rpc.h>
 #include <sched/rwlock-intern.h>
 #include <sched/rwlock.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -558,7 +558,7 @@ NOTHROW(FCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 
 PUBLIC NONNULL((1)) bool
 (FCALL __os_rwlock_read)(struct rwlock *__restrict self,
-                         struct timespec const *abs_timeout) {
+                         ktime_t abs_timeout) {
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_read", abs_timeout);
@@ -612,7 +612,7 @@ acquire_read_lock:
 				}
 				break;
 			}
-			if (!task_waitfor_tms(abs_timeout)) {
+			if (!task_waitfor(abs_timeout)) {
 				/* Timeout... (delete the read-descriptor) */
 				rwlock_delete_readlock(desc);
 				return false;
@@ -630,7 +630,7 @@ initial_lock:
 
 PUBLIC WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self,
-                                   struct timespec const *abs_timeout) {
+                                   ktime_t abs_timeout) {
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_read", abs_timeout);
@@ -688,7 +688,7 @@ acquire_read_lock:
 				}
 				break;
 			}
-			if (!task_waitfor_tms_nx(abs_timeout)) {
+			if (!task_waitfor_nx(abs_timeout)) {
 				/* Timeout... (delete the read-descriptor) */
 				rwlock_delete_readlock(desc);
 				return false;
@@ -755,7 +755,7 @@ got_lock:
 
 PUBLIC NONNULL((1)) bool
 (FCALL __os_rwlock_write)(struct rwlock *__restrict self,
-                          struct timespec const *abs_timeout) {
+                          ktime_t abs_timeout) {
 #if 0
 	return __os_rwlock_write_aggressive(self, abs_timeout);
 #else
@@ -789,7 +789,7 @@ wait_for_endwrite:
 			goto again;
 		}
 		/* Wait for the lock to become available. */
-		if (!task_waitfor_tms(abs_timeout))
+		if (!task_waitfor(abs_timeout))
 			return false; /* Timeout... */
 		goto again;
 
@@ -851,7 +851,7 @@ wait_for_unshare:
 					task_disconnectall();
 					goto got_lock;
 				}
-				if (!task_waitfor_tms(abs_timeout)) {
+				if (!task_waitfor(abs_timeout)) {
 					/* Our timeout expired. - Re-acquire the read-lock (if we had one),
 					 * switch back to read-mode, and return `false' */
 					do {
@@ -887,7 +887,7 @@ wait_for_unshare:
 
 PUBLIC WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL __os_rwlock_write_nx)(struct rwlock *__restrict self,
-                                    struct timespec const *abs_timeout) {
+                                    ktime_t abs_timeout) {
 	u32 control_word;
 	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
@@ -918,7 +918,7 @@ wait_for_endwrite:
 			goto again;
 		}
 		/* Wait for the lock to become available. */
-		if (!task_waitfor_tms_nx(abs_timeout))
+		if (!task_waitfor_nx(abs_timeout))
 			return false; /* Timeout... */
 		goto again;
 
@@ -979,7 +979,7 @@ wait_for_unshare:
 				task_disconnectall();
 				goto got_lock;
 			}
-			if (!task_waitfor_tms_nx(abs_timeout)) {
+			if (!task_waitfor_nx(abs_timeout)) {
 				/* Our timeout expired. - Re-acquire the read-lock (if we had one),
 				 * switch back to read-mode, and return `false' */
 				do {
@@ -1080,7 +1080,7 @@ rwlock_kill_readers(struct rwlock *__restrict self) {
 
 PUBLIC NONNULL((1)) bool
 (FCALL __os_rwlock_write_aggressive)(struct rwlock *__restrict self,
-                                     struct timespec const *abs_timeout) {
+                                     ktime_t abs_timeout) {
 	u32 control_word;
 	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
@@ -1111,7 +1111,7 @@ wait_for_endwrite:
 			goto again;
 		}
 		/* Wait for the lock to become available. */
-		if (!task_waitfor_tms(abs_timeout))
+		if (!task_waitfor(abs_timeout))
 			return false; /* Timeout... */
 		goto again;
 
@@ -1193,9 +1193,9 @@ wait_for_unshare:
 				 * reacquire them, but noticing that the lock is in UPGRADING mode.
 				 * NOTE: We use a small timeout so we can try again in case we missed something. */
 				{
-					struct timespec tmo = realtime();
-					tmo.add_milliseconds(200);
-					task_waitfor_tms(&tmo);
+					ktime_t tmo = ktime();
+					tmo += relktime_from_milliseconds(200);
+					task_waitfor(tmo);
 				}
 			} EXCEPT {
 				/* Something went wrong. - Re-acquire the read-lock
@@ -1270,7 +1270,7 @@ again:
 
 PUBLIC NONNULL((1)) bool
 (FCALL __os_rwlock_upgrade)(struct rwlock *__restrict self,
-                            struct timespec const *abs_timeout) {
+                            ktime_t abs_timeout) {
 	/* Special handling to upgrade a non-shared
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
@@ -1352,7 +1352,7 @@ wait_for_unshare:
 				task_disconnectall();
 				goto got_lock;
 			}
-			if (!task_waitfor_tms(abs_timeout)) {
+			if (!task_waitfor(abs_timeout)) {
 				/* Our timeout expired. - Re-acquire the read-lock,
 				 * switch back to read-mode, and return `false' */
 				do {
@@ -1382,7 +1382,7 @@ wait_for_unshare:
 
 PUBLIC WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self,
-                                      struct timespec const *abs_timeout) {
+                                      ktime_t abs_timeout) {
 	/* Special handling to upgrade a non-shared
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
@@ -1490,7 +1490,7 @@ wait_for_unshare:
 			task_disconnectall();
 			goto got_lock;
 		}
-		if (!task_waitfor_tms_nx(abs_timeout)) {
+		if (!task_waitfor_nx(abs_timeout)) {
 			/* Our timeout expired. - Re-acquire the read-lock,
 			 * switch back to read-mode, and return `false' */
 			do {

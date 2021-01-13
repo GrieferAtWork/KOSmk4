@@ -43,7 +43,7 @@
 #include <kernel/vm/phys.h>
 #include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
-#include <sched/cpu.h>
+#include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -1418,9 +1418,9 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	if (status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR |
 	              UHCI_USBSTS_RD | UHCI_USBSTS_HSE |
 	              UHCI_USBSTS_HCPE | UHCI_USBSTS_HCH)) {
-		struct timespec now;
+		ktime_t now;
 		/* Remember that we've just gotten an interrupt. */
-		now = realtime();
+		now = ktime();
 #ifndef CONFIG_NO_SMP
 		while (!sync_trywrite(&self->uc_lastint_lock))
 			task_pause();
@@ -2630,11 +2630,9 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 
 PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
-	struct timespec then = realtime();
-	then.add_milliseconds(n);
-	do {
-		task_sleep_tms(&then);
-	} while (realtime() < then);
+	ktime_t then = ktime();
+	then += relktime_from_milliseconds(n);
+	task_sleep_until(then);
 }
 
 PRIVATE u16
@@ -2887,7 +2885,7 @@ uhci_powerctl_poll(void *__restrict arg,
 	 * the entire bus has been suspended (so we need to do this to be
 	 * able to handle attach/detach events!) */
 	{
-		struct timespec timeout;
+		ktime_t timeout;
 		assert(PREEMPTION_ENABLED());
 #ifndef CONFIG_NO_SMP
 		PREEMPTION_DISABLE();
@@ -2906,9 +2904,9 @@ uhci_powerctl_poll(void *__restrict arg,
 		sync_endread(&uc->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
 		PREEMPTION_ENABLE();
-		timeout.add_milliseconds(uc->uc_suspdelay);
+		timeout += relktime_from_milliseconds(uc->uc_suspdelay);
 		/* Setup a timeout for having the UHCI convert switch into EGSM-mode. */
-		async_worker_timeout(&timeout, cookie,
+		async_worker_timeout(timeout, cookie,
 		                     &uhci_powerctl_powerctl_timeout);
 	}
 no:
@@ -3131,7 +3129,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 #ifndef CONFIG_NO_SMP
 	atomic_rwlock_cinit(&result->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
-	result->uc_lastint   = realtime();
+	result->uc_lastint   = ktime();
 	result->uc_suspdelay = 250; /* Milliseconds */
 
 	/* Register the power control callback. */

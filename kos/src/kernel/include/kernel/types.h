@@ -28,11 +28,11 @@
 #include <bits/os/timespec.h>
 #include <kos/kernel/types.h>
 
-DECL_BEGIN
-
 #define __SIZEOF_PORT_T__ 2
 
 #ifdef __CC__
+DECL_BEGIN
+
 #ifndef __port_t_defined
 #define __port_t_defined 1
 __HYBRID_ALTINT_TYPEDEF(u16, port_t, false);
@@ -90,8 +90,13 @@ typedef u64 uintptr_quarter_t;
  *       almost 600 years (so don't worry too much about overflows) */
 typedef u64 ktime_t;
 
-#endif /* __CC__ */
+/* Special values accepted by all interfaces that expose
+ * a `ktime_t abs_timeout' or `ktime_t rel_timeout' */
+#define KTIME_NONBLOCK ((ktime_t)0)  /* Don't block (but possibly yield) */
+#define KTIME_INFINITE ((ktime_t)-1) /* Wait indefinitely (never time out) */
 
 DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_TYPES_H */

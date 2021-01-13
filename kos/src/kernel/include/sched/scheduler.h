@@ -166,7 +166,7 @@ struct scheduler {
 	                                     * This chain is sorted ascendingly by `this_sched_timeout'. */
 #endif
 	struct task        *s_waiting_last; /* [0..1] Last waiting thread. (i.e. the thread with the greatest timeout,
-	                                     * which usually ends up being the infinite timeout, i.e. `(ktime_t)-1') */
+	                                     * which usually ends up being the infinite timeout, i.e. `KTIME_INFINITE') */
 };
 
 #define scheduler_s_waiting(self) \

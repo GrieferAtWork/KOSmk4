@@ -499,7 +499,7 @@ NOTHROW(FCALL ktime_future_to_tsc)(struct cpu const *__restrict me,
 	if (OVERFLOW_UMUL(distance, FORCPU(me, thiscpu_tsc_hz), &result)) {
 		uint128_t distance128;
 		/* Special handling to speed up handling of max timeouts. */
-		if (kt == (ktime_t)-1)
+		if (kt == KTIME_INFINITE)
 			goto infinite;
 		uint128_set(distance128, distance);
 		uint128_mul(distance128, FORCPU(me, thiscpu_tsc_hz));
@@ -530,7 +530,7 @@ NOTHROW(FCALL ktime_to_tsc)(struct cpu const *__restrict me,
 	}
 	if (OVERFLOW_UMUL(distance, FORCPU(me, thiscpu_tsc_hz), &result)) {
 		uint128_t distance128;
-		if (kt == (ktime_t)-1)
+		if (kt == KTIME_INFINITE)
 			goto infinite;
 		uint128_set(distance128, distance);
 		uint128_mul(distance128, FORCPU(me, thiscpu_tsc_hz));
@@ -666,7 +666,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
  *       goto booted.
  * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
  *       that the return value would overflow, the value is clamed to the
- *       maximum possible value of `(ktime_t)-1' */
+ *       maximum possible value of `KTIME_INFINITE' */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp) {
 	ktime_t result;
@@ -697,7 +697,7 @@ NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp
 
 	return result;
 infinite:
-	return (ktime_t)-1;
+	return KTIME_INFINITE;
 }
 
 /* Returns the current real time derived from the current CPU time.
@@ -722,7 +722,7 @@ NOTHROW(KCALL realtime)(void) {
  * then this function simply return `1 * USEC_PER_SEC + 7'.
  * Note however that if `rel_time->tv_sec < 0', or the result
  * of the multiplication+addition above would overflow, then
- * this function will clamp the return value to `(ktime_t)-1'. */
+ * this function will clamp the return value to `KTIME_INFINITE'. */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time) {
 	ktime_t result;
@@ -736,7 +736,7 @@ NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_tim
 		goto overflow;
 	return result;
 overflow:
-	return (ktime_t)-1;
+	return KTIME_INFINITE;
 }
 
 /* Do the inverse of `reltimespec_to_relktime' */
@@ -785,7 +785,7 @@ ktime_from_user_timespec_impl(time_t tv_sec, syscall_ulong_t tv_nsec)
 zero:
 	return 0;
 overflow:
-	return (ktime_t)-1;
+	return KTIME_INFINITE;
 }
 
 LOCAL NOBLOCK WUNUSED ktime_t FCALL
@@ -824,7 +824,7 @@ ktime_from_user_timeval_impl(time_t tv_sec, unsigned_suseconds_t tv_usec)
 zero:
 	return 0;
 overflow:
-	return (ktime_t)-1;
+	return KTIME_INFINITE;
 }
 
 LOCAL NOBLOCK WUNUSED ktime_t FCALL
@@ -845,7 +845,7 @@ ktime_from_user_reltimespec_impl(time_t tv_sec, syscall_ulong_t tv_nsec)
 		goto overflow;
 	return result;
 overflow:
-	return (ktime_t)-1;
+	return KTIME_INFINITE;
 }
 
 LOCAL NOBLOCK WUNUSED ktime_t FCALL
@@ -866,7 +866,7 @@ ktime_from_user_reltimeval_impl(time_t tv_sec, unsigned_suseconds_t tv_usec)
 		goto overflow;
 	return result;
 overflow:
-	return (ktime_t)-1;
+	return KTIME_INFINITE;
 }
 
 

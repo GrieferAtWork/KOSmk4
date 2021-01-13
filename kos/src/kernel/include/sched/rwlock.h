@@ -264,18 +264,18 @@ struct timespec;
  *                            See the section on `parallel-upgrade' above.
  * @return: true:  The operation was successful.
  * @return: false: The given timeout has expired. */
-FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL rwlock_read(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_BADALLOC,E_INTERRUPT,...);
-FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...);
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR));
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR));
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL rwlock_read(struct rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_BADALLOC,E_INTERRUPT,...);
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL rwlock_write(struct rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...);
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
 #else /* __INTELLISENSE__ */
-FUNDEF NONNULL((1)) bool FCALL __os_rwlock_read(struct rwlock *__restrict self, struct timespec const *abs_timeout) THROWS(E_BADALLOC,E_INTERRUPT,...) ASMNAME("rwlock_read");
-FUNDEF NONNULL((1)) bool FCALL __os_rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) ASMNAME("rwlock_write");
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) ASMNAME("rwlock_read_nx");
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_write_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) ASMNAME("rwlock_write_nx");
+FUNDEF NONNULL((1)) bool FCALL __os_rwlock_read(struct rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_BADALLOC,E_INTERRUPT,...) ASMNAME("rwlock_read");
+FUNDEF NONNULL((1)) bool FCALL __os_rwlock_write(struct rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) ASMNAME("rwlock_write");
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self, ktime_t abs_timeout) ASMNAME("rwlock_read_nx");
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_write_nx)(struct rwlock *__restrict self, ktime_t abs_timeout) ASMNAME("rwlock_write_nx");
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
 rwlock_read(struct rwlock *__restrict self,
-            struct timespec const *abs_timeout DFL(__NULLPTR))
+            ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_BADALLOC,E_INTERRUPT,...) {
 	if (!__os_rwlock_read(self, abs_timeout))
 		return false;
@@ -285,7 +285,7 @@ rwlock_read(struct rwlock *__restrict self,
 
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
 rwlock_write(struct rwlock *__restrict self,
-             struct timespec const *abs_timeout DFL(__NULLPTR))
+             ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) {
 	if (!__os_rwlock_write(self, abs_timeout))
 		return false;
@@ -295,7 +295,7 @@ rwlock_write(struct rwlock *__restrict self,
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self,
-                              struct timespec const *abs_timeout DFL(__NULLPTR)) {
+                              ktime_t abs_timeout DFL(KTIME_INFINITE)) {
 	if (!__os_rwlock_read_nx(self, abs_timeout))
 		return false;
 	COMPILER_READ_BARRIER();
@@ -304,7 +304,7 @@ NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self,
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self,
-                               struct timespec const *abs_timeout DFL(__NULLPTR)) {
+                               ktime_t abs_timeout DFL(KTIME_INFINITE)) {
 	if (!__os_rwlock_write_nx(self, abs_timeout))
 		return false;
 	COMPILER_BARRIER();
@@ -343,16 +343,16 @@ NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self,
  * @return: false: The given timeout has expired. */
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
 rwlock_write_aggressive(struct rwlock *__restrict self,
-                                struct timespec const *abs_timeout DFL(__NULLPTR))
+                                ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, __E_RETRY_RWLOCK, ...);
 #else /* __INTELLISENSE__ */
 FUNDEF NONNULL((1)) bool FCALL
-__os_rwlock_write_aggressive(struct rwlock *__restrict self, struct timespec const *abs_timeout)
+__os_rwlock_write_aggressive(struct rwlock *__restrict self, ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, __E_RETRY_RWLOCK, ...)
 		ASMNAME("rwlock_write_aggressive");
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
 rwlock_write_aggressive(struct rwlock *__restrict self,
-                        struct timespec const *abs_timeout DFL(__NULLPTR))
+                        ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, __E_RETRY_RWLOCK, ...) {
 	if (!__os_rwlock_write_aggressive(self, abs_timeout))
 		return false;
@@ -376,22 +376,22 @@ rwlock_write_aggressive(struct rwlock *__restrict self,
  *                          (a read-lock is still being held) */
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
 rwlock_upgrade(struct rwlock *__restrict self,
-               struct timespec const *abs_timeout DFL(__NULLPTR))
+               ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, __E_RETRY_RWLOCK, ...);
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL rwlock_upgrade_nx)(struct rwlock *__restrict self,
-                                 struct timespec const *abs_timeout DFL(__NULLPTR));
+                                 ktime_t abs_timeout DFL(KTIME_INFINITE));
 #else /* __INTELLISENSE__ */
 FUNDEF NONNULL((1)) bool FCALL
-__os_rwlock_upgrade(struct rwlock *__restrict self, struct timespec const *abs_timeout)
+__os_rwlock_upgrade(struct rwlock *__restrict self, ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, __E_RETRY_RWLOCK, ...)
 		ASMNAME("rwlock_upgrade");
 FUNDEF WUNUSED NONNULL((1)) unsigned int
-NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout)
+NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self, ktime_t abs_timeout)
 		ASMNAME("rwlock_upgrade_nx");
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
 rwlock_upgrade(struct rwlock *__restrict self,
-               struct timespec const *abs_timeout DFL(__NULLPTR))
+               ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, __E_RETRY_RWLOCK, ...) {
 	if (!__os_rwlock_upgrade(self, abs_timeout))
 		return false;
@@ -401,7 +401,7 @@ rwlock_upgrade(struct rwlock *__restrict self,
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL rwlock_upgrade_nx)(struct rwlock *__restrict self,
-                                 struct timespec const *abs_timeout DFL(__NULLPTR)) {
+                                 ktime_t abs_timeout DFL(KTIME_INFINITE)) {
 	unsigned int result;
 	result = __os_rwlock_upgrade_nx(self, abs_timeout);
 	if (result != 0)

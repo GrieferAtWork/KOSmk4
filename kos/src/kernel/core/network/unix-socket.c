@@ -629,7 +629,7 @@ NOTHROW(ASYNC_CALLBACK_CC UnixSocket_WaitForAccept_Fini)(async_job_t self) {
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
 UnixSocket_WaitForAccept_Poll(async_job_t self,
-                              /*out*/ struct timespec *__restrict UNUSED(timeout)) {
+                              /*out*/ ktime_t *__restrict UNUSED(timeout)) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
 	me     = (struct async_accept_wait *)self;
@@ -1210,7 +1210,7 @@ nope:
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
 async_send_poll(async_job_t self,
-                /*out*/ struct timespec *__restrict UNUSED(timeout)) {
+                /*out*/ ktime_t *__restrict UNUSED(timeout)) {
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
 	if (async_send_test(me))

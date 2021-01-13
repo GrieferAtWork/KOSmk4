@@ -26,8 +26,8 @@
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
-#include <sched/cpu.h>
 #include <sched/signal.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -122,7 +122,7 @@ PRIVATE unsigned int GDBRemote_Timeout = 1000; /* Milliseconds */
 INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 	int result;
 	for (;;) {
-		struct timespec timeout;
+		ktime_t timeout;
 		assert(PREEMPTION_ENABLED());
 		assert(!task_wasconnected());
 		result = GDBRemote_TryGetByte();
@@ -135,14 +135,14 @@ INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 			task_disconnectall();
 			break;
 		}
-		timeout = realtime();
-		timeout.add_milliseconds(GDBRemote_Timeout);
-		if (!task_waitfor_tms_norpc_nx(&timeout))
+		timeout = ktime();
+		timeout += relktime_from_milliseconds(GDBRemote_Timeout);
+		if (!task_waitfor_norpc_nx(timeout))
 			task_disconnectall();
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;
-		if (realtime() <= timeout)
+		if (ktime() <= timeout)
 			continue;
 		printk(KERN_WARNING "[gdb] Timeout while waiting for a response\n");
 		return -1;

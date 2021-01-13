@@ -232,12 +232,9 @@ NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_worke
 
 
 
-/* [lock(PRIVATE(_asyncwork))] Timeout storage for `asyncmain_timeout_p' */
-PRIVATE struct timespec asyncmain_timeout = { 0, 0 };
-
-/* [lock(PRIVATE(_asyncwork))][0..1] The timeout argument
+/* [lock(PRIVATE(_asyncwork))] The timeout argument
  * for the async worker main `task_waitfor()' function */
-PRIVATE struct timespec *asyncmain_timeout_p = NULL;
+PRIVATE ktime_t asyncmain_timeout_p = KTIME_INFINITE;
 
 /* [0..1] The worker who's timeout callback should
  * be invoked when `asyncmain_timeout_p' expires. */
@@ -253,25 +250,20 @@ PRIVATE async_worker_timeout_t asyncmain_timeout_cb = NULL;
  * specify the realtime() timestamp when `awc_time()' should
  * be invoked. The given `cookie' must be the same argument
  * prviously passed to `awc_poll()' */
-PUBLIC NOBLOCK NONNULL((1, 2, 3)) void
-NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restrict abs_timeout,
+PUBLIC NOBLOCK NONNULL((2, 3)) void
+NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(ktime_t abs_timeout,
                                                 void *__restrict cookie,
                                                 async_worker_timeout_t on_timeout) {
 	struct aworker *w;
 	w = (struct aworker *)cookie;
 	assertf(THIS_TASK == &_asyncwork, "This function may only be called by async-worker-poll-callbacks");
-	assertf(abs_timeout && ADDR_ISKERN(abs_timeout), "Bad timeout argument");
 	assertf(on_timeout && ADDR_ISKERN((void *)on_timeout), "Bad on_timeout callback");
 	assertf(w && ADDR_ISKERN(w) && !wasdestroyed(w), "Bad cookie");
-	if (!asyncmain_timeout_p) {
-		asyncmain_timeout_p = &asyncmain_timeout;
-	} else {
-		assert(asyncmain_timeout_p == &asyncmain_timeout);
-		if (*abs_timeout >= asyncmain_timeout)
-			return; /* The previous timeout is already older! */
-	}
+	if (abs_timeout >= asyncmain_timeout_p)
+		return; /* The previous timeout is already older! */
+
 	/* Set the used timeout. */
-	asyncmain_timeout = *abs_timeout;
+	asyncmain_timeout_p  = abs_timeout;
 	asyncmain_timeout_cb = on_timeout;
 	/* Set the associated worker as the one that will receive the timeout. */
 	asyncmain_timeout_worker.set(w);
@@ -387,7 +379,7 @@ again:
 			/* Also wait for async workers to have changed. */
 			TRY {
 				task_connect_for_poll(&awork_changed);
-				received_signal = task_waitfor_tms(asyncmain_timeout_p);
+				received_signal = task_waitfor(asyncmain_timeout_p);
 			} EXCEPT {
 				task_disconnectall();
 				error_printf("_asyncmain:task_waitfor()");
@@ -396,8 +388,7 @@ again:
 			if (!received_signal) {
 				REF struct aworker *receiver;
 				/* A timeout expired. (invoke the associated worker's time-callback) */
-				assert(asyncmain_timeout_p);
-				asyncmain_timeout_p = NULL;
+				asyncmain_timeout_p = KTIME_INFINITE;
 				receiver = asyncmain_timeout_worker.exchange(NULL);
 				if likely(receiver) {
 					REF void *obj;
@@ -416,7 +407,7 @@ again:
 				}
 			} else if (received_signal == &awork_changed) {
 				/* If workers have changed, clear any defined timeout. */
-				asyncmain_timeout_p = NULL;
+				asyncmain_timeout_p = KTIME_INFINITE;
 				asyncmain_timeout_worker.clear();
 			}
 		}
@@ -739,9 +730,6 @@ PRIVATE struct aworker asyncjob_timeout_worker = {
 };
 
 
-/* Passed to async-job poll() functions as timeout argument. */
-PRIVATE struct timespec asyncjob_main_timeout = { 0, 0 };
-
 /* @return: true:  Previously connected signals have been disconnected.
  * @return: false: Move onto the step of waiting for something to happen. */
 PRIVATE bool NOTHROW(FCALL _asyncjob_main)(void) {
@@ -773,6 +761,7 @@ handle_job:
 		} else {
 			/* Normal operations: poll()+work() if available. */
 			unsigned int pollcode;
+			ktime_t asyncjob_main_timeout;
 			TRY {
 				pollcode = (*job->aj_ops->jc_poll)(job + 1, &asyncjob_main_timeout);
 			} EXCEPT {
@@ -860,15 +849,10 @@ do_delete_job:
 				        "the job does not define a timeout callback!");
 				/* Use the async-worker timeout mechanism to set-up
 				 * a custom callback for when the timeout expires. */
-				if (!asyncmain_timeout_p) {
-					asyncmain_timeout_p = &asyncmain_timeout;
-				} else {
-					assert(asyncmain_timeout_p == &asyncmain_timeout);
-					if (asyncjob_main_timeout >= asyncmain_timeout)
-						break; /* The previous timeout is already older! */
-				}
+				if (asyncjob_main_timeout >= asyncmain_timeout_p)
+					break;
 				/* Set the used timeout and callback routing. */
-				asyncmain_timeout = asyncjob_main_timeout;
+				asyncmain_timeout_p  = asyncjob_main_timeout;
 				asyncmain_timeout_cb = &asyncjob_timeout_worker_timeout;
 				/* NOTE: Because only the async worker (i.e. us) is allowed to
 				 *       remove async jobs, we don't even have to store a reference

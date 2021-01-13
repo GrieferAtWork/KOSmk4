@@ -107,8 +107,8 @@ typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_worker_timeout_t)(void *__re
  * prviously passed to `awc_poll()'
  * NOTE: After this function got called, `awc_poll()' should return
  *       `false', as the timeout may not come into effect otherwise. */
-FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
-NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restrict abs_timeout,
+FUNDEF NOBLOCK NONNULL((2, 3)) void
+NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(ktime_t abs_timeout,
                                                 void *__restrict cookie,
                                                 async_worker_timeout_t on_timeout);
 
@@ -230,14 +230,14 @@ struct async_job_callbacks {
 
 	/* [1..1] Poll-callback. Behaves similar to the one for async workers.
 	 * If this function returns with an exception, the job will also be deleted.
-	 * @param: timeout: [out] Must be filled in with a realtime() timestamp when `ASYNC_JOB_POLL_WAITFOR'
-	 *                        is returned. Once this point in time has elapsed, the `jc_time()' callback
-	 *                        is invoked.
+	 * @param: timeout: [out] Must be filled in with an absolute ktime() timestamp when
+	 *                        `ASYNC_JOB_POLL_WAITFOR' is returned. Once this point in
+	 *                        time has elapsed, the `jc_time()' callback is invoked.
 	 *                        NOTE: This argument only has meaning when `ASYNC_JOB_POLL_WAITFOR'
 	 *                              is returned.
 	 * @return: * : One of `ASYNC_JOB_POLL_*' */
 	NONNULL((1, 2)) unsigned int
-	(ASYNC_CALLBACK_CC *jc_poll)(async_job_t self, /*out*/ struct timespec *__restrict timeout);
+	(ASYNC_CALLBACK_CC *jc_poll)(async_job_t self, /*out*/ ktime_t *__restrict timeout);
 
 	/* [1..1] Perform the work associated with this async-job.
 	 * If this function returns with an exception, the job will also be deleted.

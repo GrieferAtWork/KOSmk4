@@ -202,7 +202,7 @@ struct uhci_controller: usb_controller {
 #ifndef CONFIG_NO_SMP
 	struct atomic_rwlock       uc_lastint_lock;   /* SMP-lock for accessing `uc_lastint'. */
 #endif /* !CONFIG_NO_SMP */
-	struct timespec            uc_lastint;        /* Timestamp for the time when the last interrupt happened. */
+	ktime_t                    uc_lastint;        /* Timestamp for the time when the last interrupt happened. */
 	unsigned int               uc_suspdelay;      /* Delay (in milliseconds) before the controller is suspended. */
 	alignas(UHCI_FLE_ALIGN)
 	struct uhci_osqh           uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to

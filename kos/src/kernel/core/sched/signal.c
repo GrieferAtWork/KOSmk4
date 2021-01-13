@@ -1339,8 +1339,8 @@ NOTHROW(FCALL task_receiveall)(void) {
  *  - Called `task_receiveall()'
  *  - Called `task_trywait()' (and a non-NULL value was returned)
  *  - Called `task_waitfor()'
- *  - Called `task_waitfor_tms_nx()'
- *  - Called `task_waitfor_tms_norpc()'
+ *  - Called `task_waitfor_nx()'
+ *  - Called `task_waitfor_norpc()'
  *  - Called `task_waitfor_norpc_nx()'
  */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
@@ -2163,34 +2163,10 @@ DECL_BEGIN
 
 PUBLIC struct sig *FCALL
 task_waitfor_tms(struct timespec const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	ktime_t ktime_abs_timeout = (ktime_t)-1;
+	ktime_t ktime_abs_timeout = KTIME_INFINITE;
 	if (abs_timeout != NULL)
 		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
 	return task_waitfor(ktime_abs_timeout);
-}
-
-PUBLIC struct sig *FCALL
-task_waitfor_tms_norpc(struct timespec const *abs_timeout) THROWS(E_WOULDBLOCK) {
-	ktime_t ktime_abs_timeout = (ktime_t)-1;
-	if (abs_timeout != NULL)
-		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
-	return task_waitfor_norpc(ktime_abs_timeout);
-}
-
-PUBLIC struct sig *
-NOTHROW(FCALL task_waitfor_tms_nx)(struct timespec const *abs_timeout) {
-	ktime_t ktime_abs_timeout = (ktime_t)-1;
-	if (abs_timeout != NULL)
-		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
-	return task_waitfor_nx(ktime_abs_timeout);
-}
-
-PUBLIC struct sig *
-NOTHROW(FCALL task_waitfor_tms_norpc_nx)(struct timespec const *abs_timeout) {
-	ktime_t ktime_abs_timeout = (ktime_t)-1;
-	if (abs_timeout != NULL)
-		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
-	return task_waitfor_norpc_nx(ktime_abs_timeout);
 }
 
 DECL_END

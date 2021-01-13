@@ -120,7 +120,7 @@ typedef struct ne2k_device: nic_device {
 	                                           * The current outgoing packet. */
 	WEAK struct aio_handle *nk_tranit;        /* [0..1] Linked list of pending DMA packets. */
 	WEAK Ne2kState          nk_state;         /* Ne2k state control word */
-	struct timespec         nk_cursendtmo;    /* [lock(NE2K_STATE_TX_PKSEND)] Timeout for the current TX_PKSEND */
+	ktime_t                 nk_cursendtmo;    /* [lock(NE2K_STATE_TX_PKSEND)] Timeout for the current TX_PKSEND */
 	struct sig              nk_stidle;        /* Signal broadcast when the NIC switches to IDLE or OFF */
 	struct sig              nk_stpkld;        /* Signal broadcast when the NIC switches to TX_UPLOAD or RX_DNLOAD */
 	struct sig              nk_uioint;        /* Signal broadcast upon interrupt while in UIO-mode

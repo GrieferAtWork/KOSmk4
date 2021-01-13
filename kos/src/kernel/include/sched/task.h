@@ -234,8 +234,8 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * once the given `abs_timeout' (which must be global) expires (false)
  * NOTES:
  *   - Special values for `abs_timeout' are:
- *     - 0 (or anything `< ktime()'): Essentially does the same as task_yield()
- *     - (ktime_t)-1:                 Never times out
+ *     - KTIME_NONBLOCK (or anything `< ktime()'): Essentially does the same as task_yield()
+ *     - KTIME_INFINITE:                           Never times out
  *   - Even if the caller has disabled preemption prior to the call,
  *     it will be re-enabled once this function returns.
  *   - This function is the bottom-most (and still task-level) API
@@ -270,9 +270,13 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
  * >> task_wake(waiting_thread); */
-FUNDEF __BOOL NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL((ktime_t)-1));
-/* Deprecated variant of `task_sleep()' */
-FUNDEF __BOOL NOTHROW(FCALL task_sleep_tms)(struct timespec const *abs_timeout DFL(__NULLPTR));
+FUNDEF __BOOL NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL(KTIME_INFINITE));
+
+/* Force sleep until `abs_timeout' has passed. Any sporadic interrupts are
+ * handled by simply continuing to sleep, until a timeout event happens. */
+#define task_sleep_until(abs_timeout) \
+	do {                              \
+	} while (task_sleep(abs_timeout))
 
 #define TASK_WAKE_FNORMAL   0x0000 /* Normal wake-up flags. */
 #define TASK_WAKE_FWAITFOR  0x1000 /* When sending an IPI to a different CPU, wait for that CPU to acknowledge

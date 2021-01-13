@@ -76,10 +76,10 @@ struct shared_rwlock {
 
 LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self);
 LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self);
-LOCAL NONNULL((1)) void (FCALL shared_rwlock_read)(struct shared_rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK);
-LOCAL NONNULL((1)) void (FCALL shared_rwlock_write)(struct shared_rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK);
-LOCAL NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR));
-LOCAL NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR));
+FUNDEF NONNULL((1)) void FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1)) void FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
+FUNDEF NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
 LOCAL NOBLOCK NONNULL((1)) __BOOL
@@ -90,7 +90,7 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self);
  *       re-load local copies of affected resources. */
 LOCAL NONNULL((1)) __BOOL
 (FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
-                              struct timespec const *abs_timeout DFL(__NULLPTR))
+                              ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK);
 
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
@@ -100,7 +100,7 @@ LOCAL NONNULL((1)) __BOOL
  *       already been released. */
 LOCAL NONNULL((1)) unsigned int
 NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
-                                        struct timespec const *abs_timeout DFL(__NULLPTR));
+                                        ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
 LOCAL NOBLOCK NONNULL((1)) void
@@ -225,92 +225,6 @@ NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
 	return 1;
 }
 
-LOCAL NONNULL((1)) void
-(FCALL shared_rwlock_read)(struct shared_rwlock *__restrict self,
-                           struct timespec const *abs_timeout)
-		THROWS(E_WOULDBLOCK) {
-	__hybrid_assert(!task_wasconnected());
-	while (!shared_rwlock_tryread(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_tryread(self))
-				goto success;
-		});
-		task_connect(&self->sl_rdwait);
-		if unlikely(shared_rwlock_tryread(self)) {
-			task_disconnectall();
-			break;
-		}
-		task_waitfor_tms(abs_timeout);
-	}
-success:
-	COMPILER_READ_BARRIER();
-}
-
-LOCAL NONNULL((1)) void
-(FCALL shared_rwlock_write)(struct shared_rwlock *__restrict self,
-                            struct timespec const *abs_timeout)
-		THROWS(E_WOULDBLOCK) {
-	__hybrid_assert(!task_wasconnected());
-	while (!shared_rwlock_trywrite(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_trywrite(self))
-				goto success;
-		});
-		task_connect(&self->sl_wrwait);
-		if unlikely(shared_rwlock_trywrite(self)) {
-			task_disconnectall();
-			break;
-		}
-		task_waitfor_tms(abs_timeout);
-	}
-success:
-	COMPILER_BARRIER();
-}
-
-LOCAL NONNULL((1)) __BOOL
-NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
-                                     struct timespec const *abs_timeout) {
-	__hybrid_assert(!task_wasconnected());
-	while (!shared_rwlock_tryread(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_tryread(self))
-				goto success;
-		});
-		task_connect(&self->sl_rdwait);
-		if unlikely(shared_rwlock_tryread(self)) {
-			task_disconnectall();
-			break;
-		}
-		if (!task_waitfor_tms_nx(abs_timeout))
-			return false;
-	}
-success:
-	COMPILER_READ_BARRIER();
-	return true;
-}
-
-LOCAL NONNULL((1)) __BOOL
-NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
-                                      struct timespec const *abs_timeout) {
-	__hybrid_assert(!task_wasconnected());
-	while (!shared_rwlock_trywrite(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_trywrite(self))
-				goto success;
-		});
-		task_connect(&self->sl_wrwait);
-		if unlikely(shared_rwlock_trywrite(self)) {
-			task_disconnectall();
-			break;
-		}
-		if (!task_waitfor_tms_nx(abs_timeout))
-			return false;
-	}
-success:
-	COMPILER_BARRIER();
-	return true;
-}
-
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
@@ -330,7 +244,7 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
  *       re-load local copies of affected resources. */
 LOCAL NONNULL((1)) __BOOL
 (FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
-                              struct timespec const *abs_timeout)
+                              ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
 	if (shared_rwlock_tryupgrade(self))
 		return 1;
@@ -346,7 +260,7 @@ LOCAL NONNULL((1)) __BOOL
  *       already been released. */
 LOCAL NONNULL((1)) unsigned int
 NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
-                                        struct timespec const *abs_timeout) {
+                                        ktime_t abs_timeout) {
 	if (shared_rwlock_tryupgrade(self))
 		return 1;
 	shared_rwlock_endread(self);

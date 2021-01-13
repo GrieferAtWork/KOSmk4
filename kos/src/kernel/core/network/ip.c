@@ -32,6 +32,7 @@
 #include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
@@ -634,10 +635,10 @@ NOTHROW(KCALL iphdr_calculate_sum)(struct iphdr *__restrict self) {
 /* Add the ARP request response timeout to `timeout' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL nic_device_add_arp_response_timeout)(struct nic_device *__restrict self,
-                                                   struct timespec *__restrict timeout) {
+                                                   ktime_t *__restrict timeout) {
 	(void)self;
 	/* XXX: This timeout should be a field of the NIC device... */
-	timeout->add_milliseconds(100);
+	*timeout += relktime_from_milliseconds(100);
 }
 
 
@@ -646,7 +647,7 @@ struct ip_arp_and_datagram_job {
 	REF struct net_peeraddr  *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	REF struct nic_packet    *adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram (with sufficient header space for an ethernet header) */
 	REF struct vm            *adj_gramvm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
-	struct timespec           adj_arptmo; /* Timeout for ARP request responses. */
+	ktime_t                   adj_arptmo; /* Timeout for ARP request responses. */
 	unsigned int              adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_handle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
 	/* XXX: Have another state where we wait for an ARP request to finish being sent?
@@ -677,7 +678,7 @@ NOTHROW(ASYNC_CALLBACK_CC ip_arp_and_datagram_fini)(async_job_t self) {
 }
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
-ip_arp_and_datagram_poll(async_job_t self, struct timespec *__restrict timeout) {
+ip_arp_and_datagram_poll(async_job_t self, ktime_t *__restrict timeout) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	if (me->adj_arpc == 0) {
@@ -761,7 +762,7 @@ ip_arp_and_datagram_time(async_job_t self) {
 	/* Re-try sending the ARP request. */
 	nic_device_send_arp_request(me->adj_dev,
 	                            me->adj_peer->npa_ip);
-	me->adj_arptmo = realtime();
+	me->adj_arptmo = ktime();
 	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
 	return ASYNC_JOB_WORK_AGAIN;
 }
@@ -891,7 +892,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		job->adj_peer   = peer; /* Inherit reference */
 		job->adj_gram   = incref(packet);
 		job->adj_gramvm = incref(THIS_VM);
-		job->adj_arptmo = realtime();
+		job->adj_arptmo = ktime();
 		nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 		job->adj_arpc = 5; /* Must not be 0, but should be configurable */
 		/* Start the async job and attach it to the given AIO handle. */
@@ -906,7 +907,7 @@ struct ip_arp_and_datagrams_job {
 	REF struct net_peeraddr       *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	struct nic_packetlist          adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram list (with sufficient header space for an ethernet header) */
 	REF struct vm                 *adj_gramvm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
-	struct timespec                adj_arptmo; /* Timeout for ARP request responses. */
+	ktime_t                        adj_arptmo; /* Timeout for ARP request responses. */
 	unsigned int                   adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_multihandle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
 	/* XXX: Have another state where we wait for an ARP request to finish being sent?
@@ -929,7 +930,7 @@ NOTHROW(ASYNC_CALLBACK_CC ip_arp_and_datagrams_fini)(async_job_t self) {
 }
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
-ip_arp_and_datagrams_poll(async_job_t self, struct timespec *__restrict timeout) {
+ip_arp_and_datagrams_poll(async_job_t self, ktime_t *__restrict timeout) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
@@ -1026,7 +1027,7 @@ ip_arp_and_datagrams_time(async_job_t self) {
 	/* Re-try sending the ARP request. */
 	nic_device_send_arp_request(me->adj_dev,
 	                            me->adj_peer->npa_ip);
-	me->adj_arptmo = realtime();
+	me->adj_arptmo = ktime();
 	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
 	return ASYNC_JOB_WORK_AGAIN;
 }
@@ -1182,7 +1183,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 	}
 	job->adj_dev    = (REF struct nic_device *)incref(dev);
 	job->adj_peer   = peer; /* Inherit reference */
-	job->adj_arptmo = realtime();
+	job->adj_arptmo = ktime();
 	job->adj_gramvm = incref(THIS_VM);
 	nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 	job->adj_arpc = 5; /* Must not be 0, but should be configurable */

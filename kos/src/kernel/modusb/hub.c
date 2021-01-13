@@ -31,7 +31,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
-#include <sched/cpu.h>
+#include <sched/tsc.h>
 
 #include <hw/usb/class.h>
 #include <hw/usb/hub.h>
@@ -53,11 +53,9 @@ NOTHROW(KCALL usb_hub_fini)(struct character_device *__restrict self) {
 
 PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
-	struct timespec then = realtime();
-	then.add_milliseconds(n);
-	do {
-		task_sleep_tms(&then);
-	} while (realtime() < then);
+	ktime_t then = ktime();
+	then += relktime_from_milliseconds(n);
+	task_sleep_until(then);
 }
 
 

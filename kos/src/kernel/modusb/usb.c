@@ -32,7 +32,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
-#include <sched/cpu.h>
+#include <sched/tsc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -914,11 +914,9 @@ badconf:
 
 PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
-	struct timespec then = realtime();
-	then.add_milliseconds(n);
-	do {
-		task_sleep_tms(&then);
-	} while (realtime() < then);
+	ktime_t then = ktime();
+	then += relktime_from_milliseconds(n);
+	task_sleep_until(then);
 }
 
 

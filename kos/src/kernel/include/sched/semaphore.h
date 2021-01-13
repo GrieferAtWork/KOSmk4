@@ -29,8 +29,6 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-#include <stdbool.h>
-
 DECL_BEGIN
 
 #ifdef __CC__
@@ -42,108 +40,55 @@ struct semaphore {
 	uintptr_t  s_count; /* # of available tickets. */
 };
 
-#define SEMAPHORE_INIT(n) { SIG_INIT, n }
-#define semaphore_init(x, n) (void)(sig_init(&(x)->s_avail), (x)->s_count = (n))
+#define SEMAPHORE_INIT(n) \
+	{ SIG_INIT, n }
+#define semaphore_init(x, n) \
+	(void)(sig_init(&(x)->s_avail), (x)->s_count = (n))
 #define semaphore_cinit(x, n)               \
 	(sig_cinit(&(x)->s_avail),              \
 	 (__builtin_constant_p(n) && (n) == 0)  \
 	 ? (__hybrid_assert((x)->s_count == 0)) \
 	 : (void)((x)->s_count = (n)))
-#define semaphore_count(x) __hybrid_atomic_load((x)->s_count, __ATOMIC_ACQUIRE)
+#define semaphore_count(x) \
+	__hybrid_atomic_load((x)->s_count, __ATOMIC_ACQUIRE)
 
 /* Try to acquire a tick to the given semaphore. */
-LOCAL NOBLOCK WUNUSED NONNULL((1)) bool
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOBLOCK(FCALL semaphore_trywait)(struct semaphore *__restrict self) {
 	uintptr_t count;
 	do {
 		count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
 		if (!count)
-			return false;
+			return 0;
 	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
 	                                      __ATOMIC_SEQ_CST,
 	                                      __ATOMIC_SEQ_CST));
-	return true;
+	return 1;
 }
 
-/* Acquire a ticked from the given semaphore, or block until `abs_timeout' or indefinitely.
+/* Acquire a ticked from the given semaphore, or block until `abs_timeout'.
  * @return: true:  Successfully acquired a ticket.
  * @return: false: The given `abs_timeout' has expired. */
-LOCAL NONNULL((1)) bool
-(FCALL semaphore_wait)(struct semaphore *__restrict self,
-                       struct timespec const *abs_timeout DFL(__NULLPTR))
-                       THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	uintptr_t count;
-again:
-	do {
-		count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-		if (!count) {
-			TASK_POLL_BEFORE_CONNECT({
-				count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-				if (count != 0)
-					goto do_exchange;
-			});
-			task_connect(&self->s_avail);
-			count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-			if likely(!count) {
-				if unlikely(!task_waitfor_tms(abs_timeout))
-					return false;
-				goto again;
-			}
-			task_disconnectall();
-		}
-#ifdef CONFIG_YIELD_BEFORE_CONNECT
-do_exchange:
-		;
-#endif /* CONFIG_YIELD_BEFORE_CONNECT */
-	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
-	                                      __ATOMIC_SEQ_CST,
-	                                      __ATOMIC_SEQ_CST));
-	return true;
-}
+FUNDEF NONNULL((1)) __BOOL FCALL
+semaphore_wait(struct semaphore *__restrict self,
+               ktime_t abs_timeout DFL(KTIME_INFINITE))
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 
-/* Acquire a ticked from the given semaphore, or block until `abs_timeout' or indefinitely.
+/* Acquire a ticked from the given semaphore, or block until `abs_timeout'.
  * @return: true:  Successfully acquired a ticket.
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-LOCAL WUNUSED NONNULL((1)) bool
+FUNDEF WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
-                                 struct timespec const *abs_timeout DFL(__NULLPTR)) {
-	uintptr_t count;
-again:
-	do {
-		count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-		if (!count) {
-			TASK_POLL_BEFORE_CONNECT({
-				count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-				if (count != 0)
-					goto do_exchange;
-			});
-			task_connect(&self->s_avail);
-			count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-			if likely(!count) {
-				if unlikely(!task_waitfor_tms_nx(abs_timeout))
-					return false;
-				goto again;
-			}
-			task_disconnectall();
-		}
-#ifdef CONFIG_YIELD_BEFORE_CONNECT
-do_exchange:
-		;
-#endif /* CONFIG_YIELD_BEFORE_CONNECT */
-	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
-	                                      __ATOMIC_SEQ_CST,
-	                                      __ATOMIC_SEQ_CST));
-	return true;
-}
+                                 ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 
 /* Make a single ticket available to the given semaphore.
  * @return: true:  A waiting thread was signaled.
  * @return: false: There were no waiting threads, but the ticket was added. */
-LOCAL NOBLOCK NONNULL((1)) bool
+LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
 	__hybrid_atomic_inc(self->s_count, __ATOMIC_SEQ_CST);
 	/* Wake up exactly one thread for every ticket added. */

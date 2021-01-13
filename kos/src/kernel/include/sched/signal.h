@@ -569,8 +569,8 @@ NOTHROW(FCALL task_receiveall)(void);
  *  - Called `task_receiveall()'
  *  - Called `task_trywait()' (and a non-NULL value was returned)
  *  - Called `task_waitfor()'
- *  - Called `task_waitfor_tms_nx()'
- *  - Called `task_waitfor_tms_norpc()'
+ *  - Called `task_waitfor_nx()'
+ *  - Called `task_waitfor_norpc()'
  *  - Called `task_waitfor_norpc_nx()' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
 NOTHROW(FCALL task_wasconnected)(void);
@@ -608,30 +608,27 @@ FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
 FUNDEF struct sig *FCALL
-task_waitfor(ktime_t abs_timeout DFL((ktime_t)-1))
+task_waitfor(ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, ...);
 
 /* Same as `task_waitfor', but don't serve RPC functions. */
 FUNDEF struct sig *FCALL
-task_waitfor_norpc(ktime_t abs_timeout DFL((ktime_t)-1))
+task_waitfor_norpc(ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK);
 
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL' if
  * there are pending RPCs that are allowed to throw exception, or if preemption
  * was disabled, and the operation would have blocked. */
 FUNDEF struct sig *
-NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL((ktime_t)-1));
+NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Same as `task_waitfor', but don't serve RPC functions, and return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
 FUNDEF struct sig *
-NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL((ktime_t)-1));
+NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Deprecated task waiting functions. */
 FUNDEF struct sig *FCALL task_waitfor_tms(struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK, ...);
-FUNDEF struct sig *FCALL task_waitfor_tms_norpc(struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK);
-FUNDEF struct sig *NOTHROW(FCALL task_waitfor_tms_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
-FUNDEF struct sig *NOTHROW(FCALL task_waitfor_tms_norpc_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE

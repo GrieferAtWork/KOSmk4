@@ -262,7 +262,7 @@ PUBLIC ATTR_PERTASK REF _sched_link_t this_sched_link = LIST_ENTRY_UNBOUND_INITI
 /* [lock(PRIVATE(THIS_TASK))][valid_if(!TASK_FRUNNING)]
  * Timeout for when this thread should resume execution
  * by setting `TASK_FRUNNING | TASK_FTIMEOUT'. */
-PUBLIC ATTR_PERTASK ktime_t this_sched_timeout = (ktime_t)-1;
+PUBLIC ATTR_PERTASK ktime_t this_sched_timeout = KTIME_INFINITE;
 
 /* [1..1][lock(PRIVATE(THIS_CPU))] The currently running thread. */
 PUBLIC ATTR_PERCPU struct task *thiscpu_sched_current = NULL;
@@ -944,18 +944,22 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
 
 /* Enter a sleeping state and return once being woken (true), or
  * once the given `abs_timeout' (which must be global) expires (false)
- * NOTE: Special values for `abs_timeout' are:
- *    - 0 (or anything `< ktime()'): Essentially does the same as task_yield()
- *    - (ktime_t)-1:                 Never times out
- * WARNING: Even if the caller has disabled preemption prior to the call,
- *          it will be re-enabled once this function returns.
- * NOTE: This function is the bottom-most (and still task-level) API
- *       for conserving CPU cycles using preemption, in that this
- *       function is even used to implement `task_waitfor()'.
- *       The functions used to implement this one no longer work on tasks, but on CPUs!
- * NOTE: If the thread is transferred to a different CPU while sleeping, a
- *       sporadic wakeup will be triggered, causing `task_sleep()' to return
- *      `true'.
+ * NOTES:
+ *   - Special values for `abs_timeout' are:
+ *     - KTIME_NONBLOCK (or anything `< ktime()'): Essentially does the same as task_yield()
+ *     - KTIME_INFINITE:                           Never times out
+ *   - Even if the caller has disabled preemption prior to the call,
+ *     it will be re-enabled once this function returns.
+ *   - This function is the bottom-most (and still task-level) API
+ *     for conserving CPU cycles using preemption, in that this
+ *     function is even used to implement `task_waitfor()'.
+ *     The functions used to implement this one no longer work on tasks, but on CPUs!
+ *   - If the thread is transferred to a different CPU while sleeping, a sporadic
+ *     wakeup will be triggered, causing `task_sleep()' to return `true'.
+ *   - When this function returns as the result of a timeout, then you may
+ *     act as though that `ktime() > abs_timeout' (but note that this isn't
+ *     actually an invariant, as your task may have been moved to a different
+ *     CPU after waking up, at which point `ktime()' may have a slight offset)
  * The proper way of using this function is as follows:
  * >> while (SHOULD_WAIT()) { // Test some condition for which to wait
  * >>     PREEMPTION_DISABLE();
@@ -1103,21 +1107,11 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 
 	/* Check if we got timed out. */
 	if (ATOMIC_FETCHAND(caller->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
-		assertf(abs_timeout != (ktime_t)-1,
+		assertf(abs_timeout != KTIME_INFINITE,
 		        "TASK_FTIMEOUT set, but no timeout given?");
 		return false; /* Timeout... */
 	}
 	return true;
-}
-
-
-/* Deprecated variant of `task_sleep()' */
-PUBLIC bool
-NOTHROW(FCALL task_sleep_tms)(struct timespec const *abs_timeout) {
-	ktime_t ktime_abs_timeout = (ktime_t)-1;
-	if (abs_timeout != NULL)
-		ktime_abs_timeout = timespec_to_ktime(abs_timeout);
-	return task_sleep(ktime_abs_timeout);
 }
 
 
@@ -1194,7 +1188,7 @@ do_timeout_thread:
 		/* The current thread didn't change. - Check if we can use an infinite timeout. */
 		deadline += now;
 		if (sched.s_runcount == 1) {
-			deadline = (ktime_t)-1;
+			deadline = KTIME_INFINITE;
 		} else {
 			/* Account for time spent being active. */
 			sched_activetime(caller) += now - sched_stoptime(caller);
@@ -1456,7 +1450,7 @@ again:
 		 * Also: If any of the waiting threads would time out before
 		 *       `sched_shutdown_delay' has passed, don't actually
 		 *       shut down the CPU. */
-		timeout = (ktime_t)-1;
+		timeout = KTIME_INFINITE;
 		if (sched.s_waiting_last)
 			timeout = sched_timeout(sched_s_waiting);
 		tsc_now = tsc_get(me);
