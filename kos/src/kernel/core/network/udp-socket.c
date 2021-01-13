@@ -298,7 +298,7 @@ udp_recvfromv(struct socket *__restrict self,
               /*0..1*/ USER CHECKED u32 *presult_flags,
               struct ancillary_rmessage const *msg_control,
               syscall_ulong_t msg_flags,
-              struct timespec const *timeout)
+              ktime_t abs_timeout)
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	struct udp_socket *me;
 	me = (struct udp_socket *)self;
@@ -315,7 +315,7 @@ udp_recvfromv(struct socket *__restrict self,
 	(void)presult_flags;
 	(void)msg_control;
 	(void)msg_flags;
-	(void)timeout;
+	(void)abs_timeout;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 

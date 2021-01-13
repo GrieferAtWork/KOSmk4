@@ -629,7 +629,7 @@ NOTHROW(ASYNC_CALLBACK_CC UnixSocket_WaitForAccept_Fini)(async_job_t self) {
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
 UnixSocket_WaitForAccept_Poll(async_job_t self,
-                              /*out*/ ktime_t *__restrict UNUSED(timeout)) {
+                              /*out*/ ktime_t *__restrict UNUSED(abs_timeout)) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
 	me     = (struct async_accept_wait *)self;
@@ -643,7 +643,7 @@ UnixSocket_WaitForAccept_Poll(async_job_t self,
 	if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_PENDING)
 		return ASYNC_JOB_POLL_AVAILABLE;
 	/* XXX: We could easily implement a timeout for connect()-attempt by
-	 *      filling in `timeout' here, and returning `ASYNC_JOB_POLL_WAITFOR'! */
+	 *      filling in `abs_timeout' here, and returning `ASYNC_JOB_POLL_WAITFOR'! */
 	/* Wait for our status change. */
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
@@ -1210,7 +1210,7 @@ nope:
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
 async_send_poll(async_job_t self,
-                /*out*/ ktime_t *__restrict UNUSED(timeout)) {
+                /*out*/ ktime_t *__restrict UNUSED(abs_timeout)) {
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
 	if (async_send_test(me))
@@ -1452,7 +1452,7 @@ UnixSocket_Recvv(struct socket *__restrict self,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
-                 struct timespec const *timeout)
+                 ktime_t abs_timeout)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
@@ -1503,7 +1503,7 @@ again_read_packet:
 			goto done; /* EOF */
 		}
 		/* Wait for a packet to become available. */
-		if (!task_waitfor_tms(timeout))
+		if (!task_waitfor(abs_timeout))
 			THROW(E_NET_TIMEOUT);
 	}
 	TRY {

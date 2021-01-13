@@ -828,20 +828,17 @@ overflow:
 }
 
 LOCAL NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_reltimespec_impl(time_t tv_sec, syscall_ulong_t tv_nsec)
+relktime_from_user_reltimespec_impl(time_t tv_sec, syscall_ulong_t tv_nsec)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
-	ktime_t result, addend;
+	ktime_t result;
 	if unlikely(tv_nsec >= NSEC_PER_SEC) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,
 		      tv_nsec);
 	}
-	if (OVERFLOW_UMUL(tv_sec, NSEC_PER_SEC, &addend))
+	if (OVERFLOW_UMUL(tv_sec, NSEC_PER_SEC, &result))
 		goto overflow;
-	if (OVERFLOW_UADD(addend, tv_nsec, &addend))
-		goto overflow;
-	result = ktime();
-	if (OVERFLOW_UADD(result, addend, &result))
+	if (OVERFLOW_UADD(result, tv_nsec, &result))
 		goto overflow;
 	return result;
 overflow:
@@ -849,20 +846,17 @@ overflow:
 }
 
 LOCAL NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_reltimeval_impl(time_t tv_sec, unsigned_suseconds_t tv_usec)
+relktime_from_user_reltimeval_impl(time_t tv_sec, unsigned_suseconds_t tv_usec)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
-	ktime_t result, addend;
+	ktime_t result;
 	if unlikely(tv_usec >= USEC_PER_SEC) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,
 		      tv_usec);
 	}
-	if (OVERFLOW_UMUL(tv_sec, USEC_PER_SEC, &addend))
+	if (OVERFLOW_UMUL(tv_sec, USEC_PER_SEC, &result))
 		goto overflow;
-	if (OVERFLOW_UADD(addend, tv_usec * NSEC_PER_USEC, &addend))
-		goto overflow;
-	result = ktime();
-	if (OVERFLOW_UADD(result, addend, &result))
+	if (OVERFLOW_UADD(result, tv_usec * NSEC_PER_USEC, &result))
 		goto overflow;
 	return result;
 overflow:
@@ -876,130 +870,130 @@ overflow:
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC:  ...
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC: ... */
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_timespec32(USER CHECKED struct __timespec32 const *__restrict reltime)
+ktime_from_user_timespec32(USER CHECKED struct __timespec32 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
-	                                     (syscall_ulong_t)reltime->tv_nsec);
+	return ktime_from_user_timespec_impl((time_t)abs_time->tv_sec,
+	                                     (syscall_ulong_t)abs_time->tv_nsec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_reltimespec32(USER CHECKED struct __timespec32 const *__restrict reltime)
+relktime_from_user_reltimespec32(USER CHECKED struct __timespec32 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
-	                                        (syscall_ulong_t)reltime->tv_nsec);
+	return relktime_from_user_reltimespec_impl((time_t)rel_time->tv_sec,
+	                                           (syscall_ulong_t)rel_time->tv_nsec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_timeval32(USER CHECKED struct __timeval32 const *__restrict reltime)
+ktime_from_user_timeval32(USER CHECKED struct __timeval32 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
-	                                    (unsigned_suseconds_t)reltime->tv_usec);
+	return ktime_from_user_timeval_impl((time_t)abs_time->tv_sec,
+	                                    (unsigned_suseconds_t)abs_time->tv_usec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_reltimeval32(USER CHECKED struct __timeval32 const *__restrict reltime)
+relktime_from_user_reltimeval32(USER CHECKED struct __timeval32 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
-	                                       (unsigned_suseconds_t)reltime->tv_usec);
+	return relktime_from_user_reltimeval_impl((time_t)rel_time->tv_sec,
+	                                          (unsigned_suseconds_t)rel_time->tv_usec);
 }
 
 #ifndef __HAVE_TIMESPEC32_IS_TIMESPEC64
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_timespec64(USER CHECKED struct __timespec64 const *__restrict reltime)
+ktime_from_user_timespec64(USER CHECKED struct __timespec64 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
-	                                     (syscall_ulong_t)reltime->tv_nsec);
+	return ktime_from_user_timespec_impl((time_t)abs_time->tv_sec,
+	                                     (syscall_ulong_t)abs_time->tv_nsec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_reltimespec64(USER CHECKED struct __timespec64 const *__restrict reltime)
+relktime_from_user_reltimespec64(USER CHECKED struct __timespec64 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
-	                                        (syscall_ulong_t)reltime->tv_nsec);
+	return relktime_from_user_reltimespec_impl((time_t)rel_time->tv_sec,
+	                                           (syscall_ulong_t)rel_time->tv_nsec);
 }
 #endif /* !__HAVE_TIMESPEC32_IS_TIMESPEC64 */
 
 #ifndef __HAVE_TIMEVAL32_IS_TIMEVAL64
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_timeval64(USER CHECKED struct __timeval64 const *__restrict reltime)
+ktime_from_user_timeval64(USER CHECKED struct __timeval64 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
-	                                    (unsigned_suseconds_t)reltime->tv_usec);
+	return ktime_from_user_timeval_impl((time_t)abs_time->tv_sec,
+	                                    (unsigned_suseconds_t)abs_time->tv_usec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_reltimeval64(USER CHECKED struct __timeval64 const *__restrict reltime)
+relktime_from_user_reltimeval64(USER CHECKED struct __timeval64 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
-	                                       (unsigned_suseconds_t)reltime->tv_usec);
+	return relktime_from_user_reltimeval_impl((time_t)rel_time->tv_sec,
+	                                          (unsigned_suseconds_t)rel_time->tv_usec);
 }
 #endif /* !__HAVE_TIMEVAL32_IS_TIMEVAL64 */
 
 #ifdef __ARCH_HAVE_COMPAT
 #if !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64)
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_timespec32(USER CHECKED struct compat_timespec32 const *__restrict reltime)
+ktime_from_user_compat_timespec32(USER CHECKED struct compat_timespec32 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
-	                                     (syscall_ulong_t)reltime->tv_nsec);
+	return ktime_from_user_timespec_impl((time_t)abs_time->tv_sec,
+	                                     (syscall_ulong_t)abs_time->tv_nsec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_reltimespec32(USER CHECKED struct compat_timespec32 const *__restrict reltime)
+relktime_from_user_compat_reltimespec32(USER CHECKED struct compat_timespec32 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
-	                                        (syscall_ulong_t)reltime->tv_nsec);
+	return relktime_from_user_reltimespec_impl((time_t)rel_time->tv_sec,
+	                                           (syscall_ulong_t)rel_time->tv_nsec);
 }
 #endif /* !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64 */
 
 #ifndef __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
 #if !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_timespec64(USER CHECKED struct compat_timespec64 const *__restrict reltime)
+ktime_from_user_compat_timespec64(USER CHECKED struct compat_timespec64 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_timespec_impl((time_t)reltime->tv_sec,
-	                                     (syscall_ulong_t)reltime->tv_nsec);
+	return ktime_from_user_timespec_impl((time_t)abs_time->tv_sec,
+	                                     (syscall_ulong_t)abs_time->tv_nsec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_reltimespec64(USER CHECKED struct compat_timespec64 const *__restrict reltime)
+relktime_from_user_compat_reltimespec64(USER CHECKED struct compat_timespec64 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_reltimespec_impl((time_t)reltime->tv_sec,
-	                                        (syscall_ulong_t)reltime->tv_nsec);
+	return relktime_from_user_reltimespec_impl((time_t)rel_time->tv_sec,
+	                                           (syscall_ulong_t)rel_time->tv_nsec);
 }
 #endif /* !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64 */
 #endif /* !__HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
 
 #if !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64)
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_timeval32(USER CHECKED struct compat_timeval32 const *__restrict reltime)
+ktime_from_user_compat_timeval32(USER CHECKED struct compat_timeval32 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
-	                                    (unsigned_suseconds_t)reltime->tv_usec);
+	return ktime_from_user_timeval_impl((time_t)abs_time->tv_sec,
+	                                    (unsigned_suseconds_t)abs_time->tv_usec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_reltimeval32(USER CHECKED struct compat_timeval32 const *__restrict reltime)
+relktime_from_user_compat_reltimeval32(USER CHECKED struct compat_timeval32 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
-	                                       (unsigned_suseconds_t)reltime->tv_usec);
+	return relktime_from_user_reltimeval_impl((time_t)rel_time->tv_sec,
+	                                          (unsigned_suseconds_t)rel_time->tv_usec);
 }
 #endif /* !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64 */
 
 #ifndef __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
 #if !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_timeval64(USER CHECKED struct compat_timeval64 const *__restrict reltime)
+ktime_from_user_compat_timeval64(USER CHECKED struct compat_timeval64 const *__restrict abs_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_timeval_impl((time_t)reltime->tv_sec,
-	                                    (unsigned_suseconds_t)reltime->tv_usec);
+	return ktime_from_user_timeval_impl((time_t)abs_time->tv_sec,
+	                                    (unsigned_suseconds_t)abs_time->tv_usec);
 }
 
 PUBLIC NOBLOCK WUNUSED ktime_t FCALL
-ktime_from_user_compat_reltimeval64(USER CHECKED struct compat_timeval64 const *__restrict reltime)
+relktime_from_user_compat_reltimeval64(USER CHECKED struct compat_timeval64 const *__restrict rel_time)
 		THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) {
-	return ktime_from_user_reltimeval_impl((time_t)reltime->tv_sec,
-	                                       (unsigned_suseconds_t)reltime->tv_usec);
+	return relktime_from_user_reltimeval_impl((time_t)rel_time->tv_sec,
+	                                          (unsigned_suseconds_t)rel_time->tv_usec);
 }
 #endif /* !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64 */
 #endif /* !__HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */

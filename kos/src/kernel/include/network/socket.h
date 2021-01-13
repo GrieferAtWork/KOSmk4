@@ -46,7 +46,6 @@ DECL_BEGIN
 struct socket;
 struct aio_buffer;
 struct sockaddr;
-struct timespec;
 
 struct ancillary_message {
 	size_t am_controllen; /* [!0] Available ancillary data buffer size. */
@@ -399,20 +398,20 @@ struct socket_ops {
 	 *                        own copy of this structure)
 	 * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
 	 *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
-	 * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
-	 *                        that no data could be received up until that point. Ignored when already
-	 *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+	 * @param: abs_timeout:   Timeout after which to throw `E_NET_TIMEOUT' in the event
+	 *                        that no data could be received up until that point. Ignored
+	 *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
 	 * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
-	 * @throws: E_NET_TIMEOUT: The given `timeout' expired */
+	 * @throws: E_NET_TIMEOUT: The given `abs_timeout' expired */
 	NONNULL((1)) size_t
 	(KCALL *so_recv)(struct socket *__restrict self,
 	                 USER CHECKED void *buf, size_t bufsize,
 	                 /*0..1*/ USER CHECKED u32 *presult_flags,
 	                 struct ancillary_rmessage const *msg_control,
 	                 syscall_ulong_t msg_flags,
-	                 struct timespec const *timeout)
+	                 ktime_t abs_timeout)
 			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 			       E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [if(!so_recvfromv, [1..1]), else([0..1])] */
@@ -422,7 +421,7 @@ struct socket_ops {
 	                  /*0..1*/ USER CHECKED u32 *presult_flags,
 	                  struct ancillary_rmessage const *msg_control,
 	                  syscall_ulong_t msg_flags,
-	                  struct timespec const *timeout)
+	                  ktime_t abs_timeout)
 			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 			       E_NET_TIMEOUT, E_WOULDBLOCK);
 
@@ -441,9 +440,9 @@ struct socket_ops {
 	 *                        own copy of this structure)
 	 * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
 	 *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
-	 * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
-	 *                        that no data could be received up until that point. Ignored when already
-	 *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+	 * @param: abs_timeout:   Timeout after which to throw `E_NET_TIMEOUT' in the event
+	 *                        that no data could be received up until that point. Ignored
+	 *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
 	 * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
@@ -455,7 +454,7 @@ struct socket_ops {
 	                     /*0..1*/ USER CHECKED u32 *presult_flags,
 	                     struct ancillary_rmessage const *msg_control,
 	                     syscall_ulong_t msg_flags,
-	                     struct timespec const *timeout)
+	                     ktime_t abs_timeout)
 			THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [0..1][if(!so_recvv, [1..1])] */
 	NONNULL((1, 2)) size_t
@@ -466,7 +465,7 @@ struct socket_ops {
 	                      /*0..1*/ USER CHECKED u32 *presult_flags,
 	                      struct ancillary_rmessage const *msg_control,
 	                      syscall_ulong_t msg_flags,
-	                      struct timespec const *timeout)
+	                      ktime_t abs_timeout)
 			THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 
 	/* [0..1][(!= NULL) == (so_accept != NULL)]
@@ -634,33 +633,27 @@ struct socket {
 	                                                       * NOTE: Socket implementation should not touch this field!
 	                                                       * HINT: `POLLOUTMASK' is indicated when this is `NULL', or when contained AIO has completed! */
 	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
-	WEAK struct timespec                   sk_rcvtimeo;   /* Default (relative) receive timeout (for `SO_RCVTIMEO') */
-	WEAK struct timespec                   sk_sndtimeo;   /* Default (relative) send timeout (for `SO_SNDTIMEO') */
+	WEAK ktime_t                           sk_rcvtimeo;   /* Default (relative) receive timeout (for `SO_RCVTIMEO') */
+	WEAK ktime_t                           sk_sndtimeo;   /* Default (relative) send timeout (for `SO_SNDTIMEO') */
 	/* Socket-specific data goes here... */
 };
 
 #define __socket_init_common(self, ops, type, protocol) \
-	((self)->sk_refcnt           = 1,                   \
-	 (self)->sk_weakrefcnt       = 1,                   \
-	 (self)->sk_ops              = (ops),               \
-	 (self)->sk_type             = (type),              \
-	 (self)->sk_prot             = (protocol))
+	((self)->sk_refcnt     = 1,                         \
+	 (self)->sk_weakrefcnt = 1,                         \
+	 (self)->sk_ops        = (ops),                     \
+	 (self)->sk_type       = (type),                    \
+	 (self)->sk_prot       = (protocol),                \
+	 (self)->sk_rcvtimeo   = KTIME_INFINITE,            \
+	 (self)->sk_sndtimeo   = KTIME_INFINITE)
 #define socket_init(self, ops, type, protocol)        \
 	(__socket_init_common(self, ops, type, protocol), \
 	 xatomic_ref_init(&(self)->sk_ncon),              \
-	 (self)->sk_msgflags         = 0,                 \
-	 (self)->sk_rcvtimeo.tv_sec  = 0,                 \
-	 (self)->sk_rcvtimeo.tv_nsec = 0,                 \
-	 (self)->sk_sndtimeo.tv_sec  = 0,                 \
-	 (self)->sk_sndtimeo.tv_nsec = 0)
-#define socket_cinit(self, ops, type, protocol)         \
-	(__socket_init_common(self, ops, type, protocol),   \
-	 xatomic_ref_cinit(&(self)->sk_ncon, __NULLPTR),    \
-	 __hybrid_assert((self)->sk_msgflags == 0),         \
-	 __hybrid_assert((self)->sk_rcvtimeo.tv_sec == 0),  \
-	 __hybrid_assert((self)->sk_rcvtimeo.tv_nsec == 0), \
-	 __hybrid_assert((self)->sk_sndtimeo.tv_sec == 0),  \
-	 __hybrid_assert((self)->sk_sndtimeo.tv_nsec == 0))
+	 (self)->sk_msgflags = 0)
+#define socket_cinit(self, ops, type, protocol)       \
+	(__socket_init_common(self, ops, type, protocol), \
+	 xatomic_ref_cinit(&(self)->sk_ncon, __NULLPTR),  \
+	 __hybrid_assert((self)->sk_msgflags == 0))
 
 
 /* Destroy a given socket object, and decrement its weak reference counter. */
@@ -918,21 +911,21 @@ socket_sendtov(struct socket *__restrict self,
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
  *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
- * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
- *                        that no data could be received up until that point. Ignored when already
- *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
- *                        When `NULL', the `sk_rcvtimeo' timeout is used instead.
+ * @param: abs_timeout:   Timeout after which to throw `E_NET_TIMEOUT' in the event
+ *                        that no data could be received up until that point. Ignored
+ *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ *                        When `KTIME_INFINITE', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
- * @throws: E_NET_TIMEOUT: The given `timeout' (or default SO_RCVTIMEO-timeout) expired */
+ * @throws: E_NET_TIMEOUT: The given `abs_timeout' (or default SO_RCVTIMEO-timeout) expired */
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
             USER CHECKED void *buf, size_t bufsize,
             /*0..1*/ USER CHECKED u32 *presult_flags,
             struct ancillary_rmessage const *msg_control,
             syscall_ulong_t msg_flags,
-            struct timespec const *timeout)
+            ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
@@ -941,7 +934,7 @@ socket_recvv(struct socket *__restrict self,
              /*0..1*/ USER CHECKED u32 *presult_flags,
              struct ancillary_rmessage const *msg_control,
              syscall_ulong_t msg_flags,
-             struct timespec const *timeout)
+             ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK);
 
@@ -958,10 +951,10 @@ socket_recvv(struct socket *__restrict self,
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
  *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
- * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
- *                        that no data could be received up until that point. Ignored when already
- *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
- *                        When `NULL', the `sk_rcvtimeo' timeout is used instead.
+ * @param: abs_timeout:   Timeout after which to throw `E_NET_TIMEOUT' in the event
+ *                        that no data could be received up until that point. Ignored
+ *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ *                        When `KTIME_INFINITE', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
@@ -973,7 +966,7 @@ socket_recvfrom(struct socket *__restrict self,
                 /*0..1*/ USER CHECKED u32 *presult_flags,
                 struct ancillary_rmessage const *msg_control,
                 syscall_ulong_t msg_flags,
-                struct timespec const *timeout)
+                ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
@@ -983,7 +976,7 @@ socket_recvfromv(struct socket *__restrict self,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
-                 struct timespec const *timeout)
+                 ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 
 /* Begin to listen for incoming client (aka. peer) connection requests.

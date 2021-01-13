@@ -1233,17 +1233,16 @@ done:
 }
 
 /* Same as `epoll_controller_trywait()', but blocking wait until
- * at least 1 event could be consumed. If `timeout' is non-NULL,
+ * at least 1 event could be consumed. If `abs_timeout' is finite,
  * and expires while waiting for the first event to appear, then
- * this function will return `0' (note that if `timeout' was already
+ * this function will return `0' (note that if `abs_timeout' was already
  * expired from the get-go, this function will still try to consume
  * already-pending events, thus behaving identical to a call to
  * `epoll_controller_trywait()') */
 PUBLIC NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,
                       USER CHECKED struct epoll_event *events,
-                      size_t maxevents,
-                      struct timespec const *timeout)
+                      size_t maxevents, ktime_t abs_timeout)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
 	size_t result;
 	assert(!task_wasconnected());
@@ -1261,7 +1260,7 @@ again:
 			task_disconnectall();
 			RETHROW();
 		}
-		if (!task_waitfor_tms(timeout))
+		if (!task_waitfor(abs_timeout))
 			return 0; /* Nothing became available in the mean time... */
 		goto again;
 	}
@@ -1369,13 +1368,13 @@ DEFINE_SYSCALL4(ssize_t, epoll_wait,
 		      maxevents);
 	}
 	if (timeout < 0) {
-		result = epoll_controller_wait(self, events, maxevents, NULL);
+		result = epoll_controller_wait(self, events, maxevents);
 	} else if (timeout == 0) {
 		result = epoll_controller_trywait(self, events, maxevents);
 	} else {
-		struct timespec then = realtime();
-		then.add_milliseconds((unsigned int)timeout);
-		result = epoll_controller_wait(self, events, maxevents, &then);
+		ktime_t then = ktime();
+		then += relktime_from_milliseconds((syscall_ulong_t)timeout);
+		result = epoll_controller_wait(self, events, maxevents, then);
 	}
 	return (ssize_t)result;
 }

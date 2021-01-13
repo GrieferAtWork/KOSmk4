@@ -31,8 +31,8 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
-#include <sched/cpu.h>
 #include <sched/pid.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -85,7 +85,7 @@ PRIVATE syscall_slong_t KCALL
 sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
                syscall_ulong_t futex_op,
                uint32_t val,
-               struct timespec *timeout,
+               ktime_t timeout,
                uint32_t val2,
                USER UNCHECKED uint32_t *uaddr2,
                uint32_t val3) {
@@ -104,10 +104,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		TRY {
 			result = 0;
 			if (ATOMIC_READ(*uaddr) == val) {
-				/* `FUTEX_WAIT' takes a relative timeout, while `FUTEX_WAIT_BITSET' takes an absolute one. */
-				if (timeout && (futex_op & 127) == FUTEX_WAIT)
-					*timeout += realtime();
-				if (!task_waitfor_tms(timeout))
+				if (!task_waitfor(timeout))
 					result = -ETIMEDOUT;
 			} else {
 				task_disconnectall();
@@ -167,19 +164,18 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
                 USER UNCHECKED uint32_t *, uaddr2,
                 uint32_t, val3) {
 	syscall_slong_t result;
+	ktime_t timeout = KTIME_INFINITE;
 	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
-		struct timespec ts;
-		validate_readable(timeout_or_val2, sizeof(*timeout_or_val2));
-		COMPILER_READ_BARRIER();
-		ts.tv_sec  = timeout_or_val2->tv_sec;
-		ts.tv_nsec = timeout_or_val2->tv_nsec;
-		COMPILER_READ_BARRIER();
-		result = sys_futex_impl(uaddr, futex_op, val, &ts, 0, uaddr2, val3);
-	} else {
-		result = sys_futex_impl(uaddr, futex_op, val, NULL,
-		                        (uint32_t)(uintptr_t)timeout_or_val2,
-		                        uaddr2, val3);
+		/* `FUTEX_WAIT' takes a relative timeout, while all others takes an absolute one. */
+		if ((futex_op & 127) == FUTEX_WAIT) {
+			timeout = ktime() + relktime_from_user_rel(timeout_or_val2);
+		} else {
+			timeout = ktime_from_user(timeout_or_val2);
+		}
 	}
+	result = sys_futex_impl(uaddr, futex_op, val, timeout,
+	                        (uint32_t)(uintptr_t)timeout_or_val2,
+	                        uaddr2, val3);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_FUTEX */
@@ -193,19 +189,18 @@ DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
                        USER UNCHECKED uint32_t *, uaddr2,
                        uint32_t, val3) {
 	syscall_slong_t result;
+	ktime_t timeout = KTIME_INFINITE;
 	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
-		struct timespec ts;
-		validate_readable(timeout_or_val2, sizeof(*timeout_or_val2));
-		COMPILER_READ_BARRIER();
-		ts.tv_sec  = timeout_or_val2->tv_sec;
-		ts.tv_nsec = timeout_or_val2->tv_nsec;
-		COMPILER_READ_BARRIER();
-		result = sys_futex_impl(uaddr, futex_op, val, &ts, 0, uaddr2, val3);
-	} else {
-		result = sys_futex_impl(uaddr, futex_op, val, NULL,
-		                        (uint32_t)(uintptr_t)timeout_or_val2,
-		                        uaddr2, val3);
+		/* `FUTEX_WAIT' takes a relative timeout, while all others takes an absolute one. */
+		if ((futex_op & 127) == FUTEX_WAIT) {
+			timeout = ktime_from_user_rel(timeout_or_val2);
+		} else {
+			timeout = ktime_from_user(timeout_or_val2);
+		}
 	}
+	result = sys_futex_impl(uaddr, futex_op, val, timeout,
+	                        (uint32_t)(uintptr_t)timeout_or_val2,
+	                        uaddr2, val3);
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_FUTEX */

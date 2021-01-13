@@ -4635,7 +4635,7 @@ db_inode_loadpart(struct inode *__restrict self, datapage_t start,
 			aio_multihandle_fail(&hand);
 		}
 		TRY {
-			aio_multihandle_generic_waitfor(&hand);
+			aio_multihandle_generic_waitfor_tms(&hand);
 			aio_multihandle_generic_checkerror(&hand);
 		} EXCEPT {
 			aio_multihandle_generic_fini(&hand);
@@ -4677,7 +4677,7 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 			aio_multihandle_fail(&hand);
 		}
 		TRY {
-			aio_multihandle_generic_waitfor(&hand);
+			aio_multihandle_generic_waitfor_tms(&hand);
 			aio_multihandle_generic_checkerror(&hand);
 		} EXCEPT {
 			aio_multihandle_generic_fini(&hand);

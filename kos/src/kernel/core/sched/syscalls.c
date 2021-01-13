@@ -329,7 +329,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	timeout = ktime_from_user_rel(req);
+	timeout = ktime() + relktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
 	TRY {
 		for (;;) {
@@ -371,7 +371,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	timeout = ktime_from_user_rel(req);
+	timeout = ktime() + relktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
 	TRY {
 		for (;;) {
@@ -413,7 +413,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 	compat_validate_readable(req, sizeof(*req));
 	compat_validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	timeout = ktime_from_user_rel(req);
+	timeout = ktime() + relktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
 	TRY {
 		for (;;) {
@@ -455,7 +455,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 	compat_validate_readable(req, sizeof(*req));
 	compat_validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	timeout = ktime_from_user_rel(req);
+	timeout = ktime() + relktime_from_user_rel(req);
 	COMPILER_READ_BARRIER();
 	TRY {
 		for (;;) {

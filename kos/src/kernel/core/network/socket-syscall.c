@@ -29,6 +29,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/tsc.h>
 
 #include <hybrid/overflow.h>
 
@@ -942,8 +943,7 @@ DEFINE_SYSCALL4(ssize_t, recv, fd_t, sockfd,
 		                     /* bufsize:       */ bufsize,
 		                     /* presult_flags: */ NULL,
 		                     /* msg_control:   */ NULL,
-		                     /* msg_flags:     */ msg_flags,
-		                     /* timeout:       */ NULL);
+		                     /* msg_flags:     */ msg_flags);
 	}
 	return (ssize_t)result;
 }
@@ -993,16 +993,14 @@ DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
 			                         /* preq_addr_len: */ addr_len,
 			                         /* presult_flags: */ NULL,
 			                         /* msg_control:   */ NULL,
-			                         /* msg_flags:     */ msg_flags,
-			                         /* timeout:       */ NULL);
+			                         /* msg_flags:     */ msg_flags);
 		} else {
 			result = socket_recv(/* self:          */ me,
 			                     /* buf:           */ buf,
 			                     /* bufsize:       */ bufsize,
 			                     /* presult_flags: */ NULL,
 			                     /* msg_control:   */ NULL,
-			                     /* msg_flags:     */ msg_flags,
-			                     /* timeout:       */ NULL);
+			                     /* msg_flags:     */ msg_flags);
 		}
 	}
 	return (ssize_t)result;
@@ -1094,16 +1092,14 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 				                          /* preq_addr_len: */ &message->msg_namelen,
 				                          /* presult_flags: */ &message->msg_flags,
 				                          /* msg_control:   */ pcontrol,
-				                          /* msg_flags:     */ msg_flags,
-				                          /* timeout:       */ NULL);
+				                          /* msg_flags:     */ msg_flags);
 			} else {
 				result = socket_recvv(/* self:          */ me,
 				                      /* buf:           */ &iov,
 				                      /* bufsize:       */ iov_total,
 				                      /* presult_flags: */ &message->msg_flags,
 				                      /* msg_control:   */ pcontrol,
-				                      /* msg_flags:     */ msg_flags,
-				                      /* timeout:       */ NULL);
+				                      /* msg_flags:     */ msg_flags);
 			}
 		} EXCEPT {
 			freea(iov_vec);
@@ -1200,16 +1196,14 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 				                          /* preq_addr_len: */ &message->msg_namelen,
 				                          /* presult_flags: */ &message->msg_flags,
 				                          /* msg_control:   */ pcontrol,
-				                          /* msg_flags:     */ msg_flags,
-				                          /* timeout:       */ NULL);
+				                          /* msg_flags:     */ msg_flags);
 			} else {
 				result = socket_recvv(/* self:          */ me,
 				                      /* buf:           */ &iov,
 				                      /* bufsize:       */ iov_total,
 				                      /* presult_flags: */ &message->msg_flags,
 				                      /* msg_control:   */ pcontrol,
-				                      /* msg_flags:     */ msg_flags,
-				                      /* timeout:       */ NULL);
+				                      /* msg_flags:     */ msg_flags);
 			}
 		} EXCEPT {
 			freea(iov_vec);
@@ -1228,7 +1222,7 @@ PRIVATE ssize_t KCALL
 sys_recvmmsg_impl(fd_t sockfd,
                   USER UNCHECKED struct mmsghdr *vmessages,
                   size_t vlen, syscall_ulong_t msg_flags,
-                  struct timespec const *timeout) {
+                  ktime_t abs_timeout) {
 	size_t i;
 	REF struct handle sock;
 	struct socket *me;
@@ -1318,7 +1312,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 					                          /* presult_flags: */ &vmessages[i].msg_hdr.msg_flags,
 					                          /* msg_control:   */ pcontrol,
 					                          /* msg_flags:     */ msg_flags,
-					                          /* timeout:       */ (struct timespec *)timeout);
+					                          /* timeout:       */ abs_timeout);
 				} else {
 					result = socket_recvv(/* self:          */ me,
 					                      /* buf:           */ &iov,
@@ -1326,7 +1320,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 					                      /* presult_flags: */ &vmessages[i].msg_hdr.msg_flags,
 					                      /* msg_control:   */ pcontrol,
 					                      /* msg_flags:     */ msg_flags,
-					                      /* timeout:       */ (struct timespec *)timeout);
+					                      /* timeout:       */ abs_timeout);
 				}
 			} EXCEPT {
 				/* Special case: If the send fails for any operation other
@@ -1362,22 +1356,16 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
                 size_t, vlen, syscall_ulong_t, msg_flags,
                 USER UNCHECKED struct timespec32 const *, timeout) {
 	size_t result;
-	struct timespec _timeout_buf;
+	ktime_t abs_timeout;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
-		/* Copy the timeout into a kernel-space buffer.
-		 * We can't have `task_waitfor()' fault upon trying to access it! */
-		COMPILER_READ_BARRIER();
-		_timeout_buf.tv_sec  = (time_t)timeout->tv_sec;
-		_timeout_buf.tv_nsec = (syscall_ulong_t)timeout->tv_nsec;
-		COMPILER_READ_BARRIER();
-		timeout = (struct timespec32 *)&_timeout_buf;
+		abs_timeout = ktime_from_user(timeout);
 	}
 	result = sys_recvmmsg_impl(sockfd,
 	                           vmessages,
 	                           vlen,
 	                           msg_flags,
-	                           (struct timespec *)timeout);
+	                           abs_timeout);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_RECVMMSG */
@@ -1397,22 +1385,16 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
 #endif /* !__ARCH_WANT_SYSCALL_RECVMMSG64 */
 {
 	size_t result;
-	struct timespec _timeout_buf;
+	ktime_t abs_timeout;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
-		/* Copy the timeout into a kernel-space buffer.
-		 * We can't have `task_waitfor()' fault upon trying to access it! */
-		COMPILER_READ_BARRIER();
-		_timeout_buf.tv_sec  = (time_t)timeout->tv_sec;
-		_timeout_buf.tv_nsec = (syscall_ulong_t)timeout->tv_nsec;
-		COMPILER_READ_BARRIER();
-		timeout = (struct timespec64 *)&_timeout_buf;
+		abs_timeout = ktime_from_user(timeout);
 	}
 	result = sys_recvmmsg_impl(sockfd,
 	                           vmessages,
 	                           vlen,
 	                           msg_flags,
-	                           (struct timespec *)timeout);
+	                           abs_timeout);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_RECVMMSG64 */
@@ -1425,7 +1407,7 @@ PRIVATE ssize_t KCALL
 compat_sys_recvmmsg_impl(fd_t sockfd,
                          USER UNCHECKED struct compat_mmsghdr *vmessages,
                          size_t vlen, syscall_ulong_t msg_flags,
-                         struct timespec const *timeout) {
+                         ktime_t abs_timeout) {
 	size_t i;
 	REF struct handle sock;
 	struct socket *me;
@@ -1515,7 +1497,7 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 					                          /* presult_flags: */ &vmessages[i].msg_hdr.msg_flags,
 					                          /* msg_control:   */ pcontrol,
 					                          /* msg_flags:     */ msg_flags,
-					                          /* timeout:       */ timeout);
+					                          /* timeout:       */ abs_timeout);
 				} else {
 					result = socket_recvv(/* self:          */ me,
 					                      /* buf:           */ &iov,
@@ -1523,7 +1505,7 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 					                      /* presult_flags: */ &vmessages[i].msg_hdr.msg_flags,
 					                      /* msg_control:   */ pcontrol,
 					                      /* msg_flags:     */ msg_flags,
-					                      /* timeout:       */ timeout);
+					                      /* timeout:       */ abs_timeout);
 				}
 			} EXCEPT {
 				/* Special case: If the send fails for any operation other
@@ -1559,20 +1541,14 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
                        size_t, vlen, syscall_ulong_t, msg_flags,
                        USER UNCHECKED struct compat_timespec32 const *, timeout) {
 	ssize_t result;
-	struct timespec _timeout_buf;
+	ktime_t abs_timeout;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
-		COMPILER_READ_BARRIER();
-		_timeout_buf.tv_sec  = (time_t)timeout->tv_sec;
-		_timeout_buf.tv_nsec = timeout->tv_nsec;
-		COMPILER_READ_BARRIER();
-		timeout = (struct compat_timespec32 const *)&_timeout_buf;
+		abs_timeout = ktime_from_user(timeout);
 	}
-	result = compat_sys_recvmmsg_impl(sockfd,
-	                                  vmessages,
-	                                  vlen,
-	                                  msg_flags,
-	                                  (struct timespec const *)timeout);
+	result = compat_sys_recvmmsg_impl(sockfd, vmessages,
+	                                  vlen, msg_flags,
+	                                  abs_timeout);
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG */
@@ -1592,20 +1568,14 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RECVMMSG64 */
 {
 	ssize_t result;
-	struct timespec _timeout_buf;
+	ktime_t abs_timeout;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
-		COMPILER_READ_BARRIER();
-		_timeout_buf.tv_sec  = (time_t)timeout->tv_sec;
-		_timeout_buf.tv_nsec = timeout->tv_nsec;
-		COMPILER_READ_BARRIER();
-		timeout = (struct compat_timespec64 const *)&_timeout_buf;
+		abs_timeout = ktime_from_user(timeout);
 	}
-	result = compat_sys_recvmmsg_impl(sockfd,
-	                                  vmessages,
-	                                  vlen,
-	                                  msg_flags,
-	                                  (struct timespec const *)timeout);
+	result = compat_sys_recvmmsg_impl(sockfd, vmessages,
+	                                  vlen, msg_flags,
+	                                  abs_timeout);
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG64 */

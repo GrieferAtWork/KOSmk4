@@ -43,6 +43,7 @@
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -3463,7 +3464,7 @@ again_scan_prqueue:
 PRIVATE syscall_ulong_t KCALL
 signal_waitfor(CHECKED USER sigset_t const *uthese,
                CHECKED USER siginfo_t *uinfo,
-               struct timespec const *abs_timeout) {
+               ktime_t abs_timeout) {
 	sigset_t these;
 	syscall_ulong_t result;
 	assert(!task_wasconnected());
@@ -3506,7 +3507,7 @@ copy_and_free_ent_info:
 			RETHROW();
 		}
 		/* Wait for new signals to be delivered. */
-		if (!task_waitfor_tms(abs_timeout)) {
+		if (!task_waitfor(abs_timeout)) {
 			result = 0;
 			break;
 		}
@@ -3522,22 +3523,18 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
                 UNCHECKED USER struct timespec32 const *, uts,
                 size_t, sigsetsize) {
 	syscall_slong_t result;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
-		struct timespec tms;
 		validate_readable(uts, sizeof(*uts));
-		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)uts->tv_sec;
-		tms.tv_nsec = uts->tv_nsec;
-		COMPILER_READ_BARRIER();
-		if (tms.tv_sec || tms.tv_nsec)
-			tms += realtime();
-		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, &tms);
-	} else {
-		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, NULL);
+		abs_timeout = relktime_from_user_rel(uts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
 	}
+	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
@@ -3561,22 +3558,18 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 #endif /* !__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {
 	syscall_slong_t result;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
-		struct timespec tms;
 		validate_readable(uts, sizeof(*uts));
-		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)uts->tv_sec;
-		tms.tv_nsec = uts->tv_nsec;
-		COMPILER_READ_BARRIER();
-		if (tms.tv_sec || tms.tv_nsec)
-			tms += realtime();
-		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, &tms);
-	} else {
-		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, NULL);
+		abs_timeout = relktime_from_user_rel(uts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
 	}
+	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
@@ -3590,24 +3583,18 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
                        UNCHECKED USER struct compat_timespec32 const *, uts,
                        size_t, sigsetsize) {
 	syscall_slong_t result;
-	siginfo_t info;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
-	validate_writable(uinfo, sizeof(compat_siginfo_t));
-	compat_siginfo_to_siginfo(uinfo, &info);
+	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
-		struct timespec tms;
 		validate_readable(uts, sizeof(*uts));
-		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)uts->tv_sec;
-		tms.tv_nsec = uts->tv_nsec;
-		COMPILER_READ_BARRIER();
-		if (tms.tv_sec || tms.tv_nsec)
-			tms += realtime();
-		result = (syscall_slong_t)signal_waitfor(uthese, &info, &tms);
-	} else {
-		result = (syscall_slong_t)signal_waitfor(uthese, &info, NULL);
+		abs_timeout = relktime_from_user_rel(uts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
 	}
+	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
@@ -3631,24 +3618,18 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {
 	syscall_slong_t result;
-	siginfo_t info;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
-	validate_writable(uinfo, sizeof(compat_siginfo_t));
-	compat_siginfo_to_siginfo(uinfo, &info);
+	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
-		struct timespec tms;
 		validate_readable(uts, sizeof(*uts));
-		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)uts->tv_sec;
-		tms.tv_nsec = uts->tv_nsec;
-		COMPILER_READ_BARRIER();
-		if (tms.tv_sec || tms.tv_nsec)
-			tms += realtime();
-		result = (syscall_slong_t)signal_waitfor(uthese, &info, &tms);
-	} else {
-		result = (syscall_slong_t)signal_waitfor(uthese, &info, NULL);
+		abs_timeout = relktime_from_user_rel(uts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
 	}
+	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;

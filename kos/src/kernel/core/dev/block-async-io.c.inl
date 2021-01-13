@@ -545,7 +545,7 @@ PUBLIC NONNULL((1)) void
 #endif /* !... */
 #endif /* !DEFINE_IO_READ */
 	TRY {
-		aio_handle_generic_waitfor(&hand);
+		aio_handle_generic_waitfor_tms(&hand);
 		aio_handle_generic_checkerror(&hand);
 	} EXCEPT {
 		aio_handle_generic_fini(&hand);

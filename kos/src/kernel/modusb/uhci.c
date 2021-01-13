@@ -1887,7 +1887,7 @@ copy_next_tx:
 			/* perform the transfer using our buffer copies. */
 			uhci_transfer(self, tx_firstcopy, &aio);
 			TRY {
-				aio_handle_generic_waitfor(&aio);
+				aio_handle_generic_waitfor_tms(&aio);
 				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);

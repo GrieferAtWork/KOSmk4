@@ -29,10 +29,10 @@
 #include <kernel/handle.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -95,17 +95,15 @@ handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
 		if (WIFEXITED(self->tp_status)) {
 			ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 		} else {
-			struct timespec timeout, *ptimeout = NULL;
-			uint64_t timeout_sec;
+			ktime_t abs_timeout;
+			struct timespec ts;
 			COMPILER_READ_BARRIER();
-			timeout_sec = data->tj_reltimeout_sec;
+			ts.tv_sec  = data->tj_reltimeout_sec;
+			ts.tv_nsec = data->tj_reltimeout_nsec;
 			COMPILER_READ_BARRIER();
-			if (timeout_sec != 0 && timeout_sec != (uint64_t)-1) {
-				timeout = realtime();
-				timeout.tv_sec += timeout_sec;
-				timeout.add_nanoseconds(ATOMIC_READ(data->tj_reltimeout_nsec));
-				ptimeout = &timeout;
-			}
+			abs_timeout = relktime_from_user_rel(&ts);
+			if (abs_timeout != 0)
+				abs_timeout += ktime();
 again_waitfor:
 			task_connect_for_poll(&self->tp_changed);
 			COMPILER_READ_BARRIER();
@@ -114,8 +112,7 @@ again_waitfor:
 				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 				break;
 			}
-			if (timeout_sec ? !task_waitfor_tms(ptimeout)
-			                : !task_trywait()) {
+			if (!task_waitfor(abs_timeout)) {
 				task_disconnectall();
 				ATOMIC_WRITE(data->tj_status, 0);
 				return -ETIMEDOUT; /* Timeout */

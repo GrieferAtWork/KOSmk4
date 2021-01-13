@@ -581,7 +581,7 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
 	aio_handle_generic_init(&aio);
 	usb_controller_transfer(self, tx, &aio);
 	TRY {
-		aio_handle_generic_waitfor(&aio);
+		aio_handle_generic_waitfor_tms(&aio);
 		aio_handle_generic_checkerror(&aio);
 	} EXCEPT {
 		aio_handle_generic_fini(&aio);
@@ -662,7 +662,7 @@ usb_controller_request_sync(struct usb_controller *__restrict self,
 	aio_handle_generic_init(&aio);
 	usb_controller_request(self, endp, request, buf, &aio);
 	TRY {
-		aio_handle_generic_waitfor(&aio);
+		aio_handle_generic_waitfor_tms(&aio);
 		aio_handle_generic_checkerror(&aio);
 	} EXCEPT {
 		aio_handle_generic_fini(&aio);

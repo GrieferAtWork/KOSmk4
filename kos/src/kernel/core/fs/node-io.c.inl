@@ -388,7 +388,7 @@ load_next_part:
 			aio_multihandle_fail(&hand);
 		}
 		/* Wait for AIO completion */
-		aio_multihandle_generic_waitfor(&hand);
+		aio_multihandle_generic_waitfor_tms(&hand);
 		aio_multihandle_generic_checkerror(&hand);
 	} EXCEPT {
 		aio_multihandle_generic_fini(&hand);

@@ -186,9 +186,9 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
 /* Same as `epoll_controller_trywait()', but blocking wait until
- * at least 1 event could be consumed. If `timeout' is non-NULL,
+ * at least 1 event could be consumed. If `abs_timeout' is finite,
  * and expires while waiting for the first event to appear, then
- * this function will return `0' (note that if `timeout' was already
+ * this function will return `0' (note that if `abs_timeout' was already
  * expired from the get-go, this function will still try to consume
  * already-pending events, thus behaving identical to a call to
  * `epoll_controller_trywait()') */
@@ -196,7 +196,7 @@ FUNDEF NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,
                       USER CHECKED struct epoll_event *events,
                       size_t maxevents,
-                      struct timespec const *timeout)
+                      ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 
 /* Quickly check if there are pending events that can be waited upon. */
