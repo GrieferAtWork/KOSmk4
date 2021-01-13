@@ -193,7 +193,7 @@ DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
 	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
 		/* `FUTEX_WAIT' takes a relative timeout, while all others takes an absolute one. */
 		if ((futex_op & 127) == FUTEX_WAIT) {
-			timeout = ktime_from_user_rel(timeout_or_val2);
+			timeout = ktime() + relktime_from_user_rel(timeout_or_val2);
 		} else {
 			timeout = ktime_from_user(timeout_or_val2);
 		}

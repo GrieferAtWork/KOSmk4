@@ -3583,6 +3583,7 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
                        UNCHECKED USER struct compat_timespec32 const *, uts,
                        size_t, sigsetsize) {
 	syscall_slong_t result;
+	siginfo_t info;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
@@ -3593,10 +3594,13 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 		if (abs_timeout != 0)
 			abs_timeout += ktime();
 	}
-	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	result = (syscall_slong_t)signal_waitfor(uthese, &info,
 	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
+	else {
+		siginfo_to_compat_siginfo(&info, uinfo);
+	}
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT */
@@ -3618,6 +3622,7 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {
 	syscall_slong_t result;
+	siginfo_t info;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
@@ -3628,10 +3633,13 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 		if (abs_timeout != 0)
 			abs_timeout += ktime();
 	}
-	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	result = (syscall_slong_t)signal_waitfor(uthese, &info,
 	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
+	else {
+		siginfo_to_compat_siginfo(&info, uinfo);
+	}
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 || __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT_TIME64 */
