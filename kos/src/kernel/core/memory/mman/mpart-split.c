@@ -839,11 +839,11 @@ relock_with_data:
 		 *          also acquire a lock to it, so that we can insert the
 		 *          new part we'll be creating into it. */
 		if (!mfile_isanon(file)) {
-			if (!sync_trywrite(file)) {
+			if (!mfile_lock_trywrite(file)) {
 				incref(file);
 				unlockall(self);
 				FINALLY_DECREF_UNLIKELY(file);
-				while (!sync_canwrite(file))
+				while (!mfile_lock_canwrite(file))
 					task_yield();
 				goto again;
 			}
@@ -1264,7 +1264,7 @@ maybe_free_unused_hibitset:
 		lopart->mp_maxaddr = hipart->mp_minaddr - 1;
 		mpart_tree_insert(&file->mf_parts, lopart);
 		mpart_tree_insert(&file->mf_parts, hipart);
-		sync_endwrite(file);
+		mfile_lock_endwrite(file);
 	} else {
 		lopart->mp_maxaddr = hipart->mp_minaddr - 1;
 		DBG_memset(&hipart->mp_filent, 0xcc, sizeof(hipart->mp_filent));

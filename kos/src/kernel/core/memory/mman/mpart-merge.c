@@ -55,10 +55,10 @@ do_merge_anon:
 		goto done_unlock;
 	}
 	
-	if (sync_trywrite(file)) {
+	if (mfile_lock_trywrite(file)) {
 		struct mpart *next;
 		if unlikely(mfile_isanon(file)) {
-			sync_endwrite(file);
+			mfile_lock_endwrite(file);
 			goto do_merge_anon;
 		}
 		/* Check for a neighboring, preceding part. */
@@ -66,7 +66,7 @@ do_merge_anon:
 		if (next && next->mp_maxaddr == self->mp_minaddr - 1) {
 			/* Try to merge the prev node with `self' */
 			if (tryincref(next)) {
-				sync_endwrite(file);
+				mfile_lock_endwrite(file);
 				mpart_lock_release(self);
 				decref_unlikely(self);
 				self = next; /* Inherit reference */
@@ -77,7 +77,7 @@ do_merge_anon:
 		next = mpart_tree_nextnode(self);
 		if (!next || self->mp_maxaddr + 1 != next->mp_minaddr || !tryincref(next)) {
 done_unlock_endwrite_file:
-			sync_endwrite(file);
+			mfile_lock_endwrite(file);
 			goto done_unlock;
 		}
 		if (!mpart_lock_tryacquire(next)) {
@@ -89,7 +89,7 @@ done_unlock_endwrite_file:
 
 		mpart_lock_release(next);
 		decref_unlikely(next);
-		sync_endwrite(file);
+		mfile_lock_endwrite(file);
 	}
 done_unlock:
 	mpart_lock_release(self);

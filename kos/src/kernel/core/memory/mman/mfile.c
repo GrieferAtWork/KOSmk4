@@ -154,7 +154,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mfile_deadparts_reap)(struct mfile *__restrict self) {
 	REF struct mpart *parts;
 again:
-	if (!rwlock_trywrite(&self->mf_lock))
+	if (!atomic_rwlock_trywrite(&self->mf_lock))
 		return;
 	parts = SLIST_ATOMIC_CLEAR(&self->mf_deadparts);
 	if (self->mf_parts != MFILE_PARTS_ANONYMOUS) {
@@ -162,7 +162,7 @@ again:
 		for (iter = parts; iter; iter = SLIST_NEXT(iter, _mp_dead))
 			mpart_tree_removenode(&self->mf_parts, iter);
 	}
-	rwlock_endwrite(&self->mf_lock);
+	atomic_rwlock_endwrite(&self->mf_lock);
 	while (parts) {
 		REF struct mpart *next;
 		next = SLIST_NEXT(parts, _mp_dead);
@@ -325,7 +325,7 @@ mfile_makeanon(struct mfile *__restrict self)
 		return;
 	SLIST_INIT(&decref_later);
 again:
-	sync_write(self);
+	mfile_lock_write(self);
 	if (self->mf_parts == MFILE_PARTS_ANONYMOUS)
 		goto done_parts;
 	if (self->mf_parts == NULL) {
@@ -335,7 +335,7 @@ again:
 	/* Acquire locks to all parts, and change them to be anonymous. */
 	part = mpart_tree_foreach_incref_and_tryacquire(self->mf_parts);
 	if unlikely(part) {
-		sync_endwrite(self);
+		mfile_lock_endwrite(self);
 		FINALLY_DECREF_UNLIKELY(part);
 		while (!mpart_lock_available(part))
 			task_yield();
@@ -358,7 +358,7 @@ done_parts:
 		}
 	}
 
-	sync_endwrite(self);
+	mfile_lock_endwrite(self);
 	while (!SLIST_EMPTY(&decref_later)) {
 		part = SLIST_FIRST(&decref_later);
 		SLIST_REMOVE_HEAD(&decref_later, _mp_oob);
@@ -443,7 +443,7 @@ mfile_makeanon_subrange(struct mfile *__restrict self,
 	assert(mfile_addr_aligned(self, minaddr));
 	assert(mfile_addr_aligned(self, maxaddr + 1));
 again:
-	sync_write(self);
+	mfile_lock_write(self);
 	if (self->mf_parts == MFILE_PARTS_ANONYMOUS)
 		goto done;
 	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
@@ -455,7 +455,7 @@ again:
 		mpart_reladdr_t offset;
 		if unlikely(!tryincref(mima.mm_min))
 			mima.mm_min = NULL;
-		sync_endwrite(self);
+		mfile_lock_endwrite(self);
 		if likely(mima.mm_min) {
 			FINALLY_DECREF_UNLIKELY(mima.mm_min);
 			offset = (mpart_reladdr_t)(minaddr - mima.mm_min->mp_minaddr);
@@ -467,7 +467,7 @@ again:
 		mpart_reladdr_t offset;
 		if unlikely(!tryincref(mima.mm_max))
 			mima.mm_max = NULL;
-		sync_endwrite(self);
+		mfile_lock_endwrite(self);
 		if likely(mima.mm_max) {
 			FINALLY_DECREF_UNLIKELY(mima.mm_max);
 			offset = (mpart_reladdr_t)((maxaddr + 1) - mima.mm_max->mp_minaddr);
@@ -492,7 +492,7 @@ again:
 						mpart_destroy_later(elem);
 				}
 				/* Wait for the problematic part to become available. */
-				sync_endwrite(self);
+				mfile_lock_endwrite(self);
 				FINALLY_DECREF_UNLIKELY(part); /* The `if (tryincref(part)) {' above... */
 				while (!mpart_lock_available(part))
 					task_yield();
@@ -559,7 +559,7 @@ again:
 		decref(part);
 	}
 done:
-	sync_endwrite(self);
+	mfile_lock_endwrite(self);
 
 	/* Wake-up possibly waiting threads. */
 	sig_broadcast(&self->mf_initdone);
@@ -691,10 +691,10 @@ create_anon_part:
 		return mfile_create_global_part(self, addr, max_num_bytes);
 	}
 again_lock:
-	sync_read(self);
+	mfile_lock_read(self);
 	result = self->mf_parts;
 	if (result == MFILE_PARTS_ANONYMOUS) {
-		sync_endread(self);
+		mfile_lock_endread(self);
 		goto create_anon_part;
 	}
 again_locate:
@@ -707,7 +707,7 @@ again_locate:
 				_mfile_deadparts_reap(self);
 			goto again_lock;
 		}
-		sync_endread(self);
+		mfile_lock_endread(self);
 		return result;
 	}
 	/* No node exists for `addr'. - Figure out what the next-larger node is. */
@@ -718,15 +718,15 @@ again_locate:
 		if (limit > max_num_bytes)
 			limit = max_num_bytes;
 	}
-	sync_endread(self);
+	mfile_lock_endread(self);
 	/* Construct the new part. */
 	result = mfile_create_private_part(self, addr, max_num_bytes);
 	TRY {
 again_lock_after_result_created:
-		sync_write(self);
+		mfile_lock_write(self);
 		/* Make sure that nothing else appeared in the mean time. */
 		if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS) {
-			sync_endwrite(self);
+			mfile_lock_endwrite(self);
 			assert(result->mp_file == self);
 			decref_nokill(self);
 			assert(self->mf_blockshift < COMPILER_LENOF(mfile_anon));
@@ -752,7 +752,7 @@ again_lock_after_result_created:
 				/* Add the new part to the global list. */
 				mpart_all_list_insert(result);
 			}
-			sync_endwrite(self);
+			mfile_lock_endwrite(self);
 			return result;
 		}
 	} EXCEPT {
@@ -762,7 +762,7 @@ again_lock_after_result_created:
 		RETHROW();
 	}
 	/* The insert failed because of an overlap. */
-	sync_endwrite(self);
+	mfile_lock_endwrite(self);
 	LIST_ENTRY_UNBOUND_INIT(result, mp_allparts);
 	destroy(result);
 	goto again_locate;

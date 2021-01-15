@@ -36,29 +36,29 @@
 #define __PROT_GROWSUP   0x02000000 /* Same as `MAP_GROWSUP', but may be used with `mprotect()' */
 #ifdef __KOS__
 #if __KOS_VERSION__ >= 300
-#define __PROT_LOOSE    0x10 /* Unmap the region within the when cloning a VM (`CLONE_VM'). */
+#define __PROT_LOOSE     0x10 /* Unmap the region within the when cloning a VM (`CLONE_VM'). */
 #else /* __KOS_VERSION__ >= 300 */
-#define __PROT_LOOSE    0x10 /* Unmap the region within the when cloning a VM (`CLONE_VM').
-                              * NOTE: Implicitly set for all system-allocated user stacks,
-                              *       except for that of the calling thread. */
+#define __PROT_LOOSE     0x10 /* Unmap the region within the when cloning a VM (`CLONE_VM').
+                               * NOTE: Implicitly set for all system-allocated user stacks,
+                               *       except for that of the calling thread. */
 #endif /* __KOS_VERSION__ < 300 */
-#define __PROT_SHARED   0x20 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
-                              * NOTE: Same as the `MAP_SHARED' map flag, but
-                              *       can be set like any other protection. */
+#define __PROT_SHARED    0x20 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
+                               * NOTE: Same as the `MAP_SHARED' map flag, but
+                               *       can be set like any other protection. */
 #undef __PROT_MASK
-#define __PROT_MASK     0x3f /* Mask of flags accessible from user-space. */
+#define __PROT_MASK      0x3f /* Mask of flags accessible from user-space. */
 #if __KOS_VERSION__ < 400
-#define __PROT_NOUSER   0x40 /* Map memory as inaccessible to user-space.
-                              * WARNING: Not fully enforced for addresses within user-memory. */
+#define __PROT_NOUSER    0x40 /* Map memory as inaccessible to user-space.
+                               * WARNING: Not fully enforced for addresses within user-memory. */
 #if __KOS_VERSION__ < 300
-#define __PROT_CLEAN    0x80 /* Unset whenever user-space re-maps a page as writable. - Cannot be removed.
-                              * NOTE: This flag is used to prevent rootfork() from working
-                              *       when called from an otherwise read-only module after
-                              *       some portion of the section containing the root-fork
-                              *       system call has been mapped as writable.
-                              *    >> rootfork() fails when any page in the calling section (.text)
-                              *       isn't part of a root-module, isn't fully mapped, was
-                              *       re-mapped somewhere else, or been made writable at any point. */
+#define __PROT_CLEAN     0x80 /* Unset whenever user-space re-maps a page as writable. - Cannot be removed.
+                               * NOTE: This flag is used to prevent rootfork() from working
+                               *       when called from an otherwise read-only module after
+                               *       some portion of the section containing the root-fork
+                               *       system call has been mapped as writable.
+                               *    >> rootfork() fails when any page in the calling section (.text)
+                               *       isn't part of a root-module, isn't fully mapped, was
+                               *       re-mapped somewhere else, or been made writable at any point. */
 #endif /* __KOS_VERSION__ < 300 */
 #endif /* __KOS_VERSION__ < 400 */
 #endif /* __KOS__ */

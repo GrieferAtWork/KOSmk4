@@ -183,11 +183,11 @@ remove_node_from_globals:
 				return;
 			}
 		}
-	} else if (sync_trywrite(file)) {
+	} else if (mfile_lock_trywrite(file)) {
 		/* Immediately remove the part from the associated file's tree. */
 		if (file->mf_parts != MFILE_PARTS_ANONYMOUS)
 			mpart_tree_removenode(&file->mf_parts, self);
-		sync_endwrite(file);
+		mfile_lock_endwrite(file);
 		DBG_memset(&self->mp_filent, 0xcc, sizeof(self->mp_filent));
 		goto remove_node_from_globals;
 	} else {

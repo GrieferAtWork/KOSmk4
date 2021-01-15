@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb52d637e */
+/* HASH CRC-32:0xccd645e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,50 +63,50 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 
 /* Data cannot be accessed. */
-#ifdef __PROT_NONE
+#if !defined(PROT_NONE) && defined(__PROT_NONE)
 #define PROT_NONE __PROT_NONE
-#endif /* __PROT_NONE */
+#endif /* !PROT_NONE && __PROT_NONE */
 
 /* Data can be executed. */
-#ifdef __PROT_EXEC
+#if !defined(PROT_EXEC) && defined(__PROT_EXEC)
 #define PROT_EXEC __PROT_EXEC
-#endif /* __PROT_EXEC */
+#endif /* !PROT_EXEC && __PROT_EXEC */
 
 /* Data can be written. */
-#ifdef __PROT_WRITE
+#if !defined(PROT_WRITE) && defined(__PROT_WRITE)
 #define PROT_WRITE __PROT_WRITE
-#endif /* __PROT_WRITE */
+#endif /* !PROT_WRITE && __PROT_WRITE */
 
 /* Data can be read. */
-#ifdef __PROT_READ
+#if !defined(PROT_READ) && defined(__PROT_READ)
 #define PROT_READ __PROT_READ
-#endif /* __PROT_READ */
+#endif /* !PROT_READ && __PROT_READ */
 
 /* Ignored... */
-#ifdef __PROT_SEM
+#if !defined(PROT_SEM) && defined(__PROT_SEM)
 #define PROT_SEM __PROT_SEM
-#endif /* __PROT_SEM */
+#endif /* !PROT_SEM && __PROT_SEM */
 
 
 #if defined(__KOS__) && defined(__USE_KOS)
 /* Unmap the region within the when cloning a VM (`CLONE_VM'). */
-#ifdef __PROT_LOOSE
+#if !defined(PROT_LOOSE) && defined(__PROT_LOOSE)
 #define PROT_LOOSE __PROT_LOOSE
-#endif /* __PROT_LOOSE */
+#endif /* !PROT_LOOSE && __PROT_LOOSE */
 
 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
  * NOTE: Same as the `MAP_SHARED' map flag, but
  *       can be set like any other protection. */
-#ifdef __PROT_SHARED
+#if !defined(PROT_SHARED) && defined(__PROT_SHARED)
 #define PROT_SHARED __PROT_SHARED
-#endif /* __PROT_SHARED */
+#endif /* !PROT_SHARED && __PROT_SHARED */
 
 #ifdef __USE_KOS_KERNEL
 /* Map memory as inaccessible to user-space.
  * WARNING: Not fully enforced for addresses within user-memory. */
-#ifdef __PROT_NOUSER
+#if !defined(PROT_NOUSER) && defined(__PROT_NOUSER)
 #define PROT_NOUSER __PROT_NOUSER
-#endif /* __PROT_NOUSER */
+#endif /* !PROT_NOUSER && __PROT_NOUSER */
 
 /* Unset whenever user-space re-maps a page as writable. - Cannot be removed.
  * NOTE: This flag is used to prevent rootfork() from working
@@ -116,154 +116,154 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
  *    >> rootfork() fails when any page in the calling section (.text)
  *       isn't part of a root-module, isn't fully mapped, was
  *       re-mapped somewhere else, or been made writable at any point. */
-#ifdef __PROT_CLEAN
+#if !defined(PROT_CLEAN) && defined(__PROT_CLEAN)
 #define PROT_CLEAN __PROT_CLEAN
-#endif /* __PROT_CLEAN */
+#endif /* !PROT_CLEAN && __PROT_CLEAN */
 
 #endif /* __USE_KOS_KERNEL */
 #endif /* __USE_KOS */
 
 #ifdef __USE_KOS_KERNEL
  /* Mask of flags accessible from user-space. */
-#ifdef __PROT_MASK
+#if !defined(PROT_MASK) && defined(__PROT_MASK)
 #define PROT_MASK __PROT_MASK
-#endif /* __PROT_MASK */
+#endif /* !PROT_MASK && __PROT_MASK */
 #endif /* __USE_KOS_KERNEL */
 
 
 
 #ifdef __USE_KOS
 /* Use sharing behavior specified by `PROT_SHARED'. */
-#ifdef __MAP_AUTOMATIC
+#if !defined(MAP_AUTOMATIC) && defined(__MAP_AUTOMATIC)
 #define MAP_AUTOMATIC __MAP_AUTOMATIC
-#endif /* __MAP_AUTOMATIC */
+#endif /* !MAP_AUTOMATIC && __MAP_AUTOMATIC */
 #endif /* __USE_KOS */
 
 /* Share changes. */
-#ifdef __MAP_SHARED
+#if !defined(MAP_SHARED) && defined(__MAP_SHARED)
 #define MAP_SHARED __MAP_SHARED
-#endif /* __MAP_SHARED */
+#endif /* !MAP_SHARED && __MAP_SHARED */
 
 /* Changes are private. */
-#ifdef __MAP_PRIVATE
+#if !defined(MAP_PRIVATE) && defined(__MAP_PRIVATE)
 #define MAP_PRIVATE __MAP_PRIVATE
-#endif /* __MAP_PRIVATE */
+#endif /* !MAP_PRIVATE && __MAP_PRIVATE */
 
 /* Interpret addr exactly. */
-#ifdef __MAP_FIXED
+#if !defined(MAP_FIXED) && defined(__MAP_FIXED)
 #define MAP_FIXED __MAP_FIXED
-#endif /* __MAP_FIXED */
+#endif /* !MAP_FIXED && __MAP_FIXED */
 
 
 #ifdef __USE_MISC
 /* Mask for type of mapping. */
-#ifdef __MAP_TYPE
+#if !defined(MAP_TYPE) && defined(__MAP_TYPE)
 #define MAP_TYPE __MAP_TYPE
-#endif /* __MAP_TYPE */
+#endif /* !MAP_TYPE && __MAP_TYPE */
 
 /* Do use a file. */
-#ifdef __MAP_FILE
+#if !defined(MAP_FILE) && defined(__MAP_FILE)
 #define MAP_FILE __MAP_FILE
-#endif /* __MAP_FILE */
+#endif /* !MAP_FILE && __MAP_FILE */
 
 /* Don't use a file. */
-#ifdef __MAP_ANON
+#if !defined(MAP_ANONYMOUS) && defined(__MAP_ANON)
 #define MAP_ANONYMOUS __MAP_ANON
-#endif /* !__MAP_ANON */
+#endif /* !!MAP_ANONYMOUS && __MAP_ANONMAP_ANON */
 #endif /* __USE_MISC */
 
 /* Don't use a file. */
-#ifdef __MAP_ANON
+#if !defined(MAP_ANON) && defined(__MAP_ANON)
 #define MAP_ANON __MAP_ANON
-#endif /* __MAP_ANON */
+#endif /* !MAP_ANON && __MAP_ANON */
 
 
 /* Other flags. */
 #ifdef __USE_MISC
 /* Only give out 32-bit addresses. */
-#ifdef __MAP_32BIT
+#if !defined(MAP_32BIT) && defined(__MAP_32BIT)
 #define MAP_32BIT __MAP_32BIT
-#endif /* __MAP_32BIT */
+#endif /* !MAP_32BIT && __MAP_32BIT */
 #endif /* __USE_MISC */
 
 
 
 #ifdef __USE_MISC
 /* Stack-like segment. */
-#ifdef __MAP_GROWSDOWN
+#if !defined(MAP_GROWSDOWN) && defined(__MAP_GROWSDOWN)
 #define MAP_GROWSDOWN __MAP_GROWSDOWN
-#endif /* __MAP_GROWSDOWN */
+#endif /* !MAP_GROWSDOWN && __MAP_GROWSDOWN */
 
 /* Stack-like segment growing upwards. */
-#ifdef __MAP_GROWSUP
+#if !defined(MAP_GROWSUP) && defined(__MAP_GROWSUP)
 #define MAP_GROWSUP __MAP_GROWSUP
-#endif /* __MAP_GROWSUP */
+#endif /* !MAP_GROWSUP && __MAP_GROWSUP */
 
 /* Ignored. */
-#ifdef __MAP_DENYWRITE
+#if !defined(MAP_DENYWRITE) && defined(__MAP_DENYWRITE)
 #define MAP_DENYWRITE __MAP_DENYWRITE
-#endif /* __MAP_DENYWRITE */
+#endif /* !MAP_DENYWRITE && __MAP_DENYWRITE */
 
 /* Ignored. */
-#ifdef __MAP_EXECUTABLE
+#if !defined(MAP_EXECUTABLE) && defined(__MAP_EXECUTABLE)
 #define MAP_EXECUTABLE __MAP_EXECUTABLE
-#endif /* __MAP_EXECUTABLE */
+#endif /* !MAP_EXECUTABLE && __MAP_EXECUTABLE */
 
 /* Lock the mapping. */
-#ifdef __MAP_LOCKED
+#if !defined(MAP_LOCKED) && defined(__MAP_LOCKED)
 #define MAP_LOCKED __MAP_LOCKED
-#endif /* __MAP_LOCKED */
+#endif /* !MAP_LOCKED && __MAP_LOCKED */
 
 /* Don't check for reservations. */
-#ifdef __MAP_NORESERVE
+#if !defined(MAP_NORESERVE) && defined(__MAP_NORESERVE)
 #define MAP_NORESERVE __MAP_NORESERVE
-#endif /* __MAP_NORESERVE */
+#endif /* !MAP_NORESERVE && __MAP_NORESERVE */
 
 /* Populate (prefault) pagetables. */
-#ifdef __MAP_POPULATE
+#if !defined(MAP_POPULATE) && defined(__MAP_POPULATE)
 #define MAP_POPULATE __MAP_POPULATE
-#endif /* __MAP_POPULATE */
+#endif /* !MAP_POPULATE && __MAP_POPULATE */
 
 /* Do not block on IO. */
-#ifdef __MAP_NONBLOCK
+#if !defined(MAP_NONBLOCK) && defined(__MAP_NONBLOCK)
 #define MAP_NONBLOCK __MAP_NONBLOCK
-#endif /* __MAP_NONBLOCK */
+#endif /* !MAP_NONBLOCK && __MAP_NONBLOCK */
 
 /* Allocation is for a stack.
  * NOTE: KOS uses this flag to determine where
  *       automatic memory mappings are allocated at. */
-#ifdef __MAP_STACK
+#if !defined(MAP_STACK) && defined(__MAP_STACK)
 #define MAP_STACK __MAP_STACK
-#endif /* __MAP_STACK */
+#endif /* !MAP_STACK && __MAP_STACK */
 
 /* XXX: Implement me? */
-#ifdef __MAP_SYNC
+#if !defined(MAP_SYNC) && defined(__MAP_SYNC)
 #define MAP_SYNC __MAP_SYNC
-#endif /* __MAP_SYNC */
+#endif /* !MAP_SYNC && __MAP_SYNC */
 
 
 /* Create huge page mapping. */
-#ifdef __MAP_HUGETLB
+#if !defined(MAP_HUGETLB) && defined(__MAP_HUGETLB)
 #define MAP_HUGETLB __MAP_HUGETLB
-#endif /* __MAP_HUGETLB */
-#ifdef __MAP_HUGE_SHIFT
+#endif /* !MAP_HUGETLB && __MAP_HUGETLB */
+#if !defined(MAP_HUGE_SHIFT) && defined(__MAP_HUGE_SHIFT)
 #define MAP_HUGE_SHIFT __MAP_HUGE_SHIFT
-#endif /* __MAP_HUGE_SHIFT */
-#ifdef __MAP_HUGE_MASK
+#endif /* !MAP_HUGE_SHIFT && __MAP_HUGE_SHIFT */
+#if !defined(MAP_HUGE_MASK) && defined(__MAP_HUGE_MASK)
 #define MAP_HUGE_MASK __MAP_HUGE_MASK
-#endif /* __MAP_HUGE_MASK */
+#endif /* !MAP_HUGE_MASK && __MAP_HUGE_MASK */
 
 
 /* For anonymous mmap, memory could be uninitialized. */
-#ifdef __MAP_UNINITIALIZED
+#if !defined(MAP_UNINITIALIZED) && defined(__MAP_UNINITIALIZED)
 #define MAP_UNINITIALIZED __MAP_UNINITIALIZED
-#endif /* __MAP_UNINITIALIZED */
+#endif /* !MAP_UNINITIALIZED && __MAP_UNINITIALIZED */
 
 /* Don't override existing mappings when `MAP_FIXED' is passed.
  * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
-#ifdef __MAP_FIXED_NOREPLACE
+#if !defined(MAP_FIXED_NOREPLACE) && defined(__MAP_FIXED_NOREPLACE)
 #define MAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
-#endif /* __MAP_FIXED_NOREPLACE */
+#endif /* !MAP_FIXED_NOREPLACE && __MAP_FIXED_NOREPLACE */
 
 #ifdef __USE_KOS_KERNEL
 /* Don't actually map memory, but test the waters of a memory
@@ -271,15 +271,15 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
  * large free memory range.
  * This flag is usually followed by another call that sets
  * the `MAP_FIXED_NOREPLACE' flag. */
-#ifdef __MAP_DONT_MAP
+#if !defined(MAP_DONT_MAP) && defined(__MAP_DONT_MAP)
 #define MAP_DONT_MAP __MAP_DONT_MAP
-#endif /* __MAP_DONT_MAP */
+#endif /* !MAP_DONT_MAP && __MAP_DONT_MAP */
 
 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
  * unsigned integer that should actually be used as offset. */
-#ifdef __MAP_OFFSET64_POINTER
+#if !defined(MAP_OFFSET64_POINTER) && defined(__MAP_OFFSET64_POINTER)
 #define MAP_OFFSET64_POINTER __MAP_OFFSET64_POINTER
-#endif /* __MAP_OFFSET64_POINTER */
+#endif /* !MAP_OFFSET64_POINTER && __MAP_OFFSET64_POINTER */
 #endif /* __USE_KOS_KERNEL */
 #endif /* __USE_MISC */
 
@@ -287,22 +287,22 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 /* Error return value for `mmap()'                                      */
 /************************************************************************/
-#ifdef __MAP_FAILED
+#if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED
-#endif /* __MAP_FAILED */
+#endif /* !MAP_FAILED && __MAP_FAILED */
 
 
 /* Extended flags for use with `mprotect()' */
 
 /* Same as `MAP_GROWSDOWN', but may be used with `mprotect()' */
-#ifdef __PROT_GROWSDOWN
+#if !defined(PROT_GROWSDOWN) && defined(__PROT_GROWSDOWN)
 #define PROT_GROWSDOWN __PROT_GROWSDOWN
-#endif /* __PROT_GROWSDOWN */
+#endif /* !PROT_GROWSDOWN && __PROT_GROWSDOWN */
 
 /* Same as `MAP_GROWSUP', but may be used with `mprotect()' */
-#ifdef __PROT_GROWSUP
+#if !defined(PROT_GROWSUP) && defined(__PROT_GROWSUP)
 #define PROT_GROWSUP __PROT_GROWSUP
-#endif /* __PROT_GROWSUP */
+#endif /* !PROT_GROWSUP && __PROT_GROWSUP */
 
 
 /************************************************************************/
@@ -310,19 +310,19 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 
 /* Perform the operation asynchronously. */
-#ifdef __MS_ASYNC
+#if !defined(MS_ASYNC) && defined(__MS_ASYNC)
 #define MS_ASYNC __MS_ASYNC
-#endif /* __MS_ASYNC */
+#endif /* !MS_ASYNC && __MS_ASYNC */
 
 /* Invalidate caches. */
-#ifdef __MS_INVALIDATE
+#if !defined(MS_INVALIDATE) && defined(__MS_INVALIDATE)
 #define MS_INVALIDATE __MS_INVALIDATE
-#endif /* __MS_INVALIDATE */
+#endif /* !MS_INVALIDATE && __MS_INVALIDATE */
 
 /* Wait for the sync to finish. */
-#ifdef __MS_SYNC
+#if !defined(MS_SYNC) && defined(__MS_SYNC)
 #define MS_SYNC __MS_SYNC
-#endif /* __MS_SYNC */
+#endif /* !MS_SYNC && __MS_SYNC */
 
 
 /************************************************************************/
@@ -330,14 +330,14 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 #ifdef __USE_GNU
 /* Allowed to move to a different location */
-#ifdef __MREMAP_MAYMOVE
+#if !defined(MREMAP_MAYMOVE) && defined(__MREMAP_MAYMOVE)
 #define MREMAP_MAYMOVE __MREMAP_MAYMOVE
-#endif /* __MREMAP_MAYMOVE */
+#endif /* !MREMAP_MAYMOVE && __MREMAP_MAYMOVE */
 
 /* Fixed target address */
-#ifdef __MREMAP_FIXED
+#if !defined(MREMAP_FIXED) && defined(__MREMAP_FIXED)
 #define MREMAP_FIXED __MREMAP_FIXED
-#endif /* __MREMAP_FIXED */
+#endif /* !MREMAP_FIXED && __MREMAP_FIXED */
 #endif /* __USE_GNU */
 
 
@@ -367,79 +367,79 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 #ifdef __USE_MISC
 /* No further special treatment. */
-#ifdef __MADV_NORMAL
+#if !defined(MADV_NORMAL) && defined(__MADV_NORMAL)
 #define MADV_NORMAL __MADV_NORMAL
-#endif /* __MADV_NORMAL */
+#endif /* !MADV_NORMAL && __MADV_NORMAL */
 
 /* Expect random page references. */
-#ifdef __MADV_RANDOM
+#if !defined(MADV_RANDOM) && defined(__MADV_RANDOM)
 #define MADV_RANDOM __MADV_RANDOM
-#endif /* __MADV_RANDOM */
+#endif /* !MADV_RANDOM && __MADV_RANDOM */
 
 /* Expect sequential page references. */
-#ifdef __MADV_SEQUENTIAL
+#if !defined(MADV_SEQUENTIAL) && defined(__MADV_SEQUENTIAL)
 #define MADV_SEQUENTIAL __MADV_SEQUENTIAL
-#endif /* __MADV_SEQUENTIAL */
+#endif /* !MADV_SEQUENTIAL && __MADV_SEQUENTIAL */
 
 /* Will need these pages. */
-#ifdef __MADV_WILLNEED
+#if !defined(MADV_WILLNEED) && defined(__MADV_WILLNEED)
 #define MADV_WILLNEED __MADV_WILLNEED
-#endif /* __MADV_WILLNEED */
+#endif /* !MADV_WILLNEED && __MADV_WILLNEED */
 
 /* Don't need these pages. */
-#ifdef __MADV_DONTNEED
+#if !defined(MADV_DONTNEED) && defined(__MADV_DONTNEED)
 #define MADV_DONTNEED __MADV_DONTNEED
-#endif /* __MADV_DONTNEED */
+#endif /* !MADV_DONTNEED && __MADV_DONTNEED */
 
 /* Remove these pages and resources. */
-#ifdef __MADV_REMOVE
+#if !defined(MADV_REMOVE) && defined(__MADV_REMOVE)
 #define MADV_REMOVE __MADV_REMOVE
-#endif /* __MADV_REMOVE */
+#endif /* !MADV_REMOVE && __MADV_REMOVE */
 
 /* Do not inherit across fork. */
-#ifdef __MADV_DONTFORK
+#if !defined(MADV_DONTFORK) && defined(__MADV_DONTFORK)
 #define MADV_DONTFORK __MADV_DONTFORK
-#endif /* __MADV_DONTFORK */
+#endif /* !MADV_DONTFORK && __MADV_DONTFORK */
 
 /* Do inherit across fork. */
-#ifdef __MADV_DOFORK
+#if !defined(MADV_DOFORK) && defined(__MADV_DOFORK)
 #define MADV_DOFORK __MADV_DOFORK
-#endif /* __MADV_DOFORK */
+#endif /* !MADV_DOFORK && __MADV_DOFORK */
 
 /* KSM may merge identical pages. */
-#ifdef __MADV_MERGEABLE
+#if !defined(MADV_MERGEABLE) && defined(__MADV_MERGEABLE)
 #define MADV_MERGEABLE __MADV_MERGEABLE
-#endif /* __MADV_MERGEABLE */
+#endif /* !MADV_MERGEABLE && __MADV_MERGEABLE */
 
 /* KSM may not merge identical pages. */
-#ifdef __MADV_UNMERGEABLE
+#if !defined(MADV_UNMERGEABLE) && defined(__MADV_UNMERGEABLE)
 #define MADV_UNMERGEABLE __MADV_UNMERGEABLE
-#endif /* __MADV_UNMERGEABLE */
+#endif /* !MADV_UNMERGEABLE && __MADV_UNMERGEABLE */
 
 /* Worth backing with hugepages. */
-#ifdef __MADV_HUGEPAGE
+#if !defined(MADV_HUGEPAGE) && defined(__MADV_HUGEPAGE)
 #define MADV_HUGEPAGE __MADV_HUGEPAGE
-#endif /* __MADV_HUGEPAGE */
+#endif /* !MADV_HUGEPAGE && __MADV_HUGEPAGE */
 
 /* Not worth backing with hugepages. */
-#ifdef __MADV_NOHUGEPAGE
+#if !defined(MADV_NOHUGEPAGE) && defined(__MADV_NOHUGEPAGE)
 #define MADV_NOHUGEPAGE __MADV_NOHUGEPAGE
-#endif /* __MADV_NOHUGEPAGE */
+#endif /* !MADV_NOHUGEPAGE && __MADV_NOHUGEPAGE */
 
 /* Explicity exclude from the core dump, overrides the coredump filter bits. */
-#ifdef __MADV_DONTDUMP
+#if !defined(MADV_DONTDUMP) && defined(__MADV_DONTDUMP)
 #define MADV_DONTDUMP __MADV_DONTDUMP
-#endif /* __MADV_DONTDUMP */
+#endif /* !MADV_DONTDUMP && __MADV_DONTDUMP */
 
 /* Clear the MADV_DONTDUMP flag. */
-#ifdef __MADV_DODUMP
+#if !defined(MADV_DODUMP) && defined(__MADV_DODUMP)
 #define MADV_DODUMP __MADV_DODUMP
-#endif /* __MADV_DODUMP */
+#endif /* !MADV_DODUMP && __MADV_DODUMP */
 
 /* Poison a page for testing. */
-#ifdef __MADV_HWPOISON
+#if !defined(MADV_HWPOISON) && defined(__MADV_HWPOISON)
 #define MADV_HWPOISON __MADV_HWPOISON
-#endif /* __MADV_HWPOISON */
+#endif /* !MADV_HWPOISON && __MADV_HWPOISON */
 #endif /* __USE_MISC */
 
 
@@ -448,29 +448,29 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 #ifdef __USE_XOPEN2K
 /* No further special treatment. */
-#ifdef __POSIX_MADV_NORMAL
+#if !defined(POSIX_MADV_NORMAL) && defined(__POSIX_MADV_NORMAL)
 #define POSIX_MADV_NORMAL __POSIX_MADV_NORMAL
-#endif /* __POSIX_MADV_NORMAL */
+#endif /* !POSIX_MADV_NORMAL && __POSIX_MADV_NORMAL */
 
 /* Expect random page references. */
-#ifdef __POSIX_MADV_RANDOM
+#if !defined(POSIX_MADV_RANDOM) && defined(__POSIX_MADV_RANDOM)
 #define POSIX_MADV_RANDOM __POSIX_MADV_RANDOM
-#endif /* __POSIX_MADV_RANDOM */
+#endif /* !POSIX_MADV_RANDOM && __POSIX_MADV_RANDOM */
 
 /* Expect sequential page references. */
-#ifdef __POSIX_MADV_SEQUENTIAL
+#if !defined(POSIX_MADV_SEQUENTIAL) && defined(__POSIX_MADV_SEQUENTIAL)
 #define POSIX_MADV_SEQUENTIAL __POSIX_MADV_SEQUENTIAL
-#endif /* __POSIX_MADV_SEQUENTIAL */
+#endif /* !POSIX_MADV_SEQUENTIAL && __POSIX_MADV_SEQUENTIAL */
 
 /* Will need these pages. */
-#ifdef __POSIX_MADV_WILLNEED
+#if !defined(POSIX_MADV_WILLNEED) && defined(__POSIX_MADV_WILLNEED)
 #define POSIX_MADV_WILLNEED __POSIX_MADV_WILLNEED
-#endif /* __POSIX_MADV_WILLNEED */
+#endif /* !POSIX_MADV_WILLNEED && __POSIX_MADV_WILLNEED */
 
 /* Don't need these pages. */
-#ifdef __POSIX_MADV_DONTNEED
+#if !defined(POSIX_MADV_DONTNEED) && defined(__POSIX_MADV_DONTNEED)
 #define POSIX_MADV_DONTNEED __POSIX_MADV_DONTNEED
-#endif /* __POSIX_MADV_DONTNEED */
+#endif /* !POSIX_MADV_DONTNEED && __POSIX_MADV_DONTNEED */
 #endif /* __USE_XOPEN2K */
 
 
@@ -479,19 +479,19 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 #ifndef MCL_CURRENT
 /* Lock all currently mapped pages. */
-#ifdef __MCL_CURRENT
+#if !defined(MCL_CURRENT) && defined(__MCL_CURRENT)
 #define MCL_CURRENT __MCL_CURRENT
-#endif /* __MCL_CURRENT */
+#endif /* !MCL_CURRENT && __MCL_CURRENT */
 
 /* Lock all additions to address space. */
-#ifdef __MCL_FUTURE
+#if !defined(MCL_FUTURE) && defined(__MCL_FUTURE)
 #define MCL_FUTURE __MCL_FUTURE
-#endif /* __MCL_FUTURE */
+#endif /* !MCL_FUTURE && __MCL_FUTURE */
 
 /* Lock all pages that are faulted in. */
-#ifdef __MCL_ONFAULT
+#if !defined(MCL_ONFAULT) && defined(__MCL_ONFAULT)
 #define MCL_ONFAULT __MCL_ONFAULT
-#endif /* __MCL_ONFAULT */
+#endif /* !MCL_ONFAULT && __MCL_ONFAULT */
 #endif /* !MCL_CURRENT */
 
 
@@ -500,19 +500,19 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 
 /* Close-on-exec */
-#ifdef __MFD_CLOEXEC
+#if !defined(MFD_CLOEXEC) && defined(__MFD_CLOEXEC)
 #define MFD_CLOEXEC __MFD_CLOEXEC
-#endif /* __MFD_CLOEXEC */
+#endif /* !MFD_CLOEXEC && __MFD_CLOEXEC */
 
 /* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
-#ifdef __MFD_ALLOW_SEALING
+#if !defined(MFD_ALLOW_SEALING) && defined(__MFD_ALLOW_SEALING)
 #define MFD_ALLOW_SEALING __MFD_ALLOW_SEALING
-#endif /* __MFD_ALLOW_SEALING */
+#endif /* !MFD_ALLOW_SEALING && __MFD_ALLOW_SEALING */
 
 /* ... */
-#ifdef __MFD_HUGETLB
+#if !defined(MFD_HUGETLB) && defined(__MFD_HUGETLB)
 #define MFD_HUGETLB __MFD_HUGETLB
-#endif /* __MFD_HUGETLB */
+#endif /* !MFD_HUGETLB && __MFD_HUGETLB */
 
 
 /************************************************************************/
@@ -520,9 +520,9 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 
 /* ... */
-#ifdef __MLOCK_ONFAULT
+#if !defined(MLOCK_ONFAULT) && defined(__MLOCK_ONFAULT)
 #define MLOCK_ONFAULT __MLOCK_ONFAULT
-#endif /* __MLOCK_ONFAULT */
+#endif /* !MLOCK_ONFAULT && __MLOCK_ONFAULT */
 
 
 /************************************************************************/
@@ -530,14 +530,14 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 /************************************************************************/
 
 /* ... */
-#ifdef __PKEY_DISABLE_ACCESS
+#if !defined(PKEY_DISABLE_ACCESS) && defined(__PKEY_DISABLE_ACCESS)
 #define PKEY_DISABLE_ACCESS __PKEY_DISABLE_ACCESS
-#endif /* __PKEY_DISABLE_ACCESS */
+#endif /* !PKEY_DISABLE_ACCESS && __PKEY_DISABLE_ACCESS */
 
 /* ... */
-#ifdef __PKEY_DISABLE_WRITE
+#if !defined(PKEY_DISABLE_WRITE) && defined(__PKEY_DISABLE_WRITE)
 #define PKEY_DISABLE_WRITE __PKEY_DISABLE_WRITE
-#endif /* __PKEY_DISABLE_WRITE */
+#endif /* !PKEY_DISABLE_WRITE && __PKEY_DISABLE_WRITE */
 
 
 

@@ -28,6 +28,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 
