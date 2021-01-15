@@ -547,7 +547,6 @@ aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
 	return aio_handle_generic_hascompleted(self);
 }
 
-struct timespec;
 LOCAL NONNULL((1)) bool KCALL
 aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
                            ktime_t abs_timeout DFL(KTIME_INFINITE))

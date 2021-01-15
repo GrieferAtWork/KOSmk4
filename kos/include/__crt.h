@@ -24,17 +24,16 @@
 #include "hybrid/host.h"
 
 /* Automatically detect the linked CRT
- *   - __CRT_DOS          (windows / msvcrt.dll)
- *   - __CRT_GLC          (linux / glibc.so)
  *   - __CRT_CYG          (windows / cygwin)
+ *   - __CRT_DOS          (windows / msvcrt.dll)
+ *   - __CRT_FREESTANDING (freestanding / none)
+ *   - __CRT_GENERIC      (generic / *)
+ *   - __CRT_GLC          (linux / glibc.so)
  *   - __CRT_KOS          (kos / libc.so)
  *   - __CRT_KOS_KERNEL   (kos / kernel.bin)
- *   - __CRT_GENERIC      (generic / *)
- *   - __CRT_FREESTANDING (freestanding / none)
  */
-#if (!defined(__CRT_DOS) && !defined(__CRT_GLC) && \
-     !defined(__CRT_KOS) && !defined(__CRT_CYG) && \
-     !defined(__CRT_KRS) && !defined(__CRT_KLS) && \
+#if (!defined(__CRT_DOS) && !defined(__CRT_GLC) &&            \
+     !defined(__CRT_KOS) && !defined(__CRT_CYG) &&            \
      !defined(__CRT_GENERIC) && !defined(__CRT_KOS_KERNEL) && \
      !defined(__CRT_FREESTANDING))
 #if defined(__KOS__) && defined(__KERNEL__)
@@ -251,7 +250,7 @@
  *   - *_CALLER_CLEANUP:
  *     The caller of a function is responsible to clean up the argument list.
  *     When defined, this allows functions to be called with more arguments
- *     that they actually take
+ *     than they actually take, with superfluous arguments simply being ignored.
  *       - __LIBCCALL_CALLER_CLEANUP
  *       - __LIBKCALL_CALLER_CLEANUP
  *       - __LIBDCALL_CALLER_CLEANUP

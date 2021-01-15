@@ -33,7 +33,6 @@
 DECL_BEGIN
 
 struct task;
-struct timespec;
 
 struct mutex {
 	struct sig        m_unlock; /* Signal send when the mutex is unlocked. */

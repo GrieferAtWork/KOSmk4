@@ -246,8 +246,6 @@ NOTHROW(FCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
 }
 #endif /* !__INTELLISENSE__ */
 
-struct timespec;
-
 #ifdef __INTELLISENSE__
 /* Blocking-acquire a shared/exclusive lock.
  * NOTE: These functions clobber task connections.

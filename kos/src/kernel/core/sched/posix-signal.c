@@ -472,7 +472,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	sm     = FORTASK(self, this_sigmask).get();
-	result = (int)sigismember(&sm->sm_mask, signo);
+	result = (int)!!sigismember(&sm->sm_mask, signo);
 	decref_unlikely(sm);
 	if (result != SIGMASK_ISMASKED_NO &&
 	    unlikely(signo == SIGKILL || signo == SIGSTOP))

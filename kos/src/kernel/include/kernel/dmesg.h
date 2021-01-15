@@ -114,8 +114,6 @@ dmesg_getmessage(USER CHECKED char *buffer,
                  size_t message_length)
 		THROWS(E_SEGFAULT);
 
-struct timespec;
-
 /* Callback for `dmesg_enum()'
  * @param: arg:    The same value originally given to `dmesg_enum()'
  * @param: packet: A non-volatile and verified copy of the original system log packet.

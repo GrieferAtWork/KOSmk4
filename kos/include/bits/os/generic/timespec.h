@@ -84,6 +84,7 @@ __TIMESPEC_CXX_DECL_BEGIN
 struct timespec /*[PREFIX(tv_)]*/ {
 	__TM_TYPE(time)   tv_sec;   /* Seconds */
 #if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+#define __TIMESPEC_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
 #ifdef __USE_KOS_ALTERATIONS
@@ -92,6 +93,7 @@ struct timespec /*[PREFIX(tv_)]*/ {
 	__syscall_slong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
 #if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+#define __TIMESPEC_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 	__TIMESPEC_CXX_SUPPORT(struct timespec, __TM_TYPE(time), __syscall_ulong_t)
@@ -120,6 +122,7 @@ __TIMESPEC_CXX_SUPPORT2(struct timespec, __TM_TYPE(time), __syscall_ulong_t)
 struct __timespec64 /*[NAME(timespec64)][PREFIX(tv_)]*/ {
 	__time64_t        tv_sec;   /* Seconds */
 #if __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+#define __TIMESPEC64_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
 #ifdef __USE_KOS_ALTERATIONS
@@ -128,6 +131,7 @@ struct __timespec64 /*[NAME(timespec64)][PREFIX(tv_)]*/ {
 	__syscall_slong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
 #if __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+#define __TIMESPEC64_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 	__TIMESPEC_CXX_SUPPORT(struct __timespec64, __time64_t, __syscall_ulong_t)
@@ -147,11 +151,15 @@ __TIMESPEC_CXX_SUPPORT2(struct __timespec64, __time64_t, __syscall_ulong_t)
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#ifdef __TIMESPEC_HAVE_TV_PAD
+#define __TIMESPEC32_HAVE_TV_PAD
+#endif /* __TIMESPEC_HAVE_TV_PAD */
 #define __timespec32 timespec
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 struct __timespec32 /*[NAME(timespec32)][PREFIX(tv_)]*/ {
 	__time32_t        tv_sec;   /* Seconds */
 #if __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+#define __TIMESPEC32_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
 #ifdef __USE_KOS_ALTERATIONS
@@ -160,6 +168,7 @@ struct __timespec32 /*[NAME(timespec32)][PREFIX(tv_)]*/ {
 	__syscall_slong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
 #if __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+#define __TIMESPEC32_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 	__TIMESPEC_CXX_SUPPORT(struct __timespec32, __time32_t, __syscall_ulong_t)

@@ -97,7 +97,6 @@ struct async_worker_callbacks {
 	NONNULL((1)) bool (ASYNC_CALLBACK_CC *awc_test)(void *__restrict self);
 };
 
-struct timespec;
 /* Called after a timeout set during `awc_poll()' has expired. */
 typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_worker_timeout_t)(void *__restrict self);
 

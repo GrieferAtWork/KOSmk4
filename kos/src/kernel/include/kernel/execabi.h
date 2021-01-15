@@ -38,7 +38,11 @@
 #include <elf.h>
 #include <hybrid/typecore.h>
 #if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__
+#if __SIZEOF_ELF64_EHDR > __SIZEOF_ELF32_EHDR
 #define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF64_EHDR
+#else /* __SIZEOF_ELF64_EHDR > __SIZEOF_ELF32_EHDR */
+#define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF32_EHDR
+#endif /* __SIZEOF_ELF64_EHDR <= __SIZEOF_ELF32_EHDR */
 #elif __SIZEOF_POINTER__ == 8
 #define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF64_EHDR
 #else /* ... */
@@ -139,13 +143,13 @@ struct execargs {
 	bool                        ea_change_vm_to_effective_vm;
 	                                            /* When set to `true', `ea_vm' should be set as the effective VM upon a
 	                                             * successful return of `ea_exec'. */
-	size_t                      ea_argc_inject; /* The number of arguments from `ea_argv_inject' to inject at the beginning of the user-space argc/argv vector. */
-	char                      **ea_argv_inject; /* [1..1][owned][ea_argc_inject][owned] Vector of arguments to inject at the beginning of the user-space argc/argv vector. */
-	execabi_strings_t           ea_argv;        /* [0..1] NULL-terminated vector of arguments to-be passed to program being loaded. */
-	execabi_strings_t           ea_envp;        /* [0..1] NULL-terminated vector of environment variables to-be passed to program being loaded. */
 #ifdef __ARCH_HAVE_COMPAT
 	bool                        ea_argv_is_compat; /* When `true', `ea_argv' and `ea_envp' are compatibility-mode vectors. */
 #endif /* !__ARCH_HAVE_COMPAT */
+	execabi_strings_t           ea_argv;        /* [0..1] NULL-terminated vector of arguments to-be passed to program being loaded. */
+	execabi_strings_t           ea_envp;        /* [0..1] NULL-terminated vector of environment variables to-be passed to program being loaded. */
+	size_t                      ea_argc_inject; /* The number of arguments from `ea_argv_inject' to inject at the beginning of the user-space argc/argv vector. */
+	char                      **ea_argv_inject; /* [1..1][owned][ea_argc_inject][owned] Vector of arguments to inject at the beginning of the user-space argc/argv vector. */
 };
 
 /* Finalize the given set of exec() arguments. */
@@ -182,8 +186,8 @@ struct execabi {
 
 /* Return codes for `ea_exec' */
 #define EXECABI_EXEC_SUCCESS 0 /* Success. */
-#define EXECABI_EXEC_NOTBIN  1 /* File doesn't belong this ABI. (Even though its magic bytes were correct) */
-#define EXECABI_EXEC_RESTART 2 /* Restart execution for an updated `ea_xnode' (used to implement #!-scripts) */
+#define EXECABI_EXEC_NOTBIN  1 /* File doesn't belong to this ABI. (Even though the magic header was correct) */
+#define EXECABI_EXEC_RESTART 2 /* Restart execution with an updated `ea_xnode' (used to implement #!-scripts) */
 
 
 struct execabis_struct {

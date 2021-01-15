@@ -130,6 +130,15 @@
 /*[[[end]]]*/
 
 
+#if defined(__i386__) && !defined(__x86_64__)
+#ifdef __USE_TIME_BITS64
+#define __TIMESPEC_HAVE_TV_PAD
+#endif /* __USE_TIME_BITS64 */
+#define __TIMESPEC64_HAVE_TV_PAD
+#endif /* __i386__ && !__x86_64__ */
+#define __TIMESPECX32_64_HAVE_TV_PAD
+
+
 #define __OFFSET_TIMESPECX32_SEC     0
 #define __OFFSET_TIMESPECX32_NSEC    4
 #define __SIZEOF_TIMESPECX32         8

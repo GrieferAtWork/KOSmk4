@@ -53,7 +53,6 @@ find_eol(char *line, size_t len) {
 
 
 /* ABI exec function for #! */
-/* ABI exec function for #! */
 INTERN WUNUSED NONNULL((1)) unsigned int FCALL
 shebang_exec(struct execargs *__restrict args) {
 	/* Syntax: `#! <path-relative-to(exec_path)>[ <optional_argument>] LF'
@@ -83,6 +82,7 @@ shebang_exec(struct execargs *__restrict args) {
 			execfile     = ext_header;
 			execline_end = find_eol(execfile, CONFIG_SHEBANG_INTERPRETER_LINE_MAX);
 			if unlikely(!execline_end) {
+				/* NOTE: `kfree(ext_header);' is called by an EXCEPT below! */
 				THROW(E_NOT_EXECUTABLE_FAULTY,
 				      E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG,
 				      E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC);

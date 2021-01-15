@@ -33,7 +33,6 @@ DECL_BEGIN
 
 #ifdef __CC__
 struct task;
-struct timespec;
 
 struct semaphore {
 	struct sig s_avail; /* Signal send for every ticket made available. */

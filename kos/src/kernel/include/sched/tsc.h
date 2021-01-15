@@ -231,7 +231,12 @@ DATDEF ATTR_PERTASK ktime_t this_starttime;
  * since when the caller has ran uninterrupted. */
 DATDEF ATTR_PERTASK ktime_t this_stoptime;
 
-/* [lock(PRIVATE(THIS_CPU))] Total time this thread spent being active. */
+/* [lock(PRIVATE(THIS_CPU))]
+ * Total time this thread spent being active, as measured since
+ * the thread's creation, up until the start of the thread's most
+ * recent quantum (iow: for your own thread, to calculate the
+ * correct value, use `this_activetime + (ktime() - this_stoptime)',
+ * but make sure to disable preemption during this calculation). */
 DATDEF ATTR_PERTASK ktime_t this_activetime;
 
 /* Timestamp of when the kernel was booted. */

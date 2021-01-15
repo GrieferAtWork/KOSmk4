@@ -856,21 +856,21 @@ struct inode
 #else /* __INTELLISENSE__ */
 #define i_fileino       i_filetree.a_vaddr
 #endif /* !__INTELLISENSE__ */
-	pos_t               i_filesize;     /* [lock(.)][valid_if(INODE_FATTRLOADED)] Size of the file (in bytes)
+	pos_t               i_filesize;     /* [lock(this)][valid_if(INODE_FATTRLOADED)] Size of the file (in bytes)
 	                                     * NOTE: Before `INODE_FATTRLOADED' is set, this field is set to ZERO(0)! */
-	mode_t              i_filemode;     /* [lock(.)][valid_if(INODE_FATTRLOADED)][const(MASK(S_IFMT))]
+	mode_t              i_filemode;     /* [lock(this)][valid_if(INODE_FATTRLOADED)][const(MASK(S_IFMT))]
 	                                     * File type and permissions (see `S_*' above).
 	                                     * NOTE: The bits masked by `S_IFMT' are always valid and constant. */
-	nlink_t             i_filenlink;    /* [lock(.)][valid_if(INODE_FATTRLOADED)]
+	nlink_t             i_filenlink;    /* [lock(this)][valid_if(INODE_FATTRLOADED)]
 	                                     * Link counter of this INode.
 	                                     * When this counter reaches ZERO(0), data of the node is
 	                                     * deleted and the node can no longer be operated upon. */
-	uid_t               i_fileuid;      /* [lock(.)][valid_if(INODE_FATTRLOADED)] File user ID */
-	gid_t               i_filegid;      /* [lock(.)][valid_if(INODE_FATTRLOADED)] File group ID */
-	struct timespec     i_fileatime;    /* [lock(.)][valid_if(INODE_FATTRLOADED)] Last accessed time. */
-	struct timespec     i_filemtime;    /* [lock(.)][valid_if(INODE_FATTRLOADED)] Last modified time. */
-	struct timespec     i_filectime;    /* [lock(.)][valid_if(INODE_FATTRLOADED)] File creation time. */
-	dev_t               i_filerdev;     /* [lock(.)][valid_if(INODE_FATTRLOADED && S_ISDEV(i_filemode))] Referenced device number. */
+	uid_t               i_fileuid;      /* [lock(this)][valid_if(INODE_FATTRLOADED)] File user ID */
+	gid_t               i_filegid;      /* [lock(this)][valid_if(INODE_FATTRLOADED)] File group ID */
+	struct timespec     i_fileatime;    /* [lock(this)][valid_if(INODE_FATTRLOADED)] Last accessed time. */
+	struct timespec     i_filemtime;    /* [lock(this)][valid_if(INODE_FATTRLOADED)] Last modified time. */
+	struct timespec     i_filectime;    /* [lock(this)][valid_if(INODE_FATTRLOADED)] File creation time. */
+	dev_t               i_filerdev;     /* [lock(this)][valid_if(INODE_FATTRLOADED && S_ISDEV(i_filemode))] Referenced device number. */
 };
 
 #define INODE_ISSUPER(x) ((x)->i_super == (struct superblock *)(x)) /* Check if `x' is actually a superblock root directory node. */

@@ -76,7 +76,10 @@ struct __siginfo_struct;
  *                            was triggered whilst user-space was already in the process of handling two
  *                            others, and `UNWIND_USER_DISABLED' in case user-space exception handling never
  *                            even got triggered.
- * @param: orig_kstate:       The kernel-space CPU state where the exception originally got thrown
+ * @param: orig_kstate:       The kernel-space CPU state where the exception originally got thrown, or
+ *                            `NULL' if it that information has been lost as the result of user-space
+ *                            exception handling, or if the exception didn't actually originate from
+ *                            the kernel.
  * @param: ktraceback_vector: The vector of kernel-space program pointers traversed during unwinding.
  *                            Always `NULL' when `orig_kstate' is also `NULL'
  * @param: ktraceback_length: The number of program pointers found within `ktraceback_vector'
