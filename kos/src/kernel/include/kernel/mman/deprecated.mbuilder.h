@@ -138,6 +138,11 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbnode *NOTHROW(FCALL mbnode_tree_nex
 FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mbnode_tree_minmaxlocate)(struct mbnode *root, void const *minkey, void const *maxkey, struct mbnode_tree_minmax *__restrict result) ASMNAME("mnode_tree_minmaxlocate");
 
 
+struct mpart_pointer_set {
+	size_t         mpps_mask; /* Allocated hash mask (power-of-2-minus-1) */
+	struct mpart **mpps_list; /* [0..1][0..mpps_mask+1][owned] Hash-vector of mem-parts. */
+};
+
 struct mbuilder {
 #ifdef __INTELLISENSE__
 	struct mbnode             *mb_mappings; /* [0..n] Tree of mem-nodes. */
@@ -145,7 +150,7 @@ struct mbuilder {
 	RBTREE_ROOT(struct mbnode) mb_mappings; /* [0..n] Tree of mem-nodes. */
 #endif /* !__INTELLISENSE__ */
 	struct mbnode_slist        mb_files;    /* [0..n][link(mbn_nxtfile)] List of file mappings. */
-	struct mbnode_slist        mb_uparts;   /* [0..n][link(mbn_nxtuprt)] List of nodes that map unique mem-parts. */
+	struct mpart_pointer_set   mb_parts;    /* [0..n] Set of all of the unique parts used by the builder. */
 	union {
 		struct mbnode_slist    mb_fparts;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 		struct mnode_slist    _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */

@@ -77,6 +77,13 @@ template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T
 #endif /* !FORMMAN */
 
 
+/* TODO: fork() should not have to truely create a new page directory.
+ *              Instead, try to make it so that both the page directory,
+ *              as well as `struct mnode' can be shared between multiple
+ *              memory managers! */
+/* TODO: exec() should use `mman_new()' to create an actual, new memory
+ *              manager from scratch. */
+
 
 /* The kernel's own memory manager. */
 DATDEF struct mman mman_kernel;
@@ -105,6 +112,70 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL task_setmman)(struct mman *__rest
 /* Return the active mman of the given `thread' */
 FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
+
+
+/*
+ * Idea on how to implement an O(1) fork(2) system call:
+ *
+ * >> struct mman *mman_fork() {
+ * >>     struct mman *result = malloc(...);
+ * >>     pagedir_fork(result->mn_pdir);
+ * >>     result->mm_mappings = incref(THIS_VM->mm_mappings);
+ * >> }
+ *
+ * pagedir_fork:
+ *    Use the `v_unused*_ign' bits of the entries of all of the
+ *    dynamically allocated vectors within the page directory
+ *    as a data-stream to encode a reference counter for the
+ *    surrounding page-vector. (s.a. `p32_pagedir_refe2_incref')
+ *
+ * copy_on_write_btree:
+ *    A binary tree, where upon every write to one of the mnode fields,
+ *    we first check a reference counter stored within the mnode itself
+ *    as to whether of not that node is being shared.
+ *    If it is being shared, then we must create a copy of it, and the
+ *    entire path-chain leading up to the node. (because we'll also need
+ *    to write the lhs/rhs fields of the to-be modified node's parent,
+ *    and it's parent, and so on...)
+ *
+ * Changes necessary:
+ *  - mnode.mn_mman:     Must become a vector, who's length can then be
+ *                       interpreted as the node's reference counter.
+ *                       This vector must facilitate both atomic add
+ *                       and remove operations (with the remove also
+ *                       needing to be NOBLOCK+NOTHROW)
+ *  - RBTREE:            Add an extension that allows for copy-on-write
+ *                       reference counting functionality.
+ *                       Do this by adding a function `RBTREE_PREPARE_WRITE(node, proot)'
+ *                       that can be overwritten to do `node = copy_if_shared(node, proot)'
+ *  - pagedir:           Implement reference counting on all levels, and
+ *                       check the reference counters before making any
+ *                       changes to a vector. It may be useful to have a
+ *                       dedicated REFCNT_MAYBE_GREATER_ONE bit that can
+ *                       be checked by isshared(), and, if set, causes a
+ *                       search for other references to be performed, and
+ *                       if none are found, have that bit get cleared.
+ *                       -> Only vectors not currently shared can be modified.
+ *  - pagedir:           Then act of splitting/merging Ei-level page-vectors
+ *                       must account for references, such that newly created
+ *                       vectors have refcnt=1, and vectors that go away have
+ *                       their refcnt decremented.
+ *  - mnode.mn_writable: Get rid of this.
+ *                       The idea was to have a list of all of the places
+ *                       where writable memory mappings exist, however in
+ *                       this new design, the pagedir API is responsible
+ *                       to clear all of the WRITABLE-bits as part of the
+ *                       call to `pagedir_fork()'. Internally, this search
+ *                       can be combined with the incref procedure.
+ *  - mpart_split:       Must account for copy-on-write, such that all altered
+ *                       nodes will be unshared such that the current behavior
+ *                       can be made use of normally.
+ *  - exec:              Instead of going through all of the troubles of wanting to
+ *                       re-use the old mman by clearing it and its page directory,
+ *                       make it so that a new mman is created, which is then
+ *                       assigned to main thread of the process that called exec.
+ *                       The old mman can then simply be decref'd.
+ */
 
 
 

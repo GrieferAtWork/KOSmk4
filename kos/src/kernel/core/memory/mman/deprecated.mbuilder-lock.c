@@ -28,11 +28,45 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <misc/unlockinfo.h>
+#include <sched/task.h>
 
 #include <assert.h>
+#include <stdbool.h>
 #include <string.h>
 
 DECL_BEGIN
+
+/* Acquire a lock to every unique mem-part mapped by `self'.
+ * If this fails for at least one of the parts, unlock all
+ * parts already locked at that point, invoke `unlock' if
+ * given, wait until the blocking part becomes available,
+ * and return `false'
+ * Otherwise, return `true' */
+PRIVATE NONNULL((1)) bool FCALL
+mbuilder_lock_all_mparts(struct mbuilder *__restrict self,
+                         struct unlockinfo *unlock) {
+	struct mbnode *iter;
+	SLIST_FOREACH (iter, &self->mb_uparts, mbn_nxtuprt) {
+		struct mpart *part = iter->mbn_part;
+		if (mpart_lock_tryacquire(part))
+			continue;
+		/* We've got a blocking part... */
+		{
+			struct mbnode *iter2;
+			for (iter2 = SLIST_FIRST(&self->mb_uparts);
+			     iter2 != iter; iter2 = SLIST_NEXT(iter2, mbn_nxtuprt))
+				mpart_lock_release(iter2->mbn_part);
+		}
+		unlockinfo_xunlock(unlock);
+		while (!mpart_lock_available(part))
+			task_yield();
+		return false;
+	}
+	return true;
+}
+
+
 
 /* Acquire locks to all of the parts being mapped by `self', and
  * ensure that all mappings within `self' are fully continuous.
@@ -47,24 +81,36 @@ PUBLIC NONNULL((1)) bool FCALL
 mbuilder_partlocks_acquire_or_unlock(struct mbuilder *__restrict self,
                                      struct unlockinfo *unlock)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	/* TODO */
-}
+	/* Step #1: Acquire locks to all mapped parts. */
+	if (!mbuilder_lock_all_mparts(self, unlock))
+		goto fail;
 
-/* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
- * will keep on attempting the operation until it succeeds. */
-PUBLIC NONNULL((1)) void FCALL
-mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	/* TODO */
+
+	return true;
+fail:
+	return false;
 }
 
 /* Release locks to all of the mapped mem-parts, as should have previously
  * been acquired during a call to `mbuilder_partlocks_acquire()' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self) {
-	/* TODO */
+	struct mbnode *node;
+	SLIST_FOREACH (node, &self->mb_uparts, mbn_nxtuprt) {
+		mpart_lock_release(node->mbn_part);
+	}
 }
 
+
+/* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
+ * will keep on attempting the operation until it succeeds. */
+PUBLIC NONNULL((1)) void FCALL
+mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	while (!mbuilder_partlocks_acquire_or_unlock(self, NULL))
+		;
+}
 
 DECL_END
 

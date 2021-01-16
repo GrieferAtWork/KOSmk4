@@ -100,7 +100,7 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 	struct mbnode *iter;
 
 	/* Drop file references. */
-	SLIST_FOREACH(iter, &self->mb_files, mbn_nxtfile) {
+	SLIST_FOREACH (iter, &self->mb_files, mbn_nxtfile) {
 		decref(iter->mbn_file);
 	}
 
@@ -138,7 +138,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL mbuilder_contains_mpart)(struct mbuilder *__restrict self,
                                        struct mpart *__restrict part) {
 	struct mbnode *iter;
-	SLIST_FOREACH(iter, &self->mb_uparts, mbn_nxtuprt) {
+	SLIST_FOREACH (iter, &self->mb_uparts, mbn_nxtuprt) {
 		if (iter->mbn_part == part)
 			return true;
 	}
