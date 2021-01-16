@@ -601,9 +601,9 @@ mfile_sync(struct mfile *__restrict self)
 /* Create a new part, but don't add it to the global chain of parts, yet.
  * NOTE: The returned part will have the `MPART_F_NO_GLOBAL_REF' flag set! */
 PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
-mfile_create_private_part(struct mfile *__restrict self,
-                          PAGEDIR_PAGEALIGNED pos_t addr,
-                          PAGEDIR_PAGEALIGNED size_t num_bytes)
+mfile_private_makepart(struct mfile *__restrict self,
+                       PAGEDIR_PAGEALIGNED pos_t addr,
+                       PAGEDIR_PAGEALIGNED size_t num_bytes)
 		THROWS(E_WOULDBLOCK, ...) {
 	REF struct mpart *result;
 	assert(mfile_addr_aligned(self, addr));
@@ -646,16 +646,16 @@ mfile_create_private_part(struct mfile *__restrict self,
 
 
 
-/* Same as `mfile_create_private_part()', but also add the part to the globally
- * visible chain of parts. However, don't clear the `MPART_F_NO_GLOBAL_REF'
- * flag for the part, meaning that the part won't have a global reference. */
-PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
-mfile_create_global_part(struct mfile *__restrict self,
-                         PAGEDIR_PAGEALIGNED pos_t addr,
-                         PAGEDIR_PAGEALIGNED size_t num_bytes)
+/* Same as `mfile_getpart()', but may _only_ be used when `self' is an
+ * anonymous file! As such, this function is mainly used to allocate
+ * parts for `mfile_ndef' and `mfile_zero' */
+PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
+mfile_makepart(struct mfile *__restrict self,
+               PAGEDIR_PAGEALIGNED pos_t addr,
+               PAGEDIR_PAGEALIGNED size_t num_bytes)
 		THROWS(E_WOULDBLOCK, ...) {
 	REF struct mpart *result;
-	result = mfile_create_private_part(self, addr, num_bytes);
+	result = mfile_private_makepart(self, addr, num_bytes);
 
 	/* Add the new part to the global list. */
 	if (result->mp_state != MPART_ST_VIO)
@@ -720,7 +720,7 @@ again_locate:
 	}
 	mfile_lock_endread(self);
 	/* Construct the new part. */
-	result = mfile_create_private_part(self, addr, max_num_bytes);
+	result = mfile_private_makepart(self, addr, max_num_bytes);
 	TRY {
 again_lock_after_result_created:
 		mfile_lock_write(self);

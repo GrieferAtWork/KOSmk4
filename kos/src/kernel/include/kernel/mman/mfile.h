@@ -242,6 +242,15 @@ mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED size_t max_num_bytes)
 		THROWS(E_WOULDBLOCK, ...);
 
+/* Same as `mfile_getpart()', but may _only_ be used when `self' is an
+ * anonymous file! As such, this function is mainly used to allocate
+ * parts for `mfile_ndef' and `mfile_zero' */
+FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
+mfile_makepart(struct mfile *__restrict self,
+               PAGEDIR_PAGEALIGNED pos_t addr,
+               PAGEDIR_PAGEALIGNED size_t num_bytes)
+		THROWS(E_WOULDBLOCK, ...);
+
 
 struct mnode;
 

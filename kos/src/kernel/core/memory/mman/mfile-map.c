@@ -121,8 +121,9 @@ again_getpart:
 	SLIST_INSERT(&self->mfm_nodes, node, _mn_alloc);
 	node->mn_minaddr = (byte_t *)0;
 	node->mn_maxaddr = (byte_t *)num_bytes - 1;
+	DBG_memset(&node->mn_flags, 0xcc, sizeof(node->mn_flags));
 	DBG_memset(&node->mn_mement, 0xcc, sizeof(node->mn_mement));
-	DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));
+	/*DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));*/ /* Used to chain nodes. */
 	node->mn_part    = part; /* Inherit reference */
 	node->mn_partoff = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
 	DBG_memset(&node->mn_link, 0xcc, sizeof(node->mn_link));

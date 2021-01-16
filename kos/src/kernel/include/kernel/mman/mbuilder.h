@@ -34,12 +34,12 @@
 DECL_BEGIN
 
 struct unlockinfo;
-struct mbuilder_node;
+struct mbnode;
 struct mnode;
 struct mman;
 struct mman_execinfo_struct;
 
-SLIST_HEAD(mbuilder_node_slist, mbuilder_node);
+SLIST_HEAD(mbnode_slist, mbnode);
 
 #ifndef __mnode_slist_defined
 #define __mnode_slist_defined 1
@@ -63,35 +63,42 @@ typedef size_t mpart_reladdr_t;
 
 
 
-struct mbuilder_node {
+struct mbnode {
 	/* NOTE: This structure is (intentionally) binary-compatible
 	 *       (for the most part) with `struct mnode'!
 	 * This is because when the memory image constructed within
 	 * an mbuilder is loaded into an mman, all of the builder's
 	 * nodes become mnode objects! */
-	union {
-		SLIST_ENTRY(mbuilder_node)     _mbn_alloc;    /* Internal list of freshly allocated nodes. */
-		uintptr_t                       mbn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
-	};
+	uintptr_t                           mbn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	byte_t                             *mbn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mbn_maxaddr;  /* [const] Greatest address mapped by this node. */
-	RBTREE_NODE(struct mbuilder_node)   mbn_mement;   /* [const] R/B tree entry of mman mappings. */
+	RBTREE_NODE(struct mbnode)          mbn_mement;   /* [const] R/B tree entry of mman mappings. */
 	REF struct mpart                   *mbn_part;     /* [0..1][const] The bound mem-part.
 	                                                   * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mbn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry         *mbn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 	union {
+		SLIST_ENTRY(mbnode)            _mbn_alloc;    /* Internal list of freshly allocated nodes. */
+		struct mbnode                  *mbn_filnxt;   /* [0..1] Next node apart of the same file mapping.
+		                                               * When non-NULL, you may assume that `mbnode_getendaddr(this) == mbnode_getaddr(mbn_filnxt)' */
+		WEAK REF struct mman          *_mbn_mman;     /* s.a. `struct mnode::mn_mman' */
+	};
+	union {
 		struct {
-			pos_t                       mbn_filpos;   /* [const] Absolute position of where `mbn_part' is (supposed) to start.
-			                                           * Ignored when `mbn_part' references an anonymous file. */
-			SLIST_ENTRY(mbuilder_node)  mbn_nxtprt;   /* Next builder node that reference a unique `mbn_part'.
+			SLIST_ENTRY(mbnode)         mbn_nxtuprt;  /* [0..1] Next builder node that references a unique `mbn_part'.
 			                                           * If the same `mbn_part' is mapped more than once within
 			                                           * the same `mbuilder', then this list will only ever contain
 			                                           * exactly one of the nodes that are mapping said part. */
+			/* The next 3 fields are [valid_if(this IN :mb_files)]
+			 * If this is the case, our `mbn_filnxt' (if non-NULL) points
+			 * to the second node that is being used to map this file. */
+			SLIST_ENTRY(mbnode)         mbn_nxtfile;  /* [0..1] First node of the next separate file mapping. */
+			REF struct mfile           *mbn_file;     /* [0..1][const] The file that is being mapped. */
+			pos_t                       mbn_filpos;   /* [const] Absolute position of where `mbn_part' is (supposed)
+			                                           * to start. Ignored when `mbn_file' is an anonymous file. */
 		};
 		struct {
 			/* Fields from `struct mnode' */
-			WEAK REF struct mman               *_mbn_mman;     /* s.a. `struct mnode::mn_mman' */
 			PAGEDIR_PAGEALIGNED mpart_reladdr_t _mbn_partoff;  /* s.a. `struct mnode::mn_partoff' */
 			LIST_ENTRY(mnode)                   _mbn_link;     /* s.a. `struct mnode::mn_link' */
 			LIST_ENTRY(mnode)                   _mbn_writable; /* s.a. `struct mnode::mn_writable' */
@@ -100,45 +107,49 @@ struct mbuilder_node {
 };
 
 /* Get bounds for the given mem-node. */
-#define mbuilder_node_getminaddr(self) ((void *)(self)->mbn_minaddr)
-#define mbuilder_node_getmaxaddr(self) ((void *)(self)->mbn_maxaddr)
-#define mbuilder_node_getendaddr(self) ((void *)((self)->mbn_maxaddr + 1))
-#define mbuilder_node_getaddr(self)    ((void *)(self)->mbn_minaddr)
-#define mbuilder_node_getsize(self)    ((size_t)((self)->mbn_maxaddr - (self)->mbn_minaddr) + 1)
-#define mbuilder_node_iskern(self)     ADDR_ISKERN((self)->mbn_minaddr)
-#define mbuilder_node_isuser(self)     ADDR_ISUSER((self)->mbn_minaddr)
+#define mbnode_getminaddr(self) ((void *)(self)->mbn_minaddr)
+#define mbnode_getmaxaddr(self) ((void *)(self)->mbn_maxaddr)
+#define mbnode_getendaddr(self) ((void *)((self)->mbn_maxaddr + 1))
+#define mbnode_getaddr(self)    ((void *)(self)->mbn_minaddr)
+#define mbnode_getsize(self)    ((size_t)((self)->mbn_maxaddr - (self)->mbn_minaddr) + 1)
+#define mbnode_iskern(self)     ADDR_ISKERN((self)->mbn_minaddr)
+#define mbnode_isuser(self)     ADDR_ISUSER((self)->mbn_minaddr)
 /* Return the part-relative min-/max-address that is being mapped. */
-#define mbuilder_node_getmapminaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff))
-#define mbuilder_node_getmapmaxaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff + ((size_t)((self)->mbn_maxaddr - (self)->mbn_minaddr))))
-#define mbuilder_node_getmapendaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff + mbuilder_node_getsize(self)))
+#define mbnode_getmapminaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff))
+#define mbnode_getmapmaxaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff + ((size_t)((self)->mbn_maxaddr - (self)->mbn_minaddr))))
+#define mbnode_getmapendaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff + mbnode_getsize(self)))
 
 
 /* Mem-builder-node tree API. */
-struct mbuilder_node_tree_minmax {
-	struct mbuilder_node *mm_min; /* [0..1] Lowest branch. */
-	struct mbuilder_node *mm_max; /* [0..1] Greatest branch. */
+struct mbnode_tree_minmax {
+	struct mbnode *mm_min; /* [0..1] Lowest branch. */
+	struct mbnode *mm_max; /* [0..1] Greatest branch. */
 };
 
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mbuilder_node *NOTHROW(FCALL mbuilder_node_tree_locate)(/*nullable*/ struct mbuilder_node *root, void const *key) ASMNAME("mnode_tree_locate");
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mbuilder_node *NOTHROW(FCALL mbuilder_node_tree_rlocate)(/*nullable*/ struct mbuilder_node *root, void const *minkey, void const *maxkey) ASMNAME("mnode_tree_rlocate");
-FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mbuilder_node_tree_insert)(struct mbuilder_node **__restrict proot, struct mbuilder_node *__restrict node) ASMNAME("mnode_tree_insert");
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mbuilder_node_tree_tryinsert)(struct mbuilder_node **__restrict proot, struct mbuilder_node *__restrict node) ASMNAME("mnode_tree_tryinsert");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbuilder_node *NOTHROW(FCALL mbuilder_node_tree_remove)(struct mbuilder_node **__restrict proot, void const *key) ASMNAME("mnode_tree_remove");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbuilder_node *NOTHROW(FCALL mbuilder_node_tree_rremove)(struct mbuilder_node **__restrict proot, void const *minkey, void const *maxkey) ASMNAME("mnode_tree_rremove");
-FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mbuilder_node_tree_removenode)(struct mbuilder_node **__restrict proot, struct mbuilder_node *__restrict node) ASMNAME("mnode_tree_removenode");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbuilder_node *NOTHROW(FCALL mbuilder_node_tree_prevnode)(struct mbuilder_node *__restrict self) ASMNAME("mnode_tree_prevnode");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbuilder_node *NOTHROW(FCALL mbuilder_node_tree_nextnode)(struct mbuilder_node *__restrict self) ASMNAME("mnode_tree_nextnode");
-FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mbuilder_node_tree_minmaxlocate)(struct mbuilder_node *root, void const *minkey, void const *maxkey, struct mbuilder_node_tree_minmax *__restrict result) ASMNAME("mnode_tree_minmaxlocate");
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mbnode *NOTHROW(FCALL mbnode_tree_locate)(/*nullable*/ struct mbnode *root, void const *key) ASMNAME("mnode_tree_locate");
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mbnode *NOTHROW(FCALL mbnode_tree_rlocate)(/*nullable*/ struct mbnode *root, void const *minkey, void const *maxkey) ASMNAME("mnode_tree_rlocate");
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mbnode_tree_insert)(struct mbnode **__restrict proot, struct mbnode *__restrict node) ASMNAME("mnode_tree_insert");
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mbnode_tree_tryinsert)(struct mbnode **__restrict proot, struct mbnode *__restrict node) ASMNAME("mnode_tree_tryinsert");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbnode *NOTHROW(FCALL mbnode_tree_remove)(struct mbnode **__restrict proot, void const *key) ASMNAME("mnode_tree_remove");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbnode *NOTHROW(FCALL mbnode_tree_rremove)(struct mbnode **__restrict proot, void const *minkey, void const *maxkey) ASMNAME("mnode_tree_rremove");
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mbnode_tree_removenode)(struct mbnode **__restrict proot, struct mbnode *__restrict node) ASMNAME("mnode_tree_removenode");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbnode *NOTHROW(FCALL mbnode_tree_prevnode)(struct mbnode *__restrict self) ASMNAME("mnode_tree_prevnode");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbnode *NOTHROW(FCALL mbnode_tree_nextnode)(struct mbnode *__restrict self) ASMNAME("mnode_tree_nextnode");
+FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mbnode_tree_minmaxlocate)(struct mbnode *root, void const *minkey, void const *maxkey, struct mbnode_tree_minmax *__restrict result) ASMNAME("mnode_tree_minmaxlocate");
 
 
 struct mbuilder {
 #ifdef __INTELLISENSE__
-	struct mbuilder_node             *mb_mappings; /* [0..n] Tree of mem-nodes. */
+	struct mbnode             *mb_mappings; /* [0..n] Tree of mem-nodes. */
 #else /* __INTELLISENSE__ */
-	RBTREE_ROOT(struct mbuilder_node) mb_mappings; /* [0..n] Tree of mem-nodes. */
+	RBTREE_ROOT(struct mbnode) mb_mappings; /* [0..n] Tree of mem-nodes. */
 #endif /* !__INTELLISENSE__ */
-	struct mbuilder_node_slist        mb_uparts;   /* [0..n][link(mbn_nxtprt)] List of nodes that map unique mem-parts. */
-	struct mbuilder_node_slist        mb_fparts;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
+	struct mbnode_slist        mb_files;    /* [0..n][link(mbn_nxtfile)] List of file mappings. */
+	struct mbnode_slist        mb_uparts;   /* [0..n][link(mbn_nxtuprt)] List of nodes that map unique mem-parts. */
+	union {
+		struct mbnode_slist    mb_fparts;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
+		struct mnode_slist    _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
+	};
 };
 
 /* Initialize the given mem-builder. */
@@ -189,6 +200,7 @@ NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self);
  * to assume that no memory mappings (or anything else for that matter) changes if the
  * function fails and returns by throwing an error, and that everything happens exactly
  * as intended if it returns normally.
+ * NOTE: Upon success, `self' will have been finalized.
  * @param: self:   The VM Builder object from which to take mappings to-be applied to `target'
  *                 Upon success, the contents of `self' are left undefined and must either be
  *                 re-initialized, or not be attempted to be finalized.
@@ -199,10 +211,10 @@ NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self);
  * @param: additional_actions: Additional actions to be atomically performed alongside
  *                 the application of the new memory mappings (set of `VMB_APPLY_AA_*') */
 FUNDEF NONNULL((1, 2)) void KCALL
-mbuilder_apply(struct mbuilder *__restrict self,
-               struct mman *__restrict target,
-               unsigned int additional_actions,
-               struct mman_execinfo_struct *execinfo DFL(__NULLPTR))
+mbuilder_apply_and_fini(struct mbuilder *__restrict self,
+                        struct mman *__restrict target,
+                        unsigned int additional_actions,
+                        struct mman_execinfo_struct *execinfo DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define MBUILDER_APPLY_AA_NOTHING      0x0000 /* No additional actions */
 #define MBUILDER_APPLY_AA_TERMTHREADS  0x0001 /* Terminate all threads using `target', excluding the caller.

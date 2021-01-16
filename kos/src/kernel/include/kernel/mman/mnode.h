@@ -48,13 +48,15 @@
                                   * >>      LIST_NEXT(self, mn_link) != NULL)
                                   * If any of these checks succeed, then `mn_part' is replaced with
                                   * the required private copy, thus allowing for copy-on-write */
-/*efine MNODE_F_          0x0040  * ... */
-/*efine MNODE_F_          0x0080  * ... */
-#define MNODE_F_NO_SPLIT  0x0100 /* [const] Don't allow this mem-node to be split. */
-#define MNODE_F_NO_MERGE  0x0200 /* [const] Don't allow this mem-node to be merged. When set, this flag
+#define MNODE_F_NO_SPLIT  0x0040 /* [const] Don't allow this mem-node to be split. */
+#define MNODE_F_NO_MERGE  0x0080 /* [const] Don't allow this mem-node to be merged. When set, this flag
                                   *         guaranties that munmap() will _always_ succeed without ever
                                   *         resulting in an `E_BADALLOC' exception. */
-#define MNODE_F_COREPART  0x0400 /* [const] Core part (affects how this mnode is freed) */
+#define MNODE_F_COREPART  0x0100 /* [const] Core part (affects how this mnode is freed) */
+#define MNODE_F_KERNPART  0x0200 /* [const] This node describes part of the static kernel core and must
+                                  *         not be modified or removed. Attempting to do so anyways will
+                                  *         result in kernel panic. */
+/*efine MNODE_F_          0x0400  * ... */
 #define MNODE_F_MPREPARED 0x0800 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
                                   *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
                                   *         within the new process will have this flag cleared) */
@@ -83,13 +85,10 @@
                                   *  - mn_part->mp_flags & MPART_F_MLOCK_FROZEN // Not strictly enforced
                                   *  - mn_part->mp_flags & MPART_F_DONT_SPLIT
                                   *  - mn_part->mp_flags & MPART_F_NO_GLOBAL_REF
-                                  *  - MPART_ST_INMEM(mn_part->mp_state)
-                                  */
+                                  *  - MPART_ST_INMEM(mn_part->mp_state) */
 #define MNODE_F_MLOCK     0x2000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
-#define MNODE_F_KERNPART  0x4000 /* [const] This node describes part of the static kernel core and must
-                                  *         not be modified or removed. Attempting to do so anyways will
-                                  *         result in kernel panic. */
-#define MNODE_F__RBRED    0x8000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
+#define MNODE_F__RBRED    0x4000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
+#define _MNODE_F_MPREFLT  0x8000 /* Only used by `mbuilder' to implement `MAP_POPULATE' */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -114,10 +113,7 @@ struct mnode {
 	 *          the part that is being mapped), else you have no guaranty that
 	 *          the node won't just be free'd, and you'll end up accessing dead
 	 *          memory! */
-	union {
-		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
-		uintptr_t                       mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
-	};
+	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
 	union {
@@ -128,9 +124,12 @@ struct mnode {
 	                                                  * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
-	WEAK REF struct mman               *mn_mman;     /* [1..1][const] Associated memory manager.
-	                                                  * NOTE: This only becomes a weak reference when `mnode_wasdestroyed(self)' is true!
-	                                                  *       Before that point, this is just a regular, old pointer! */
+	union {
+		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
+		WEAK REF struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
+		                                              * NOTE: This only becomes a weak reference when `mnode_wasdestroyed(self)' is true!
+		                                              *       Before that point, this is just a regular, old pointer! */
+	};
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)] Entry for `mp_copy' or `mp_share' */
 	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)] Chain of nodes that (may) contain pages that

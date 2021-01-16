@@ -64,16 +64,16 @@
                                        * file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The backing block-state bitset exists in-line. */
-#define MPART_F_COREPART       0x0020 /* [const] Core part (affects how this mpart is freed) */
+/*efine MPART_F_               0x0020  * ... */
 #define MPART_F_DONT_SPLIT     0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
                                        *         then the attempt will instead result in kernel panic. Similarly,
                                        *         this flag also prevents the part from being merged. */
 #define MPART_F_DONT_FREE      0x0080 /* [const] Don't page_free() backing physical memory or swap. */
-/*efine MPART_F_               0x0100  * ... */
+#define MPART_F_COREPART       0x0100 /* [const] Core part (affects how this mpart is freed) */
 /*efine MPART_F_               0x0200  * ... */
 /*efine MPART_F_               0x0400  * ... */
 /*efine MPART_F_               0x0800  * ... */
-/*efine MPART_F_               0x1000  * ... */
+#define MPART_F_MLOCK_FROZEN   0x1000 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
 #define MPART_F_MLOCK          0x2000 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the part's state
                                        * cannot move away from INCORE). Unless `MPART_F_MLOCK_FROZEN' is set, this flag
                                        * is set whenever this part is mapped by any mem-node that has the MNODE_F_MLOCK
@@ -81,8 +81,8 @@
                                        * or has its MNODE_F_MLOCK flag cleared, all mappings of the mem-part are scanned
                                        * in search for other locked mappings. If any are found, then this flag will remain
                                        * set. If none are found, then this flag is cleared. */
-#define MPART_F_MLOCK_FROZEN   0x4000 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
-#define MPART_F__RBRED         0x8000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
+#define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
+/*efine MPART_F_               0x8000  * ... */
 
 
 /* Possible values for `struct mpart::mp_state' */
@@ -113,7 +113,10 @@ struct aio_pbuffer;
 LIST_HEAD(mnode_list, mnode);
 #endif /* !__mnode_list_defined */
 LIST_HEAD(mpart_list, mpart);
+#ifndef __mnode_slist_defined
+#define __mnode_slist_defined 1
 SLIST_HEAD(mnode_slist, mnode);
+#endif /* !__mnode_slist_defined */
 #ifndef __mpart_slist_defined
 #define __mpart_slist_defined 1
 SLIST_HEAD(mpart_slist, mpart);
