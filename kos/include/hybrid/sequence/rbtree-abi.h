@@ -237,11 +237,6 @@ __DECL_END
 #define RBTREE_IMPL __PRIVATE
 #endif /* !RBTREE_IMPL */
 
-#ifndef RBTREE_PREPARE_WRITE
-#undef RBTREE_PREPARE_WRITE_NEEDS_P_ROOT
-#define RBTREE_PREPARE_WRITE(self, proot) (void)0
-#endif /* !RBTREE_PREPARE_WRITE */
-
 #if (!defined(RBTREE_GETLHS) || !defined(RBTREE_GETRHS) ||         \
      !defined(RBTREE_SETLHS) || !defined(RBTREE_SETRHS) ||         \
      (!defined(RBTREE_LEFT_LEANING) && (!defined(RBTREE_GETPAR) || \
@@ -500,18 +495,6 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
 	return root;
 }
 #endif /* !RBTREE_MINKEY_EQ_MAXKEY && (RBTREE_WANT_RLOCATE || RBTREE_WANT_RREMOVE) */
-
-#ifdef RBTREE_PREPARE_WRITE_NEEDS_P_ROOT
-#define RBTREE_FOR_PREPARE_WRITE_PAR__P_ROOT , RBTREE_T **__restrict proot
-#define RBTREE_FOR_PREPARE_WRITE_ARG__P_ROOT , proot
-#else /* RBTREE_PREPARE_WRITE_NEEDS_P_ROOT */
-#define RBTREE_FOR_PREPARE_WRITE_PAR__P_ROOT /* nothing */
-#define RBTREE_FOR_PREPARE_WRITE_ARG__P_ROOT /* nothing */
-#endif /* !RBTREE_PREPARE_WRITE_NEEDS_P_ROOT */
-
-/* TODO: Spread around call to `RBTREE_PREPARE_WRITE(), but remember
- *       that these calls are allowed to change the actual addresses
- *       of all nodes all along the path to the given node. */
 
 
 #ifdef RBTREE_LEFT_LEANING
@@ -1552,8 +1535,6 @@ __DECL_END
 #undef RBTREE_KEY_SETMIN
 #undef RBTREE_KEY_SETMAX
 
-#undef RBTREE_PREPARE_WRITE
-#undef RBTREE_PREPARE_WRITE_NEEDS_P_ROOT
 #undef RBTREE_GETPAR
 #undef RBTREE_GETLHS
 #undef RBTREE_GETRHS

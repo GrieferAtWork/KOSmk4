@@ -138,6 +138,29 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
  *    to write the lhs/rhs fields of the to-be modified node's parent,
  *    and it's parent, and so on...)
  *
+ *
+ * !!!PROBLEM!!! The parent pointer of the R/B-tree used for mem-nodes
+ *               would have to be altered whenever one of the nodes has
+ *               to be changed, which would result in the entire tree
+ *               being unshared.
+ * Solution:     Boils down to: When nodes are shared by different parents,
+ *               then every node also needs 1 parent-pointer for every one
+ *               of its parents.
+ *               In other words: just extending the R/B-tree ABI isn't enough.
+ *               And furthermore: we can't get rid of parent pointers: they're
+ *               more important than ever (see the next (solved) problem)
+ *
+ * !!!PROBLEM!!! In order for `mpart_split()' and `mpart--unsharecow' to
+ *               to their things, they'd need to be able to enumerate _all_
+ *               of the memory managers associated with a given mem-node!
+ * Solution:     This can be solved by forming a backwards tree of all of
+ *               the different, recursive parent pointers of reachable from
+ *               the current node. On every path where we reach an end, that
+ *               last node with 0 parent pointers will reference a different
+ *               memory manager, which in turn contains a mapping for the
+ *               associated mpart!
+ *
+ *
  * Changes necessary:
  *  - mnode.mn_mman:     Must become a vector, who's length can then be
  *                       interpreted as the node's reference counter.
