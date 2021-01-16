@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x108f4a3b */
+/* HASH CRC-32:0x150ca083 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,7 +203,7 @@ INTDEF ATTR_RETNONNULL WUNUSED sigset_t *NOTHROW_NCX(LIBCCALL libc_getsigmaskptr
  * >> static sigset_t const fullset = SIGSET_INIT_FULL;
  * >> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
  * >> // Code in here executes with all maskable signals masked
- * >> // Note however that code in here also musn't call sigprocmask()
+ * >> // Note however that code in here also mustn't call sigprocmask()
  * >> setsigmaskptr(oldset);
  * Equivalent code using sigprocmask (which has way more overhead):
  * >> static sigset_t const fullset = SIGSET_INIT_FULL;

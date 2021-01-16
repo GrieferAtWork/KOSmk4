@@ -259,7 +259,7 @@ nofproc:
 		size_t thread_count = 0;
 		struct task *iter;
 		sync_read(&v->v_tasklock);
-		for (iter = v->v_tasks; iter; iter = iter->t_vm_tasks.ln_next)
+		for (iter = v->v_tasks; iter; iter = iter->t_mman_tasks.ln_next)
 			++thread_count;
 		sync_endread(&v->v_tasklock);
 		if (format_printf(printer, arg, "%" PRIuSIZ " ",

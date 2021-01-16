@@ -1421,7 +1421,7 @@ NOTHROW(KCALL pidns_install_list)(struct pidns *__restrict self,
  * for allowing a new `struct taskpid' being added.
  * This function will never block, or throw an exception. - If preparation fails,
  * `false' is returned, and the caller is expected to use `pidns_prepare_for_insert'
- * in order to forceably prepare the PIDns (which the also allows for blocking) */
+ * in order to forcibly prepare the PIDns (which the also allows for blocking) */
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL pidns_prepare_for_insert_nx)(struct pidns *__restrict self) {
 	if (((self->pn_size + 1) * 3) / 2 >= self->pn_mask) {

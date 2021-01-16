@@ -79,7 +79,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 	{
 		struct vm_execinfo_struct *execinfo;
-		execinfo = &FORVM(thread->t_vm, thisvm_execinfo);
+		execinfo = &FORVM(thread->t_mman, thisvm_execinfo);
 		if (execinfo->ei_dent) {
 			len = dbg_printer(NULL,
 			                  execinfo->ei_dent->de_name,

@@ -54,7 +54,7 @@ NOTHROW(KCALL dbg_getpagedir)(void) {
 	struct vm *v;
 	if (!dbg_current)
 		goto fallback;
-	v = dbg_current->t_vm;
+	v = dbg_current->t_mman;
 	if (!v)
 		goto fallback;
 	return v->v_pdir_phys;
@@ -164,7 +164,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
 						goto done_nopanic_copy;
-					new_vm = dbg_current->t_vm;
+					new_vm = dbg_current->t_mman;
 					if unlikely(!ADDR_ISKERN(new_vm))
 						goto done_nopanic_copy;
 					if (new_vm->v_pdir_phys != pdir)
@@ -174,7 +174,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 				}
 				old_vm = THIS_VM;
 				ok     = num_bytes - error;
-				PERTASK_SET(this_vm, dbg_current->t_vm);
+				PERTASK_SET(this_vm, dbg_current->t_mman);
 				TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,
@@ -261,7 +261,7 @@ again_memcpy_nopf:
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
 						goto done_nopanic_copy;
-					new_vm = dbg_current->t_vm;
+					new_vm = dbg_current->t_mman;
 					if unlikely(!ADDR_ISKERN(new_vm))
 						goto done_nopanic_copy;
 					if (new_vm->v_pdir_phys != pdir)
@@ -271,7 +271,7 @@ again_memcpy_nopf:
 				}
 				old_vm = THIS_VM;
 				ok     = num_bytes - error;
-				PERTASK_SET(this_vm, dbg_current->t_vm);
+				PERTASK_SET(this_vm, dbg_current->t_mman);
 				TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,

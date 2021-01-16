@@ -107,39 +107,41 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 
-struct mdeadram {
-	SLIST_ENTRY(PAGEDIR_PAGEALIGNED mdeadram) mdr_link; /* [lock(ATOMIC)] Next dead-ram area. */
-	PAGEDIR_PAGEALIGNED size_t                mdr_size; /* Total size (in bytes) of the dead-ram area.
-	                                                     * This counts from the start of this structure. */
-};
 
-SLIST_HEAD(mdeadram_slist, mdeadram);
+struct mlockop;
+#ifndef __mlockop_slist_defined
+#define __mlockop_slist_defined 1
+SLIST_HEAD(mlockop_slist, mlockop);
+#endif /* !__mlockop_slist_defined */
 
 
-/* Only used by the kernel mman: Linked chain of dead-ram sections
- * for which an attempt at unmapping should be made whenever the
- * lock for this mman is released.
+/* Only used by the kernel mman: Linked chain of pending operations
+ * that should be executed (via a reap-mechanism) whenever the lock
+ * for this mman is released.
  * This list is situated such that for user-space mmans, it always
- * appears as an empty list, meaning that the clear-dead-ram check
- * can simply be performed for every mman, and will simply be a
- * no-op when done for anything but the kernel mman.
+ * appears as an empty list, meaning that the must-reap-check can
+ * simply be performed for every mman, and will simply be a no-op
+ * when done for anything but the kernel mman.
  * However, you still mustn't add anything into it for a user-space
  * memory manager! */
-DATDEF ATTR_PERMMAN struct mdeadram_slist thismman_deadram;
+DATDEF ATTR_PERMMAN struct mlockop_slist thismman_lockops;
 
-/* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_deadram)' */
-DATDEF struct mdeadram_slist mman_kernel_deadram;
+/* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_lockops)' */
+#ifndef __mman_kernel_lockops_defined
+#define __mman_kernel_lockops_defined 1
+DATDEF struct mlockop_slist mman_kernel_lockops;
+#endif /* !__mman_kernel_lockops_defined */
 
 
 
-/* Reap dead ram regions of `self' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mman_deadram_reap)(struct mman *__restrict self);
-#define mman_deadram_mustreap(self) \
-	(__hybrid_atomic_load(FORMMAN(self, thismman_deadram.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
+/* Reap lock operations of `self' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
+#define mman_lockops_mustreap(self) \
+	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define mman_deadram_reap(self) _mman_deadram_reap(self)
+#define mman_lockops_reap(self) _mman_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
-#define mman_deadram_reap(self) (void)(!mman_deadram_mustreap(self) || (_mman_deadram_reap(self), 0))
+#define mman_lockops_reap(self) (void)(!mman_lockops_mustreap(self) || (_mman_lockops_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 
@@ -147,7 +149,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mman_deadram_reap)(struct mman *
 #define mman_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->mm_lock)
 #define mman_lock_acquire(self)    atomic_lock_acquire(&(self)->mm_lock)
 #define mman_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->mm_lock)
-#define mman_lock_release(self)    (atomic_lock_release(&(self)->mm_lock), mman_deadram_reap(self))
+#define mman_lock_release(self)    (atomic_lock_release(&(self)->mm_lock), mman_lockops_reap(self))
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
 __DEFINE_SYNC_MUTEX(struct mman,

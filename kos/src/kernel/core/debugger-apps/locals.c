@@ -267,7 +267,7 @@ enum_locals_at_with_debug_sections(void const *absolute_pc,
 	ssize_t result;
 	struct vm *required_vm = &vm_kernel;
 	if (ADDR_ISUSER(absolute_pc))
-		required_vm = dbg_current->t_vm;
+		required_vm = dbg_current->t_mman;
 	if (required_vm == THIS_VM) {
 		result = enum_locals_at_with_debug_sections_impl(absolute_pc,
 		                                                 callback,

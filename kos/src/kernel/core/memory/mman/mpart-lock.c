@@ -1284,6 +1284,8 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
 	for (; start_node != stop_node; start_node = LIST_NEXT(start_node, mn_link)) {
 		if unlikely(mnode_wasdestroyed(start_node))
 			continue; /* Skip dead nodes. */
+		if (start_node->mn_flags & MNODE_F_MPREPARED)
+			continue;
 		pagedir_unprepare_map_p(start_node->mn_mman->mm_pdir_phys,
 		                        mnode_getaddr(start_node),
 		                        mnode_getsize(start_node));
@@ -1301,11 +1303,13 @@ try_prepare_mmans_or_throw(struct mpart *__restrict self,
 	LIST_FOREACH (node, &self->mp_copy, mn_link) {
 		if unlikely(mnode_wasdestroyed(node))
 			continue; /* Skip dead nodes. */
-		/* Prepare the page directory. */
-		if unlikely(!pagedir_prepare_map_p(node->mn_mman->mm_pdir_phys,
-		                                   mnode_getaddr(node),
-		                                   mnode_getsize(node)))
-			goto err_badalloc;
+		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
+			/* Prepare the page directory. */
+			if unlikely(!pagedir_prepare_map_p(node->mn_mman->mm_pdir_phys,
+			                                   mnode_getaddr(node),
+			                                   mnode_getsize(node)))
+				goto err_badalloc;
+		}
 		result = true;
 	}
 	return result;
@@ -1532,8 +1536,10 @@ free_unused_block_status:
 			if (LIST_ISBOUND(node, mn_writable))
 				LIST_UNBIND(node, mn_writable);
 
-			/* With the new mapping in place, unprepare the page directory. */
-			pagedir_unprepare_map_p(mm->mm_pdir_phys, addr, size);
+			if (!(node->mn_flags & MNODE_F_MPREPARED)) {
+				/* With the new mapping in place, unprepare the page directory. */
+				pagedir_unprepare_map_p(mm->mm_pdir_phys, addr, size);
+			}
 
 			/* Sync memory within the affected area. After all: The backing
 			 * physical memory location just changed, so we must flush tlb

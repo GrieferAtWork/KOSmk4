@@ -51,11 +51,11 @@ STATIC_ASSERT(SHARED_RWLOCK_RMASK >= (__ARCH_PAGEID_MAX + 1));
  * @param: preset:     A callback this is invoked when it was impossible to acquire all
  *                     necessary DMA locks simultaneously without causing a dead-lock.
  *                     This is then resolved by releasing all pre-existing locks, before
- *                     forceably acquiring+releasing the blocking lock (thus ensuring that
+ *                     forcibly acquiring+releasing the blocking lock (thus ensuring that
  *                     it has become available), before starting over.
  *                     This callback is then invoked just after all previously acquired
  *                     DMA locks have been released, but just before the blocking lock
- *                     is forceably acquired. - It's purpose is then to reset whatever
+ *                     is forcibly acquired. - It's purpose is then to reset whatever
  *                     information was already gathered from then released ranges.
  * @param: arg:        Argument passed to `prange' and `preset' upon execution.
  * @param: lockvec:    Vector of DMA lock slots provided by the caller.

@@ -476,7 +476,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	/* Finalize the associated data parts, freeing up backing physical memory. */
 	vm_datapart_freeram(&FORCPU(self, thiscpu_x86_dfstackpart_), false);
 	vm_datapart_freeram(&FORTASK(myidle, this_kernel_stackpart_), false);
-	LLIST_REMOVE(myidle, t_vm_tasks);
+	LLIST_REMOVE(myidle, t_mman_tasks);
 	cpu_free(self);
 }
 
@@ -508,7 +508,7 @@ i386_allocate_secondary_cores(void) {
 		/*FORTASK(altidle, this_sched_link).ln_next = NULL;*/
 
 		/* Insert the new task into the kernel VM's task user list. */
-		LLIST_INSERT(vm_kernel.v_tasks, altidle, t_vm_tasks);
+		LLIST_INSERT(vm_kernel.v_tasks, altidle, t_mman_tasks);
 
 		/* Allocate & map stacks for this cpu's IDLE task, as well as the #DF stack. */
 		FORCPU(altcore, thiscpu_x86_dfstackpart_).dp_tree.a_vmax   = (datapage_t)(CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1);

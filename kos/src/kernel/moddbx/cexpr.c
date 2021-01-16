@@ -2896,7 +2896,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
  * one of the following prefixes:
  *   - this_*      Addend is `(uintptr_t)dbg_current'
  *   - thiscpu_*   Addend is `(uintptr_t)dbg_current->t_cpu'
- *   - thisvm_*    Addend is `(uintptr_t)dbg_current->t_vm'
+ *   - thisvm_*    Addend is `(uintptr_t)dbg_current->t_mman'
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
@@ -3080,7 +3080,7 @@ do_increase_addend:
 							if (name[4] == 'v' && name[5] == 'm' && name[6] == '_') {
 								if unlikely(!ADDR_ISKERN(dbg_current))
 									goto err_fefault_symtype;
-								addend = (uintptr_t)dbg_current->t_vm;
+								addend = (uintptr_t)dbg_current->t_mman;
 								goto do_increase_addend;
 							}
 							if (name[4] == 'c' && name[5] == 'p' &&

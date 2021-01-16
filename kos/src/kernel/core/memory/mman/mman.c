@@ -26,11 +26,24 @@
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mm-event.h>
+#include <kernel/mman/mm-lockop.h>
 #include <kernel/paging.h>
 
 #include <kos/except.h>
 
 DECL_BEGIN
+
+/* List of callbacks that should be invoked after mman_exec()
+ * These are called alongside stuff like `handle_manager_cloexec()'
+ * NOTE: The passed mman is always `THIS_MMAN', and is never `&mman_kernel' */
+PUBLIC CALLBACK_LIST(void KCALL(void)) mman_onexec_callbacks = CALLBACK_LIST_INIT;
+/* Mman initialization/finalization callbacks. */
+PUBLIC CALLBACK_LIST(void FCALL(struct mman *)) mman_oninit_callbacks = CALLBACK_LIST_INIT;
+PUBLIC CALLBACK_LIST(void FCALL(struct mman *)) mman_onfini_callbacks = CALLBACK_LIST_INIT;
+PUBLIC CALLBACK_LIST(void FCALL(struct mman * /*newmman*/, struct mman * /*oldmman*/)) mman_onclone_callbacks = CALLBACK_LIST_INIT;
+
+
 
 /* Memory manager reference counting control. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -74,9 +87,17 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 	/* TODO */
 }
 
-/* Reap dead ram regions of `self' */
+/* Reap lock operations of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mman_reap)(struct mman *__restrict self) {
+NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self) {
+	/* TODO */
+}
+
+/* Run `op->mlo_func' in the context of holding a lock to the kernel VM at some
+ * point in the future. The given `op->mlo_func' is responsible for freeing the
+ * backing memory of `op' during its invocation. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op) {
 	/* TODO */
 }
 

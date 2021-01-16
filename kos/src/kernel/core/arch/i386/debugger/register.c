@@ -365,8 +365,8 @@ nocpu:
 
 	}
 	/* Account for register overrides related to some thread-local components. */
-	if (dbg_current->t_vm) {
-		struct vm *v = dbg_current->t_vm;
+	if (dbg_current->t_mman) {
+		struct vm *v = dbg_current->t_mman;
 		v->v_pdir_phys = (PHYS pagedir_t *)x86_dbg_origstate.fcs_coregs.co_cr3;
 		FORVM(v, thisvm_x86_dr0) = x86_dbg_origstate.fcs_drregs.dr_dr0;
 		FORVM(v, thisvm_x86_dr1) = x86_dbg_origstate.fcs_drregs.dr_dr1;
@@ -530,8 +530,8 @@ nocpu:
 				x86_dbg_origstate.fcs_idt           = x86_dbg_exitstate.de_state.fcs_idt;
 			}
 			/* Account for register overrides related to some thread-local components. */
-			if (dbg_current->t_vm) {
-				struct vm *v = dbg_current->t_vm;
+			if (dbg_current->t_mman) {
+				struct vm *v = dbg_current->t_mman;
 				x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)v->v_pdir_phys;
 				x86_dbg_origstate.fcs_drregs.dr_dr0 = FORVM(v, thisvm_x86_dr0);
 				x86_dbg_origstate.fcs_drregs.dr_dr1 = FORVM(v, thisvm_x86_dr1);

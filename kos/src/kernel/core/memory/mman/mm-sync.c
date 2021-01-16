@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
+#include <kernel/mman/mm-sync.h>
 #include <kernel/paging.h>
 #include <sched/cpu.h>
 

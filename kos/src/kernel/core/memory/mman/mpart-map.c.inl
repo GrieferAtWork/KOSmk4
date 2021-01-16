@@ -23,10 +23,12 @@
 //#define DEFINE_mpart_mmap_p
 #endif /* __INTELLISENSE__ */
 
+#include <debugger/rt.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 
@@ -241,7 +243,7 @@ do_load_large_pages_readonly:
 
 /* (Re-)map the given mem-part into a page directory.
  * The caller must ensure:
- *   - mpart_lock_acquired(self)
+ *   - mpart_lock_acquired(self)               (unless `self' was accessed from a hinted node)
  *   - pagedir_prepare_p(self, addr, size)     (was called)
  *
  * NOTES:
@@ -272,7 +274,6 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
 {
 	unsigned int shift;
 	bitset_word_t const *bitset;
-	assert(mpart_lock_acquired(self));
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
 	assert(IS_ALIGNED(size, PAGESIZE));
 	assert(IS_ALIGNED(offset, PAGESIZE));

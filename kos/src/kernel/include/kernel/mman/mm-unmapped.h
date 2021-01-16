@@ -35,8 +35,8 @@ DECL_BEGIN
 
 /* Flags for `mman_getunmapped()' and friends */
 #define MMAN_GETUNMAPPED_F_CLOSEBY         0x0000                /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address that is close to `addr' */
-#define MMAN_GETUNMAPPED_F_ABOVE           __MAP_GROWSUP         /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address `return >= addr' (but also allow returning anything else) */
 #define MMAN_GETUNMAPPED_F_BELOW           __MAP_GROWSDOWN       /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address `return + num_bytes <= addr' (but also allow returning anything else) */
+#define MMAN_GETUNMAPPED_F_ABOVE           __MAP_GROWSUP         /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Try to return an address `return >= addr' (but also allow returning anything else) */
 #define MMAN_GETUNMAPPED_F_STACK           __MAP_STACK           /* [valid_if(!MMAN_GETUNMAPPED_F_FIXED)] Allocate stack memory:
                                                                   *  - When `MMAN_GETUNMAPPED_F_CLOSEBY' is given, use the proper stack
                                                                   *    growth direction `MMAN_GETUNMAPPED_F_(ABOVE|BELOW)' instead.
@@ -124,7 +124,7 @@ DATDEF unsigned int mman_getunmapped_extflags;
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL mman_getunmapped_nx)(struct mman *__restrict self,
                                    void *addr, size_t num_bytes, unsigned int flags,
-                                   PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE));
+                                   size_t min_alignment DFL(PAGESIZE));
 
 /* Same as above, but never return `MMAN_GETUNMAPPED_ERROR'. Instead,
  * the given mman is unlocked on error, and an exception is thrown.
@@ -138,7 +138,7 @@ NOTHROW(FCALL mman_getunmapped_nx)(struct mman *__restrict self,
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
 mman_getunmapped_or_unlock(struct mman *__restrict self,
                            void *addr, size_t num_bytes, unsigned int flags,
-                           PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE))
+                           size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 

@@ -479,7 +479,7 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_getsigmaskptr]]]*/
 
-/*[[[head:libc_setsigmaskptr,hash:CRC-32=0x88053a96]]]*/
+/*[[[head:libc_setsigmaskptr,hash:CRC-32=0x6d635ab4]]]*/
 /* >> setsigmaskptr(3)
  * Set the current signal mask pointer to `sigmaskptr'
  * This is a kos-specific function that can be used to
@@ -492,7 +492,7 @@ do_legacy_sigprocmask:
  * >> static sigset_t const fullset = SIGSET_INIT_FULL;
  * >> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
  * >> // Code in here executes with all maskable signals masked
- * >> // Note however that code in here also musn't call sigprocmask()
+ * >> // Note however that code in here also mustn't call sigprocmask()
  * >> setsigmaskptr(oldset);
  * Equivalent code using sigprocmask (which has way more overhead):
  * >> static sigset_t const fullset = SIGSET_INIT_FULL;

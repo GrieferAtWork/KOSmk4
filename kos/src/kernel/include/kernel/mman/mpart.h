@@ -52,30 +52,35 @@
 /* Possible values for `struct mpart::mp_flags' */
 #define MPART_F_NORMAL         0x0000 /* Normal flags. */
 #define MPART_F_LOCKBIT        0x0001 /* Lock-bit for this m-part */
-#define MPART_F_MLOCK          0x0002 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the part's state
+#define MPART_F_MAYBE_BLK_INIT 0x0002 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
+#define MPART_F_NO_GLOBAL_REF  0x0004 /* [lock(WRITE_ONCE)] `mpart_all_list' doesn't hold a reference to this
+                                       * part. When memory is running low, and the kernel tries to unload unused
+                                       * memory parts, it will set this flag for all parts there are.
+                                       * Also note that this flag is set by default when the associated block's
+                                       * `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
+#define MPART_F_CHANGED        0x0008 /* [lock(SET(MPART_F_LOCKBIT), CLEAR(:mfile::mf_lock || :mfile::mf_changed == MFILE_PARTS_ANONYMOUS))]
+                                       * Blocks of this part (may) have changed. This flag must be cleared by the associated
+                                       * file after changes have been synced, or the file becomes anonymous. */
+#define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
+                                       * The backing block-state bitset exists in-line. */
+#define MPART_F_COREPART       0x0020 /* [const] Core part (affects how this mpart is freed) */
+#define MPART_F_DONT_SPLIT     0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
+                                       *         then the attempt will instead result in kernel panic. Similarly,
+                                       *         this flag also prevents the part from being merged. */
+#define MPART_F_DONT_FREE      0x0080 /* [const] Don't page_free() backing physical memory or swap. */
+/*efine MPART_F_               0x0100  * ... */
+/*efine MPART_F_               0x0200  * ... */
+/*efine MPART_F_               0x0400  * ... */
+/*efine MPART_F_               0x0800  * ... */
+/*efine MPART_F_               0x1000  * ... */
+#define MPART_F_MLOCK          0x2000 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the part's state
                                        * cannot move away from INCORE). Unless `MPART_F_MLOCK_FROZEN' is set, this flag
                                        * is set whenever this part is mapped by any mem-node that has the MNODE_F_MLOCK
                                        * flag set, and whenever a mem-node with the MNODE_F_MLOCK flag set has is destroyed,
                                        * or has its MNODE_F_MLOCK flag cleared, all mappings of the mem-part are scanned
                                        * in search for other locked mappings. If any are found, then this flag will remain
                                        * set. If none are found, then this flag is cleared. */
-#define MPART_F_MLOCK_FROZEN   0x0004 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
-#define MPART_F_NO_GLOBAL_REF  0x0008 /* [lock(WRITE_ONCE)] `mpart_all_list' doesn't hold a reference to this
-                                       * part. When memory is running low, and the kernel tries to unload unused
-                                       * memory parts, it will set this flag for all parts there are.
-                                       * Also note that this flag is set by default when the associated block's
-                                       * `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
-#define MPART_F_CHANGED        0x0010 /* [lock(SET(MPART_F_LOCKBIT), CLEAR(:mfile::mf_lock || :mfile::mf_changed == MFILE_PARTS_ANONYMOUS))]
-                                       * Blocks of this part (may) have changed. This flag must be cleared by the associated
-                                       * file after changes have been synced, or the file becomes anonymous. */
-#define MPART_F_BLKST_INL      0x0020 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
-                                       * The backing block-state bitset exists in-line. */
-#define MPART_F_DONT_SPLIT     0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
-                                       *         then the attempt will instead result in kernel panic. Similarly, this
-                                       *         flag also prevents the part from being merged. */
-#define MPART_F_DONT_FREE      0x0080 /* [const] Don't page_free() backing physical memory or swap. */
-#define MPART_F_MAYBE_BLK_INIT 0x0100 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
-#define MPART_F_COREPART       0x4000 /* [const] Core part (affects how this mpart is freed) */
+#define MPART_F_MLOCK_FROZEN   0x4000 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
 #define MPART_F__RBRED         0x8000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
 
 
@@ -734,7 +739,7 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self);
 
 /* (Re-)map the given mem-part into a page directory.
  * The caller must ensure:
- *   - mpart_lock_acquired(self)
+ *   - mpart_lock_acquired(self)               (unless `self' was accessed from a hinted node)
  *   - pagedir_prepare_p(self, addr, size)     (was called)
  *
  * NOTES:
@@ -758,6 +763,24 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
                           PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                           u16 perm);
 
+/* For use with `MNODE_F_MHINT':
+ *  - Ensure that the pages (== block) at the given `offset'
+ *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the
+ *    block loader from the associated file if necessary.
+ *  - Afterwards, map the associated page to `addr' within
+ *    the current page directory, using `perm'.
+ * This function is used to implement handling of hinted
+ * mem-nodes when encountered by the #PF handler. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
+                                 PAGEDIR_PAGEALIGNED void *addr,
+                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
+                                 u16 perm);
+
+/* Convenience wrapper for `mpart_hinted_mmap()' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
+                                 PAGEDIR_PAGEALIGNED void *fault_page);
 
 
 

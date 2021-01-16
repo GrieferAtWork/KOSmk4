@@ -23,7 +23,7 @@
 /* DeBug eXtensions: Malloc function.
  *
  * Behaves just like the normal kmalloc, except that this one can only be used
- * from within the debugger, and all memory allocated is forceably released when
+ * from within the debugger, and all memory allocated is forcibly released when
  * the debugger is reset/exited. Additionally, none of these functions make use
  * of exceptions, but always return `NULL' if an allocation failed.
  */

@@ -64,7 +64,7 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 	}
 	{
 		struct vm_execinfo_struct *execinfo;
-		execinfo = &FORVM(dbg_current->t_vm, thisvm_execinfo);
+		execinfo = &FORVM(dbg_current->t_mman, thisvm_execinfo);
 		dbg_setcolor(ANSITTY_CL_RED, ANSITTY_CL_GREY);
 		dbg_print(DBGSTR("Breakpoint "));
 		if (execinfo->ei_path && execinfo->ei_dent) {

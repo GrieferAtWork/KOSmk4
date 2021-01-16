@@ -96,22 +96,22 @@ struct cpu;
 struct vm;
 struct scpustate;
 struct task {
-	struct task            *t_self;      /* [1..1][const][== this] Self-pointer (always at offset == 0) */
-	WEAK refcnt_t           t_refcnt;    /* Task reference counter. */
-	WEAK uintptr_t          t_flags;     /* Thread state & flags (Set of `TASK_F*'). */
-	struct cpu             *t_cpu;       /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
-	                                      * NOTE: Also accessible via the `this_cpu' field. */
-	REF struct vm          *t_vm;        /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
-	                                      *             write(THIS_TASK && INTERN(lock)))]
-	                                      * The VM used to host this task.
-	                                      * NOTE: Also accessible via the `this_vm' field. */
-	LLIST_NODE(struct task) t_vm_tasks;  /* [lock(t_vm->v_tasklock)] Chain of tasks using `t_vm' */
-	size_t                  t_heapsz;    /* [const] Allocated heap size of this task. */
+	struct task            *t_self;       /* [1..1][const][== this] Self-pointer (always at offset == 0) */
+	WEAK refcnt_t           t_refcnt;     /* Task reference counter. */
+	WEAK uintptr_t          t_flags;      /* Thread state & flags (Set of `TASK_F*'). */
+	struct cpu             *t_cpu;        /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
+	                                       * NOTE: Also accessible via the `this_cpu' field. */
+	REF struct vm          *t_mman;       /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
+	                                       *             write(THIS_TASK && INTERN(lock)))]
+	                                       * The VM used to host this task.
+	                                       * NOTE: Also accessible via the `this_vm' field. */
+	LLIST_NODE(struct task) t_mman_tasks; /* [lock(t_mman->v_tasklock)] Chain of tasks using `t_mman' */
+	size_t                  t_heapsz;     /* [const] Allocated heap size of this task. */
 	union {
-		struct task        *_t_next;     /* [0..1][lock(INTERNAL)] Next dead VM within the same VM. */
-		struct scpustate   *t_state;     /* [lock(PRIVATE(t_cpu == THIS_CPU))]
-		                                  * [valid_if(t_self != FORCPU(t_cpu, thiscpu_sched_current))]
-		                                  * The CPU state to-be restored when execution of this task continues. */
+		struct task        *_t_next;      /* [0..1][lock(INTERNAL)] Next dead VM within the same VM. */
+		struct scpustate   *t_state;      /* [lock(PRIVATE(t_cpu == THIS_CPU))]
+		                                   * [valid_if(t_self != FORCPU(t_cpu, thiscpu_sched_current))]
+		                                   * The CPU state to-be restored when execution of this task continues. */
 	};
 #define KEY_task_vm_dead__next_offsetafter __COMPILER_OFFSETAFTER(struct task, _t_next)
 #define KEY_task_vm_dead__next(thread)     (thread)->_t_next

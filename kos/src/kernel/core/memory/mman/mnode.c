@@ -83,6 +83,11 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	REF struct mpart *part;
+	if ((self->mn_flags & MNODE_F_MPREPARED) && !wasdestroyed(self->mn_mman)) {
+		pagedir_phys_t pd = self->mn_mman->mm_pdir_phys;
+		pagedir_unprepare_map_p(pd, mnode_getaddr(self), mnode_getsize(self));
+	}
+
 	xdecref(self->mn_fspath);
 	xdecref(self->mn_fsname);
 	if ((part = self->mn_part) != NULL) {
@@ -204,15 +209,20 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 	addr = mnode_getaddr(self);
 	size = mnode_getsize(self);
 
-	/* Prepare the page directory */
-	if unlikely(!pagedir_prepare_map_p(pdir, addr, size))
-		return MNODE_CLEAR_WRITE_BADALLOC;
+	if (self->mn_flags & MNODE_F_MPREPARED) {
+		/* Delete write permissions. */
+		pagedir_unwrite_p(pdir, addr, size);
+	} else {
+		/* Prepare the page directory */
+		if unlikely(!pagedir_prepare_map_p(pdir, addr, size))
+			return MNODE_CLEAR_WRITE_BADALLOC;
 
-	/* Delete write permissions. */
-	pagedir_unwrite_p(pdir, addr, size);
+		/* Delete write permissions. */
+		pagedir_unwrite_p(pdir, addr, size);
 
-	/* Unprepare the page directory. */
-	pagedir_unprepare_map_p(pdir, addr, size);
+		/* Unprepare the page directory. */
+		pagedir_unprepare_map_p(pdir, addr, size);
+	}
 
 	/* Unlink from the list of writable nodes. */
 	LIST_UNBIND(self, mn_writable);

@@ -102,7 +102,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 			goto badobj;
 		thread_cpu_id = thread_cpu->c_id;
 		thread_flags  = thread->t_flags;
-		execinfo      = &FORVM(thread->t_vm, thisvm_execinfo);
+		execinfo      = &FORVM(thread->t_mman, thisvm_execinfo);
 		dent          = execinfo->ei_dent;
 		if (dent) {
 			if (dent->de_refcnt == 0)

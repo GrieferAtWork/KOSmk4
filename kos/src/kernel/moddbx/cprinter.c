@@ -1385,7 +1385,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 		struct vm *effective_vm;
 		effective_vm = &vm_kernel;
 		if (ADDR_ISUSER(ptr) && ADDR_ISKERN(dbg_current))
-			effective_vm = dbg_current->t_vm;
+			effective_vm = dbg_current->t_mman;
 		is_void_pointer = true;
 		if (ADDR_ISKERN(effective_vm)) {
 			struct vm_node *node;

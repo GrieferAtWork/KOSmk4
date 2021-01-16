@@ -774,7 +774,7 @@ handle_remove_write_error:
 			size_t thread_count = 0;
 			alloc_count = rpc_count_chain(task_terminate_rpcs);
 			for (thread = target->v_tasks; thread;
-			     thread = thread->t_vm_tasks.ln_next) {
+			     thread = thread->t_mman_tasks.ln_next) {
 				if (!(ATOMIC_READ(thread->t_flags) &
 				      (TASK_FTERMINATING | TASK_FTERMINATED)) &&
 				    thread != THIS_TASK)
@@ -821,7 +821,7 @@ handle_remove_write_error:
 		 * delivering RPCs to all of the affected threads, thus terminating them.
 		 * |----- Point of no return */
 		for (thread = target->v_tasks; thread;
-		     thread = thread->t_vm_tasks.ln_next) {
+		     thread = thread->t_mman_tasks.ln_next) {
 			struct rpc_entry *next;
 			int error;
 			if (ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))

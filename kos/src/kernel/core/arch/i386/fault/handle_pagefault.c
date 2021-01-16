@@ -66,6 +66,16 @@
 #include <asm/cfi.h>
 #endif /* !__x86_64__ */
 
+
+#ifdef __x86_64__
+#define IF_X32(...) /* nothing */
+#define IF_X64(...) __VA_ARGS__
+#else /* __x86_64__ */
+#define IF_X32(...) __VA_ARGS__
+#define IF_X64(...) /* nothing */
+#endif /* !__x86_64__ */
+
+
 /* NOTE: This #PF handler is also used while in debugger mode. And here's why:
  *
  * Use the normal #PF handler in debugger mode.
@@ -262,7 +272,7 @@ NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
 /* Check if `*pc' points to some I/O instruction that doesn't
  * perform a read or write access to `fault_addr'. */
 LOCAL WUNUSED bool FCALL
-is_io_instruction_and_not_memory_access(byte_t *pc,
+is_io_instruction_and_not_memory_access(byte_t const *pc,
                                         struct icpustate *state,
                                         uintptr_t fault_addr) {
 	byte_t opcode;
@@ -352,15 +362,14 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 
 
 PRIVATE ATTR_NORETURN void FCALL
-rethrow_exception_from_pf_handler(struct icpustate *__restrict state, uintptr_t pc) {
+rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void *pc) {
 	NESTED_TRY {
-		pc = (uintptr_t)instruction_trysucc((void const *)pc,
-		                                    instrlen_isa_from_icpustate(state));
+		pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
 	} EXCEPT {
-		icpustate_setpc(state, pc + 1);
+		icpustate_setpc(state, (uintptr_t)pc + 1);
 		RETHROW();
 	}
-	icpustate_setpc(state, pc);
+	icpustate_setpc(state, (uintptr_t)pc);
 	RETHROW();
 }
 
@@ -368,6 +377,12 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, uintptr_t 
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
+#if 1
+#define FAULT_IS_USER ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) != 0)
+#else
+#define FAULT_IS_USER icpustate_isuser(state)
+#endif
+#define FAULT_IS_WRITE ((ecode & X86_PAGEFAULT_ECODE_WRITING) != 0)
 #if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
      X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
 #define GET_PF_CONTEXT_UW_BITS() (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING))
@@ -377,11 +392,760 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	 (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0))
 #endif
 
-#if 1
-#define isuser() (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
-#else
-#define isuser() icpustate_isuser(state)
-#endif
+
+#ifdef CONFIG_USE_NEW_VM
+	void *pc, *addr;
+	struct mfault mf;
+	struct task_connections con;
+
+	/* Check for memcpy_nopf() */
+	pc = (void *)state->ics_irregs.ir_pip;
+	if unlikely_untraced(x86_nopf_check(pc)) {
+		state->ics_irregs.ir_pip = x86_nopf_retof(pc);
+		return state;
+	}
+
+	/* Read our the faulting address */
+	addr = __rdcr2();
+
+	/* Re-enable interrupts if they were enabled before. */
+	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
+		__sti();
+
+	/* Load the address of the faulting page. */
+	mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
+
+	/* Check if a hint was defined for this page. */
+	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT |
+	              X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
+	    ADDR_ISKERN(addr)) {
+		struct mnode *hinted_node;
+		hinted_node = (struct mnode *)pagedir_gethint(addr);
+		if (hinted_node != NULL) {
+			/* Deal with hinted nodes. */
+			mnode_hinted_mmap(hinted_node, mf.mfl_addr);
+			return state;
+		}
+	}
+
+	/* Figure out memory manager in charge of the accessed address. */
+	mf.mfl_mman = &mman_kernel;
+	if (ADDR_ISUSER(addr) || FAULT_IS_USER) {
+#ifndef NDEBUG
+		/* Special case: When the TLS segment contains an invalid pointer, us
+		 *               trying to obtain THIS_VM at this point is just going
+		 *               to result in a #DF:
+		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
+		 *   #2: Trigger #PF at `%tls.base'
+		 *   #3: When `%tls.base' points into user-space (e.g. is `NULL'), we get here again
+		 *   #4: Repeat at step #1
+		 * This then eventually results in a stack overflow that cannot be
+		 * inspected properly, so when compiling for a debug-target, we use
+		 * memcpy_nopf() to access the TLS segment. */
+		struct task *mythread;
+#ifdef __x86_64__
+		mythread = (struct task *)__rdgsbaseq();
+#else /* __x86_64__ */
+		mythread = NULL;
+		if likely(__rdfs() == SEGMENT_KERNEL_FSBASE) {
+			struct desctab gdt;
+			__sgdt(&gdt);
+			if likely(gdt.dt_limit > SEGMENT_KERNEL_FSBASE) {
+				struct segment *fsseg;
+				fsseg    = (struct segment *)(gdt.dt_base + SEGMENT_KERNEL_FSBASE);
+				mythread = (struct task *)segment_rdbaseX(fsseg);
+			}
+		}
+#endif /* !__x86_64__ */
+		if unlikely(memcpy_nopf(&mf.mfl_mman, &mythread->t_mman, sizeof(mf.mfl_mman)) != 0) {
+			assertf(memcpy_nopf(&mf.mfl_mman, &mythread->t_mman, sizeof(mf.mfl_mman)) == 0,
+			        "Corrupt TLS base pointer: mythread = %p", mythread);
+			/* Allow the user to IGNORE the assertion check, in which case we'll
+			 * try to repair the damage... */
+			mf.mfl_mman = x86_repair_broken_tls_state()->t_mman;
+		}
+#else /* !NDEBUG */
+		mf.mfl_mman = THIS_VM;
+#endif /* NDEBUG */
+	}
+
+	/* Preserve high-level task connections. */
+	task_pushconnections(&con);
+
+	/* Fill in missing members of the mem-fault controller. */
+	__mfault_init(&mf);
+	mf.mfl_size  = PAGESIZE;
+	mf.mfl_flags = MMAN_FAULT_F_NORMAL;
+	if (FAULT_IS_WRITE)
+		mf.mfl_flags |= MMAN_FAULT_F_WRITE;
+	TRY {
+
+		/* Acquire a lock to the mman in charge. */
+again_lock_mman:
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+		if unlikely(!mman_lock_tryacquire(mf.mfl_mman)) {
+			/* Access to the phys2virt section is allowed while preemption is disabled.
+			 * However, when preemption is disabled, locking the kernel VM may fail,
+			 * so we need a special-case check for access to the phys2virt section when
+			 * we've previously failed to lock the kernel VM for reading. */
+			if (mf.mfl_mman == &mman_kernel && !FAULT_IS_USER &&
+			    (uintptr_t)addr >= KERNEL_PHYS2VIRT_MIN &&
+			    (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX) {
+				mfault_fini(&mf);
+				x86_phys2virt64_require(addr);
+				goto pop_connections_and_return;
+			}
+			mman_lock_acquire(mf.mfl_mman);
+		}
+#else /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+		mman_lock_acquire(mf.mfl_mman);
+#endif /* !CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+
+		/* Lookup the mapping for the accessed address. */
+		mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings,
+		                                mf.mfl_addr);
+		if unlikely(!mf.mfl_node) {
+			struct mman *mm = mf.mfl_mman;
+			mman_lock_release(mm);
+			mfault_fini(&mf);
+			if (mm != &mman_kernel) {
+				if (ADDR_ISKERN(addr)) {
+					if (FAULT_IS_USER) {
+						/* This can happen depending on what the CPU does when
+						 * attempting to access the IOB vector associated with
+						 * the calling thread.
+						 * In this case, we must re-attempt the lookup within kernel-space. */
+						mman_lock_acquire(&mman_kernel);
+						mf.mfl_node = mnode_tree_locate(mman_kernel.mm_mappings,
+						                                mf.mfl_addr);
+						if (mf.mfl_node && !mf.mfl_node->mn_part) {
+							mman_lock_release(&mman_kernel);
+							/* Reserved node. */
+							if (is_iob_node(mf.mfl_node))
+								goto do_handle_iob_node_access;
+						} else {
+							mman_lock_release(&mman_kernel);
+						}
+					}
+				}
+#if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__x86_64__)
+				else {
+					/* We can get here if the calling program is running in compatibility
+					 * mode, and has just attempted to perform a memory access/call to its
+					 * ukern segment.
+					 * NOTE: At this point we already know that `addr < KERNELSPACE_BASE',
+					 *       and because any non-canonical CR2 would have instead caused
+					 *       a GPF, we actually also know that `addr <= 0x0000ffffffffffff' */
+					if (icpustate_getcs(state) == SEGMENT_USER_CODE32_RPL &&
+					    addr >= (void *)(uintptr_t)COMPAT_KERNELSPACE_BASE &&
+					    /* NOTE: The addr <= 32-bit is necessary since the hosted
+					     *       application may have done something like `*(u32 *)0xffffffff = 0',
+					     *       which would (among other addresses) have also accessed
+					     *       memory beyond the 32-bit address space, and I'm not entirely
+					     *       sure if a processor would wrap the pointer in this case...
+					     * Also: There may be other ways for 32-bit programs to deref 64-bit
+					     *       pointers that I can't think of right now. */
+					    addr <= (void *)(uintptr_t)UINT32_C(0xffffffff)) {
+						struct mnode *krs;
+						/* The access is of a 32-bit program trying to reach into
+						 * what it ~thinks~ is the location of its kernel-space.
+						 * -> Try to handle this case by re-sizing the `v_kernreserve'
+						 *    to instead start at +3GiB, but only do so if there isn't
+						 *    anything else mapped within that address range.
+						 * Technically, it would be more correct if'd had already done
+						 * this during the exec() that spawned the calling application,
+						 * especially since prior to this being done, the application
+						 * would have been able to map something else into the +3GiB...+4GiB
+						 * address space range, however given that this is highly kos-specific
+						 * behavior, I do think that doing this lazily should be ok (especially
+						 * since a 32-bit program trying to map into +3GiB...+4GiB would already
+						 * be doing something that it shouldn't, as attempting to map that area
+						 * of memory is something that cannot be done when hosted by a 32-bit
+						 * kernel) */
+
+						mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
+						mf.mfl_mman = mm;
+						__mfault_init(&mf);
+						mf.mfl_size  = PAGESIZE;
+						mf.mfl_flags = MMAN_FAULT_F_NORMAL;
+						if (FAULT_IS_WRITE)
+							mf.mfl_flags |= MMAN_FAULT_F_WRITE;
+						mman_lock_acquire(mm);
+						mf.mfl_node = mnode_tree_locate(mm->mm_mappings,
+						                                mf.mfl_addr);
+						/* Re-check that there is no mapping at the accessed address. */
+						if unlikely(mf.mfl_node != NULL) {
+#define NEED_got_node_and_lock
+							goto got_node_and_lock;
+						}
+						/* Make sure that `v_kernreserve' hasn't already been extended. */
+						krs = &FORMMAN(mm, mman_kernel_reservation);
+						assert(mnode_getaddr(krs) == (void *)KERNELSPACE_BASE ||
+						       mnode_getaddr(krs) == (void *)COMPAT_KERNELSPACE_BASE);
+						assert(krs->mn_mman == mm);
+						if (mnode_getaddr(krs) == (void *)KERNELSPACE_BASE) {
+							/* Make sure that the +3GiB...+4GiB region is currently unmapped. */
+							if (!mnode_tree_rlocate(mm->mm_mappings,
+							                        (void const *)((uintptr_t)COMPAT_KERNELSPACE_BASE),
+							                        (void const *)((uintptr_t)UINT64_C(0x100000000) -
+							                                       (uintptr_t)COMPAT_KERNELSPACE_BASE))) {
+								/* All right! Let's extend the `v_kernreserve' node! */
+								printk(KERN_DEBUG "[x32] Extend v_kernreserve to include +3GiB...+4GiB\n");
+								mf.mfl_node = krs;
+								mnode_tree_removenode(&mm->mm_mappings, krs);
+								krs->mn_minaddr = (byte_t *)COMPAT_KERNELSPACE_BASE;
+								krs->mn_part    = &userkern_segment_part_compat;
+								assert(krs->mn_fspath == NULL);
+								assert(krs->mn_fsname == NULL);
+								/* Re-insert the node and continue operating as if we'd found
+								 * everything as it has been changed into from the get-go. */
+								mnode_tree_insert(&mm->mm_mappings, krs);
+#define NEED_got_node_and_lock
+								goto got_node_and_lock;
+							}
+						}
+						mman_lock_release(mm);
+					}
+				}
+#endif /* !CONFIG_NO_USERKERN_SEGMENT && __x86_64__ */
+			}
+			/* TODO */
+			goto pop_connections_and_throw_segfault;
+		}
+#ifdef NEED_got_node_and_lock
+#undef NEED_got_node_and_lock
+got_node_and_lock:
+#endif /* NEED_got_node_and_lock */
+
+		/* At this point, the accessed mem-node has been
+		 * determined, and is known to be non-NULL! */
+		mf.mfl_part = mf.mfl_node->mn_part;
+		if unlikely(mf.mfl_part == NULL) {
+			/* Deal with reserved memory nodes. */
+			struct cpu *me;
+			mman_lock_release(mf.mfl_mman);
+			{
+				struct mnode *node;
+				node = mf.mfl_node;
+				mfault_fini(&mf);
+				mf.mfl_node = node;
+			}
+
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+			/* Check for special case: `mf.mfl_node' belongs to the physical identity area. */
+			if (mf.mfl_node == &x86_phys2virt64_node) {
+				x86_phys2virt64_require(addr);
+				goto pop_connections_and_return;
+			}
+#endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+
+			/* Check for special case: `mf.mfl_node' may be the `thiscpu_x86_iobnode' of some CPU */
+do_handle_iob_node_access:
+			me = THIS_CPU;
+			if (mf.mfl_node == &FORCPU(me, thiscpu_x86_iobnode)) {
+				PREEMPTION_DISABLE();
+				IF_SMP(COMPILER_READ_BARRIER();)
+				IF_SMP(me = THIS_CPU;)
+				IF_SMP(if (mf.mfl_node == &FORCPU(me, thiscpu_x86_iobnode))) {
+					/* Most likely case: Accessing the IOB of the current CPU. */
+					bool allow_preemption;
+					assertf(FORCPU(me, thiscpu_x86_ioperm_bitmap) == NULL ||
+					        FORCPU(me, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP,
+					        "me                                    = %p\n"
+					        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p\n"
+					        "THIS_X86_IOPERM_BITMAP                = %p\n",
+					        me, FORCPU(me, thiscpu_x86_ioperm_bitmap),
+					        THIS_X86_IOPERM_BITMAP);
+					/* Make sure to handle any access errors after the ioperm() bitmap
+					 * was already mapped during the current quantum as full segfault. */
+					if unlikely(FORCPU(me, thiscpu_x86_ioperm_bitmap) != NULL) {
+						/* Check for special case: even if the IOPERM bitmap is already
+						 * mapped, allow a mapping upgrade if it was mapped read-only
+						 * before, but is now needed as read-write. */
+						if (FAULT_IS_WRITE && !pagedir_iswritable(addr))
+							; /* Upgrade the mapping */
+						else {
+							goto pop_connections_and_throw_segfault;
+						}
+					}
+					allow_preemption = icpustate_getpreemption(state);
+					/* Make special checks if the access itself seems to
+					 * originate from a direct user-space access. */
+					if (FAULT_IS_USER) {
+						/* User-space can never get write-access to the IOB vector. */
+						if (FAULT_IS_WRITE)
+							goto pop_connections_and_throw_segfault;
+						/* User-space isn't allowed to directly access the IOB vector.
+						 * To not rely on undocumented processor behavior, manually check
+						 * if the access originates from a user-space I/O instruction.
+						 * If not (such as user-space directly trying to read kernel memory),
+						 * then we always deny the access, no matter what! */
+						if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state,
+						                                             (uintptr_t)addr))
+							goto pop_connections_and_throw_segfault;
+					}
+					if (!handle_iob_access(me, FAULT_IS_WRITE, allow_preemption)) {
+						assert(PREEMPTION_ENABLED());
+						goto again_lock_mman;
+					}
+					if (allow_preemption)
+						__sti();
+					goto pop_connections_and_return;
+				}
+				IF_SMP(if (icpustate_getpreemption(state)) __sti());
+			}
+
+			/* Either this is an access to the IOB vector of a different CPU,
+			 * or the accessed node is just some random, reservation node.
+			 * In the former case, we must take care to deal with a race condition
+			 * which may happen in an SMP system where our current thread has been
+			 * moved to a different CPU since we've re-enabled preemption at the
+			 * start of this function, and before getting here. In that case, the
+			 * access is still going to reference the IOB of the old CPU, and we
+			 * have to alter our behavior depending on the access happening because
+			 * of the some invalid access to a different CPU's IOB vector, or the
+			 * access being caused by the CPU itself, and a CPU-transfer happening
+			 * at just the wrong moment. */
+#ifndef CONFIG_NO_SMP
+			if (is_iob_node(mf.mfl_node)) {
+				/* If we didn't actually re-enable preemption, then no cpu-transfer could have happened! */
+				if (!icpustate_getpreemption(state))
+					goto pop_connections_and_throw_segfault;
+				/* I/O access from kernel-space wouldn't result in an IOB check, so
+				 * if the access comes from kernel-space, then this is the calling
+				 * thread incorrectly accessing some other cpu's IOB. */
+				if (!FAULT_IS_USER)
+					goto pop_connections_and_throw_segfault;
+				/* If the calling thread couldn't have changed CPUs, then this is an access to  */
+				if (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE)
+					goto pop_connections_and_throw_segfault;
+				/* The calling thread is capable of being migrated between different CPUs,
+				 * and the accessed node _is_ the IOB vector of a different CPU. However with
+				 * all of these factors, there still exists the possibility that the access
+				 * happened because the CPU itself accessed the vector, as may be triggered
+				 * by use of the `(in|out)(b|w|l)' instructions.
+				 * To make sure that we can handle those cases as well, as can check the
+				 * memory to which `icpustate_getpc(state)' points for being one of these
+				 * instructions.
+				 * To prevent the possibility of repeating the access to the IOB vector during
+				 * this check (in case a bad jump caused IP to end up within the IOB vector),
+				 * also make sure that `pc' isn't apart of said vector! */
+				if ((byte_t const *)pc >= vm_node_getmin(mf.mfl_node) &&
+				    (byte_t const *)pc <= vm_node_getmax(mf.mfl_node))
+					goto pop_connections_and_throw_segfault;
+				/* If we got here cause of an I/O instruction, just return to the caller and
+				 * have them attempt the access once again, hopefully without accessing  */
+				if (is_io_instruction_and_not_memory_access((byte_t const *)pc, state,
+				                                            (uintptr_t)addr))
+					goto pop_connections_and_return;
+			}
+#endif /* !CONFIG_NO_SMP */
+			goto pop_connections_and_throw_segfault;
+		}
+
+		/* Deal with VIO memory access */
+#ifdef LIBVIO_CONFIG_ENABLED
+		if (mf.mfl_part->mp_state == MPART_ST_VIO) {
+			struct vio_emulate_args args;
+			uintptr_t node_flags;
+
+#ifdef CONFIG_HAVE_DEBUGGER
+			/* Don't dispatch VIO while in debugger-mode. */
+			if unlikely(dbg_active) {
+				mman_lock_release(mf.mfl_mman);
+				mfault_fini(&mf);
+				goto pop_connections_and_throw_segfault;
+			}
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+			/* Fill in VIO callback arguments. */
+			node_flags                    = mf.mfl_node->mn_flags;
+			args.vea_args.va_acmap_page   = mf.mfl_addr;
+			args.vea_args.va_acmap_offset = (vio_addr_t)(mf.mfl_node->mn_partoff +
+			                                             (size_t)((byte_t *)mf.mfl_addr -
+			                                                      (byte_t *)mnode_getaddr(mf.mfl_node)));
+			args.vea_args.va_part         = incref(mf.mfl_part);
+			args.vea_ptrlo                = mnode_getminaddr(mf.mfl_node);
+			args.vea_ptrhi                = mnode_getmaxaddr(mf.mfl_node);
+			args.vea_addr                 = vioargs_vioaddr(&args.vea_args, args.vea_ptrlo);
+			mman_lock_release(mf.mfl_mman);
+			mfault_fini(&mf);
+
+			TRY {
+				mpart_lock_acquire(args.vea_args.va_part);
+			} EXCEPT {
+				decref(args.vea_args.va_part);
+				RETHROW();
+			}
+			args.vea_args.va_file = incref(args.vea_args.va_part->mp_file);
+			args.vea_args.va_ops  = args.vea_args.va_file->mf_ops->mo_vio;
+			mpart_lock_release(args.vea_args.va_part);
+
+			/* Ensure that VIO operators are present. */
+			if unlikely(!args.vea_args.va_ops) {
+				decref_unlikely(args.vea_args.va_file);
+				decref_unlikely(args.vea_args.va_part);
+				goto pop_connections_and_throw_segfault;
+			}
+
+			/* Check for special case: call into VIO memory */
+			if (args.vea_args.va_ops->vo_call && addr == pc) {
+				/* Make sure that memory mapping has execute permissions! */
+				if unlikely(!(node_flags & MNODE_F_PEXEC)) {
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+					PERTASK_SET(this_exception_args.e_segfault.s_context,
+					            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
+					                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
+cleanup_vio_and_pop_connections_and_set_exception_pointers2:
+					decref_unlikely(args.vea_args.va_file);
+					decref_unlikely(args.vea_args.va_part);
+					goto pop_connections_and_set_exception_pointers2;
+#define NEED_pop_connections_and_set_exception_pointers2
+				}
+				/* Special case: call into VIO memory */
+				TRY {
+					vio_addr_t vio_addr;
+					uintptr_t callsite_pc;
+					uintptr_t sp;
+					IF_X64(bool is_compat;)
+					/* Must unwind the stack to restore the IP of the VIO call-site. */
+					sp = icpustate_getsp(state);
+					if (sp >= KERNELSPACE_BASE && FAULT_IS_USER)
+						goto do_normal_vio; /* Validate the stack-pointer for user-space. */
+					IF_X64(is_compat = icpustate_is32bit(state);)
+					TRY {
+						IF_X64(if (is_compat) {
+							callsite_pc = (uintptr_t)*(u32 *)sp;
+						} else) {
+							callsite_pc = *(uintptr_t *)sp;
+						}
+					} EXCEPT {
+						if (!was_thrown(E_SEGFAULT))
+							RETHROW();
+						goto do_normal_vio;
+					}
+					/* Unwind the stack, and remember the call-site instruction pointer. */
+#ifdef __x86_64__
+					if (FAULT_IS_USER ? (callsite_pc >= USERSPACE_END)
+					                  : (callsite_pc < KERNELSPACE_BASE))
+						goto do_normal_vio;
+					icpustate_setpc(state, callsite_pc);
+					icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+#else /* __x86_64__ */
+					if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
+					    FAULT_IS_USER) {
+						if (callsite_pc >= KERNELSPACE_BASE)
+							goto do_normal_vio;
+						irregs_wrip(&state->ics_irregs_k, callsite_pc);
+						state->ics_irregs_u.ir_esp += 4;
+					} else {
+						if (callsite_pc < KERNELSPACE_BASE)
+							goto do_normal_vio;
+						state->ics_irregs_k.ir_eip = callsite_pc;
+						state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+						                                      OFFSET_ICPUSTATE_IRREGS +
+						                                      SIZEOF_IRREGS_KERNEL);
+					}
+#endif /* !__x86_64__ */
+					/* Figure out the exact VIO address that got called. */
+					vio_addr = args.vea_args.va_acmap_offset +
+					           ((uintptr_t)addr - (uintptr_t)args.vea_args.va_acmap_page);
+					/* Invoke the VIO call operator. */
+					args.vea_args.va_state = state;
+					(*args.vea_args.va_ops->vo_call)(&args.vea_args, vio_addr);
+					state = args.vea_args.va_state;
+				} EXCEPT {
+					/* Ensure that a the VIO flag is set if necessary */
+					if (was_thrown(E_SEGFAULT)) {
+						void *faultaddr;
+						faultaddr = (void *)PERTASK_GET(this_exception_args.e_segfault.s_addr);
+						if (faultaddr == addr) {
+							uintptr_t flags;
+							flags = PERTASK_GET(this_exception_args.e_segfault.s_context);
+							flags |= E_SEGFAULT_CONTEXT_VIO;
+							PERTASK_SET(this_exception_args.e_segfault.s_context, flags);
+						}
+					}
+					/* Directly unwind the exception, since we've got a custom return-pc set-up.
+					 * If we did a normal RETHROW() here, then the (currently correct) return PC
+					 * would get overwritten with the VIO function address. */
+					decref_unlikely(args.vea_args.va_file);
+					decref_unlikely(args.vea_args.va_part);
+					task_popconnections();
+					if (FAULT_IS_USER)
+						PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
+					/* Manually fix-up exception flags since we're not actually going
+					 * to call `__cxa_end_catch()' because of the direct unwinding
+					 * used here. As such, we must manually ensure that `EXCEPT_FINCATCH'
+					 * isn't set once we return to our caller. */
+					PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
+					x86_userexcept_unwind_interrupt(state);
+				}
+				decref_unlikely(args.vea_args.va_file);
+				decref_unlikely(args.vea_args.va_part);
+				goto pop_connections_and_return;
+			}
+do_normal_vio:
+			/* Make sure that the segment was mapped with the proper protection */
+			if unlikely((ecode & X86_PAGEFAULT_ECODE_WRITING)
+			            ? !(node_flags & MNODE_F_PWRITE)   /* Write to read-only VIO segment */
+			            : !(node_flags & MNODE_F_PREAD)) { /* Read from non-readable VIO segment */
+				PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_WRITING)
+				                                 ? ERROR_CODEOF(E_SEGFAULT_READONLY)
+				                                 : ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+				PERTASK_SET(this_exception_args.e_segfault.s_context,
+				            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
+				                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
+				goto cleanup_vio_and_pop_connections_and_set_exception_pointers2;
+			}
+			args.vea_args.va_state = state;
+			TRY {
+				/* Emulate the current instruction. */
+				viocore_emulate(&args);
+			} EXCEPT {
+				decref_unlikely(args.vea_args.va_file);
+				decref_unlikely(args.vea_args.va_part);
+				/*task_popconnections();*/ /* Handled by outer EXCEPT */
+				RETHROW();
+			}
+			decref_unlikely(args.vea_args.va_file);
+			decref_unlikely(args.vea_args.va_part);
+			task_popconnections();
+#ifndef __x86_64__
+			/* Check if the kernel %esp or %ss was modified */
+			if unlikely(args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
+			                                        VIO_EMULATE_ARGS_386_KERNEL_SS_VALID)) {
+				u32 real_esp = args.vea_kernel_esp_override;
+				u16 real_ss  = args.vea_kernel_ss_override;
+				u32 *regload_area;
+				assert(!FAULT_IS_USER);
+				if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_SS_VALID))
+					real_ss = icpustate32_getkernelss(args.vea_args.va_state);
+				if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
+					real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
+				regload_area = (u32 *)vm_node_getstart(THIS_KERNEL_STACK);
+				/* Fill in the register save area to match what's going to
+				 * get loaded by `x86_vio_kernel_esp_bootstrap_loader()' */
+				regload_area[0] = real_ss;
+				regload_area[1] = real_esp;
+				regload_area[2] = args.vea_args.va_state->ics_irregs_k.ir_eip;
+				regload_area[3] = args.vea_args.va_state->ics_gpregs.gp_eax;
+				/* Have `%eax' point to the register save area */
+				args.vea_args.va_state->ics_gpregs.gp_eax = (u32)regload_area;
+				/* Have the icpustate return to the bootstrap function */
+				args.vea_args.va_state->ics_irregs_k.ir_eip = (u32)x86_vio_kernel_esp_bootstrap_loader;
+			}
+#endif /* !__x86_64__ */
+			return args.vea_args.va_state;
+		}
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+		/* Verify that the caller is allowed to perform th access that they're attempting. */
+		if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PEXEC) &&
+		            ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || addr == pc)) {
+			/* Non-executable memory */
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+decref_part_and_pop_connections_and_set_exception_pointers:
+			mman_lock_release(mf.mfl_mman);
+			mfault_fini(&mf);
+#define NEED_pop_connections_and_set_exception_pointers
+			goto pop_connections_and_set_exception_pointers;
+		}
+		if (mf.mfl_flags & MMAN_FAULT_F_WRITE) {
+			if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PWRITE)) {
+				/* Read-only memory */
+				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+				goto decref_part_and_pop_connections_and_set_exception_pointers;
+			}
+		} else {
+			if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PREAD)) {
+				/* Write-only memory */
+				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+				goto decref_part_and_pop_connections_and_set_exception_pointers;
+			}
+		}
+
+		/* Do a regular, old memory fault. */
+		TRY {
+			if (!mfault_or_unlock(&mf))
+				goto again_lock_mman;
+		} EXCEPT {
+			mfault_fini(&mf);
+			RETHROW();
+		}
+	} EXCEPT {
+		task_popconnections();
+		if (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
+			PERTASK_SET(this_exception_faultaddr, pc);
+		RETHROW();
+	}
+
+	/* Re-map the freshly faulted memory. */
+	if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
+		mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
+		           mf.mfl_offs, mnode_getperm(mf.mfl_node));
+	} else {
+		if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
+			mpart_lock_release(mf.mfl_part);
+			mman_lock_release(mf.mfl_mman);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+		}
+		mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
+		           mf.mfl_offs, mnode_getperm(mf.mfl_node));
+		pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+	}
+	mpart_lock_release(mf.mfl_part);
+	/* If write-access was granted, add the node to the list of writable nodes. */
+	if ((mf.mfl_flags & MMAN_FAULT_F_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+	    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
+	mman_lock_release(mf.mfl_mman);
+
+	/* And we're done! */
+
+pop_connections_and_return:
+	task_popconnections();
+	return state;
+
+	/************************************************************************/
+	/* Error handling...                                                    */
+	/************************************************************************/
+pop_connections_and_throw_segfault:
+	task_popconnections();
+	goto throw_segfault;
+#ifdef NEED_pop_connections_and_set_exception_pointers
+#undef NEED_pop_connections_and_set_exception_pointers
+pop_connections_and_set_exception_pointers:
+	task_popconnections();
+	goto set_exception_pointers;
+#endif /* NEED_pop_connections_and_set_exception_pointers */
+#ifdef NEED_pop_connections_and_set_exception_pointers2
+#undef NEED_pop_connections_and_set_exception_pointers2
+pop_connections_and_set_exception_pointers2:
+	task_popconnections();
+	goto set_exception_pointers2;
+#endif /* NEED_pop_connections_and_set_exception_pointers2 */
+pop_connections_and_throw_segfault:
+	task_popconnections();
+throw_segfault:
+	if (pc == addr) {
+		/* This can happen when trying to call an invalid function pointer.
+		 * -> Try to unwind this happening. */
+		IF_X64(bool is_compat;)
+		uintptr_t callsite_pc;
+		uintptr_t sp = icpustate_getsp(state);
+		if (sp >= KERNELSPACE_BASE && (sp != (uintptr_t)(&state->ics_irregs + 1) || FAULT_IS_USER))
+			goto not_a_badcall;
+		IF_X64(is_compat = icpustate_is32bit(state);)
+		TRY {
+			IF_X64(if (is_compat) {
+				callsite_pc = (uintptr_t)*(u32 *)sp;
+			} else) {
+				callsite_pc = *(uintptr_t *)sp;
+			}
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT)) {
+				if (FAULT_IS_USER)
+					PERTASK_SET(this_exception_faultaddr, (void *)pc);
+				rethrow_exception_from_pf_handler(state, pc);
+			}
+			goto not_a_badcall;
+		}
+#ifdef __x86_64__
+		if (FAULT_IS_USER ? (callsite_pc >= USERSPACE_END)
+		                  : (callsite_pc < KERNELSPACE_BASE))
+			goto not_a_badcall;
+		icpustate_setpc(state, callsite_pc);
+		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+#else /* __x86_64__ */
+		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
+			if (callsite_pc >= KERNELSPACE_BASE)
+				goto not_a_badcall;
+			icpustate_setpc(state, callsite_pc);
+			state->ics_irregs_u.ir_esp += 4;
+		} else {
+			if (callsite_pc < KERNELSPACE_BASE)
+				goto not_a_badcall;
+			state->ics_irregs_k.ir_eip = callsite_pc;
+			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+			                                      OFFSET_ICPUSTATE_IRREGS +
+			                                      SIZEOF_IRREGS_KERNEL);
+		}
+#endif /* !__x86_64__ */
+		TRY {
+			void const *call_instr;
+			call_instr = instruction_pred_nx((void *)callsite_pc,
+			                                 instrlen_isa_from_icpustate(state));
+			if likely(call_instr)
+				callsite_pc = (uintptr_t)call_instr;
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT)) {
+				if (FAULT_IS_USER)
+					PERTASK_SET(this_exception_faultaddr, (void *)pc);
+				rethrow_exception_from_pf_handler(state, pc);
+			}
+			/* Discard read-from-callsite_pc exception... */
+		}
+		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
+		PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_PRESENT)
+		                                 ? ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE)
+		                                 : ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)addr);
+		PERTASK_SET(this_exception_args.e_segfault.s_context,
+		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
+		                        E_SEGFAULT_CONTEXT_EXEC |
+		                        GET_PF_CONTEXT_UW_BITS()));
+		{
+			unsigned int i;
+			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+				PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+		}
+		printk(KERN_DEBUG "[segfault] PC-Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
+		       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),
+		       callsite_pc, icpustate_getpc(state), ecode);
+		goto do_unwind_state;
+	}
+not_a_badcall:
+	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) ==
+	    /*    */ (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) {
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+	} else if ((ecode & X86_PAGEFAULT_ECODE_PRESENT) &&
+	           ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (pc == addr))) {
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+	} else {
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+	}
+set_exception_pointers:
+	PERTASK_SET(this_exception_args.e_segfault.s_context,
+	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
+	                        ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (pc == addr)
+	                         ? E_SEGFAULT_CONTEXT_EXEC
+	                         : 0) |
+	                        GET_PF_CONTEXT_UW_BITS()));
+set_exception_pointers2:
+	PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)addr);
+	{
+		unsigned int i;
+		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+#if EXCEPT_BACKTRACE_SIZE != 0
+		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+			PERTASK_SET(this_exception_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	}
+	/* Always make the state point to the instruction _after_ the one causing the problem. */
+	PERTASK_SET(this_exception_faultaddr, pc);
+	pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
+	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
+	       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),
+	       icpustate_getpc(state), pc, ecode);
+	icpustate_setpc(state, (uintptr_t)pc);
+do_unwind_state:
+	/* Try to trigger a debugger trap (if enabled) */
+	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
+		state = kernel_debugtrap_r(state, SIGSEGV);
+	x86_userexcept_unwind_interrupt(state);
+
+#else /* CONFIG_USE_NEW_VM */
 	void *addr;
 	uintptr_t pc;
 	pageid_t pageid;
@@ -398,17 +1162,22 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-	pageid   = PAGEID_ENCODE(addr);
+	pageid = PAGEID_ENCODE(addr);
 	pageaddr = (void *)((uintptr_t)addr & ~PAGEMASK);
 #if 0
 	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "]\n",
 	       (uintptr_t)addr, pageaddr, pc, icpustate_getsp(state));
 #endif
-	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
-	    pageid >= PAGEID_ENCODE(KERNELSPACE_BASE)) {
-	    /* Check if a hint was defined for this page. */
+
+	/* Check if a hint was defined for this page. */
+	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT |
+	              X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
+	    ADDR_ISKERN(addr)) {
 		struct vm_node *hinted_node;
 		if ((hinted_node = (struct vm_node *)pagedir_gethint(addr)) != NULL) {
+#ifdef CONFIG_USE_NEW_VM
+			mnode_hinted_mmap(hinted_node, pageaddr);
+#else /* CONFIG_USE_NEW_VM */
 			/* This is a hinted node (perform assertions on all
 			 * of the requirements documented for such a node) */
 			physpage_t ppage;
@@ -446,11 +1215,12 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			if ((hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
 				pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
 			pagedir_mapone(pageaddr, physpage2addr(ppage), pagedir_prot);
+#endif /* !CONFIG_USE_NEW_VM */
 			goto done;
 		}
 	}
 	effective_vm = &vm_kernel;
-	if (pageid < PAGEID_ENCODE(KERNELSPACE_BASE) || isuser()) {
+	if (ADDR_ISUSER(addr) || FAULT_IS_USER) {
 #ifndef NDEBUG
 		/* Special case: When the TLS segment contains an invalid pointer, us
 		 *               trying to obtain THIS_VM at this point is just going
@@ -477,12 +1247,12 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			}
 		}
 #endif /* !__x86_64__ */
-		if unlikely(memcpy_nopf(&effective_vm, &mythread->t_vm, sizeof(effective_vm)) != 0) {
-			assertf(memcpy_nopf(&effective_vm, &mythread->t_vm, sizeof(effective_vm)) == 0,
+		if unlikely(memcpy_nopf(&effective_vm, &mythread->t_mman, sizeof(effective_vm)) != 0) {
+			assertf(memcpy_nopf(&effective_vm, &mythread->t_mman, sizeof(effective_vm)) == 0,
 			        "Corrupt TLS base pointer: mythread = %p", mythread);
 			/* Allow the user to IGNORE the assertion check, in which case we'll
 			 * try to repair the damage... */
-			effective_vm = x86_repair_broken_tls_state()->t_vm;
+			effective_vm = x86_repair_broken_tls_state()->t_mman;
 		}
 #else /* !NDEBUG */
 		effective_vm = THIS_VM;
@@ -506,7 +1276,7 @@ again_lookup_node:
 				if (effective_vm == &vm_kernel &&
 				    (uintptr_t)addr >= KERNEL_PHYS2VIRT_MIN &&
 				    (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX &&
-				    !isuser()) {
+				    !FAULT_IS_USER) {
 					x86_phys2virt64_require(addr);
 					goto done_before_pop_connections;
 				}
@@ -522,7 +1292,7 @@ again_lookup_node:
 			if unlikely(!node) {
 				sync_endread(effective_vm);
 				if (pageid >= PAGEID_ENCODE(KERNELSPACE_BASE)) {
-					if (effective_vm != &vm_kernel && isuser()) {
+					if (effective_vm != &vm_kernel && FAULT_IS_USER) {
 						/* This can happen depending on what the CPU does when
 						 * attempting to access the IOB vector associated with
 						 * the calling thread.
@@ -665,7 +1435,7 @@ do_handle_iob_node_access:
 						allow_preemption = icpustate_getpreemption(state);
 						/* Make special checks if the access itself seems to
 						 * originate from a direct user-space access. */
-						if (isuser()) {
+						if (FAULT_IS_USER) {
 							/* User-space can never get write-access to the IOB vector. */
 							if (ecode & X86_PAGEFAULT_ECODE_WRITING)
 								goto pop_connections_and_throw_segfault;
@@ -708,7 +1478,7 @@ do_handle_iob_node_access:
 					/* I/O access from kernel-space wouldn't result in an IOB check, so
 					 * if the access comes from kernel-space, then this is the calling
 					 * thread incorrectly accessing some other cpu's IOB. */
-					if (!isuser())
+					if (!FAULT_IS_USER)
 						goto pop_connections_and_throw_segfault;
 					/* If the calling thread couldn't have changed CPUs, then this is an access to  */
 					if (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE)
@@ -804,7 +1574,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 #endif /* __x86_64__ */
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
 							sp = icpustate_getsp(state);
-							if (sp >= KERNELSPACE_BASE && isuser())
+							if (sp >= KERNELSPACE_BASE && FAULT_IS_USER)
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 #ifdef __x86_64__
 							is_compat = icpustate_is32bit(state);
@@ -825,14 +1595,14 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							}
 							/* Unwind the stack, and remember the call-site instruction pointer. */
 #ifdef __x86_64__
-							if (isuser() ? (callsite_pc >= USERSPACE_END)
+							if (FAULT_IS_USER ? (callsite_pc >= USERSPACE_END)
 							             : (callsite_pc < KERNELSPACE_BASE))
 								goto do_normal_vio;
 							icpustate_setpc(state, callsite_pc);
 							icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 #else /* __x86_64__ */
 							if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
-							    isuser()) {
+							    FAULT_IS_USER) {
 								if (callsite_pc >= KERNELSPACE_BASE)
 									goto do_normal_vio;
 								irregs_wrip(&state->ics_irregs_k, callsite_pc);
@@ -871,7 +1641,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							 * would get overwritten with the VIO function address. */
 							decref_unlikely(args.vea_args.va_part);
 							task_popconnections();
-							if (isuser())
+							if (FAULT_IS_USER)
 								PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
 							/* Manually fix-up exception flags since we're not actually going
 							 * to call `__cxa_end_catch()' because of the direct unwinding
@@ -927,7 +1697,7 @@ do_normal_vio:
 						u32 real_esp = args.vea_kernel_esp_override;
 						u16 real_ss  = args.vea_kernel_ss_override;
 						u32 *regload_area;
-						assert(!isuser());
+						assert(!FAULT_IS_USER);
 						if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_SS_VALID))
 							real_ss = icpustate32_getkernelss(args.vea_args.va_state);
 						if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
@@ -1111,9 +1881,9 @@ done_before_pop_connections:
 		} EXCEPT {
 			task_disconnectall();
 			task_popconnections();
-			if (isuser())
+			if (FAULT_IS_USER)
 				PERTASK_SET(this_exception_faultaddr, (void *)pc);
-			rethrow_exception_from_pf_handler(state, pc);
+			rethrow_exception_from_pf_handler(state, (void *)pc);
 		}
 		task_popconnections();
 		__IF0 {
@@ -1141,7 +1911,7 @@ throw_segfault:
 #endif /* __x86_64__ */
 		uintptr_t callsite_pc;
 		uintptr_t sp = icpustate_getsp(state);
-		if (sp >= KERNELSPACE_BASE && (sp != (uintptr_t)(&state->ics_irregs + 1) || isuser()))
+		if (sp >= KERNELSPACE_BASE && (sp != (uintptr_t)(&state->ics_irregs + 1) || FAULT_IS_USER))
 			goto not_a_badcall;
 #ifdef __x86_64__
 		is_compat = icpustate_is32bit(state);
@@ -1157,20 +1927,20 @@ throw_segfault:
 			}
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
-				if (isuser())
+				if (FAULT_IS_USER)
 					PERTASK_SET(this_exception_faultaddr, (void *)pc);
-				rethrow_exception_from_pf_handler(state, pc);
+				rethrow_exception_from_pf_handler(state, (void *)pc);
 			}
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (isuser() ? (callsite_pc >= USERSPACE_END)
+		if (FAULT_IS_USER ? (callsite_pc >= USERSPACE_END)
 		             : (callsite_pc < KERNELSPACE_BASE))
 			goto not_a_badcall;
 		icpustate_setpc(state, callsite_pc);
 		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 #else /* __x86_64__ */
-		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || isuser()) {
+		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
 			if (callsite_pc >= KERNELSPACE_BASE)
 				goto not_a_badcall;
 			icpustate_setpc(state, callsite_pc);
@@ -1192,9 +1962,9 @@ throw_segfault:
 				callsite_pc = (uintptr_t)call_instr;
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
-				if (isuser())
+				if (FAULT_IS_USER)
 					PERTASK_SET(this_exception_faultaddr, (void *)pc);
-				rethrow_exception_from_pf_handler(state, pc);
+				rethrow_exception_from_pf_handler(state, (void *)pc);
 			}
 			/* Discard read-from-callsite_pc exception... */
 		}
@@ -1256,7 +2026,9 @@ do_unwind_state:
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	x86_userexcept_unwind_interrupt(state);
-#undef isuser
+#endif /* !CONFIG_USE_NEW_VM */
+#undef FAULT_IS_USER
+#undef FAULT_IS_WRITE
 #undef GET_PF_CONTEXT_UW_BITS
 }
 

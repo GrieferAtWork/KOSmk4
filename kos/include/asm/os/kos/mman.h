@@ -70,8 +70,10 @@
 #define __MAP_FIXED            0x00000010 /* Interpret addr exactly. */
 #define __MAP_ANON             0x00000020 /* Don't use a file. */
 #define __MAP_32BIT            0x00000040 /* Only give out 32-bit addresses. */
+/*efine __MAP_                 0x00000080  * ... */
 #define __MAP_GROWSDOWN        0x00000100 /* Stack-like segment. */
 #define __MAP_GROWSUP          0x00000200 /* Stack-like segment growing upwards. */
+/*efine __MAP_                 0x00000400  * ... */
 #define __MAP_DENYWRITE        0x00000800 /* Ignored. */
 #define __MAP_EXECUTABLE       0x00001000 /* Ignored. */
 #define __MAP_LOCKED           0x00002000 /* Lock the mapping. */
@@ -83,11 +85,12 @@
                                            *       automatic memory mappings are allocated at. */
 #define __MAP_SYNC             0x00000000 /* XXX: Implement me? */
 #define __MAP_HUGETLB          0x00040000 /* Create huge page mapping. */
+/*efine __MAP_                 0x00080000  * ... */
 #define __MAP_FIXED_NOREPLACE  0x00100000 /* Don't override existing mappings when `MAP_FIXED' is passed.
                                            * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
-#define __MAP_HUGE_SHIFT       26
-#define __MAP_HUGE_MASK        0x3f
 #define __MAP_UNINITIALIZED    0x04000000 /* For anonymous mmap, memory could be uninitialized. */
+#define __MAP_HUGE_SHIFT       26
+#define __MAP_HUGE_MASK        0x3f       /* 0xfc000000 */
 
 #ifdef __KOS__
 #define __MAP_AUTOMATIC        0x00000000 /* Use sharing behavior specified by `PROT_SHARED'. */

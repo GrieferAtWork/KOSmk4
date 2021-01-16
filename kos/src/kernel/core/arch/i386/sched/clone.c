@@ -169,9 +169,9 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 	if (clone_flags & (CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID))
 		validate_writable(child_tidptr, sizeof(*child_tidptr));
 	if (clone_flags & CLONE_VM) {
-		result_vm = incref(caller->t_vm);
+		result_vm = incref(caller->t_mman);
 	} else {
-		result_vm = vm_clone(caller->t_vm, false);
+		result_vm = vm_clone(caller->t_mman, false);
 	}
 	TRY {
 		/* Allocate a new task structure. */
@@ -338,14 +338,14 @@ again_lock_vm:
 		FORTASK(result, this_sstate) = state;
 	}
 
-	result->t_vm = result_vm; /* Inherit reference. */
+	result->t_mman = result_vm; /* Inherit reference. */
 	TRY {
 		pertask_init_t *iter;
-		assert(!result->t_vm_tasks.ln_pself);
+		assert(!result->t_mman_tasks.ln_pself);
 
 		/* Insert the new task into the VM */
 		vm_tasklock_write(result_vm);
-		LLIST_INSERT(result_vm->v_tasks, result, t_vm_tasks);
+		LLIST_INSERT(result_vm->v_tasks, result, t_mman_tasks);
 		vm_tasklock_endwrite(result_vm);
 
 		iter = __kernel_pertask_init_start;

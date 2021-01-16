@@ -98,7 +98,7 @@ DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
 		if (strcmp(argv[0], lsvm_str_kernel) == 0)
 			;
 		else if (strcmp(argv[0], lsvm_str_user) == 0)
-			v = dbg_current->t_vm;
+			v = dbg_current->t_mman;
 		else if (!sscanf(argv[0], DBGSTR("%p"), &v))
 			return DBG_STATUS_INVALID_ARGUMENTS;
 		--argc, ++argv;

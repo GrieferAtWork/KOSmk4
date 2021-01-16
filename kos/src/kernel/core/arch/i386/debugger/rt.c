@@ -828,7 +828,7 @@ reset_pdir_p32(struct p32_pdir *__restrict self, u32 phys_self) {
 PRIVATE ATTR_DBGTEXT void KCALL
 reset_pdir(struct task *mythread) {
 	struct vm *myvm;
-	myvm = mythread->t_vm;
+	myvm = mythread->t_mman;
 	if unlikely((uintptr_t)myvm < KERNELSPACE_BASE)
 		return;
 	if unlikely((physaddr_t)myvm->v_pdir_phys != pagedir_translate(&myvm->v_pagedir))

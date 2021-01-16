@@ -106,7 +106,7 @@ select_random_integer_with_bias(uintptr_t minval,
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL mman_getunmapped_nx)(struct mman *__restrict self,
                                    void *addr, size_t num_bytes, unsigned int flags,
-                                   PAGEDIR_PAGEALIGNED size_t min_alignment)
+                                   size_t min_alignment)
 #elif defined(DEFINE_mman_getunmapped_or_unlock)
 /* Same as above, but never return `MMAN_GETUNMAPPED_ERROR'. Instead,
  * the given mman is unlocked on error, and an exception is thrown.
@@ -119,11 +119,13 @@ NOTHROW(FCALL mman_getunmapped_nx)(struct mman *__restrict self,
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
 mman_getunmapped_or_unlock(struct mman *__restrict self,
                            void *addr, size_t num_bytes, unsigned int flags,
-                           PAGEDIR_PAGEALIGNED size_t min_alignment)
+                           size_t min_alignment)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
 #endif /* ... */
 {
+#define HAS_EXTENDED_MIN_ALIGNMENT \
+	(min_alignment > PAGESIZE && IS_POWER_OF_TWO(min_alignment))
 	void *result;
 	struct mnode *node;
 	assert(mman_lock_acquired(self));
@@ -224,7 +226,7 @@ again_find_good_range:
 #endif /* __SIZEOF_POINTER__ > 4 */
 
 		/* Apply extended alignment requirements to result bounds and the hint address. */
-		if unlikely(min_alignment > PAGESIZE) {
+		if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
 			uintptr_t aligned_max_start_addr;
 			allow_minaddr = (void *)CEIL_ALIGN((uintptr_t)allow_minaddr, min_alignment);
 			addr           = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
@@ -306,7 +308,7 @@ select_from_avail_range:
 				goto done_dynamic;
 			}
 			alignshift = PAGESHIFT;
-			if unlikely(min_alignment > PAGESIZE)
+			if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
 				alignshift = ffs(min_alignment) - 1;
 
 			/* Figure out the outer bounds of the available range, and
@@ -394,7 +396,7 @@ again_find_below_above:
 					if (gap_size < num_bytes)
 						goto continue_find_below;
 					/* Include extended alignment requirements. */
-					if unlikely(min_alignment > PAGESIZE) {
+					if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
 						gap_min = (void *)CEIL_ALIGN((uintptr_t)gap_min, min_alignment);
 						if (gap_min >= gap_max)
 							goto continue_find_below;
@@ -430,7 +432,7 @@ continue_find_below:
 					if (gap_size < num_bytes)
 						goto continue_find_above;
 					/* Include extended alignment requirements. */
-					if unlikely(min_alignment > PAGESIZE) {
+					if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
 						gap_min = (void *)CEIL_ALIGN((uintptr_t)gap_min, min_alignment);
 						if (gap_min >= gap_max)
 							goto continue_find_above;
@@ -551,6 +553,7 @@ err_already_exists:
 		      node_minaddr, node_maxaddr);
 	}
 #endif /* ... */
+#undef HAS_EXTENDED_MIN_ALIGNMENT
 }
 
 DECL_END

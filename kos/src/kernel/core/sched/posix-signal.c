@@ -269,12 +269,12 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 	 *       know that nothing can change `this_userprocmask_address' */
 	um = FORTASK(self, this_userprocmask_address);
 
-	/* Make sure we're operating in the context of `self->t_vm'
+	/* Make sure we're operating in the context of `self->t_mman'
 	 * Note that we don't use task_setvm() to change our's, since
 	 * that function may throw an exception, and would already be
 	 * complete overkill for our purposes. */
 	myvm     = THIS_VM;
-	threadvm = self->t_vm;
+	threadvm = self->t_mman;
 	if (myvm != threadvm)
 		pagedir_set(threadvm->v_pdir_phys);
 

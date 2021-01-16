@@ -23,8 +23,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -38,6 +41,13 @@
 #include <string.h>
 
 DECL_BEGIN
+
+#ifdef __INTELLISENSE__
+typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
+#else /* __INTELLISENSE__ */
+#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
+#endif /* !__INTELLISENSE__ */
+#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 /* Load the bounds of the longest consecutive physical memory address range
  * that starts at `partrel_offset', has been populated with meaningful data
@@ -485,6 +495,171 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 		/* Add the part to its file's changed-list. */
 		SLIST_ATOMIC_INSERT(&file->mf_changed, self, mp_changed);
 	}
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
+                                              size_t partrel_block_index,
+                                              unsigned int old_st,
+                                              unsigned int new_st) {
+	bitset_word_t *pword, mask, oldword, newword;
+	bitset_word_t old_val, new_val;
+	unsigned int shift;
+	assert(old_st < ((unsigned int)1 << MPART_BLOCK_STBITS));
+	assert(new_st < ((unsigned int)1 << MPART_BLOCK_STBITS));
+	shift   = (unsigned int)((partrel_block_index % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS);
+	mask    = (bitset_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
+	old_val = (bitset_word_t)old_st << shift;
+	new_val = (bitset_word_t)new_st << shift;
+	if (self->mp_flags & MPART_F_BLKST_INL) {
+		pword = &self->mp_blkst_inl;
+	} else {
+		size_t index;
+		assert(self->mp_blkst_ptr);
+		index = partrel_block_index / BITSET_ITEMS_PER_WORD;
+		pword = &self->mp_blkst_ptr[index];
+	}
+	do {
+		oldword = ATOMIC_READ(*pword);
+		if ((oldword & mask) != old_val)
+			return false;
+		newword = (oldword & ~mask) | new_val;
+	} while (!ATOMIC_CMPXCH_WEAK(*pword, oldword, newword));
+	return true;
+}
+
+/* For use with `MNODE_F_MHINT':
+ *  - Ensure that the pages (== block) at the given `offset'
+ *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the
+ *    block loader from the associated file if necessary.
+ *  - Afterwards, map the associated page to `addr' within
+ *    the current page directory, using `perm'.
+ * This function is used to implement handling of hinted
+ * mem-nodes when encountered by the #PF handler. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
+                                 PAGEDIR_PAGEALIGNED void *addr,
+                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
+                                 u16 perm) {
+	unsigned int st;
+	struct mpart_physloc pl;
+	size_t block_index;
+
+	/* Some hinted-node-related assertions that we can make
+	 * without the need of knowing the accessing mem-node. */
+	assert(self->mp_copy.lh_first == NULL);
+	assert(self->mp_file != NULL);
+	assert(ADDR_ISKERN(self->mp_file));
+	assert(self->mp_file->mf_blockshift == PAGESHIFT);
+	assert(self->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS);
+	assert(self->mp_flags & MPART_F_MLOCK);
+	assert(self->mp_flags & MPART_F_DONT_SPLIT);
+	assert(self->mp_flags & MPART_F_NO_GLOBAL_REF);
+	assert(MPART_ST_INMEM(self->mp_state));
+
+	/* Index of the block (aka. page) that is being accessed.
+	 * Note the `self->mp_file->mf_blockshift == PAGESHIFT'
+	 * assert above, so we know that 1 block equals 1 page! */
+	block_index = offset >> PAGESHIFT;
+
+	/* Load the physical location of the accessed page. */
+	mpart_memaddr_direct(self, offset, &pl);
+
+	/* Ensure that the accessed block is set to `MPART_BLOCK_ST_CHNG' */
+#ifndef CONFIG_NO_SMP
+again_read_st:
+#endif /* !CONFIG_NO_SMP */
+	st = mpart_getblockstate(self, block_index);
+	if (st != MPART_BLOCK_ST_CHNG) {
+		/* When another CPU is currently initializing this same page,
+		 * then we must wait for it to finish doing so before we can
+		 * proceed. */
+		pflag_t was;
+		typeof(self->mp_file->mf_ops->mo_loadblocks) mo_loadblocks;
+
+#ifdef CONFIG_NO_SMP
+		assert(st != MPART_BLOCK_ST_INIT);
+#else /* CONFIG_NO_SMP */
+		if (st == MPART_BLOCK_ST_INIT) {
+			task_tryyield_or_pause();
+			goto again_read_st;
+		}
+#endif /* !CONFIG_NO_SMP */
+
+		/* Must lazily initialize this block!
+		 * For this purpose, we must disable preemption, since being
+		 * interrupted during the init, and having another thread then
+		 * attempt to access the same page that we're trying to init
+		 * would result in a dead-lock, where it will just keep on
+		 * seeing `MPART_BLOCK_ST_INIT' for all of eternity... */
+		was = PREEMPTION_PUSHOFF();
+		if (!mpart_atomic_cmpxch_blockstate(self, block_index, st,
+		                                    MPART_BLOCK_ST_INIT)) {
+			/* Someone else was faster... -> Just re-read the status! */
+			PREEMPTION_POP(was);
+			goto again_read_st;
+		}
+		mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
+		if (mo_loadblocks != NULL) {
+			/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW! */
+			(*mo_loadblocks)(self->mp_file,
+			                 (mfile_block_t)((mpart_getminaddr(self) >>
+			                                  PAGESHIFT) +
+			                                 block_index),
+			                 pl.mppl_addr, 1);
+		}
+		/* And with that, the init is done. -> Mark the block as CHNG.
+		 * Also note that we don't have to deal with `MPART_F_MAYBE_BLK_INIT'
+		 * or `self->mp_file->mf_initdone'. - None of those matter for hinted
+		 * memory nodes! */
+		mpart_setblockstate(self, block_index, MPART_BLOCK_ST_CHNG);
+		PREEMPTION_POP(was);
+	}
+
+	/* At this point, we know that the accessed page has surely been
+	 * initialized, so we are safe to map it into the current page directory.
+	 * Also: We don't have to worry about preparing the page directory here.
+	 *       Hinted nodes require that the `MNODE_F_MPREPARED' flag be set,
+	 *       meaning that we're allowed to assume that the page directory
+	 *       is, and always has been, prepared. */
+	pagedir_mapone(addr, pl.mppl_addr, perm);
+
+	/* Because we got here as the result of a #PF, we don't even have to
+	 * sync anything since all that our mapone() call did, was expand the
+	 * set of available permissions, which the MMU will lazily pick up on
+	 * all by itself. */
+}
+
+/* Convenience wrapper for `mpart_hinted_mmap()' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
+                                 PAGEDIR_PAGEALIGNED void *fault_page) {
+	struct mpart *part;
+
+	/* Assert all of the invariants associated with hinted nodes. */
+	assert(ADDR_ISKERN(self));
+	assert(ADDRRANGE_ISKERN(mnode_getaddr(self),
+	                        mnode_getendaddr(self)));
+	assert(self->mn_flags & MNODE_F_SHARED);
+	assert(self->mn_flags & MNODE_F_MPREPARED);
+	assert(self->mn_flags & MNODE_F_MLOCK);
+	assert(self->mn_flags & MNODE_F_NO_SPLIT);
+	assert(self->mn_flags & MNODE_F_NO_MERGE);
+	assert(self->mn_mman == &mman_kernel);
+	part = self->mn_part;
+	assert(part != NULL);
+	assert(ADDR_ISKERN(part));
+	assert(part->mp_share.lh_first == self);
+	assert(self->mn_link.le_prev == &part->mp_share.lh_first);
+	assert(self->mn_link.le_next == NULL);
+
+	/* Call forward to the mem-part-level hint handler. */
+	mpart_hinted_mmap(part, fault_page,
+	                  self->mn_partoff +
+	                  (mpart_reladdr_t)((uintptr_t)fault_page -
+	                                    (uintptr_t)mnode_getminaddr(self)),
+	                  mnode_getperm_kernel(self));
 }
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa02042b */
+/* HASH CRC-32:0x6fc81b1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -201,7 +201,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigs
  * >> static sigset_t const fullset = SIGSET_INIT_FULL;
  * >> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
  * >> // Code in here executes with all maskable signals masked
- * >> // Note however that code in here also musn't call sigprocmask()
+ * >> // Note however that code in here also mustn't call sigprocmask()
  * >> setsigmaskptr(oldset);
  * Equivalent code using sigprocmask (which has way more overhead):
  * >> static sigset_t const fullset = SIGSET_INIT_FULL;

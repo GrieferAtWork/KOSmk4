@@ -117,17 +117,29 @@ typedef USER UNCHECKED char const *USER CHECKED const *execabi_strings_t;
 
 struct driver;
 struct icpustate;
+#ifdef CONFIG_USE_NEW_VM
+struct mman;
+#else /* CONFIG_USE_NEW_VM */
 struct vm;
+#endif /* !CONFIG_USE_NEW_VM */
 struct path;
 struct directory_entry;
 struct regular_node;
 
 struct execargs {
-	struct vm                  *ea_vm;          /* [1..1] The VM into which to map the executable.
+#ifdef CONFIG_USE_NEW_VM
+	struct mman                *ea_mman;        /* [1..1] The mman into which to map the executable.
+	                                             * This must not be the kernel mman, which causes an assertion failure.
+	                                             * NOTE: When `ea_change_mman_to_effective_mman' is `true', prior to a successful
+	                                             *       return of `execabi::ea_exec', it will also do a `task_setmman(ea_mman)',
+	                                             *       meaning that the caller will become apart of the given mman. */
+#else /* CONFIG_USE_NEW_VM */
+	struct vm                  *ea_mman;        /* [1..1] The VM into which to map the executable.
 	                                             * This must not be the kernel VM, which causes an assertion failure.
-	                                             * NOTE: When `ea_change_vm_to_effective_vm' is `true', prior to a successful
-	                                             *       return of `ea_exec', it will also do a `task_setvm(ea_vm)',
+	                                             * NOTE: When `ea_change_mman_to_effective_mman' is `true', prior to a successful
+	                                             *       return of `execabi::ea_exec', it will also do a `task_setvm(ea_mman)',
 	                                             *       meaning that the caller will become apart of the given VM. */
+#endif /* !CONFIG_USE_NEW_VM */
 	struct icpustate           *ea_state;       /* [1..1] The user-space CPU state to update upon success in a manner
 	                                             *        that proper execution of the loaded binary is possible.
 	                                             * Note however that in the case of a dynamic binary, a dynamic linker
@@ -140,9 +152,9 @@ struct execargs {
 	                                             * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If the
 	                                             * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
 	                                             * are simply zero-initialized. */
-	bool                        ea_change_vm_to_effective_vm;
-	                                            /* When set to `true', `ea_vm' should be set as the effective VM upon a
-	                                             * successful return of `ea_exec'. */
+	bool                        ea_change_mman_to_effective_mman;
+	                                            /* When set to `true', `ea_mman' should be set as the effective mman upon a
+	                                             * successful return of `execabi::ea_exec'. */
 #ifdef __ARCH_HAVE_COMPAT
 	bool                        ea_argv_is_compat; /* When `true', `ea_argv' and `ea_envp' are compatibility-mode vectors. */
 #endif /* !__ARCH_HAVE_COMPAT */

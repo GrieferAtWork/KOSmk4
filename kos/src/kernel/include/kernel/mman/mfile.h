@@ -24,12 +24,12 @@
 
 #include <kernel/memory.h>
 #include <kernel/types.h>
-#include <sched/rwlock.h>
 #include <sched/signal.h>
 
 #include <hybrid/__minmax.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -94,10 +94,7 @@ struct mfile_ops {
 struct mfile {
 	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */
 	struct mfile_ops           *mf_ops;        /* [1..1][const] File operators. */
-	/* TODO: Use an atomic rwlock here! Higher-level components
-	 *       built on-top of `struct mfile' (such as `struct inode')
-	 *       should provide their own locking mechanism! */
-	struct rwlock               mf_lock;       /* Lock for this file. */
+	struct atomic_rwlock        mf_lock;       /* Lock for this file. */
 	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
 	                                            * contained parts changes state from INIT to LOAD. */
@@ -119,7 +116,7 @@ struct mfile {
 	{                                                                                  \
 		/* .mf_refcnt     = */ refcnt,                                                 \
 		/* .mf_ops        = */ ops,                                                    \
-		/* .mf_lock       = */ RWLOCK_INIT,                                            \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,                                     \
 		/* .mf_parts      = */ parts,                                                  \
 		/* .mf_initdone   = */ SIG_INIT,                                               \
 		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),                              \
@@ -168,46 +165,26 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_deadparts_reap)(struct mfi
 #endif /* !__OPTIMIZE_SIZE__ */
 
 /* Lock accessor helpers for `struct mfile' */
-#define mfile_lock_write(self)      rwlock_write(&(self)->mf_lock)
-#define mfile_lock_write_nx(self)   rwlock_write_nx(&(self)->mf_lock)
-#define mfile_lock_trywrite(self)   rwlock_trywrite(&(self)->mf_lock)
-#define mfile_lock_endwrite(self)   (rwlock_endwrite(&(self)->mf_lock), mfile_deadparts_reap(self))
-#define mfile_lock_endwrite_f(self) rwlock_endwrite(&(self)->mf_lock)
-#define mfile_lock_read(self)       rwlock_read(&(self)->mf_lock)
-#define mfile_lock_read_nx(self)    rwlock_read_nx(&(self)->mf_lock)
-#define mfile_lock_tryread(self)    rwlock_tryread(&(self)->mf_lock)
-#define mfile_lock_endread(self)    (void)(rwlock_endread(&(self)->mf_lock) && (mfile_deadparts_reap(self), 0))
-#define mfile_lock_endread_f(self)  rwlock_endread(&(self)->mf_lock)
-#define mfile_lock_end(self)        (void)(rwlock_end(&(self)->mf_lock) && (mfile_deadparts_reap(self), 0))
-#define mfile_lock_end_f(self)      rwlock_end(&(self)->mf_lock)
-#define mfile_lock_upgrade(self)    rwlock_upgrade(&(self)->mf_lock)
-#define mfile_lock_upgrade_nx(self) rwlock_upgrade_nx(&(self)->mf_lock)
-#define mfile_lock_tryupgrade(self) rwlock_tryupgrade(&(self)->mf_lock)
-#define mfile_lock_downgrade(self)  rwlock_downgrade(&(self)->mf_lock)
-#define mfile_lock_reading(self)    rwlock_reading(&(self)->mf_lock)
-#define mfile_lock_writing(self)    rwlock_writing(&(self)->mf_lock)
-#define mfile_lock_canread(self)    rwlock_canread(&(self)->mf_lock)
-#define mfile_lock_canwrite(self)   rwlock_canwrite(&(self)->mf_lock)
-
-/* Define C++ sync API hooks. */
-__DEFINE_SYNC_RWLOCK(struct mfile,
-                     mfile_lock_tryread,
-                     mfile_lock_read,
-                     mfile_lock_read_nx,
-                     mfile_lock_endread,
-                     mfile_lock_reading,
-                     mfile_lock_canread,
-                     mfile_lock_trywrite,
-                     mfile_lock_write,
-                     mfile_lock_write_nx,
-                     mfile_lock_endwrite,
-                     mfile_lock_writing,
-                     mfile_lock_canwrite,
-                     mfile_lock_end,
-                     mfile_lock_tryupgrade,
-                     mfile_lock_upgrade,
-                     mfile_lock_upgrade_nx,
-                     mfile_lock_downgrade)
+#define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)
+#define mfile_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mf_lock)
+#define mfile_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mf_lock)
+#define mfile_lock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->mf_lock), mfile_deadparts_reap(self))
+#define mfile_lock_endwrite_f(self) atomic_rwlock_endwrite(&(self)->mf_lock)
+#define mfile_lock_read(self)       atomic_rwlock_read(&(self)->mf_lock)
+#define mfile_lock_read_nx(self)    atomic_rwlock_read_nx(&(self)->mf_lock)
+#define mfile_lock_tryread(self)    atomic_rwlock_tryread(&(self)->mf_lock)
+#define mfile_lock_endread(self)    (void)(atomic_rwlock_endread(&(self)->mf_lock) && (mfile_deadparts_reap(self), 0))
+#define mfile_lock_endread_f(self)  atomic_rwlock_endread(&(self)->mf_lock)
+#define mfile_lock_end(self)        (void)(atomic_rwlock_end(&(self)->mf_lock) && (mfile_deadparts_reap(self), 0))
+#define mfile_lock_end_f(self)      atomic_rwlock_end(&(self)->mf_lock)
+#define mfile_lock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mf_lock)
+#define mfile_lock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mf_lock)
+#define mfile_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mf_lock)
+#define mfile_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mf_lock)
+#define mfile_lock_reading(self)    atomic_rwlock_reading(&(self)->mf_lock)
+#define mfile_lock_writing(self)    atomic_rwlock_writing(&(self)->mf_lock)
+#define mfile_lock_canread(self)    atomic_rwlock_canread(&(self)->mf_lock)
+#define mfile_lock_canwrite(self)   atomic_rwlock_canwrite(&(self)->mf_lock)
 
 
 /* Make the given file anonymous. What this means is that:
@@ -401,9 +378,15 @@ FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_writev_p(struct mfile *__restrict se
 /* Builtin mem files */
 DATDEF struct mfile /*    */ mfile_phys;     /* Physical memory access (file position is physical memory address) */
 DATDEF struct mfile_ops /**/ mfile_phys_ops; /* ... */
+#ifndef __mfile_ndef_defined
+#define __mfile_ndef_defined 1
 DATDEF struct mfile /*    */ mfile_ndef;     /* Random, uninitialized, anonymous memory. */
+#endif /* !__mfile_ndef_defined */
 DATDEF struct mfile_ops /**/ mfile_ndef_ops; /* ... */
+#ifndef __mfile_zero_defined
+#define __mfile_zero_defined 1
 DATDEF struct mfile /*    */ mfile_zero;     /* Zero-initialized, anonymous memory. */
+#endif /* !__mfile_zero_defined */
 DATDEF struct mfile_ops /**/ mfile_zero_ops; /* ... */
 
 /* Fallback files for anonymous memory. These behave the same as `mfile_zero',

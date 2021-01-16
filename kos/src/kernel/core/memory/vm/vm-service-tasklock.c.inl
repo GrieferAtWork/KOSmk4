@@ -39,9 +39,9 @@ NOTHROW(KCALL vm_clear_pending_deltasks)(struct vm *__restrict self) {
 	iter = ATOMIC_XCH(self->v_deltasks, NULL);
 	while (iter) {
 		next = KEY_task_vm_dead__next(iter);
-		assert(iter->t_vm == self);
-		assert(iter->t_vm_tasks.ln_pself != NULL);
-		LLIST_REMOVE(iter, t_vm_tasks);
+		assert(iter->t_mman == self);
+		assert(iter->t_mman_tasks.ln_pself != NULL);
+		LLIST_REMOVE(iter, t_mman_tasks);
 		heap_free(&kernel_locked_heap, iter, iter->t_heapsz, GFP_NORMAL);
 		iter = next;
 	}

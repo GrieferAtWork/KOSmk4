@@ -72,8 +72,8 @@ struct task task_header = {
 	/* .t_refcnt   = */ 1,
 	/* .t_flags    = */ TASK_FNORMAL,
 	/* .t_cpu      = */ &_bootcpu,
-	/* .t_vm       = */ &vm_kernel,
-	/* .t_vm_tasks = */ LLIST_INITNODE,
+	/* .t_mman       = */ &vm_kernel,
+	/* .t_mman_tasks = */ LLIST_INITNODE,
 	/* .t_heapsz   = */ (size_t)__kernel_pertask_size,
 	/* .t_state    = */ NULL
 };
@@ -196,7 +196,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	void *boot_trampoline_pages;
 	DEFINE_PUBLIC_SYMBOL(this_task, offsetof(struct task, t_self), sizeof(struct task));
 	DEFINE_PUBLIC_SYMBOL(this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
-	DEFINE_PUBLIC_SYMBOL(this_vm, offsetof(struct task, t_vm), sizeof(struct vm *));
+	DEFINE_PUBLIC_SYMBOL(this_vm, offsetof(struct task, t_mman), sizeof(struct vm *));
 	DEFINE_PUBLIC_SYMBOL(this_sstate, offsetof(struct task, t_state), sizeof(struct scpustate *));
 	DEFINE_PUBLIC_SYMBOL(this_exception_code, &this_exception_info.ei_code, sizeof(this_exception_info.ei_code));
 	DEFINE_PUBLIC_SYMBOL(this_exception_data, &this_exception_info.ei_data, sizeof(this_exception_info.ei_data));
@@ -315,12 +315,12 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&_bootidle, this_kernel_stacknode_).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
 
 	vm_kernel.v_tasks              = &_boottask;
-	_boottask.t_vm_tasks.ln_pself  = &vm_kernel.v_tasks;
-	_boottask.t_vm_tasks.ln_next   = &_asyncwork;
-	_asyncwork.t_vm_tasks.ln_pself = &_boottask.t_vm_tasks.ln_next;
-	_asyncwork.t_vm_tasks.ln_next  = &_bootidle;
-	_bootidle.t_vm_tasks.ln_pself  = &_asyncwork.t_vm_tasks.ln_next;
-	assert(_bootidle.t_vm_tasks.ln_next == NULL);
+	_boottask.t_mman_tasks.ln_pself  = &vm_kernel.v_tasks;
+	_boottask.t_mman_tasks.ln_next   = &_asyncwork;
+	_asyncwork.t_mman_tasks.ln_pself = &_boottask.t_mman_tasks.ln_next;
+	_asyncwork.t_mman_tasks.ln_next  = &_bootidle;
+	_bootidle.t_mman_tasks.ln_pself  = &_asyncwork.t_mman_tasks.ln_next;
+	assert(_bootidle.t_mman_tasks.ln_next == NULL);
 
 	_boottask.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `_boottask' */
 	_asyncwork.t_refcnt = 2; /* +1: scheduler chain, +1: intern symbol `_asyncwork' */
@@ -432,12 +432,12 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	vm_datapart_do_freeram(&FORTASK(self, this_kernel_stackpart_));
 
 	{
-		REF struct vm *myvm = self->t_vm;
+		REF struct vm *myvm = self->t_mman;
 		COMPILER_READ_BARRIER();
-		if (self->t_vm_tasks.ln_pself) {
+		if (self->t_mman_tasks.ln_pself) {
 			struct task *next;
 			if (vm_tasklock_trywrite(myvm)) {
-				LLIST_REMOVE(self, t_vm_tasks);
+				LLIST_REMOVE(self, t_mman_tasks);
 				vm_tasklock_endwrite(myvm);
 				goto do_free_self;
 			}
@@ -446,7 +446,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 			self->t_heapsz = heap_truncate(&kernel_locked_heap,
 			                               self,
 			                               self->t_heapsz,
-			                               MAX(MAX(COMPILER_OFFSETAFTER(struct task, t_vm_tasks),
+			                               MAX(MAX(COMPILER_OFFSETAFTER(struct task, t_mman_tasks),
 			                                       KEY_task_vm_dead__next_offsetafter),
 			                                   COMPILER_OFFSETAFTER(struct task, t_heapsz)),
 			                               GFP_NORMAL);
@@ -611,17 +611,17 @@ again_lock_vm:
 		RETHROW();
 	}
 
-	result->t_vm = task_vm;
+	result->t_mman = task_vm;
 	incref(task_vm);
 
 	/* Run custom initializers. */
 	TRY {
 		pertask_init_t *iter;
-		assert(!result->t_vm_tasks.ln_pself);
+		assert(!result->t_mman_tasks.ln_pself);
 
 		/* Insert the new task into the VM */
 		vm_tasklock_write(task_vm);
-		LLIST_INSERT(task_vm->v_tasks, result, t_vm_tasks);
+		LLIST_INSERT(task_vm->v_tasks, result, t_mman_tasks);
 		vm_tasklock_endwrite(task_vm);
 
 		iter = __kernel_pertask_init_start;

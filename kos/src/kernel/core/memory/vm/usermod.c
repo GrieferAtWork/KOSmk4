@@ -1199,7 +1199,7 @@ getusermod(USER void const *addr,
 		return vm_getusermod(THIS_VM, addr, addr_must_be_executable);
 	}
 	/* Use the VM of the thread currently selected by the debugger. */
-	result = vm_getusermod(dbg_current->t_vm,
+	result = vm_getusermod(dbg_current->t_mman,
 	                       addr,
 	                       addr_must_be_executable);
 	return result;
@@ -1214,7 +1214,7 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
 		return vm_getusermod_nx(THIS_VM, addr, addr_must_be_executable);
 	}
 	/* Use the VM of the thread currently selected by the debugger. */
-	result = vm_getusermod_nx(dbg_current->t_vm,
+	result = vm_getusermod_nx(dbg_current->t_mman,
 	                          addr,
 	                          addr_must_be_executable);
 	return result;
@@ -1534,8 +1534,8 @@ DBG_COMMAND(lslib,
 	if (argc != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_print(DBGSTR("name                            loadaddr minaddr  maxaddr\n"));
-	vm_enumusermod(dbg_current->t_vm, &lslib_enum_cb,
-	               FORVM(dbg_current->t_vm, thisvm_execinfo).ei_node);
+	vm_enumusermod(dbg_current->t_mman, &lslib_enum_cb,
+	               FORVM(dbg_current->t_mman, thisvm_execinfo).ei_node);
 	return 0;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

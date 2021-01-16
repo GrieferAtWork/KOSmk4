@@ -293,7 +293,7 @@ err_overlap:
 				ei.ei_dent = args->ea_xdentry;
 				ei.ei_path = args->ea_xpath;
 				vmb_apply(&builder,
-				          args->ea_vm,
+				          args->ea_mman,
 				          VMB_APPLY_AA_TERMTHREADS |
 				          VMB_APPLY_AA_SETEXECINFO,
 				          &ei);
@@ -305,11 +305,11 @@ err_overlap:
 
 		{
 			REF struct vm *oldvm = THIS_VM;
-			/* Change the calling thread's vm to `args->ea_vm' */
-			if (oldvm != args->ea_vm) {
+			/* Change the calling thread's vm to `args->ea_mman' */
+			if (oldvm != args->ea_mman) {
 				incref(oldvm);
 				TRY {
-					task_setvm(args->ea_vm);
+					task_setvm(args->ea_mman);
 				} EXCEPT {
 					decref_nokill(oldvm);
 					RETHROW();
@@ -345,14 +345,14 @@ err_overlap:
 					                                                entry_pc);
 				}
 			} EXCEPT {
-				if (oldvm != args->ea_vm) {
+				if (oldvm != args->ea_mman) {
 					FINALLY_DECREF(oldvm);
 					task_setvm(oldvm);
 				}
 				RETHROW();
 			}
-			if (oldvm != args->ea_vm) {
-				if likely(args->ea_change_vm_to_effective_vm) {
+			if (oldvm != args->ea_mman) {
+				if likely(args->ea_change_mman_to_effective_mman) {
 					decref(oldvm);
 				} else {
 					FINALLY_DECREF(oldvm);

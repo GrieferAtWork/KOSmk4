@@ -338,9 +338,9 @@ typedef NONNULL((2)) ssize_t
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
  * >>     cmodule_enum_drivers();                 // Excluding `cmodule_ataddr(pc)'
- * >>     cmodule_enum_uservm(dbg_current->t_vm);
+ * >>     cmodule_enum_uservm(dbg_current->t_mman);
  * >> } else {
- * >>     cmodule_enum_uservm(dbg_current->t_vm); // Excluding `cmodule_ataddr(pc)'
+ * >>     cmodule_enum_uservm(dbg_current->t_mman); // Excluding `cmodule_ataddr(pc)'
  * >>     cmodule_enum_drivers();
  * >> }
  * @return: * :        pformatprinter-compatible return value.
@@ -376,7 +376,7 @@ NOTHROW(FCALL cmodule_enum_drivers)(cmodule_enum_callback_t cb,
 /* Clear the internal cache of pre-loaded CModules (called
  * from `dbx_heap_alloc()' in an attempt to free memory).
  * @param: keep_loaded: When true, keep modules descriptors loaded if they
- *                      are apart of the kernel, or the `dbg_current->t_vm'
+ *                      are apart of the kernel, or the `dbg_current->t_mman'
  *                      Otherwise, clear all modules from the cache.
  * @return: * : The # of modules that actually got destroyed (i.e. removing
  *              them from the cache caused their refcnt to drop to `0') */

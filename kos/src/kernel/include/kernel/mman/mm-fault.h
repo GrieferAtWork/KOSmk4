@@ -197,12 +197,14 @@ struct mfault {
 	struct mnode                       *mfl_pcopy[2]; /* [0..1][*] Up to 2 additional mem-nodes used for private unsharing. */
 };
 
-#define mfault_init(self, mm, addr, size, flags)           \
-	(void)((self)->mfl_mman  = (mm),                       \
-	       (self)->mfl_addr  = (addr),                     \
-	       (self)->mfl_size  = (size),                     \
-	       (self)->mfl_flags = (flags),                    \
-	       mpart_setcore_data_init(&(self)->mfl_scdat),    \
+#define mfault_init(self, mm, addr, size, flags) \
+	(void)((self)->mfl_mman  = (mm),             \
+	       (self)->mfl_addr  = (addr),           \
+	       (self)->mfl_size  = (size),           \
+	       (self)->mfl_flags = (flags),          \
+	       __mfault_init(self))
+#define __mfault_init(self)                                \
+	(void)(mpart_setcore_data_init(&(self)->mfl_scdat),    \
 	       mpart_unsharecow_data_init(&(self)->mfl_ucdat), \
 	       (self)->mfl_pcopy[0] = __NULLPTR)
 #define mfault_fini(self)                                 \
@@ -222,15 +224,18 @@ struct mfault {
  * Usage:
  * >> void pf_handler(void *addr, bool is_write) {
  * >>     struct mfault mf;
+ * >>     // Missing: Handling for `MNODE_F_MHINT'
+ * >>     // Missing: Call to `task_pushconnections()'
  * >>     mfault_init(&mf, ADDR_ISKERN(addr) ? &mman_kernel : THIS_MMAN,
  * >>                 FLOOR_ALIGN(addr, PAGESIZE), PAGESIZE,
  * >>                 is_write ? MMAN_FAULT_F_WRITE : 0);
  * >>     TRY {
  * >> again:
  * >>         mman_lock_acquire(mf.mfl_mman);
- * >>         mf.mfl_node  = mnode_tree_locate(mf.mfl_mman->mm_mappings);
- * >>         mf.mfl_part  = mf.mfl_node->mn_part;
+ * >>         mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings, mf.mfl_addr);
+ * >>         mf.mfl_part = mf.mfl_node->mn_part;
  * >>         // Missing: NULL- and safety-checks; VIO support
+ * >>         // Missing: Is-access-even-allowed-checks
  * >>         if (!mfault_or_unlock(&mf))
  * >>             goto again;
  * >>     } EXCEPT {

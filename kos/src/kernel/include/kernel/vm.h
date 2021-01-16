@@ -25,8 +25,16 @@
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mm-dma.h>
+#include <kernel/mman/mm-enum.h>
+#include <kernel/mman/mm-event.h>
+#include <kernel/mman/mm-exec.h>
 #include <kernel/mman/mm-fault.h>
+#include <kernel/mman/mm-lockop.h>
+#include <kernel/mman/mm-map.h>
+#include <kernel/mman/mm-rw.h>
 #include <kernel/mman/mm-sync.h>
+#include <kernel/mman/mm-unmapped.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
@@ -122,6 +130,12 @@
 #define VM_PROT_READ                              MNODE_F_PREAD
 #define VM_PROT_PRIVATE                           MNODE_F_NORMAL
 #define VM_PROT_SHARED                            MNODE_F_SHARED
+#define VM_NODE_FLAG_NORMAL                       MNODE_F_NORMAL
+#define VM_NODE_FLAG_PREPARED                     MNODE_F_MPREPARED
+#define VM_NODE_FLAG_HINTED                       MNODE_F_MHINT
+#define VM_NODE_FLAG_NOMERGE                      MNODE_F_NO_MERGE
+#define VM_NODE_FLAG_COREPRT                      MNODE_F_COREPART
+#define VM_NODE_FLAG_KERNPRT                      MNODE_F_KERNPART
 #define vn_prot                                   mn_flags
 #define vn_flags                                  mn_flags
 #define vn_vm                                     mn_mman
@@ -157,7 +171,6 @@
 #define v_treelock                                mm_lock
 #define v_tasks                                   mm_threads.lh_first
 #define v_tasklock                                mm_threadslock
-#define v_kernreserve                             mm_kernreserve
 #define vm_kernel                                 mman_kernel
 #define this_vm                                   this_mman
 #define THIS_VM                                   THIS_MMAN
@@ -203,7 +216,7 @@
 #define vm_kernel_treelock_read_nx()              mman_lock_acquire_nx(&mman_kernel)
 #define vm_kernel_treelock_endread()              mman_lock_release(&mman_kernel)
 #define vm_kernel_treelock_end()                  mman_lock_release(&mman_kernel)
-#define vm_kernel_treelock_tryservice()           mman_deadram_reap(&mman_kernel)
+#define vm_kernel_treelock_tryservice()           mman_lockops_reap(&mman_kernel)
 #define vm_treelock_write(self)                   mman_lock_acquire(self)
 #define vm_treelock_write_nx(self)                mman_lock_acquire_nx(self)
 #define vm_treelock_trywrite(self)                mman_lock_tryacquire(self)
@@ -218,47 +231,166 @@
 #define vm_treelock_canread(self)                 mman_lock_available(self)
 #define vm_treelock_canwrite(self)                mman_lock_available(self)
 
-/* TODO: vm_mapat() */
-/* TODO: vm_mapat_subrange() */
-/* TODO: vm_mapresat() */
-/* TODO: vm_getfree() */
-/* TODO: vm_get_aslr_disabled() */
-/* TODO: vm_set_aslr_disabled() */
-/* TODO: vm_find_first_node_greater_equal() */
-/* TODO: vm_find_last_node_lower_equal() */
-/* TODO: vm_map() */
-/* TODO: vm_map_subrange() */
-/* TODO: vm_mapres() */
-/* TODO: vm_unmap() */
-/* TODO: vm_protect() */
-/* TODO: vm_unmap_kernel_ram() */
-/* TODO: vm_syncmem() */
-/* TODO: vm_read_nopf() */
-/* TODO: vm_write_nopf() */
-/* TODO: vm_memset_nopf() */
-/* TODO: vm_read() */
-/* TODO: vm_write() */
-/* TODO: vm_memset() */
-/* TODO: struct vm_dmalock */
-/* TODO: vm_dmalock_release() */
-/* TODO: vm_startdma() */
-/* TODO: vm_startdmav() */
-/* TODO: vm_stopdma() */
-/* TODO: vm_exec() */
-/* TODO: vm_exec_assert_regular() */
-/* TODO: struct vm_mapinfo */
-/* TODO: vm_mapinfo_size() */
-/* TODO: vm_enum_callback_t */
-/* TODO: vm_enum() */
-/* TODO: struct vm_kernel_pending_operation */
-/* TODO: vm_kernel_pending_cb_t */
-/* TODO: vm_kernel_pending_operations */
-/* TODO: vm_kernel_locked_operation */
-/* TODO: vm_onexec_callbacks */
-/* TODO: vm_oninit_callbacks */
-/* TODO: vm_onfini_callbacks */
-/* TODO: vm_onclone_callbacks */
+#ifdef __CC__
+#include <kos/except.h>
+DECL_BEGIN
 
+
+FORCELOCAL WUNUSED NONNULL((1, 4)) bool
+vm_mapat(struct vm *__restrict self,
+         PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+         PAGEDIR_PAGEALIGNED size_t num_bytes,
+         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+         struct path *fspath DFL(__NULLPTR),
+         struct directory_entry *fsname DFL(__NULLPTR),
+         PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+         uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL), uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	(void)guard;
+	TRY {
+		mman_map(self, addr, num_bytes, prot,
+		         MAP_FIXED | MAP_FIXED_NOREPLACE | flag,
+		         data, fspath, fsname, data_start_offset);
+	} EXCEPT {
+		if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+			return false;
+		RETHROW();
+	}
+	return true;
+}
+
+FORCELOCAL WUNUSED NONNULL((1, 4)) bool
+vm_mapat_subrange(struct vm *__restrict self,
+                  PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                  PAGEDIR_PAGEALIGNED size_t num_bytes,
+                  struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                  struct path *fspath DFL(__NULLPTR),
+                  struct directory_entry *fsname DFL(__NULLPTR),
+                  PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+                  PAGEDIR_PAGEALIGNED pos_t data_subrange_minoffset DFL(0),
+                  PAGEDIR_PAGEALIGNED pos_t data_subrange_numbytes DFL((pos_t)-1),
+                  uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+                  uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+                  uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	(void)guard;
+	TRY {
+		mman_map_subrange(self, addr, num_bytes, prot, MAP_FIXED | MAP_FIXED_NOREPLACE | flag,
+		                  data, fspath, fsname, data_subrange_minoffset + data_start_offset,
+		                  data_subrange_minoffset,
+		                  data_subrange_minoffset + data_subrange_numbytes - 1);
+	} EXCEPT {
+		if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+			return false;
+		RETHROW();
+	}
+	return true;
+}
+
+FORCELOCAL WUNUSED NONNULL((1)) bool
+vm_mapresat(struct vm *__restrict self,
+            PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+            PAGEDIR_PAGEALIGNED size_t num_bytes,
+            uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	TRY {
+		mman_map_res(self, addr, num_bytes,
+		             MAP_FIXED | MAP_FIXED_NOREPLACE |
+		             flag);
+	} EXCEPT {
+		if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+			return false;
+		RETHROW();
+	}
+	return true;
+}
+
+
+DECL_END
+#endif /* __CC__ */
+
+
+#define VM_GETFREE_ABOVE MAP_GROWSUP
+#define VM_GETFREE_BELOW MAP_GROWSDOWN
+#define VM_GETFREE_ERROR MMAN_GETUNMAPPED_ERROR
+#define vm_getfree(self, hint, num_bytes, min_alignment, mode) \
+	mman_getunmapped_nx(self, hint, num_bytes, mode, min_alignment)
+#define vm_get_aslr_disabled() (mman_getunmapped_extflags & MMAN_GETUNMAPPED_F_NO_ASLR)
+#define vm_set_aslr_disabled(v)                                                                        \
+	((v) ? __hybrid_atomic_or(mman_getunmapped_extflags, MMAN_GETUNMAPPED_F_NO_ASLR, __ATOMIC_SEQ_CST) \
+	     : __hybrid_atomic_and(mman_getunmapped_extflags, ~MMAN_GETUNMAPPED_F_NO_ASLR, __ATOMIC_SEQ_CST))
+#define vm_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \
+               fspath, fsname, data_start_offset, prot, flag, guard)     \
+	mman_map(self, hint, num_bytes, prot, (getfree_mode) | (flags),      \
+	         data, fspath, fsname, data_start_offset, min_alignment)
+#define vm_map_subrange(self, hint, num_bytes, min_alignment, getfree_mode, data,   \
+                        fspath, fsname, data_start_offset, data_subrange_minoffset, \
+                        data_subrange_numbytes, prot, flag, guard)                  \
+	mman_map_subrange(self, hint, num_bytes, prot, (getfree_mode) | (flags),        \
+	                  data, fspath, fsname,                                         \
+	                  (data_subrange_minoffset) + (data_start_offset),              \
+	                  data_subrange_minoffset,                                      \
+	                  (data_subrange_minoffset) + (data_subrange_numbytes)-1,       \
+	                  min_alignment)
+#define vm_mapres(self, hint, num_bytes, min_alignment, getfree_mode, flag) \
+	mman_map_res(self, hint, num_bytes, (getfree_mode) | (flag), min_alignment)
+
+#define VM_UNMAP_SEGFAULTIFUNUSED MMAN_UNMAP_FAULTIFUNUSED
+#define VM_UNMAP_NOSPLIT          MMAN_UNMAP_NOSPLIT
+#define VM_UNMAP_NOKERNPART       MMAN_UNMAP_NOKERNPART
+#define VM_UNMAP_ANYTHING         0
+#define vm_unmap                  mman_unmap
+#define vm_protect                mman_protect
+#define vm_unmap_kernel_ram       mman_unmap_kernel_ram
+#define vm_syncmem(self, addr, num_bytes) \
+	(mman_syncmem(self, addr, num_bytes), (u64)0)
+#define vm_read_nopf                  mman_read_nopf
+#define vm_write_nopf                 mman_write_nopf
+#define vm_memset_nopf                mman_memset_nopf
+#define vm_read                       mman_read
+#define vm_write                      mman_write
+#define vm_memset                     mman_memset
+#define vm_dmalock                    mdmalock
+#define dl_part                       mdl_part
+#define vm_dmalock_release            mman_dmalock_release
+#define vm_startdma                   mman_startdma
+#define vm_startdmav                  mman_startdmav
+#define vm_enumdma                    mman_enumdma
+#define vm_enumdmav                   mman_enumdmav
+#define vm_stopdma                    mman_stopdma
+#define vm_exec                       mman_exec
+#define vm_exec_assert_regular(self)  (void)0 /* TODO: This should be exposed in <fs/node.h>! */
+#define vm_mapinfo                    mmapinfo
+#define vmi_min                       mmi_min
+#define vmi_max                       mmi_max
+#define vmi_prot                      mmi_flags
+#define vmi_block                     mmi_file
+#define vmi_offset                    mmi_offset
+#define vmi_fspath                    mmi_fspath
+#define vmi_fsname                    mmi_fsname
+#define vmi_index                     mmi_index
+#define vm_mapinfo_size               mmapinfo_size
+#define vm_enum_callback_t            mman_enum_callback_t
+#define vm_enum                       mman_enum
+#define vm_kernel_pending_operation   mlockop
+#define vm_kernel_pending_cb_t        mlockop_callback_t
+#define vkpo_next                     mlo_link.sle_next
+#define vkpo_exec                     mlo_func
+#define vm_kernel_pending_operations  mman_kernel_lockops.slh_first
+#define VM_KERNEL_PENDING_CB_RETURN_T struct mlockop *
+#define VM_KERNEL_PENDING_CB_RETURN   return __NULLPTR
+#define vm_kernel_locked_operation    mman_kernel_lockop
+#define vm_onexec_callbacks           mman_onexec_callbacks
+#define vm_oninit_callbacks           mman_oninit_callbacks
+#define vm_onfini_callbacks           mman_onfini_callbacks
+#define vm_onclone_callbacks          mman_onclone_callbacks
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+#define DEFINE_PERVM_ONEXEC DEFINE_PERMMAN_ONEXEC
+#define DEFINE_PERVM_INIT   DEFINE_PERMMAN_INIT
+#define DEFINE_PERVM_FINI   DEFINE_PERMMAN_FINI
+#define DEFINE_PERVM_CLONE  DEFINE_PERMMAN_CLONE
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #else /* CONFIG_USE_NEW_VM */
 #include <kernel/driver-callbacks.h>
@@ -2741,11 +2873,11 @@ NOTHROW(vm_dmalock_release)(struct vm_dmalock *__restrict self);
  * @param: preset:     A callback this is invoked when it was impossible to acquire all
  *                     necessary DMA locks simultaneously without causing a dead-lock.
  *                     This is then resolved by releasing all pre-existing locks, before
- *                     forceably acquiring+releasing the blocking lock (thus ensuring that
+ *                     forcibly acquiring+releasing the blocking lock (thus ensuring that
  *                     it has become available), before starting over.
  *                     This callback is then invoked just after all previously acquired
  *                     DMA locks have been released, but just before the blocking lock
- *                     is forceably acquired. - It's purpose is then to reset whatever
+ *                     is forcibly acquired. - It's purpose is then to reset whatever
  *                     information was already gathered from then released ranges.
  * @param: arg:        Argument passed to `prange' and `preset' upon execution.
  * @param: lockvec:    Vector of DMA lock slots provided by the caller.
@@ -2925,6 +3057,9 @@ vm_enum(struct vm *__restrict self, vm_enum_callback_t cb, void *arg,
         );
 
 
+
+#define VM_KERNEL_PENDING_CB_RETURN_T void
+#define VM_KERNEL_PENDING_CB_RETURN   return
 
 struct vm_kernel_pending_operation;
 typedef NOBLOCK void /*NOTHROW*/ (KCALL *vm_kernel_pending_cb_t)(struct vm_kernel_pending_operation *__restrict self);

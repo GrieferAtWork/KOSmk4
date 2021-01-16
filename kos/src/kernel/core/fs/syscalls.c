@@ -3034,14 +3034,14 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
 	/* Deal with the special VFORK mode. */
-	args->ea_change_vm_to_effective_vm = true;
+	args->ea_change_mman_to_effective_mman = true;
 	if (thread_flags & TASK_FVFORK) {
 		REF struct vm *newvm;
 		/* Construct the new VM for the process after the exec. */
 		newvm = vm_alloc();
 		{
 			FINALLY_DECREF_UNLIKELY(newvm);
-			args->ea_vm = newvm;
+			args->ea_mman = newvm;
 			vm_exec(args);
 			/* Load the newly initialized VM as our current VM */
 			task_setvm(newvm);
@@ -3086,7 +3086,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
 		sigmask_check();
 	} else {
-		args->ea_vm = THIS_VM;
+		args->ea_mman = THIS_VM;
 		vm_exec(args);
 #ifdef CONFIG_HAVE_USERPROCMASK
 		/* If the previous process used to have a userprocmask, and didn't make proper

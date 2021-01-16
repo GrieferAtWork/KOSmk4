@@ -500,15 +500,18 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
  * Usage:
  * >> void pf_handler(void *addr, bool is_write) {
  * >>     struct mfault mf;
+ * >>     // Missing: Handling for `MNODE_F_MHINT'
+ * >>     // Missing: Call to `task_pushconnections()'
  * >>     mfault_init(&mf, ADDR_ISKERN(addr) ? &mman_kernel : THIS_MMAN,
  * >>                 FLOOR_ALIGN(addr, PAGESIZE), PAGESIZE,
  * >>                 is_write ? MMAN_FAULT_F_WRITE : 0);
  * >>     TRY {
  * >> again:
  * >>         mman_lock_acquire(mf.mfl_mman);
- * >>         mf.mfl_node  = mnode_tree_locate(mf.mfl_mman->mm_mappings);
- * >>         mf.mfl_part  = mf.mfl_node->mn_part;
+ * >>         mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings, mf.mfl_addr);
+ * >>         mf.mfl_part = mf.mfl_node->mn_part;
  * >>         // Missing: NULL- and safety-checks; VIO support
+ * >>         // Missing: Is-access-even-allowed-checks
  * >>         if (!mfault_or_unlock(&mf))
  * >>             goto again;
  * >>     } EXCEPT {
@@ -827,8 +830,12 @@ mfault_or_unlock(struct mfault *__restrict self)
 			assert(copy);
 			copy->mp_refcnt = 1; /* This reference will be inherited by the node we create below */
 			copy->mp_flags  = MPART_F_NO_GLOBAL_REF | MPART_F_LOCKBIT;
+#if MNODE_F_MLOCK == MPART_F_MLOCK
+			copy->mp_flags |= node->mn_flags & MNODE_F_MLOCK;
+#else /* MNODE_F_MLOCK == MPART_F_MLOCK */
 			if (node->mn_flags & MNODE_F_MLOCK)
 				copy->mp_flags |= MPART_F_MLOCK;
+#endif /* MNODE_F_MLOCK != MPART_F_MLOCK */
 			copy->mp_file = incref(&mfile_anon[part->mp_file->mf_blockshift]);
 			LIST_INIT(&copy->mp_share);
 			SLIST_INIT(&copy->mp_deadnodes);

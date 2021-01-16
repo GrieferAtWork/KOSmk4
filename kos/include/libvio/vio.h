@@ -71,8 +71,7 @@ typedef __pos64_t vio_addr_t;
 struct vioargs {
 	struct vio_operators const *va_ops;          /* [1..1][== va_file->db_type->dt_vio] */
 	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
-	vio_addr_t                  va_acmap_offset; /* [== vm_datapart_startbyte(va_part)]
-	                                              * VIO file offset at `va_acmap_page' (== mmap:offset). */
+	vio_addr_t                  va_acmap_offset; /* VIO file offset at `va_acmap_page' (== mmap:offset). */
 	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU state at the time of the access
 	                                              * being made (or `NULL' when accessed through other means). */
 #ifdef __KERNEL__

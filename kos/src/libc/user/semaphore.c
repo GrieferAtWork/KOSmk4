@@ -228,7 +228,7 @@ err_tempname_filename:
 				 *
 				 * Handle this case by giving that potential other process some
 				 * time to finish, and if the file still exists after this delay,
-				 * forceably remove it to deal with problematic processes. */
+				 * forcibly remove it to deal with problematic processes. */
 				ts.tv_sec  = 0;
 				ts.tv_nsec = 25000000; /* 1/40th of a second. */
 				nanosleep(&ts, NULL);

@@ -271,9 +271,9 @@ err:
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
  * >>     cmodule_enum_drivers();                 // Excluding `cmodule_ataddr(pc)'
- * >>     cmodule_enum_uservm(dbg_current->t_vm);
+ * >>     cmodule_enum_uservm(dbg_current->t_mman);
  * >> } else {
- * >>     cmodule_enum_uservm(dbg_current->t_vm); // Excluding `cmodule_ataddr(pc)'
+ * >>     cmodule_enum_uservm(dbg_current->t_mman); // Excluding `cmodule_ataddr(pc)'
  * >>     cmodule_enum_drivers();
  * >> }
  * @return: * :        pformatprinter-compatible return value.
@@ -311,8 +311,8 @@ NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
 	}
 	/* Enumerate user-space modules. */
 	if (dbg_current && dbg_current->t_self == dbg_current &&
-	    dbg_current->t_vm != NULL && dbg_current->t_vm != &vm_kernel) {
-		temp = cmodule_enum_uservm_except(dbg_current->t_vm, cb, cookie, start_module);
+	    dbg_current->t_mman != NULL && dbg_current->t_mman != &vm_kernel) {
+		temp = cmodule_enum_uservm_except(dbg_current->t_mman, cb, cookie, start_module);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
@@ -367,7 +367,7 @@ INTERN REF struct cmodule *cmodule_cache = NULL;
 /* Clear the internal cache of pre-loaded DW modules (called
  * from `dbx_heap_alloc()' in an attempt to free memory).
  * @param: keep_loaded: When true, keep modules descriptors loaded if they
- *                      are apart of the kernel, or the `dbg_current->t_vm'
+ *                      are apart of the kernel, or the `dbg_current->t_mman'
  *                      Otherwise, clear all modules from the cache.
  * @return: * : The # of modules that actually got destroyed (i.e. removing
  *              them from the cache caused their refcnt to drop to `0') */
@@ -382,7 +382,7 @@ PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 			modvm = module_vm(iter->cm_module,
 			                  iter->cm_modtyp);
 			if (modvm == &vm_kernel ||
-			    modvm == dbg_current->t_vm) {
+			    modvm == dbg_current->t_mman) {
 				/* Don't remove this one. */
 				piter = &iter->cm_cache;
 				continue;

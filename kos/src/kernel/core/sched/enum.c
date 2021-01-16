@@ -743,7 +743,7 @@ task_enum_vm_nb(task_enum_cb_t cb, void *arg,
 	ssize_t temp, result = 0;
 	IF_NOT_DEBUGGER_ACTIVE(vm_tasklock_read(v));
 	for (thread = v->v_tasks; thread;
-	     thread = thread->t_vm_tasks.ln_next) {
+	     thread = thread->t_mman_tasks.ln_next) {
 		/* Enumerate the thread. */
 		CB_THREAD(thread);
 	}
