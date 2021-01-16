@@ -363,7 +363,7 @@ mman_forcefaultv(struct mman *__restrict self,
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL unlock_mman_cb)(struct mpart_unlockinfo *__restrict self) {
+NOTHROW(FCALL unlock_mman_cb)(struct unlockinfo *__restrict self) {
 	struct mfault *mf;
 	mf = container_of(self, struct mfault, mfl_unlck);
 	mman_lock_release(mf->mfl_mman);
@@ -375,16 +375,16 @@ NOTHROW(FCALL unlock_mman_cb)(struct mpart_unlockinfo *__restrict self) {
 /* Functions from "mpart-lock.c"                                        */
 INTDEF NONNULL((1, 3)) bool FCALL
 unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
-                              struct mpart_unlockinfo *unlock,
+                              struct unlockinfo *unlock,
                               struct mpart_unsharecow_data *__restrict data);
 INTDEF NONNULL((1, 3)) bool FCALL
 unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
-                                struct mpart_unlockinfo *unlock,
+                                struct unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes);
 INTDEF NONNULL((1, 3)) bool FCALL
 unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
-                                struct mpart_unlockinfo *unlock,
+                                struct unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes);
 INTDEF NOBLOCK NONNULL((1, 2)) void

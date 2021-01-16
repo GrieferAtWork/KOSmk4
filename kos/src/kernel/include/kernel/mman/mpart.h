@@ -24,6 +24,7 @@
 
 #include <kernel/memory.h>
 #include <kernel/types.h>
+#include <misc/unlockinfo.h>
 
 #include <hybrid/__minmax.h>
 #include <hybrid/sched/__yield.h>
@@ -376,24 +377,11 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
  *   - return == false:  mpart_lock_release_f(self);  // Meaning that dead nodes may not have been reaped!
  *   - EXCEPT:           mpart_lock_release(self);
  ************************************************************************/
-struct mpart_unlockinfo {
-	/* [1..1] Callback that is invoked after releasing the lock
-	 *        to the associated mem-part inside of one of the
-	 *        `mpart_*_or_unlock()' functions below.
-	 * This callback may then be used to release additional atomic
-	 * locks which the caller may be holding, and it guarantied to
-	 * be called on all `return == false' and `EXCEPT' braches. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct mpart_unlockinfo *__restrict self);
-};
-/* When `self' is non-NULL, invoke it's `ui_unlock'-callback. */
-#define mpart_unlockinfo_xunlock(self) \
-	(void)(!(self) || ((*(self)->ui_unlock)(self), 0))
-
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
 FUNDEF NONNULL((1)) __BOOL FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
-                         struct mpart_unlockinfo *unlock);
+                         struct unlockinfo *unlock);
 
 struct mpart_setcore_data {
 	uintptr_t           *scd_bitset;      /* [0..1][owned] Block-status bitset. */
@@ -414,7 +402,7 @@ NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict sel
 /* Ensure that `MPART_ST_INCORE(self->mp_state)' */
 FUNDEF NONNULL((1, 3)) __BOOL FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
-                        struct mpart_unlockinfo *unlock,
+                        struct unlockinfo *unlock,
                         struct mpart_setcore_data *__restrict data);
 
 /* Ensure that all blocks (within the given range of blocks)
@@ -425,7 +413,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
  * If they don't, then this function will cause an assertion failure! */
 FUNDEF NONNULL((1)) bool FCALL
 mpart_loadsome_or_unlock(struct mpart *__restrict self,
-                         struct mpart_unlockinfo *unlock,
+                         struct unlockinfo *unlock,
                          mpart_reladdr_t partrel_offset,
                          size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
@@ -455,7 +443,7 @@ struct mpart_unsharecow_data {
  *       already been destroyed, such that no alive copy-nodes still exist! */
 FUNDEF NONNULL((1, 2)) __BOOL FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
-                           struct mpart_unlockinfo *unlock,
+                           struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data);
 
 /* Ensure that:
@@ -463,7 +451,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
 FUNDEF NONNULL((1)) __BOOL FCALL
 mpart_unwrite_or_unlock(struct mpart *__restrict self,
-                        struct mpart_unlockinfo *unlock);
+                        struct unlockinfo *unlock);
 /************************************************************************/
 
 

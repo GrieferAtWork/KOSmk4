@@ -115,7 +115,7 @@ typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
  * return `false'. Otherwise, keep the lock to `self' and return `true' */
 PUBLIC NONNULL((1)) bool FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
-                         struct mpart_unlockinfo *unlock) {
+                         struct unlockinfo *unlock) {
 	if unlikely(mpart_hasblocksstate_init(self)) {
 		incref(self);
 		FINALLY_DECREF_UNLIKELY(self);
@@ -124,7 +124,7 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 			REF struct mfile *file;
 			file = incref(self->mp_file);
 			mpart_lock_release_f(self);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 			{
 				FINALLY_DECREF_UNLIKELY(file);
 				task_connect(&file->mf_initdone);
@@ -187,7 +187,7 @@ NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict sel
  * @return: false: Success, but the lock to `self' was lost */
 PRIVATE NONNULL((1, 3)) bool FCALL
 mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
-                                   struct mpart_unlockinfo *unlock,
+                                   struct unlockinfo *unlock,
                                    struct mpart_setcore_data *__restrict data,
                                    size_t total_pages) {
 	struct mchunk chunk, *vec;
@@ -268,7 +268,7 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 		                                  GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 		if unlikely(!vec) {
 			mpart_lock_release_f(self);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 			/* Must do the allocation with blocking */
 			vec = (struct mchunk *)kmalloc_nx(4 * sizeof(struct mchunk),
 			                                  GFP_LOCKED | GFP_PREFLT);
@@ -347,7 +347,7 @@ extend_vector:
 			if unlikely(!vec) {
 				/* Must do the thing with blocking. */
 				mpart_lock_release_f(self);
-				mpart_unlockinfo_xunlock(unlock);
+				unlockinfo_xunlock(unlock);
 				goto do_realloc_in_extend_after_unlock;
 			}
 			data->scd_copy_mem_sc.ms_v = vec;
@@ -370,7 +370,7 @@ extend_vector:
 	return true;
 err_badalloc:
 	mpart_lock_release_f(self);
-	mpart_unlockinfo_xunlock(unlock);
+	unlockinfo_xunlock(unlock);
 err_badalloc_after_unlock:
 	mpart_deadnodes_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, total_pages);
@@ -387,7 +387,7 @@ err_badalloc_after_unlock:
 
 PRIVATE NONNULL((1, 3)) bool FCALL
 setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
-                                struct mpart_unlockinfo *unlock,
+                                struct unlockinfo *unlock,
                                 struct mpart_setcore_data *__restrict data,
                                 size_t num_blocks,
                                 gfp_t gfp_flags) {
@@ -404,7 +404,7 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 		if unlikely(!new_bitset) {
 			/* Must allocate the bitset while blocking. */
 			mpart_lock_release_f(self);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 			TRY {
 				data->scd_bitset = (bitset_word_t *)krealloc(data->scd_bitset, req_size,
 				                                             GFP_LOCKED | GFP_PREFLT | gfp_flags);
@@ -510,7 +510,7 @@ setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
 /* Ensure that `MPART_ST_INCORE(self->mp_state)' */
 PUBLIC NONNULL((1, 3)) bool FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
-                        struct mpart_unlockinfo *unlock,
+                        struct unlockinfo *unlock,
                         struct mpart_setcore_data *__restrict data) {
 	size_t num_bytes, num_pages, num_blocks;
 	struct mfile *file;
@@ -615,7 +615,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		incref(self);
 		incref(file);
 		mpart_lock_release_f(self);
-		mpart_unlockinfo_xunlock(unlock);
+		unlockinfo_xunlock(unlock);
 		TRY {
 			struct mchunkvec mem_data;
 			struct mchunkvec swp_data;
@@ -748,7 +748,7 @@ nope:
  * If they don't, then this function will cause an assertion failure! */
 PUBLIC NONNULL((1)) bool FCALL
 mpart_loadsome_or_unlock(struct mpart *__restrict self,
-                         struct mpart_unlockinfo *unlock,
+                         struct unlockinfo *unlock,
                          mpart_reladdr_t partrel_offset,
                          size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -810,7 +810,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		 * blocks without holding that non-recursive, and
 		 * non-preemptive lock! */
 		mpart_lock_release_f(self);
-		mpart_unlockinfo_xunlock(unlock);
+		unlockinfo_xunlock(unlock);
 		TRY {
 			/* Actually do the load. */
 			if likely(file->mf_ops->mo_loadblocks) {
@@ -843,7 +843,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		TRY {
 			incref(file);
 			mpart_lock_release_f(self);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 			{
 				FINALLY_DECREF_UNLIKELY(file);
 				task_connect(&file->mf_initdone);
@@ -877,7 +877,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
  * the file used by `self' describes zero-initialized, anonymous memory. */
 PRIVATE NONNULL((1)) bool FCALL
 mpart_maybe_loadall_or_unlock(struct mpart *__restrict self,
-                              struct mpart_unlockinfo *unlock) {
+                              struct unlockinfo *unlock) {
 	/* Check for special case: Without a block-state-bitset,
 	 * there can't be any INIT or LOAD-parts. */
 	if unlikely(!mpart_hasblockstate(self))
@@ -1069,7 +1069,7 @@ NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restri
  * @return: false: Success, but the lock to `self' was lost */
 INTERN NONNULL((1, 3)) bool FCALL
 unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
-                              struct mpart_unlockinfo *unlock,
+                              struct unlockinfo *unlock,
                               struct mpart_unsharecow_data *__restrict data) {
 	struct mpart *copy;
 	if unlikely(data->ucd_copy != NULL)
@@ -1081,7 +1081,7 @@ unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
 	if unlikely(!copy) {
 		/* Must allocate while blocking. */
 		mpart_lock_release_f(self);
-		mpart_unlockinfo_xunlock(unlock);
+		unlockinfo_xunlock(unlock);
 		TRY {
 			copy = (struct mpart *)kmalloc(sizeof(struct mpart),
 			                               GFP_LOCKED | GFP_PREFLT);
@@ -1106,7 +1106,7 @@ done:
  * @return: false: Success, but the lock to `self' was lost */
 INTERN NONNULL((1, 3)) bool FCALL
 unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
-                                struct mpart_unlockinfo *unlock,
+                                struct unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t block_count, reqsize;
@@ -1124,7 +1124,7 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
 	if unlikely(!bitset) {
 		/* Must allocate while blocking. */
 		mpart_lock_release_f(self);
-		mpart_unlockinfo_xunlock(unlock);
+		unlockinfo_xunlock(unlock);
 		TRY {
 			bitset = (bitset_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
 			                                   GFP_LOCKED | GFP_PREFLT);
@@ -1150,7 +1150,7 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
  * @return: false: Success, but the lock to `self' was lost */
 INTERN NONNULL((1, 3)) bool FCALL
 unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
-                                struct mpart_unlockinfo *unlock,
+                                struct unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	bool result;
@@ -1245,7 +1245,7 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part
 /* Acquire locks to all of the memory-managers in use by copy-on-write nodes of `part' */
 PRIVATE NONNULL((1)) bool FCALL
 unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
-                                       struct mpart_unlockinfo *unlock) {
+                                       struct unlockinfo *unlock) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
 		struct mman *mm;
@@ -1262,7 +1262,7 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 
 			/* Drop our lock to the original part. */
 			mpart_lock_release_f(part);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 
 			/* Wait until the lock of this mman becomes available. */
 			TRY {
@@ -1297,7 +1297,7 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
  * If this cannot be done, release all locks and throw an exception. */
 PRIVATE NONNULL((1)) bool FCALL
 try_prepare_mmans_or_throw(struct mpart *__restrict self,
-                           struct mpart_unlockinfo *unlock) {
+                           struct unlockinfo *unlock) {
 	struct mnode *node;
 	bool result = false;
 	LIST_FOREACH (node, &self->mp_copy, mn_link) {
@@ -1320,7 +1320,7 @@ err_badalloc:
 	unprepare_mmans_until(LIST_FIRST(&self->mp_copy), node);
 	unsharecow_unlock_unique_mmans(self);
 	mpart_lock_release_f(self);
-	mpart_unlockinfo_xunlock(unlock);
+	unlockinfo_xunlock(unlock);
 	mpart_deadnodes_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 }
@@ -1338,7 +1338,7 @@ err_badalloc:
  *       already been destroyed, such that no alive copy-nodes still exist! */
 PUBLIC NONNULL((1, 3)) bool FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
-                           struct mpart_unlockinfo *unlock,
+                           struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data) {
 	struct mpart *copy;
 	struct mnode *node;
@@ -1390,7 +1390,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 			/* Special case: All nodes had been destroyed! */
 			unsharecow_unlock_unique_mmans(self);
 			mpart_lock_release_f(self);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 			goto nope_decref_mmans;
 		}
 	} EXCEPT {
@@ -1593,7 +1593,7 @@ nope:
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
 PUBLIC NONNULL((1)) bool FCALL
 mpart_unwrite_or_unlock(struct mpart *__restrict self,
-                        struct mpart_unlockinfo *unlock) {
+                        struct unlockinfo *unlock) {
 	struct mnode *node;
 	/* Enumerate all shared nodes in order to delete write-access from them. */
 	LIST_FOREACH (node, &self->mp_share, mn_link) {
@@ -1609,7 +1609,7 @@ again_try_clear_write:
 			if unlikely(!tryincref(mm))
 				goto again_try_clear_write;
 			mpart_lock_release_f(self);
-			mpart_unlockinfo_xunlock(unlock);
+			unlockinfo_xunlock(unlock);
 			TRY {
 				while (!sync_canwrite(mm))
 					task_yield();
@@ -1624,7 +1624,7 @@ again_try_clear_write:
 		/* Hard error: bad allocation :( */
 		assert(error == MNODE_CLEAR_WRITE_BADALLOC);
 		mpart_lock_release_f(self);
-		mpart_unlockinfo_xunlock(unlock);
+		unlockinfo_xunlock(unlock);
 		mpart_deadnodes_reap(self);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 	}

@@ -20,13 +20,18 @@
 #ifdef __INTELLISENSE__
 #include "mm-unmapped.c"
 //#define DEFINE_mman_getunmapped_nx
-#define DEFINE_mman_getunmapped_or_unlock
+//#define DEFINE_mman_getunmapped_or_unlock
+//#define DEFINE_mbuilder_getunmapped_nx
+#define DEFINE_mbuilder_getunmapped
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/rand.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#if (defined(DEFINE_mbuilder_getunmapped_nx) || defined(DEFINE_mbuilder_getunmapped))
+#include <kernel/mman/mbuilder.h>
+#endif /* (DEFINE_mbuilder_getunmapped_nx || DEFINE_mbuilder_getunmapped) */
 
 #include <kos/except.h>
 
@@ -39,9 +44,10 @@ DECL_BEGIN
 
 #ifndef MM_UNMAPPED_HELPERS_DEFINED
 #define MM_UNMAPPED_HELPERS_DEFINED
+#ifdef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_UNMAPPED_C
 /* Select a random integer >= minval && <= maxval, with
  * a bias towards numbers that are closer to `bias' */
-PRIVATE PAGEDIR_PAGEALIGNED uintptr_t KCALL
+INTERN PAGEDIR_PAGEALIGNED uintptr_t KCALL
 select_random_integer_with_bias(uintptr_t minval,
                                 uintptr_t maxval,
                                 uintptr_t bias) {
@@ -78,9 +84,16 @@ select_random_integer_with_bias(uintptr_t minval,
 	}
 	return bias;
 }
-
+#else /* GUARD_KERNEL_SRC_MEMORY_MMAN_MM_UNMAPPED_C */
+INTDEF PAGEDIR_PAGEALIGNED uintptr_t KCALL
+select_random_integer_with_bias(uintptr_t minval,
+                                uintptr_t maxval,
+                                uintptr_t bias);
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_UNMAPPED_C */
 #endif /* !MM_UNMAPPED_HELPERS_DEFINED */
 
+
+#undef SELF_IS_MBUILDER
 
 /* Try to find a suitable, unmapped address range:
  * @param: self:      The mman in which to create the mapping. For this purpose,
@@ -122,13 +135,85 @@ mman_getunmapped_or_unlock(struct mman *__restrict self,
                            size_t min_alignment)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
+#elif defined(DEFINE_mbuilder_getunmapped_nx)
+#define SELF_IS_MBUILDER
+/* Try to find a suitable, unmapped address range
+ * Behaves exactly the same as `mman_getunmapped_nx()' */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) void *
+NOTHROW(FCALL mbuilder_getunmapped_nx)(struct mbuilder *__restrict self,
+                                       void *addr, size_t num_bytes, unsigned int flags,
+                                       size_t min_alignment)
+#elif defined(DEFINE_mbuilder_getunmapped)
+#define SELF_IS_MBUILDER
+/* Same as `mbuilder_getunmapped_nx()', but never return `MMAN_GETUNMAPPED_ERROR'.
+ * Instead, the given mman is unlocked on error, and an exception is thrown.
+ * Behaves exactly the same as `mman_getunmapped_or_unlock()', except that there
+ * aren't any locks involved. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
+mbuilder_getunmapped(struct mbuilder *__restrict self,
+                     void *addr, size_t num_bytes, unsigned int flags,
+                     size_t min_alignment)
+		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
+		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
 #endif /* ... */
 {
+#ifdef SELF_IS_MBUILDER
+#define self__mm_mappings             self->mb_mappings
+#define LOCAL_mnode                   mbuilder_node
+#define LOCAL_mnode_tree_locate       mbuilder_node_tree_locate
+#define LOCAL_mnode_tree_rlocate      mbuilder_node_tree_rlocate
+#define LOCAL_mnode_tree_insert       mbuilder_node_tree_insert
+#define LOCAL_mnode_tree_tryinsert    mbuilder_node_tree_tryinsert
+#define LOCAL_mnode_tree_remove       mbuilder_node_tree_remove
+#define LOCAL_mnode_tree_rremove      mbuilder_node_tree_rremove
+#define LOCAL_mnode_tree_removenode   mbuilder_node_tree_removenode
+#define LOCAL_mnode_tree_prevnode     mbuilder_node_tree_prevnode
+#define LOCAL_mnode_tree_nextnode     mbuilder_node_tree_nextnode
+#define LOCAL_mnode_tree_minmax       mbuilder_node_tree_minmax
+#define LOCAL_mnode_tree_minmaxlocate mbuilder_node_tree_minmaxlocate
+#define LOCAL_mnode_getminaddr        mbuilder_node_getminaddr
+#define LOCAL_mnode_getmaxaddr        mbuilder_node_getmaxaddr
+#define LOCAL_mnode_getendaddr        mbuilder_node_getendaddr
+#define LOCAL_mnode_getaddr           mbuilder_node_getaddr
+#define LOCAL_mnode_getsize           mbuilder_node_getsize
+#define LOCAL_mnode_iskern            mbuilder_node_iskern
+#define LOCAL_mnode_isuser            mbuilder_node_isuser
+#define LOCAL_mnode_getmapminaddr     mbuilder_node_getmapminaddr
+#define LOCAL_mnode_getmapmaxaddr     mbuilder_node_getmapmaxaddr
+#define LOCAL_mnode_getmapendaddr     mbuilder_node_getmapendaddr
+#else /* SELF_IS_MBUILDER */
+#define self__mm_mappings             self->mm_mappings
+#define LOCAL_mnode                   mnode
+#define LOCAL_mnode_tree_locate       mnode_tree_locate
+#define LOCAL_mnode_tree_rlocate      mnode_tree_rlocate
+#define LOCAL_mnode_tree_insert       mnode_tree_insert
+#define LOCAL_mnode_tree_tryinsert    mnode_tree_tryinsert
+#define LOCAL_mnode_tree_remove       mnode_tree_remove
+#define LOCAL_mnode_tree_rremove      mnode_tree_rremove
+#define LOCAL_mnode_tree_removenode   mnode_tree_removenode
+#define LOCAL_mnode_tree_prevnode     mnode_tree_prevnode
+#define LOCAL_mnode_tree_nextnode     mnode_tree_nextnode
+#define LOCAL_mnode_tree_minmax       mnode_tree_minmax
+#define LOCAL_mnode_tree_minmaxlocate mnode_tree_minmaxlocate
+#define LOCAL_mnode_getminaddr        mnode_getminaddr
+#define LOCAL_mnode_getmaxaddr        mnode_getmaxaddr
+#define LOCAL_mnode_getendaddr        mnode_getendaddr
+#define LOCAL_mnode_getaddr           mnode_getaddr
+#define LOCAL_mnode_getsize           mnode_getsize
+#define LOCAL_mnode_iskern            mnode_iskern
+#define LOCAL_mnode_isuser            mnode_isuser
+#define LOCAL_mnode_getmapminaddr     mnode_getmapminaddr
+#define LOCAL_mnode_getmapmaxaddr     mnode_getmapmaxaddr
+#define LOCAL_mnode_getmapendaddr     mnode_getmapendaddr
+#endif /* !SELF_IS_MBUILDER */
+
 #define HAS_EXTENDED_MIN_ALIGNMENT \
 	(min_alignment > PAGESIZE && IS_POWER_OF_TWO(min_alignment))
 	void *result;
-	struct mnode *node;
+	struct LOCAL_mnode *node;
+#ifndef SELF_IS_MBUILDER
 	assert(mman_lock_acquired(self));
+#endif /* !SELF_IS_MBUILDER */
 
 	/* Load additional flags. */
 	flags |= mman_getunmapped_extflags;
@@ -137,14 +222,18 @@ mman_getunmapped_or_unlock(struct mman *__restrict self,
 	if (flags & MMAN_GETUNMAPPED_F_FIXED) {
 		result = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 		if (flags & MMAN_GETUNMAPPED_F_FIXED_NOREPLACE) {
-			node = mnode_tree_rlocate(self->mm_mappings,
-			                          (byte_t *)addr,
-			                          (byte_t *)addr + num_bytes - 1);
+			node = LOCAL_mnode_tree_rlocate(self__mm_mappings,
+			                                (byte_t *)addr,
+			                                (byte_t *)addr + num_bytes - 1);
 			if (node != NULL)
 				goto err_already_exists;
 		} else if (ADDRRANGE_ISKERN_PARTIAL((byte_t *)addr,
-		                                    (byte_t *)addr + num_bytes) &&
-		           self != &mman_kernel) {
+		                                    (byte_t *)addr + num_bytes)
+#ifndef SELF_IS_MBUILDER
+		           &&
+		           self != &mman_kernel
+#endif /* !SELF_IS_MBUILDER */
+		           ) {
 			/* Special case: Only allowed to mmap FIXED into kernel-space
 			 *               when using the kernel page directory as base,
 			 *               which user-space isn't (normally) allowed to
@@ -152,7 +241,7 @@ mman_getunmapped_or_unlock(struct mman *__restrict self,
 			goto err_already_exists_or_nomem;
 		}
 	} else {
-		struct mnode_tree_minmax mima;
+		struct LOCAL_mnode_tree_minmax mima;
 		PAGEDIR_PAGEALIGNED void *allow_minaddr, *allow_maxaddr;
 		PAGEDIR_PAGEALIGNED void *avail_minaddr, *avail_maxaddr;
 		/* Ensure that the hinted address range is properly aligned. */
@@ -188,6 +277,7 @@ mman_getunmapped_or_unlock(struct mman *__restrict self,
 again_find_good_range:
 
 		/* Figure out the bounds between which the mapping must be placed. */
+#ifndef SELF_IS_MBUILDER
 		if (self == &mman_kernel && ADDR_ISKERN(addr)) {
 			/* Kernel-space requesting a memory location in kernel-space. */
 #ifdef KERNELSPACE_BASE
@@ -200,7 +290,9 @@ again_find_good_range:
 #else /* KERNELSPACE_END */
 			allow_maxaddr = (byte_t *)0 - num_bytes;
 #endif /* KERNELSPACE_END */
-		} else {
+		} else
+#endif /* !SELF_IS_MBUILDER */
+		{
 			/* Allocate in user-space. */
 			allow_minaddr = mman_getunmapped_user_minaddr;
 #ifdef KERNELSPACE_LOWMEM
@@ -259,7 +351,12 @@ err_no_space:
 			goto err_no_space;
 
 		if ((byte_t *)addr < (byte_t *)allow_minaddr) {
-			if (self != &mman_kernel) {
+#ifndef SELF_IS_MBUILDER
+			if (self == &mman_kernel) {
+				addr = allow_minaddr;
+			} else
+#endif /* !SELF_IS_MBUILDER */
+			{
 do_set_automatic_userspace_hint:
 				if (flags & MMAN_GETUNMAPPED_F_STACK) {
 					addr = mman_getunmapped_user_stkbase;
@@ -272,10 +369,13 @@ do_set_automatic_userspace_hint:
 				}
 				if unlikely((byte_t *)addr < (byte_t *)allow_minaddr)
 					addr = allow_minaddr;
-			} else {
-				addr = allow_minaddr;
 			}
-		} else if (addr == NULL && self != &mman_kernel) {
+		} else if (addr == NULL
+#ifndef SELF_IS_MBUILDER
+		           &&
+		           self != &mman_kernel
+#endif /* !SELF_IS_MBUILDER */
+		           ) {
 			goto do_set_automatic_userspace_hint;
 		}
 
@@ -293,10 +393,10 @@ do_set_automatic_userspace_hint:
 		}
 
 		/* Check if the hinted address range is available. */
-		mnode_tree_minmaxlocate(self->mm_mappings,
-		                        avail_minaddr,
-		                        avail_maxaddr,
-		                        &mima);
+		LOCAL_mnode_tree_minmaxlocate(self__mm_mappings,
+		                              avail_minaddr,
+		                              avail_maxaddr,
+		                              &mima);
 		assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
 		if (mima.mm_min == NULL) {
 			uintptr_t retindex;
@@ -315,21 +415,21 @@ select_from_avail_range:
 			 * select a biased result value based on the original hint. */
 			if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
 				if (avail_minaddr > allow_minaddr) {
-					mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
-					                        (byte_t *)avail_minaddr - 1, &mima);
+					LOCAL_mnode_tree_minmaxlocate(self__mm_mappings, allow_minaddr,
+					                              (byte_t *)avail_minaddr - 1, &mima);
 					if (mima.mm_max != NULL)
-						avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
+						avail_minaddr = LOCAL_mnode_getmaxaddr(mima.mm_max) + 1;
 				}
 				retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
 				                                           (uintptr_t)addr >> alignshift,
 				                                           (uintptr_t)addr >> alignshift);
 			} else if (MMAN_GETUNMAPPED_ISABOVE(flags)) {
 				if (avail_maxaddr < allow_maxaddr) {
-					mnode_tree_minmaxlocate(self->mm_mappings,
-					                        (byte_t *)avail_maxaddr + 1,
-					                        (byte_t *)allow_maxaddr, &mima);
+					LOCAL_mnode_tree_minmaxlocate(self__mm_mappings,
+					                              (byte_t *)avail_maxaddr + 1,
+					                              (byte_t *)allow_maxaddr, &mima);
 					if (mima.mm_min != NULL)
-						avail_minaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
+						avail_minaddr = LOCAL_mnode_getminaddr(mima.mm_min) - 1;
 				}
 				avail_maxaddr = (byte_t *)((uintptr_t)avail_maxaddr - (num_bytes - 1));
 				retindex = select_random_integer_with_bias((uintptr_t)addr >> alignshift,
@@ -337,17 +437,17 @@ select_from_avail_range:
 				                                           (uintptr_t)addr >> alignshift);
 			} else {
 				if (avail_minaddr > allow_minaddr) {
-					mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
-					                        (byte_t *)avail_minaddr - 1, &mima);
+					LOCAL_mnode_tree_minmaxlocate(self__mm_mappings, allow_minaddr,
+					                              (byte_t *)avail_minaddr - 1, &mima);
 					if (mima.mm_max != NULL)
-						avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
+						avail_minaddr = LOCAL_mnode_getmaxaddr(mima.mm_max) + 1;
 				}
 				if (avail_maxaddr < allow_maxaddr) {
-					mnode_tree_minmaxlocate(self->mm_mappings,
-					                        (byte_t *)avail_maxaddr + 1,
-					                        (byte_t *)allow_maxaddr, &mima);
+					LOCAL_mnode_tree_minmaxlocate(self__mm_mappings,
+					                              (byte_t *)avail_maxaddr + 1,
+					                              (byte_t *)allow_maxaddr, &mima);
 					if (mima.mm_min != NULL)
-						avail_minaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
+						avail_minaddr = LOCAL_mnode_getminaddr(mima.mm_min) - 1;
 				}
 				avail_maxaddr = (byte_t *)((uintptr_t)avail_maxaddr - (num_bytes - 1));
 				retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
@@ -356,7 +456,7 @@ select_from_avail_range:
 			}
 			result = (void *)(retindex << alignshift);
 		} else {
-			struct mnode *prev, *next;
+			struct LOCAL_mnode *prev, *next;
 			bool want_below, want_above;
 			PAGEDIR_PAGEALIGNED void *lo_best_minaddr, *lo_best_maxaddr;
 			PAGEDIR_PAGEALIGNED void *hi_best_minaddr, *hi_best_maxaddr;
@@ -385,11 +485,11 @@ again_find_below_above:
 				for (;;) {
 					void *gap_min, *gap_max;
 					size_t gap_size;
-					prev    = mnode_tree_prevnode(next);
+					prev    = LOCAL_mnode_tree_prevnode(next);
 					gap_min = allow_minaddr;
 					if (prev != NULL)
-						gap_min = (byte_t *)mnode_getmaxaddr(prev) + 1;
-					gap_max = (byte_t *)mnode_getminaddr(next) - 1;
+						gap_min = LOCAL_mnode_getmaxaddr(prev) + 1;
+					gap_max = LOCAL_mnode_getminaddr(next) - 1;
 					if (gap_min >= gap_max)
 						goto continue_find_below;
 					gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
@@ -421,11 +521,11 @@ continue_find_below:
 				for (;;) {
 					void *gap_min, *gap_max;
 					size_t gap_size;
-					next    = mnode_tree_nextnode(prev);
-					gap_min = (byte_t *)mnode_getmaxaddr(prev) + 1;
+					next    = LOCAL_mnode_tree_nextnode(prev);
+					gap_min = LOCAL_mnode_getmaxaddr(prev) + 1;
 					gap_max = allow_maxaddr;
 					if (next != NULL)
-						gap_max = (byte_t *)mnode_getminaddr(next) - 1;
+						gap_max = LOCAL_mnode_getminaddr(next) - 1;
 					if (gap_min >= gap_max)
 						goto continue_find_above;
 					gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
@@ -530,34 +630,64 @@ done_dynamic:
 	}
 	return result;
 err_already_exists_or_nomem:
-#ifdef DEFINE_mman_getunmapped_or_unlock
+#if defined(DEFINE_mman_getunmapped_or_unlock) || defined(DEFINE_mbuilder_getunmapped)
 	if ((flags & (MMAN_GETUNMAPPED_F_FIXED | MMAN_GETUNMAPPED_F_FIXED_NOREPLACE)) !=
 	    /*    */ (MMAN_GETUNMAPPED_F_FIXED | MMAN_GETUNMAPPED_F_FIXED_NOREPLACE)) {
+#ifndef SELF_IS_MBUILDER
 		mman_lock_release(self);
+#endif /* !SELF_IS_MBUILDER */
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
 	}
-#endif /* DEFINE_mman_getunmapped_or_unlock */
+#endif /* DEFINE_mman_getunmapped_or_unlock || DEFINE_mbuilder_getunmapped */
 err_already_exists:
-#ifdef DEFINE_mman_getunmapped_nx
+#if defined(DEFINE_mman_getunmapped_nx) || defined(DEFINE_mbuilder_getunmapped_nx)
 	return MMAN_GETUNMAPPED_ERROR;
-#elif defined(DEFINE_mman_getunmapped_or_unlock)
+#elif defined(DEFINE_mman_getunmapped_or_unlock) || defined(DEFINE_mbuilder_getunmapped)
 	/**/ {
 		void *node_minaddr;
 		void *node_maxaddr;
-		node_minaddr = mnode_getminaddr(node);
-		node_maxaddr = mnode_getmaxaddr(node);
+		node_minaddr = LOCAL_mnode_getminaddr(node);
+		node_maxaddr = LOCAL_mnode_getmaxaddr(node);
+#ifndef SELF_IS_MBUILDER
 		mman_lock_release(self);
+#endif /* !SELF_IS_MBUILDER */
 		THROW(E_BADALLOC_ADDRESS_ALREADY_EXISTS,
 		      (byte_t *)addr,
 		      (byte_t *)addr + num_bytes - 1,
 		      node_minaddr, node_maxaddr);
 	}
 #endif /* ... */
+#undef self__mm_mappings
+#undef LOCAL_mnode
+#undef LOCAL_mnode_tree_locate
+#undef LOCAL_mnode_tree_rlocate
+#undef LOCAL_mnode_tree_insert
+#undef LOCAL_mnode_tree_tryinsert
+#undef LOCAL_mnode_tree_remove
+#undef LOCAL_mnode_tree_rremove
+#undef LOCAL_mnode_tree_removenode
+#undef LOCAL_mnode_tree_prevnode
+#undef LOCAL_mnode_tree_nextnode
+#undef LOCAL_mnode_tree_minmax
+#undef LOCAL_mnode_tree_minmaxlocate
+#undef LOCAL_mnode_getminaddr
+#undef LOCAL_mnode_getmaxaddr
+#undef LOCAL_mnode_getendaddr
+#undef LOCAL_mnode_getaddr
+#undef LOCAL_mnode_getsize
+#undef LOCAL_mnode_iskern
+#undef LOCAL_mnode_isuser
+#undef LOCAL_mnode_getmapminaddr
+#undef LOCAL_mnode_getmapmaxaddr
+#undef LOCAL_mnode_getmapendaddr
 #undef HAS_EXTENDED_MIN_ALIGNMENT
+#undef SELF_IS_MBUILDER
 }
 
 DECL_END
 
 #undef DEFINE_mman_getunmapped_or_unlock
 #undef DEFINE_mman_getunmapped_nx
+#undef DEFINE_mbuilder_getunmapped_nx
+#undef DEFINE_mbuilder_getunmapped
 

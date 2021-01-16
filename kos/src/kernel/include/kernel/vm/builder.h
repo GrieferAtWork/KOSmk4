@@ -30,7 +30,9 @@
 #include <asm/pageid.h>
 #include <compat/config.h> /* __ARCH_HAVE_COMPAT */
 
-#ifndef CONFIG_USE_NEW_VM
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman/mm-builder.h>
+#else /* CONFIG_USE_NEW_VM */
 DECL_BEGIN
 
 /* A small, helper-type for safely constructing and applying a VM state.

@@ -124,11 +124,13 @@ struct mnode {
 		SLIST_ENTRY(mnode)             _mn_dead;     /* [lock(ATOMIC)] Chain of dead nodes (for use with `struct mpart::mp_deadnodes') */
 		RBTREE_NODE(struct mnode)       mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 	};
+	REF struct mpart                   *mn_part;     /* [0..1][const] The bound mem-part.
+	                                                  * When set to NULL, then this node represents a reserved node. */
+	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
+	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 	WEAK REF struct mman               *mn_mman;     /* [1..1][const] Associated memory manager.
 	                                                  * NOTE: This only becomes a weak reference when `mnode_wasdestroyed(self)' is true!
 	                                                  *       Before that point, this is just a regular, old pointer! */
-	REF struct mpart                   *mn_part;     /* [0..1][const] The bound mem-part.
-	                                                  * When set to NULL, then this node represents a reserved node. */
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)] Entry for `mp_copy' or `mp_share' */
 	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)] Chain of nodes that (may) contain pages that
@@ -139,8 +141,6 @@ struct mnode {
 	                                                  * with write-access enabled (which happens lazily upon first access)
 	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
-	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
-	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 };
 
 /* Check if the given mem-node was destroyed. */

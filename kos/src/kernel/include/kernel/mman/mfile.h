@@ -24,6 +24,7 @@
 
 #include <kernel/memory.h>
 #include <kernel/types.h>
+#include <misc/unlockinfo.h>
 #include <sched/signal.h>
 
 #include <hybrid/__minmax.h>
@@ -257,13 +258,13 @@ struct mfile_map {
 	 * >> void mman_mapat(struct mman *mm, void *addr, size_t num_bytes,
 	 * >>                 struct mfile *file, pos_t offset) {
 	 * >>     struct mfile_map data;
-	 * >>     mfile_map_init(&data, file, offset, num_bytes);
+	 * >>     mfile_map_init_and_acquire(&data, file, offset, num_bytes);
 	 * >>     TRY {
-	 * >>         while (!sync_trywrite(&mm->mm_lock)) {
-	 * >>             mfile_map_unlock(&data);
-	 * >>             while (!sync_canwrite(&mm->mm_lock))
+	 * >>         while (!mman_lock_available(mm)) {
+	 * >>             mfile_map_release(&data);
+	 * >>             while (!mman_lock_available(mm))
 	 * >>                 task_yield();
-	 * >>             mfile_map_relock(&data);
+	 * >>             mfile_map_acquire(&data);
 	 * >>         }
 	 * >>     } EXCEPT {
 	 * >>         mfile_map_fini(&data);
@@ -303,24 +304,35 @@ struct mfile_map {
 	                                       *  - mn_fspath, mn_fsname */
 };
 
-/* Lookup/create and lock all parts to span the given address range,
- * as well as allocate 1 mem-node for each part, such that everything
+/* Lookup/create all parts to span the given address range, as
+ * well as allocate 1 mem-node for each part, such that everything
  * put together forms 1 continuous range of fully mappable mem-parts.
  *
  * This function is designed for use in implementing `mman_map()', such
- * that this function is called before trying to acquire a lock to the
- * target mman.
+ * that this function is called before trying to acquire a lock to all
+ * of the bound mem-part (s.a. `mfile_map_acquire') and the target mman.
  * As such, this API is designed to make it simple to:
- *  - Release locks to all of the parts
- *  - Re-acquire locks to all of the parts, as well as making
+ *  - Acquire locks to all of the parts, as well as making
  *    sure that all of the parts still form 1 uninterrupted
- *    mapping over the given address range in its entirety */
-FUNDEF NONNULL((1, 2)) void FCALL
+ *    mapping over the given address range in its entirety
+ *  - Release locks to all of the parts */
+FUNDEF NONNULL((1, 2, 5)) void FCALL
 mfile_map_init(struct mfile_map *__restrict self,
                struct mfile *__restrict file,
                PAGEDIR_PAGEALIGNED pos_t addr,
-               PAGEDIR_PAGEALIGNED size_t num_bytes)
+               PAGEDIR_PAGEALIGNED size_t num_bytes,
+               /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* More efficient combination of `mfile_map_init()' and `mfile_map_acquire()' */
+FUNDEF NONNULL((1, 2, 5)) void FCALL
+mfile_map_init_and_acquire(struct mfile_map *__restrict self,
+                           struct mfile *__restrict file,
+                           PAGEDIR_PAGEALIGNED pos_t addr,
+                           PAGEDIR_PAGEALIGNED size_t num_bytes,
+                           /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
 
 /* Unlock or re-lock a mem-node allocator (that is: release/re-acquire locks
  * to all of the individual parts pointed to by the nodes allocated by `self')
@@ -330,19 +342,35 @@ mfile_map_init(struct mfile_map *__restrict self,
  * holes anywhere along the way, while the the act of holding locks to all of
  * the parts then guaranties that no new holes can possibly pop up out of the
  * blue. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_map_unlock)(struct mfile_map *__restrict self);
 FUNDEF NONNULL((1)) void FCALL
-mfile_map_relock(struct mfile_map *__restrict self)
+mfile_map_acquire(struct mfile_map *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self);
+
+
+/* (try to) do the same as `mfile_map_acquire()', but if doing so cannot be
+ * done without blocking on an internal lock, then release all already-acquired
+ * locks, invoke the `unlock' callback (if given), wait for the necessary lock
+ * to become available, and return `false'.
+ * Otherwise, don't invoke `unlock' and return `true'.
+ * NOTE: In the case of an exception, `unlock' is guarantied to be invoked
+ *       prior to the exception being thrown.
+ * @param: mnode_free_list: Required/superfluous mem-nodes are added/removed from
+ *                          this list for the purpose of allocation/deallocation. */
+FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
+mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
+                            struct unlockinfo *unlock,
+                            /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Finalize a given mem-node-allocator.
  * This function will free (and only free; the caller is responsible to release
  * all of the locks to the individual mem-parts themselves, though for this purpose,
- * `mfile_map_unlock()' may also be used) all of the (still-)allocated
+ * `mfile_map_release()' may also be used) all of the (still-)allocated
  * mem-nodes, as can be found apart of the `self->mfm_nodes' list. In addition
  * to freeing all of the container-nodes, this function will also drop 1 reference
- * to the mem-part pointed-to by each of the nodes.
+ * from the mem-parts pointed-to by each of the nodes.
  * NOTE: This function doesn't necessarily have to be called if the caller was
  *       able to inherit _all_ of the nodes originally allocated (which should
  *       normally be the case when mapping was successful) */
