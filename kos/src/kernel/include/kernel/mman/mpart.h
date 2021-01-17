@@ -26,6 +26,8 @@
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
 
+#include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
 #include <hybrid/__minmax.h>
 #include <hybrid/sched/__yield.h>
 #include <hybrid/sequence/list.h>
@@ -59,9 +61,11 @@
                                        * memory parts, it will set this flag for all parts there are.
                                        * Also note that this flag is set by default when the associated block's
                                        * `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
-#define MPART_F_CHANGED        0x0008 /* [lock(SET(MPART_F_LOCKBIT), CLEAR(:mfile::mf_lock || :mfile::mf_changed == MFILE_PARTS_ANONYMOUS))]
-                                       * Blocks of this part (may) have changed. This flag must be cleared by the associated
-                                       * file after changes have been synced, or the file becomes anonymous. */
+#define MPART_F_CHANGED        0x0008 /* [lock(SET(MPART_F_LOCKBIT),
+                                       *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
+                                       *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
+                                       * Blocks of this part (may) have changed. This flag must be cleared by the
+                                       * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The backing block-state bitset exists in-line. */
 /*efine MPART_F_               0x0020  * ... */
@@ -154,7 +158,9 @@ struct mchunkvec {
 struct mpart {
 	WEAK refcnt_t                 mp_refcnt;    /* Reference counter. */
 	uintptr_half_t                mp_flags;     /* Memory part flags (set of `MPART_F_*') */
-	uintptr_half_t                mp_state;     /* [lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
+	uintptr_half_t                mp_state;     /* [lock(MPART_F_LOCKBIT)]
+	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
+	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * Memory part state (one of `MPART_ST_*') */
 	union {
 		REF struct mfile         *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
@@ -190,7 +196,9 @@ struct mpart {
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
 	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || :mfile::mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
 	                                             *       WRITE(MPART_F_LOCKBIT && :mfile::mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
-	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT))] In-file max address of this part. */
+	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
+	                                             *           mp_meta->mpm_dmalocks != 0)]
+	                                             * In-file max address of this part. */
 	union {
 		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
 		RBTREE_NODE(struct mpart) mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
@@ -215,7 +223,7 @@ struct mpart {
 	union {
 		/* NOTE: Everything in here is implicitly:
 		 * [lock(MPART_F_LOCKBIT)]
-		 * [const_if(EXISTS(MPART_BLOCK_ST_INIT))] */
+		 * [const_if(EXISTS(MPART_BLOCK_ST_INIT) || mp_meta->mpm_dmalocks != 0)] */
 
 		/* NOTE: When `mchunkvec' is used, individual chunks are always chosen such
 		 *       that a whole blocks are always contained within a single chunk, even
@@ -317,6 +325,7 @@ __DEFINE_SYNC_MUTEX(struct mpart,
 
 
 
+
 /* Mem-part tree API. All of these functions require that the caller
  * be holding a lock to the associated file. */
 struct mpart_tree_minmax {
@@ -392,6 +401,17 @@ FUNDEF NONNULL((1)) __BOOL FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock);
 
+/* Ensure that `self->mp_meta->mpm_dmalocks == 0' */
+FUNDEF NONNULL((1)) __BOOL FCALL
+mpart_nodma_or_unlock(struct mpart *__restrict self,
+                      struct unlockinfo *unlock);
+
+/* Ensure that `self->mp_meta != NULL' */
+FUNDEF NONNULL((1)) __BOOL FCALL
+mpart_hasmeta_or_unlock(struct mpart *__restrict self,
+                        struct unlockinfo *unlock);
+
+
 struct mpart_setcore_data {
 	uintptr_t           *scd_bitset;      /* [0..1][owned] Block-status bitset. */
 	unsigned int         scd_copy_state;  /* One of `MPART_ST_VOID', `MPART_ST_MEM' or `MPART_ST_MEM_SC' */
@@ -466,7 +486,12 @@ mpart_unwrite_or_unlock(struct mpart *__restrict self,
 
 /* Acquire a lock until `mpart_initdone_or_unlock()' */
 FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_noinitblocks(struct mpart *__restrict self)
+mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Acquire a lock until `mpart_initdone_or_unlock() && mpart_nodma_or_unlock()' */
+FUNDEF NONNULL((1)) void FCALL
+mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Acquire a lock until `mpart_setcore_or_unlock()' */
@@ -499,8 +524,9 @@ FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that all shared
- * mappings of the given mem-part are no longer mapped with write permissions:
+/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
+ * are still being held, and that all shared mappings of the given mem-part are
+ * no longer mapped with write permissions:
  * >> LIST_FOREACH(node, &self->mp_share, mn_link) {
  * >>     mnode_clear_write(node);
  * >> }
@@ -525,7 +551,7 @@ mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
  * anonymous is one of the conditions for a writable copy-on-write mapping to
  * continue to exist) */
 FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unwrite(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 

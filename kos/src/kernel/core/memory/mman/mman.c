@@ -48,7 +48,6 @@ PUBLIC CALLBACK_LIST(void FCALL(struct mman * /*newmman*/, struct mman * /*oldmm
 /* Memory manager reference counting control. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
-	/* TODO */
 	heap_free(&kernel_locked_heap,
 	          self,
 	          self->mm_heapsize,
@@ -69,7 +68,7 @@ mman_new(void) THROWS(E_BADALLOC, ...) {
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
-mman_fork(struct mman *__restrict self) THROWS(E_BADALLOC, ...) {
+mman_fork(void) THROWS(E_BADALLOC, ...) {
 	/* TODO */
 }
 

@@ -106,6 +106,11 @@ struct mpartmeta {
 	LLRBTREE_ROOT(WEAK struct mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree.
 	                                                 * NOTE: May contain dead futex objects! */
 	struct WEAK mfutex_slist          mpm_ftx_dead; /* [0..n][lock(ATOMIC)] Chain of dead futex objects. */
+	WEAK refcnt_t                     mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
+	                                                 * # of DMA locks referencing the associated part. */
+	struct sig                        mpm_dma_done; /* Broadcast when `:mp_dmalocks' drops to `0'
+	                                                 * NOTE: Only one if `mp_meta != NULL' at the time of
+	                                                 *       the `:mp_dmalocks' counter dropping to `0'! */
 #ifdef ARCH_VM_HAVE_RTM
 	/* We keep the RTM version and field in the futex controller, such that
 	 * they don't take up space in the base `mpart' structure, but only exist
@@ -118,6 +123,26 @@ struct mpartmeta {
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
+
+#ifdef ARCH_VM_HAVE_RTM
+#define __mpartmeta_init_rtm(self)  , (self)->mpm_rtm_vers = 0
+#define __mpartmeta_cinit_rtm(self) , __hybrid_assert((self)->mpm_rtm_vers == 0)
+#else /* ARCH_VM_HAVE_RTM */
+#define __mpartmeta_init_rtm(self)
+#define __mpartmeta_cinit_rtm(self)
+#endif /* !ARCH_VM_HAVE_RTM */
+#define mpartmeta_init(self)                   \
+	(atomic_rwlock_init(&(self)->mpm_ftxlock), \
+	 (self)->mpm_ftx = __NULLPTR,              \
+	 SLIST_INIT(&(self)->mpm_ftx_dead),        \
+	 sig_init(&(self)->mpm_dma_done)           \
+	 __mpartmeta_init_rtm(self))
+#define mpartmeta_cinit(self)                             \
+	(atomic_rwlock_cinit(&(self)->mpm_ftxlock),           \
+	 __hybrid_assert((self)->mpm_ftx = __NULLPTR),        \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mpm_ftx_dead)), \
+	 sig_cinit(&(self)->mpm_dma_done)                     \
+	 __mpartmeta_cinit_rtm(self))
 
 
 /* Reap dead futex objects of `self' */
@@ -153,6 +178,28 @@ NOTHROW(FCALL _mpartmeta_deadftx_reap)(struct mpartmeta *__restrict self);
 #define mpartmeta_ftxlock_canwrite(self)   atomic_rwlock_canwrite(&(self)->mpm_ftxlock)
 
 
+
+
+
+/* Helper functions to creating/destroying DMA locks. */
+FORCELOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(mpart_dma_addlock)(struct mpart *__restrict self) {
+	__hybrid_assert(mpart_lock_acquired(self));
+	struct mpartmeta *meta = self->mp_meta;
+	__hybrid_assert(meta != __NULLPTR);
+	__hybrid_atomic_inc(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
+}
+
+FORCELOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(mpart_dma_dellock)(struct mpart *__restrict self) {
+	refcnt_t old_count;
+	struct mpartmeta *meta = self->mp_meta;
+	__hybrid_assert(meta != __NULLPTR);
+	old_count = __hybrid_atomic_fetchdec(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
+	__hybrid_assert(old_count >= 1);
+	if (old_count == 1)
+		sig_broadcast(&meta->mpm_dma_done);
+}
 
 
 DECL_END

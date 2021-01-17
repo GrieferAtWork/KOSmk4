@@ -404,11 +404,18 @@ mpart_sync_impl(struct mpart *__restrict self, bool keep_lock) {
 	if unlikely(self->mp_state == MPART_ST_VIO)
 		goto done_noop_nolock;
 
-	/* Lock the part, load it into the core, and make sure that */
 again:
 	if (!(self->mp_flags & MPART_F_CHANGED) && !keep_lock)
 		goto done_noop_nolock;
-	mpart_lock_acquire_and_setcore_unwrite(self);
+	/* Lock the part, load it into the core, make sure that anyone
+	 * that might have write-access right now has this permission
+	 * revoked, and that there aren't any DMA operation in-process. */
+	/* TODO: It would be nice if we could differentiate between read-
+	 *       and write- DMA operations, and only wait for write DMA
+	 *       operations here. - In practice, we don't have to worry
+	 *       about anyone reading memory in the mean time... */
+	mpart_lock_acquire_and_setcore_unwrite_nodma(self);
+
 	if (!(self->mp_flags & MPART_F_CHANGED))
 		goto done_noop;
 
@@ -453,7 +460,7 @@ again:
 				mpart_lock_release_f(self);
 				bitset = (bitset_word_t *)kmalloc(bitset_size, GFP_LOCKED | GFP_PREFLT);
 				TRY {
-					mpart_lock_acquire_and_setcore_unwrite(self);
+					mpart_lock_acquire_and_setcore_unwrite_nodma(self);
 				} EXCEPT {
 					kfree(bitset);
 					mpart_deadnodes_reap(self);
@@ -604,7 +611,7 @@ done_noop:
 	return result;
 done_noop_nolock:
 	if (keep_lock)
-		mpart_lock_acquire_and_setcore_unwrite(self);
+		mpart_lock_acquire_and_setcore_unwrite_nodma(self);
 	return result;
 }
 

@@ -688,7 +688,7 @@ mfile_getpart(struct mfile *__restrict self,
 	assert(max_num_bytes != 0);
 	if (self->mf_parts == MFILE_PARTS_ANONYMOUS) {
 create_anon_part:
-		return mfile_create_global_part(self, addr, max_num_bytes);
+		return mfile_makepart(self, addr, max_num_bytes);
 	}
 again_lock:
 	mfile_lock_read(self);

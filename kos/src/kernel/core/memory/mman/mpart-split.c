@@ -533,9 +533,11 @@ mpart_split_data_alloc_himeta(struct mpart_split_data *__restrict self) {
 			himeta = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
 			                                     GFP_CALLOC | GFP_LOCKED |
 			                                     GFP_PREFLT);
+			mpartmeta_cinit(himeta);
 			self->msd_himeta = himeta;
 			return false;
 		}
+		mpartmeta_cinit(himeta);
 		self->msd_himeta = himeta;
 	}
 done:
@@ -776,8 +778,10 @@ mpart_split(struct mpart *__restrict self,
 	mpart_split_data_init(&data, self, partrel_offset);
 	TRY {
 again:
-		/* Acquire a lock and ensure that there aren't any INIT-blocks. */
-		mpart_lock_acquire_and_noinitblocks(self);
+		/* Acquire a lock and ensure that there aren't any INIT-blocks,
+		 * and that no-one is holding any DMA-locks onto `self', the
+		 * later also being allowed to prevent a part from being split. */
+		mpart_lock_acquire_and_initdone_nodma(self);
 
 		/* Quick check: If the given `data.msd_offset' is out-of-bounds,
 		 *              then we actually have to return `NULL'! */
@@ -815,7 +819,7 @@ release_and_return_null:
 restart_alloc:
 		if (!mpart_split_data_alloc_mnodes(&data)) {
 relock_with_data:
-			mpart_lock_acquire_and_noinitblocks(self);
+			mpart_lock_acquire_and_initdone_nodma(self);
 			if unlikely(data.msd_offset >= mpart_getsize(self))
 				goto release_and_return_null;
 			file = self->mp_file;
@@ -1286,7 +1290,7 @@ maybe_free_unused_hibitset:
 	 *       vector without first acquiring a lock to the associated part, because
 	 *       the only case where this can happen is when one had previously written
 	 *       INIT values to its elements, which is something that we've already
-	 *       asserted to not be the case (s.a. `mpart_lock_acquire_and_noinitblocks()') */
+	 *       asserted to not be the case (s.a. `mpart_lock_acquire_and_initdone_nodma()') */
 	if (!(self->mp_flags & MPART_F_BLKST_INL)) {
 		size_t block_count;
 		bitset_word_t *bitset;

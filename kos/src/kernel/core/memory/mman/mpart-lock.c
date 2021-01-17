@@ -30,9 +30,11 @@
 #include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>
 #include <kernel/vm/phys.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -111,9 +113,7 @@ typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
 /* MPart API to lock a part, alongside doing some other operations.     */
 /************************************************************************/
 
-/* Ensure that none of the blocks of `self' are set to `MPART_BLOCK_ST_INIT'.
- * If such blocks exist, then unlock `self', wait for them to go away, and
- * return `false'. Otherwise, keep the lock to `self' and return `true' */
+/* Ensure that `!mpart_hasblocksstate_init(self)' */
 PUBLIC NONNULL((1)) bool FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock) {
@@ -149,6 +149,63 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 			RETHROW();
 		}
 		return false;
+	}
+	return true;
+}
+
+/* Ensure that `self->mp_dmalocks == 0' */
+PUBLIC NONNULL((1)) bool FCALL
+mpart_nodma_or_unlock(struct mpart *__restrict self,
+                      struct unlockinfo *unlock) {
+	struct mpartmeta *meta;
+	meta = ATOMIC_READ(self->mp_meta);
+	if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
+		/* Must blocking-wait until all DMA locks have been released. */
+		incref(self);
+		mpart_lock_release_f(self);
+		unlockinfo_xunlock(unlock);
+		{
+			FINALLY_DECREF_UNLIKELY(self);
+			task_connect(&meta->mpm_dma_done);
+			if unlikely(ATOMIC_READ(meta->mpm_dmalocks) == 0) {
+				task_disconnectall();
+				return false;
+			}
+		}
+		task_waitfor();
+		return false;
+	}
+	return true;
+}
+
+/* Ensure that `self->mp_meta != NULL' */
+PUBLIC NONNULL((1)) bool FCALL
+mpart_hasmeta_or_unlock(struct mpart *__restrict self,
+                        struct unlockinfo *unlock) {
+	if (self->mp_meta == NULL) {
+		struct mpartmeta *meta;
+		meta = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta),
+		                                      GFP_ATOMIC | GFP_CALLOC |
+		                                      GFP_LOCKED | GFP_PREFLT);
+		if (meta == NULL) {
+			/* Must allocate while blocking. */
+			incref(self);
+			mpart_lock_release_f(self);
+			unlockinfo_xunlock(unlock);
+			FINALLY_DECREF_UNLIKELY(self);
+			meta = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
+			                                   GFP_CALLOC | GFP_LOCKED |
+			                                   GFP_PREFLT);
+			mpartmeta_cinit(meta);
+			/* Remember that meta-data has been allocated. */
+			if unlikely(!ATOMIC_CMPXCH(self->mp_meta, NULL, meta))
+				kfree(meta);
+			return false;
+		}
+		mpartmeta_cinit(meta);
+		/* Remember that meta-data has been allocated. */
+		if unlikely(!ATOMIC_CMPXCH(self->mp_meta, NULL, meta))
+			kfree(meta);
 	}
 	return true;
 }
@@ -1645,11 +1702,21 @@ again_try_clear_write:
 
 /* Acquire a lock until `mpart_initdone_or_unlock()' */
 PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_noinitblocks(struct mpart *__restrict self)
+mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	do {
 		mpart_lock_acquire(self);
 	} while (!mpart_initdone_or_unlock(self, NULL));
+}
+
+/* Acquire a lock until `mpart_initdone_or_unlock() && mpart_nodma_or_unlock()' */
+PUBLIC NONNULL((1)) void FCALL
+mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	do {
+		mpart_lock_acquire(self);
+	} while (!mpart_initdone_or_unlock(self, NULL) ||
+	         !mpart_nodma_or_unlock(self, NULL));
 }
 
 
@@ -1759,8 +1826,9 @@ mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
 
 
 
-/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that all shared
- * mappings of the given mem-part are no longer mapped with write permissions:
+/* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
+ * are still being held, and that all shared mappings of the given mem-part are
+ * no longer mapped with write permissions:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link) {
  * >>     mnode_clear_write(node);
  * >> }
@@ -1785,11 +1853,12 @@ mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
  * anonymous is one of the conditions for a writable copy-on-write mapping to
  * continue to exist) */
 PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unwrite(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	do {
 		mpart_lock_acquire_and_setcore(self);
-	} while (!mpart_unwrite_or_unlock(self, NULL));
+	} while (!mpart_nodma_or_unlock(self, NULL) ||
+	         !mpart_unwrite_or_unlock(self, NULL));
 }
 
 

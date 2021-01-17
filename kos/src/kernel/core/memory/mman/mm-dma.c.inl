@@ -17,47 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_DMA_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_DMA_H 1
+#ifdef __INTELLISENSE__
+#include "mm-dma.c"
+//#define DEFINE_mman_startdma
+#define DEFINE_mman_startdmav
+//#define DEFINE_mman_enumdma
+//#define DEFINE_mman_enumdmav
+#endif /* __INTELLISENSE__ */
 
-#include <kernel/compiler.h>
-
-#include <kernel/paging.h>
-#include <kernel/types.h>
-
+#include <kernel/iovec.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/mpartmeta.h>
+#include <sched/task.h>
 
-#ifdef __CC__
+#include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
+
+#include <assert.h>
+#include <stddef.h>
+
 DECL_BEGIN
 
-struct mman;
-struct aio_buffer;
-
-/* Callback for enumerating physical memory ranges for the purposes of DMA
- * @param: cookie:    The same `cookie' given to `mman_startdma[v]'
- * @param: paddr:     The physical memory base address of the range.
- * @param: num_bytes: The number of bytes found within the range.
- * @param: lock:      The lock used to lock the associated DMA range. */
-typedef __BOOL (KCALL *mdma_range_callback_t)(void *cookie, physaddr_t paddr, size_t num_bytes,
-                                              struct mdmalock *__restrict lock);
-
-/* Descriptor for a lock held for the purposes of DMA */
-struct mdmalock {
-	REF struct mpart *mdl_part; /* [1..1] The data part to which a DMA-lock is being held.
-	                             * This lock will be released via a call to `mpart_dma_dellock()' */
-};
-
-/* Release the given DMA lock */
-#ifdef __INTELLISENSE__
-NOBLOCK NONNULL((1)) void
-NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
-#else /* __INTELLISENSE__ */
-#define mman_dmalock_release(x)        \
-	(mpart_dma_dellock((x)->mdl_part), \
-	 decref_unlikely((x)->mdl_part))
-#endif /* !__INTELLISENSE__ */
-
+#undef LOCAL_IS_ENUM
+#undef LOCAL_IS_VECTOR
+#ifdef DEFINE_mman_startdma
 /* Start DMAing on memory within the specified address range.
  * @param: prange:      A callback that is invoked for each affected physical memory range
  *                      Should this callback return `false', all previously acquired DMA
@@ -78,17 +61,19 @@ NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
  * @return: 0 :         [mman_startdma[v]] The equivalent `mman_startdma[v]' would have thrown an exception
  * @return: <= lockcnt: The number of used DMA locks (SUCCESS)
  * @return: >  lockcnt: The number of _REQUIRED_ DMA locks (FAILURE) (All locks that may have already been acqured will have already been released) */
-FUNDEF NONNULL((1, 2, 4)) size_t KCALL
+PUBLIC NONNULL((1, 2, 4)) size_t KCALL
 mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
               void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
               UNCHECKED void *addr, size_t num_bytes, __BOOL for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2, 4, 6)) size_t KCALL
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+#elif defined(DEFINE_mman_startdmav)
+PUBLIC NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
                struct aio_buffer const *__restrict addr_v, __BOOL for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+#define LOCAL_IS_VECTOR
+#elif defined(DEFINE_mman_enumdma)
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
  * @param: prange:      A callback that is invoked for each affected physical memory range
  *                      Should this callback return `false', enumeration will half and the
@@ -106,28 +91,133 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
  *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(buf)',
  *              though for the same reasons that `mman_startdma[v]' can fail (s.a. `@return: 0' cases),
  *              this may be less than that */
-FUNDEF NONNULL((1, 2)) size_t KCALL
+PUBLIC NONNULL((1, 2)) size_t KCALL
 mman_enumdma(struct mman *__restrict self,
              mdma_range_callback_t prange, void *cookie,
-             void *addr, size_t num_bytes, __BOOL for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2, 4)) size_t KCALL
+             UNCHECKED void *addr, size_t num_bytes,
+             bool for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+#define LOCAL_IS_ENUM
+#elif defined(DEFINE_mman_enumdmav)
+PUBLIC NONNULL((1, 2, 4)) size_t KCALL
 mman_enumdmav(struct mman *__restrict self,
               mdma_range_callback_t prange, void *cookie,
               struct aio_buffer const *__restrict addr_v,
-              __BOOL for_writing)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+              bool for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+#define LOCAL_IS_ENUM
+#define LOCAL_IS_VECTOR
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
+{
+#ifdef LOCAL_IS_VECTOR
+	struct aio_buffer_entry _addrv_ent;
+#endif /* LOCAL_IS_VECTOR */
+#ifdef LOCAL_IS_ENUM
+#define LOCAL_mman_stopdma_opt(vec, count) (void)0
+#else /* LOCAL_IS_ENUM */
+#define LOCAL_mman_stopdma_opt(vec, count) mman_stopdma(vec, count)
+again:
+#endif /* !LOCAL_IS_ENUM */
+	size_t result;
+	result = 0;
+#ifdef LOCAL_IS_VECTOR
+	AIO_BUFFER_FOREACH(_addrv_ent, addr_v)
+#define addr      _addrv_ent.ab_base
+#define num_bytes _addrv_ent.ab_size
+#endif /* LOCAL_IS_VECTOR */
+	while (num_bytes != 0) {
+		struct mnode *node;
+		struct mpart *part;
+		mpart_reladdr_t partrel_addr;
+		size_t partrel_size;
 
+		/* Lookup the node at the given address */
+again_lookup_part:
+		mman_lock_acquire(self);
+		node = mnode_tree_locate(self->mm_mappings, addr);
+		if unlikely(!node)
+			goto err_release_and_unmapped; /* No mapping at all */
+		part = node->mn_part;
+		if unlikely(!part)
+			goto err_release_and_unmapped; /* Reserved mapping */
 
-/* Stop DMAing by releasing all of the specified DMA locks.
- * NOTE: The caller must ensure that `lockcnt == return(mman_startdma*())', and
- *       that the specified `lockvec' is either the exact same `lockvec' originally
- *       passed to `mman_startdma[v]()', or an identical memory copy of it. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec, size_t lockcnt);
+		/* Figure out the part-relative address
+		 * range that is being enumerated. */
+		partrel_addr = node->mn_partoff + (size_t)((byte_t const *)addr - (byte_t const *)mnode_getaddr(node));
+		partrel_size = (size_t)((byte_t const *)mnode_getendaddr(node) - (byte_t const *)addr);
 
+		/* Keep a reference to the part so we can unlock the mman. */
+		incref(part);
+		mman_lock_release(self);
+		TRY {
+			/* Ensure that all blocks that overlap with the given address
+			 * range have their state set to `MPART_BLOCK_ST_LOAD' for
+			 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
+			 *
+			 * XXX: If would be cool to have optimization for writes, such that
+			 *      DMA operations which target whole, previously uninitialized
+			 *      blocks (MPART_BLOCK_ST_NDEF), didn't have to load those
+			 *      blocks prior to the DMA operation being performed.
+			 *      For one, this would require a differentiation between a
+			 *      successful and a failed write-related DMA operation.
+			 *      The problem with this is that this would also require
+			 *      the extension of `struct mdmalock', but that would then
+			 *      require a re-write of `AtaAIOHandleData' or an increase
+			 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'... */
+again_lock_part:
+			if (!mpart_lock_acquire_and_setcore_loadsome(part, partrel_addr, partrel_size))
+				goto again_lookup_part; /* Deal with the case where the part was truncated. */
+
+			/* Ensure that `part->mp_meta' has been allocated */
+			if (!mpart_hasmeta_or_unlock(part, NULL))
+				goto again_lock_part;
+
+			/* If we're doing a write-DMA, mark the accessed address range as changed. */
+			if (for_writing)
+				mpart_changed(part, partrel_addr, partrel_size);
+
+			/* Create the actual DMA-lock. */
+			mpart_dma_addlock(part);
+			mpart_lock_release(part);
+
+#ifndef LOCAL_IS_ENUM
+			/* TODO: Append `part' to the given list of DMA locks. (inherit reference here) */
+#endif /* !LOCAL_IS_ENUM */
+
+			/* TODO: Invoke `prange' (through use of `mpart_memaddr_direct()') */
+
+		} EXCEPT {
+			decref_unlikely(part);
+			RETHROW();
+		}
+#ifdef LOCAL_IS_ENUM
+		decref_unlikely(part);
+#endif /* LOCAL_IS_ENUM */
+
+		/* Account for everything that was enumerated. */
+		addr = (byte_t *)addr + partrel_size;
+		num_bytes -= partrel_size;
+		mman_lock_acquire(self);
+	}
+#undef addr
+#undef num_bytes
+	mman_lock_release(self);
+	return result;
+err_release_and_unmapped:
+	mman_lock_release(self);
+	LOCAL_mman_stopdma_opt(lockvec, MIN(result, lockcnt));
+	return 0;
+#undef LOCAL_mman_stopdma_opt
+}
+
+#undef LOCAL_IS_VECTOR
+#undef LOCAL_IS_ENUM
 
 DECL_END
-#endif /* __CC__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_DMA_H */
+#undef DEFINE_mman_startdma
+#undef DEFINE_mman_startdmav
+#undef DEFINE_mman_enumdma
+#undef DEFINE_mman_enumdmav
