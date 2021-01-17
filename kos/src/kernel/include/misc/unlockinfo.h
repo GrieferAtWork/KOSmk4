@@ -37,6 +37,13 @@ struct unlockinfo {
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct unlockinfo *__restrict self);
 };
 
+/* NOTE: *_or_unlock() functions that use `struct unlockinfo' usually follow
+ *       the following locking logic:
+ *  - return == true:   REQUESTED_CONDITION_MET && UNLOCK_NOT_INVOKED;
+ *  - return == false:  UNLOCK_INVOKED;
+ *  - EXCEPT:           UNLOCK_INVOKED; */
+
+
 /* When `self' is non-NULL, invoke it's `ui_unlock'-callback. */
 #define unlockinfo_xunlock(self) \
 	(void)(!(self) || ((*(self)->ui_unlock)(self), 0))

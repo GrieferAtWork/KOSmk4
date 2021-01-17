@@ -78,9 +78,8 @@ template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T
 
 
 /* TODO: fork() should not have to truely create a new page directory.
- *              Instead, try to make it so that both the page directory,
- *              as well as `struct mnode' can be shared between multiple
- *              memory managers! */
+ *              Instead, try to make it so that dynamic elements of the
+ *              page directory can be shared between multiple mmans! */
 /* TODO: exec() should use `mman_new()' to create an actual, new memory
  *              manager from scratch. */
 
@@ -120,7 +119,7 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
  * >> struct mman *mman_fork() {
  * >>     struct mman *result = malloc(...);
  * >>     pagedir_fork(result->mn_pdir);
- * >>     result->mm_mappings = incref(THIS_VM->mm_mappings);
+ * >>     ...
  * >> }
  *
  * pagedir_fork:
@@ -129,77 +128,19 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
  *    as a data-stream to encode a reference counter for the
  *    surrounding page-vector. (s.a. `p32_pagedir_refe2_incref')
  *
- * copy_on_write_btree:
- *    A binary tree, where upon every write to one of the mnode fields,
- *    we first check a reference counter stored within the mnode itself
- *    as to whether of not that node is being shared.
- *    If it is being shared, then we must create a copy of it, and the
- *    entire path-chain leading up to the node. (because we'll also need
- *    to write the lhs/rhs fields of the to-be modified node's parent,
- *    and it's parent, and so on...)
- *
- *
- * // !!!PROBLEM!!! The parent pointer of the R/B-tree used for mem-nodes
- * ||               would have to be altered whenever one of the nodes has
- * ||               to be changed, which would result in the entire tree
- * ||               being unshared.
- * || Solution:     Boils down to: When nodes are shared by different parents,
- * ||               then every node also needs 1 parent-pointer for every one
- * ||               of its parents.
- * ||               In other words: just extending the R/B-tree ABI isn't enough.
- * ||               And furthermore: we can't get rid of parent pointers: they're
- * ||               more important than ever (see the next (solved) problem)
- * || 
- * || !!!PROBLEM!!! In order for `mpart_split()' and `mpart--unsharecow' to
- * ||               to their things, they'd need to be able to enumerate _all_
- * ||               of the memory managers associated with a given mem-node!
- * || Solution:     This can be solved by forming a backwards tree of all of
- * ||               the different, recursive parent pointers of reachable from
- * ||               the current node. On every path where we reach an end, that
- * ||               last node with 0 parent pointers will reference a different
- * ||               memory manager, which in turn contains a mapping for the
- * ||               associated mpart!
- * \\__________________________________________________________________________
- *  \_ See the file "design.dee" for a mock-up of how this might look like.
- *
- *
- * Changes necessary:
- *  - mnode.mn_mman:     Must become a vector, who's length can then be
- *                       interpreted as the node's reference counter.
- *                       This vector must facilitate both atomic add
- *                       and remove operations (with the remove also
- *                       needing to be NOBLOCK+NOTHROW)
- *  - RBTREE:            Add an extension that allows for copy-on-write
- *                       reference counting functionality.
- *                       Do this by adding a function `RBTREE_PREPARE_WRITE(node, proot)'
- *                       that can be overwritten to do `node = copy_if_shared(node, proot)'
- *  - pagedir:           Implement reference counting on all levels, and
- *                       check the reference counters before making any
- *                       changes to a vector. It may be useful to have a
- *                       dedicated REFCNT_MAYBE_GREATER_ONE bit that can
- *                       be checked by isshared(), and, if set, causes a
- *                       search for other references to be performed, and
- *                       if none are found, have that bit get cleared.
- *                       -> Only vectors not currently shared can be modified.
- *  - pagedir:           Then act of splitting/merging Ei-level page-vectors
- *                       must account for references, such that newly created
- *                       vectors have refcnt=1, and vectors that go away have
- *                       their refcnt decremented.
- *  - mnode.mn_writable: Get rid of this.
- *                       The idea was to have a list of all of the places
- *                       where writable memory mappings exist, however in
- *                       this new design, the pagedir API is responsible
- *                       to clear all of the WRITABLE-bits as part of the
- *                       call to `pagedir_fork()'. Internally, this search
- *                       can be combined with the incref procedure.
- *  - mpart_split:       Must account for copy-on-write, such that all altered
- *                       nodes will be unshared such that the current behavior
- *                       can be made use of normally.
- *  - exec:              Instead of going through all of the troubles of wanting to
- *                       re-use the old mman by clearing it and its page directory,
- *                       make it so that a new mman is created, which is then
- *                       assigned to main thread of the process that called exec.
- *                       The old mman can then simply be decref'd.
+ * NOTE: The pagedir_fork() idea may be possible to implement,
+ *       but the whole copy-on-write memory-mappings-tree idea
+ *       would be _way_ too complicated, and wouldn't actually
+ *       given us that great of a performance boost, since the
+ *       first time either process does a write, half of their
+ *       shared tree would have to be unshared.
+ *       This is because only unsharing a single node wouldn't
+ *       do, since we always have to unshare all nodes along the
+ *       way to the actual node that we want to modify.
+ *       And then there's the problem of syncing memory access
+ *       to all of the nodes: With shared trees, simply locking
+ *       the memory manager isn't good enough, since there would
+ *       be more than 1 mman involved!
  */
 
 

@@ -28,6 +28,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-sync.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>

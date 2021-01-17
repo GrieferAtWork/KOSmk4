@@ -28,6 +28,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>

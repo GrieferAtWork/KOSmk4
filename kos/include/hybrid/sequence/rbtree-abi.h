@@ -94,6 +94,7 @@ struct my_node {
 /* #define RBTREE_WANT_RREMOVE            (Declare `RBTREE(rremove)', requires !RBTREE_MINKEY_EQ_MAXKEY) */
 /* #define RBTREE_WANT_RLOCATE            (Declare `RBTREE(rlocate)', requires !RBTREE_MINKEY_EQ_MAXKEY) */
 /* #define RBTREE_WANT_TRYINSERT          (Declare `RBTREE(tryinsert)') */
+/* #define RBTREE_OMIT_REMOVE             (Omit    `RBTREE(remove)') */
 /* #define RBTREE_DEBUG                   (Enable internal debug assertions and verification) */
 /* #define RBTREE_NDEBUG                  (Disable internal debug assertions and verification) */
 /* #define RBTREE_LEFT_LEANING            (Define ABI for a left-leaning tree, which doesn't require a parent
@@ -141,11 +142,13 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
                                             RBTREE_T *__restrict node);
 #endif /* RBTREE_WANT_TRYINSERT */
 
+#ifndef RBTREE_OMIT_REMOVE
 /* Remove and return the node node for `key'.
  * @return: RBTREE_NULL: No node exists for the given key. */
 RBTREE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(remove))(RBTREE_T **__restrict proot,
                                          RBTREE_Tkey key);
+#endif /* !RBTREE_OMIT_REMOVE */
 
 #if !defined(RBTREE_MINKEY_EQ_MAXKEY) && defined(RBTREE_WANT_RREMOVE)
 /* Remove and return the node node for `minkey...maxkey'.
@@ -827,7 +830,23 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 /* NORMAL                                                               */
 /************************************************************************/
 
-/* Have `self' swap positions with its max-child. */
+#ifndef RBTREE_REPPAR
+#define RBTREE_REPPAR(self, oldv, newv) RBTREE_SETPAR(self, newv)
+#endif /* !RBTREE_REPPAR */
+
+
+/* Have `self' swap positions with its rhs-child.
+ *
+ *          parent         >>        parent
+ *             |           >>           |
+ *           self          >>          rhs
+ *          /    \         >>         /   \
+ *        BBB     rhs      >>      self    AAA
+ *               /   \     >>     /   \
+ *           newrhs   AAA  >>   BBB    newrhs
+ *
+ * Modified nodes:                     parent, self, rhs
+ * Modified nodes (parent-field only): newrhs */
 __LOCAL __ATTR_NONNULL((1)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotl))(RBTREE_T *__restrict self) {
 	RBTREE_T *rhs, *parent, *newrhs;
@@ -839,7 +858,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotl))(RBTREE_T *__restrict self) {
 	RBTREE_SETLHS(rhs, self);
 	RBTREE_SETPAR(self, rhs);
 	if (newrhs != RBTREE_NULL)
-		RBTREE_SETPAR(newrhs, self);
+		RBTREE_REPPAR(newrhs, rhs, self);
 	if (parent != RBTREE_NULL) {
 		if (self == RBTREE_GETLHS(parent)) {
 			RBTREE_SETLHS(parent, rhs);
@@ -851,7 +870,18 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotl))(RBTREE_T *__restrict self) {
 	RBTREE_SETPAR(rhs, parent);
 }
 
-/* Have `self' swap positions with its min-child. */
+/* Have `self' swap positions with its lhs-child.
+ *
+ *          parent         >>        parent
+ *             |           >>           |
+ *           self          >>          lhs
+ *          /    \         >>         /   \
+ *        lhs     BBB      >>      AAA    self
+ *       /   \             >>            /    \
+ *     AAA    newlhs       >>         newlhs   BBB
+ *
+ * Modified nodes:                     parent, self, lhs
+ * Modified nodes (parent-field only): newlhs */
 __LOCAL __ATTR_NONNULL((1)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotr))(RBTREE_T *__restrict self) {
 	RBTREE_T *lhs, *parent, *newlhs;
@@ -863,7 +893,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotr))(RBTREE_T *__restrict self) {
 	RBTREE_SETRHS(lhs, self);
 	RBTREE_SETPAR(self, lhs);
 	if (newlhs != RBTREE_NULL)
-		RBTREE_SETPAR(newlhs, self);
+		RBTREE_REPPAR(newlhs, lhs, self);
 	if (parent != RBTREE_NULL) {
 		if (self == RBTREE_GETLHS(parent)) {
 			RBTREE_SETLHS(parent, lhs);
@@ -965,7 +995,7 @@ again:
 				if (parent == RBTREE_GETLHS(grandparent)) {
 					(RBTREE(_rotl)(parent));
 					parent      = node;
-					node        = RBTREE_GETLHS(node);
+					node        = RBTREE_GETLHS(parent);
 					grandparent = RBTREE_GETPAR(parent);
 				}
 			} else {
@@ -973,7 +1003,7 @@ again:
 				if (parent == RBTREE_GETRHS(grandparent)) {
 					(RBTREE(_rotr)(parent));
 					parent      = node;
-					node        = RBTREE_GETRHS(node);
+					node        = RBTREE_GETRHS(parent);
 					grandparent = RBTREE_GETPAR(parent);
 				}
 			}
@@ -1097,14 +1127,22 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_replace))(RBTREE_T **__restrict proot,
 	temp = RBTREE_GETLHS(node);
 	RBTREE_SETLHS(repl, temp);
 	if (temp != RBTREE_NULL) {
+#ifdef RBTREE_HASPAR
+		RBTREE_ASSERT(RBTREE_HASPAR(temp, node));
+#else /* RBTREE_HASPAR */
 		RBTREE_ASSERT(RBTREE_GETPAR(temp) == node);
-		RBTREE_SETPAR(temp, repl);
+#endif /* !RBTREE_HASPAR */
+		RBTREE_REPPAR(temp, node, repl);
 	}
 	temp = RBTREE_GETRHS(node);
 	RBTREE_SETRHS(repl, temp);
 	if (temp != RBTREE_NULL) {
+#ifdef RBTREE_HASPAR
+		RBTREE_ASSERT(RBTREE_HASPAR(temp, node));
+#else /* RBTREE_HASPAR */
 		RBTREE_ASSERT(RBTREE_GETPAR(temp) == node);
-		RBTREE_SETPAR(temp, repl);
+#endif /* !RBTREE_HASPAR */
+		RBTREE_REPPAR(temp, node, repl);
 	}
 }
 
@@ -1172,7 +1210,11 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 		lhs = rhs;
 	/* Replace `node' with `lhs' */
 	parent = RBTREE_GETPAR(node);
+#ifdef RBTREE_REPPAR_MAYBE_NULL
+	RBTREE_REPPAR_MAYBE_NULL(lhs, node, parent, proot);
+#else /* RBTREE_REPPAR_MAYBE_NULL */
 	RBTREE_SETPAR(lhs, parent);
+#endif /* !RBTREE_REPPAR_MAYBE_NULL */
 	if (parent == RBTREE_NULL) {
 		/* Special case: Remove the root node. */
 		*proot = lhs;
@@ -1305,6 +1347,7 @@ done:;
 #endif /* !RBTREE_LEFT_LEANING */
 
 
+#ifndef RBTREE_OMIT_REMOVE
 /* Remove and return the node node for `key'.
  * @return: RBTREE_NULL: No node exists for the given key. */
 RBTREE_IMPL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
@@ -1316,6 +1359,8 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(remove))(RBTREE_T **__restrict proot,
 		(RBTREE(removenode)(proot, node));
 	return node;
 }
+#endif /* !RBTREE_OMIT_REMOVE */
+
 
 #if !defined(RBTREE_MINKEY_EQ_MAXKEY) && defined(RBTREE_WANT_RREMOVE)
 /* Remove and return the node node for `minkey...maxkey'.
@@ -1560,3 +1605,4 @@ __DECL_END
 #undef RBTREE_WANT_RREMOVE
 #undef RBTREE_WANT_RLOCATE
 #undef RBTREE_WANT_TRYINSERT
+#undef RBTREE_OMIT_REMOVE

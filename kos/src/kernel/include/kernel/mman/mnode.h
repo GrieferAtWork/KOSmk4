@@ -87,8 +87,8 @@
                                   *  - mn_part->mp_flags & MPART_F_NO_GLOBAL_REF
                                   *  - MPART_ST_INMEM(mn_part->mp_state) */
 #define MNODE_F_MLOCK     0x2000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
-#define MNODE_F__RBRED    0x4000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
-#define _MNODE_F_MPREFLT  0x8000 /* Only used by `mbuilder' to implement `MAP_POPULATE' */
+/*efine MNODE_F_          0x4000  * ... */
+#define MNODE_F__RBRED    0x8000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
 
 #ifdef __CC__
 DECL_BEGIN

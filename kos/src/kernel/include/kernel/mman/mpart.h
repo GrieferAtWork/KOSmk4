@@ -81,8 +81,8 @@
                                        * or has its MNODE_F_MLOCK flag cleared, all mappings of the mem-part are scanned
                                        * in search for other locked mappings. If any are found, then this flag will remain
                                        * set. If none are found, then this flag is cleared. */
-#define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
-/*efine MPART_F_               0x8000  * ... */
+/*efine MPART_F_               0x4000  * ... */
+#define MPART_F__RBRED         0x8000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
 
 
 /* Possible values for `struct mpart::mp_state' */
@@ -112,11 +112,17 @@ struct aio_pbuffer;
 #define __mnode_list_defined 1
 LIST_HEAD(mnode_list, mnode);
 #endif /* !__mnode_list_defined */
+
+#ifndef __mpart_list_defined
+#define __mpart_list_defined 1
 LIST_HEAD(mpart_list, mpart);
+#endif /* !__mpart_list_defined */
+
 #ifndef __mnode_slist_defined
 #define __mnode_slist_defined 1
 SLIST_HEAD(mnode_slist, mnode);
 #endif /* !__mnode_slist_defined */
+
 #ifndef __mpart_slist_defined
 #define __mpart_slist_defined 1
 SLIST_HEAD(mpart_slist, mpart);
