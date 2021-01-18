@@ -1814,14 +1814,41 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 
 
 
-/* The combination of `mpart_lock_acquire_and_setcore_loadall()'
- * and `mpart_lock_acquire_and_setcore_unsharecow()' */
+/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
+ * and `mpart_lock_acquire_and_setcore_loadall()' */
 PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_unsharecow_loadall(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	do {
 		mpart_lock_acquire_and_setcore_unsharecow(self);
 	} while (!mpart_loadall_or_unlock(self, NULL));
+}
+
+/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
+ * and `mpart_lock_acquire_and_setcore_loadsome()' */
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
+mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self,
+                                                   mpart_reladdr_t partrel_offset,
+                                                   size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	mpart_reladdr_t endaddr;
+again:
+	mpart_lock_acquire_and_setcore_unsharecow(self);
+	if (OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) ||
+	    endaddr > mpart_getsize(self)) {
+		/* Out-of-bounds... */
+		mpart_lock_release_f(self);
+		return false;
+	}
+	TRY {
+		/* Ensure that the given range has been loaded. */
+		if (!mpart_loadsome_or_unlock(self, NULL, partrel_offset, num_bytes))
+			goto again;
+	} EXCEPT {
+		mpart_deadnodes_reap(self);
+		RETHROW();
+	}
+	return true;
 }
 
 

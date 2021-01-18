@@ -91,7 +91,7 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
 
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
  * @param: prange:      A callback that is invoked for each affected physical memory range
- *                      Should this callback return `false', enumeration will half and the
+ *                      Should this callback return `false', enumeration will halt and the
  *                      function will return the number of previously successfully enumerated
  *                      DMA bytes.
  * @param: cookie:      Cookie-argument passed to `prange' upon execution.

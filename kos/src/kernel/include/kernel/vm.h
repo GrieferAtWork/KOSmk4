@@ -354,8 +354,10 @@ DECL_END
 #define vm_dmalock                      mdmalock
 #define dl_part                         mdl_part
 #define vm_dmalock_release(...)         mman_dmalock_release(__VA_ARGS__)
-#define vm_startdma(...)                mman_startdma(__VA_ARGS__)
-#define vm_startdmav(...)               mman_startdmav(__VA_ARGS__)
+#define vm_startdma(effective_vm, prange, preset, arg, lockvec, lockcnt, vaddr, num_bytes, for_writing) \
+	mman_startdma(effective_vm, prange, arg, lockvec, lockcnt, vaddr, num_bytes, for_writing)
+#define vm_startdmav(effective_vm, prange, preset, arg, lockvec, lockcnt, vaddr_buf, for_writing) \
+	mman_startdmav(effective_vm, prange, arg, lockvec, lockcnt, vaddr_buf, for_writing)
 #define vm_enumdma(...)                 mman_enumdma(__VA_ARGS__)
 #define vm_enumdmav(...)                mman_enumdmav(__VA_ARGS__)
 #define vm_stopdma(...)                 mman_stopdma(__VA_ARGS__)

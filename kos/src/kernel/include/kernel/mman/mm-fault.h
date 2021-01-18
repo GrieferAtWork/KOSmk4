@@ -147,7 +147,7 @@ struct mfault {
 	 * >>         // NOTE: Splitting is skipped if `mfl_part' contains no copy-on-write mappings!
 	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
 	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));
-	 * >>         mpart_lock_acquire_and_setcore_loadall_unsharecow(mfl_part);
+	 * >>         mpart_lock_acquire_and_setcore_unsharecow_loadall(mfl_part);
 	 * >>     } else if (LIST_EMPTY(&mfl_part->mp_share) &&
 	 * >>                LIST_FIRST(&mfl_part->mp_copy) == mfl_node &&
 	 * >>                LIST_NEXT(mfl_node, mn_link) == NULL &&

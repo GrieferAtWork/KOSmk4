@@ -518,10 +518,18 @@ FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* The combination of `mpart_lock_acquire_and_setcore_loadall()'
- * and `mpart_lock_acquire_and_setcore_unsharecow()' */
+/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
+ * and `mpart_lock_acquire_and_setcore_loadall()' */
 FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_loadall_unsharecow(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_unsharecow_loadall(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
+ * and `mpart_lock_acquire_and_setcore_loadsome()' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self,
+                                                   mpart_reladdr_t partrel_offset,
+                                                   size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
@@ -702,7 +710,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 /* Directly return physical backing memory containing the byte `partrel_offset',
  * without looking at the associated block-state at all. The caller is responsible
  * to ensure that `MPART_ST_INMEM(self->mp_state)' before calling this function.
- * NOTE: The caller must be holding a lock to `self'
+ * NOTE: The caller must be holding a lock to `self' (which is allowed to be a DMA lock)
  * NOTE: This function may also assume that at least the first byte (that
  *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */

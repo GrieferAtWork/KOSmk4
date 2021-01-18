@@ -76,7 +76,7 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
 #elif defined(DEFINE_mman_enumdma)
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
  * @param: prange:      A callback that is invoked for each affected physical memory range
- *                      Should this callback return `false', enumeration will half and the
+ *                      Should this callback return `false', enumeration will halt and the
  *                      function will return the number of previously successfully enumerated
  *                      DMA bytes.
  * @param: cookie:      Cookie-argument passed to `prange' upon execution.
@@ -114,14 +114,8 @@ mman_enumdmav(struct mman *__restrict self,
 #ifdef LOCAL_IS_VECTOR
 	struct aio_buffer_entry _addrv_ent;
 #endif /* LOCAL_IS_VECTOR */
-#ifdef LOCAL_IS_ENUM
-#define LOCAL_mman_stopdma_opt(vec, count) (void)0
-#else /* LOCAL_IS_ENUM */
-#define LOCAL_mman_stopdma_opt(vec, count) mman_stopdma(vec, count)
-again:
-#endif /* !LOCAL_IS_ENUM */
-	size_t result;
-	result = 0;
+	size_t result = 0;
+
 #ifdef LOCAL_IS_VECTOR
 	AIO_BUFFER_FOREACH(_addrv_ent, addr_v)
 #define addr      _addrv_ent.ab_base
@@ -136,6 +130,9 @@ again:
 		/* Lookup the node at the given address */
 again_lookup_part:
 		mman_lock_acquire(self);
+#ifndef LOCAL_IS_ENUM
+again_lookup_part_locked:
+#endif /* !LOCAL_IS_ENUM */
 		node = mnode_tree_locate(self->mm_mappings, addr);
 		if unlikely(!node)
 			goto err_release_and_unmapped; /* No mapping at all */
@@ -143,15 +140,32 @@ again_lookup_part:
 		if unlikely(!part)
 			goto err_release_and_unmapped; /* Reserved mapping */
 
-		/* Figure out the part-relative address
-		 * range that is being enumerated. */
+		/* Figure out the part-relative address range that is being enumerated. */
 		partrel_addr = node->mn_partoff + (size_t)((byte_t const *)addr - (byte_t const *)mnode_getaddr(node));
 		partrel_size = (size_t)((byte_t const *)mnode_getendaddr(node) - (byte_t const *)addr);
+		if (partrel_size > num_bytes)
+			partrel_size = num_bytes;
+
+#ifndef LOCAL_IS_ENUM
+		if (result >= lockcnt) {
+			if (result == lockcnt)
+				mman_stopdma(lockvec, lockcnt); /* Release already acquired locks. */
+			addr = (byte_t *)addr + partrel_size;
+			num_bytes -= partrel_size;
+			++result;
+			goto again_lookup_part_locked;
+		}
+#endif /* !LOCAL_IS_ENUM */
 
 		/* Keep a reference to the part so we can unlock the mman. */
 		incref(part);
 		mman_lock_release(self);
 		TRY {
+			size_t enum_size;
+#ifdef LOCAL_IS_ENUM
+			struct mdmalock dma_lock;
+#endif /* LOCAL_IS_ENUM */
+
 			/* Ensure that all blocks that overlap with the given address
 			 * range have their state set to `MPART_BLOCK_ST_LOAD' for
 			 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
@@ -167,8 +181,12 @@ again_lookup_part:
 			 *      require a re-write of `AtaAIOHandleData' or an increase
 			 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'... */
 again_lock_part:
-			if (!mpart_lock_acquire_and_setcore_loadsome(part, partrel_addr, partrel_size))
-				goto again_lookup_part; /* Deal with the case where the part was truncated. */
+			if (for_writing ? !mpart_lock_acquire_and_setcore_unsharecow_loadsome(part, partrel_addr, partrel_size)
+			                : !mpart_lock_acquire_and_setcore_loadsome(part, partrel_addr, partrel_size)) {
+				/* Deal with the case where the part was truncated. */
+				decref_unlikely(part);
+				goto again_lookup_part;
+			}
 
 			/* Ensure that `part->mp_meta' has been allocated */
 			if (!mpart_hasmeta_or_unlock(part, NULL))
@@ -183,11 +201,40 @@ again_lock_part:
 			mpart_lock_release(part);
 
 #ifndef LOCAL_IS_ENUM
-			/* TODO: Append `part' to the given list of DMA locks. (inherit reference here) */
+			/* Append `part' to the given list of DMA locks. */
+			lockvec[result].mdl_part = part; /* Inherit reference */
+			++result;
+#define LOCAL_dma_lock (&lockvec[result - 1])
+#else /* !LOCAL_IS_ENUM */
+			dma_lock.mdl_part = part;
+#define LOCAL_dma_lock (&dma_lock)
 #endif /* !LOCAL_IS_ENUM */
 
-			/* TODO: Invoke `prange' (through use of `mpart_memaddr_direct()') */
+			/* Invoke `prange' (through use of `mpart_memaddr_direct()') */
+			enum_size = partrel_size;
+			for (;;) {
+				struct mpart_physloc pl;
+				bool ok;
+				mpart_memaddr_direct(part, partrel_addr, &pl);
+				if (pl.mppl_size > enum_size)
+					pl.mppl_size = enum_size;
+				ok = (*prange)(cookie, pl.mppl_addr, pl.mppl_size, LOCAL_dma_lock);
+				if (!ok) {
+#ifdef LOCAL_IS_ENUM
+					decref_unlikely(part);
+#endif /* LOCAL_IS_ENUM */
+					goto err_unmapped;
+				}
+#ifdef LOCAL_IS_ENUM
+				result += pl.mppl_size;
+#endif /* LOCAL_IS_ENUM */
+				if (pl.mppl_size >= enum_size)
+					break;
+				partrel_addr += pl.mppl_size;
+				enum_size -= pl.mppl_size;
+			}
 
+#undef LOCAL_dma_lock
 		} EXCEPT {
 			decref_unlikely(part);
 			RETHROW();
@@ -207,9 +254,12 @@ again_lock_part:
 	return result;
 err_release_and_unmapped:
 	mman_lock_release(self);
-	LOCAL_mman_stopdma_opt(lockvec, MIN(result, lockcnt));
+err_unmapped:
+#ifndef LOCAL_IS_ENUM
+	if (result <= lockcnt)
+		mman_stopdma(lockvec, result);
+#endif /* !LOCAL_IS_ENUM */
 	return 0;
-#undef LOCAL_mman_stopdma_opt
 }
 
 #undef LOCAL_IS_VECTOR
