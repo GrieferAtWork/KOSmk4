@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59105a5b */
+/* HASH CRC-32:0x265ea59a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,11 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_strtol_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_strtol_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -82,11 +86,13 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG_LONG__ == 4
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #include <libc/local/stdlib/strto64_l.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoll_l (*(__LONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __locale_t))&__LIBC_LOCAL_NAME(strto64_l))
 #elif __SIZEOF_LONG_LONG__ == 8
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #include <libc/local/stdlib/strto32_l.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoll_l (*(__LONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __locale_t))&__LIBC_LOCAL_NAME(strto32_l))
@@ -95,6 +101,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtoll_l.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoll_l __LIBC_LOCAL_NAME(strtoll_l)
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_strtoll_l_defined */
 __LOCAL_LIBC(_atoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG

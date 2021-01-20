@@ -2661,4 +2661,3 @@ __SYSDECL_END
 #undef libc___libc_current_sigrtmin
 #undef libc___libc_current_sigrtmax
 }
-

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x334ffde6 */
+/* HASH CRC-32:0xdd86e061 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,8 +38,8 @@
 #include <bits/types.h>
 #include <bits/os/ptrace.h> /* `struct __ptrace_peeksiginfo_args' */
 
-__SYSDECL_BEGIN
 
+__SYSDECL_BEGIN
 
 #if (defined(__PTRACE_TRACEME) || defined(__PTRACE_PEEKTEXT) ||       \
      defined(__PTRACE_PEEKDATA) || defined(__PTRACE_PEEKUSER) ||      \

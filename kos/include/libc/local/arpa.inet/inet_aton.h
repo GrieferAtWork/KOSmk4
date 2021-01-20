@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74808f30 */
+/* HASH CRC-32:0x1bf68bda */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inet_paton_defined
 #define __local___localdep_inet_paton_defined 1
 #ifdef __CRT_HAVE_inet_paton
-/* Same as `inet_aton()', but update `*pcp' to point past the address
+/* >> inet_paton(3)
+ * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -45,7 +46,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_i
 __NAMESPACE_LOCAL_END
 #include <libc/local/arpa.inet/inet_paton.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `inet_aton()', but update `*pcp' to point past the address
+/* >> inet_paton(3)
+ * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -61,7 +63,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_inet_paton __LIBC_LOCAL_NAME(inet_paton)
 #endif /* !__CRT_HAVE_inet_paton */
 #endif /* !__local___localdep_inet_paton_defined */
-/* Convert an Internet host address `CP' from its numbers-and-dots
+/* >> inet_aton(3)
+ * Convert an Internet host address `CP' from its numbers-and-dots
  * notational form into its binary representation in network byte
  * order. The result is then stored in `*INP'
  * Accepted notations are:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a78de4c */
+/* HASH CRC-32:0xc99a697b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@
 #ifndef _UCHAR_H
 #include <uchar.h>
 #endif /* !_UCHAR_H */
+
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_wcstoimax) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
@@ -436,8 +436,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32toumax_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* __USE_XOPEN2K8 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_UCHAR_INTTYPES_H */

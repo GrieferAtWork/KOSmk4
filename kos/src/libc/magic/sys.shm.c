@@ -33,12 +33,17 @@
 %[define_replacement(key_t = __key_t)]
 %[default:section(".text.crt{|.dos}.utility.shm")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/shm.h>
+)]%[insert:prefix(
 #include <asm/pagesize.h> /* __ARCH_PAGESIZE */
+)]%[insert:prefix(
 #include <bits/os/shm.h>
+)]%{
 #include <sys/ipc.h> /* [n4217.pdf:12556] #include mandated by POSIX */
 
 /* Permission flag for use with `shmget()'. */

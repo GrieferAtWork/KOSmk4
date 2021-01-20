@@ -29,14 +29,18 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.system.info")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <linux/kernel.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 }
 
 [[cp, decl_include("<linux/sysinfo.h>")]]
@@ -56,8 +60,7 @@ $intptr_t get_avphys_pages();
 
 
 %{
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

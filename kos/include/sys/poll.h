@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x894801a6 */
+/* HASH CRC-32:0x67506a4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@
 #include <bits/os/timespec.h>
 #endif /* __USE_GNU */
 
-__SYSDECL_BEGIN
+
 
 /* Flags for `struct pollfd::events' */
 #if !defined(POLLIN) && defined(__POLLIN)
@@ -123,6 +123,8 @@ __SYSDECL_BEGIN
 #endif /* __USE_BSD */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 #ifndef __nfds_t_defined
 #define __nfds_t_defined 1
 typedef __UINTPTR_TYPE__ nfds_t;
@@ -156,8 +158,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ppoll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_POLL_H */

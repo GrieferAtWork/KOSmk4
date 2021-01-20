@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x637eb3e1 */
+/* HASH CRC-32:0xa2dc2705 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,8 @@
 #include <parts/wchar/process.h>
 #endif /* !_PARTS_WCHAR_PROCESS_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -369,8 +368,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t con
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),(__path))
 #endif /* ... */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_WCHAR_UNISTD_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54227585 */
+/* HASH CRC-32:0xac6b25ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_srand_defined 1
 #ifdef __CRT_HAVE_srand
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srand,(__seed))
-#elif defined(__CRT_HAVE_srandom) && __SIZEOF_INT__ == __SIZEOF_LONG__
+#else /* __CRT_HAVE_srand */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_srandom) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srandom,(__seed))
-#else /* ... */
+#else /* __CRT_HAVE_srandom && __SIZEOF_INT__ == __SIZEOF_LONG__ */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/srand.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_srand __LIBC_LOCAL_NAME(srand)
-#endif /* !... */
+#endif /* !__CRT_HAVE_srandom || __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#endif /* !__CRT_HAVE_srand */
 #endif /* !__local___localdep_srand_defined */
 __LOCAL_LIBC(srandom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(srandom))(unsigned int __seed) {

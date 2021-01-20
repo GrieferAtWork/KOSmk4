@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fe6cff6 */
+/* HASH CRC-32:0x28b4c316 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Convert an `ARGZ' string into a NUL-terminated c-string
+/* >> argz_stringify(3)
+ * Convert an `ARGZ' string into a NUL-terminated c-string
  * with a total `strlen(argz) == len - 1', by replacing all
  * of the NUL-characters separating the individual ARGZ strings
  * with `SEP'. */

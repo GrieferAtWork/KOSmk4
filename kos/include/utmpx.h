@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6894e53 */
+/* HASH CRC-32:0xfa5fdb7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,27 +41,9 @@
 
 #include <bits/crt/db/utmpx.h>
 #include <bits/types.h>
+
 #include <sys/time.h>
 
-/* Documentation taken from Glibc /usr/include/utmp.h */
-/* Copyright (C) 1993-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 /* Compatibility names for the strings of the canonical file names.  */
@@ -72,6 +54,7 @@ __SYSDECL_BEGIN
 #endif /* __USE_GNU */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 struct utmp;
@@ -82,35 +65,32 @@ struct utmp;
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 
-/* Open user accounting database */
+/* >> setutxent(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setutxent,(void),())
-/* Close user accounting database */
+/* >> endutxent(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endutxent,(void),())
-/* Get the next entry from the user accounting database */
+/* >> getutxent(3) */
 __CDECLARE_OPT(,struct utmpx *,__NOTHROW_RPC,getutxent,(void),())
-/* Get the user accounting database entry corresponding to ID */
+/* >> getutxid(3) */
 __CDECLARE_OPT(,struct utmpx *,__NOTHROW_RPC,getutxid,(struct utmpx const *__id),(__id))
-/* Get the user accounting database entry corresponding to LINE */
+/* >> getutxline(3) */
 __CDECLARE_OPT(,struct utmpx *,__NOTHROW_RPC,getutxline,(struct utmpx const *__line),(__line))
-/* Write the entry UTMPX into the user accounting database */
+/* >> pututxline(3) */
 __CDECLARE_OPT(,struct utmpx *,__NOTHROW_RPC,pututxline,(struct utmpx const *__utmpx),(__utmpx))
 
 #ifdef __USE_GNU
-/* Change name of the utmpx file to be examined.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> utmpxname(3) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,utmpxname,(char const *__file),(__file))
-/* Append entry UTMP to the wtmpx-like file WTMPX_FILE.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> updwtmpx(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,updwtmpx,(char const *__wtmpx_file, struct utmpx const *__utmpx),(__wtmpx_file,__utmpx))
-/* Copy the information in UTMPX to UTMP.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> getutmp(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,getutmp,(struct utmpx const *__utmpx, struct utmp *__utmp),(__utmpx,__utmp))
-/* Copy the information in UTMP to UTMPX.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> getutmpx(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,getutmpx,(struct utmp const *__utmp, struct utmpx *__utmpx),(__utmp,__utmpx))
 #endif /* __USE_GNU */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_UTMPX_H */

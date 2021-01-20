@@ -36,18 +36,22 @@
 %[define_replacement(idtype_t = int)]
 %[default:section(".text.crt{|.dos}.sched.wait")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/wait.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <parts/waitmacros.h>
+)]%{
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <bits/os/siginfo.h> /* `struct __siginfo_struct' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
-__SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #if !defined(WCOREFLAG) && defined(__WCOREFLAG)
@@ -73,6 +77,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __siginfo_t_defined
@@ -329,8 +334,7 @@ int detach($pid_t pid);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

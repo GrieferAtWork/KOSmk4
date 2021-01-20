@@ -30,9 +30,11 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <asm/os/ulimit.h>
+)]%{
 
 __SYSDECL_BEGIN
 

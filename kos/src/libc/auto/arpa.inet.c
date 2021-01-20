@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24aff87f */
+/* HASH CRC-32:0xc11d3a15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Return the network-number-part of the Internet address `INADDR' */
+/* >> inet_netof(3)
+ * Return the network-number-part of the Internet address `INADDR' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
@@ -47,7 +48,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Return the local-host-address-part of the Internet address `INADDR' */
+/* >> inet_lnaof(3)
+ * Return the local-host-address-part of the Internet address `INADDR' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
@@ -61,7 +63,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Construct an Internet-host-address in network byte order from
+/* >> inet_makeaddr(3)
+ * Construct an Internet-host-address in network byte order from
  * the combination of its network (`net'), and host (`host') number.
  * The `net' and `host' arguments can later be re-extracted by use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
@@ -83,7 +86,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
 	return result;
 }
 #include <netinet/in.h>
-/* Convert an Internet host address `CP' from its numbers-and-dots
+/* >> inet_addr(3)
+ * Convert an Internet host address `CP' from its numbers-and-dots
  * notational form into its binary representation in network byte order
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
@@ -101,7 +105,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 		return INADDR_NONE;
 	return addr.s_addr;
 }
-/* Return the conventional numbers-and-dots representation of a
+/* >> inet_ntoa(3)
+ * Return the conventional numbers-and-dots representation of a
  * given Internet host address `inaddr'. The returned pointer is
  * apart of a static buffer and may change in subsequence (or parallel)
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
@@ -112,7 +117,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Re-entrant version of `inet_ntoa()' */
+/* >> inet_ntoa_r(3)
+ * Re-entrant version of `inet_ntoa()' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
                                        char buf[16]) {
@@ -126,7 +132,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* This function is the same as `inet_addr()', except that
+/* >> inet_network(3)
+ * This function is the same as `inet_addr()', except that
  * the return value is in host-endian, rather than net-endian */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
@@ -135,7 +142,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 		return INADDR_NONE;
 	return addr.s_addr;
 }
-/* Convert an Internet host address `CP' from its numbers-and-dots
+/* >> inet_aton(3)
+ * Convert an Internet host address `CP' from its numbers-and-dots
  * notational form into its binary representation in network byte
  * order. The result is then stored in `*INP'
  * Accepted notations are:
@@ -155,7 +163,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
 	return libc_inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 #include <hybrid/__byteswap.h>
-/* Same as `inet_aton()', but update `*pcp' to point past the address
+/* >> inet_paton(3)
+ * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -313,7 +322,8 @@ err:
 	return 0;
 }
 #include <libc/errno.h>
-/* Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
+/* >> inet_neta(3)
+ * Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
  *     0.0.0.0      For net = 0
  *     %u           For net <= 255
  *     %u.%u        For net <= 65535

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3c4fbd3 */
+/* HASH CRC-32:0x57591fa7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,8 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_mbtowc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(,int,__NOTHROW_NCX,mbtoc16,(char16_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
@@ -129,8 +128,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIB
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32stombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL c32stombs)(char *__restrict __dst, char32_t const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stombs))(__dst, __src, __dstlen); })
 #endif /* !... */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_UCHAR_STDLIB_H */

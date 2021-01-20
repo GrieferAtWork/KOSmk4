@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3c23b05 */
+/* HASH CRC-32:0x56cbab81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+/* >> argz_replace(3)
+ * Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
  * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
  * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
  * @return: 0:      Success

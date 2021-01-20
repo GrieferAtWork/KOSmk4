@@ -364,8 +364,7 @@ for (local f: funcs) {
 
 }
 
-%{
-}%[insert:prefix(
+%[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
 #include <bits/types.h>
@@ -1590,10 +1589,10 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 
 [[decl_include("<features.h>")]]
 [[guard, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)), crt_intern_kos_alias(libc_ffsl)]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ffsl")]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)), crt_intern_kos_alias(libc_ffsl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ffsl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
 [[impl_include("<hybrid/__bit.h>"), export_alias("__ffs")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFS))]]
 __STDC_INT_AS_UINT_T ffs(int i) {
@@ -1616,9 +1615,9 @@ __STDC_INT_AS_UINT_T ffs(int i) {
 %#ifdef __USE_GNU
 [[decl_include("<features.h>")]]
 [[wunused, nothrow, ATTR_CONST, crtbuiltin]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("ffs")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("ffs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSL))]]
 __STDC_INT_AS_UINT_T ffsl(long i) {
@@ -1628,8 +1627,8 @@ __STDC_INT_AS_UINT_T ffsl(long i) {
 [[decl_include("<features.h>")]]
 [[wunused, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("ffs")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("ffs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSLL))]]
 __STDC_INT_AS_UINT_T ffsll(__LONGLONG i) {
 	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)i);
@@ -1713,12 +1712,12 @@ mempcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
 
 @@Copy memory between non-overlapping memory blocks.
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcpy")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcpy")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemcpy")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemcpy")]]
 [[if_fast_defined(memcpyw), preferred_fast_extern_inline("memcpyw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
-[[if_fast_defined(memcpyw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(memcpyw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
 [[if_fast_defined(memcpyw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
 [[if_fast_defined(memcpyw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYW))]]
@@ -1735,12 +1734,12 @@ memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 @@Same as `memcpyw', but return `DST + N_WORDS', rather than `DST'
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempcpy")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmempcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempcpy")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmempcpy")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmempcpy")]]
 [[if_fast_defined(mempcpyw), preferred_fast_extern_inline("mempcpyw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
-[[if_fast_defined(mempcpyw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempcpyw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempcpyw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempcpyw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYW))]]
@@ -1752,11 +1751,11 @@ mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 @@Copy memory between non-overlapping memory blocks.
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcpy")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcpy")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemcpy")]]
 [[if_fast_defined(memcpyl), preferred_fast_extern_inline("memcpyl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
-[[if_fast_defined(memcpyl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memcpyl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memcpyl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memcpyl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYL))]]
@@ -1772,11 +1771,11 @@ memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 @@Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST'
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempcpy")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmempcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempcpy")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmempcpy")]]
 [[if_fast_defined(mempcpyl), preferred_fast_extern_inline("mempcpyl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
-[[if_fast_defined(mempcpyl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempcpyl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempcpyl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempcpyl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYL))]]
@@ -1805,12 +1804,12 @@ mempmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks.
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemmove")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemmove")]]
 [[if_fast_defined(memmovew), preferred_fast_extern_inline("memmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
-[[if_fast_defined(memmovew), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovew), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovew), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovew), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEW))]]
@@ -1835,12 +1834,12 @@ memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST'
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmempmove")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmempmove")]]
 [[if_fast_defined(mempmovew), preferred_fast_extern_inline("mempmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
-[[if_fast_defined(mempmovew), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovew), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmovew), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmovew), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEW))]]
@@ -1852,11 +1851,11 @@ mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks.
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemmove")]]
 [[if_fast_defined(memmovel), preferred_fast_extern_inline("memmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
-[[if_fast_defined(memmovel), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovel), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovel), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovel), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEL))]]
@@ -1881,11 +1880,11 @@ memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST'
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmempmove")]]
 [[if_fast_defined(mempmovel), preferred_fast_extern_inline("mempmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
-[[if_fast_defined(mempmovel), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovel), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmovel), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmovel), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEL))]]
@@ -1930,11 +1929,11 @@ mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmovew"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
 [[if_fast_defined(memmoveupw), preferred_fast_extern_inline("memmoveupw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmoveupw), preferred_fast_extern_inline("memmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
-[[if_fast_defined(memmoveupw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmoveupw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmoveupw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmoveupw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[impl_include("<hybrid/__assert.h>")]]
@@ -1954,11 +1953,11 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmovew"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
 [[if_fast_defined(memmovedownw), preferred_fast_extern_inline("memmovedownw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovedownw), preferred_fast_extern_inline("memmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
-[[if_fast_defined(memmovedownw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovedownw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovedownw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovedownw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[impl_include("<hybrid/__assert.h>")]]
@@ -1978,11 +1977,11 @@ memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
 [[libc, kernel, ATTR_LEAF, alias("mempmovew"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
 [[if_fast_defined(mempmoveupw), preferred_fast_extern_inline("mempmoveupw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmoveupw), preferred_fast_extern_inline("mempmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
-[[if_fast_defined(mempmoveupw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmoveupw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmoveupw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmoveupw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPW))]]
@@ -1994,11 +1993,11 @@ mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
 [[libc, kernel, ATTR_LEAF, alias("mempmovew"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
 [[if_fast_defined(mempmovedownw), preferred_fast_extern_inline("mempmovedownw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmovedownw), preferred_fast_extern_inline("mempmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
-[[if_fast_defined(mempmovedownw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovedownw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmovedownw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(mempmovedownw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNW))]]
@@ -2010,11 +2009,11 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmovel"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[if_fast_defined(memmoveupl), preferred_fast_extern_inline("memmoveupl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmoveupl), preferred_fast_extern_inline("memmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
-[[if_fast_defined(memmoveupl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmoveupl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmoveupl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmoveupl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[impl_include("<hybrid/__assert.h>")]]
@@ -2034,11 +2033,11 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmovel"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[if_fast_defined(memmovedownl), preferred_fast_extern_inline("memmovedownl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovedownl), preferred_fast_extern_inline("memmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
-[[if_fast_defined(memmovedownl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovedownl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovedownl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovedownl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[impl_include("<hybrid/__assert.h>")]]
@@ -2058,11 +2057,11 @@ memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
 [[libc, kernel, ATTR_LEAF, alias("mempmovel"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[if_fast_defined(mempmoveupl), preferred_fast_extern_inline("mempmoveupl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmoveupl), preferred_fast_extern_inline("mempmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
-[[if_fast_defined(mempmoveupl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmoveupl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmoveupl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmoveupl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPL))]]
@@ -2074,11 +2073,11 @@ mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
 [[libc, kernel, ATTR_LEAF, alias("mempmovel"), decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[if_fast_defined(mempmovedownl), preferred_fast_extern_inline("mempmovedownl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmovedownl), preferred_fast_extern_inline("mempmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
-[[if_fast_defined(mempmovedownl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovedownl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmovedownl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(mempmovedownl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNL))]]
@@ -2107,12 +2106,12 @@ mempsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
 
 @@Fill memory with a given word
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemset")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemset")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemset")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemset")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemset")]]
 [[if_fast_defined(memsetw), preferred_fast_extern_inline("memsetw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
-[[if_fast_defined(memsetw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(memsetw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
 [[if_fast_defined(memsetw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
 [[if_fast_defined(memsetw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETW))]]
@@ -2127,12 +2126,12 @@ memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 @@Same as `memsetw', but return `DST + N_WORDS', rather than `DST'
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempset")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmempset")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempset")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmempset")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmempset")]]
 [[if_fast_defined(mempsetw), preferred_fast_extern_inline("mempsetw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
-[[if_fast_defined(mempsetw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(mempsetw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
 [[if_fast_defined(mempsetw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
 [[if_fast_defined(mempsetw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETW))]]
@@ -2143,11 +2142,11 @@ mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 @@Fill memory with a given dword
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemset")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemset")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemset")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemset")]]
 [[if_fast_defined(memsetl), preferred_fast_extern_inline("memsetl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
-[[if_fast_defined(memsetl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(memsetl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
 [[if_fast_defined(memsetl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
 [[if_fast_defined(memsetl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETL))]]
@@ -2161,11 +2160,11 @@ memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 @@Same as `memsetl', but return `DST + N_DWORDS', rather than `DST'
 [[libc, kernel, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempset")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmempset")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempset")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmempset")]]
 [[if_fast_defined(mempsetl), preferred_fast_extern_inline("mempsetl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
-[[if_fast_defined(mempsetl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(mempsetl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
 [[if_fast_defined(mempsetl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
 [[if_fast_defined(mempsetl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETL))]]
@@ -2183,12 +2182,12 @@ int memcmpb([[nonnull]] /*aligned(1)*/ void const *s1,
 
 @@Compare memory buffers and return the difference of the first non-matching word
 [[libc, kernel, wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcmp")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemcmp")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemcmp")]]
 [[if_fast_defined(memcmpw), preferred_fast_extern_inline("memcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
-[[if_fast_defined(memcmpw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
 [[if_fast_defined(memcmpw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
 [[if_fast_defined(memcmpw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPW))]]
@@ -2204,11 +2203,11 @@ $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
 
 @@Compare memory buffers and return the difference of the first non-matching dword
 [[libc, kernel, wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcmp")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemcmp")]]
 [[if_fast_defined(memcmpl), preferred_fast_extern_inline("memcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
-[[if_fast_defined(memcmpl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
 [[if_fast_defined(memcmpl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
 [[if_fast_defined(memcmpl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPL))]]
@@ -2233,12 +2232,12 @@ $uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, in
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[libc, kernel, wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemchr")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemchr")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemchr")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemchr")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemchr")]]
 [[if_fast_defined(memchrw), preferred_fast_extern_inline("memchrw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
-[[if_fast_defined(memchrw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
+[[if_fast_defined(memchrw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
 [[if_fast_defined(memchrw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
 [[if_fast_defined(memchrw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRW))]]
@@ -2256,11 +2255,11 @@ $uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[libc, kernel, wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemchr")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemchr")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemchr")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemchr")]]
 [[if_fast_defined(memchrl), preferred_fast_extern_inline("memchrl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
-[[if_fast_defined(memchrl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
+[[if_fast_defined(memchrl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
 [[if_fast_defined(memchrl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
 [[if_fast_defined(memchrl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRL))]]
@@ -5842,7 +5841,7 @@ $size_t fuzzy_memcmpb([[nonnull]] void const *s1, $size_t s1_bytes,
                       [[nonnull]] void const *s2, $size_t s2_bytes) = fuzzy_memcmp;
 
 [[wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_wmemcmp")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$fuzzy_wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$fuzzy_wmemcmp")]]
 [[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$fuzzy_wmemcmp")]]
@@ -5906,7 +5905,7 @@ $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wunused, pure, requires_include("<parts/malloca.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_wmemcmp")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$fuzzy_wmemcmp")]]
 [[export_as("fuzzy_wmemcmp"), requires(!defined(__NO_MALLOCA))]]
 $size_t fuzzy_memcmpl([[nonnull]] void const *s1, $size_t s1_dwords,
@@ -7187,5 +7186,3 @@ __SYSDECL_END
 // 	}
 // 	return memcpyq(dst, src, n_qwords);
 // }
-
-

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde05583e */
+/* HASH CRC-32:0x6d8df171 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,9 +80,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Creates a new mutex object with type TYPE.
- * If successful the new object is pointed by MUTEX
- * s.a. `pthread_mutex_init()' */
+/* >> mtx_init(3)
+ * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(mtx_init) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type) {
 	__errno_t __error;

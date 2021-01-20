@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x820c276 */
+/* HASH CRC-32:0x8c2778bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,29 +31,25 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Open user accounting database */
+/* >> setutxent(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setutxent)(void);
-/* Close user accounting database */
+/* >> endutxent(3) */
 INTDEF void NOTHROW_RPC_NOKOS(LIBCCALL libc_endutxent)(void);
-/* Get the next entry from the user accounting database */
+/* >> getutxent(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBCCALL libc_getutxent)(void);
-/* Get the user accounting database entry corresponding to ID */
+/* >> getutxid(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id);
-/* Get the user accounting database entry corresponding to LINE */
+/* >> getutxline(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line);
-/* Write the entry UTMPX into the user accounting database */
+/* >> pututxline(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx);
-/* Change name of the utmpx file to be examined.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> utmpxname(3) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file);
-/* Append entry UTMP to the wtmpx-like file WTMPX_FILE.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> updwtmpx(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file, struct utmpx const *utmpx);
-/* Copy the information in UTMPX to UTMP.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> getutmp(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx, struct utmp *utmp);
-/* Copy the information in UTMP to UTMPX.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> getutmpx(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp, struct utmpx *utmpx);
 #endif /* !__KERNEL__ */
 

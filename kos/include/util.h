@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c7cc0b1 */
+/* HASH CRC-32:0x175549be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,21 +91,27 @@ typedef __SIZE_TYPE__ size_t;
 
 #if !defined(__login_defined) && defined(__CRT_HAVE_login)
 #define __login_defined 1
-/* Write the given entry into utmp and wtmp */
+/* >> login(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
 #endif /* !__login_defined && __CRT_HAVE_login */
 #ifndef __login_tty_defined
 #define __login_tty_defined 1
 #ifdef __CRT_HAVE_login_tty
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
+/* >> login_tty(3)
+ * Set the given `fd' as the controlling terminal, stdin,
+ * stdout, and stderr. Afterwards, `fd' is closed.
+ * @return: 0 : Success
+ * @return: * : Error */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_login_tty */
 #include <asm/os/tty.h>
 #if defined(__TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
 #include <libc/local/utmp/login_tty.h>
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
+/* >> login_tty(3)
+ * Set the given `fd' as the controlling terminal, stdin,
+ * stdout, and stderr. Afterwards, `fd' is closed.
+ * @return: 0 : Success
+ * @return: * : Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty))(__fd); })
 #else /* __TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
 #undef __login_tty_defined
@@ -114,12 +120,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #endif /* !__login_tty_defined */
 #if !defined(__logout_defined) && defined(__CRT_HAVE_logout)
 #define __logout_defined 1
-/* Write the utmp entry to say the user on UT_LINE has logged out */
+/* >> logout(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
 #endif /* !__logout_defined && __CRT_HAVE_logout */
 #if !defined(__logwtmp_defined) && defined(__CRT_HAVE_logwtmp)
 #define __logwtmp_defined 1
-/* Append to wtmp an entry for the current time and the given info */
+/* >> logwtmp(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
 #endif /* !__logwtmp_defined && __CRT_HAVE_logwtmp */
 /* @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
@@ -212,8 +218,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,fparseln,(FIL
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fparseln, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL fparseln)(FILE *__stream, size_t *__plen, size_t *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fparseln))(__stream, __plen, __plineno, __delim, __flags); })
 #endif /* ... */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_UTIL_H */

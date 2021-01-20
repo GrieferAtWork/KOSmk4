@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70df6cdf */
+/* HASH CRC-32:0xfb4d8c09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* A combination of `argz_create_sep()' and `argz_append()' that will
+/* >> argz_add_sep(3)
+ * A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
  * markers between separate strings. Note however that duplicate,

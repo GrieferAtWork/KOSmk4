@@ -106,13 +106,19 @@
 
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/stat.h>
+)]%[insert:prefix(
 #include <bits/os/stat.h>     /* `struct stat', `struct stat64' */
+)]%[insert:prefix(
 #include <bits/os/timespec.h> /* `struct timespec' */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>

@@ -32,32 +32,18 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.database.utmpx")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/db/utmpx.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
+
 #include <sys/time.h>
 
-/* Documentation taken from Glibc /usr/include/utmp.h */
-/* Copyright (C) 1993-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 /* Compatibility names for the strings of the canonical file names.  */
@@ -68,6 +54,7 @@ __SYSDECL_BEGIN
 #endif /* __USE_GNU */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 struct utmp;
@@ -80,57 +67,54 @@ typedef __pid_t pid_t;
 
 }
 
-@@Open user accounting database
+@@>> setutxent(3)
 [[cp]]
 void setutxent();
 
-@@Close user accounting database
+@@>> endutxent(3)
 [[cp_nokos]]
 void endutxent();
 
-@@Get the next entry from the user accounting database
+@@>> getutxent(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *getutxent();
 
-@@Get the user accounting database entry corresponding to ID
+@@>> getutxid(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *getutxid(struct utmpx const *id);
 
-@@Get the user accounting database entry corresponding to LINE
+@@>> getutxline(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *getutxline(struct utmpx const *line);
 
-@@Write the entry UTMPX into the user accounting database
+@@>> pututxline(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *pututxline(struct utmpx const *utmpx);
 
 %
 %#ifdef __USE_GNU
-@@Change name of the utmpx file to be examined.
-@@This function is not part of POSIX and therefore no official cancellation point
+@@>> utmpxname(3)
 [[cp]]
 int utmpxname(char const *file);
 
-@@Append entry UTMP to the wtmpx-like file WTMPX_FILE.
-@@This function is not part of POSIX and therefore no official cancellation point
+@@>> updwtmpx(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 void updwtmpx(char const *wtmpx_file, struct utmpx const *utmpx);
 
-@@Copy the information in UTMPX to UTMP.
-@@This function is not part of POSIX and therefore no official cancellation point
+@@>> getutmp(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>", "<bits/crt/db/utmp.h>")]]
 void getutmp(struct utmpx const *utmpx, struct utmp *utmp);
 
-@@Copy the information in UTMP to UTMPX.
-@@This function is not part of POSIX and therefore no official cancellation point
+@@>> getutmpx(3)
 [[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 void getutmpx(struct utmp const *utmp, struct utmpx *utmpx);
 %#endif /* __USE_GNU */
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 }

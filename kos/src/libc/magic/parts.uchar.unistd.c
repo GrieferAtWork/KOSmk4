@@ -21,8 +21,9 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _UNISTD_H
 #include <unistd.h>
 #endif /* !_UNISTD_H */
@@ -33,9 +34,8 @@
 #include <parts/uchar/process.h>
 #endif /* !_PARTS_UCHAR_PROCESS_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -165,9 +165,7 @@ c32chroot(*) %{uchar32("wchroot")}
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

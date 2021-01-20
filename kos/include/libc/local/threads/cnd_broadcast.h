@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5aa56ae9 */
+/* HASH CRC-32:0xc7e0ea7e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,8 +40,11 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Unblock all threads currently waiting on condition variable pointed by COND
- * s.a. `pthread_cond_broadcast()' */
+/* >> cnd_broadcast(3)
+ * Wakeup all threads currently waiting on the given
+ * condition variable (s.a. `pthread_cond_broadcast(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(cnd_broadcast) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_broadcast))(__cnd_t *__restrict __cond) {
 	__errno_t __error;

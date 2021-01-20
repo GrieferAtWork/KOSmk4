@@ -31,8 +31,9 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 }%[insert:prefix(
 #include <hybrid/__byteorder.h>
@@ -42,13 +43,21 @@
 #include <hybrid/typecore.h>
 )]%{
 
+}%[insert:prefix(
 #include <bits/os/sockaddr.h>
+)]%[insert:prefix(
 #include <bits/os/sockaddr_storage.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <net/bits/types.h>
+)]%[insert:prefix(
 #include <netinet/bits/in.h>
+)]%[insert:prefix(
 #include <netinet/ipport.h>
+)]%[insert:prefix(
 #include <netinet/ipproto.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/socket.h>
@@ -59,8 +68,6 @@
 
 /* TODO: Constants and structs from this header should
  *       be moved into <asm/> and <bits/> headers! */
-
-__SYSDECL_BEGIN
 
 /* Integer net address classification macros */
 #define IN_CLASSA(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0x80000000)) == 0)
@@ -98,6 +105,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __sa_family_t_defined
 #define __sa_family_t_defined 1
@@ -504,8 +512,7 @@ int setsourcefilter($fd_t sockfd, $uint32_t interface_addr,
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

@@ -21,8 +21,9 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _STDIO_H
 #include <stdio.h>
 #endif /* !_STDIO_H */
@@ -30,9 +31,8 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -163,9 +163,7 @@ c32popen(*) %{uchar32("wpopen")}
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

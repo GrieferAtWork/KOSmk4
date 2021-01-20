@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc146267 */
+/* HASH CRC-32:0x2b44e93a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_setvbuf_unlocked_defined
 #define __local_setvbuf_unlocked_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #include <features.h>
+#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setvbuf from stdio */

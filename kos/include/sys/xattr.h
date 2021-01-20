@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde4b8afc */
+/* HASH CRC-32:0x39d3751d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,flistxattr,(__fd_t __fd
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,removexattr,(char const *__path, char const *__name),(__path,__name))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,lremovexattr,(char const *__path, char const *__name),(__path,__name))
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
-
 #endif /* __CC__ */
 
 __SYSDECL_END

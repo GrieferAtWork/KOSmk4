@@ -33,14 +33,22 @@
 %[define_replacement(id_t = __id_t)]
 %[default:section(".text.crt{|.dos}.sched.resource")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/resource.h>
+)]%[insert:prefix(
 #include <bits/os/rlimit.h>  /* struct rlimit, struct rlimit64 */
+)]%[insert:prefix(
 #include <bits/os/rusage.h>  /* struct rusage, struct rusage64 */
+)]%[insert:prefix(
 #include <bits/os/timeval.h> /* struct timeval */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
+
 
 __SYSDECL_BEGIN
 
@@ -455,6 +463,7 @@ int setrlimit64(__rlimit_resource_t resource,
 
 
 %{
+
 #endif /* __CC__ */
 
 __SYSDECL_END

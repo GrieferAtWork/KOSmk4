@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc569260f */
+/* HASH CRC-32:0xcd3241d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_rand_defined 1
 #ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
-#elif defined(__CRT_HAVE_random) && __SIZEOF_INT__ == __SIZEOF_LONG__
+#else /* __CRT_HAVE_rand */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_random) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
-#else /* ... */
+#else /* __CRT_HAVE_random && __SIZEOF_INT__ == __SIZEOF_LONG__ */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/rand.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_rand __LIBC_LOCAL_NAME(rand)
-#endif /* !... */
+#endif /* !__CRT_HAVE_random || __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#endif /* !__CRT_HAVE_rand */
 #endif /* !__local___localdep_rand_defined */
 /* Dependency: wcslen from wchar */
 #ifndef __local___localdep_wcslen_defined

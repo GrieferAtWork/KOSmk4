@@ -40,30 +40,13 @@
 %[define_replacement(oflag_t = __oflag_t)]
 %[default:section(".text.crt{|.dos}.system.mman")]
 
-%{
-
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <asm/os/mman.h>
+)]%[insert:prefix(
 #include <bits/types.h>
-
-__SYSDECL_BEGIN
-
-#ifdef __CC__
-#ifndef __off_t_defined
-#define __off_t_defined 1
-typedef __FS_TYPE(off) off_t;
-#endif /* !__off_t_defined */
-
-#ifndef __size_t_defined
-#define __size_t_defined 1
-typedef __size_t size_t;
-#endif /* !__size_t_defined */
-
-#ifndef __mode_t_defined
-#define __mode_t_defined 1
-typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
-#endif /* !__mode_t_defined */
-#endif /* __CC__ */
+)]%{
 
 
 /* Data cannot be accessed. */
@@ -546,6 +529,23 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
+#ifndef __off_t_defined
+#define __off_t_defined 1
+typedef __FS_TYPE(off) off_t;
+#endif /* !__off_t_defined */
+
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
+
+#ifndef __mode_t_defined
+#define __mode_t_defined 1
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
+#endif /* !__mode_t_defined */
+
 }
 
 [[decl_include("<features.h>")]]
@@ -785,9 +785,8 @@ int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)

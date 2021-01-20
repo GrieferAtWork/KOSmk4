@@ -21,8 +21,9 @@
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/loadavg.h) */
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -39,4 +40,3 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 }
-

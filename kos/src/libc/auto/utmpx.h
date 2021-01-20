@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x267a59b0 */
+/* HASH CRC-32:0x89becf3d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,23 +30,19 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Get the user accounting database entry corresponding to ID */
+/* >> getutxid(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBDCALL libd_getutxid)(struct utmpx const *id);
-/* Get the user accounting database entry corresponding to LINE */
+/* >> getutxline(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBDCALL libd_getutxline)(struct utmpx const *line);
-/* Write the entry UTMPX into the user accounting database */
+/* >> pututxline(3) */
 INTDEF struct utmpx *NOTHROW_RPC(LIBDCALL libd_pututxline)(struct utmpx const *utmpx);
-/* Change name of the utmpx file to be examined.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> utmpxname(3) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_utmpxname)(char const *file);
-/* Append entry UTMP to the wtmpx-like file WTMPX_FILE.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> updwtmpx(3) */
 INTDEF void NOTHROW_RPC(LIBDCALL libd_updwtmpx)(char const *wtmpx_file, struct utmpx const *utmpx);
-/* Copy the information in UTMPX to UTMP.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> getutmp(3) */
 INTDEF void NOTHROW_RPC(LIBDCALL libd_getutmp)(struct utmpx const *utmpx, struct utmp *utmp);
-/* Copy the information in UTMP to UTMPX.
- * This function is not part of POSIX and therefore no official cancellation point */
+/* >> getutmpx(3) */
 INTDEF void NOTHROW_RPC(LIBDCALL libd_getutmpx)(struct utmp const *utmp, struct utmpx *utmpx);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

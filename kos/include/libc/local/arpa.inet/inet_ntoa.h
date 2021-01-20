@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2eb9677d */
+/* HASH CRC-32:0xf05a0e4f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,20 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <netinet/bits/in.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Re-entrant version of `inet_ntoa()' */
+/* >> inet_ntoa_r(3)
+ * Re-entrant version of `inet_ntoa()' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),inet_ntoa_r,(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/arpa.inet/inet_ntoa_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Re-entrant version of `inet_ntoa()' */
+/* >> inet_ntoa_r(3)
+ * Re-entrant version of `inet_ntoa()' */
 #define __localdep_inet_ntoa_r __LIBC_LOCAL_NAME(inet_ntoa_r)
 #endif /* !__CRT_HAVE_inet_ntoa_r */
 #endif /* !__local___localdep_inet_ntoa_r_defined */
-/* Return the conventional numbers-and-dots representation of a
+/* >> inet_ntoa(3)
+ * Return the conventional numbers-and-dots representation of a
  * given Internet host address `inaddr'. The returned pointer is
  * apart of a static buffer and may change in subsequence (or parallel)
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd13c59db */
+/* HASH CRC-32:0x89c4a475 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Count and return the # of strings in `ARGZ'
+/* >> argz_count(3)
+ * Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __LOCAL_LIBC(argz_count) __ATTR_PURE __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_count))(char const *__argz, __SIZE_TYPE__ __argz_len) {

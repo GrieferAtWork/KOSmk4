@@ -31,8 +31,9 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_setaliasent,hash:CRC-32=0x32743d6b]]]*/
-/* Rewind/Open the internal mail alias database file (which is located in `/etc/aliases') */
+/*[[[head:libc_setaliasent,hash:CRC-32=0x27a2b301]]]*/
+/* >> setaliasent(3)
+ * Rewind/Open the internal mail alias database file (which is located in `/etc/aliases') */
 INTERN ATTR_SECTION(".text.crt.database.aliases") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void)
 /*[[[body:libc_setaliasent]]]*/
@@ -42,8 +43,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void)
 }
 /*[[[end:libc_setaliasent]]]*/
 
-/*[[[head:libc_endaliasent,hash:CRC-32=0xc605f562]]]*/
-/* Close the internal mail alias database file (s.a. `setaliasent(3)') */
+/*[[[head:libc_endaliasent,hash:CRC-32=0x79cc160a]]]*/
+/* >> endaliasent(3)
+ * Close the internal mail alias database file (s.a. `setaliasent(3)') */
 INTERN ATTR_SECTION(".text.crt.database.aliases") void
 NOTHROW_NCX(LIBCCALL libc_endaliasent)(void)
 /*[[[body:libc_endaliasent]]]*/
@@ -53,8 +55,9 @@ NOTHROW_NCX(LIBCCALL libc_endaliasent)(void)
 }
 /*[[[end:libc_endaliasent]]]*/
 
-/*[[[head:libc_getaliasent,hash:CRC-32=0xcc596140]]]*/
-/* Read the entry entry from the mail alias alias database.
+/*[[[head:libc_getaliasent,hash:CRC-32=0x2d0eb7a7]]]*/
+/* >> getaliasent(3)
+ * Read the entry entry from the mail alias alias database.
  * If the database hadn't already been opened, this function will
  * open it the same way that a call to `setaliasent(3)' would.
  * @return: * :   A pointer to an internal, statically allocated structure
@@ -71,8 +74,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void)
 }
 /*[[[end:libc_getaliasent]]]*/
 
-/*[[[head:libc_getaliasent_r,hash:CRC-32=0x9b24ae0b]]]*/
-/* Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
+/*[[[head:libc_getaliasent_r,hash:CRC-32=0x207dd016]]]*/
+/* >> getaliasent_r(3)
+ * Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
 INTERN ATTR_SECTION(".text.crt.database.aliases") NONNULL((1, 2, 4)) errno_t
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf,
                                              char *__restrict buffer,
@@ -89,8 +93,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_
 }
 /*[[[end:libc_getaliasent_r]]]*/
 
-/*[[[head:libc_getaliasbyname,hash:CRC-32=0xc59bc1ab]]]*/
-/* Find a database entry associated with the given `name'
+/*[[[head:libc_getaliasbyname,hash:CRC-32=0x35272d4]]]*/
+/* >> getaliasbyname(3)
+ * Find a database entry associated with the given `name'
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=ENOENT] No entry matching `name'
  * @return: NULL: [errno=*]      Error */
@@ -105,8 +110,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
 }
 /*[[[end:libc_getaliasbyname]]]*/
 
-/*[[[head:libc_getaliasbyname_r,hash:CRC-32=0x42cff199]]]*/
-/* Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
+/*[[[head:libc_getaliasbyname_r,hash:CRC-32=0xe81a87e]]]*/
+/* >> getaliasbyname_r(3)
+ * Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
 INTERN ATTR_SECTION(".text.crt.database.aliases") NONNULL((1, 2, 3, 5)) errno_t
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
                                                 struct aliasent *__restrict result_buf,

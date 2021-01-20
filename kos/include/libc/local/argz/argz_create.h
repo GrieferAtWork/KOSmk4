@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa50d3efa */
+/* HASH CRC-32:0x43e7f341 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,8 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+/* >> argz_create(3)
+ * Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
  * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
  * sub-string represents one of the original strings from `ARGV'

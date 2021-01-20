@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa385e92e */
+/* HASH CRC-32:0x502efeef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_wcstoul_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcstou32 from wchar */
 #ifndef __local___localdep_wcstou32_defined

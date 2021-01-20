@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c4654e5 */
+/* HASH CRC-32:0xb67a41e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,15 +130,21 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
 #ifndef __local___localdep_login_tty_defined
 #define __local___localdep_login_tty_defined 1
 #ifdef __CRT_HAVE_login_tty
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
+/* >> login_tty(3)
+ * Set the given `fd' as the controlling terminal, stdin,
+ * stdout, and stderr. Afterwards, `fd' is closed.
+ * @return: 0 : Success
+ * @return: * : Error */
 __CREDIRECT(,int,__NOTHROW_RPC_KOS,__localdep_login_tty,(__fd_t __fd),login_tty,(__fd))
 #elif defined(__TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2))
 __NAMESPACE_LOCAL_END
 #include <libc/local/utmp/login_tty.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
+/* >> login_tty(3)
+ * Set the given `fd' as the controlling terminal, stdin,
+ * stdout, and stderr. Afterwards, `fd' is closed.
+ * @return: 0 : Success
+ * @return: * : Error */
 #define __localdep_login_tty __LIBC_LOCAL_NAME(login_tty)
 #else /* ... */
 #undef __local___localdep_login_tty_defined

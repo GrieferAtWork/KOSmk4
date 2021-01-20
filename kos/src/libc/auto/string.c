@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa81d202 */
+/* HASH CRC-32:0xad75eae4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -968,6 +968,7 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
 	} while (c1);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)
 DEFINE_INTERN_ALIAS(libc_ffs, libc_ffsl);
 #elif __SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)
@@ -979,6 +980,7 @@ NOTHROW(LIBCCALL libc_ffs)(int i) {
 	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)i);
 }
 #endif /* ... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)
 DEFINE_INTERN_ALIAS(libc_ffsl, libc_ffsll);
 #elif !defined(LIBC_ARCH_HAVE_FFSL)
@@ -4590,6 +4592,7 @@ DEFINE_PUBLIC_ALIAS(_strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncasecmp, libc_strncasecmp);
 #endif /* !__KERNEL__ */
+#include <hybrid/typecore.h>
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFS))
 DEFINE_PUBLIC_ALIAS(__ffs, libc_ffs);
 DEFINE_PUBLIC_ALIAS(ffs, libc_ffs);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41ae2149 */
+/* HASH CRC-32:0xdacb4b8f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+/* >> argz_append(3)
+ * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),argz_append,(__pargz,__pargz_len,__buf,__buf_len))
@@ -39,7 +40,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_appen
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+/* >> argz_append(3)
+ * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
@@ -47,7 +49,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_appen
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_append.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+/* >> argz_append(3)
+ * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 #define __localdep_argz_append __LIBC_LOCAL_NAME(argz_append)
@@ -59,7 +62,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_delete_defined
 #define __local___localdep_argz_delete_defined 1
 #ifdef __CRT_HAVE_argz_delete
-/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+/* >> argz_delete(3)
+ * Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
  * found, remove that entry by shifting all following elements downwards
  * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
@@ -67,7 +71,8 @@ __NAMESPACE_LOCAL_BEGIN
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
 #elif defined(__CRT_HAVE___argz_add_sep)
-/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+/* >> argz_delete(3)
+ * Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
  * found, remove that entry by shifting all following elements downwards
  * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
@@ -78,7 +83,8 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__localdep_argz_delete,(ch
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_delete.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+/* >> argz_delete(3)
+ * Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
  * found, remove that entry by shifting all following elements downwards
  * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements

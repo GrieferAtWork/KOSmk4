@@ -30,16 +30,18 @@
 %[default:section(".text.crt{|.dos}.utility.monetary")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
+
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -65,8 +67,8 @@ ssize_t strfmon_l([[nonnull]] char *__restrict s, size_t maxsize, $locale_t loc,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

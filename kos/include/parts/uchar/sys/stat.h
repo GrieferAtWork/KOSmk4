@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x518b016b */
+/* HASH CRC-32:0x895c5ca9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,13 +36,11 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
-
-
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_UCHAR_SYS_STAT_H */

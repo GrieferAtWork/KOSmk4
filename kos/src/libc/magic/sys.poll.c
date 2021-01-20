@@ -38,21 +38,28 @@
 %[default:section(".text.crt{|.dos}.io.poll")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/poll.h>
+)]%[insert:prefix(
 #include <bits/os/pollfd.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GNU
 #include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/os/timespec.h>
 #endif /* __USE_GNU */
 
-__SYSDECL_BEGIN
+
 
 /* Flags for `struct pollfd::events' */
 #if !defined(POLLIN) && defined(__POLLIN)
@@ -127,6 +134,8 @@ __SYSDECL_BEGIN
 #endif /* __USE_BSD */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 #ifndef __nfds_t_defined
 #define __nfds_t_defined 1
 typedef __UINTPTR_TYPE__ nfds_t;
@@ -194,8 +203,8 @@ int ppoll64([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
 %#endif /* __USE_GNU */
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

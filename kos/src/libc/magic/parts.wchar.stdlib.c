@@ -21,8 +21,11 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <hybrid/typecore.h>
+)]%{
 #ifndef _STDLIB_H
 #include <stdlib.h>
 #endif /* !_STDLIB_H */
@@ -30,43 +33,40 @@
 #include <wchar.h>
 #endif /* !_WCHAR_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
 %#ifdef __USE_KOS
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.convert")]
 [[wchar, wunused, ATTR_PURE, dos_export_alias("_wtoi")]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
-[[if(__SIZEOF_INT__ == 8), alias("_wtoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_wtoi64")]]
 int wtoi([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
 
 [[wchar, wunused, ATTR_PURE, dos_export_alias("_wtol")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, wtoi)]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
-[[if(__SIZEOF_LONG__ == 8), alias("_wtoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_wtoi64")]]
 long wtol([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atol"))}
 
 %#ifdef __LONGLONG
 [[wchar, wunused, ATTR_PURE, dos_export_alias("_wtoll")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "wtoi")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "wtol")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("_wtol")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("_wtoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("_wtol")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wtoi64")]]
 __LONGLONG wtoll([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoll"))}
 %#endif /* __LONGLONG */
 %#endif /* __USE_KOS */
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

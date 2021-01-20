@@ -30,11 +30,15 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.system.syslog")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/syslog.h>
+)]%[insert:prefix(
 #include <asm/os/paths.h> /* __PATH_LOG */
+)]%{
 
 #ifdef __USE_KOS
 #include <bits/crt/format-printer.h>
@@ -46,65 +50,33 @@
 #endif /* !_PATH_LOG && __PATH_LOG */
 
 
-/*
- * Copyright (c) 1982, 1986, 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *	@(#)syslog.h	8.1 (Berkeley) 6/2/93
- */
-
-__SYSDECL_BEGIN
 
 #if !defined(LOG_EMERG) && defined(__LOG_EMERG)
-#define LOG_EMERG   __LOG_EMERG   /* system is unusable */
+#define LOG_EMERG   __LOG_EMERG   /* ... */
 #endif /* !LOG_EMERG && __LOG_EMERG */
 #if !defined(LOG_ALERT) && defined(__LOG_ALERT)
-#define LOG_ALERT   __LOG_ALERT   /* action must be taken immediately */
+#define LOG_ALERT   __LOG_ALERT   /* ... */
 #endif /* !LOG_ALERT && __LOG_ALERT */
 #if !defined(LOG_CRIT) && defined(__LOG_CRIT)
-#define LOG_CRIT    __LOG_CRIT    /* critical conditions */
+#define LOG_CRIT    __LOG_CRIT    /* ... */
 #endif /* !LOG_CRIT && __LOG_CRIT */
 #if !defined(LOG_ERR) && defined(__LOG_ERR)
-#define LOG_ERR     __LOG_ERR     /* error conditions */
+#define LOG_ERR     __LOG_ERR     /* ... */
 #endif /* !LOG_ERR && __LOG_ERR */
 #if !defined(LOG_WARNING) && defined(__LOG_WARNING)
-#define LOG_WARNING __LOG_WARNING /* warning conditions */
+#define LOG_WARNING __LOG_WARNING /* ... */
 #endif /* !LOG_WARNING && __LOG_WARNING */
 #if !defined(LOG_NOTICE) && defined(__LOG_NOTICE)
-#define LOG_NOTICE  __LOG_NOTICE  /* normal but significant condition */
+#define LOG_NOTICE  __LOG_NOTICE  /* ... */
 #endif /* !LOG_NOTICE && __LOG_NOTICE */
 #if !defined(LOG_INFO) && defined(__LOG_INFO)
-#define LOG_INFO    __LOG_INFO    /* informational */
+#define LOG_INFO    __LOG_INFO    /* ... */
 #endif /* !LOG_INFO && __LOG_INFO */
 #if !defined(LOG_DEBUG) && defined(__LOG_DEBUG)
-#define LOG_DEBUG   __LOG_DEBUG   /* debug-level messages */
+#define LOG_DEBUG   __LOG_DEBUG   /* ... */
 #endif /* !LOG_DEBUG && __LOG_DEBUG */
 #if !defined(LOG_PRIMASK) && defined(__LOG_PRIMASK)
-#define LOG_PRIMASK __LOG_PRIMASK /* mask to extract priority part (internal) */
+#define LOG_PRIMASK __LOG_PRIMASK /* ... */
 #endif /* !LOG_PRIMASK && __LOG_PRIMASK */
 
 /* extract priority */
@@ -133,58 +105,44 @@ __SYSDECL_BEGIN
  *       against the codes used by linux (there may be differences here...) */
 
 /* facility codes */
-#define LOG_KERN     (0<<3)  /* kernel messages. */
-#define LOG_USER     (1<<3)  /* random user-level messages. */
-#define LOG_MAIL     (2<<3)  /* mail system. */
-#define LOG_DAEMON   (3<<3)  /* system daemons. */
-#define LOG_AUTH     (4<<3)  /* security/authorization messages. */
-#define LOG_SYSLOG   (5<<3)  /* messages generated internally by syslogd. */
-#define LOG_LPR      (6<<3)  /* line printer subsystem. */
-#define LOG_NEWS     (7<<3)  /* network news subsystem. */
-#define LOG_UUCP     (8<<3)  /* UUCP subsystem. */
-#define LOG_CRON     (9<<3)  /* clock daemon. */
-#define LOG_AUTHPRIV (10<<3) /* security/authorization messages (private). */
-#define LOG_FTP      (11<<3) /* ftp daemon. */
-
-/* other codes through 15 reserved for system use */
-#define LOG_LOCAL0      (16<<3) /* reserved for local use */
-#define LOG_LOCAL1      (17<<3) /* reserved for local use */
-#define LOG_LOCAL2      (18<<3) /* reserved for local use */
-#define LOG_LOCAL3      (19<<3) /* reserved for local use */
-#define LOG_LOCAL4      (20<<3) /* reserved for local use */
-#define LOG_LOCAL5      (21<<3) /* reserved for local use */
-#define LOG_LOCAL6      (22<<3) /* reserved for local use */
-#define LOG_LOCAL7      (23<<3) /* reserved for local use */
-#ifdef __KERNEL__
-/* More Log facilities only available within the kernel. */
-#define LOG_FS          (24<<3)
-#define LOG_MEM         (25<<3)
-#define LOG_HW          (26<<3)
-#define LOG_IRQ         (27<<3)
-#define LOG_EXEC        (28<<3)
-#define LOG_SCHED       (29<<3)
-#define LOG_BOOT        (30<<3)
-#define LOG_IO          (31<<3)
-#define LOG_NFACILITIES  32     /* current number of facilities */
-#else /* __KERNEL__ */
-#define LOG_NFACILITIES  24     /* current number of facilities */
-#endif /* !__KERNEL__ */
-#define LOG_FACMASK      0x03f8 /* mask to extract facility part */
-#define LOG_FAC(p)   (((p) & LOG_FACMASK) >> 3) /* facility of pri */
+#define LOG_KERN        (0 << 3)                 /* ... */
+#define LOG_USER        (1 << 3)                 /* ... */
+#define LOG_MAIL        (2 << 3)                 /* ... */
+#define LOG_DAEMON      (3 << 3)                 /* ... */
+#define LOG_AUTH        (4 << 3)                 /* ... */
+#define LOG_SYSLOG      (5 << 3)                 /* ... */
+#define LOG_LPR         (6 << 3)                 /* ... */
+#define LOG_NEWS        (7 << 3)                 /* ... */
+#define LOG_UUCP        (8 << 3)                 /* ... */
+#define LOG_CRON        (9 << 3)                 /* ... */
+#define LOG_AUTHPRIV    (10 << 3)                /* ... */
+#define LOG_FTP         (11 << 3)                /* ... */
+#define LOG_LOCAL0      (16 << 3)                /* ... */
+#define LOG_LOCAL1      (17 << 3)                /* ... */
+#define LOG_LOCAL2      (18 << 3)                /* ... */
+#define LOG_LOCAL3      (19 << 3)                /* ... */
+#define LOG_LOCAL4      (20 << 3)                /* ... */
+#define LOG_LOCAL5      (21 << 3)                /* ... */
+#define LOG_LOCAL6      (22 << 3)                /* ... */
+#define LOG_LOCAL7      (23 << 3)                /* ... */
+#define LOG_NFACILITIES 24                       /* # of facilities */
+#define LOG_FACMASK     0x03f8                   /* ... */
+#define LOG_FAC(p)      (((p)&LOG_FACMASK) >> 3) /* ... */
 
 /* arguments to setlogmask. */
-#define LOG_MASK(pri)  (1 <<  (pri)) /* mask for one priority. */
-#define LOG_UPTO(pri) ((1 << ((pri)+1))-1) /* all priorities through pri. */
+#define LOG_MASK(pri) (1 << (pri))             /* ... */
+#define LOG_UPTO(pri) ((1 << ((pri) + 1)) - 1) /* ... */
 
-#define LOG_PID    0x01 /* log the pid with each message. */
-#define LOG_CONS   0x02 /* log on the console if errors in sending. */
-#define LOG_ODELAY 0x04 /* delay open until first syslog() (default). */
-#define LOG_NDELAY 0x08 /* don't delay open. */
-#define LOG_NOWAIT 0x10 /* don't wait for console forks: DEPRECATED. */
-#define LOG_PERROR 0x20 /* log to stderr as well. */
+#define LOG_PID    0x01 /* ... */
+#define LOG_CONS   0x02 /* ... */
+#define LOG_ODELAY 0x04 /* ... */
+#define LOG_NDELAY 0x08 /* ... */
+#define LOG_NOWAIT 0x10 /* ... */
+#define LOG_PERROR 0x20 /* ... */
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 }
 
 void closelog();
@@ -292,8 +250,7 @@ CODE facilitynames[] = {
 };
 #endif /* SYSLOG_NAMES */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

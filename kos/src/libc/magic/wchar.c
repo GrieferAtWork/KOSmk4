@@ -61,16 +61,25 @@ typedef size_t rsize_t;
 
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/limitcore.h> /* __WCHAR_MIN__, __WCHAR_MAX__ */
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/stdio.h> /* __WEOF */
+)]%[insert:prefix(
 #include <bits/crt/tm.h>   /* struct tm */
+)]%[insert:prefix(
 #include <bits/crt/mbstate.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 #ifdef __USE_KOS
 #include <parts/malloca.h>
@@ -82,7 +91,6 @@ typedef size_t rsize_t;
 #include <crtdefs.h>
 #endif /* __USE_DOS */
 
-__SYSDECL_BEGIN
 
 /* Define `NULL' */
 #ifndef NULL
@@ -99,6 +107,7 @@ __SYSDECL_BEGIN
 #endif /* !WEOF */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __std_mbstate_t_defined
 #define __std_mbstate_t_defined 1
@@ -265,8 +274,8 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 }
 
 [[std, wchar, export_alias("__mbrtowc")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("mbrtoc16")]]
@@ -302,8 +311,8 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 [[std, wchar]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("c16rtomb")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("c32rtomb")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("c16rtomb")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("c32rtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("c16rtomb")]]
 [[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$c16rtomb")]]
 [[kos_export_as("c32rtomb")]]
@@ -413,18 +422,18 @@ size_t wcsrtombs([[outp(dstlen)]] char *dst,
 }
 
 [[std, guard, wchar]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wcstoll", "wcstoq")]]
-[[if(__SIZEOF_LONG__ == 4), alias("wcsto32")]]
-[[if(__SIZEOF_LONG__ == 8), alias("wcsto64", "_wcstoi64")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wcstoll", "wcstoq")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcsto32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcsto64", "_wcstoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstol(*) %{generate(str2wcs("strtol"))}
 
 [[std, guard, wchar]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wcstoull", "wcstouq")]]
-[[if(__SIZEOF_LONG__ == 4), alias("wcstou32")]]
-[[if(__SIZEOF_LONG__ == 8), alias("wcstou64", "_wcstoui64")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wcstoull", "wcstouq")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstou32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstou64", "_wcstoui64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstoul(*) %{generate(str2wcs("strtoul"))}
 
@@ -455,10 +464,10 @@ int wmemcmp([[inp(num_chars)]] wchar_t const *s1,
 
 [[std, wchar, nonnull, no_crt_impl]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("memcpyw")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("memcpyl")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(memcpyw)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(memcpyl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memcpyw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("memcpyl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(memcpyw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(memcpyl)]]
 wchar_t *wmemcpy([[outp(num_chars)]] wchar_t *__restrict dst,
                  [[inp(num_chars)]] wchar_t const *__restrict src,
                  size_t num_chars) {
@@ -475,10 +484,10 @@ wchar_t *wmemcpy([[outp(num_chars)]] wchar_t *__restrict dst,
 
 [[std, wchar, nonnull, no_crt_impl]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("memmovew")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("memmovel")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(memmovew)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(memmovel)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memmovew")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("memmovel")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(memmovew)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(memmovel)]]
 wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
                   [[inp(num_chars)]] wchar_t const *src,
                   size_t num_chars) {
@@ -495,10 +504,10 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 
 [[std, wchar, no_crt_impl]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("memsetw")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("memsetl")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(memsetw)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(memsetl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memsetw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("memsetl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(memsetw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(memsetl)]]
 [[nonnull]] wchar_t *wmemset([[outp(num_chars)]] wchar_t *dst,
                              wchar_t filler, size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -732,10 +741,10 @@ wchar_t *wcsstr([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("memchrw")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("memchrl")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(memchrw)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(memchrl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memchrw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("memchrl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(memchrw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(memchrl)]]
 wchar_t *wmemchr([[inp(num_chars)]] wchar_t const *__restrict haystack, wchar_t needle, size_t num_chars)
 	[([[inp(num_chars)]] wchar_t *__restrict haystack, wchar_t needle, size_t num_chars): wchar_t *]
 	[([[inp(num_chars)]] wchar_t const *__restrict haystack, wchar_t needle, size_t num_chars): wchar_t const *]
@@ -859,17 +868,17 @@ wcstold(*) %{generate(str2wcs("strtold"))}
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 [[std, guard, wchar, export_alias("wcstoq")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstol")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("wcsto64", "_wcstoi64")]]
-[[if(__SIZEOF_LONG_LONG__ == 4), alias("wcsto32")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstol")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcsto64", "_wcstoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcsto32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax")]]
 wcstoll(*) %{generate(str2wcs("strtoll"))}
 
 [[std, guard, wchar, export_alias("wcstouq")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstoul")]]
-[[if(__SIZEOF_LONG_LONG__ == 4), alias("wcstou32")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("wcstou64", "_wcstoui64")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstoul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstou32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstou64", "_wcstoui64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax")]]
 wcstoull(*) %{generate(str2wcs("strtoull"))}
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]
@@ -1050,10 +1059,10 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 %[define_wchar_replacement(wmempcpy = "(char16_t *)mempcpyw", "(char32_t *)mempcpyl")]
 
 [[wchar, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("mempcpyw")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("mempcpyl")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempcpyw)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mempcpyl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mempcpyw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mempcpyl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempcpyw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(mempcpyl)]]
 [[nonnull]] wchar_t *wmempcpy([[outp(num_chars)]] wchar_t *__restrict dst,
                               [[inp(num_chars)]] wchar_t const *__restrict src,
                               $size_t num_chars) {
@@ -1069,10 +1078,10 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 %[define_wchar_replacement(wmempmove = "(char16_t *)mempmovew", "(char32_t *)mempmovel")]
 
 [[std, wchar, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("mempmovew")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("mempmovel")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempmovew)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mempmovel)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mempmovew")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mempmovel")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempmovew)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(mempmovel)]]
 [[nonnull]] wchar_t *wmempmove([[outp(num_chars)]] wchar_t *dst,
                                [[inp(num_chars)]] wchar_t const *src,
                                $size_t num_chars) {
@@ -1097,16 +1106,16 @@ wcstoul_l(*) %{generate(str2wcs("strtoul_l"))}
 %[insert:function(wcstouq = wcstoull)]
 
 [[wchar, dos_export_alias("_wcstoll_l"), export_alias("__wcstoll_l")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("_wcstoi64_l")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wcstoi64_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoll_l(*) %{generate(str2wcs("strtoll_l"))}
 
 [[wchar, export_alias("__wcstoull_l")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("_wcstoui64_l")]]
-[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wcstoui64_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoull_l(*) %{generate(str2wcs("strtoull_l"))}
 
@@ -1367,30 +1376,30 @@ __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict forma
 
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
-[[if(__SIZEOF_LONG__ == 4), alias("wcstol")]]
-[[if(__SIZEOF_LONG_LONG__ == 4), alias("wcstoll", "wcstoq")]]
-[[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstol")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstoll", "wcstoq")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstoimax")]]
 wcsto32(*) %{generate(str2wcs("strto32"))}
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
-[[if(__SIZEOF_LONG__ == 4), alias("wcstoul")]]
-[[if(__SIZEOF_LONG_LONG__ == 4), alias("wcstoull", "wcstouq")]]
-[[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstoul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstoull", "wcstouq")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstoumax")]]
 wcstou32(*) %{generate(str2wcs("strtou32"))}
 
 %
 %#ifdef __UINT64_TYPE__
 [[wchar, dos_export_alias("_wcstoui64")]]
-[[if(__SIZEOF_LONG__ == 8), alias("wcstoul")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("wcstoull", "wcstouq")]]
-[[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstoul")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstoull", "wcstouq")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstoumax")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstou64(*) %{generate(str2wcs("strtou64"))}
 
 [[wchar, dos_export_alias("_wcstoi64")]]
-[[if(__SIZEOF_LONG__ == 8), alias("wcstol")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("wcstoll", "wcstoq")]]
-[[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstol")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstoll", "wcstoq")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstoimax")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcsto64(*) %{generate(str2wcs("strto64"))}
 %#endif /* __UINT64_TYPE__ */
@@ -1398,30 +1407,30 @@ wcsto64(*) %{generate(str2wcs("strto64"))}
 %
 %#ifdef __USE_XOPEN2K8
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
-[[if(__SIZEOF_LONG__ == 4), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
-[[if(__SIZEOF_LONG_LONG__ == 4), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
-[[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
 wcsto32_l(*) %{generate(str2wcs("strto32_l"))}
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
-[[if(__SIZEOF_LONG__ == 4), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
-[[if(__SIZEOF_LONG_LONG__ == 4), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
-[[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
 wcstou32_l(*) %{generate(str2wcs("strtou32_l"))}
 
 %
 %#ifdef __UINT64_TYPE__
 [[wchar, dos_export_alias("_wcstoi64_l")]]
-[[if(__SIZEOF_LONG__ == 8), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
-[[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcsto64_l(*) %{generate(str2wcs("strto64_l"))}
 
 [[wchar, dos_export_alias("_wcstoui64_l")]]
-[[if(__SIZEOF_LONG__ == 8), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
-[[if(__SIZEOF_LONG_LONG__ == 8), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
-[[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstou64_l(*) %{generate(str2wcs("strtou64_l"))}
 %#endif /* __UINT64_TYPE__ */
@@ -1492,10 +1501,10 @@ wchar_t *wcscasestr([[nonnull]] wchar_t const *haystack, wchar_t const *needle)
 
 @@Same as wmemset, but return a pointer after the last written character
 [[wchar, ATTR_LEAF, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("mempsetw")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("mempsetl")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempsetw)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mempsetl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mempsetw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mempsetl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempsetw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(mempsetl)]]
 [[nonnull]] wchar_t *wmempset([[outp(num_chars)]] wchar_t *dst,
                               wchar_t filler, $size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1587,10 +1596,10 @@ $size_t wcsnroff([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle,
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, ATTR_PURE, no_crt_impl]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_memcmpw")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_memcmpl")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(fuzzy_memcmpw)]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(fuzzy_memcmpl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_memcmpw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_memcmpl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(fuzzy_memcmpw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(fuzzy_memcmpl)]]
 $size_t fuzzy_wmemcmp([[inp(s1_chars)]] wchar_t const *s1, $size_t s1_chars,
                       [[inp(s2_chars)]] wchar_t const *s2, $size_t s2_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -2428,9 +2437,9 @@ $errno_t _wtmpnam_s([[outp(wchar_count)]] wchar_t *dst, $size_t wchar_count);
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #ifdef __USE_KOS
 #if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_WCHAR_FORMAT_PRINTER_H)
@@ -2461,4 +2470,3 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
-

@@ -73,15 +73,23 @@
 //%[define_str2wcs_replacement(toascii = "(wchar_t)towascii")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/byteorder.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/stdio.h>   /* __WEOF */
+)]%[insert:prefix(
 #include <bits/crt/wctype.h> /* __wctype_t, __wctrans_t */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #include <xlocale.h>
@@ -91,13 +99,13 @@
 #include <endian.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
 
 #if !defined(WEOF) && defined(__WEOF)
 #define WEOF __WEOF
 #endif /* !WEOF && __WEOF */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_wint_t_defined
@@ -520,9 +528,7 @@ int _iswcsym_l($wint_t wc, $locale_t locale) {
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

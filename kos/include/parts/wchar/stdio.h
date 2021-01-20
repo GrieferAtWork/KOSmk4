@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cf4c49f */
+/* HASH CRC-32:0xd07f98a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
+
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __wremove_defined
 #define __wremove_defined 1
@@ -72,8 +72,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wpopen,
 #endif /* !... */
 #endif /* !__wpopen_defined */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_WCHAR_STDIO_H */

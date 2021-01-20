@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacb231ec */
+/* HASH CRC-32:0x99e489d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
 DEFINE_INTERN_ALIAS(libc_popcount, libc_popcount32);
 #elif __SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
@@ -42,6 +43,7 @@ NOTHROW(LIBCCALL libc_popcount)(unsigned int i) {
 	return __hybrid_popcount(i);
 }
 #endif /* ... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
 DEFINE_INTERN_ALIAS(libc_popcountl, libc_popcount32);
 #elif __SIZEOF_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
@@ -55,6 +57,7 @@ NOTHROW(LIBCCALL libc_popcountl)(unsigned long i) {
 	return __hybrid_popcount(i);
 }
 #endif /* ... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
 DEFINE_INTERN_ALIAS(libc_popcountll, libc_popcount32);
 #elif __SIZEOF_LONG_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
@@ -90,6 +93,7 @@ NOTHROW(LIBCCALL libc_popcount64)(uint64_t i) {
 
 DECL_END
 
+#include <hybrid/typecore.h>
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNT))
 DEFINE_PUBLIC_ALIAS(popcount, libc_popcount);
 #endif /* !__KERNEL__ && ((__SIZEOF_INT__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_INT__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNT) */

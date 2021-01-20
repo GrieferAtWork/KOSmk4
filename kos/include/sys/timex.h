@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa45db174 */
+/* HASH CRC-32:0xe40d8509 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@
 #include <bits/os/timex.h>
 #include <bits/crt/ntptimeval.h>
 #include <bits/types.h>
+
 #include <sys/time.h>
 
 /* Mode code flags (for `struct timex::mode') */
@@ -188,9 +189,8 @@
 #define MAXTC 6 /* ??? */
 
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
@@ -262,8 +262,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* ... */
 #endif /* __USE_TIME64 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_TIMEX_H */

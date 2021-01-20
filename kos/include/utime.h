@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc284f70e */
+/* HASH CRC-32:0x3e01f6ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@
 #include <bits/types.h>
 #include <bits/os/utimbuf.h>
 
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if (defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_DOS))
 #ifndef __time_t_defined
@@ -222,9 +222,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime64,(__WCHAR_TYPE__ const
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _wutime64)(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))(__filename, __file_times); }
 #endif /* ... */
 #endif /* __USE_DOS */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UTIME_H)
@@ -237,6 +238,5 @@ __SYSDECL_END
 #include <parts/uchar/utime.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_UTIME_H */
 #endif /* __USE_UTF */
-
 
 #endif /* !_UTIME_H */

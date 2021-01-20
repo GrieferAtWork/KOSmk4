@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aca0913 */
+/* HASH CRC-32:0x946ccc93 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,17 +66,23 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
+#include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __LOCAL_LIBC(mtx_timedlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock))(__mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) {
 	__errno_t __error;
 	__error = __localdep_pthread_mutex_timedlock((__pthread_mutex_t *)__mutex, __time_point);
 	if __likely(!__error)
 		return __thrd_success;
+#ifdef __ETIMEDOUT
+	if (__error == __ETIMEDOUT)
+		return __thrd_timedout;
+#endif /* __ETIMEDOUT */
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END

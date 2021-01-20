@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e44dff2 */
+/* HASH CRC-32:0x23971fba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,10 +44,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Try to lock the mutex pointed by MUTEX without blocking.
- * If the mutex is free the current threads takes control of
- * it, otherwise it returns immediately
- * s.a. `pthread_mutex_trylock()' */
+/* >> mtx_trylock(3)
+ * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_busy:    Cannot lock without blocking right now
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(mtx_trylock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_trylock))(__mtx_t *__restrict __mutex) {
 	__errno_t __error;

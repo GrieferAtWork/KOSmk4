@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc06acbb7 */
+/* HASH CRC-32:0xf752c910 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #ifndef __local_fuzzy_c32sncmp_defined
 #define __local_fuzzy_c32sncmp_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBKCALL)) || !defined(__NO_MALLOCA)
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32snlen from parts.uchar.string */
 #ifndef __local___localdep_c32snlen_defined

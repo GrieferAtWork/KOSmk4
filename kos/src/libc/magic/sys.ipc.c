@@ -33,12 +33,17 @@
 %[define_replacement(mode_t = __mode_t)]
 %[define_replacement(key_t = __key_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <asm/os/ipc.h>
+)]%[insert:prefix(
 #include <bits/os/ipc.h>
+)]%{
 
 
 /* Mode flags for `msgget()', `semget()', and `shmget()'. */

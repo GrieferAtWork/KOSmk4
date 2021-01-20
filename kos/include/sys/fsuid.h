@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ebc6afc */
+/* HASH CRC-32:0x2369d7cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,9 +57,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
@@ -67,8 +66,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
 /* Same as `setfsuid()', but for group id */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_FSUID_H */

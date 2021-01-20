@@ -32,12 +32,17 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/fcntl.h> /* __LOCK_* */
+)]%[insert:prefix(
 #include <asm/os/stdio.h> /* __SEEK_* */
+)]%[insert:prefix(
 #include <bits/types.h>   /* fd_t */
+)]%{
 
 #ifdef __USE_GLIBC
 #include <fcntl.h>

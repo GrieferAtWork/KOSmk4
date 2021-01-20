@@ -33,9 +33,11 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(clock_t = __clock_t)]
 
-%{
+%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/os/tms.h> /* struct tms */
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

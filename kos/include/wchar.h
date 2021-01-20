@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8639f83 */
+/* HASH CRC-32:0xf1eae47f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,7 +298,6 @@ __NAMESPACE_STD_USING(wmempmove)
 #include <crtdefs.h>
 #endif /* __USE_DOS */
 
-__SYSDECL_BEGIN
 
 /* Define `NULL' */
 #ifndef NULL
@@ -315,6 +314,7 @@ __SYSDECL_BEGIN
 #endif /* !WEOF */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __std_mbstate_t_defined
 #define __std_mbstate_t_defined 1
@@ -1587,9 +1587,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstok_defined
 #define __local___localdep_wcstok_defined 1
 #ifdef __CRT_HAVE_wcstok_s
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,__localdep_wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #else /* __CRT_HAVE_wcstok_s */
 __NAMESPACE_LOCAL_END
@@ -1608,14 +1605,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstok_defined
 #define __local___localdep_wcstok_defined 1
 #if defined(__CRT_HAVE_wcstok) && !defined(__CRT_DOS_PRIMARY)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,__localdep_wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_wcstok_s) && defined(__CRT_DOS_PRIMARY)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,__localdep_wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -3164,9 +3155,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
 #ifdef __CRT_HAVE_wcsnlen
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> strnlen(3)
  * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(wchar_t const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
@@ -5158,9 +5146,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath_s, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !_WSTDLIBP_DEFINED */
 #endif /* __USE_DOS */
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #ifdef __USE_KOS
 #if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_WCHAR_FORMAT_PRINTER_H)

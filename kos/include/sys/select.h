@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73f296a4 */
+/* HASH CRC-32:0xe7c7ffb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,9 +55,8 @@
 #define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
 #endif /* FD_SETSIZE */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined  1
@@ -138,8 +137,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pselect64, __FORCELOCAL __ATTR_ARTIFICIAL __STDC
 #endif /* __USE_XOPEN2K */
 #endif /* __USE_TIME64 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SELECT_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebdef1e1 */
+/* HASH CRC-32:0x86b94056 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -588,6 +588,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,gai_error,(struct gaicb *__req),(__req))
 /* Cancel the requests associated with GAICBP */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,gai_cancel,(struct gaicb *__gaicbp),(__gaicbp))
 #endif /* __USE_GNU */
+
 #endif /* __CC__ */
 
 __SYSDECL_END

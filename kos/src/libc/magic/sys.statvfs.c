@@ -32,12 +32,17 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.fs.statfs.statvfs")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/statvfs.h>  /* __ST_* */
+)]%[insert:prefix(
 #include <bits/os/statvfs.h> /* struct statvfs, struct statvfs64 */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #if !defined(ST_RDONLY) && defined(__ST_RDONLY)
 #define ST_RDONLY      __ST_RDONLY /* ??? */

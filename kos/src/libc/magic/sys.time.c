@@ -43,12 +43,18 @@
 %[define_replacement(itimerval64 = __itimerval64)]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/itimer.h> /* __ITIMER_* */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/os/itimerval.h>
+)]%{
+
 #include <sys/select.h>
 
 __SYSDECL_BEGIN

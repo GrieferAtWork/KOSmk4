@@ -38,24 +38,37 @@
 %[define_replacement(__CONST_SOCKADDR_ARG = "struct sockaddr const *__restrict")]
 %[default:section(".text.crt{|.dos}.net.socket")]
 
-%{
-#include <__stdinc.h>
+%[insert:prefix(
 #include <features.h>
+)]%{
 
-#include <hybrid/typecore.h>
-
-#include <asm/os/socket-ioctls.h>
-#include <asm/os/socket.h>
-#include <bits/os/cmsghdr.h>
-#include <bits/os/linger.h>
-#include <bits/os/msghdr.h>
-#include <bits/os/sockaddr.h>
-#include <bits/os/sockaddr_storage.h>
-#include <bits/os/timespec.h>
 }%[insert:prefix(
+#include <hybrid/typecore.h>
+)]%{
+
+}%[insert:prefix(
+#include <asm/os/socket-ioctls.h>
+)]%[insert:prefix(
+#include <asm/os/socket.h>
+)]%[insert:prefix(
+#include <bits/os/cmsghdr.h>
+)]%[insert:prefix(
+#include <bits/os/linger.h>
+)]%[insert:prefix(
+#include <bits/os/msghdr.h>
+)]%[insert:prefix(
+#include <bits/os/sockaddr.h>
+)]%[insert:prefix(
+#include <bits/os/sockaddr_storage.h>
+)]%[insert:prefix(
+#include <bits/os/timespec.h>
+)]%[insert:prefix(
 #include <bits/types.h>
 )]%{
+
+}%[insert:prefix(
 #include <sys/uio.h>
+)]%{
 
 #ifdef __USE_GNU
 #include <bits/os/mmsghdr.h>
@@ -70,8 +83,6 @@
 #ifdef __USE_GLIBC
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
-
-__SYSDECL_BEGIN
 
 #if !defined(FIOSETOWN) && defined(__FIOSETOWN)
 #define FIOSETOWN  __FIOSETOWN  /* ... */
@@ -786,6 +797,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -1267,8 +1279,8 @@ int isfdtype($fd_t fd, __STDC_INT_AS_UINT_T fdtype);
 %#endif /* __USE_MISC */
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

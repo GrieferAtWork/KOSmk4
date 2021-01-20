@@ -38,11 +38,15 @@
 
 %[default:section(".text.crt{|.dos}.io.tty")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/termios.h>
+)]%[insert:prefix(
 #include <bits/os/termios.h>
+)]%{
 /*#include <sys/ioctl.h>*/
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)

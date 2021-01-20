@@ -21,8 +21,9 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _SYS_STAT_H
 #include <sys/stat.h>
 #endif /* !_SYS_STAT_H */
@@ -30,9 +31,8 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -41,9 +41,7 @@ __SYSDECL_BEGIN
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

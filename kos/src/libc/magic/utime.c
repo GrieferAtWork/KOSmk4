@@ -44,15 +44,19 @@
 %[define_replacement(utimbuf32  = __utimbuf32)]
 %[define_replacement(utimbuf64  = __utimbuf64)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/os/utimbuf.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if (defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_DOS))
 #ifndef __time_t_defined
@@ -306,9 +310,10 @@ int _wutime32([[nonnull]] wchar_t const *filename,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UTIME_H)
@@ -321,6 +326,5 @@ __SYSDECL_END
 #include <parts/uchar/utime.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_UTIME_H */
 #endif /* __USE_UTF */
-
 
 }

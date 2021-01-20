@@ -27,11 +27,15 @@
 %[define_replacement(eventfd_t = __UINT64_TYPE__)]
 %[default:section(".text.crt{|.dos}.sched.eventfd")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/eventfd.h> /* __EFD_* */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <stdint.h>

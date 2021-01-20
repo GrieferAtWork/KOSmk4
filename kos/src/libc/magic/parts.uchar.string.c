@@ -21,19 +21,22 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _STRING_H
 #include <string.h>
 #endif /* !_STRING_H */
 #ifndef _UCHAR_H
 #include <uchar.h>
 #endif /* !_UCHAR_H */
-#include <parts/malloca.h>
 
-__SYSDECL_BEGIN
+}%[insert:prefix(
+#include <parts/malloca.h>
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -220,9 +223,7 @@ wildc32scasecmp_l(*) %{uchar32("wildwcscasecmp_l")}
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

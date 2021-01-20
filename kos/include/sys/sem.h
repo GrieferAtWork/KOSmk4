@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d648f6b */
+/* HASH CRC-32:0xb49c0948 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,8 +122,8 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,semop,(int __semid, struct sembuf *__sops, siz
 /* Operate on semaphore with timeout */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,semtimedop,(int __semid, struct sembuf *__sops, size_t __nsops, struct timespec const *__timeout),(__semid,__sops,__nsops,__timeout))
 #endif /* __USE_GNU */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SEM_H */

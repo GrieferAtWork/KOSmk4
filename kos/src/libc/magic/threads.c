@@ -57,36 +57,25 @@
 STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/threads.h>
+)]%[insert:prefix(
 #include <bits/crt/threads.h>
+)]%[insert:prefix(
 #include <bits/os/timespec.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 __SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/threads.h, but have since been modified */
-/* ISO C11 Standard: 7.26 - Thread support library  <threads.h>.
-   Copyright (C) 2018-2019 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 
 #ifndef TSS_DTOR_ITERATIONS
@@ -216,8 +205,10 @@ typedef __cnd_t cnd_t;
 }
 
 
-@@Create a new thread executing the function FUNC.  Arguments for FUNC
-@@are passed through ARG. If successful, THR is set to new thread identifier
+@@>> thrd_create(3)
+@@Create and start a new thread (s.a. `pthread_create(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]
 [[requires_function(pthread_create)]]
@@ -236,17 +227,20 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
 	return thrd_error;
 }
 
+@@>> thrd_equal(3)
+@@Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
+@@@return: == 0: Threads are not equal
+@@@return: != 0: Threads are qual
 [[decl_include("<bits/crt/threads.h>")]]
 int thrd_equal(thrd_t thr1, thrd_t thr2) = pthread_equal;
 
-@@Return current thread identifier
-@@s.a. `pthread_self()'
+@@>> thrd_current(3)
+@@Return the descriptor for the calling thread (s.a. `pthread_self(3)')
 [[decl_include("<bits/crt/threads.h>")]]
 thrd_t thrd_current() = pthread_self;
 
-@@Block current thread execution for at least the (relative) time pointed by TIME_POINT.
-@@The current thread may resume if receives a signal. In that case, if REMAINING
-@@is not NULL, the remaining time is stored in the object pointed by it
+@@>> thrd_sleep(3), thrd_sleep64(3)
+@@Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
 @@@return:     0: The (relative) time specified by `time_point' has elapsed
 @@@return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
 @@@return: <= -2: Some other error occurred
@@ -334,18 +328,17 @@ int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
 }
 %#endif /* __USE_TIME64 */
 
-@@Terminate current thread execution, cleaning up any thread local
-@@storage and freeing resources. Returns the value specified in RES
-@@s.a. `pthread_exit()'
-[[ATTR_NORETURN, throws]]
-[[requires_function(pthread_exit)]]
+@@>> thrd_exit(3)
+@@Terminate the calling thread (s.a. `pthread_exit(3)')
+[[ATTR_NORETURN, throws, requires_function(pthread_exit)]]
 void thrd_exit(int res) {
 	pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
 
-@@Detach the thread identified by THR from the current
-@@environment (it does not allow join or wait for it)
-@@s.a. `pthread_detach()'
+@@>> thrd_detach(3)
+@@Detach the given thread (s.a. `pthread_detach(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[impl_include("<asm/crt/threads.h>")]]
 [[decl_include("<bits/crt/threads.h>")]]
 [[requires_function(pthread_detach)]]
@@ -357,9 +350,10 @@ int thrd_detach(thrd_t thr) {
 	return thrd_error;
 }
 
-@@Block current thread until execution of THR is complete.
-@@In case that RES is not NULL, will store the return value of THR when exiting
-@@s.a. `pthread_join()'
+@@>> thrd_join(3)
+@@Wait for the given thread to finish (s.a. `pthread_join(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[cp, decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>")]]
 [[requires_function(pthread_join)]]
@@ -381,10 +375,8 @@ int thrd_join(thrd_t thr, int *res) {
 	return thrd_error;
 }
 
-@@Stop current thread execution and call the scheduler to decide which
-@@thread should execute next. The current thread may be selected by the
-@@scheduler to keep running
-@@s.a. `pthread_yield()'
+@@>> thrd_yield(3)
+@@Yield execution to another thraed (s.a. `pthread_yield(3)')
 [[nothrow]]
 void thrd_yield() = pthread_yield;
 
@@ -395,9 +387,10 @@ void thrd_yield() = pthread_yield;
 %/* Mutex functions.  */
 %
 
-@@Creates a new mutex object with type TYPE.
-@@If successful the new object is pointed by MUTEX
-@@s.a. `pthread_mutex_init()'
+@@>> mtx_init(3)
+@@Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<features.h>", "<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<asm/crt/pthreadvalues.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_init)]]
@@ -423,9 +416,10 @@ int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 	return thrd_error;
 }
 
-@@Block the current thread until the mutex pointed to by MUTEX is
-@@unlocked.  In that case current thread will not be blocked
-@@s.a. `pthread_mutex_lock()'
+@@>> mtx_lock(3)
+@@Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[cp, decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_lock)]]
@@ -437,15 +431,16 @@ int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 	return thrd_error;
 }
 
-@@Block the current thread until the mutex pointed by MUTEX
-@@is unlocked or time pointed by TIME_POINT is reached.
-@@In case the mutex is unlock, the current thread will not be blocked
-@@s.a. `pthread_mutex_timedlock()'
+@@>> mtx_timedlock(3), mtx_timedlock64(3)
+@@Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+@@@return: thrd_success:  Success
+@@@return: thrd_timedout: Timeout
+@@@return: thrd_error:    Error
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock")]]
 [[decl_include("<bits/crt/threads.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock)]]
 int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
                   [[nonnull]] struct timespec const *__restrict time_point) {
@@ -453,13 +448,17 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 	error = pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
+@@pp_ifdef ETIMEDOUT@@
+	if (error == ETIMEDOUT)
+		return thrd_timedout;
+@@pp_endif@@
 	return thrd_error;
 }
 
 %#ifdef __USE_TIME64
 [[cp, doc_alias("mtx_timedlock"), time64_variant_of(mtx_timedlock)]]
 [[decl_include("<bits/crt/threads.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock64)]]
 int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {
@@ -467,15 +466,20 @@ int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
 	error = pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
+@@pp_ifdef ETIMEDOUT@@
+	if (error == ETIMEDOUT)
+		return thrd_timedout;
+@@pp_endif@@
 	return thrd_error;
 }
 %#endif /* __USE_TIME64 */
 
 
-@@Try to lock the mutex pointed by MUTEX without blocking.
-@@If the mutex is free the current threads takes control of
-@@it, otherwise it returns immediately
-@@s.a. `pthread_mutex_trylock()'
+@@>> mtx_trylock(3)
+@@Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_busy:    Cannot lock without blocking right now
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<libc/errno.h>")]]
 [[requires_function(pthread_mutex_trylock)]]
@@ -491,9 +495,10 @@ int mtx_trylock([[nonnull]] mtx_t *__restrict mutex) {
 	return thrd_error;
 }
 
-@@Unlock the mutex pointed by MUTEX.
-@@It may potentially awake other threads waiting on this mutex
-@@s.a. `pthread_mutex_unlock()'
+@@>> mtx_unlock(3)
+@@Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_unlock)]]
@@ -505,16 +510,15 @@ int mtx_unlock([[nonnull]] mtx_t *__restrict mutex) {
 	return thrd_error;
 }
 
-@@Destroy the mutex object pointed by MUTEX
-@@s.a. `pthread_mutex_destroy()'
+@@>> mtx_destroy(3)
+@@Destroy the given mutex (s.a. `pthread_mutex_destroy(3)')
 [[decl_include("<bits/crt/threads.h>")]]
 void mtx_destroy([[nonnull]] mtx_t *__restrict mutex) = pthread_mutex_destroy;
 
 
 
-@@Call function FUNC exactly once, even if invoked from several threads.
-@@All calls must be made with the same FLAG object
-@@s.a. `pthread_once()'
+@@>> call_once(3)
+@@Invoke `func', but make sure this only happens once (s.a. `pthread_once()')
 [[decl_include("<bits/crt/threads.h>"), throws]]
 void call_once([[nonnull]] once_flag *__restrict flag,
                [[nonnull]] __once_func_t func) = pthread_once;
@@ -524,8 +528,10 @@ void call_once([[nonnull]] once_flag *__restrict flag,
 %/* Condition variable functions.  */
 %
 
-@@Initialize new condition variable pointed by COND
-@@s.a. `pthread_cond_init()'
+@@>> cnd_init(3)
+@@Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_cond_init)]]
@@ -537,8 +543,11 @@ int cnd_init([[nonnull]] cnd_t *__restrict cond) {
 	return thrd_error;
 }
 
-@@Unblock one thread that currently waits on condition variable pointed by COND
-@@s.a. `pthread_cond_signal()'
+@@>> cnd_signal(3)
+@@Wakeup one thread currently waiting on the given
+@@condition variable (s.a. `pthread_cond_signal(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_cond_signal)]]
@@ -550,8 +559,11 @@ int cnd_signal([[nonnull]] cnd_t *__restrict cond) {
 	return thrd_error;
 }
 
-@@Unblock all threads currently waiting on condition variable pointed by COND
-@@s.a. `pthread_cond_broadcast()'
+@@>> cnd_broadcast(3)
+@@Wakeup all threads currently waiting on the given
+@@condition variable (s.a. `pthread_cond_broadcast(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires($has_function(pthread_cond_broadcast))]]
@@ -563,8 +575,10 @@ int cnd_broadcast([[nonnull]] cnd_t *__restrict cond) {
 	return thrd_error;
 }
 
-@@Block current thread on the condition variable pointed by COND
-@@s.a. `pthread_cond_wait()'
+@@>> cnd_wait(3)
+@@Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[cp, decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_cond_wait)]]
@@ -578,14 +592,17 @@ int cnd_wait([[nonnull]] cnd_t *__restrict cond,
 	return thrd_error;
 }
 
-@@Block current thread on the condition variable until condition variable
-@@pointed by COND is signaled or time pointed by TIME_POINT is reached
-@@s.a. `pthread_cond_timedwait()'
+@@>> cnd_timedwait(3), cnd_timedwait64(3)
+@@Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+@@@return: thrd_success:  Success
+@@@return: thrd_timedout: Timeout
+@@@return: thrd_error:    Error
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait64)]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait)]]
 [[decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<asm/os/errno.h>")]]
 [[requires($has_function(pthread_cond_timedwait))]]
 int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
                   [[nonnull]] mtx_t *__restrict mutex,
@@ -596,8 +613,10 @@ int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
 	                               time_point);
 	if likely(!error)
 		return thrd_success;
+@@pp_ifdef ETIMEDOUT@@
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
+@@pp_endif@@
 	return thrd_error;
 }
 
@@ -605,6 +624,7 @@ int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
 [[cp, doc_alias("cnd_timedwait"), time64_variant_of(cnd_timedwait)]]
 [[decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<asm/os/errno.h>")]]
 [[requires($has_function(pthread_cond_timedwait64))]]
 int cnd_timedwait64([[nonnull]] cnd_t *__restrict cond,
                     [[nonnull]] mtx_t *__restrict mutex,
@@ -615,8 +635,10 @@ int cnd_timedwait64([[nonnull]] cnd_t *__restrict cond,
 	                                 time_point);
 	if likely(!error)
 		return thrd_success;
+@@pp_ifdef ETIMEDOUT@@
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
+@@pp_endif@@
 	return thrd_error;
 }
 %#endif /* __USE_TIME64 */
@@ -630,9 +652,10 @@ void cnd_destroy(cnd_t *cond) = pthread_cond_destroy;
 %/* Thread specific storage functions.  */
 %
 
-@@Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
-@@If DESTRUCTOR is not NULL, the function will be called when the thread terminates
-@@s.a. `pthread_key_create()'
+@@>> tss_create(3)
+@@Create a new TLS key (s.a. `pthread_key_create(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_key_create)]]
@@ -644,15 +667,16 @@ int tss_create(tss_t *tss_id, tss_dtor_t destructor) {
 	return thrd_error;
 }
 
-@@Return the value held in thread-specific storage
-@@for the current thread identified by TSS_ID
-@@s.a. `pthread_getspecific()'
+@@>> tss_get(3)
+@@Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
+@@@return: * : The calling thread's value of the given TLS variable
 [[decl_include("<bits/crt/threads.h>")]]
 void *tss_get(tss_t tss_id) = pthread_getspecific;
 
-@@Sets the value of the thread-specific storage
-@@identified by TSS_ID for the current thread to VAL
-@@s.a. `pthread_setspecific()'
+@@>> tss_set(3)
+@@Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+@@@return: thrd_success: Success
+@@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_setspecific)]]
@@ -664,9 +688,8 @@ int tss_set(tss_t tss_id, void *val) {
 	return thrd_error;
 }
 
-@@Destroys the thread-specific storage identified by TSS_ID.
-@@The destructor of the TSS will not be called upon thread exit
-@@s.a. `pthread_key_delete()'
+@@>> tss_delete(3)
+@@Destroys the given TLS key (s.a. `pthread_key_delete(3)')
 [[decl_include("<bits/crt/threads.h>")]]
 void tss_delete(tss_t tss_id) = pthread_key_delete;
 
@@ -678,6 +701,7 @@ void tss_delete(tss_t tss_id) = pthread_key_delete;
 % *       to see this function anywhere other than Solaris, restrict it to its feature
 % *       namespace. */
 %#ifdef __USE_SOLARIS
+@@>> thr_min_stack(3)
 [[ATTR_CONST, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/confname.h>", "<asm/crt/limits.h>")]]
 $size_t thr_min_stack() {
@@ -694,6 +718,7 @@ $size_t thr_min_stack() {
 @@pp_endif@@
 }
 
+@@>> thr_main(3)
 @@Another one of these non-restricted, but solaris-specific functions:
 @@This one returns 1 if the calling thread is the main() thread (i.e.
 @@the thread that was started by the kernel in order to execute the

@@ -31,12 +31,17 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.io.poll")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/sem.h>
+)]%[insert:prefix(
 #include <bits/os/sem.h>
+)]%[insert:prefix(
 #include <bits/os/sembuf.h>
+)]%{
 #include <sys/ipc.h> /* [n4217.pdf:12514] #include mandated by POSIX */
 
 #ifdef __USE_GNU
@@ -135,8 +140,8 @@ int semtimedop(int semid,
 %#endif /* __USE_GNU */
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

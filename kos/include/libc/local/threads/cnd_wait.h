@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x867968b8 */
+/* HASH CRC-32:0x23688436 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,8 +41,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Block current thread on the condition variable pointed by COND
- * s.a. `pthread_cond_wait()' */
+/* >> cnd_wait(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(cnd_wait) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_wait))(__cnd_t *__restrict __cond, __mtx_t *__restrict __mutex) {
 	__errno_t __error;

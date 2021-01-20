@@ -33,15 +33,19 @@
 %[define_replacement(ucontext_t = "struct ucontext")]
 %[default:section(".text.crt{|.dos}.cpu.ucontext")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/ucontext.h> /* `__CRT_SUPPORTS_UCONTEXT' */
+)]%{
+
 #include <sys/ucontext.h>     /* `ucontext_t' */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 }
 
 %
@@ -144,8 +148,7 @@ void makecontext([[nonnull]] ucontext_t *ucp,
 #define setcontext(ucp) ((setcontext)(ucp), __builtin_unreachable(), 0)
 #endif /* __CRT_SUPPORTS_UCONTEXT */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

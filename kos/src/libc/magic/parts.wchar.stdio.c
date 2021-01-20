@@ -21,19 +21,22 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _STDIO_H
 #include <stdio.h>
 #endif /* !_STDIO_H */
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
-#include <bits/types.h>
 
-__SYSDECL_BEGIN
+}%[insert:prefix(
+#include <bits/types.h>
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -60,9 +63,7 @@ $FILE *wpopen([[nonnull]] wchar_t const *command,
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

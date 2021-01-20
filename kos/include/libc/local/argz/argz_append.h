@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdef3ba2 */
+/* HASH CRC-32:0x71c8d845 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,8 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+/* >> argz_append(3)
+ * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_append) __ATTR_NONNULL((1, 2)) __errno_t

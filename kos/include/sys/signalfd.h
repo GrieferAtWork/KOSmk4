@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeedad6b */
+/* HASH CRC-32:0x578423a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@
 #include <stdint.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
+
 
 /* Flags for signalfd. */
 #if (defined(__SFD_NONBLOCK) || defined(__SFD_CLOEXEC) || \
@@ -89,6 +89,7 @@ enum {
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
@@ -99,8 +100,8 @@ typedef struct __sigset_struct sigset_t;
  * delivery of signals masked by `SIGMASK' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__sigmask, __STDC_INT_AS_UINT_T __flags),(__fd,__sigmask,__flags))
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SIGNALFD_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75ea7992 */
+/* HASH CRC-32:0x7327bb95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,6 @@
 #include <bits/os/siginfo.h> /* `struct __siginfo_struct' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
-__SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #if !defined(WCOREFLAG) && defined(__WCOREFLAG)
@@ -74,6 +73,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __siginfo_t_defined
@@ -295,8 +295,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t
 __CDECLARE_OPT(,int,__NOTHROW_NCX,detach,(__pid_t __pid),(__pid))
 #endif /* __USE_KOS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_WAIT_H */

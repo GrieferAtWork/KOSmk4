@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1293e1ae */
+/* HASH CRC-32:0xb12ccb26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_sendfile)(fd_t out_fd, fd_t in_fd, off_t *offset, size_t count);
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_sendfile64)(fd_t out_fd, fd_t in_fd, off64_t *offset, size_t count);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

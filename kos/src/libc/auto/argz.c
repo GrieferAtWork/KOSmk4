@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b61f4f8 */
+/* HASH CRC-32:0xf1f60c26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <libc/errno.h>
 #include <hybrid/__assert.h>
-/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+/* >> argz_create(3)
+ * Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
  * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
  * sub-string represents one of the original strings from `ARGV'
@@ -82,7 +83,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
 	return 0;
 }
 #include <libc/errno.h>
-/* Create an ARGZ string from `string' by splitting that string at each
+/* >> argz_create_sep(3)
+ * Create an ARGZ string from `string' by splitting that string at each
  * occurance of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
@@ -147,7 +149,8 @@ again_check_ch:
 	*pargz_len = (size_t)(dst - result_string);
 	return 0;
 }
-/* Count and return the # of strings in `ARGZ'
+/* >> argz_count(3)
+ * Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE size_t
 NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
@@ -166,7 +169,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
 	}
 	return result;
 }
-/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+/* >> argz_extract(3)
+ * Extend pointers to individual string from `ARGZ', and sequentially write them to
  * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 3)) void
@@ -186,7 +190,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
 		argz     += temp;
 	}
 }
-/* Convert an `ARGZ' string into a NUL-terminated c-string
+/* >> argz_stringify(3)
+ * Convert an `ARGZ' string into a NUL-terminated c-string
  * with a total `strlen(argz) == len - 1', by replacing all
  * of the NUL-characters separating the individual ARGZ strings
  * with `SEP'. */
@@ -208,7 +213,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
 	}
 }
 #include <libc/errno.h>
-/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+/* >> argz_append(3)
+ * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2)) error_t
@@ -231,7 +237,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
 	*pargz_len = newlen;
 	return 0;
 }
-/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+/* >> argz_add(3)
+ * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
@@ -242,7 +249,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
 	return libc_argz_append(pargz, pargz_len, str, libc_strlen(str) + 1);
 }
 #include <libc/errno.h>
-/* A combination of `argz_create_sep()' and `argz_append()' that will
+/* >> argz_add_sep(3)
+ * A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
  * markers between separate strings. Note however that duplicate,
@@ -318,7 +326,8 @@ again_check_ch:
 	*pargz_len = (size_t)(dst - result_string);
 	return 0;
 }
-/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+/* >> argz_delete(3)
+ * Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
  * found, remove that entry by shifting all following elements downwards
  * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
@@ -346,7 +355,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
 	             sizeof(char));
 }
 #include <libc/errno.h>
-/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+/* >> argz_insert(3)
+ * When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
  * Otherwise, `before' should point somewhere into the middle, or to the start
  * of an existing argument entry, who's beginning will first be located, before
  * this function will then allocate additional memory to insert a copy of `entry'
@@ -414,7 +424,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	return 0;
 }
 #include <libc/errno.h>
-/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+/* >> argz_replace(3)
+ * Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
  * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
  * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
  * @return: 0:      Success
@@ -507,7 +518,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 	}
 	return 0;
 }
-/* Iterate the individual strings that make up a given ARGZ vector.
+/* >> argz_next(3)
+ * Iterate the individual strings that make up a given ARGZ vector.
  * This function is intended to be used in one of 2 ways:
  * >> char *my_entry = NULL;
  * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)

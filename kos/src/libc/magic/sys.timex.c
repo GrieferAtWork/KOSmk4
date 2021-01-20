@@ -40,13 +40,20 @@
 %[define_replacement(timex64      = __timex64)]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/timex.h>
+)]%[insert:prefix(
 #include <bits/os/timex.h>
+)]%[insert:prefix(
 #include <bits/crt/ntptimeval.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
+
 #include <sys/time.h>
 
 /* Mode code flags (for `struct timex::mode') */
@@ -195,9 +202,8 @@
 #define MAXTC 6 /* ??? */
 
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -602,8 +608,7 @@ int ntp_gettime64([[nonnull]] struct ntptimeval64 *__restrict ntv) {
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

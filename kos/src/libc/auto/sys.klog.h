@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd363ea90 */
+/* HASH CRC-32:0x1fb33954 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,6 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Control the kernel's logging facility.  This corresponds exactly to the
- * kernel's syslog system call, but that name is easily confused with the
- * user-level syslog facility, which is something completely different */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_klogctl)(__STDC_INT_AS_UINT_T type, char *bufp, __STDC_INT_AS_SIZE_T len);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

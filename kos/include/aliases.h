@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28026d6b */
+/* HASH CRC-32:0xf6c17125 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,11 +41,14 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/* Rewind/Open the internal mail alias database file (which is located in `/etc/aliases') */
+/* >> setaliasent(3)
+ * Rewind/Open the internal mail alias database file (which is located in `/etc/aliases') */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setaliasent,(void),())
-/* Close the internal mail alias database file (s.a. `setaliasent(3)') */
+/* >> endaliasent(3)
+ * Close the internal mail alias database file (s.a. `setaliasent(3)') */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endaliasent,(void),())
-/* Read the entry entry from the mail alias alias database.
+/* >> getaliasent(3)
+ * Read the entry entry from the mail alias alias database.
  * If the database hadn't already been opened, this function will
  * open it the same way that a call to `setaliasent(3)' would.
  * @return: * :   A pointer to an internal, statically allocated structure
@@ -53,14 +56,17 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endaliasent,(void),())
  * @return: NULL: [errno=ENOENT]      Database end has been reached
  * @return: NULL: [errno=*]           Error */
 __CDECLARE_OPT(__ATTR_WUNUSED,struct aliasent *,__NOTHROW_RPC_KOS,getaliasent,(void),())
-/* Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
+/* >> getaliasent_r(3)
+ * Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),__errno_t,__NOTHROW_RPC_KOS,getaliasent_r,(struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__result_buf,__buffer,__buflen,__result))
-/* Find a database entry associated with the given `name'
+/* >> getaliasbyname(3)
+ * Find a database entry associated with the given `name'
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=ENOENT] No entry matching `name'
  * @return: NULL: [errno=*]      Error */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
-/* Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
+/* >> getaliasbyname_r(3)
+ * Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),__errno_t,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
 
 __SYSDECL_END

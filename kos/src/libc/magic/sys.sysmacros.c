@@ -32,13 +32,14 @@
 %[define_replacement(dev_t = __dev_t)]
 %[default:section(".text.crt{|.dos}.system.utility")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/types.h>
-
-__SYSDECL_BEGIN
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -64,8 +65,7 @@ $dev_t gnu_dev_makedev($major_t major, $minor_t minor) {
 #define minor(dev)        gnu_dev_minor(dev)
 #define makedev(maj, min) gnu_dev_makedev(maj, min)
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

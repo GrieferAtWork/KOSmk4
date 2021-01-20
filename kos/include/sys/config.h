@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23006947 */
+/* HASH CRC-32:0x79888466 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -397,6 +397,7 @@
 #endif /* __CRT_HAVE_setenv || ((__CRT_HAVE_getenv || __LOCAL_environ) && __CRT_HAVE__putenv_s) */
 
 #undef HAVE_SETLINEBUF
+#include <features.h>
 #if defined(__CRT_HAVE_setlinebuf) || defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #define HAVE_SETLINEBUF 1
 #endif /* __CRT_HAVE_setlinebuf || __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */

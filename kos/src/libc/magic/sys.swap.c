@@ -29,11 +29,12 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.fs.swap")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <asm/os/swap.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 /* The swap priority is encoded as:
  *  - (prio << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK */
@@ -51,6 +52,7 @@ __SYSDECL_BEGIN
 #endif /* __SWAP_FLAG_DISCARD */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -64,8 +66,7 @@ int swapoff([[nonnull]] char const *path);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

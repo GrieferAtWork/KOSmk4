@@ -28,11 +28,12 @@
 
 %[default:section(".text.crt{|.dos}.system.reboot")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <asm/os/reboot.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 /* Linux compatibility header */
 #ifdef __RB_AUTOBOOT
@@ -58,6 +59,7 @@ __SYSDECL_BEGIN
 #endif /* __RB_KEXEC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -68,8 +70,7 @@ int reboot(__STDC_INT_AS_UINT_T howto);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

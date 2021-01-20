@@ -28,11 +28,15 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/xattr.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>
@@ -159,7 +163,6 @@ int fremovexattr($fd_t fd,
 
 
 %{
-
 #endif /* __CC__ */
 
 __SYSDECL_END

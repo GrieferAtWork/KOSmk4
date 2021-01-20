@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f9e3e8 */
+/* HASH CRC-32:0xdf374634 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,8 @@ __NAMESPACE_LOCAL_BEGIN
  * The registered cleanup handlers are called via exception handling */
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
 #endif /* !__local___localdep_pthread_exit_defined */
-/* Terminate current thread execution, cleaning up any thread local
- * storage and freeing resources. Returns the value specified in RES
- * s.a. `pthread_exit()' */
+/* >> thrd_exit(3)
+ * Terminate the calling thread (s.a. `pthread_exit(3)') */
 __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
 (__LIBCCALL __LIBC_LOCAL_NAME(thrd_exit))(int __res) __THROWS(...) {
 	__localdep_pthread_exit((void *)(__UINTPTR_TYPE__)(unsigned int)__res);

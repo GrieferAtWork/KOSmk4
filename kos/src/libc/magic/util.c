@@ -25,10 +25,15 @@
 
 %{
 
+}%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/util.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 /*#include <sys/types.h>*/
 /*#include <stdio.h>*/
@@ -364,9 +369,9 @@ err:
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 }
-

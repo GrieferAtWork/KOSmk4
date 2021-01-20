@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9db0eadc */
+/* HASH CRC-32:0xfb70c4af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,17 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#ifndef _PROCESS_H
 #include <process.h>
+#endif /* !_PROCESS_H */
+#ifndef _UCHAR_H
 #include <uchar.h>
+#endif /* !_UCHAR_H */
+
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __T16ARGV
 #ifdef __USE_DOS
@@ -458,8 +462,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,c32system,(char32_t const *__cmd),_wsystem,(__cmd
 __CREDIRECT_KOS(,int,__NOTHROW_RPC,c32system,(char32_t const *__cmd),_wsystem,(__cmd))
 #endif /* ... */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_UCHAR_PROCESS_H */

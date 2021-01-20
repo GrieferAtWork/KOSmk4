@@ -27,10 +27,13 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.database.utmpx")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <asm/crt/ttyent.h>
+)]%[insert:prefix(
 #include <bits/crt/db/ttyent.h>
+)]%{
 
 #define _PATH_TTYS   "/etc/ttys"
 #define _TTYS_OFF    "off"
@@ -45,9 +48,8 @@
 #define TTY_SECURE __TTY_SECURE /* allow uid of 0 to login */
 #endif /* __TTY_SECURE */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -64,8 +66,8 @@ int endttyent();
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

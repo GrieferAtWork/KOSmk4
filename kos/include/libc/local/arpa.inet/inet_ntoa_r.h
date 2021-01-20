@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d05ac28 */
+/* HASH CRC-32:0x496a093 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,8 @@ __NAMESPACE_LOCAL_END
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Re-entrant version of `inet_ntoa()' */
+/* >> inet_ntoa_r(3)
+ * Re-entrant version of `inet_ntoa()' */
 __LOCAL_LIBC(inet_ntoa_r) __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa_r))(struct in_addr __inaddr, char __buf[16]) {
 	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77cdc817 */
+/* HASH CRC-32:0x3a72655a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,8 +41,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Initialize new condition variable pointed by COND
- * s.a. `pthread_cond_init()' */
+/* >> cnd_init(3)
+ * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(cnd_init) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_init))(__cnd_t *__restrict __cond) {
 	__errno_t __error;

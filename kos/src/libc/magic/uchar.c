@@ -38,14 +38,17 @@
 %[declare_known_section(".text.crt.dos.wchar.unicode.convert")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%[insert:prefix(
 #include <bits/crt/mbstate.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __std_mbstate_t_defined
 #define __std_mbstate_t_defined 1
@@ -95,9 +98,9 @@ typedef __CHAR32_TYPE__ char32_t;
 %[insert:std]
 
 [[std, no_crt, preferred_alias("mbrtoc16")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtowc", "__mbrtowc")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc16"), bind_local_function(uchar_mbrtoc16)]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
@@ -105,9 +108,9 @@ size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
 
 [[std, no_crt, preferred_alias("mbrtoc32")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtowc", "__mbrtowc")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc32"), bind_local_function(uchar_mbrtoc32)]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
@@ -115,18 +118,18 @@ size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
 
 [[std, no_crt, preferred_alias("c16rtomb")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), alias("wcrtomb")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wcrtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
-[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
 [[exposed_name("c16rtomb"), bind_local_function(uchar_c16rtomb)]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
                      [[nullable]] mbstate_t *mbs);
 
 [[std, no_crt, preferred_alias("c32rtomb")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), alias("wcrtomb")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wcrtomb")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
-[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
 [[exposed_name("c32rtomb"), bind_local_function(uchar_c32rtomb)]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
@@ -172,9 +175,10 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
+
 
 #ifdef __USE_UTF
 #if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
@@ -235,4 +239,3 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
-

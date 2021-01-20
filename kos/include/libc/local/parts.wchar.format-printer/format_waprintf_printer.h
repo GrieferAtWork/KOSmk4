@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb60dda2 */
+/* HASH CRC-32:0x3a84be1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,16 +80,21 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wmemcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(memcpyw))
-#elif __SIZEOF_WCHAR_T__ == 4
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wmemcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(memcpyl))
-#else /* ... */
+#else /* __SIZEOF_WCHAR_T__ == 4 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wmemcpy.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
+#endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !... */
 #endif /* !__local___localdep_wmemcpy_defined */
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

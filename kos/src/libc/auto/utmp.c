@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1c94519 */
+/* HASH CRC-32:0xe4fb6240 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,8 +33,11 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/os/tty.h>
 #include <asm/os/stdio.h>
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
+/* >> login_tty(3)
+ * Set the given `fd' as the controlling terminal, stdin,
+ * stdout, and stderr. Afterwards, `fd' is closed.
+ * @return: 0 : Success
+ * @return: * : Error */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 	if unlikely(libc_setsid() < 0)

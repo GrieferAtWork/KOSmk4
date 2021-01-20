@@ -26,11 +26,15 @@
 
 %[default:section(".text.crt{|.dos}.net.ether")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <net/ethernet.h>
+)]%[insert:prefix(
 #include <netinet/if_ether.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

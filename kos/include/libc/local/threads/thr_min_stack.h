@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcbf1041 */
+/* HASH CRC-32:0xa7b0ffc5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/confname.h>
 #include <asm/crt/limits.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> thr_min_stack(3) */
 __LOCAL_LIBC(thr_min_stack) __ATTR_CONST __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_min_stack))(void) {
 #if (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE__sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_THREAD_STACK_MIN)

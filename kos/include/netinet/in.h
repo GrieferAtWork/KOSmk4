@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8aecff7 */
+/* HASH CRC-32:0x54600985 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,8 +61,6 @@
 /* TODO: Constants and structs from this header should
  *       be moved into <asm/> and <bits/> headers! */
 
-__SYSDECL_BEGIN
-
 /* Integer net address classification macros */
 #define IN_CLASSA(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0x80000000)) == 0)
 #define IN_CLASSA_NET              __UINT32_C(0xff000000)
@@ -99,6 +97,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __sa_family_t_defined
 #define __sa_family_t_defined 1
@@ -437,8 +436,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getsourcefilter,(__fd_t __sockfd, __UINT32
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct sockaddr_storage const *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
 #endif /* __USE_GNU */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_NETINET_IN_H */

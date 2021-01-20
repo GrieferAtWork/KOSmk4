@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57b59d4e */
+/* HASH CRC-32:0xa3e53710 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <hybrid/typecore.h>
 #ifndef _STDLIB_H
 #include <stdlib.h>
 #endif /* !_STDLIB_H */
@@ -36,9 +37,8 @@
 #include <wchar.h>
 #endif /* !_WCHAR_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_wtoi
@@ -99,8 +99,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PUR
 #endif /* __LONGLONG */
 #endif /* __USE_KOS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_WCHAR_STDLIB_H */

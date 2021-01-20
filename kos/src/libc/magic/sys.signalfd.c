@@ -27,19 +27,25 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.sched.signalfd")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/signalfd.h>          /* __SFD_*/
+)]%[insert:prefix(
 #include <bits/os/signalfd_siginfo.h> /* struct signalfd_siginfo */
+)]%[insert:prefix(
 #include <bits/os/sigset.h>           /* struct __sigset_struct */
+)]%[insert:prefix(
 #include <bits/types.h>               /* __fd_t */
+)]%{
 
 #ifdef __USE_GLIBC
 #include <stdint.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
+
 
 /* Flags for signalfd. */
 #if (defined(__SFD_NONBLOCK) || defined(__SFD_CLOEXEC) || \
@@ -85,6 +91,7 @@ enum {
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
@@ -101,8 +108,8 @@ $fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *sigmask,
                __STDC_INT_AS_UINT_T flags);
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

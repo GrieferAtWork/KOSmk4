@@ -60,13 +60,16 @@ __SYSDECL_BEGIN
 }
 
 
+@@>> setaliasent(3)
 @@Rewind/Open the internal mail alias database file (which is located in `/etc/aliases')
 [[cp_kos]]
 void setaliasent();
 
+@@>> endaliasent(3)
 @@Close the internal mail alias database file (s.a. `setaliasent(3)')
 void endaliasent();
 
+@@>> getaliasent(3)
 @@Read the entry entry from the mail alias alias database.
 @@If the database hadn't already been opened, this function will
 @@open it the same way that a call to `setaliasent(3)' would.
@@ -77,12 +80,14 @@ void endaliasent();
 [[wunused, cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
 struct aliasent *getaliasent();
 
+@@>> getaliasent_r(3)
 @@Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)')
 [[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
 $errno_t getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
                        [[nonnull]] char *__restrict buffer, size_t buflen,
                        [[nonnull]] struct aliasent **__restrict result);
 
+@@>> getaliasbyname(3)
 @@Find a database entry associated with the given `name'
 @@@return: * :   A pointer to an internal, statically allocated structure
 @@@return: NULL: [errno=ENOENT] No entry matching `name'
@@ -90,6 +95,7 @@ $errno_t getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
 [[wunused, cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
 struct aliasent *getaliasbyname([[nonnull]] char const *name);
 
+@@>> getaliasbyname_r(3)
 @@Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)')
 [[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
 $errno_t getaliasbyname_r([[nonnull]] char const *__restrict name,

@@ -32,15 +32,23 @@
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 %[default:section(".text.crt{|.dos}.io.utility")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/ioctl.h>
+)]%[insert:prefix(
 #include <asm/os/socket-ioctls.h>
+)]%[insert:prefix(
 #include <asm/os/tty.h>
+)]%[insert:prefix(
 #include <bits/os/termio.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <sys/ttydefaults.h>
+)]%{
 
 
 /************************************************************************/
@@ -643,8 +651,6 @@
 #if !defined(SIOCPROTOPRIVATE) && defined(__SIOCPROTOPRIVATE)
 #define SIOCPROTOPRIVATE __SIOCPROTOPRIVATE /* Protocol-private ioctls. */
 #endif /* !SIOCPROTOPRIVATE && __SIOCPROTOPRIVATE */
-
-
 
 
 

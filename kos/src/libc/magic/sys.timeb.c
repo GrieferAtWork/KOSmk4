@@ -38,15 +38,18 @@
 %[define_replacement(timeb32 = __timeb32)]
 %[define_replacement(timeb64 = __timeb64)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/os/timeb.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
-
-__SYSDECL_BEGIN
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined 1
@@ -398,8 +401,7 @@ int ftime64([[nonnull]] struct timeb64 *timebuf) {
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

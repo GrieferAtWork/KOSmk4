@@ -40,12 +40,17 @@
 %[define_replacement(tv_nsec = tv_nsec)]
 %[define_replacement(tv_usec = tv_usec)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/db/netdb.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <netinet/in.h>
+)]%{
 
 #include <stdint.h>
 
@@ -750,6 +755,7 @@ int gai_cancel(struct gaicb *gaicbp);
 
 
 %{
+
 #endif /* __CC__ */
 
 __SYSDECL_END

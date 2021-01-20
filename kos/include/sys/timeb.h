@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41caf0d1 */
+/* HASH CRC-32:0x63e60a74 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,8 @@
 #include <bits/types.h>
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined 1
@@ -126,8 +125,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* ... */
 #endif /* __USE_TIME64 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_TIMEB_H */

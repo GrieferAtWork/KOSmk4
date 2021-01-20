@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6491de4 */
+/* HASH CRC-32:0xa796207 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg, __WCHAR_
 	(void)__data;
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
 	 *      However, magic headers don't support conditional attributes, so we can't just do
-	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
 	__COMPILER_IMPURE();
 	return (__SSIZE_TYPE__)__datalen;
 #endif /* __SIZEOF_WCHAR_T__ != 2 */

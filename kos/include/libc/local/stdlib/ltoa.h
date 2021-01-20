@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6db20522 */
+/* HASH CRC-32:0xf2484ee2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,16 +35,21 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
-#elif defined(__CRT_HAVE__i64toa_s) && __SIZEOF_LONG__ == 8
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE__i64toa_s) && __SIZEOF_LONG__ == 8
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
-#else /* ... */
+#else /* __CRT_HAVE__i64toa_s && __SIZEOF_LONG__ == 8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_ltoa_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__ltoa_s __LIBC_LOCAL_NAME(_ltoa_s)
+#endif /* !__CRT_HAVE__i64toa_s || __SIZEOF_LONG__ != 8 */
 #endif /* !... */
 #endif /* !__local___localdep__ltoa_s_defined */
 __LOCAL_LIBC(ltoa) __ATTR_NONNULL((2)) char *

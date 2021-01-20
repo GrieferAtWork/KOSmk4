@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x224ebb06 */
+/* HASH CRC-32:0x7c11e00d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-/* Iterate the individual strings that make up a given ARGZ vector.
+/* >> argz_next(3)
+ * Iterate the individual strings that make up a given ARGZ vector.
  * This function is intended to be used in one of 2 ways:
  * >> char *my_entry = NULL;
  * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)

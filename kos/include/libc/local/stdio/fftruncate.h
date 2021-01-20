@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee60f984 */
+/* HASH CRC-32:0xa99089ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fftruncate_defined
 #define __local_fftruncate_defined 1
 #include <__crt.h>
+#include <features.h>
 #if ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
 #include <kos/anno.h>
 #ifndef __PIO_OFFSET
@@ -57,7 +58,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 #define __local___localdep_ftruncate_defined 1
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2)
@@ -65,7 +65,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2)
@@ -73,7 +72,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2)
@@ -81,7 +79,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2)
@@ -89,7 +86,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2)

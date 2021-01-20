@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59c79044 */
+/* HASH CRC-32:0xcf11b8a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,17 +52,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: thrd_sleep32 from threads */
 #if !defined(__local___localdep_thrd_sleep32_defined) && defined(__CRT_HAVE_thrd_sleep)
 #define __local___localdep_thrd_sleep32_defined 1
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_thrd_sleep32,(struct __timespec32 const *__time_point, struct __timespec32 *__remaining),thrd_sleep,(__time_point,__remaining))
 #endif /* !__local___localdep_thrd_sleep32_defined && __CRT_HAVE_thrd_sleep */
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */

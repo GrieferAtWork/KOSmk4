@@ -22,15 +22,22 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(pid_t = __pid_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
+#ifndef _PROCESS_H
 #include <process.h>
+#endif /* !_PROCESS_H */
+#ifndef _UCHAR_H
 #include <uchar.h>
-#include <bits/types.h>
+#endif /* !_UCHAR_H */
 
-__SYSDECL_BEGIN
+}%[insert:prefix(
+#include <bits/types.h>
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -102,9 +109,7 @@ c32system(*) %{uchar32("wsystem")}
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

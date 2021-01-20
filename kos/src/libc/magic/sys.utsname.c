@@ -31,9 +31,11 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/os/utsname.h>
+)]%{
 
 /* Note that SVID assumes all members have the same size. */
 #ifdef __USE_MISC

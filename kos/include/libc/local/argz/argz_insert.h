@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79a0c4ef */
+/* HASH CRC-32:0xbdea1790 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_add_defined
 #define __local___localdep_argz_add_defined 1
 #ifdef __CRT_HAVE_argz_add
-/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+/* >> argz_add(3)
+ * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
-/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+/* >> argz_add(3)
+ * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
@@ -43,7 +45,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_ad
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_add.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+/* >> argz_add(3)
+ * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
@@ -125,7 +128,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+/* >> argz_insert(3)
+ * When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
  * Otherwise, `before' should point somewhere into the middle, or to the start
  * of an existing argument entry, who's beginning will first be located, before
  * this function will then allocate additional memory to insert a copy of `entry'

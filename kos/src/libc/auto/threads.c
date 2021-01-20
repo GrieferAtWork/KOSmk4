@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa71f1faf */
+/* HASH CRC-32:0xa3eec288 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,10 @@ STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 #ifndef __KERNEL__
 #include <asm/crt/threads.h>
 #include <libc/errno.h>
-/* Create a new thread executing the function FUNC.  Arguments for FUNC
- * are passed through ARG. If successful, THR is set to new thread identifier */
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
                                        thrd_start_t func,
@@ -53,17 +55,17 @@ NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
 #endif /* thrd_nomem && ENOMEM */
 	return thrd_error;
 }
-/* Terminate current thread execution, cleaning up any thread local
- * storage and freeing resources. Returns the value specified in RES
- * s.a. `pthread_exit()' */
+/* >> thrd_exit(3)
+ * Terminate the calling thread (s.a. `pthread_exit(3)') */
 INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_NORETURN void
 (LIBCCALL libc_thrd_exit)(int res) THROWS(...) {
 	libc_pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
 #include <asm/crt/threads.h>
-/* Detach the thread identified by THR from the current
- * environment (it does not allow join or wait for it)
- * s.a. `pthread_detach()' */
+/* >> thrd_detach(3)
+ * Detach the given thread (s.a. `pthread_detach(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr) {
 	errno_t error;
@@ -73,9 +75,10 @@ NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr) {
 	return thrd_error;
 }
 #include <asm/crt/threads.h>
-/* Block current thread until execution of THR is complete.
- * In case that RES is not NULL, will store the return value of THR when exiting
- * s.a. `pthread_join()' */
+/* >> thrd_join(3)
+ * Wait for the given thread to finish (s.a. `pthread_join(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
                                      int *res) {
@@ -98,9 +101,10 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 #include <asm/crt/threads.h>
 #include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
-/* Creates a new mutex object with type TYPE.
- * If successful the new object is pointed by MUTEX
- * s.a. `pthread_mutex_init()' */
+/* >> mtx_init(3)
+ * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
                                     __STDC_INT_AS_UINT_T type) {
@@ -126,9 +130,10 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Block the current thread until the mutex pointed to by MUTEX is
- * unlocked.  In that case current thread will not be blocked
- * s.a. `pthread_mutex_lock()' */
+/* >> mtx_lock(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
 	errno_t error;
@@ -139,10 +144,12 @@ NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+#include <asm/os/errno.h>
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
                                          struct timespec const *__restrict time_point) {
@@ -150,6 +157,10 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
 	error = libc_pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
+#ifdef ETIMEDOUT
+	if (error == ETIMEDOUT)
+		return thrd_timedout;
+#endif /* ETIMEDOUT */
 	return thrd_error;
 }
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -157,10 +168,12 @@ DEFINE_INTERN_ALIAS(libc_mtx_timedlock64, libc_mtx_timedlock);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+#include <asm/os/errno.h>
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
                                            struct timespec64 const *__restrict time_point) {
@@ -168,16 +181,21 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 	error = libc_pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
+#ifdef ETIMEDOUT
+	if (error == ETIMEDOUT)
+		return thrd_timedout;
+#endif /* ETIMEDOUT */
 	return thrd_error;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 #include <libc/errno.h>
-/* Try to lock the mutex pointed by MUTEX without blocking.
- * If the mutex is free the current threads takes control of
- * it, otherwise it returns immediately
- * s.a. `pthread_mutex_trylock()' */
+/* >> mtx_trylock(3)
+ * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_busy:    Cannot lock without blocking right now
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
 	errno_t error;
@@ -192,9 +210,10 @@ NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Unlock the mutex pointed by MUTEX.
- * It may potentially awake other threads waiting on this mutex
- * s.a. `pthread_mutex_unlock()' */
+/* >> mtx_unlock(3)
+ * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
 	errno_t error;
@@ -205,8 +224,10 @@ NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Initialize new condition variable pointed by COND
- * s.a. `pthread_cond_init()' */
+/* >> cnd_init(3)
+ * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
 	errno_t error;
@@ -217,8 +238,11 @@ NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Unblock one thread that currently waits on condition variable pointed by COND
- * s.a. `pthread_cond_signal()' */
+/* >> cnd_signal(3)
+ * Wakeup one thread currently waiting on the given
+ * condition variable (s.a. `pthread_cond_signal(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
 	errno_t error;
@@ -229,8 +253,11 @@ NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Unblock all threads currently waiting on condition variable pointed by COND
- * s.a. `pthread_cond_broadcast()' */
+/* >> cnd_broadcast(3)
+ * Wakeup all threads currently waiting on the given
+ * condition variable (s.a. `pthread_cond_broadcast(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
 	errno_t error;
@@ -241,8 +268,10 @@ NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Block current thread on the condition variable pointed by COND
- * s.a. `pthread_cond_wait()' */
+/* >> cnd_wait(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
                                     mtx_t *__restrict mutex) {
@@ -255,9 +284,12 @@ NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+#include <asm/os/errno.h>
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
                                          mtx_t *__restrict mutex,
@@ -268,8 +300,10 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
 	                               time_point);
 	if likely(!error)
 		return thrd_success;
+#ifdef ETIMEDOUT
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
+#endif /* ETIMEDOUT */
 	return thrd_error;
 }
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -277,9 +311,12 @@ DEFINE_INTERN_ALIAS(libc_cnd_timedwait64, libc_cnd_timedwait);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+#include <asm/os/errno.h>
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
                                            mtx_t *__restrict mutex,
@@ -290,16 +327,19 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
 	                                 time_point);
 	if likely(!error)
 		return thrd_success;
+#ifdef ETIMEDOUT
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
+#endif /* ETIMEDOUT */
 	return thrd_error;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
- * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
- * s.a. `pthread_key_create()' */
+/* >> tss_create(3)
+ * Create a new TLS key (s.a. `pthread_key_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
                                       tss_dtor_t destructor) {
@@ -311,9 +351,10 @@ NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
 }
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-/* Sets the value of the thread-specific storage
- * identified by TSS_ID for the current thread to VAL
- * s.a. `pthread_setspecific()' */
+/* >> tss_set(3)
+ * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
                                    void *val) {
@@ -325,6 +366,7 @@ NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
 }
 #include <asm/crt/confname.h>
 #include <asm/crt/limits.h>
+/* >> thr_min_stack(3) */
 INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_CONST size_t
 NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void) {
 

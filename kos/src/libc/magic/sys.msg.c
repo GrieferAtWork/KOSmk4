@@ -32,9 +32,11 @@
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]
 %[default:section(".text.crt{|.dos}.sched.msg")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/os/msq.h>
+)]%{
 #include <sys/ipc.h> /* [n4217.pdf:12344] #include mandated by POSIX */
 
 #ifdef __USE_GNU

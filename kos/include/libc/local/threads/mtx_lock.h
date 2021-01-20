@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2da4885b */
+/* HASH CRC-32:0x3ef869fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Block the current thread until the mutex pointed to by MUTEX is
- * unlocked.  In that case current thread will not be blocked
- * s.a. `pthread_mutex_lock()' */
+/* >> mtx_lock(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(mtx_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mutex) {
 	__errno_t __error;

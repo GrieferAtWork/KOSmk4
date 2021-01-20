@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ebab21e */
+/* HASH CRC-32:0x28eb6d1f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -409,6 +409,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c32width from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c32width_defined
 #define __local___localdep_format_c32width_defined 1
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_format_length) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string

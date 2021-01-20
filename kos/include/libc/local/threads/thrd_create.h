@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7466982 */
+/* HASH CRC-32:0xf24c184 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Create a new thread executing the function FUNC.  Arguments for FUNC
- * are passed through ARG. If successful, THR is set to new thread identifier */
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(thrd_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, __thrd_start_t __func, void *__arg) {
 	__errno_t __error;

@@ -888,7 +888,7 @@ double nexttoward(double x, __LONGDOUBLE y) {
 
 @@Return X times (2 to the Nth power)
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbn")]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalbln", "__scalbln")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalbln", "__scalbln")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/scalbn.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -906,7 +906,7 @@ double scalbn(double x, int n) {
 [[doc_alias("scalbn")]]
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbln")]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbn)]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbn")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbn")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/scalbn.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -977,7 +977,7 @@ double remquo(double x, double y, int *pquo); /* TODO */
 @@Round X to nearest integral value according to current rounding direction
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lrint")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lrint.h>")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrint")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrint")]]
 long int lrint(double x) {
 @@pp_ifdef __LIBM_MATHFUNI@@
 	return __LIBM_MATHFUNI(@lrint@, x);
@@ -989,7 +989,7 @@ long int lrint(double x) {
 @@Round X to nearest integral value, rounding halfway cases away from zero
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lround")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lround.h>")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llround")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llround")]]
 long int lround(double x) {
 @@pp_ifdef __LIBM_MATHFUNI@@
 	return __LIBM_MATHFUNI(@lround@, x);
@@ -1073,12 +1073,12 @@ float nexttowardf(float x, __LONGDOUBLE y) {
 
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbnf")]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnf", "__scalblnf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnf", "__scalblnf")]]
 float scalbnf(float x, int n) %{generate(double2float("scalbn"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalblnf")]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnf)]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnf")]]
 float scalblnf(float x, long int n) %{generate(double2float("scalbln"))}
 
 [[std, wunused, nothrow, ATTR_CONST, doc_alias(nearbyint)]]
@@ -1096,11 +1096,11 @@ float nearbyintf(float x);
 [[std, crtbuiltin, export_alias("__remquof")]] remquof(*) %{generate(double2float("remquo"))}
 
 [[std, crtbuiltin, export_alias("__lrintf")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintf", "__llrintf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintf", "__llrintf")]]
 long int lrintf(float x) %{generate(double2float("lrint"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lroundf")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundf", "__llroundf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundf", "__llroundf")]]
 long int lroundf(float x) %{generate(double2float("lround"))}
 
 [[std, crtbuiltin, export_alias("__fdimf")]] fdimf(*) %{generate(double2float("fdim"))}
@@ -1111,12 +1111,12 @@ long int lroundf(float x) %{generate(double2float("lround"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llrintf")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintf)]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintf")]]
 __LONGLONG llrintf(float x) %{generate(double2float("llrint"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llroundf")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundf)]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundf")]]
 __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
@@ -1124,12 +1124,12 @@ __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 nexttowardl(*) = nextafterl;
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbnl")]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnl", "__scalblnl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnl", "__scalblnl")]]
 __LONGDOUBLE scalbnl(__LONGDOUBLE x, int n) %{generate(double2ldouble("scalbn"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalblnl")]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]]
-[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
 __LONGDOUBLE scalblnl(__LONGDOUBLE x, long int n) %{generate(double2ldouble("scalbln"))}
 
 [[std, wunused, nothrow, ATTR_CONST, doc_alias(nearbyint)]]
@@ -1147,11 +1147,11 @@ __LONGDOUBLE nearbyintl(__LONGDOUBLE x);
 [[std, crtbuiltin, export_alias("__remquol")]] remquol(*) %{generate(double2ldouble("remquo"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lrintl")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintl", "__llrintl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintl", "__llrintl")]]
 long int lrintl(__LONGDOUBLE x) %{generate(double2ldouble("lrint"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lroundl")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundl", "__llroundl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundl", "__llroundl")]]
 long int lroundl(__LONGDOUBLE x) %{generate(double2ldouble("lround"))}
 
 [[std, crtbuiltin, export_alias("__fdiml")]] fdiml(*) %{generate(double2ldouble("fdim"))}
@@ -1162,12 +1162,12 @@ long int lroundl(__LONGDOUBLE x) %{generate(double2ldouble("lround"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llrintl")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintl")]]
 __LONGLONG llrintl(__LONGDOUBLE x) %{generate(double2ldouble("llrint"))}
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llroundl")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundl")]]
 __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
 
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */

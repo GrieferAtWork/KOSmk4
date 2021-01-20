@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8efec26 */
+/* HASH CRC-32:0xdd8bafdd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,9 +38,8 @@
 #include <features.h>
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_gnu_dev_major
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__major_t,__NOTHROW,gnu_dev_major,(__dev_t __dev),(__dev))
@@ -66,8 +65,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_makedev, __FORCELOCAL __ATTR_ARTIFICIAL 
 #define minor(dev)        gnu_dev_minor(dev)
 #define makedev(maj, min) gnu_dev_makedev(maj, min)
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SYSMACROS_H */

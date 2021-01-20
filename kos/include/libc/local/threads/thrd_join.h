@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe93af533 */
+/* HASH CRC-32:0xa85f069b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,9 +41,10 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthr
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Block current thread until execution of THR is complete.
- * In case that RES is not NULL, will store the return value of THR when exiting
- * s.a. `pthread_join()' */
+/* >> thrd_join(3)
+ * Wait for the given thread to finish (s.a. `pthread_join(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(thrd_join) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr, int *__res) {
 	__errno_t __error;

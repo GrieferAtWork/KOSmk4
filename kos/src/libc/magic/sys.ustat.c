@@ -24,12 +24,15 @@
 
 %[define_replacement(dev_t = __dev_t)]
 
-%{
-
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/os/ustat.h> /* struct ustat */
+)]%[insert:prefix(
 #include <bits/types.h>    /* __dev_t */
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

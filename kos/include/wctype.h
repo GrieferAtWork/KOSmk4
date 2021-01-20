@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aece24b */
+/* HASH CRC-32:0xd348d83b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,13 +108,13 @@ __NAMESPACE_STD_USING(towupper)
 #include <endian.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
 
 #if !defined(WEOF) && defined(__WEOF)
 #define WEOF __WEOF
 #endif /* !WEOF && __WEOF */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_wint_t_defined
@@ -783,9 +783,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_iswcsym_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !_WCTYPE_DEFINED */
 #endif /* __USE_DOS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER
 #define _CXX_STDONLY_CWCTYPE 1

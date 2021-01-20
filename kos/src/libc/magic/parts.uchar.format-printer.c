@@ -22,22 +22,28 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[default:section(".text.crt{|.dos}.wchar.string.format")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _FORMAT_PRINTER_H
 #include <format-printer.h>
 #endif /* !_FORMAT_PRINTER_H */
 #ifndef _UCHAR_H
 #include <uchar.h>
 #endif /* !_UCHAR_H */
+
+}%[insert:prefix(
 #include <bits/crt/uformat-printer.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
+}%[insert:prefix(
 #include <libc/malloc.h>
-
-__SYSDECL_BEGIN
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* Calling convention used by `pc16formatprinter' */
 #ifndef C16FORMATPRINTER_CC
@@ -225,9 +231,7 @@ format_c32aprintf_printer(*) %{uchar32("format_waprintf_printer")}
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

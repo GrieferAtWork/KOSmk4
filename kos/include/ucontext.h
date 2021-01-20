@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb55d2bb */
+/* HASH CRC-32:0xd4ad69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,11 +39,12 @@
 #include <features.h>
 
 #include <asm/crt/ucontext.h> /* `__CRT_SUPPORTS_UCONTEXT' */
+
 #include <sys/ucontext.h>     /* `ucontext_t' */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 
 /* Save the caller's current register state into the given `UCP'
  * Usually, this function will never fail and always return `0'.
@@ -128,8 +129,7 @@ __LIBC __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(uconte
 #define setcontext(ucp) ((setcontext)(ucp), __builtin_unreachable(), 0)
 #endif /* __CRT_SUPPORTS_UCONTEXT */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_UCONTEXT_H */

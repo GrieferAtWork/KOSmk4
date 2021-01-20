@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccd645e */
+/* HASH CRC-32:0x43d509e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,29 +37,9 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-
 #include <features.h>
 #include <asm/os/mman.h>
 #include <bits/types.h>
-
-__SYSDECL_BEGIN
-
-#ifdef __CC__
-#ifndef __off_t_defined
-#define __off_t_defined 1
-typedef __FS_TYPE(off) off_t;
-#endif /* !__off_t_defined */
-
-#ifndef __size_t_defined
-#define __size_t_defined 1
-typedef __size_t size_t;
-#endif /* !__size_t_defined */
-
-#ifndef __mode_t_defined
-#define __mode_t_defined 1
-typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
-#endif /* !__mode_t_defined */
-#endif /* __CC__ */
 
 
 /* Data cannot be accessed. */
@@ -542,6 +522,23 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
+#ifndef __off_t_defined
+#define __off_t_defined 1
+typedef __FS_TYPE(off) off_t;
+#endif /* !__off_t_defined */
+
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
+
+#ifndef __mode_t_defined
+#define __mode_t_defined 1
+typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
+#endif /* !__mode_t_defined */
+
 #if defined(__CRT_HAVE_mmap64) && defined(__USE_FILE_OFFSET64)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
@@ -675,9 +672,8 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_free,(int __pkey),(__pkey))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __USE_GNU */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)

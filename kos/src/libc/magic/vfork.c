@@ -18,11 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

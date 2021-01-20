@@ -40,18 +40,30 @@ typedef struct __mbstate mbstate_t;
 }
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/__byteorder.h>
+)]%[insert:prefix(
 #include <hybrid/__byteswap.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/format-printer.h>
+)]%[insert:prefix(
 #include <bits/crt/mbstate.h>
+)]%[insert:prefix(
 #include <bits/crt/uformat-printer.h>
+)]%[insert:prefix(
 #include <bits/crt/wformat-printer.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
+
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -2008,17 +2020,3 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 
 __DECL_END
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

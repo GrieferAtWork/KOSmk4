@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72def977 */
+/* HASH CRC-32:0xa706a717 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,22 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
-#elif defined(__CRT_HAVE__ui64toa_s) && __SIZEOF_LONG__ == 8
+#else /* __CRT_HAVE__ultoa_s */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE__ui64toa_s) && __SIZEOF_LONG__ == 8
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
-#else /* ... */
+#else /* __CRT_HAVE__ui64toa_s && __SIZEOF_LONG__ == 8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_ultoa_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__ultoa_s __LIBC_LOCAL_NAME(_ultoa_s)
-#endif /* !... */
+#endif /* !__CRT_HAVE__ui64toa_s || __SIZEOF_LONG__ != 8 */
+#endif /* !__CRT_HAVE__ultoa_s */
 #endif /* !__local___localdep__ultoa_s_defined */
 __LOCAL_LIBC(ultoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ultoa))(unsigned long __val, char *__buf, int __radix) {

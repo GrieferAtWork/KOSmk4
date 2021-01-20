@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43fef955 */
+/* HASH CRC-32:0x757bee89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,16 +31,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point, struct timespec *remaining);
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33f908f8 */
+/* HASH CRC-32:0xb1e99316 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <__stdinc.h>
 #include <features.h>
 
 #include <hybrid/typecore.h>
@@ -50,6 +49,7 @@
 #include <bits/os/sockaddr_storage.h>
 #include <bits/os/timespec.h>
 #include <bits/types.h>
+
 #include <sys/uio.h>
 
 #ifdef __USE_GNU
@@ -65,8 +65,6 @@
 #ifdef __USE_GLIBC
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
-
-__SYSDECL_BEGIN
 
 #if !defined(FIOSETOWN) && defined(__FIOSETOWN)
 #define FIOSETOWN  __FIOSETOWN  /* ... */
@@ -781,6 +779,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -1296,8 +1295,8 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__
  * @return: -1: error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, __STDC_INT_AS_UINT_T __fdtype),(__fd,__fdtype))
 #endif /* __USE_MISC */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SOCKET_H */

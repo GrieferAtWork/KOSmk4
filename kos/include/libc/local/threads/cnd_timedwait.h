@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65a9c8a9 */
+/* HASH CRC-32:0x9468c404 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,10 +74,13 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
+#include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __LOCAL_LIBC(cnd_timedwait) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict __cond, __mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) {
 	__errno_t __error;
@@ -86,8 +89,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict _
 	                               __time_point);
 	if __likely(!__error)
 		return __thrd_success;
+#ifdef __ETIMEDOUT
 	if (__error == __ETIMEDOUT)
 		return __thrd_timedout;
+#endif /* __ETIMEDOUT */
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END

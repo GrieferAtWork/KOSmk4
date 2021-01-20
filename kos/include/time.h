@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc516db26 */
+/* HASH CRC-32:0xbe551970 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -243,29 +243,6 @@ __NAMESPACE_STD_USING(timespec_get)
 #endif /* __USE_GNU */
 
 
-/* Some documentation comments are taken from /usr/include/time.h on a linux machine.
- * The following copyright notice can be found at the top of that file: */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
-__SYSDECL_BEGIN
-
-
 #ifdef __USE_KOS
 #define MSEC_PER_SEC  __UINT16_C(1000)
 #define USEC_PER_MSEC __UINT16_C(1000)
@@ -280,7 +257,6 @@ __SYSDECL_BEGIN
 #define TIME_UTC 1
 #endif /* __USE_ISOC11 */
 
-/* Nonzero if YEAR is a leap year (every 4 years, except every 100th isn't, and every 400th is). */
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
 #endif /* !__isleap */
@@ -398,6 +374,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_I
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_size_t_defined
@@ -1442,9 +1419,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_asctime_r */
 #endif /* __USE_POSIX */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_TIME_H)

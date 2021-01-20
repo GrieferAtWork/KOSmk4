@@ -31,8 +31,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_setutxent,hash:CRC-32=0xaa3ffd17]]]*/
-/* Open user accounting database */
+/*[[[head:libc_setutxent,hash:CRC-32=0x8152a5f5]]]*/
+/* >> setutxent(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_setutxent)(void)
 /*[[[body:libc_setutxent]]]*/
@@ -42,8 +42,8 @@ NOTHROW_RPC(LIBCCALL libc_setutxent)(void)
 }
 /*[[[end:libc_setutxent]]]*/
 
-/*[[[head:libc_endutxent,hash:CRC-32=0xa269e300]]]*/
-/* Close user accounting database */
+/*[[[head:libc_endutxent,hash:CRC-32=0xa963d7b2]]]*/
+/* >> endutxent(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endutxent)(void)
 /*[[[body:libc_endutxent]]]*/
@@ -53,8 +53,8 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endutxent)(void)
 }
 /*[[[end:libc_endutxent]]]*/
 
-/*[[[head:libc_getutxent,hash:CRC-32=0xadc1a678]]]*/
-/* Get the next entry from the user accounting database */
+/*[[[head:libc_getutxent,hash:CRC-32=0xd74ed63a]]]*/
+/* >> getutxent(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_getutxent)(void)
 /*[[[body:libc_getutxent]]]*/
@@ -65,8 +65,8 @@ NOTHROW_RPC(LIBCCALL libc_getutxent)(void)
 }
 /*[[[end:libc_getutxent]]]*/
 
-/*[[[head:libc_getutxid,hash:CRC-32=0x9cdc536e]]]*/
-/* Get the user accounting database entry corresponding to ID */
+/*[[[head:libc_getutxid,hash:CRC-32=0x2063b232]]]*/
+/* >> getutxid(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id)
 /*[[[body:libc_getutxid]]]*/
@@ -78,8 +78,8 @@ NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id)
 }
 /*[[[end:libc_getutxid]]]*/
 
-/*[[[head:libc_getutxline,hash:CRC-32=0x16c819a7]]]*/
-/* Get the user accounting database entry corresponding to LINE */
+/*[[[head:libc_getutxline,hash:CRC-32=0x964b2e67]]]*/
+/* >> getutxline(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line)
 /*[[[body:libc_getutxline]]]*/
@@ -91,8 +91,8 @@ NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line)
 }
 /*[[[end:libc_getutxline]]]*/
 
-/*[[[head:libc_pututxline,hash:CRC-32=0x25e30005]]]*/
-/* Write the entry UTMPX into the user accounting database */
+/*[[[head:libc_pututxline,hash:CRC-32=0x3b217bf6]]]*/
+/* >> pututxline(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx)
 /*[[[body:libc_pututxline]]]*/
@@ -104,9 +104,8 @@ NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx)
 }
 /*[[[end:libc_pututxline]]]*/
 
-/*[[[head:libc_utmpxname,hash:CRC-32=0x86d75556]]]*/
-/* Change name of the utmpx file to be examined.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_utmpxname,hash:CRC-32=0x74eca74c]]]*/
+/* >> utmpxname(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") int
 NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
 /*[[[body:libc_utmpxname]]]*/
@@ -118,9 +117,8 @@ NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
 }
 /*[[[end:libc_utmpxname]]]*/
 
-/*[[[head:libc_updwtmpx,hash:CRC-32=0x5d0f5568]]]*/
-/* Append entry UTMP to the wtmpx-like file WTMPX_FILE.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_updwtmpx,hash:CRC-32=0x4919cda3]]]*/
+/* >> updwtmpx(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file,
                                     struct utmpx const *utmpx)
@@ -133,9 +131,8 @@ NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file,
 }
 /*[[[end:libc_updwtmpx]]]*/
 
-/*[[[head:libc_getutmp,hash:CRC-32=0x340a01bf]]]*/
-/* Copy the information in UTMPX to UTMP.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_getutmp,hash:CRC-32=0x569482c8]]]*/
+/* >> getutmp(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx,
                                    struct utmp *utmp)
@@ -148,9 +145,8 @@ NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx,
 }
 /*[[[end:libc_getutmp]]]*/
 
-/*[[[head:libc_getutmpx,hash:CRC-32=0x85da6b1d]]]*/
-/* Copy the information in UTMP to UTMPX.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_getutmpx,hash:CRC-32=0x4d999bff]]]*/
+/* >> getutmpx(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
                                     struct utmpx *utmpx)

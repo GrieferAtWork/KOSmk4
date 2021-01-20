@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93bbb5e8 */
+/* HASH CRC-32:0x4cdf999a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,9 +41,10 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pt
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Detach the thread identified by THR from the current
- * environment (it does not allow join or wait for it)
- * s.a. `pthread_detach()' */
+/* >> thrd_detach(3)
+ * Detach the given thread (s.a. `pthread_detach(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(thrd_detach) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_detach))(__thrd_t __thr) {
 	__errno_t __error;

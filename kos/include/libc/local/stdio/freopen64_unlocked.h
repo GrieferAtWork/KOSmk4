@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf4cae8 */
+/* HASH CRC-32:0x29975f8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_freopen64_unlocked_defined
 #define __local_freopen64_unlocked_defined 1
 #include <__crt.h>
+#include <features.h>
 #if defined(__CRT_HAVE_freopen) || defined(__CRT_HAVE_freopen64) || defined(__CRT_HAVE_freopen_unlocked) || defined(__CRT_HAVE_freopen64_unlocked)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: freopen64 from stdio */

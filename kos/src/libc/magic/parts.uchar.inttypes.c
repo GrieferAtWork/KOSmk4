@@ -21,19 +21,22 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _INTTYPES_H
 #include <inttypes.h>
 #endif /* !_INTTYPES_H */
 #ifndef _UCHAR_H
 #include <uchar.h>
 #endif /* !_UCHAR_H */
-#include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
+}%[insert:prefix(
+#include <hybrid/typecore.h>
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -51,9 +54,7 @@ c32toumax_l:(*) %{uchar32("wcstoumax_l")}
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

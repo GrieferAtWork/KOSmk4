@@ -51,6 +51,7 @@ typedef __socklen_t socklen_t;
 
 }
 
+@@>> inet_netof(3)
 @@Return the network-number-part of the Internet address `INADDR'
 [[wunused, ATTR_CONST]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
@@ -66,6 +67,7 @@ $uint32_t inet_netof(struct in_addr inaddr) {
 	}
 }
 
+@@>> inet_lnaof(3)
 @@Return the local-host-address-part of the Internet address `INADDR'
 [[wunused, ATTR_CONST]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
@@ -81,6 +83,7 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 	}
 }
 
+@@>> inet_makeaddr(3)
 @@Construct an Internet-host-address in network byte order from
 @@the combination of its network (`net'), and host (`host') number.
 @@The `net' and `host' arguments can later be re-extracted by use
@@ -104,6 +107,7 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 	return result;
 }
 
+@@>> inet_addr(3)
 @@Convert an Internet host address `CP' from its numbers-and-dots
 @@notational form into its binary representation in network byte order
 @@Accepted notations are:
@@ -123,6 +127,7 @@ in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 	return addr.@s_addr@;
 }
 
+@@>> inet_ntoa(3)
 @@Return the conventional numbers-and-dots representation of a
 @@given Internet host address `inaddr'. The returned pointer is
 @@apart of a static buffer and may change in subsequence (or parallel)
@@ -135,6 +140,8 @@ char *inet_ntoa(struct in_addr inaddr) {
 
 %#ifdef __USE_KOS
 %#define INET_NTOA_R_MAXLEN 16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
+
+@@>> inet_ntoa_r(3)
 @@Re-entrant version of `inet_ntoa()'
 [[decl_include("<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
@@ -150,6 +157,7 @@ char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 }
 %#endif /* __USE_KOS */
 
+@@>> inet_network(3)
 @@This function is the same as `inet_addr()', except that
 @@the return value is in host-endian, rather than net-endian
 [[decl_include("<hybrid/typecore.h>")]]
@@ -165,6 +173,7 @@ $uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 %/* The following functions are not part of XNS 5.2. */
 %#ifdef __USE_MISC
 
+@@>> inet_aton(3)
 @@Convert an Internet host address `CP' from its numbers-and-dots
 @@notational form into its binary representation in network byte
 @@order. The result is then stored in `*INP'
@@ -186,6 +195,7 @@ int inet_aton([[nonnull]] char const *__restrict cp,
 }
 
 %#ifdef __USE_KOS
+@@>> inet_paton(3)
 @@Same as `inet_aton()', but update `*pcp' to point past the address
 @@Accepted notations are:
 @@    a.b.c.d  (1.2.3.4)
@@ -346,6 +356,7 @@ err:
 }
 %#endif /* __USE_KOS */
 
+@@>> inet_neta(3)
 @@Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
 @@    0.0.0.0      For net = 0
 @@    %u           For net <= 255
@@ -396,28 +407,34 @@ too_small:
 	return NULL;
 }
 
+@@>> inet_net_ntop(3)
 @@TODO: Implement & document
 [[cp_kos, decl_include("<hybrid/typecore.h>")]]
 char *inet_net_ntop(int af, void const *cp, int bits, char *buf, $size_t len);
 
+@@>> inet_net_pton(3)
 @@TODO: Implement & document
 [[cp_kos, decl_include("<hybrid/typecore.h>")]]
 int inet_net_pton(int af, char const *cp, void *buf, $size_t len);
 
+@@>> inet_nsap_addr(3)
 @@TODO: Implement & document
 [[cp_kos]]
 unsigned int inet_nsap_addr(char const *cp, unsigned char *buf, int len);
 
+@@>> inet_nsap_ntoa(3)
 @@TODO: Implement & document
 [[cp_kos]]
 char *inet_nsap_ntoa(int len, unsigned char const *cp, char *buf);
 
 %#endif /* __USE_MISC */
 
+@@>> inet_pton(3)
 @@TODO: Implement & document
 [[cp_kos]]
 int inet_pton(int af, char const *__restrict cp, void *__restrict buf);
 
+@@>> inet_ntop(3)
 @@TODO: Implement & document
 [[cp_kos, decl_include("<bits/types.h>")]]
 char const *inet_ntop(int af, void const *__restrict cp,

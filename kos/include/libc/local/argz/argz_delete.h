@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ccc1b69 */
+/* HASH CRC-32:0xf30cf029 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+/* >> argz_delete(3)
+ * Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
  * found, remove that entry by shifting all following elements downwards
  * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements

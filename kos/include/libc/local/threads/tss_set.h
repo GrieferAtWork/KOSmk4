@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48c13f8c */
+/* HASH CRC-32:0x29609c5f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,9 +43,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Sets the value of the thread-specific storage
- * identified by TSS_ID for the current thread to VAL
- * s.a. `pthread_setspecific()' */
+/* >> tss_set(3)
+ * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(tss_set) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id, void *__val) {
 	__errno_t __error;

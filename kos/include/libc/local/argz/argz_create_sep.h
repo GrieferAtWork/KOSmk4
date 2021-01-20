@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0d09273 */
+/* HASH CRC-32:0xbf807454 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Create an ARGZ string from `string' by splitting that string at each
+/* >> argz_create_sep(3)
+ * Create an ARGZ string from `string' by splitting that string at each
  * occurance of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");

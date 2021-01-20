@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c626021 */
+/* HASH CRC-32:0x134842f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,13 +37,13 @@
 
 #include <features.h>
 #include <bits/types.h>
+
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -71,8 +71,8 @@ __LIBC __ATTR_LIBC_STRFMON(4, 5) __ATTR_NONNULL((1, 4)) ssize_t __NOTHROW_NCX(__
 __LIBC __ATTR_LIBC_STRFMON(4, 5) __ATTR_NONNULL((1, 4)) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME("__strfmon_l");
 #endif /* ... */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_MONETARY_H */

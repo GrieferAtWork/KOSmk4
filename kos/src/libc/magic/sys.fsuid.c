@@ -28,9 +28,11 @@
 %[define_replacement(gid_t = __gid_t)]
 %[default:section(".text.crt{|.dos}.sched.user")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>
@@ -54,9 +56,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -71,8 +72,7 @@ int setfsgid($gid_t gid);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

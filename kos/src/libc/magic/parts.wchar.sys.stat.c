@@ -22,8 +22,9 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[default:section(".text.crt{|.dos}.wchar.fs.stat")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _SYS_STAT_H
 #include <sys/stat.h>
 #endif /* !_SYS_STAT_H */
@@ -31,9 +32,8 @@
 #include <wchar.h>
 #endif /* !_WCHAR_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -42,9 +42,7 @@ __SYSDECL_BEGIN
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

@@ -24,19 +24,22 @@
 %[define_replacement(utimbuf64 = __utimbuf64)]
 %[default:section(".text.crt{|.dos}.wchar.fs.modify_time")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _UTIME_H
 #include <utime.h>
 #endif /* !_UTIME_H */
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
-#include <bits/types.h>
 
-__SYSDECL_BEGIN
+}%[insert:prefix(
+#include <bits/types.h>
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -110,9 +113,7 @@ int wutime64([[nonnull]] $wchar_t const *filename,
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

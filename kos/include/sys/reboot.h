@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54a2ce5a */
+/* HASH CRC-32:0x49fd3dcc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,6 @@
 #include <features.h>
 #include <asm/os/reboot.h>
 
-__SYSDECL_BEGIN
 
 /* Linux compatibility header */
 #ifdef __RB_AUTOBOOT
@@ -63,13 +62,13 @@ __SYSDECL_BEGIN
 #endif /* __RB_KEXEC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,reboot,(__STDC_INT_AS_UINT_T __howto),(__howto))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_REBOOT_H */

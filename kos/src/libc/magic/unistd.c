@@ -54,18 +54,29 @@
 #include "../libc/globals.h"
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/confname.h>
+)]%[insert:prefix(
 #include <asm/os/stdio.h>
+)]%[insert:prefix(
 #include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
+)]%[insert:prefix(
 #include <bits/posix_opt.h>
+)]%[insert:prefix(
 #include <bits/crt/sys_errlist.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 }%[insert:prefix(
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <asm/pagesize.h>
@@ -90,7 +101,6 @@
 #define PF_PATH "/etc/passwd"
 #endif /* __USE_SOLARIS */
 
-__SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN2K8
 #define _POSIX_VERSION 200809L
@@ -197,6 +207,8 @@ __SYSDECL_BEGIN
 #endif /* __USE_MISC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 #ifndef __ssize_t_defined
 #define __ssize_t_defined 1
 typedef __ssize_t ssize_t;
@@ -2263,9 +2275,8 @@ $off64_t tell64($fd_t fd) {
 %{
 #endif /* __USE_SOLARIS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UNISTD_H)
@@ -2280,4 +2291,3 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
-

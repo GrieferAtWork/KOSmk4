@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34fab33c */
+/* HASH CRC-32:0xb64ba385 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,6 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
 
 /* Flags accepted by `getrandom(2)' */
 #ifdef __GRND_NONBLOCK
@@ -51,7 +50,9 @@ __SYSDECL_BEGIN
 #define GRND_RANDOM __GRND_RANDOM /* Use /dev/random, rather than /dev/urandom */
 #endif /* __GRND_RANDOM */
 
+
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -88,9 +89,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrando
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
-#else /* __CRT_HAVE_getentropy */
-#include <asm/os/random.h>
-#if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
+#elif defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #include <libc/local/sys.random/getentropy.h>
 /* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
  * the case where the calling thread is interrupted, causing an
@@ -103,14 +102,12 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
-#else /* __GRND_RANDOM && __CRT_HAVE_getrandom */
+#else /* ... */
 #undef __getentropy_defined
-#endif /* !__GRND_RANDOM || !__CRT_HAVE_getrandom */
-#endif /* !__CRT_HAVE_getentropy */
+#endif /* !... */
 #endif /* !__getentropy_defined */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_RANDOM_H */

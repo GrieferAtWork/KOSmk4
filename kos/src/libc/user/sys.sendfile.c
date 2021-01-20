@@ -32,11 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_sendfile,hash:CRC-32=0x5c50d5cf]]]*/
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
+/*[[[head:libc_sendfile,hash:CRC-32=0x4be9e70a]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,
                                     fd_t in_fd,
@@ -50,14 +46,10 @@ NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,
 }
 /*[[[end:libc_sendfile]]]*/
 
-/*[[[head:libc_sendfile64,hash:CRC-32=0xeb326a7a]]]*/
+/*[[[head:libc_sendfile64,hash:CRC-32=0x3a61efef]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_sendfile64, libc_sendfile);
 #else /* MAGIC:alias */
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd,
                                       fd_t in_fd,

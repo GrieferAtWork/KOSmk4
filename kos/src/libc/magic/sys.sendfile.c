@@ -31,34 +31,32 @@
 %[define_replacement(off64_t = __off64_t)]
 %[default:section(".text.crt{|.dos}.fs.statfs.statfs")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <bits/types.h>
+)]%[insert:prefix(
+#include <hybrid/typecore.h>
+)]%{
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
-
-/* Documentation taken from GLibc /usr/include/i386-linux-gnu/sys/sendfile.h */
-/* sendfile -- copy data directly from one file descriptor to another
-   Copyright (C) 1998-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
-};
+#ifndef __ssize_t_defined
+#define __ssize_t_defined 1
+typedef __ssize_t ssize_t;
+#endif /* !__ssize_t_defined */
+
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __SIZE_TYPE__ size_t;
+#endif /* !__size_t_defined */
+
+}
 
 [[decl_include("<bits/types.h>")]]
 [[doc_alias("sendfile"), ignore, nocrt, alias("sendfile")]]
@@ -67,10 +65,6 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
                    size_t count);
 
 
-@@Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
-@@to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
-@@read bytes. If OFFSET is a null pointer, use the normal file position instead.
-@@Return the number of written bytes, or -1 in case of error
 [[no_crt_self_import, decl_include("<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
@@ -120,8 +114,8 @@ ssize_t sendfile64($fd_t out_fd, $fd_t in_fd,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

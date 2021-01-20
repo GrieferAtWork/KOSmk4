@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a196228 */
+/* HASH CRC-32:0x7a119e0e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fftruncate64_defined
 #define __local_fftruncate64_defined 1
 #include <__crt.h>
+#include <features.h>
 #if (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
 #include <kos/anno.h>
 #ifndef __PIO_OFFSET
@@ -57,7 +58,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 #define __local___localdep_ftruncate64_defined 1
 #ifdef __CRT_HAVE_ftruncate64
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
@@ -65,7 +65,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
@@ -73,7 +72,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)

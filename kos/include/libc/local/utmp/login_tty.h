@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c4bacc8 */
+/* HASH CRC-32:0x1ee8957d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,8 +113,11 @@ __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_setsid,(void),setsid,())
 __NAMESPACE_LOCAL_END
 #include <asm/os/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
+/* >> login_tty(3)
+ * Set the given `fd' as the controlling terminal, stdin,
+ * stdout, and stderr. Afterwards, `fd' is closed.
+ * @return: 0 : Success
+ * @return: * : Error */
 __LOCAL_LIBC(login_tty) int
 __NOTHROW_RPC_KOS(__LIBCCALL __LIBC_LOCAL_NAME(login_tty))(__fd_t __fd) {
 	if __unlikely(__localdep_setsid() < 0)

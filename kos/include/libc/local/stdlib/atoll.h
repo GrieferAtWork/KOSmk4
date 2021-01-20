@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6900faea */
+/* HASH CRC-32:0xdb5efe2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_atoll_defined
 #define __local_atoll_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strto32 from stdlib */
 #ifndef __local___localdep_strto32_defined

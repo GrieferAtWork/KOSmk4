@@ -47,16 +47,25 @@
 
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/os/fd_set.h>   /* struct __fd_set_struct, __NFDBITS, __fd_mask, __FD_ELT, __FD_MASK, __SIZEOF_FD_SET */
+)]%[insert:prefix(
 #include <bits/os/sigset.h>   /* struct __sigset_struct */
+)]%[insert:prefix(
 #include <bits/os/timespec.h> /* struct timespec */
+)]%[insert:prefix(
 #include <bits/os/timeval.h>  /* struct timeval */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifndef __INTELLISENSE__
 #include <libc/string.h> /* __libc_bzero */
@@ -66,9 +75,8 @@
 #define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
 #endif /* FD_SETSIZE */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined  1
@@ -230,8 +238,7 @@ __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

@@ -39,12 +39,18 @@
 %[define_replacement(pos64_t    = __pos64_t)]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/limits.h> /* __IOV_MAX */
+)]%[insert:prefix(
 #include <bits/os/iovec.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
+
 #include <sys/types.h>
 
 #ifndef UIO_MAXIOV
@@ -55,9 +61,8 @@
 #endif /* __IOV_MAX && __IOV_MAX != -1 */
 #endif /* !UIO_MAXIOV */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -186,8 +191,7 @@ ssize_t pwritev64($fd_t fd, [[inp(count)]] struct iovec const *iov,
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

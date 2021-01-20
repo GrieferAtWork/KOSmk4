@@ -61,6 +61,7 @@ typedef __errno_t error_t;
 %[define_replacement(error_t = __errno_t)]
 
 
+@@>> argz_create(3)
 @@Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
 @@as is also passed to main(), and accepted by the exec() family of functions
 @@An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
@@ -114,6 +115,7 @@ error_t argz_create([[nonnull]] char *const argv[],
 
 %[insert:function(__argz_create = argz_create)]
 
+@@>> argz_create_sep(3)
 @@Create an ARGZ string from `string' by splitting that string at each
 @@occurance of `sep'. This function behaves the same as the following
 @@pseudo-code:
@@ -183,6 +185,7 @@ again_check_ch:
 
 %[insert:function(__argz_create_sep = argz_create_sep)]
 
+@@>> argz_count(3)
 @@Count and return the # of strings in `ARGZ'
 @@Simply count the number of`NUL-characters within `argz...+=argz_len'
 [[ATTR_PURE, export_alias("__argz_count"), decl_include("<hybrid/typecore.h>")]]
@@ -204,6 +207,7 @@ size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 
 %[insert:function(__argz_count = argz_count)]
 
+@@>> argz_extract(3)
 @@Extend pointers to individual string from `ARGZ', and sequentially write them to
 @@`ARGV', for which the caller is responsivle to provide sufficient space to hold them
 @@all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements)
@@ -228,6 +232,7 @@ void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len
 
 %[insert:function(__argz_extract = argz_extract)]
 
+@@>> argz_stringify(3)
 @@Convert an `ARGZ' string into a NUL-terminated c-string
 @@with a total `strlen(argz) == len - 1', by replacing all
 @@of the NUL-characters separating the individual ARGZ strings
@@ -251,6 +256,7 @@ void argz_stringify(char *argz, size_t len, int sep) {
 %[insert:function(__argz_stringify = argz_stringify)]
 
 
+@@>> argz_append(3)
 @@Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
@@ -278,6 +284,7 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 
 %[insert:function(__argz_append = argz_append)]
 
+@@>> argz_add(3)
 @@Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
 @@This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
 @@@return: 0 :     Success
@@ -292,6 +299,7 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 
 %[insert:function(__argz_add = argz_add)]
 
+@@>> argz_add_sep(3)
 @@A combination of `argz_create_sep()' and `argz_append()' that will
 @@append a duplication of `string' onto `*PARGZ', whilst replacing all
 @@instances of `sep' with NUL-characters, thus turning them into the
@@ -372,6 +380,7 @@ again_check_ch:
 
 %[insert:function(__argz_add_sep = argz_add_sep)]
 
+@@>> argz_delete(3)
 @@Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
 @@found, remove that entry by shifting all following elements downwards
 @@by one, as well as decrementing `*PARGZ_LEN' by one.
@@ -402,6 +411,7 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 
 %[insert:function(__argz_delete = argz_delete)]
 
+@@>> argz_insert(3)
 @@When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
 @@Otherwise, `before' should point somewhere into the middle, or to the start
 @@of an existing argument entry, who's beginning will first be located, before
@@ -474,6 +484,7 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 %[insert:function(__argz_insert = argz_insert)]
 
 
+@@>> argz_replace(3)
 @@Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
 @@with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
 @@the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
@@ -572,6 +583,7 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 
 %[insert:function(__argz_replace = argz_replace)]
 
+@@>> argz_next(3)
 @@Iterate the individual strings that make up a given ARGZ vector.
 @@This function is intended to be used in one of 2 ways:
 @@>> char *my_entry = NULL;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6107fda */
+/* HASH CRC-32:0x465086f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_strtoull_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtou32 from stdlib */
 #ifndef __local___localdep_strtou32_defined

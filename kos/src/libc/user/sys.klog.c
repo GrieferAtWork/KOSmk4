@@ -31,10 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_klogctl,hash:CRC-32=0x8cb71f37]]]*/
-/* Control the kernel's logging facility.  This corresponds exactly to the
- * kernel's syslog system call, but that name is easily confused with the
- * user-level syslog facility, which is something completely different */
+/*[[[head:libc_klogctl,hash:CRC-32=0xb4e5d19]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.klog") int
 NOTHROW_NCX(LIBCCALL libc_klogctl)(__STDC_INT_AS_UINT_T type,
                                    char *bufp,

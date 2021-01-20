@@ -53,13 +53,19 @@
 %[define_replacement(itimerspec64 = __itimerspec64)]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/tm.h>
+)]%[insert:prefix(
 #include <asm/os/clock.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>
@@ -207,29 +213,6 @@
 #endif /* __USE_GNU */
 
 
-/* Some documentation comments are taken from /usr/include/time.h on a linux machine.
- * The following copyright notice can be found at the top of that file: */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
-__SYSDECL_BEGIN
-
-
 #ifdef __USE_KOS
 #define MSEC_PER_SEC  __UINT16_C(1000)
 #define USEC_PER_MSEC __UINT16_C(1000)
@@ -244,7 +227,6 @@ __SYSDECL_BEGIN
 #define TIME_UTC 1
 #endif /* __USE_ISOC11 */
 
-/* Nonzero if YEAR is a leap year (every 4 years, except every 100th isn't, and every 400th is). */
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
 #endif /* !__isleap */
@@ -332,6 +314,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_size_t_defined
@@ -2011,9 +1994,8 @@ char *asctime_r([[nonnull]] struct $tm const *__restrict tp,
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_TIME_H)

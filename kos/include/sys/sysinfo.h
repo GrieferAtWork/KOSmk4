@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d019ed0 */
+/* HASH CRC-32:0xd66192eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,16 +38,16 @@
 #include <linux/kernel.h>
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sysinfo,(struct sysinfo *__info),(__info))
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_RPC,get_nprocs_conf,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_RPC,get_nprocs,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_phys_pages,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_avphys_pages,(void),())
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SYSINFO_H */

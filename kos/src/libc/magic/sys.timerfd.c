@@ -29,11 +29,15 @@
 %[define_replacement(itimerspec64 = __itimerspec64)]
 %[default:section(".text.crt{|.dos}.timer")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/timerfd.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <time.h>

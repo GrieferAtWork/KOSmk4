@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5afc41a4 */
+/* HASH CRC-32:0xc65ff92a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,16 +49,15 @@
 #define TTY_SECURE __TTY_SECURE /* allow uid of 0 to login */
 #endif /* __TTY_SECURE */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __CDECLARE_OPT(,struct ttyent *,__NOTHROW_RPC_KOS,getttyent,(void),())
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
 __CDECLARE_OPT(,int,__NOTHROW_NCX,endttyent,(void),())
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_TTYENT_H */

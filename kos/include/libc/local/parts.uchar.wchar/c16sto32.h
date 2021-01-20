@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6074362c */
+/* HASH CRC-32:0x8e08b3e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_c16sto32_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16stou32 from parts.uchar.wchar */
 #ifndef __local___localdep_c16stou32_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf375b3c2 */
+/* HASH CRC-32:0xbb5eaf01 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -646,8 +646,6 @@
 #if !defined(SIOCPROTOPRIVATE) && defined(__SIOCPROTOPRIVATE)
 #define SIOCPROTOPRIVATE __SIOCPROTOPRIVATE /* Protocol-private ioctls. */
 #endif /* !SIOCPROTOPRIVATE && __SIOCPROTOPRIVATE */
-
-
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e3a5dfe */
+/* HASH CRC-32:0xe7e18032 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@
 #include <asm/os/block.h> /* __BLK* (ioctls) */
 #include <asm/os/mount.h>
 
-__SYSDECL_BEGIN
+
 
 #if !defined(BLKROSET) && defined(__BLKROSET)
 #define BLKROSET     __BLKROSET     /* [int const *arg] Set device read-only (0 = read-write) */
@@ -202,6 +202,8 @@ __SYSDECL_BEGIN
 #endif /* !UMOUNT_NOFOLLOW && __UMOUNT_NOFOLLOW */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 /* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #ifdef __CRT_HAVE_umount
@@ -212,8 +214,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(umount, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* ... */
 /* @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),(__special_file,__flags))
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_MOUNT_H */

@@ -30,13 +30,17 @@
 %[default:section(".text.crt{|.dos}.fs.mount")]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/block.h> /* __BLK* (ioctls) */
+)]%[insert:prefix(
 #include <asm/os/mount.h>
+)]%{
 
-__SYSDECL_BEGIN
+
 
 #if !defined(BLKROSET) && defined(__BLKROSET)
 #define BLKROSET     __BLKROSET     /* [int const *arg] Set device read-only (0 = read-write) */
@@ -198,6 +202,8 @@ __SYSDECL_BEGIN
 #endif /* !UMOUNT_NOFOLLOW && __UMOUNT_NOFOLLOW */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 }
 
 
@@ -219,8 +225,8 @@ int umount2([[nullable]] char const *special_file,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

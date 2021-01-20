@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c876aa */
+/* HASH CRC-32:0x9fa61255 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,8 @@
 #include <parts/uchar/process.h>
 #endif /* !_PARTS_UCHAR_PROCESS_H */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_wttyname) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> ttyname(3)
@@ -1231,8 +1230,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const 
 #endif /* ... */
 #endif /* ... */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_UCHAR_UNISTD_H */

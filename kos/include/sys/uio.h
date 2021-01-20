@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa97eea5b */
+/* HASH CRC-32:0xd59debdc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,7 @@
 #include <asm/os/limits.h> /* __IOV_MAX */
 #include <bits/os/iovec.h>
 #include <bits/types.h>
+
 #include <sys/types.h>
 
 #ifndef UIO_MAXIOV
@@ -52,9 +53,8 @@
 #endif /* __IOV_MAX && __IOV_MAX != -1 */
 #endif /* !UIO_MAXIOV */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -182,8 +182,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwritev64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* __USE_LARGEFILE64 */
 #endif /* !__USE_MISC */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_UIO_H */

@@ -26,13 +26,19 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.io.poll")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/epoll.h>
+)]%[insert:prefix(
 #include <bits/os/epoll.h>
+)]%[insert:prefix(
 #include <bits/os/sigset.h> /* struct __sigset_struct */
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

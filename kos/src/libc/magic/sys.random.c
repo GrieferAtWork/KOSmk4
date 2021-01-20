@@ -29,16 +29,19 @@
 %[define_replacement(GRND_NONBLOCK = __GRND_NONBLOCK)]
 %[default:section(".text.crt{|.dos}.system.random")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/random.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 #ifdef __USE_GLIBC
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
 
 /* Flags accepted by `getrandom(2)' */
 #ifdef __GRND_NONBLOCK
@@ -48,7 +51,9 @@ __SYSDECL_BEGIN
 #define GRND_RANDOM __GRND_RANDOM /* Use /dev/random, rather than /dev/urandom */
 #endif /* __GRND_RANDOM */
 
+
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -115,8 +120,7 @@ err:
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

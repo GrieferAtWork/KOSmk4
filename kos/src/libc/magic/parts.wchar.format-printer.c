@@ -64,24 +64,31 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 #ifndef _FORMAT_PRINTER_H
 #include <format-printer.h>
 #endif /* !_FORMAT_PRINTER_H */
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
+}%[insert:prefix(
 #include <hybrid/__assert.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/wformat-printer.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
+}%[insert:prefix(
 #include <libc/malloc.h>
-
-__SYSDECL_BEGIN
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* Calling convention used by `pwformatprinter' */
 #ifndef WFORMATPRINTER_CC
@@ -224,7 +231,7 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
 	%{generate(str2wcs("format_snprintf_printer"))}
 
 [[wchar, doc_alias("format_width"), ATTR_PURE]]
-[[if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)]]
 /* Don't export in KOS-mode (in that mode, we're an alias for `libc_format_length') */
 [[crt_kos_impl_if(0), crt_dos_impl_if(!defined(__KERNEL__))]]
 $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
@@ -249,8 +256,8 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 	(void)data;
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
 	 *      However, magic headers don't support conditional attributes, so we can't just do
-	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
 	COMPILER_IMPURE();
 	return (ssize_t)datalen;
 @@pp_endif@@
@@ -443,9 +450,7 @@ err:
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 }
-

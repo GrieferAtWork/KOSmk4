@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a631c62 */
+/* HASH CRC-32:0x304a622f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_c32stoll_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32sto32 from parts.uchar.wchar */
 #ifndef __local___localdep_c32sto32_defined

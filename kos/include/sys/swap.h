@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67a5c848 */
+/* HASH CRC-32:0x1a44c33 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,6 @@
 #include <features.h>
 #include <asm/os/swap.h>
 
-__SYSDECL_BEGIN
 
 /* The swap priority is encoded as:
  *  - (prio << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK */
@@ -55,13 +54,13 @@ __SYSDECL_BEGIN
 #endif /* __SWAP_FLAG_DISCARD */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* @param swapflags: Set of `SWAP_FLAG_*' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),(__path,__swapflags))
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),(__path))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SWAP_H */

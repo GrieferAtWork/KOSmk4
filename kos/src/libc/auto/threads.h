@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8011ee21 */
+/* HASH CRC-32:0x13cca25f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,230 +30,279 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Create a new thread executing the function FUNC.  Arguments for FUNC
- * are passed through ARG. If successful, THR is set to new thread identifier */
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr, thrd_start_t func, void *arg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Create a new thread executing the function FUNC.  Arguments for FUNC
- * are passed through ARG. If successful, THR is set to new thread identifier */
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr, thrd_start_t func, void *arg);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_thrd_sleep)(struct timespec const *time_point, struct timespec *remaining);
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_thrd_sleep64)(struct timespec64 const *time_point, struct timespec64 *remaining);
-/* Terminate current thread execution, cleaning up any thread local
- * storage and freeing resources. Returns the value specified in RES
- * s.a. `pthread_exit()' */
+/* >> thrd_exit(3)
+ * Terminate the calling thread (s.a. `pthread_exit(3)') */
 INTDEF ATTR_NORETURN void (LIBDCALL libd_thrd_exit)(int res) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Terminate current thread execution, cleaning up any thread local
- * storage and freeing resources. Returns the value specified in RES
- * s.a. `pthread_exit()' */
+/* >> thrd_exit(3)
+ * Terminate the calling thread (s.a. `pthread_exit(3)') */
 INTDEF ATTR_NORETURN void (LIBCCALL libc_thrd_exit)(int res) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Detach the thread identified by THR from the current
- * environment (it does not allow join or wait for it)
- * s.a. `pthread_detach()' */
+/* >> thrd_detach(3)
+ * Detach the given thread (s.a. `pthread_detach(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_thrd_detach)(thrd_t thr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Detach the thread identified by THR from the current
- * environment (it does not allow join or wait for it)
- * s.a. `pthread_detach()' */
+/* >> thrd_detach(3)
+ * Detach the given thread (s.a. `pthread_detach(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block current thread until execution of THR is complete.
- * In case that RES is not NULL, will store the return value of THR when exiting
- * s.a. `pthread_join()' */
+/* >> thrd_join(3)
+ * Wait for the given thread to finish (s.a. `pthread_join(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_thrd_join)(thrd_t thr, int *res);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block current thread until execution of THR is complete.
- * In case that RES is not NULL, will store the return value of THR when exiting
- * s.a. `pthread_join()' */
+/* >> thrd_join(3)
+ * Wait for the given thread to finish (s.a. `pthread_join(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr, int *res);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Creates a new mutex object with type TYPE.
- * If successful the new object is pointed by MUTEX
- * s.a. `pthread_mutex_init()' */
+/* >> mtx_init(3)
+ * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mtx_init)(mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Creates a new mutex object with type TYPE.
- * If successful the new object is pointed by MUTEX
- * s.a. `pthread_mutex_init()' */
+/* >> mtx_init(3)
+ * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block the current thread until the mutex pointed to by MUTEX is
- * unlocked.  In that case current thread will not be blocked
- * s.a. `pthread_mutex_lock()' */
+/* >> mtx_lock(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mtx_lock)(mtx_t *__restrict mutex);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block the current thread until the mutex pointed to by MUTEX is
- * unlocked.  In that case current thread will not be blocked
- * s.a. `pthread_mutex_lock()' */
+/* >> mtx_lock(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_mtx_timedlock)(mtx_t *__restrict mutex, struct timespec const *__restrict time_point);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex, struct timespec const *__restrict time_point);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_mtx_timedlock64)(mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Try to lock the mutex pointed by MUTEX without blocking.
- * If the mutex is free the current threads takes control of
- * it, otherwise it returns immediately
- * s.a. `pthread_mutex_trylock()' */
+/* >> mtx_trylock(3)
+ * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_busy:    Cannot lock without blocking right now
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mtx_trylock)(mtx_t *__restrict mutex);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Try to lock the mutex pointed by MUTEX without blocking.
- * If the mutex is free the current threads takes control of
- * it, otherwise it returns immediately
- * s.a. `pthread_mutex_trylock()' */
+/* >> mtx_trylock(3)
+ * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_busy:    Cannot lock without blocking right now
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Unlock the mutex pointed by MUTEX.
- * It may potentially awake other threads waiting on this mutex
- * s.a. `pthread_mutex_unlock()' */
+/* >> mtx_unlock(3)
+ * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mtx_unlock)(mtx_t *__restrict mutex);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Unlock the mutex pointed by MUTEX.
- * It may potentially awake other threads waiting on this mutex
- * s.a. `pthread_mutex_unlock()' */
+/* >> mtx_unlock(3)
+ * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Initialize new condition variable pointed by COND
- * s.a. `pthread_cond_init()' */
+/* >> cnd_init(3)
+ * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cnd_init)(cnd_t *__restrict cond);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Initialize new condition variable pointed by COND
- * s.a. `pthread_cond_init()' */
+/* >> cnd_init(3)
+ * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Unblock one thread that currently waits on condition variable pointed by COND
- * s.a. `pthread_cond_signal()' */
+/* >> cnd_signal(3)
+ * Wakeup one thread currently waiting on the given
+ * condition variable (s.a. `pthread_cond_signal(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cnd_signal)(cnd_t *__restrict cond);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Unblock one thread that currently waits on condition variable pointed by COND
- * s.a. `pthread_cond_signal()' */
+/* >> cnd_signal(3)
+ * Wakeup one thread currently waiting on the given
+ * condition variable (s.a. `pthread_cond_signal(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Unblock all threads currently waiting on condition variable pointed by COND
- * s.a. `pthread_cond_broadcast()' */
+/* >> cnd_broadcast(3)
+ * Wakeup all threads currently waiting on the given
+ * condition variable (s.a. `pthread_cond_broadcast(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cnd_broadcast)(cnd_t *__restrict cond);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Unblock all threads currently waiting on condition variable pointed by COND
- * s.a. `pthread_cond_broadcast()' */
+/* >> cnd_broadcast(3)
+ * Wakeup all threads currently waiting on the given
+ * condition variable (s.a. `pthread_cond_broadcast(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block current thread on the condition variable pointed by COND
- * s.a. `pthread_cond_wait()' */
+/* >> cnd_wait(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_cnd_wait)(cnd_t *__restrict cond, mtx_t *__restrict mutex);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block current thread on the condition variable pointed by COND
- * s.a. `pthread_cond_wait()' */
+/* >> cnd_wait(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond, mtx_t *__restrict mutex);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_cnd_timedwait)(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec const *__restrict time_point);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec const *__restrict time_point);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_cnd_timedwait64)(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
- * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
- * s.a. `pthread_key_create()' */
+/* >> tss_create(3)
+ * Create a new TLS key (s.a. `pthread_key_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tss_create)(tss_t *tss_id, tss_dtor_t destructor);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
- * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
- * s.a. `pthread_key_create()' */
+/* >> tss_create(3)
+ * Create a new TLS key (s.a. `pthread_key_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id, tss_dtor_t destructor);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Sets the value of the thread-specific storage
- * identified by TSS_ID for the current thread to VAL
- * s.a. `pthread_setspecific()' */
+/* >> tss_set(3)
+ * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tss_set)(tss_t tss_id, void *val);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Sets the value of the thread-specific storage
- * identified by TSS_ID for the current thread to VAL
- * s.a. `pthread_setspecific()' */
+/* >> tss_set(3)
+ * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id, void *val);
+/* >> thr_min_stack(3) */
 INTDEF ATTR_CONST size_t NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void);
 #endif /* !__KERNEL__ */
 

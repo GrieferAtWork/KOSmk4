@@ -30,15 +30,20 @@
 %[define_type_class(__ptrace_request_t = "TD")]
 %[default:section(".text.crt{|.dos}.system.ptrace")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/ptrace.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/os/ptrace.h> /* `struct __ptrace_peeksiginfo_args' */
+)]%{
+
 
 __SYSDECL_BEGIN
-
 
 #if (defined(__PTRACE_TRACEME) || defined(__PTRACE_PEEKTEXT) ||       \
      defined(__PTRACE_PEEKDATA) || defined(__PTRACE_PEEKUSER) ||      \

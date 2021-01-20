@@ -266,6 +266,7 @@ incdir("");
 #include <bits/os/ipc.h>
 #include <bits/os/itimerspec.h>
 #include <bits/os/itimerval.h>
+#include <bits/os/linger.h>
 #include <bits/os/mcontext.h>
 #include <bits/os/mmsghdr.h>
 #include <bits/os/msgbuf.h>
@@ -305,6 +306,7 @@ incdir("");
 #include <bits/os/timex.h>
 #include <bits/os/tms.h>
 #include <bits/os/ucontext.h>
+#include <bits/os/ucred.h>
 #include <bits/os/ustat.h>
 #include <bits/os/utimbuf.h>
 #include <bits/os/utsname.h>
@@ -1031,6 +1033,7 @@ incdir("");
 #include <sys/poll.h>
 #include <sys/procfs.h>
 #include <sys/ptrace.h>
+#include <sys/queue.h>
 #include <sys/random.h>
 #include <sys/reboot.h>
 #include <sys/resource.h>

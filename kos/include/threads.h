@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b21098b */
+/* HASH CRC-32:0xfecd5fb7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,25 +44,6 @@
 #include <kos/anno.h>
 
 __SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/threads.h, but have since been modified */
-/* ISO C11 Standard: 7.26 - Thread support library  <threads.h>.
-   Copyright (C) 2018-2019 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 
 #ifndef TSS_DTOR_ITERATIONS
@@ -190,64 +171,65 @@ typedef __mtx_t mtx_t;
 typedef __cnd_t cnd_t;
 
 #ifdef __CRT_HAVE_thrd_create
-/* Create a new thread executing the function FUNC.  Arguments for FUNC
- * are passed through ARG. If successful, THR is set to new thread identifier */
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, thrd_start_t __func, void *__arg),(__thr,__func,__arg))
 #elif defined(__CRT_HAVE_pthread_create)
 #include <libc/local/threads/thrd_create.h>
-/* Create a new thread executing the function FUNC.  Arguments for FUNC
- * are passed through ARG. If successful, THR is set to new thread identifier */
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, thrd_start_t __func, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
-/* >> pthread_equal(3)
- * Compare two thread identifiers
- * @return: 0 : Given threads are non-equal
- * @return: * : Given threads are equal */
+/* >> thrd_equal(3)
+ * Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
+ * @return: == 0: Threads are not equal
+ * @return: != 0: Threads are qual */
 __CEIREDIRECT(,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),pthread_equal,{ return __thr1 == __thr2; })
 #elif defined(__CRT_HAVE_thrd_equal)
-/* >> pthread_equal(3)
- * Compare two thread identifiers
- * @return: 0 : Given threads are non-equal
- * @return: * : Given threads are equal */
+/* >> thrd_equal(3)
+ * Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
+ * @return: == 0: Threads are not equal
+ * @return: != 0: Threads are qual */
 __CEIDECLARE(,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),{ return __thr1 == __thr2; })
 #else /* ... */
-/* >> pthread_equal(3)
- * Compare two thread identifiers
- * @return: 0 : Given threads are non-equal
- * @return: * : Given threads are equal */
+/* >> thrd_equal(3)
+ * Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
+ * @return: == 0: Threads are not equal
+ * @return: != 0: Threads are qual */
 __LOCAL int __NOTHROW_NCX(__LIBCCALL thrd_equal)(thrd_t __thr1, thrd_t __thr2) { return __thr1 == __thr2; }
 #endif /* !... */
 #ifdef __CRT_HAVE_pthread_self
-/* Return current thread identifier
- * s.a. `pthread_self()' */
+/* >> thrd_current(3)
+ * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
 __CREDIRECT(,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self,())
 #elif defined(__CRT_HAVE_thrd_current)
-/* Return current thread identifier
- * s.a. `pthread_self()' */
+/* >> thrd_current(3)
+ * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
 __CDECLARE(,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
 #endif /* ... */
 #if defined(__CRT_HAVE_thrd_sleep64) && defined(__USE_TIME_BITS64)
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),thrd_sleep64,(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) && !defined(__USE_TIME_BITS64)
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <libc/local/threads/thrd_sleep.h>
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
@@ -255,26 +237,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_thrd_sleep64
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),thrd_sleep,(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <libc/local/threads/thrd_sleep64.h>
-/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
- * The current thread may resume if receives a signal. In that case, if REMAINING
- * is not NULL, the remaining time is stored in the object pointed by it
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
@@ -282,70 +261,62 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_thrd_exit
-/* Terminate current thread execution, cleaning up any thread local
- * storage and freeing resources. Returns the value specified in RES
- * s.a. `pthread_exit()' */
+/* >> thrd_exit(3)
+ * Terminate the calling thread (s.a. `pthread_exit(3)') */
 __CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thrd_exit,(int __res),(__res))
 #elif defined(__CRT_HAVE_pthread_exit)
 #include <libc/local/threads/thrd_exit.h>
-/* Terminate current thread execution, cleaning up any thread local
- * storage and freeing resources. Returns the value specified in RES
- * s.a. `pthread_exit()' */
+/* >> thrd_exit(3)
+ * Terminate the calling thread (s.a. `pthread_exit(3)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL thrd_exit)(int __res) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_exit))(__res); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thrd_detach
-/* Detach the thread identified by THR from the current
- * environment (it does not allow join or wait for it)
- * s.a. `pthread_detach()' */
+/* >> thrd_detach(3)
+ * Detach the given thread (s.a. `pthread_detach(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,thrd_detach,(thrd_t __thr),(__thr))
 #elif defined(__CRT_HAVE_pthread_detach)
 #include <libc/local/threads/thrd_detach.h>
-/* Detach the thread identified by THR from the current
- * environment (it does not allow join or wait for it)
- * s.a. `pthread_detach()' */
+/* >> thrd_detach(3)
+ * Detach the given thread (s.a. `pthread_detach(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_detach, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_detach)(thrd_t __thr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_detach))(__thr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thrd_join
-/* Block current thread until execution of THR is complete.
- * In case that RES is not NULL, will store the return value of THR when exiting
- * s.a. `pthread_join()' */
+/* >> thrd_join(3)
+ * Wait for the given thread to finish (s.a. `pthread_join(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_RPC,thrd_join,(thrd_t __thr, int *__res),(__thr,__res))
 #elif defined(__CRT_HAVE_pthread_join)
 #include <libc/local/threads/thrd_join.h>
-/* Block current thread until execution of THR is complete.
- * In case that RES is not NULL, will store the return value of THR when exiting
- * s.a. `pthread_join()' */
+/* >> thrd_join(3)
+ * Wait for the given thread to finish (s.a. `pthread_join(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_join, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL thrd_join)(thrd_t __thr, int *__res) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_join))(__thr, __res); })
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_yield
-/* Stop current thread execution and call the scheduler to decide which
- * thread should execute next. The current thread may be selected by the
- * scheduler to keep running
- * s.a. `pthread_yield()' */
+/* >> thrd_yield(3)
+ * Yield execution to another thraed (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),sched_yield,())
 #elif defined(__CRT_HAVE_thrd_yield)
-/* Stop current thread execution and call the scheduler to decide which
- * thread should execute next. The current thread may be selected by the
- * scheduler to keep running
- * s.a. `pthread_yield()' */
+/* >> thrd_yield(3)
+ * Yield execution to another thraed (s.a. `pthread_yield(3)') */
 __CDECLARE_VOID(,__NOTHROW,thrd_yield,(void),())
 #elif defined(__CRT_HAVE_pthread_yield)
-/* Stop current thread execution and call the scheduler to decide which
- * thread should execute next. The current thread may be selected by the
- * scheduler to keep running
- * s.a. `pthread_yield()' */
+/* >> thrd_yield(3)
+ * Yield execution to another thraed (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),pthread_yield,())
 #elif defined(__CRT_HAVE___sched_yield)
-/* Stop current thread execution and call the scheduler to decide which
- * thread should execute next. The current thread may be selected by the
- * scheduler to keep running
- * s.a. `pthread_yield()' */
+/* >> thrd_yield(3)
+ * Yield execution to another thraed (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),__sched_yield,())
 #elif defined(__CRT_HAVE_yield)
-/* Stop current thread execution and call the scheduler to decide which
- * thread should execute next. The current thread may be selected by the
- * scheduler to keep running
- * s.a. `pthread_yield()' */
+/* >> thrd_yield(3)
+ * Yield execution to another thraed (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),yield,())
 #endif /* ... */
 
@@ -353,121 +324,132 @@ __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),yield,())
 /* Mutex functions.  */
 
 #ifdef __CRT_HAVE_mtx_init
-/* Creates a new mutex object with type TYPE.
- * If successful the new object is pointed by MUTEX
- * s.a. `pthread_mutex_init()' */
+/* >> mtx_init(3)
+ * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_init,(mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type),(__mutex,__type))
 #elif defined(__CRT_HAVE_pthread_mutex_init)
 #include <libc/local/threads/mtx_init.h>
-/* Creates a new mutex object with type TYPE.
- * If successful the new object is pointed by MUTEX
- * s.a. `pthread_mutex_init()' */
+/* >> mtx_init(3)
+ * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_init)(mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_init))(__mutex, __type); })
 #endif /* ... */
 #ifdef __CRT_HAVE_mtx_lock
-/* Block the current thread until the mutex pointed to by MUTEX is
- * unlocked.  In that case current thread will not be blocked
- * s.a. `pthread_mutex_lock()' */
+/* >> mtx_lock(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mtx_lock,(mtx_t *__restrict __mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_lock)
 #include <libc/local/threads/mtx_lock.h>
-/* Block the current thread until the mutex pointed to by MUTEX is
- * unlocked.  In that case current thread will not be blocked
- * s.a. `pthread_mutex_lock()' */
+/* >> mtx_lock(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mtx_lock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_lock))(__mutex); })
 #endif /* ... */
 #if defined(__CRT_HAVE_mtx_timedlock64) && defined(__USE_TIME_BITS64)
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),mtx_timedlock64,(__mutex,__time_point))
 #elif defined(__CRT_HAVE_mtx_timedlock) && !defined(__USE_TIME_BITS64)
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),(__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/threads/mtx_timedlock.h>
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock)(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock))(__mutex, __time_point); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_mtx_timedlock64
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),(__mutex,__time_point))
 #elif defined(__CRT_HAVE_mtx_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),mtx_timedlock,(__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/threads/mtx_timedlock64.h>
-/* Block the current thread until the mutex pointed by MUTEX
- * is unlocked or time pointed by TIME_POINT is reached.
- * In case the mutex is unlock, the current thread will not be blocked
- * s.a. `pthread_mutex_timedlock()' */
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock64)(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock64))(__mutex, __time_point); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_mtx_trylock
-/* Try to lock the mutex pointed by MUTEX without blocking.
- * If the mutex is free the current threads takes control of
- * it, otherwise it returns immediately
- * s.a. `pthread_mutex_trylock()' */
+/* >> mtx_trylock(3)
+ * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_busy:    Cannot lock without blocking right now
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_trylock,(mtx_t *__restrict __mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_trylock)
 #include <libc/local/threads/mtx_trylock.h>
-/* Try to lock the mutex pointed by MUTEX without blocking.
- * If the mutex is free the current threads takes control of
- * it, otherwise it returns immediately
- * s.a. `pthread_mutex_trylock()' */
+/* >> mtx_trylock(3)
+ * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_busy:    Cannot lock without blocking right now
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_trylock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_trylock))(__mutex); })
 #endif /* ... */
 #ifdef __CRT_HAVE_mtx_unlock
-/* Unlock the mutex pointed by MUTEX.
- * It may potentially awake other threads waiting on this mutex
- * s.a. `pthread_mutex_unlock()' */
+/* >> mtx_unlock(3)
+ * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_unlock,(mtx_t *__restrict __mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_unlock)
 #include <libc/local/threads/mtx_unlock.h>
-/* Unlock the mutex pointed by MUTEX.
- * It may potentially awake other threads waiting on this mutex
- * s.a. `pthread_mutex_unlock()' */
+/* >> mtx_unlock(3)
+ * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_unlock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_unlock))(__mutex); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutex_destroy
-/* Destroy the mutex object pointed by MUTEX
- * s.a. `pthread_mutex_destroy()' */
+/* >> mtx_destroy(3)
+ * Destroy the given mutex (s.a. `pthread_mutex_destroy(3)') */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict __mutex),pthread_mutex_destroy,(__mutex))
 #elif defined(__CRT_HAVE_mtx_destroy)
-/* Destroy the mutex object pointed by MUTEX
- * s.a. `pthread_mutex_destroy()' */
+/* >> mtx_destroy(3)
+ * Destroy the given mutex (s.a. `pthread_mutex_destroy(3)') */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict __mutex),(__mutex))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_once
-/* Call function FUNC exactly once, even if invoked from several threads.
- * All calls must be made with the same FLAG object
- * s.a. `pthread_once()' */
+/* >> call_once(3)
+ * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),pthread_once,(__flag,__func))
 #elif defined(__CRT_HAVE_call_once)
-/* Call function FUNC exactly once, even if invoked from several threads.
- * All calls must be made with the same FLAG object
- * s.a. `pthread_once()' */
+/* >> call_once(3)
+ * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),(__flag,__func))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
-/* Call function FUNC exactly once, even if invoked from several threads.
- * All calls must be made with the same FLAG object
- * s.a. `pthread_once()' */
+/* >> call_once(3)
+ * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL call_once)(once_flag *__restrict __flag, __once_func_t __func) __THROWS(...) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))((__pthread_once_t *)__flag, (__pthread_once_routine_t)__func); }
 #endif /* !... */
 
@@ -475,78 +457,110 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL call_once
 /* Condition variable functions.  */
 
 #ifdef __CRT_HAVE_cnd_init
-/* Initialize new condition variable pointed by COND
- * s.a. `pthread_cond_init()' */
+/* >> cnd_init(3)
+ * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_init,(cnd_t *__restrict __cond),(__cond))
 #elif defined(__CRT_HAVE_pthread_cond_init)
 #include <libc/local/threads/cnd_init.h>
-/* Initialize new condition variable pointed by COND
- * s.a. `pthread_cond_init()' */
+/* >> cnd_init(3)
+ * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_init)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_init))(__cond); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_signal
-/* Unblock one thread that currently waits on condition variable pointed by COND
- * s.a. `pthread_cond_signal()' */
+/* >> cnd_signal(3)
+ * Wakeup one thread currently waiting on the given
+ * condition variable (s.a. `pthread_cond_signal(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_signal,(cnd_t *__restrict __cond),(__cond))
 #elif defined(__CRT_HAVE_pthread_cond_signal)
 #include <libc/local/threads/cnd_signal.h>
-/* Unblock one thread that currently waits on condition variable pointed by COND
- * s.a. `pthread_cond_signal()' */
+/* >> cnd_signal(3)
+ * Wakeup one thread currently waiting on the given
+ * condition variable (s.a. `pthread_cond_signal(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_signal)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_signal))(__cond); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_broadcast
-/* Unblock all threads currently waiting on condition variable pointed by COND
- * s.a. `pthread_cond_broadcast()' */
+/* >> cnd_broadcast(3)
+ * Wakeup all threads currently waiting on the given
+ * condition variable (s.a. `pthread_cond_broadcast(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_broadcast,(cnd_t *__restrict __cond),(__cond))
 #elif defined(__CRT_HAVE_pthread_cond_broadcast)
 #include <libc/local/threads/cnd_broadcast.h>
-/* Unblock all threads currently waiting on condition variable pointed by COND
- * s.a. `pthread_cond_broadcast()' */
+/* >> cnd_broadcast(3)
+ * Wakeup all threads currently waiting on the given
+ * condition variable (s.a. `pthread_cond_broadcast(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_broadcast, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_broadcast)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_broadcast))(__cond); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_wait
-/* Block current thread on the condition variable pointed by COND
- * s.a. `pthread_cond_wait()' */
+/* >> cnd_wait(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,cnd_wait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex),(__cond,__mutex))
 #elif defined(__CRT_HAVE_pthread_cond_wait)
 #include <libc/local/threads/cnd_wait.h>
-/* Block current thread on the condition variable pointed by COND
- * s.a. `pthread_cond_wait()' */
+/* >> cnd_wait(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_wait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL cnd_wait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_wait))(__cond, __mutex); })
 #endif /* ... */
 #if defined(__CRT_HAVE_cnd_timedwait64) && defined(__USE_TIME_BITS64)
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),cnd_timedwait64,(__cond,__mutex,__time_point))
 #elif defined(__CRT_HAVE_cnd_timedwait) && !defined(__USE_TIME_BITS64)
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),(__cond,__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/threads/cnd_timedwait.h>
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait))(__cond, __mutex, __time_point); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_cnd_timedwait64
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),(__cond,__mutex,__time_point))
 #elif defined(__CRT_HAVE_cnd_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),cnd_timedwait,(__cond,__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/threads/cnd_timedwait64.h>
-/* Block current thread on the condition variable until condition variable
- * pointed by COND is signaled or time pointed by TIME_POINT is reached
- * s.a. `pthread_cond_timedwait()' */
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait64)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait64))(__cond, __mutex, __time_point); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
@@ -564,49 +578,51 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
 /* Thread specific storage functions.  */
 
 #ifdef __CRT_HAVE_tss_create
-/* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
- * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
- * s.a. `pthread_key_create()' */
+/* >> tss_create(3)
+ * Create a new TLS key (s.a. `pthread_key_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, tss_dtor_t __destructor),(__tss_id,__destructor))
 #elif defined(__CRT_HAVE_pthread_key_create)
 #include <libc/local/threads/tss_create.h>
-/* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
- * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
- * s.a. `pthread_key_create()' */
+/* >> tss_create(3)
+ * Create a new TLS key (s.a. `pthread_key_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tss_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tss_create)(tss_t *__tss_id, tss_dtor_t __destructor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_create))(__tss_id, __destructor); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_getspecific
-/* Return the value held in thread-specific storage
- * for the current thread identified by TSS_ID
- * s.a. `pthread_getspecific()' */
+/* >> tss_get(3)
+ * Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
+ * @return: * : The calling thread's value of the given TLS variable */
 __CREDIRECT(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),pthread_getspecific,(__tss_id))
 #elif defined(__CRT_HAVE_tss_get)
-/* Return the value held in thread-specific storage
- * for the current thread identified by TSS_ID
- * s.a. `pthread_getspecific()' */
+/* >> tss_get(3)
+ * Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
+ * @return: * : The calling thread's value of the given TLS variable */
 __CDECLARE(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),(__tss_id))
 #endif /* ... */
 #ifdef __CRT_HAVE_tss_set
-/* Sets the value of the thread-specific storage
- * identified by TSS_ID for the current thread to VAL
- * s.a. `pthread_setspecific()' */
+/* >> tss_set(3)
+ * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,tss_set,(tss_t __tss_id, void *__val),(__tss_id,__val))
 #elif defined(__CRT_HAVE_pthread_setspecific)
 #include <libc/local/threads/tss_set.h>
-/* Sets the value of the thread-specific storage
- * identified by TSS_ID for the current thread to VAL
- * s.a. `pthread_setspecific()' */
+/* >> tss_set(3)
+ * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tss_set, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tss_set)(tss_t __tss_id, void *__val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_set))(__tss_id, __val); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_key_delete
-/* Destroys the thread-specific storage identified by TSS_ID.
- * The destructor of the TSS will not be called upon thread exit
- * s.a. `pthread_key_delete()' */
+/* >> tss_delete(3)
+ * Destroys the given TLS key (s.a. `pthread_key_delete(3)') */
 __CREDIRECT_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),pthread_key_delete,(__tss_id))
 #elif defined(__CRT_HAVE_tss_delete)
-/* Destroys the thread-specific storage identified by TSS_ID.
- * The destructor of the TSS will not be called upon thread exit
- * s.a. `pthread_key_delete()' */
+/* >> tss_delete(3)
+ * Destroys the given TLS key (s.a. `pthread_key_delete(3)') */
 __CDECLARE_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),(__tss_id))
 #endif /* ... */
 
@@ -617,13 +633,16 @@ __CDECLARE_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),(__tss_id))
  *       namespace. */
 #ifdef __USE_SOLARIS
 #ifdef __CRT_HAVE_thr_min_stack
+/* >> thr_min_stack(3) */
 __CDECLARE(__ATTR_CONST,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
 #else /* __CRT_HAVE_thr_min_stack */
 #include <libc/local/threads/thr_min_stack.h>
+/* >> thr_min_stack(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
 #endif /* !__CRT_HAVE_thr_min_stack */
 #ifdef __CRT_HAVE_pthread_main_np
-/* Another one of these non-restricted, but solaris-specific functions:
+/* >> thr_main(3)
+ * Another one of these non-restricted, but solaris-specific functions:
  * This one returns 1 if the calling thread is the main() thread (i.e.
  * the thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned if
@@ -633,7 +652,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __
  * proper pthread-controller attached. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,thr_main,(void),pthread_main_np,())
 #elif defined(__CRT_HAVE_thr_main)
-/* Another one of these non-restricted, but solaris-specific functions:
+/* >> thr_main(3)
+ * Another one of these non-restricted, but solaris-specific functions:
  * This one returns 1 if the calling thread is the main() thread (i.e.
  * the thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned if
@@ -644,7 +664,8 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,thr_main,(void),pthread_main_np,())
 __CDECLARE(__ATTR_CONST,int,__NOTHROW,thr_main,(void),())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
 #include <libc/local/pthread/pthread_main_np.h>
-/* Another one of these non-restricted, but solaris-specific functions:
+/* >> thr_main(3)
+ * Another one of these non-restricted, but solaris-specific functions:
  * This one returns 1 if the calling thread is the main() thread (i.e.
  * the thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned if

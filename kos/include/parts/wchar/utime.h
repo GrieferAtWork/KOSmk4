@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x255aa526 */
+/* HASH CRC-32:0x38d19ef1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
+
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_wutime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filename, struct utimbuf const *__file_times),wutime64,(__filename,__file_times))
@@ -67,8 +67,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wutime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* ... */
 #endif /* __USE_TIME64 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_WCHAR_UTIME_H */

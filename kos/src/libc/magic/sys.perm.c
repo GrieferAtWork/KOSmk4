@@ -25,13 +25,15 @@
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 %[default:section(".text.crt{|.dos}.system.ioperm")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
-
-__SYSDECL_BEGIN
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 }
 
 @@Change I/O port permissions for a specific I/O port range
@@ -43,8 +45,8 @@ int ioperm($ulongptr_t from, $ulongptr_t num, __STDC_INT_AS_UINT_T turn_on);
 int iopl(__STDC_INT_AS_UINT_T level);
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

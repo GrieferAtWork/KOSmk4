@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23d407f6 */
+/* HASH CRC-32:0x7d9b99e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_fsetpos64_unlocked_defined
 #define __local_fsetpos64_unlocked_defined 1
 #include <__crt.h>
+#include <features.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
 #include <kos/anno.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fsetpos64 from stdio */
 #ifndef __local___localdep_fsetpos64_defined

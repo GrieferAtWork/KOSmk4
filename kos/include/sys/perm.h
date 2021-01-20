@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdb25a40 */
+/* HASH CRC-32:0x141cd96d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,15 +32,15 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 /* Change I/O port permissions for a specific I/O port range */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ioperm,(__ULONGPTR_TYPE__ __from, __ULONGPTR_TYPE__ __num, __STDC_INT_AS_UINT_T __turn_on),(__from,__num,__turn_on))
 /* Change I/O port permissions for all I/O ports */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,iopl,(__STDC_INT_AS_UINT_T __level),(__level))
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_PERM_H */

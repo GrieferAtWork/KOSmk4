@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccbfa8d0 */
+/* HASH CRC-32:0x4261c985 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fdreopen_unlocked_defined
 #define __local_fdreopen_unlocked_defined 1
 #include <__crt.h>
+#include <features.h>
 #if defined(__CRT_HAVE_fdreopen) || defined(__CRT_HAVE_fdreopen64) || defined(__CRT_HAVE_fdreopen_unlocked) || defined(__CRT_HAVE_fdreopen64_unlocked)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fdreopen from stdio */

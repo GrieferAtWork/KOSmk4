@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44406e86 */
+/* HASH CRC-32:0x96d5bdce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
+
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __TWARGV
 #ifdef __USE_DOS
@@ -277,8 +277,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,wsystem,(wchar_t const *__cmd),_wsystem,(__cmd))
 #endif /* !... */
 #endif /* !__wsystem_defined */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_WCHAR_PROCESS_H */

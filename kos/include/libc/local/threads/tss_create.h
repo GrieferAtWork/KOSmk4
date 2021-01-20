@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a72577c */
+/* HASH CRC-32:0xdbeb4a20 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,9 +50,10 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
- * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
- * s.a. `pthread_key_create()' */
+/* >> tss_create(3)
+ * Create a new TLS key (s.a. `pthread_key_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
 __LOCAL_LIBC(tss_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id, __tss_dtor_t __destructor) {
 	__errno_t __error;
