@@ -17,20 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_KRAM_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_KRAM_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
-#include <kernel/mman/mm-map.h>
+#include <kernel/mman/mm-kram.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
+#include <kernel/panic.h>
+
+#include <hybrid/align.h>
+#include <hybrid/atomic.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -50,9 +58,9 @@ DECL_BEGIN
  *                       be combined with `GFP_LOCKED' to prevent the backing
  *                       physical memory from being altered.
  *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
- *   - GFP_MAP_BELOW:    s.a. `MMAN_GETUNMAPPED_F_BELOW'
- *   - GFP_MAP_ABOVE:    s.a. `MMAN_GETUNMAPPED_F_ABOVE'
- *   - GFP_MAP_NOASLR:   s.a. `MMAN_GETUNMAPPED_F_NO_ASLR'
+ *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
+ *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
+ *   - GFP_MAP_NOASLR:   s.a. `MAP_NOASLR'
  *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded onto
@@ -67,56 +75,15 @@ mmap_map_kernel_ram(PAGEDIR_PAGEALIGNED void *hint,
 
 
 
-/* Non-throwing version of `mmap_map_kernel_ram()'.
- * returns `MMAP_MAP_KERNEL_RAM_NX_ERROR' on error. */
+/* Non-throwing version of `mmap_map_kernel_ram()'. Returns `MAP_FAILED' on error. */
 PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
 NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
                                       PAGEDIR_PAGEALIGNED size_t num_bytes,
                                       gfp_t gfp, size_t min_alignment) {
 	/* TODO */
-	return MMAP_MAP_KERNEL_RAM_NX_ERROR;
-}
-
-/* Without blocking, unmap a given region of kernel RAM.
- * These functions will attempt to acquire a lock to the kernel mman, and
- * if that fails, will instead inject a pending lock operation into the
- * kernel mman's `mman_kernel_lockops', which will then perform the actual
- * job of unmapping the associated address range as soon as doing so becomes
- * possible.
- * These functions may only be used to unmap nodes mapped with the `MNODE_F_NO_MERGE'
- * flag, as well as read+write permissions. Additionally, if preparing the backing
- * page directory fails, as might happen if the associated node didn't have the
- * `MNODE_F_MPREPARED' flag set, then a warning is written to the system (unless
- * an internal rate-limit check fails), and the unmap operation is re-inserted as
- * a pending lock operation into `mman_kernel_lockops' (meaning that the unmap will
- * be re-attempted repeatedly until it (hopefully) succeeds at some point)
- * @param: is_zero: When true, allows the memory management system to assume that
- *                  the backing physical memory is zero-initialized. If you're not
- *                  sure if this is the case, better pass `false'. If you lie here,
- *                  calloc() might arbitrarily break... */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                     PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                     bool is_zero) {
-	/* TODO */
-}
-
-/* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
- * @return: NULL: Successfully unmapped kernel ram.
- * @return: * :   Failed to prepare the underlying page directory.
- *                The returned value is a freshly initialized pending mman-
- *                lock-operation which the caller must enqueue for execution.
- *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
-PUBLIC WUNUSED NOBLOCK struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                            bool is_zero) {
-	struct mnode *node;
-	assert(mman_lock_acquired(&mman_kernel));
-
-	/* TODO */
+	return MAP_FAILED;
 }
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_KRAM_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C */

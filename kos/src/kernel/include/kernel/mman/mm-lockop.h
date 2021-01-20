@@ -33,7 +33,17 @@ DECL_BEGIN
 struct mman;
 struct mlockop;
 
+#ifndef __gfp_t_defined
+#define __gfp_t_defined 1
+typedef unsigned int gfp_t;
+#endif /* !__gfp_t_defined */
+
+
 /* Callback prototype for mman pending locked operations.
+ * NOTE: This callback is allowed to assume that `self->mlo_link.sle_next == NULL'
+ * @param: flags: A set of `GFP_*' flags that must be used in dynamic allocations.
+ *                Callbacks of this type may assume that this set always contains
+ *                at least `GFP_ATOMIC', and doesn't contain `GFP_CALLOC'.
  * @return: NULL: Discard this lock operation.
  * @return: * :   A chain of lock operations that should be re-scheduled
  *                to be performed the next time the mman's lock is released.
@@ -43,9 +53,11 @@ struct mlockop;
  *                Use this mechanism is you have to schedule a lock operation
  *                that may fail arbitrarily, and will continue to fail if one
  *                were to keep attempting it without going away to do something
- *                else before. */
+ *                else before.
+ *                The return value will (eventually) be re-queued as through it
+ *                had been passed in a call to `mman_kernel_lockop_many()' */
 typedef NOBLOCK struct mlockop *
-/*NOTHROW*/ (FCALL *mlockop_callback_t)(struct mlockop *__restrict self);
+/*NOTHROW*/ (FCALL *mlockop_callback_t)(struct mlockop *__restrict self, gfp_t flags);
 
 /* Memory-manager locked operation.
  * This struct describes a pending operation that should be executed
@@ -71,7 +83,13 @@ DATDEF struct mlockop_slist mman_kernel_lockops;
  * point in the future. The given `op->mlo_func' is responsible for freeing the
  * backing memory of `op' during its invocation. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op);
+NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op, gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+
+/* Same as `mman_kernel_lockop()', but `op->mlo_link' may point to another lock
+ * op that should also be enqueued, which may point to another, and so on...
+ * Additionally, `op' may be `NULL', in which case the call is a no-op */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL mman_kernel_lockop_many)(struct mlockop *op, gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
 
 #ifdef __cplusplus
 extern "C++" {

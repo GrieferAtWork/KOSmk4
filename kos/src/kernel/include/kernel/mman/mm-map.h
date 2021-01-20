@@ -116,9 +116,9 @@
 #endif /* !MAP_FIXED_NOREPLACE && __MAP_FIXED_NOREPLACE */
 
 /* Disable ASLR (iow: don't randomize automatically determined mmap addresses)  */
-#if !defined(MAP_NO_ASLR) && defined(__MAP_NO_ASLR)
-#define MAP_NO_ASLR __MAP_NO_ASLR
-#endif /* !MAP_NO_ASLR && __MAP_NO_ASLR */
+#if !defined(MAP_NOASLR) && defined(__MAP_NOASLR)
+#define MAP_NOASLR __MAP_NOASLR
+#endif /* !MAP_NOASLR && __MAP_NOASLR */
 
 /* Kernel-only mmap flag: Set the `MNODE_F_MPREPARED' node flag,
  * and ensure that the backing page directory address range is kept
@@ -252,7 +252,9 @@ mman_unmap(struct mman *__restrict self,
  * @param: addr:       The base address at which to start changing protection.
  * @param: num_bytes:  The number of continuous bytes of memory to change, starting at `addr'
  * @param: prot_mask:  Mask of protection bits that should be kept (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
+ *                     Other bits are silently ignored.
  * @param: prot_flags: Set of protection bits that should be added (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
+ *                     Other bits are silently ignored.
  * @param: flags:      Set of `MMAN_UNMAP_*'
  * @return: * :        The actual # of (possibly) altered bytes of memory. */
 FUNDEF NONNULL((1)) size_t KCALL
@@ -270,99 +272,9 @@ mman_protect(struct mman *__restrict self,
  *       are simply ignored. */
 FUNDEF void FCALL
 mman_syncmem(struct mman *__restrict self,
-             PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-             PAGEDIR_PAGEALIGNED size_t num_bytes)
+             UNCHECKED void *addr DFL((void *)0),
+             size_t num_bytes DFL((size_t)-1))
 		THROWS(E_WOULDBLOCK, ...);
-
-
-
-#ifndef __gfp_t_defined
-#define __gfp_t_defined 1
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
-
-
-/************************************************************************/
-/* Additional GFP_* flags for `mmap_map_kernel_ram()'                   */
-/************************************************************************/
-
-#define GFP_MAP_32BIT        0x0040 /* The backing _physical_ memory will use 32-bit addresses.
-                                     * This differs from the normal meaning of the `MAP_32BIT' flag!!! */
-#define GFP_MAP_PREPARED     0x0800 /* Set the `MNODE_F_MPREPARED' node flag, and ensure that
-                                     * the backing page directory address range is kept prepared
-                                     * for the duration of the node's lifetime. */
-#define GFP_MAP_BELOW        0x0100 /* s.a. `MMAN_GETUNMAPPED_F_BELOW' */
-#define GFP_MAP_ABOVE        0x0200 /* s.a. `MMAN_GETUNMAPPED_F_ABOVE' */
-#define GFP_MAP_NOASLR   0x40000000 /* s.a. `MMAN_GETUNMAPPED_F_NO_ASLR' */
-
-
-/* @param: gfp: Set of:
- *   - GFP_LOCKED:       Normal behavior
- *   - GFP_PREFLT:       Prefault everything
- *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
- *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
- *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_VCBASE:       Allocate the mnode and mpart from the core-part heap.
- *                       This also causes the `MNODE_F_COREPART' / `MPART_F_COREPART'
- *                       flags to be set for each resp. This flag is used internally
- *                       to resolve the dependency loop between this function needing
- *                       to call kmalloc() and kmalloc() needing to call this function.
- *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
- *                       must be combined with `MAP_POPULATE', and should also
- *                       be combined with `GFP_LOCKED' to prevent the backing
- *                       physical memory from being altered.
- *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
- *   - GFP_MAP_BELOW:    s.a. `MMAN_GETUNMAPPED_F_BELOW'
- *   - GFP_MAP_ABOVE:    s.a. `MMAN_GETUNMAPPED_F_ABOVE'
- *   - GFP_MAP_NOASLR:   s.a. `MMAN_GETUNMAPPED_F_NO_ASLR'
- *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
- *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
- *   - Other flags are silently ignored, but will be forwarded onto
- *     other calls to kmalloc() that may need to be made internally. */
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kernel_ram(PAGEDIR_PAGEALIGNED void *hint,
-                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                    gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
-/* Non-throwing version of `mmap_map_kernel_ram()'.
- * returns `MMAP_MAP_KERNEL_RAM_NX_ERROR' on error. */
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
-NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
-#define MMAP_MAP_KERNEL_RAM_NX_ERROR ((void *)-1)
-
-/* Without blocking, unmap a given region of kernel RAM.
- * These functions will attempt to acquire a lock to the kernel mman, and
- * if that fails, will instead inject a pending lock operation into the
- * kernel mman's `mman_kernel_lockops', which will then perform the actual
- * job of unmapping the associated address range as soon as doing so becomes
- * possible.
- * These functions may only be used to unmap nodes mapped with the `MNODE_F_NO_MERGE'
- * flag, as well as read+write permissions. Additionally, if preparing the backing
- * page directory fails, as might happen if the associated node didn't have the
- * `MNODE_F_MPREPARED' flag set, then a warning is written to the system (unless
- * an internal rate-limit check fails), and the unmap operation is re-inserted as
- * a pending lock operation into `mman_kernel_lockops' (meaning that the unmap will
- * be re-attempted repeatedly until it (hopefully) succeeds at some point)
- * @param: is_zero: When true, allows the memory management system to assume that
- *                  the backing physical memory is zero-initialized. If you're not
- *                  sure if this is the case, better pass `false'. If you lie here,
- *                  calloc() might arbitrarily break... */
-FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                     PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                     __BOOL is_zero DFL(0));
-
-/* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
- * @return: NULL: Successfully unmapped kernel ram.
- * @return: * :   Failed to prepare the underlying page directory.
- *                The returned value is a freshly initialized pending mman-
- *                lock-operation which the caller must enqueue for execution.
- *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
-FUNDEF WUNUSED NOBLOCK struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                            __BOOL is_zero DFL(0));
 
 DECL_END
 #endif /* __CC__ */

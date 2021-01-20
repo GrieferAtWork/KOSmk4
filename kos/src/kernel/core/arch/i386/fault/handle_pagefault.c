@@ -373,6 +373,17 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void *pc) 
 	RETHROW();
 }
 
+#ifdef CONFIG_USE_NEW_VM
+#ifndef CONFIG_NO_SMP
+INTDEF WEAK unsigned int mman_kernel_hintinit_inuse;
+#define mman_kernel_hintinit_inuse_inc() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
+#define mman_kernel_hintinit_inuse_dec() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
+#else /* !CONFIG_NO_SMP */
+#define mman_kernel_hintinit_inuse_inc() (void)0
+#define mman_kernel_hintinit_inuse_dec() (void)0
+#endif /* CONFIG_NO_SMP */
+#endif /* CONFIG_USE_NEW_VM */
+
 
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
@@ -408,10 +419,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Read our the faulting address */
 	addr = __rdcr2();
 
-	/* Re-enable interrupts if they were enabled before. */
-	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
-		__sti();
-
 	/* Load the address of the faulting page. */
 	mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
 
@@ -422,11 +429,31 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		struct mnode *hinted_node;
 		hinted_node = (struct mnode *)pagedir_gethint(addr);
 		if (hinted_node != NULL) {
-			/* Deal with hinted nodes. */
-			mnode_hinted_mmap(hinted_node, mf.mfl_addr);
-			return state;
+			/* Count how # CPUs are doing hinted-node initialization, so
+			 * that `mman_unmap_kernel_ram_locked()' can sync itself with
+			 * other CPUs which may still be accessing a mem-node which
+			 * is currently being split. */
+			mman_kernel_hintinit_inuse_inc();
+			hinted_node = (struct mnode *)pagedir_gethint(addr);
+			if likely(hinted_node != NULL) {
+				/* Deal with hinted nodes. */
+				mnode_hinted_mmap(hinted_node, mf.mfl_addr);
+				mman_kernel_hintinit_inuse_dec();
+				return state;
+			}
+			mman_kernel_hintinit_inuse_dec();
 		}
+		/* Check if some other thread initialized this page...
+		 * If this happened, */
+		if ((ecode & X86_PAGEFAULT_ECODE_WRITING)
+		    ? pagedir_iswritable(addr)
+		    : pagedir_ismapped(addr))
+			return state;
 	}
+
+	/* Re-enable interrupts if they were enabled before. */
+	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
+		__sti();
 
 	/* Figure out memory manager in charge of the accessed address. */
 	mf.mfl_mman = &mman_kernel;

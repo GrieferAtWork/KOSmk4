@@ -86,20 +86,6 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 	/* TODO */
 }
 
-/* Reap lock operations of `self' */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self) {
-	/* TODO */
-}
-
-/* Run `op->mlo_func' in the context of holding a lock to the kernel VM at some
- * point in the future. The given `op->mlo_func' is responsible for freeing the
- * backing memory of `op' during its invocation. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op) {
-	/* TODO */
-}
-
 
 DECL_END
 

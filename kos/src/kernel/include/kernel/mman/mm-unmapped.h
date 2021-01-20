@@ -87,9 +87,9 @@ struct unlockinfo;
 
 /* [valid_if(!MAP_FIXED)]
  * Disable ASLR (iow: don't randomize automatically determined mmap addresses)  */
-#if !defined(MAP_NO_ASLR) && defined(__MAP_NO_ASLR)
-#define MAP_NO_ASLR __MAP_NO_ASLR
-#endif /* !MAP_NO_ASLR && __MAP_NO_ASLR */
+#if !defined(MAP_NOASLR) && defined(__MAP_NOASLR)
+#define MAP_NOASLR __MAP_NOASLR
+#endif /* !MAP_NOASLR && __MAP_NOASLR */
 
 
 /* Error return value for `mman_getunmapped()' & friends */
@@ -131,13 +131,13 @@ DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
  * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
 DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
 
-/* Same as `mman_getunmapped_user_defbase', but used instead when
- * the `MMAN_GETUNMAPPED_F_STACK' flag is given. */
+/* Same as `mman_getunmapped_user_defbase', but used
+ * instead when the `MAP_STACK' flag is given. */
 DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_getunmapped()'
- * NOTE: _ONLY_ use this always force the `MMAN_GETUNMAPPED_F_NO_ASLR' flag to
+ * NOTE: _ONLY_ use this always force the `MAP_NOASLR' flag to
  *       be set, thus allowing you to force-disable ASLR system-wide. Using this
  *       for other flags does what you'd think, but the results would probably
  *       be catastrophic.
@@ -164,7 +164,7 @@ DATDEF unsigned int mman_getunmapped_extflags;
  *                    be aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the return
  *                    value is undefined, except that it will still be at least PAGESIZE!
- * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NO_ASLR'
+ * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Error: No free space matching requirements was found. */
@@ -194,7 +194,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
  *                    be aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the return
  *                    value is undefined, except that it will still be at least PAGESIZE!
- * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NO_ASLR'
+ * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Additionally, `MAP_FIXED' and `MAP_FIXED_NOREPLACE' are accepted.
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go

@@ -97,13 +97,13 @@ PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = HINT_GETADDR(KERNEL_VM
  * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
 PUBLIC USER CHECKED void *mman_getunmapped_user_defbase = HINT_GETADDR(KERNEL_VMHINT_USER_HEAP);
 
-/* Same as `mman_getunmapped_user_defbase', but used instead when
- * the `MAP_STACK' flag is given. */
+/* Same as `mman_getunmapped_user_defbase', but used
+ * instead when the `MAP_STACK' flag is given. */
 PUBLIC USER CHECKED void *mman_getunmapped_user_stkbase = HINT_GETADDR(KERNEL_VMHINT_USER_STACK);
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_getunmapped()'
- * NOTE: _ONLY_ use this always force the `MAP_NO_ASLR' flag to
+ * NOTE: _ONLY_ use this always force the `MAP_NOASLR' flag to
  *       be set, thus allowing you to force-disable ASLR system-wide. Using this
  *       for other flags does what you'd think, but the results would probably
  *       be catastrophic.
@@ -171,7 +171,7 @@ select_random_integer_with_bias(uintptr_t minval,
  *                    be aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the return
  *                    value is undefined, except that it will still be at least PAGESIZE!
- * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NO_ASLR'
+ * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Error: No free space matching requirements was found. */
@@ -253,7 +253,7 @@ again_find_good_range:
 #endif /* USERSPACE_END */
 	}
 #if __SIZEOF_POINTER__ > 4
-	if (flags & MMAN_GETUNMAPPED_F_32BIT) {
+	if (flags & MAP_32BIT) {
 		void *limit;
 		limit = (void *)(uintptr_t)(((size_t)UINT32_MAX + 1) - num_bytes);
 		if ((byte_t *)allow_maxaddr > (byte_t *)limit)
@@ -337,7 +337,7 @@ do_set_automatic_userspace_hint:
 		unsigned int alignshift;
 select_from_avail_range:
 		/* The hinted address range it available! */
-		if (flags & MAP_NO_ASLR) {
+		if (flags & MAP_NOASLR) {
 			result = avail_minaddr;
 			goto done_dynamic;
 		}
@@ -504,7 +504,7 @@ continue_find_above:
 				lo_dist += -hi_dist;
 				hi_dist = 0;
 			}
-			if (flags & MAP_NO_ASLR) {
+			if (flags & MAP_NOASLR) {
 				/* Don't randomize!
 				 * Always select from whichever address range is closer. */
 				if ((size_t)lo_dist < (size_t)hi_dist)
@@ -591,7 +591,7 @@ err:
  *                    be aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the return
  *                    value is undefined, except that it will still be at least PAGESIZE!
- * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NO_ASLR'
+ * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Additionally, `MAP_FIXED' and `MAP_FIXED_NOREPLACE' are accepted.
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
@@ -644,6 +644,10 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 			/* Check if we must split mem-nodes in order to fulfil the request. */
 			mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
 			assert(mima.mm_min && mima.mm_max);
+			/* TODO: If we were to work together without our caller (mman_map()),
+			 *       then we could make this easier by simply truncating the
+			 *       pre-existing node, and only splitting it when the result
+			 *       range is fully contained within a single, pre-existing node! */
 			if (mnode_getminaddr(mima.mm_min) != result) {
 				/* Must split this node! */
 				if (!mnode_split_or_unlock(self, mima.mm_min, result, unlock))

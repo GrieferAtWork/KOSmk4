@@ -27,6 +27,7 @@
 #include <kernel/mman/mm-map.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman.h>
 
 #include <kos/except.h>
 
@@ -81,6 +82,8 @@ mman_unmap(struct mman *__restrict self,
            UNCHECKED void *addr, size_t num_bytes,
            unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+
+
 	/* TODO */
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
@@ -91,7 +94,9 @@ mman_unmap(struct mman *__restrict self,
  * @param: addr:       The base address at which to start changing protection.
  * @param: num_bytes:  The number of continuous bytes of memory to change, starting at `addr'
  * @param: prot_mask:  Mask of protection bits that should be kept (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
+ *                     Other bits are silently ignored.
  * @param: prot_flags: Set of protection bits that should be added (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
+ *                     Other bits are silently ignored.
  * @param: flags:      Set of `MMAN_UNMAP_*'
  * @return: * :        The actual # of (possibly) altered bytes of memory. */
 PUBLIC NONNULL((1)) size_t KCALL
@@ -113,11 +118,27 @@ mman_protect(struct mman *__restrict self,
  *       are simply ignored. */
 PUBLIC void FCALL
 mman_syncmem(struct mman *__restrict self,
-             PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-             PAGEDIR_PAGEALIGNED size_t num_bytes)
+             UNCHECKED void *addr, size_t num_bytes)
 		THROWS(E_WOULDBLOCK, ...) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	void *maxaddr = (byte_t *)addr + num_bytes - 1;
+	while (addr <= maxaddr) {
+		REF struct mpart *part;
+		struct mnode_tree_minmax mima;
+		mman_lock_read(self);
+		mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
+		if (!mima.mm_min) {
+			mman_lock_endread(self);
+			break;
+		}
+		addr = mnode_getendaddr(mima.mm_min);
+		part = xincref(mima.mm_min->mn_part);
+		mman_lock_endread(self);
+		if (part) {
+			FINALLY_DECREF_UNLIKELY(part);
+			/* Sync the backing data-part. */
+			mpart_sync(part);
+		}
+	}
 }
 
 

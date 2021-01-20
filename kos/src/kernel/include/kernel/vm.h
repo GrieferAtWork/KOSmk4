@@ -316,10 +316,10 @@ DECL_END
 #define VM_GETFREE_ERROR MAP_FAILED
 #define vm_getfree(self, hint, num_bytes, min_alignment, mode) \
 	mman_findunmapped(self, hint, num_bytes, mode, min_alignment)
-#define vm_get_aslr_disabled() (mman_getunmapped_extflags & MMAN_GETUNMAPPED_F_NO_ASLR)
+#define vm_get_aslr_disabled() (mman_getunmapped_extflags & MAP_NOASLR)
 #define vm_set_aslr_disabled(v)                                                                        \
-	((v) ? __hybrid_atomic_or(mman_getunmapped_extflags, MMAN_GETUNMAPPED_F_NO_ASLR, __ATOMIC_SEQ_CST) \
-	     : __hybrid_atomic_and(mman_getunmapped_extflags, ~MMAN_GETUNMAPPED_F_NO_ASLR, __ATOMIC_SEQ_CST))
+	((v) ? __hybrid_atomic_or(mman_getunmapped_extflags, MAP_NOASLR, __ATOMIC_SEQ_CST) \
+	     : __hybrid_atomic_and(mman_getunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST))
 #define vm_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \
                fspath, fsname, data_start_offset, prot, flag, guard)     \
 	mman_map(self, hint, num_bytes, prot, (getfree_mode) | (flags),      \

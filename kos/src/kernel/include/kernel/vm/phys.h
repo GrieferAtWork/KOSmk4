@@ -282,6 +282,7 @@ NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
 	return result;
 }
 
+#ifndef NO_PHYS_IDENTITY
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_map_noidentity)(struct vm_ptram *__restrict self,
                                        physaddr_t addr, __BOOL writable DFL(true)) {
@@ -290,8 +291,9 @@ NOTHROW(KCALL vm_ptram_map_noidentity)(struct vm_ptram *__restrict self,
 	result += (uintptr_t)(addr & PAGEMASK);
 	return result;
 }
-
-
+#else /* !NO_PHYS_IDENTITY */
+#define vm_ptram_map_noidentity(...) vm_ptram_map(__VA_ARGS__)
+#endif /* NO_PHYS_IDENTITY */
 
 #endif /* __CC__ */
 

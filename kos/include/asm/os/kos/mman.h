@@ -100,7 +100,7 @@
                                            * large free memory range.
                                            * This flag is usually followed by another call that sets
                                            * the `MAP_FIXED_NOREPLACE' flag. */
-#define __MAP_NO_ASLR          0x40000000 /* Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
+#define __MAP_NOASLR           0x40000000 /* Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
 #define __MAP_OFFSET64_POINTER 0x80000000 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
                                            * unsigned integer that should actually be used as offset. */
 #endif /* __KOS_VERSION__ >= 400 */

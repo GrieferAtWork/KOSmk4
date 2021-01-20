@@ -56,7 +56,8 @@
 #define MNODE_F_KERNPART  0x0200 /* [const] This node describes part of the static kernel core and must
                                   *         not be modified or removed. Attempting to do so anyways will
                                   *         result in kernel panic. */
-#define MNODE_F_UNMAPPED  0x0400 /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped. */
+#define MNODE_F_UNMAPPED  0x0400 /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
+                                  * NOTE: You should never see this flag on any node still part of an mman's node-tree! */
 #define MNODE_F_MPREPARED 0x0800 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
                                   *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
                                   *         within the new process will have this flag cleared) */
@@ -142,6 +143,7 @@ struct mnode {
 	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 };
+
 
 
 /* Load the bounding set of page directory permissions with which

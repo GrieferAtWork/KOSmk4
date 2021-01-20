@@ -412,10 +412,4 @@ DECL_END
 #define RBTREE_IMPL            PUBLIC
 #include <hybrid/sequence/rbtree-abi.h>
 
-DECL_BEGIN
-
-
-
-DECL_END
-
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_C */
