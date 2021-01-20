@@ -42,7 +42,43 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libc/string.h>
+
 DECL_BEGIN
+
+#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
+#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
+#else
+#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
+#endif
+
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+#ifdef __INTELLISENSE__
+typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
+#else /* __INTELLISENSE__ */
+#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
+#endif /* !__INTELLISENSE__ */
+#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -612,24 +648,45 @@ mfile_private_makepart(struct mfile *__restrict self,
 	result->mp_refcnt = 1;
 	result->mp_flags  = MPART_F_NORMAL | MPART_F_NO_GLOBAL_REF;
 	result->mp_state  = MPART_ST_VOID;
-	result->mp_file   = self;
+	result->mp_file   = incref(self);
 	LIST_INIT(&result->mp_copy);
 	LIST_INIT(&result->mp_share);
 	SLIST_INIT(&result->mp_deadnodes);
-	/* Check if the part is supposed to be anonymous from the get-go. */
-	if (self->mf_parts == MFILE_PARTS_ANONYMOUS) {
-		assert(self->mf_blockshift < COMPILER_LENOF(mfile_anon));
-		result->mp_file = &mfile_anon[self->mf_blockshift];
-	}
-	incref(result->mp_file);
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	result->mp_minaddr = addr;
 	result->mp_maxaddr = addr + num_bytes - 1;
-	DBG_memset(&result->mp_blkst_ptr, 0xcc, sizeof(result->mp_blkst_ptr));
-	result->mp_meta = NULL;
+	result->mp_meta    = NULL;
 	if (self->mf_ops->mo_vio) {
 		result->mp_state = MPART_ST_VIO;
 		LIST_ENTRY_UNBOUND_INIT(result, mp_allparts);
+		result->mp_blkst_ptr = NULL;
+	} else {
+		size_t num_blocks;
+		num_blocks = num_bytes >> self->mf_blockshift;
+		/* Allocate the block-status bitset. */
+		if (num_blocks <= BITSET_ITEMS_PER_WORD) {
+			result->mp_flags |= MPART_F_BLKST_INL;
+			result->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
+		} else {
+			bitset_word_t *bitset;
+			size_t num_words;
+			num_words = CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD);
+			TRY {
+				bitset = (bitset_word_t *)kmalloc(num_words * sizeof(bitset_word_t),
+#if MPART_BLOCK_ST_NDEF == 0
+				                                  GFP_CALLOC |
+#endif /* MPART_BLOCK_ST_NDEF == 0 */
+				                                  GFP_LOCKED | GFP_PREFLT);
+			} EXCEPT {
+				kfree(result);
+				RETHROW();
+			}
+#if MPART_BLOCK_ST_NDEF != 0
+			__libc_memsetc(bitset, MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF),
+			               num_words, __SIZEOF_POINTER__);
+#endif /* MPART_BLOCK_ST_NDEF != 0 */
+			result->mp_blkst_ptr = bitset;
+		}
 	}
 	if (self->mf_ops->mo_initpart) {
 		/* Service custom part initializer. */
@@ -637,6 +694,8 @@ mfile_private_makepart(struct mfile *__restrict self,
 			(*self->mf_ops->mo_initpart)(self, result);
 		} EXCEPT {
 			decref_nokill(self);
+			if (!(result->mp_flags & MPART_F_BLKST_INL))
+				kfree(result->mp_blkst_ptr);
 			kfree(result);
 			RETHROW();
 		}
@@ -800,6 +859,8 @@ PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
 PRIVATE NOBLOCK NONNULL((1, 2)) void FCALL
 memfile_phys_initpart(struct mfile *__restrict UNUSED(self),
                       struct mpart *__restrict part) {
+	if (!(part->mp_flags & MPART_F_BLKST_INL))
+		kfree(part->mp_blkst_ptr);
 	/* (re-)configure the part to point to static, physical memory. */
 	part->mp_flags = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN |
 	                 MPART_F_NO_GLOBAL_REF | MPART_F_DONT_FREE;

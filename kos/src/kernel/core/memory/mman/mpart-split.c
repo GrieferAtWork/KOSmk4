@@ -411,8 +411,10 @@ NOTHROW(FCALL mpart_count_needed_nodes_in_list)(struct mpart_split_data const *_
 	struct mnode *node;
 	LIST_FOREACH(node, list, mn_link) {
 		mpart_reladdr_t min, max;
-		if unlikely(mnode_wasdestroyed(node))
+		if unlikely(wasdestroyed(node->mn_mman))
 			continue; /* Skip nodes that were destroyed. */
+		if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+			continue; /* Skip nodes that were unmapped. (NOTE: We're holding a lock to `node->mn_mman') */
 		min = mnode_getmapminaddr(node);
 		max = mnode_getmapmaxaddr(node);
 		assert(min <= max);
@@ -893,8 +895,10 @@ relock_with_data:
 		struct mnode *lonode;
 		for (lonode = LIST_FIRST(&lopart->mp_copy); lonode;) {
 			mpart_reladdr_t min, max;
-			if unlikely(mnode_wasdestroyed(lonode))
+			if unlikely(wasdestroyed(lonode->mn_mman))
 				continue; /* Skip nodes that were destroyed. */
+			if unlikely(lonode->mn_flags & MNODE_F_UNMAPPED)
+				continue; /* Skip nodes that were unmapped. (NOTE: We're holding a lock to `lonode->mn_mman') */
 			assert(lonode->mn_part == lopart);
 			min = mnode_getmapminaddr(lonode);
 			max = mnode_getmapmaxaddr(lonode);

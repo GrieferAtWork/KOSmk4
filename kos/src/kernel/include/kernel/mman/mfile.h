@@ -38,6 +38,7 @@ DECL_BEGIN
 struct mpart; /* Memory file part. */
 struct mfile; /* Memory storage owner/descriptor. */
 struct mfile_ops;
+struct mman;
 struct aio_buffer;
 struct aio_pbuffer;
 
@@ -266,24 +267,24 @@ struct mfile_map {
 	 * Usage:
 	 * >> void mman_mapat(struct mman *mm, void *addr, size_t num_bytes,
 	 * >>                 struct mfile *file, pos_t offset) {
-	 * >>     struct mfile_map data;
-	 * >>     mfile_map_init_and_acquire(&data, file, offset, num_bytes);
+	 * >>     struct mfile_map map;
+	 * >>     mfile_map_init_and_acquire(&map, file, offset, num_bytes);
 	 * >>     TRY {
-	 * >>         while (!mman_lock_available(mm)) {
-	 * >>             mfile_map_release(&data);
+	 * >>         while (!mman_lock_tryacquire(mm)) {
+	 * >>             mfile_map_release(&map);
 	 * >>             while (!mman_lock_available(mm))
 	 * >>                 task_yield();
-	 * >>             mfile_map_acquire(&data);
+	 * >>             mfile_map_acquire(&map);
 	 * >>         }
 	 * >>     } EXCEPT {
-	 * >>         mfile_map_fini(&data);
+	 * >>         mfile_map_fini(&map);
 	 * >>         RETHROW();
 	 * >>     }
 	 * >>     assert(!mnode_tree_rlocate(mm->mm_mappings, addr, (byte_t *)addr + num_bytes - 1));
-	 * >>     while (!SLIST_EMPTY(&data.mfm_nodes)) {
+	 * >>     while (!SLIST_EMPTY(&map.mfm_nodes)) {
 	 * >>         struct mnode *node;
-	 * >>         node = SLIST_FIRST(&data.mfm_nodes);
-	 * >>         SLIST_REMOVE_HEAD(&data.mfm_nodes, _mn_alloc);
+	 * >>         node = SLIST_FIRST(&map.mfm_nodes);
+	 * >>         SLIST_REMOVE_HEAD(&map.mfm_nodes, _mn_alloc);
 	 * >>         node->mn_flags = MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_SHARED;
 	 * >>         node->mn_mman  = mm;
 	 * >>         LIST_INSERT_HEAD(&node->mn_part->mp_share, node, mn_link);
@@ -293,12 +294,25 @@ struct mfile_map {
 	 * >>         node->mn_minaddr += (uintptr_t)addr;
 	 * >>         node->mn_maxaddr += (uintptr_t)addr;
 	 * >>         mnode_tree_insert(&mm->mm_mappings, node);
+	 * >>         mpart_lock_release(node->mn_part);
 	 * >>     }
-	 * >>     sync_endwrite(&mm->mm_lock);
+	 * >>     mman_lock_release(mm);
+	 * >>     mfile_map_fini(&map);
 	 * >> } */
 	struct mfile              *mfm_file;  /* [1..1][const] File from which to allocate nodes. */
 	PAGEDIR_PAGEALIGNED pos_t  mfm_addr;  /* [const] Starting address within the source file. */
 	PAGEDIR_PAGEALIGNED size_t mfm_size;  /* [const] Total # of bytes that should be mapped. */
+	unsigned int               mfm_prot;  /* Set of `0 | PROT_WRITE' (other flags are silently ignored) */
+	unsigned int               mfm_flags; /* Set of `0 | MAP_POPULATE | MAP_NONBLOCK' (other flags are silently ignored)
+	                                       * MAP_POPULATE -- Ensure the following conditions when locking data parts:
+	                                       *                  - mpart_setcore_or_unlock()
+	                                       *                  - mpart_loadsome_or_unlock()   (within the range being mapped)
+	                                       *                  - mpart_unsharecow_or_unlock() (only if `mfm_prot & PROT_WRITE')
+	                                       * MAP_NONBLOCK -- The `MAP_POPULATE' flag may be ignored if page init of
+	                                       *                 previously not loaded pages would block. Currently, all
+	                                       *                 page initializers are assumed to block, with the exception
+	                                       *                 of those that have a NULL-init callback, and the builtin
+	                                       *                 file types known to be non-blocking (e.g. `mfile_zero') */
 	struct mnode_slist         mfm_nodes; /* [0..n][owned] List of nodes.
 	                                       *  - Linked via `_mn_alloc'
 	                                       *  - Sorted ascendingly by part-offset
@@ -311,6 +325,9 @@ struct mfile_map {
 	                                       * The following fields are uninitialized:
 	                                       *  - mn_flags, mn_mement, mn_mman, mn_link, mn_writable
 	                                       *  - mn_fspath, mn_fsname */
+	struct mnode_slist         mfm_flist; /* [0..n][owned] Internal list of free nodes.
+	                                       * Required/superfluous mem-nodes are added/removed from
+	                                       * this list for the purpose of allocation/deallocation */
 };
 
 /* Lookup/create all parts to span the given address range, as
@@ -325,22 +342,37 @@ struct mfile_map {
  *    sure that all of the parts still form 1 uninterrupted
  *    mapping over the given address range in its entirety
  *  - Release locks to all of the parts */
-FUNDEF NONNULL((1, 2, 5)) void FCALL
-mfile_map_init(struct mfile_map *__restrict self,
-               struct mfile *__restrict file,
-               PAGEDIR_PAGEALIGNED pos_t addr,
-               PAGEDIR_PAGEALIGNED size_t num_bytes,
-               /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* More efficient combination of `mfile_map_init()' and `mfile_map_acquire()' */
-FUNDEF NONNULL((1, 2, 5)) void FCALL
+#ifdef __INTELLISENSE__
+NONNULL((1, 2)) void
 mfile_map_init_and_acquire(struct mfile_map *__restrict self,
                            struct mfile *__restrict file,
                            PAGEDIR_PAGEALIGNED pos_t addr,
                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                           /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
+                           unsigned int prot, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Same as `mfile_map_init_and_acquire()', but don't acquire an initial lock. */
+FUNDEF NONNULL((1, 2)) void FCALL
+mfile_map_init(struct mfile_map *__restrict self,
+               struct mfile *__restrict file,
+               PAGEDIR_PAGEALIGNED pos_t addr,
+               PAGEDIR_PAGEALIGNED size_t num_bytes,
+               unsigned int prot, unsigned int flags)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+#else /* __INTELLISENSE__ */
+#define mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags) \
+	((self)->mfm_file = (file), (self)->mfm_addr = (addr),                   \
+	 (self)->mfm_prot = (prot), (self)->mfm_flags = (flags),                 \
+	 _mfile_map_init_and_acquire(self))
+#define mfile_map_init(self, file, addr, num_bytes, prot, flags)           \
+	(mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags), \
+	 mfile_map_release(self))
+#endif /* !__INTELLISENSE__ */
+FUNDEF NONNULL((1)) void FCALL
+_mfile_map_init_and_acquire(struct mfile_map *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+
 
 
 /* Unlock or re-lock a mem-node allocator (that is: release/re-acquire locks
@@ -351,9 +383,9 @@ mfile_map_init_and_acquire(struct mfile_map *__restrict self,
  * holes anywhere along the way, while the the act of holding locks to all of
  * the parts then guaranties that no new holes can possibly pop up out of the
  * blue. */
-FUNDEF NONNULL((1)) void FCALL
-mfile_map_acquire(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+#define mfile_map_acquire(self) \
+	do {                        \
+	} while (!mfile_map_acquire_or_unlock(self, __NULLPTR))
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self);
 
@@ -364,13 +396,10 @@ NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self);
  * to become available, and return `false'.
  * Otherwise, don't invoke `unlock' and return `true'.
  * NOTE: In the case of an exception, `unlock' is guarantied to be invoked
- *       prior to the exception being thrown.
- * @param: mnode_free_list: Required/superfluous mem-nodes are added/removed from
- *                          this list for the purpose of allocation/deallocation. */
-FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
+ *       prior to the exception being thrown. */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
-                            struct unlockinfo *unlock,
-                            /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
+                            struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Finalize a given mem-node-allocator.
@@ -386,6 +415,27 @@ mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self);
 
+
+
+
+/* Helpers for constructing unlockinfo objects that invoke `mfile_map_release()' when
+ * triggering an unlock. - Mainly intended for use with `mman_getunmapped_or_unlock()'
+ * once both mem-parts and the target mman have been locked in `mman_map()' */
+struct mfile_map_with_unlockinfo
+#ifdef __cplusplus
+    : unlockinfo /* Underlying unlock info */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct unlockinfo mmwu_info; /* Underlying unlock info */
+#endif /* __cplusplus */
+	struct mfile_map  mmwu_map;  /* MFile mapping. */
+};
+
+/* Fallback to-be used with `mfile_map_with_unlockinfo::mmwu_info::ui_unlock'
+ * When invoked, will call `mfile_map_release()' on the contained mfile-map. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict self);
 
 
 

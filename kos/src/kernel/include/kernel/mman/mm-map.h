@@ -115,6 +115,11 @@
 #define MAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
 #endif /* !MAP_FIXED_NOREPLACE && __MAP_FIXED_NOREPLACE */
 
+/* Disable ASLR (iow: don't randomize automatically determined mmap addresses)  */
+#if !defined(MAP_NO_ASLR) && defined(__MAP_NO_ASLR)
+#define MAP_NO_ASLR __MAP_NO_ASLR
+#endif /* !MAP_NO_ASLR && __MAP_NO_ASLR */
+
 /* Kernel-only mmap flag: Set the `MNODE_F_MPREPARED' node flag,
  * and ensure that the backing page directory address range is kept
  * prepared for the duration of the node's lifetime. */
@@ -140,11 +145,11 @@ DATDEF struct mfile mfile_zero;     /* Zero-initialized, anonymous memory. */
 
 
 /* Map a given file into the specified mman.
- * @param: hint:          s.a. `mman_getunmapped_nx'
+ * @param: hint:          s.a. `mman_findunmapped'
  * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
- * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED | MAP_FIXED_NOREPLACE' (Other bits are silently ignored)
+ * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED' (Other bits are silently ignored)
  *                        Additionally, the following flags may be set to customize the behavior of how
- *                        a suitable address is located (s.a. `mman_getunmapped_nx()' for more info):
+ *                        a suitable address is located (s.a. `mman_findunmapped()' for more info):
  *                        `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE'
  * @param: file:          The file that is being mapped.
  * @param: file_fspath:   Optional mapping path (only used for memory->disk mapping listings)
@@ -155,7 +160,7 @@ DATDEF struct mfile mfile_zero;     /* Zero-initialized, anonymous memory. */
  *                        But that that when `MAP_FIXED' flag is also set, then the sub-page
  *                        offset of `hint' will be silently ignored, meaning that in this case
  *                        the return value may differ from `hint'!
- * @param: min_alignment: s.a. `mman_getunmapped_nx'
+ * @param: min_alignment: s.a. `mman_findunmapped'
  * @return: * : The effective mapping base at which `file->DATA.BYTES[file_pos]' can be found,
  *              unless `num_bytes' was given as `0', in which case the return value is undefined,
  *              but arguably valid (e.g. will be a user-/kernel-space location as it would have
@@ -202,8 +207,8 @@ mman_map_subrange(struct mman *__restrict self,
 
 /* Same as `mman_map()', but instead of actually mapping something, leave the
  * address range as empty (but possibly prepared), making it a reserved address range.
- * @param: flags: Set of `MAP_PREPARED | MAP_FIXED_NOREPLACE' (Other bits are silently ignored)
- *                Additionally, the usual bits relating to `mman_getunmapped_nx()' are accepted:
+ * @param: flags: Set of `MAP_PREPARED' (Other bits are silently ignored)
+ *                Additionally, the usual bits relating to `mman_findunmapped()' are accepted:
  *                `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE' */
 FUNDEF NONNULL((1)) void *KCALL
 mman_map_res(struct mman *__restrict self,
@@ -349,10 +354,12 @@ NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                                      __BOOL is_zero DFL(0));
 
 /* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
- * @return: true:  Successfully unmapped kernel ram.
- * @return: false: Failed to prepare the underlying page directory. In
- *                 this case, the ram mapping will not have been deleted. */
-FUNDEF NOBLOCK __BOOL
+ * @return: NULL: Successfully unmapped kernel ram.
+ * @return: * :   Failed to prepare the underlying page directory.
+ *                The returned value is a freshly initialized pending mman-
+ *                lock-operation which the caller must enqueue for execution.
+ *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
+FUNDEF WUNUSED NOBLOCK struct mlockop *
 NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                                             PAGEDIR_PAGEALIGNED size_t num_bytes,
                                             __BOOL is_zero DFL(0));

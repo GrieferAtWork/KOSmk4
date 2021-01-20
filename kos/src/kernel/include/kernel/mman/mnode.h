@@ -56,7 +56,7 @@
 #define MNODE_F_KERNPART  0x0200 /* [const] This node describes part of the static kernel core and must
                                   *         not be modified or removed. Attempting to do so anyways will
                                   *         result in kernel panic. */
-/*efine MNODE_F_          0x0400  * ... */
+#define MNODE_F_UNMAPPED  0x0400 /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped. */
 #define MNODE_F_MPREPARED 0x0800 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
                                   *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
                                   *         within the new process will have this flag cleared) */
@@ -127,12 +127,13 @@ struct mnode {
 	union {
 		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 		WEAK REF struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
-		                                              * NOTE: This only becomes a weak reference when `mnode_wasdestroyed(self)' is true!
-		                                              *       Before that point, this is just a regular, old pointer! */
+		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
+		                                              *       and the node has to be inserted into the associated part's dead-node-list.
+		                                              *       Unless this has happened, this is just a regular, old pointer! */
 	};
-	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)] Offset into `mn_part', to where the maping starts. */
-	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)] Entry for `mp_copy' or `mp_share' */
-	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)] Chain of nodes that (may) contain pages that
+	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
+	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
+	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Chain of nodes that (may) contain pages that
 	                                                  * are current mapped with write-access enabled. This list is used to speed
 	                                                  * up the clearing of write-access of modified memory mappings when copying
 	                                                  * a memory manager as part of fork(2). For this purpose, this list contains
@@ -142,9 +143,9 @@ struct mnode {
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 };
 
-/* Check if the given mem-node was destroyed. */
-#define mnode_wasdestroyed(self) wasdestroyed((self)->mn_mman)
 
+/* Load the bounding set of page directory permissions with which
+ * a given mem-nodes should have its backing memory be mapped. */
 #if (PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC && \
      PAGEDIR_MAP_FREAD == MNODE_F_PREAD && \
      PAGEDIR_MAP_FWRITE == MNODE_F_PWRITE)
@@ -153,9 +154,17 @@ struct mnode {
 	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
 #define mnode_getperm_kernel(self) \
 	((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE))
-#else
-#error TODO
-#endif
+#else /* ... */
+#define mnode_getperm(self)                                           \
+	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_MAP_FEXEC : 0) |   \
+	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_MAP_FREAD : 0) |   \
+	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_MAP_FWRITE : 0) | \
+	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
+#define mnode_getperm_kernel(self)                                  \
+	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_MAP_FEXEC : 0) | \
+	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_MAP_FREAD : 0) | \
+	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_MAP_FWRITE : 0))
+#endif /* !... */
 
 /* Get bounds for the given mem-node. */
 #define mnode_getminaddr(self) ((void *)(self)->mn_minaddr)
@@ -166,6 +175,7 @@ struct mnode {
 #define mnode_iskern(self)     ADDR_ISKERN((self)->mn_minaddr)
 #define mnode_isuser(self)     ADDR_ISUSER((self)->mn_minaddr)
 /* Return the part-relative min-/max-address that is being mapped. */
+#define mnode_getmapaddr(self)    ((mpart_reladdr_t)((self)->mn_partoff))
 #define mnode_getmapminaddr(self) ((mpart_reladdr_t)((self)->mn_partoff))
 #define mnode_getmapmaxaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr))))
 #define mnode_getmapendaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + mnode_getsize(self)))
@@ -222,6 +232,15 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
  * the current page directory. */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self);
+
+/* Split `lonode' (which contains `addr_where_to_split') at that address.
+ * If this cannot be done without blocking, unlock and eventually return `false' */
+FUNDEF WUNUSED NONNULL((1, 2)) __BOOL FCALL
+mnode_split_or_unlock(struct mman *__restrict self,
+                      struct mnode *__restrict lonode,
+                      PAGEDIR_PAGEALIGNED void *addr_where_to_split,
+                      struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* While holding a lock to `self->mn_mman' and `self->mn_part', try
  * to merge the given node with its successor/predecessor node, without

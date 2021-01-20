@@ -345,6 +345,23 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
 
 
 
+/************************************************************************/
+/* Low-level mpart APIs                                                 */
+/************************************************************************/
+
+/* Initialize `self->mp_state' and `self->mp_mem' or `self->mp_mem_sc', such
+ * that `self' points to exactly `total_pages' pages of physical memory.
+ * This function is init-only and doesn't care about locks or the whatever
+ * the given `self' may point to, meaning it should not be called when `self'
+ * was already fully initialized.
+ * NOTE: This function assumes that `self->mp_file' has already been initialized,
+ *       and will pass that value on-to `mfile_alloc_physmem()'! */
+FUNDEF NONNULL((1)) void KCALL
+mpart_ll_allocmem(struct mpart *__restrict self,
+                  size_t total_pages);
+
+
+
 
 /************************************************************************/
 /* MPart API to lock a part, alongside doing some other operations.     */
@@ -513,7 +530,7 @@ mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
                                         size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock until `mpart_setcore_and_unsharecow_or_unlock()' */
+/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_unsharecow_or_unlock()' */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
@@ -770,7 +787,9 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self);
 
 /* (Re-)map the given mem-part into a page directory.
  * The caller must ensure:
- *   - mpart_lock_acquired(self)               (unless `self' was accessed from a hinted node)
+ *   - mpart_lock_acquired(self)               (unless `self' was accessed from a hinted node,
+ *                                              or the caller knows that `self' can't be accessed
+ *                                              from the outside world)
  *   - pagedir_prepare_p(self, addr, size)     (was called)
  *
  * NOTES:
@@ -778,8 +797,12 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self);
  *     the `PAGEDIR_MAP_FWRITE' perm-flag is automatically cleared.
  *   - When mapping blocks marked as `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT',
  *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD' and `PAGEDIR_MAP_FWRITE' perm-
- *     flags are automatically cleared. */
-FUNDEF NOBLOCK NONNULL((1)) void
+ *     flags are automatically cleared.
+ *
+ * @return: * : The union of permissions actually applied to all pages.
+ *              This may be used to figure out if write permissions were
+ *              actually given to any of the requested pages. */
+FUNDEF NOBLOCK NONNULL((1)) u16
 NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
                             PAGEDIR_PAGEALIGNED void *addr,
                             PAGEDIR_PAGEALIGNED size_t size,
@@ -787,7 +810,7 @@ NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
                             u16 perm);
 
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
-FUNDEF NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NONNULL((1)) u16
 NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
                           PAGEDIR_PAGEALIGNED void *addr,
                           PAGEDIR_PAGEALIGNED size_t size,

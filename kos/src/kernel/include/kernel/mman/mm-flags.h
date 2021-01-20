@@ -40,24 +40,16 @@ DECL_BEGIN
  *   - 0            -> MNODE_F_NORMAL
  *   - MAP_PREPARED -> MNODE_F_MPREPARED
  *   - MAP_LOCKED   -> MNODE_F_MLOCK
- *   - MAP_POPULATE -> _MNODE_F_MPREFLT   (`mnodeflags_from_mapflags_with_populate'-only!)
  */
 #if (0 == MNODE_F_NORMAL &&               \
      MAP_PREPARED == MNODE_F_MPREPARED && \
-     MAP_LOCKED == MNODE_F_MLOCK &&       \
-     MAP_POPULATE == _MNODE_F_MPREFLT)
+     MAP_LOCKED == MNODE_F_MLOCK)
 #define mnodeflags_from_mapflags(mapflags) \
 	((mapflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK))
-#define mnodeflags_from_mapflags_with_populate(mapflags) \
-	((mapflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK | _MNODE_F_MPREFLT))
 #else /* ... */
 #define mnodeflags_from_mapflags(mapflags)                 \
 	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
 	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0))
-#define mnodeflags_from_mapflags_with_populate(mapflags)   \
-	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
-	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0) |       \
-	 (((mapflags)&MAP_POPULATE) ? _MNODE_F_MPREFLT : 0))
 #endif /* !... */
 
 

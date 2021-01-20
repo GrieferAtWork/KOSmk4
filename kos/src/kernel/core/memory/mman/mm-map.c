@@ -23,99 +23,51 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-map.h>
-#include <kernel/paging.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 
 #include <kos/except.h>
 
+#include <assert.h>
 #include <stdbool.h>
+#include <string.h>
 
 DECL_BEGIN
 
-/* Map a given file into the specified mman.
- * @param: hint:          s.a. `mman_getunmapped_nx'
- * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
- * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED | MAP_FIXED_NOREPLACE' (Other bits are silently ignored)
- *                        Additionally, the following flags may be set to customize the behavior of how
- *                        a suitable address is located (s.a. `mman_getunmapped_nx()' for more info):
- *                        `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE'
- * @param: file:          The file that is being mapped.
- * @param: file_fspath:   Optional mapping path (only used for memory->disk mapping listings)
- * @param: file_fsname:   Optional mapping name (only used for memory->disk mapping listings)
- * @param: file_pos:      Offset into the file being mapped, of where the mapping should start.
- *                        If this value isn't page-aligned, then its sub-page offset is added
- *                        to the return value eventually returned by this function.
- *                        But that that when `MAP_FIXED' flag is also set, then the sub-page
- *                        offset of `hint' will be silently ignored, meaning that in this case
- *                        the return value may differ from `hint'!
- * @param: min_alignment: s.a. `mman_getunmapped_nx'
- * @return: * : The effective mapping base at which `file->DATA.BYTES[file_pos]' can be found,
- *              unless `num_bytes' was given as `0', in which case the return value is undefined,
- *              but arguably valid (e.g. will be a user-/kernel-space location as it would have
- *              been when `num_bytes' was non-zero). */
-PUBLIC NONNULL((1, 6)) void *KCALL
-mman_map(struct mman *__restrict self,
-         UNCHECKED void *hint, size_t num_bytes,
-         unsigned int prot, unsigned int flags,
-         struct mfile *__restrict file,
-         struct path *file_fspath,
-         struct directory_entry *file_fsname,
-         pos_t file_pos, size_t min_alignment)
-		THROWS(E_WOULDBLOCK, E_BADALLOC,
-		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
+#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
+#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
+#else
+#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
+#endif
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
-
-/* Same as `mman_map()', but only allow pages entirely contained within
- * the file-relative address range `file_map_minaddr...file_map_maxaddr'
- * to be mapped. Attempting to map file contents beyond this range will
- * instead result in `&mfile_zero' getting mapped instead.
- * This function is mainly used to restrict access to raw physical memory
- * when user-space is allowed to directly mmap() device ram, but the driver
- * want's to prevent user-space from mapping more than the physical address
- * ranges actually associated with a device. */
-PUBLIC NONNULL((1, 6)) void *KCALL
-mman_map_subrange(struct mman *__restrict self,
-                  UNCHECKED void *hint, size_t num_bytes,
-                  unsigned int prot, unsigned int flags,
-                  struct mfile *__restrict file,
-                  struct path *file_fspath,
-                  struct directory_entry *file_fsname,
-                  pos_t file_pos,
-                  pos_t file_map_minaddr,
-                  pos_t file_map_maxaddr,
-                  size_t min_alignment)
-		THROWS(E_WOULDBLOCK, E_BADALLOC,
-		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
-
-/* Same as `mman_map()', but instead of actually mapping something, leave the
- * address range as empty (but possibly prepared), making it a reserved address range.
- * @param: flags: Set of `MAP_PREPARED | MAP_FIXED_NOREPLACE' (Other bits are silently ignored)
- *                Additionally, the usual bits relating to `mman_getunmapped_nx()' are accepted:
- *                `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE' */
-PUBLIC NONNULL((1)) void *KCALL
-mman_map_res(struct mman *__restrict self,
-             UNCHECKED void *hint, size_t num_bytes,
-             unsigned int flags,
-             size_t min_alignment)
-		THROWS(E_WOULDBLOCK, E_BADALLOC,
-		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
+#ifdef __INTELLISENSE__
+typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
+#else /* __INTELLISENSE__ */
+#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
+#endif /* !__INTELLISENSE__ */
+#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 
 /* Unmap all memory mappings within the given address range.
@@ -169,86 +121,16 @@ mman_syncmem(struct mman *__restrict self,
 }
 
 
-
-/* @param: gfp: Set of:
- *   - GFP_LOCKED:       Normal behavior
- *   - GFP_PREFLT:       Prefault everything
- *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
- *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
- *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_VCBASE:       Allocate the mnode and mpart from the core-part heap.
- *                       This also causes the `MNODE_F_COREPART' / `MPART_F_COREPART'
- *                       flags to be set for each resp. This flag is used internally
- *                       to resolve the dependency loop between this function needing
- *                       to call kmalloc() and kmalloc() needing to call this function.
- *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
- *                       must be combined with `MAP_POPULATE', and should also
- *                       be combined with `GFP_LOCKED' to prevent the backing
- *                       physical memory from being altered.
- *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
- *   - GFP_MAP_BELOW:    s.a. `MMAN_GETUNMAPPED_F_BELOW'
- *   - GFP_MAP_ABOVE:    s.a. `MMAN_GETUNMAPPED_F_ABOVE'
- *   - GFP_MAP_NOASLR:   s.a. `MMAN_GETUNMAPPED_F_NO_ASLR'
- *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
- *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
- *   - Other flags are silently ignored, but will be forwarded onto
- *     other calls to kmalloc() that may need to be made internally. */
-PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kernel_ram(PAGEDIR_PAGEALIGNED void *hint,
-                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                    gfp_t gfp, size_t min_alignment) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
-
-/* Non-throwing version of `mmap_map_kernel_ram()'.
- * returns `MMAP_MAP_KERNEL_RAM_NX_ERROR' on error. */
-PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
-NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t gfp, size_t min_alignment) {
-	/* TODO */
-	return MMAP_MAP_KERNEL_RAM_NX_ERROR;
-}
-
-/* Without blocking, unmap a given region of kernel RAM.
- * These functions will attempt to acquire a lock to the kernel mman, and
- * if that fails, will instead inject a pending lock operation into the
- * kernel mman's `mman_kernel_lockops', which will then perform the actual
- * job of unmapping the associated address range as soon as doing so becomes
- * possible.
- * These functions may only be used to unmap nodes mapped with the `MNODE_F_NO_MERGE'
- * flag, as well as read+write permissions. Additionally, if preparing the backing
- * page directory fails, as might happen if the associated node didn't have the
- * `MNODE_F_MPREPARED' flag set, then a warning is written to the system (unless
- * an internal rate-limit check fails), and the unmap operation is re-inserted as
- * a pending lock operation into `mman_kernel_lockops' (meaning that the unmap will
- * be re-attempted repeatedly until it (hopefully) succeeds at some point)
- * @param: is_zero: When true, allows the memory management system to assume that
- *                  the backing physical memory is zero-initialized. If you're not
- *                  sure if this is the case, better pass `false'. If you lie here,
- *                  calloc() might arbitrarily break... */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                     PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                     bool is_zero) {
-	/* TODO */
-}
-
-/* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
- * @return: true:  Successfully unmapped kernel ram.
- * @return: false: Failed to prepare the underlying page directory. In
- *                 this case, the ram mapping will not have been deleted. */
-PUBLIC NOBLOCK bool
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                            bool is_zero) {
-	/* TODO */
-}
-
-
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define DEFINE_mman_map
+#include "mm-map.c.inl"
+#define DEFINE_mman_map_subrange
+#include "mm-map.c.inl"
+#define DEFINE_mman_map_res
+#include "mm-map.c.inl"
+#endif /* !__INTELLISENSE__ */
+
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_C */

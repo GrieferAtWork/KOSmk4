@@ -313,9 +313,9 @@ DECL_END
 
 #define VM_GETFREE_ABOVE MAP_GROWSUP
 #define VM_GETFREE_BELOW MAP_GROWSDOWN
-#define VM_GETFREE_ERROR MMAN_GETUNMAPPED_ERROR
+#define VM_GETFREE_ERROR MAP_FAILED
 #define vm_getfree(self, hint, num_bytes, min_alignment, mode) \
-	mman_getunmapped_nx(self, hint, num_bytes, mode, min_alignment)
+	mman_findunmapped(self, hint, num_bytes, mode, min_alignment)
 #define vm_get_aslr_disabled() (mman_getunmapped_extflags & MMAN_GETUNMAPPED_F_NO_ASLR)
 #define vm_set_aslr_disabled(v)                                                                        \
 	((v) ? __hybrid_atomic_or(mman_getunmapped_extflags, MMAN_GETUNMAPPED_F_NO_ASLR, __ATOMIC_SEQ_CST) \

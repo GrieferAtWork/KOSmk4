@@ -246,7 +246,7 @@ again:
 	/* Unlink all of the deleted nodes. */
 	must_recheck_mlock = false;
 	SLIST_FOREACH (node, &deadnodes, _mn_dead) {
-		assert(mnode_wasdestroyed(node));
+		assert(wasdestroyed(node->mn_mman) || (node->mn_flags & MNODE_F_UNMAPPED));
 		LIST_REMOVE(node, mn_link);
 		if (node->mn_flags & MNODE_F_MLOCK)
 			must_recheck_mlock = true;

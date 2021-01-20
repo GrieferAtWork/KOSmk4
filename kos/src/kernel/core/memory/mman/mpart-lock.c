@@ -1101,7 +1101,7 @@ NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restri
 	self->ucb_mapmax = 0;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
 		mpart_reladdr_t min, max;
-		if (mnode_wasdestroyed(node))
+		if (wasdestroyed(node->mn_mman))
 			continue;
 		min = mnode_getmapminaddr(node);
 		max = mnode_getmapmaxaddr(node);
@@ -1340,10 +1340,10 @@ PRIVATE NONNULL((1, 2)) void
 NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
                                      struct mnode *stop_node) {
 	for (; start_node != stop_node; start_node = LIST_NEXT(start_node, mn_link)) {
-		if unlikely(mnode_wasdestroyed(start_node))
+		if unlikely(wasdestroyed(start_node->mn_mman))
 			continue; /* Skip dead nodes. */
-		if (start_node->mn_flags & MNODE_F_MPREPARED)
-			continue;
+		if (start_node->mn_flags & (MNODE_F_MPREPARED | MNODE_F_UNMAPPED))
+			continue; /* Skip nodes already prepared, or ones that were unmapped. */
 		pagedir_unprepare_map_p(start_node->mn_mman->mm_pdir_phys,
 		                        mnode_getaddr(start_node),
 		                        mnode_getsize(start_node));
@@ -1359,8 +1359,10 @@ try_prepare_mmans_or_throw(struct mpart *__restrict self,
 	struct mnode *node;
 	bool result = false;
 	LIST_FOREACH (node, &self->mp_copy, mn_link) {
-		if unlikely(mnode_wasdestroyed(node))
+		if unlikely(wasdestroyed(node->mn_mman))
 			continue; /* Skip dead nodes. */
+		if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+			continue; /* Skip nodes that were unmapped. */
 		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 			/* Prepare the page directory. */
 			if unlikely(!pagedir_prepare_map_p(node->mn_mman->mm_pdir_phys,
@@ -1792,7 +1794,7 @@ again:
 
 
 
-/* Acquire a lock until `mpart_setcore_and_unsharecow_or_unlock()' */
+/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_unsharecow_or_unlock()' */
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {

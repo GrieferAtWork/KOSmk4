@@ -32,6 +32,7 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
+#include <kernel/panic.h>
 
 #include <hybrid/atomic.h>
 
@@ -83,9 +84,16 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	REF struct mpart *part;
-	if ((self->mn_flags & MNODE_F_MPREPARED) && !wasdestroyed(self->mn_mman)) {
-		pagedir_phys_t pd = self->mn_mman->mm_pdir_phys;
-		pagedir_unprepare_map_p(pd, mnode_getaddr(self), mnode_getsize(self));
+	assertf((self->mn_flags & MNODE_F_UNMAPPED) || wasdestroyed(self->mn_mman),
+	        "A mem-node may only be destroyed if it's marked as UNMAPPED, "
+	        "or belonges to a dead memory manager");
+	if ((self->mn_flags & MNODE_F_MPREPARED)) {
+		REF struct mman *mm = self->mn_mman;
+		if (tryincref(mm)) {
+			pagedir_phys_t pd = self->mn_mman->mm_pdir_phys;
+			pagedir_unprepare_map_p(pd, mnode_getaddr(self), mnode_getsize(self));
+			decref_unlikely(mm);
+		}
 	}
 
 	xdecref(self->mn_fspath);
@@ -261,6 +269,126 @@ NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self) {
 	return MNODE_CLEAR_WRITE_SUCCESS;
 }
 
+
+/* Split `lonode' (which contains `addr_where_to_split') at that address.
+ * If this cannot be done without blocking, unlock and eventually return `false' */
+PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
+mnode_split_or_unlock(struct mman *__restrict self,
+                      struct mnode *__restrict lonode,
+                      PAGEDIR_PAGEALIGNED void *addr_where_to_split,
+                      struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	bool result = true;
+	struct mnode *hinode;
+	struct mpart *part;
+	assert((byte_t *)addr_where_to_split >= (byte_t *)mnode_getaddr(lonode));
+	assert((byte_t *)addr_where_to_split < (byte_t *)mnode_getendaddr(lonode));
+
+	/* Safety check: panic if the specified node isn't allowed to be split. */
+	if unlikely(lonode->mn_flags & MNODE_F_NO_SPLIT) {
+		kernel_panic("Not allowed to split node at %p-%p at %p",
+		             mnode_getminaddr(lonode),
+		             mnode_getmaxaddr(lonode),
+		             addr_where_to_split);
+	}
+
+	/* Try to allocate the missing high-node. */
+	hinode = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
+	                                    GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
+	if (!hinode) {
+		/* Must do the thing without blocking. */
+		byte_t const *mnode_minaddr, *mnode_maxaddr;
+		mnode_minaddr = lonode->mn_minaddr;
+		mnode_maxaddr = lonode->mn_maxaddr;
+		mman_lock_release(self);
+		unlockinfo_xunlock(unlock);
+		result = false;
+		hinode = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_ATOMIC);
+		TRY {
+			mman_lock_acquire(self);
+		} EXCEPT {
+			kfree(hinode);
+			RETHROW();
+		}
+		/* Check if anything changed in the mean time. */
+reload_lonode_after_mman_lock:
+		lonode = mnode_tree_locate(self->mm_mappings, mnode_minaddr);
+		if ((lonode == NULL) ||
+		    (lonode->mn_minaddr != mnode_minaddr) ||
+		    (lonode->mn_maxaddr != mnode_maxaddr) ||
+		    (lonode->mn_flags & MNODE_F_NO_SPLIT))
+			goto err_changed_free_hinode;
+	}
+
+	/* Fill in fields of `hinode' from `lonode' */
+	assert(lonode->mn_mman == self);
+	part               = lonode->mn_part;
+	hinode->mn_flags   = lonode->mn_flags;
+	hinode->mn_minaddr = (byte_t *)addr_where_to_split;
+	hinode->mn_maxaddr = lonode->mn_maxaddr;
+	hinode->mn_part    = part; /* incref'd later! */
+	hinode->mn_fspath  = xincref(lonode->mn_fspath);
+	hinode->mn_fsname  = xincref(lonode->mn_fsname);
+	hinode->mn_mman    = self;
+	hinode->mn_partoff = lonode->mn_partoff + (size_t)((byte_t *)addr_where_to_split - lonode->mn_minaddr);
+
+	/* At this point, we've managed to allocate the missing hi-node.
+	 * Deal with the simple case where the original node doesn't have
+	 * a backing mem-part (since in that case, we don't even need to
+	 * acquire any additional locks) */
+	if (part == NULL)
+		goto done_nopart; /* Simple case */
+
+	/* Must acquire a lock to the part so we can insert  */
+	if (!mpart_lock_tryacquire(part)) {
+		/* Must blocking-wait for the part to become available. */
+		incref(part);
+		mman_lock_release(self);
+		if (result) {
+			unlockinfo_xunlock(unlock);
+			result = false;
+		}
+		xdecref(hinode->mn_fspath);
+		xdecref(hinode->mn_fsname);
+		{
+			FINALLY_DECREF_UNLIKELY(part);
+			while (!mpart_lock_available(part))
+				task_yield();
+		}
+		mman_lock_acquire(self);
+		goto reload_lonode_after_mman_lock;
+	}
+
+	/* Insert the new mem-node into the backing part's list of either
+	 * copy-on-write, or shared mappings. */
+	if (hinode->mn_flags & MNODE_F_SHARED) {
+		LIST_INSERT_HEAD(&part->mp_share, hinode, mn_link);
+	} else {
+		LIST_INSERT_HEAD(&part->mp_copy, hinode, mn_link);
+	}
+	mpart_lock_release(part);
+	incref(part); /* The reference stored in `hinode->mn_part' */
+done_nopart:
+	/* Copy the is-writable attribute form `lonode' into `hinode' */
+	LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
+	if (LIST_ISBOUND(lonode, mn_writable))
+		LIST_INSERT_HEAD(&self->mm_writable, hinode, mn_writable);
+
+	/* Update the existing node, and re-insert both nodes into the mman. */
+	mnode_tree_removenode(&self->mm_mappings, lonode);
+	lonode->mn_maxaddr = (byte_t *)addr_where_to_split - 1;
+	mnode_tree_insert(&self->mm_mappings, lonode);
+	mnode_tree_insert(&self->mm_mappings, hinode);
+
+	/* If we had to unlock stuff above, release our lock to the mman to
+	 * keep things consistent with the false-result-means-no-locks invariant. */
+	if (!result)
+		mman_lock_release(self);
+	return result;
+err_changed_free_hinode:
+	kfree(hinode);
+	return false;
+}
 
 
 /* Mem-node tree API. All of these functions require that the caller

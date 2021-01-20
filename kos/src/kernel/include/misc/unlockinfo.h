@@ -34,7 +34,11 @@ struct unlockinfo {
 	 * locks which the caller may be holding, and it guarantied to
 	 * be called on all `return == false' and `EXCEPT' braches of
 	 * the called `*_or_unlock()' function. */
+#ifdef __INTELLISENSE__
+	/*   */ NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct unlockinfo *__restrict self);
+#else /* __INTELLISENSE__ */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct unlockinfo *__restrict self);
+#endif /* !__INTELLISENSE__ */
 };
 
 /* NOTE: *_or_unlock() functions that use `struct unlockinfo' usually follow

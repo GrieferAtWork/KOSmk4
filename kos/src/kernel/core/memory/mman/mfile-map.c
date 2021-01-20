@@ -26,6 +26,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mm-map.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <sched/task.h>
@@ -49,6 +50,41 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
+
+
+
+/* Finalize a given mem-node-allocator.
+ * This function will free (and only free; the caller is responsible to release
+ * all of the locks to the individual mem-parts themselves, though for this purpose,
+ * `mfile_map_release()' may also be used) all of the (still-)allocated
+ * mem-nodes, as can be found apart of the `self->mfm_nodes' list. In addition
+ * to freeing all of the container-nodes, this function will also drop 1 reference
+ * from the mem-parts pointed-to by each of the nodes.
+ * NOTE: This function doesn't necessarily have to be called if the caller was
+ *       able to inherit _all_ of the nodes originally allocated (which should
+ *       normally be the case when mapping was successful) */
+PUBLIC NONNULL((1)) void
+NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
+	struct mnode *iter, *next;
+	iter = SLIST_FIRST(&self->mfm_nodes);
+	while (iter) {
+		next = SLIST_NEXT(iter, _mn_alloc);
+		decref(iter->mn_part);
+		kfree(iter);
+		iter = next;
+	}
+	/* Free all nodes still apart of the free-list. */
+	iter = SLIST_FIRST(&self->mfm_flist);
+	while (iter) {
+		next = SLIST_NEXT(iter, _mn_alloc);
+		kfree(iter);
+		iter = next;
+	}
+}
+
+
+
+
 /* Lookup/create all parts to span the given address range, as
  * well as allocate 1 mem-node for each part, such that everything
  * put together forms 1 continuous range of fully mappable mem-parts.
@@ -61,77 +97,68 @@ DECL_BEGIN
  *    sure that all of the parts still form 1 uninterrupted
  *    mapping over the given address range in its entirety
  *  - Release locks to all of the parts */
-PUBLIC NONNULL((1, 2, 5)) void FCALL
-mfile_map_init(struct mfile_map *__restrict self,
-               struct mfile *__restrict file,
-               PAGEDIR_PAGEALIGNED pos_t addr,
-               PAGEDIR_PAGEALIGNED size_t num_bytes,
-               /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
+PUBLIC NONNULL((1)) void FCALL
+_mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	mfile_map_init_and_acquire(self, file, addr, num_bytes, mnode_free_list);
-	mfile_map_release(self);
-}
-
-/* More efficient combination of `mfile_map_init()' and `mfile_map_acquire()' */
-PUBLIC NONNULL((1, 2, 5)) void FCALL
-mfile_map_init_and_acquire(struct mfile_map *__restrict self,
-                           struct mfile *__restrict file,
-                           PAGEDIR_PAGEALIGNED pos_t addr,
-                           PAGEDIR_PAGEALIGNED size_t num_bytes,
-                           /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct mfile *file;
 	struct mnode *node;
 	REF struct mpart *part;
 	pos_t block_aligned_addr;
-	size_t block_aligned_num_bytes;
-	assert(IS_ALIGNED(addr, PAGESIZE));
-	assert(IS_ALIGNED(num_bytes, PAGESIZE));
-	block_aligned_addr      = addr & ~file->mf_part_amask;
-	block_aligned_num_bytes = num_bytes + (size_t)(addr - block_aligned_addr);
-	block_aligned_num_bytes = (block_aligned_num_bytes + file->mf_part_amask) & ~file->mf_part_amask;
-	self->mfm_file          = file;
-	self->mfm_addr          = addr;
-	self->mfm_size          = num_bytes;
+	size_t block_aligned_size;
+	file = self->mfm_file;
+	assert(self->mfm_size != 0);
+	assert(IS_ALIGNED(self->mfm_addr, PAGESIZE));
+	assert(IS_ALIGNED(self->mfm_size, PAGESIZE));
+	block_aligned_addr = self->mfm_addr & ~file->mf_part_amask;
+	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
+	block_aligned_size = (block_aligned_size + file->mf_part_amask) & ~file->mf_part_amask;
+
 	SLIST_INIT(&self->mfm_nodes);
-	node = SLIST_FIRST(mnode_free_list);
-	if (node != NULL) {
-		SLIST_REMOVE_HEAD(mnode_free_list, _mn_alloc);
-	} else {
-		node = (struct mnode *)kmalloc(sizeof(struct mnode),
-		                               GFP_LOCKED | GFP_PREFLT);
-	}
+	SLIST_INIT(&self->mfm_flist);
+	/* Allocate the initial node! */
+	node = (struct mnode *)kmalloc(sizeof(struct mnode),
+	                               GFP_LOCKED | GFP_PREFLT);
 	TRY {
 again_getpart:
 		part = mfile_getpart(file,
 		                     block_aligned_addr,
-		                     block_aligned_num_bytes);
-		mpart_lock_acquire(part);
-		/* re-check if `part' contains `block_aligned_addr'. */
-		if (!(mpart_getminaddr(part) <= block_aligned_addr &&
-		      mpart_getmaxaddr(part) >= block_aligned_addr)) {
-			mpart_lock_release(part);
+		                     block_aligned_size);
+		TRY {
+			mpart_lock_acquire(part);
+			/* re-check if `part' contains `block_aligned_addr'. */
+			if (!(mpart_getminaddr(part) <= block_aligned_addr &&
+			      mpart_getmaxaddr(part) >= block_aligned_addr)) {
+				mpart_lock_release(part);
+				decref(part);
+				goto again_getpart;
+			}
+			if (self->mfm_flags & MAP_POPULATE) {
+				/* TODO */
+			}
+		} EXCEPT {
 			decref(part);
-			goto again_getpart;
+			RETHROW();
 		}
 	} EXCEPT {
-		SLIST_INSERT(mnode_free_list, node, _mn_alloc);
+		kfree(node);
+		DBG_memset(self, 0xcc, sizeof(*self));
 		RETHROW();
 	}
 	/* Initialize the initial node. */
 	SLIST_INSERT(&self->mfm_nodes, node, _mn_alloc);
 	node->mn_minaddr = (byte_t *)0;
-	node->mn_maxaddr = (byte_t *)num_bytes - 1;
+	node->mn_maxaddr = (byte_t *)self->mfm_size - 1;
 	DBG_memset(&node->mn_flags, 0xcc, sizeof(node->mn_flags));
 	DBG_memset(&node->mn_mement, 0xcc, sizeof(node->mn_mement));
 	/*DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));*/ /* Used to chain nodes. */
 	node->mn_part    = part; /* Inherit reference */
-	node->mn_partoff = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
+	node->mn_partoff = (mpart_reladdr_t)(self->mfm_addr - mpart_getminaddr(part));
 	DBG_memset(&node->mn_link, 0xcc, sizeof(node->mn_link));
 	DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
 	DBG_memset(&node->mn_fspath, 0xcc, sizeof(node->mn_fspath));
 	DBG_memset(&node->mn_fsname, 0xcc, sizeof(node->mn_fsname));
 	/* Check if `part' already contains the whole mapping needed by `node' */
-	if (mpart_getmaxaddr(part) >= (addr + num_bytes - 1))
+	if (mpart_getmaxaddr(part) >= (self->mfm_addr + self->mfm_size - 1))
 		return; /* done! */
 	/* Failed to acquire all required parts. - Unlock our's, and re-lock everything
 	 * NOTE: This should never ~really~ happen when `file' is anonymous, though... */
@@ -140,6 +167,7 @@ again_getpart:
 		mfile_map_acquire(self);
 	} EXCEPT {
 		mfile_map_fini(self);
+		DBG_memset(self, 0xcc, sizeof(*self));
 		RETHROW();
 	}
 }
@@ -202,34 +230,21 @@ mfile_map_lockall(struct mfile_map *__restrict self,
 	return true;
 }
 
-/* Acquire locks to all parts */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mnode_slist_freeall)(struct mnode_slist *__restrict self) {
-	while (!SLIST_EMPTY(self)) {
-		struct mnode *node;
-		node = SLIST_FIRST(self);
-		SLIST_REMOVE_HEAD(self, _mn_alloc);
-		kfree(node);
-	}
-}
-
 
 /* Unlock the part, and remove the node in all cases where the mapping-area
  * of the given node no longer overlaps with even a single byte of the area
  * described by the associated part. */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mnode_slist_unlock_and_remove_non_overlapping_parts)(struct mnode_slist *__restrict self,
-                                                                   struct mnode_slist *__restrict free_list,
-                                                                   pos_t base_address) {
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_unlock_and_remove_non_overlapping_parts)(struct mfile_map *__restrict self) {
 	struct mnode **p_node, *node;
-	p_node = SLIST_P_FIRST(self);
+	p_node = SLIST_P_FIRST(&self->mfm_nodes);
 	while ((node = *p_node) != NULL) {
 		pos_t node_map_minaddr;
 		pos_t node_map_maxaddr;
 		struct mpart *part = node->mn_part;
 		/* Calculate the address range that was ~supposed~ to be mapped by this node. */
-		node_map_minaddr = base_address + (uintptr_t)node->mn_minaddr;
-		node_map_maxaddr = base_address + (uintptr_t)node->mn_maxaddr;
+		node_map_minaddr = self->mfm_addr + (uintptr_t)node->mn_minaddr;
+		node_map_maxaddr = self->mfm_addr + (uintptr_t)node->mn_maxaddr;
 		assert(node_map_minaddr <= node_map_maxaddr);
 		if (!RANGE_OVERLAPS(node_map_minaddr,
 		                    node_map_maxaddr,
@@ -238,7 +253,7 @@ NOTHROW(FCALL mnode_slist_unlock_and_remove_non_overlapping_parts)(struct mnode_
 			/* The mapped ranges no longer overlap. -> Remove this node. */
 			SLIST_P_REMOVE(p_node, _mn_alloc);
 			DBG_memset(node, 0xcc, sizeof(*node));
-			SLIST_INSERT(free_list, node, _mn_alloc);
+			SLIST_INSERT(&self->mfm_flist, node, _mn_alloc);
 			mpart_lock_release(part);
 			decref(part);
 		} else {
@@ -349,10 +364,9 @@ NOTHROW(FCALL mnode_slist_is_complete_range)(struct mnode_slist *__restrict self
 	return (size_t)expected_minaddr == num_bytes;
 }
 
-PRIVATE NONNULL((1, 3)) bool FCALL
+PRIVATE NONNULL((1)) bool FCALL
 mfile_map_fill_holes(struct mfile_map *__restrict self,
-                     struct unlockinfo *unlock,
-                     struct mnode_slist *__restrict free_list)
+                     struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	bool result;
 	struct mnode **p_node, *prev, *next;
@@ -463,7 +477,7 @@ continue_with_pnode:
 								/* Free this node! */
 								decref_unlikely(del_node->mn_part);
 								DBG_memset(del_node, 0xcc, sizeof(*del_node));
-								SLIST_INSERT(free_list, del_node, _mn_alloc);
+								SLIST_INSERT(&self->mfm_flist, del_node, _mn_alloc);
 							}
 							if (del_node == removed_nodes_hi)
 								break;
@@ -484,9 +498,9 @@ continue_with_pnode:
 
 			/* Allocate and initialize the new node used to cover the gap.
 			 * For this purpose, try to take a node from the free-list */
-			new_node = SLIST_FIRST(free_list);
+			new_node = SLIST_FIRST(&self->mfm_flist);
 			if (new_node != NULL) {
-				SLIST_REMOVE_HEAD(free_list, _mn_alloc);
+				SLIST_REMOVE_HEAD(&self->mfm_flist, _mn_alloc);
 			} else {
 				/* Must allocate a new node proper!
 				 * NOTE: No need to release any locks here, because we're not holding any! */
@@ -502,7 +516,7 @@ continue_with_pnode:
 			new_node->mn_part = part; /* Inherit reference */
 			/* Have the node fill the gap in its entirety. If we're wrong with
 			 * this assessment, then later calls to
-			 *   - mnode_slist_unlock_and_remove_non_overlapping_parts
+			 *   - mfile_map_unlock_and_remove_non_overlapping_parts
 			 *   - mnode_slist_adjusted_mapped_ranges
 			 * will fix the error we're making here.
 			 *
@@ -534,15 +548,11 @@ continue_with_pnode:
  * to become available, and return `false'.
  * Otherwise, don't invoke `unlock' and return `true'.
  * NOTE: In the case of an exception, `unlock' is guarantied to be invoked
- *       prior to the exception being thrown.
- * @param: mnode_free_list: Required/superfluous mem-nodes are added/removed from
- *                          this list for the purpose of allocation/deallocation. */
-PUBLIC NONNULL((1, 3)) bool FCALL
+ *       prior to the exception being thrown. */
+PUBLIC NONNULL((1)) bool FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
-                           struct unlockinfo *unlock,
-                           /*in|out*/ struct mnode_slist *__restrict mnode_free_list)
+                            struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct mnode *node;
 	struct mfile *file;
 	pos_t block_aligned_addr;
 	size_t block_aligned_size;
@@ -562,9 +572,7 @@ again:
 	/* Now go through the list of nodes and throw out nodes who's parts
 	 * no longer overlap at all with range that is being mapped by the
 	 * associated node. */
-	mnode_slist_unlock_and_remove_non_overlapping_parts(&self->mfm_nodes,
-	                                                    mnode_free_list,
-	                                                    self->mfm_addr);
+	mfile_map_unlock_and_remove_non_overlapping_parts(self);
 
 	/* We now know that _all_ remaining nodes _do_ actually map at least
 	 * some part of the requested address range. As such, try to alter
@@ -596,7 +604,7 @@ again:
 		 *       the duplicate itself), and where we were intending to insert
 		 *       the turns-out-to-be-a-duplicate part. */
 		mfile_map_release(self);
-		if (!mfile_map_fill_holes(self, unlock, mnode_free_list))
+		if (!mfile_map_fill_holes(self, unlock))
 			goto fail;
 
 		/* With all of the whole filled, the range should once again be complete,
@@ -605,50 +613,24 @@ again:
 		goto again;
 	}
 
+	if (self->mfm_flags & MAP_POPULATE) {
+		/* TODO */
+	}
 	return true;
 fail:
 	return false;
 }
 
 
-PUBLIC NONNULL((1)) void FCALL
-mfile_map_acquire(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct mnode_slist free_list;
-	SLIST_INIT(&free_list);
-	TRY {
-		while (!mfile_map_acquire_or_unlock(self, NULL, &free_list))
-			;
-	} EXCEPT {
-		mnode_slist_freeall(&free_list);
-		RETHROW();
-	}
-	mnode_slist_freeall(&free_list);
+/* Fallback to-be used with `mfile_map_with_unlockinfo::mmwu_info::ui_unlock'
+ * When invoked, will call `mfile_map_release()' on the contained mfile-map. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict self) {
+	struct mfile_map_with_unlockinfo *me;
+	me = (struct mfile_map_with_unlockinfo *)self;
+	mfile_map_release(&me->mmwu_map);
 }
 
-
-
-/* Finalize a given mem-node-allocator.
- * This function will free (and only free; the caller is responsible to release
- * all of the locks to the individual mem-parts themselves, though for this purpose,
- * `mfile_map_release()' may also be used) all of the (still-)allocated
- * mem-nodes, as can be found apart of the `self->mfm_nodes' list. In addition
- * to freeing all of the container-nodes, this function will also drop 1 reference
- * from the mem-parts pointed-to by each of the nodes.
- * NOTE: This function doesn't necessarily have to be called if the caller was
- *       able to inherit _all_ of the nodes originally allocated (which should
- *       normally be the case when mapping was successful) */
-PUBLIC NONNULL((1)) void
-NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
-	while (!SLIST_EMPTY(&self->mfm_nodes)) {
-		struct mnode *node;
-		node = SLIST_FIRST(&self->mfm_nodes);
-		SLIST_REMOVE_HEAD(&self->mfm_nodes, _mn_alloc);
-		/*mpart_lock_release(node->mn_part);*/ /* Must be done by `mfile_map_release' */
-		decref(node->mn_part);
-		kfree(node);
-	}
-}
 
 
 DECL_END
