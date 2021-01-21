@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8968b36f */
+/* HASH CRC-32:0x4337450a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@
 #include <bits/crt/ftw.h>
 #include <bits/types.h>
 #include <bits/os/stat.h>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 

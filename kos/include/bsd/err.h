@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d122621 */
+/* HASH CRC-32:0x1aec5aaa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,14 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <err.h>
 #include <kos/anno.h>
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
+#include <err.h>
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 #ifndef __warnc_defined
 #define __warnc_defined 1
 #ifdef __CRT_HAVE_warnc
@@ -116,8 +117,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(verrc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #endif /* (!__CRT_HAVE_vwarnc && (__NO_STDSTREAMS || !__LOCAL_program_invocation_short_name || (!__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock))) || (!__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit) */
 #endif /* !__CRT_HAVE_verrc */
 #endif /* !__verrc_defined */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_BSD_ERR_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x244a152e */
+/* HASH CRC-32:0xf9bfff81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,10 +44,10 @@
 #include <bits/types.h>
 
 #if !defined(ST_RDONLY) && defined(__ST_RDONLY)
-#define ST_RDONLY      __ST_RDONLY /* ??? */
+#define ST_RDONLY      __ST_RDONLY /* Disallow all file writes */
 #endif /* !ST_RDONLY && __ST_RDONLY */
 #if !defined(ST_NOSUID) && defined(__ST_NOSUID)
-#define ST_NOSUID      __ST_NOSUID /* ??? */
+#define ST_NOSUID      __ST_NOSUID /* Ignore `S_ISUID' and `S_ISGID' */
 #endif /* !ST_NOSUID && __ST_NOSUID */
 #ifdef __USE_GNU
 #if !defined(ST_NODEV) && defined(__ST_NODEV)

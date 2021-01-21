@@ -23,20 +23,20 @@
 
 %[define_replacement(errno_t = __errno_t)]
 
-%{
+%[insert:prefix(
 #include <stringlist.h>
-
-__SYSDECL_BEGIN
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 }
 
 %[insert:extern(sl_delete)]
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
-

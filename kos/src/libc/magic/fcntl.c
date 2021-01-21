@@ -72,13 +72,19 @@
 
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/fcntl.h>
+)]%[insert:prefix(
 #include <asm/os/oflags.h>
+)]%[insert:prefix(
 #include <bits/os/flock.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GNU
 #include <asm/os/limits.h> /* __IOV_MAX */
@@ -1921,4 +1927,3 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
-

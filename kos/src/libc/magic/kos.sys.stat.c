@@ -28,10 +28,13 @@
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <sys/stat.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -53,8 +53,9 @@
 %[define_str2wcs_replacement(isblank  = iswblank)]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
@@ -1139,4 +1140,3 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 }
-

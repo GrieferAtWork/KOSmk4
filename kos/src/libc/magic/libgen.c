@@ -33,8 +33,9 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

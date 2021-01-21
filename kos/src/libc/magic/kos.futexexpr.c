@@ -24,13 +24,19 @@
 %[define_replacement(timespec64 = __timespec64)]
 %[default:section(".text.crt{|.dos}.sched.futexexpr")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <kos/bits/futex.h>
+)]%[insert:prefix(
 #include <kos/bits/futex-expr.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/os/timespec.h>
+)]%[insert:prefix(
 #include <hybrid/__atomic.h>
+)]%{
 #ifndef __cplusplus
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus */
@@ -316,7 +322,6 @@ int lfutexlockexpr64([[nonnull]] lfutex_t *ulockaddr, void *base,
 	return lfutexlockexpr32(ulockaddr, base, exprc, exprv, &tms32, timeout_flags);
 }
 %#endif /* __USE_TIME64 */
-
 
 
 %{

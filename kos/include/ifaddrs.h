@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d1b732a */
+/* HASH CRC-32:0x94a5822b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,9 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/* >> getifaddrs(3) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,getifaddrs,(struct ifaddrs **__ifap),(__ifap))
+/* >> freeifaddrs(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,freeifaddrs,(struct ifaddrs *__ifa),(__ifa))
 
 __SYSDECL_END

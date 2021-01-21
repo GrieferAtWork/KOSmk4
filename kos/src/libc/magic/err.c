@@ -35,10 +35,13 @@
 #include "../libc/globals.h"
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -166,4 +169,3 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 }
-

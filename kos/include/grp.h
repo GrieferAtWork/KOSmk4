@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd82111dc */
+/* HASH CRC-32:0xb9dfa118 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,36 +77,50 @@ __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
+/* >> getgrgid(3), getgrgid_r(3) */
 __CDECLARE_OPT(,struct group *,__NOTHROW_RPC,getgrgid,(__gid_t __gid),(__gid))
+/* >> getgrnam(3), getgrnam_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,getgrnam,(char const *__restrict __name),(__name))
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+/* >> setgrent(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setgrent,(void),())
+/* >> endgrent(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endgrent,(void),())
+/* >> getgrent(3), getgrent_r(3) */
 __CDECLARE_OPT(,struct group *,__NOTHROW_RPC,getgrent,(void),())
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_GNU
+/* >> putgrent(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,putgrent,(struct group const *__restrict __entry, __FILE *__restrict __stream),(__entry,__stream))
 #endif /* __USE_GNU */
 
 #ifdef __USE_POSIX
+/* >> getgrgid(3), getgrgid_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,getgrgid_r,(__gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__gid,__resultbuf,__buffer,__buflen,__result))
+/* >> getgrnam(3), getgrnam_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getgrnam_r,(char const *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
 
 #ifdef __USE_GNU
+/* >> getgrent(3), getgrent_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC,getgrent_r,(struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__resultbuf,__buffer,__buflen,__result))
 #endif /* __USE_GNU */
 
 #ifdef __USE_MISC
+/* >> fgetgrent(3), fgetgrent_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__resultbuf,__buffer,__buflen,__result))
 #endif /* __USE_MISC */
 #endif /* __USE_POSIX */
 
 #ifdef __USE_MISC
+/* >> fgetgrent(3), fgetgrent_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
+/* >> setgroups(2) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+/* >> getgrouplist(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
+/* >> initgroups(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
 #endif /* __USE_MISC */
 

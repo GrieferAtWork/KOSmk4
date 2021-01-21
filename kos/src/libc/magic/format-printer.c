@@ -70,16 +70,25 @@
 #endif /* !__KERNEL__ */
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/__assert.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/format-printer.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
+}%[insert:prefix(
 #include <libc/malloc.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 
 #ifdef __CC__
@@ -1240,4 +1249,3 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
-

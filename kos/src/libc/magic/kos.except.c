@@ -52,18 +52,27 @@
 }
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
-#include <hybrid/pp/__va_nargs.h>
-
-#include <bits/types.h>
-#include <kos/anno.h>
-#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
-#include <kos/bits/exception_data.h> /* struct exception_data */
-#include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
-#include <kos/except/codes.h>        /* E_OK, ... */
 }%[insert:prefix(
+#include <hybrid/pp/__va_nargs.h>
+)]%{
+
+}%[insert:prefix(
+#include <bits/types.h>
+)]%[insert:prefix(
+#include <kos/anno.h>
+)]%[insert:prefix(
+#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
+)]%[insert:prefix(
+#include <kos/bits/exception_data.h> /* struct exception_data */
+)]%[insert:prefix(
+#include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
+)]%[insert:prefix(
+#include <kos/except/codes.h>        /* E_OK, ... */
+)]%[insert:prefix(
 #include <kos/bits/fastexcept.h>
 )]%{
 

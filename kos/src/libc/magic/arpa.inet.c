@@ -35,11 +35,15 @@
 %[define_replacement(in_addr_t = __u_net32_t)]
 %[define_replacement(socklen_t = __socklen_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <netinet/in.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

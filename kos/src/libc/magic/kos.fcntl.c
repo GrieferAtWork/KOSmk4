@@ -19,10 +19,14 @@
  */
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 
-%{
+
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <fcntl.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -144,7 +148,6 @@ $fd_t OpenAt64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 %
-
 
 %{
 

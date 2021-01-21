@@ -21,8 +21,9 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 
-%{
+%[insert:prefix(
 #include <sys/ioctl.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

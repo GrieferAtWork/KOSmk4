@@ -38,12 +38,15 @@
 %[default:section(".text.crt{|.dos}.math.fenv")]
 
 %(c, ccompat)#ifndef __NO_FPU
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
-#include <bits/crt/fenv.h>
-#include <kos/anno.h>
 }%[insert:prefix(
+#include <bits/crt/fenv.h>
+)]%[insert:prefix(
+#include <kos/anno.h>
+)]%[insert:prefix(
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/fenv.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

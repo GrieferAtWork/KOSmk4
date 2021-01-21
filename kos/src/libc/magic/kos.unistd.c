@@ -24,12 +24,17 @@
 %[declare_user_export(program_invocation_short_name, __progname)]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
+}%[insert:prefix(
 #include <unistd.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

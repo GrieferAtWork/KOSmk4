@@ -39,8 +39,9 @@
 
 %(auto_source)#include "../libc/globals.h"
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 }%(c,libc_fast){
 #include <asm/os/errno.h>

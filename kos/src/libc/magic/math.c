@@ -60,8 +60,9 @@
 %[define_double_replacement(__NAN = __NANF, __NANL)]
 
 %(c, ccompat)#ifndef __NO_FPU
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 }%[insert:prefix(
 #include <hybrid/typecore.h>
@@ -89,29 +90,8 @@
 #include <asm/crt/math-libc_version.h>
 #endif /* __USE_MISC */
 
-/* Documentation comments have been taken from GLIBc */
-/* Declarations for math functions.
-   Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
-__SYSDECL_BEGIN
-
-/* Some useful constants. */
+/* Math constants */
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #define M_E        2.7182818284590452354  /* e */
 #define M_LOG2E    1.4426950408889634074  /* log_2 e */
@@ -128,9 +108,7 @@ __SYSDECL_BEGIN
 #define M_SQRT1_2  0.70710678118654752440 /* 1/sqrt(2) */
 #endif /* __USE_MISC || __USE_XOPEN */
 
-/* The above constants are not adequate for computation using `long double's.
- * Therefore we provide as an extension constants with similar names as a
- * GNU extension.  Provide enough digits for the 128-bit IEEE quad. */
+/* Math constants with long-double precision. */
 #if defined(__USE_GNU) && defined(__COMPILER_HAVE_LONGDOUBLE)
 #define M_El        2.718281828459045235360287471352662498L /* e */
 #define M_LOG2El    1.442695040888963407359924681001892137L /* log_2 e */
@@ -198,6 +176,8 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 }
 
 %[insert:std]
@@ -2120,42 +2100,20 @@ __LIBC int (signgam);
 #endif /* ... */
 
 #ifdef __USE_ISOC99
-/* Get the architecture specific values describing the floating-point
- * evaluation.  The following symbols will get defined:
+/*
+ * float_t:    float-type at least as wide as `float'; used to eval `float'-expressions
+ * double_t:   float-type at least as wide as `double'; used to eval `double'-expressions
  *
- *  float_t    floating-point type at least as wide as `float' used
- *      to evaluate `float' expressions
- *  double_t    floating-point type at least as wide as `double' used
- *      to evaluate `double' expressions
- *
- *  FLT_EVAL_METHOD
- *      Defined to
- *        0    if `float_t' is `float' and `double_t' is `double'
- *        1    if `float_t' and `double_t' are `double'
- *        2    if `float_t' and `double_t' are `long double'
- *        else    `float_t' and `double_t' are unspecified
- *
- *  INFINITY    representation of the infinity value of type `float'
- *
- *  FP_FAST_FMA
- *  FP_FAST_FMAF
- *  FP_FAST_FMAL
- *      If defined it indicates that the `fma' function
- *      generally executes about as fast as a multiply and an add.
- *      This macro is defined only iff the `fma' function is
- *      implemented directly with a hardware multiply-add instructions.
- *
- *  FP_ILOGB0    Expands to a value returned by `ilogb(0.0)'.
- *  FP_ILOGBNAN  Expands to a value returned by `ilogb(NAN)'.
- *
- *  DECIMAL_DIG    Number of decimal digits supported by conversion between
- *      decimal and all internal floating-point formats. */
-
+ * FLT_EVAL_METHOD:
+ *    0:    `float_t' <=> `float',       `double_t' <=> `double'
+ *    1:    `float_t' <=> `double',      `double_t' <=> `double'
+ *    2:    `float_t' <=> `long double', `double_t' <=> `long double'
+ *    else: Mapping of `float_t' and `double_t' is unspecified
+ */
 #if (defined(__FP_NAN) || defined(__FP_INFINITE) ||   \
      defined(__FP_ZERO) || defined(__FP_SUBNORMAL) || \
      defined(__FP_NORMAL))
-/* All floating-point numbers can be put in one of these categories. */
-/* NOTE: These values must match the declarations from <libm/fdlibm.h>! */
+/* Categories for floating-point numbers. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -2312,7 +2270,7 @@ typedef __double_t double_t;
 #define islessequal(x, y)    ((__DOS_FPCOMPARE(x, y)&3) != 0)
 #define islessgreater(x, y)  ((__DOS_FPCOMPARE(x, y)&5) != 0)
 #define isunordered(x, y)    (__DOS_FPCOMPARE(x, y) == 0)
-#endif
+#endif /* ... */
 
 
 /* Generic... */
@@ -2551,11 +2509,11 @@ __NAMESPACE_STD_USING(islessgreater)
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __cplusplus && __CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
-/* Bitmasks for the math_errhandling macro. */
-#define MATH_ERRNO     1 /* errno set by math functions. */
-#define MATH_ERREXCEPT 2 /* Exceptions raised by math functions. */
+/* Bit values for `math_errhandling'. */
+#define MATH_ERRNO     1 /* Errno is set by math functions. */
+#define MATH_ERREXCEPT 2 /* Exceptions are raised by math functions. */
 
-/* By default all functions support both errno and exception handling.
+/* By default, all functions support both errno and exception handling.
  * In gcc's fast math mode and if inline functions are defined this might not be true. */
 #ifndef __FAST_MATH__
 #define math_errhandling (MATH_ERRNO | MATH_ERREXCEPT)
@@ -2575,29 +2533,27 @@ __NAMESPACE_STD_USING(islessgreater)
      defined(___XOPEN_) || defined(___POSIX_) || \
      defined(___ISOC_))
 }%[push_macro @undef { _IEEE_ _SVID_ _XOPEN_ _POSIX_ _ISOC_ }]%{
-/* Support for various different standard error handling behaviors. */
+/* Possible behavior for math standard error handling. */
 typedef enum {
 #ifdef ___IEEE_
-	_IEEE_ = ___IEEE_,   /* According to IEEE 754/IEEE 854. */
+	_IEEE_ = ___IEEE_,   /* s.a. IEEE 754/IEEE 854. */
 #endif /* ___IEEE_ */
 #ifdef ___SVID_
-	_SVID_ = ___SVID_,   /* According to System V, release 4. */
+	_SVID_ = ___SVID_,   /* s.a. SysV, release 4. */
 #endif /* ___SVID_ */
 #ifdef ___XOPEN_
-	_XOPEN_ = ___XOPEN_, /* Nowadays also Unix98. */
+	_XOPEN_ = ___XOPEN_, /* aka. Unix98. */
 #endif /* ___XOPEN_ */
 #ifdef ___POSIX_
 	_POSIX_ = ___POSIX_, /* ... */
 #endif /* ___POSIX_ */
 #ifdef ___ISOC_
-	_ISOC_ = ___ISOC_    /* Actually this is ISO C99. */
+	_ISOC_ = ___ISOC_    /* ISO C99. */
 #endif /* ___ISOC_ */
 } _LIB_VERSION_TYPE;
 }%[pop_macro]%{
 
-/* This variable can be changed at run-time to any of the values above to
- * affect floating point error handling behavior (it may also be necessary
- * to change the hardware FPU exception settings). */
+/* One of `_LIB_VERSION_TYPE': The current math error behavior */
 #ifdef __CRT_HAVE__LIB_VERSION
 }%[push_macro @undef { _LIB_VERSION }]%{
 __LIBC _LIB_VERSION_TYPE _LIB_VERSION;
@@ -2606,8 +2562,7 @@ __LIBC _LIB_VERSION_TYPE _LIB_VERSION;
 #endif /* ... */
 
 
-/* In SVID error handling, `matherr' is called with this description of the exceptional condition.
- * We have a problem when using C++ since `exception' is a reserved name in C++. */
+/* With SVID error handling, `matherr(3)' gets called with struct on error */
 #ifdef __cplusplus
 struct __exception
 #else /* __cplusplus */
@@ -2639,7 +2594,7 @@ __CDECLARE(,int,__NOTHROW,matherr,(struct exception *__exc),(__exc))
 
 #define X_TLOSS 1.41484755040568800000e+16
 
-/* Types of exceptions in the `type' field. */
+/* Values for `exception::type' */
 #ifdef __MATH_EXCEPT_DOMAIN
 #define DOMAIN __MATH_EXCEPT_DOMAIN /* ... */
 #endif /* __MATH_EXCEPT_DOMAIN */
@@ -2659,13 +2614,10 @@ __CDECLARE(,int,__NOTHROW,matherr,(struct exception *__exc),(__exc))
 #define PLOSS __MATH_EXCEPT_PLOSS /* ... */
 #endif /* __MATH_EXCEPT_PLOSS */
 
-/* SVID mode specifies returning this large value instead of infinity. */
-#define HUGE 3.40282347e+38F
-
+#define HUGE 3.40282347e+38F /* SVID-specific constant */
 #else /* __USE_MISC */
 #ifdef __USE_XOPEN
-/* X/Open wants another strange constant. */
-#define MAXFLOAT 3.40282347e+38F
+#define MAXFLOAT 3.40282347e+38F /* X/Open-specific constant */
 #endif /* __USE_XOPEN */
 #endif /* !__USE_MISC */
 
@@ -2673,9 +2625,9 @@ __CDECLARE(,int,__NOTHROW,matherr,(struct exception *__exc),(__exc))
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
 %(c, ccompat)#endif /* !__NO_FPU */

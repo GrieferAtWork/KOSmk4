@@ -23,12 +23,17 @@
 /* (#) Portability: MinGW (/mingw-w64-headers/crt/dos.h) */
 }
 
-%{
+%[insert:prefix(
 #include <features.h> /* __USE_OLD_DOS */
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/host.h> /* __i386__, __x86_64__ */
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/_diskfree_t.h>
+)]%{
 
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>

@@ -30,8 +30,9 @@
 
 %[default:section(".text.crt{|.dos}.net.interface")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 #ifdef __USE_MISC
 #include <sys/types.h>

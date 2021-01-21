@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9d92b46 */
+/* HASH CRC-32:0xdea46e74 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@
 
 #include <stringlist.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 #ifndef __sl_delete_defined
 #define __sl_delete_defined 1
 #ifdef __CRT_HAVE_sl_delete
@@ -53,8 +53,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_delete,(st
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sl_delete)(struct _stringlist *__sl, char const *__name, int __freeit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_delete))(__sl, __name, __freeit); })
 #endif /* !__CRT_HAVE_sl_delete */
 #endif /* !__sl_delete_defined */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_BSD_STRINGLIST_H */

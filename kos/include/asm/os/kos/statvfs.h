@@ -22,8 +22,8 @@
 
 #include <__stdinc.h>
 
-#define __ST_RDONLY      0x0001 /* ??? */
-#define __ST_NOSUID      0x0002 /* ??? */
+#define __ST_RDONLY      0x0001 /* Disallow all file writes */
+#define __ST_NOSUID      0x0002 /* Ignore `S_ISUID' and `S_ISGID' */
 #define __ST_NODEV       0x0004 /* ??? */
 #define __ST_NOEXEC      0x0008 /* ??? */
 #define __ST_SYNCHRONOUS 0x0010 /* ??? */

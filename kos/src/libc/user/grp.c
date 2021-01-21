@@ -37,7 +37,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_getgrgid,hash:CRC-32=0x7ce1bd23]]]*/
+/*[[[head:libc_getgrgid,hash:CRC-32=0xb6ef74b6]]]*/
+/* >> getgrgid(3), getgrgid_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 /*[[[body:libc_getgrgid]]]*/
@@ -49,7 +50,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 }
 /*[[[end:libc_getgrgid]]]*/
 
-/*[[[head:libc_getgrnam,hash:CRC-32=0xee197878]]]*/
+/*[[[head:libc_getgrnam,hash:CRC-32=0xdf2e267e]]]*/
+/* >> getgrnam(3), getgrnam_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 /*[[[body:libc_getgrnam]]]*/
@@ -61,7 +63,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 }
 /*[[[end:libc_getgrnam]]]*/
 
-/*[[[head:libc_setgrent,hash:CRC-32=0xe6e65628]]]*/
+/*[[[head:libc_setgrent,hash:CRC-32=0x3b216a03]]]*/
+/* >> setgrent(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") void
 NOTHROW_RPC(LIBCCALL libc_setgrent)(void)
 /*[[[body:libc_setgrent]]]*/
@@ -71,7 +74,8 @@ NOTHROW_RPC(LIBCCALL libc_setgrent)(void)
 }
 /*[[[end:libc_setgrent]]]*/
 
-/*[[[head:libc_endgrent,hash:CRC-32=0x641c37da]]]*/
+/*[[[head:libc_endgrent,hash:CRC-32=0x22183a08]]]*/
+/* >> endgrent(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 /*[[[body:libc_endgrent]]]*/
@@ -81,7 +85,8 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 }
 /*[[[end:libc_endgrent]]]*/
 
-/*[[[head:libc_getgrent,hash:CRC-32=0x5792ae5b]]]*/
+/*[[[head:libc_getgrent,hash:CRC-32=0x943e44f3]]]*/
+/* >> getgrent(3), getgrent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrent)(void)
 /*[[[body:libc_getgrent]]]*/
@@ -92,7 +97,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrent)(void)
 }
 /*[[[end:libc_getgrent]]]*/
 
-/*[[[head:libc_putgrent,hash:CRC-32=0xcaaaa285]]]*/
+/*[[[head:libc_putgrent,hash:CRC-32=0xc0f4a7c4]]]*/
+/* >> putgrent(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
                                     FILE *__restrict stream)
@@ -106,7 +112,8 @@ NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
 }
 /*[[[end:libc_putgrent]]]*/
 
-/*[[[head:libc_getgrgid_r,hash:CRC-32=0x3a931761]]]*/
+/*[[[head:libc_getgrgid_r,hash:CRC-32=0x693b1077]]]*/
+/* >> getgrgid(3), getgrgid_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
                                       struct group *__restrict resultbuf,
@@ -126,7 +133,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
 }
 /*[[[end:libc_getgrgid_r]]]*/
 
-/*[[[head:libc_getgrnam_r,hash:CRC-32=0x705123f9]]]*/
+/*[[[head:libc_getgrnam_r,hash:CRC-32=0x31f0eb7]]]*/
+/* >> getgrnam(3), getgrnam_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
                                       struct group *__restrict resultbuf,
@@ -146,7 +154,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
 }
 /*[[[end:libc_getgrnam_r]]]*/
 
-/*[[[head:libc_getgrent_r,hash:CRC-32=0x61ab34a7]]]*/
+/*[[[head:libc_getgrent_r,hash:CRC-32=0x60227ef8]]]*/
+/* >> getgrent(3), getgrent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
                                       char *__restrict buffer,
@@ -164,7 +173,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
 }
 /*[[[end:libc_getgrent_r]]]*/
 
-/*[[[head:libc_fgetgrent_r,hash:CRC-32=0x33f949d3]]]*/
+/*[[[head:libc_fgetgrent_r,hash:CRC-32=0x86119e41]]]*/
+/* >> fgetgrent(3), fgetgrent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
                                        struct group *__restrict resultbuf,
@@ -184,7 +194,8 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
 }
 /*[[[end:libc_fgetgrent_r]]]*/
 
-/*[[[head:libc_fgetgrent,hash:CRC-32=0x91a986b7]]]*/
+/*[[[head:libc_fgetgrent,hash:CRC-32=0xd25bcde2]]]*/
+/* >> fgetgrent(3), fgetgrent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) struct group *
 NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 /*[[[body:libc_fgetgrent]]]*/
@@ -196,7 +207,8 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetgrent]]]*/
 
-/*[[[head:libc_setgroups,hash:CRC-32=0x74eb5525]]]*/
+/*[[[head:libc_setgroups,hash:CRC-32=0x1fc5c7b3]]]*/
+/* >> setgroups(2) */
 INTERN ATTR_SECTION(".text.crt.database.group") int
 NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
                                      gid_t const *groups)
@@ -212,7 +224,8 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
 }
 /*[[[end:libc_setgroups]]]*/
 
-/*[[[head:libc_getgrouplist,hash:CRC-32=0x32d8befc]]]*/
+/*[[[head:libc_getgrouplist,hash:CRC-32=0x75f93cf6]]]*/
+/* >> getgrouplist(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 3, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
                                         gid_t group,
@@ -230,7 +243,8 @@ NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
 }
 /*[[[end:libc_getgrouplist]]]*/
 
-/*[[[head:libc_initgroups,hash:CRC-32=0xaf80da3c]]]*/
+/*[[[head:libc_initgroups,hash:CRC-32=0x78d27b62]]]*/
+/* >> initgroups(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
                                       gid_t group)

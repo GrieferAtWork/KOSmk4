@@ -29,10 +29,13 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/ifaddrs.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/socket.h>
@@ -43,9 +46,11 @@ __SYSDECL_BEGIN
 
 }
 
+@@>> getifaddrs(3)
 [[decl_include("<bits/crt/ifaddrs.h>")]]
 int getifaddrs(struct ifaddrs **ifap);
 
+@@>> freeifaddrs(3)
 [[decl_include("<bits/crt/ifaddrs.h>")]]
 void freeifaddrs(struct ifaddrs *ifa);
 

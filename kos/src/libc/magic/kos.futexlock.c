@@ -22,12 +22,17 @@
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 %[default:section(".text.crt{|.dos}.sched.futexlock")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <kos/bits/futex.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/os/timespec.h>
+)]%[insert:prefix(
 #include <hybrid/__atomic.h>
+)]%{
 #ifndef __cplusplus
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus */

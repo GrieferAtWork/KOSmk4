@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9606d06f */
+/* HASH CRC-32:0xdd5cf465 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,18 +31,15 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Prepare to begin reading and/or writing mount table
- * entries from the beginning of FILE.  MODE is as for `fopen' */
+/* >> setmntent(3) */
 INTDEF NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file, char const *mode);
-/* Read one mount table entry from STREAM.  Returns a pointer to storage
- * reused on the next call, or null for EOF or error (use feof/ferror to check) */
+/* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
-/* Reentrant version of the above function */
+/* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
-/* Write the mount table entry described by MNT to STREAM.
- * Return zero on success, nonzero on failure */
+/* >> addmntent(3) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
-/* Close a stream opened with `setmntent' */
+/* >> endmntent(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
 #endif /* !__KERNEL__ */
 

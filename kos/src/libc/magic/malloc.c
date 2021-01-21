@@ -38,11 +38,15 @@
 #include "stdlib.h"
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/malloc.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #ifndef __cplusplus
@@ -50,7 +54,6 @@
 #endif /* !__cplusplus */
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
-__SYSDECL_BEGIN
 
 #ifdef __M_TRIM_THRESHOLD
 #define M_TRIM_THRESHOLD __M_TRIM_THRESHOLD
@@ -63,6 +66,7 @@ __SYSDECL_BEGIN
 #endif /* __M_MMAP_THRESHOLD */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -357,8 +361,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, 
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

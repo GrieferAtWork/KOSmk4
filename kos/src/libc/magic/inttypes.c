@@ -61,7 +61,6 @@
 #include <xlocale.h>
 #endif /* __USE_DOS */
 
-__SYSDECL_BEGIN
 
 /* printf(): (u)int8_t */
 #ifdef __PRI1_PREFIX
@@ -439,6 +438,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef ____imaxdiv_struct_defined
 #define ____imaxdiv_struct_defined 1
@@ -682,9 +682,8 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 #endif /* !____gwchar_t_defined */
 #endif /* !__INTELLISENSE__ */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_INTTYPES_H)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf15d6903 */
+/* HASH CRC-32:0xe89388da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,26 +30,27 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Prepare to begin reading and/or writing mount table
- * entries from the beginning of FILE.  MODE is as for `fopen' */
+/* >> setmntent(3) */
 INTDEF NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_setmntent)(char const *file, char const *mode);
-/* Read one mount table entry from STREAM.  Returns a pointer to storage
- * reused on the next call, or null for EOF or error (use feof/ferror to check) */
+/* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
-/* Reentrant version of the above function */
+/* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
-/* Write the mount table entry described by MNT to STREAM.
- * Return zero on success, nonzero on failure */
+/* >> addmntent(3) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
-/* Close a stream opened with `setmntent' */
+/* >> endmntent(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
-/* Search MNT->mnt_opts for an option matching OPT.
- * Returns the address of the substring, or null if none found */
+/* >> hasmntopt(3)
+ * Check if `mnt->mnt_opts' contains an option matching `opt'.
+ * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
+ * @return: NULL: No option `opt' found in `mnt->mnt_opts' */
 INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBDCALL libd_hasmntopt)(struct mntent const *mnt, char const *opt);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Search MNT->mnt_opts for an option matching OPT.
- * Returns the address of the substring, or null if none found */
+/* >> hasmntopt(3)
+ * Check if `mnt->mnt_opts' contains an option matching `opt'.
+ * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
+ * @return: NULL: No option `opt' found in `mnt->mnt_opts' */
 INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt);
 #endif /* !__KERNEL__ */
 

@@ -25,10 +25,13 @@
 
 %[default:section(".text.crt{|.dos}.string.envz")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <argz.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

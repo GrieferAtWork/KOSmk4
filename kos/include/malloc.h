@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc473f99e */
+/* HASH CRC-32:0xeb434548 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,6 @@
 #endif /* !__cplusplus */
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
-__SYSDECL_BEGIN
 
 #ifdef __M_TRIM_THRESHOLD
 #define M_TRIM_THRESHOLD __M_TRIM_THRESHOLD
@@ -64,6 +63,7 @@ __SYSDECL_BEGIN
 #endif /* __M_MMAP_THRESHOLD */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -418,8 +418,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,_msize,(void *__restr
 #endif /* ... */
 #endif /* __USE_DOS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_MALLOC_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3482395d */
+/* HASH CRC-32:0xd104f9e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,27 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> getgrgid(3), getgrgid_r(3) */
 INTDEF struct group *NOTHROW_RPC(LIBDCALL libd_getgrgid)(gid_t gid);
+/* >> getgrnam(3), getgrnam_r(3) */
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBDCALL libd_getgrnam)(char const *__restrict name);
+/* >> putgrent(3) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
+/* >> getgrgid(3), getgrgid_r(3) */
 INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_getgrgid_r)(gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+/* >> getgrnam(3), getgrnam_r(3) */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_getgrnam_r)(char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+/* >> getgrent(3), getgrent_r(3) */
 INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC(LIBDCALL libd_getgrent_r)(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+/* >> fgetgrent(3), fgetgrent_r(3) */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+/* >> fgetgrent(3), fgetgrent_r(3) */
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBDCALL libd_fgetgrent)(FILE *__restrict stream);
+/* >> setgroups(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_setgroups)(size_t count, gid_t const *groups);
+/* >> getgrouplist(3) */
 INTDEF NONNULL((1, 3, 4)) int NOTHROW_RPC(LIBDCALL libd_getgrouplist)(char const *user, gid_t group, gid_t *groups, int *ngroups);
+/* >> initgroups(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_initgroups)(char const *user, gid_t group);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

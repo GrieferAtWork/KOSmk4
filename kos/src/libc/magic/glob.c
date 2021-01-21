@@ -36,12 +36,17 @@
 %[define_replacement(glob64_t = "struct __glob64_struct")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/glob.h>
+)]%[insert:prefix(
 #include <bits/crt/glob.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 /* Flags accepted by the `flags' argument of `glob(3)' */
 #if !defined(GLOB_ERR) && defined(__GLOB_ERR)

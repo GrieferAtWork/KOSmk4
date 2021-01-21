@@ -22,9 +22,11 @@
 
 %[default:section(".text.crt{|.dos}.string.format")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/crt/format-printer.h>
+)]%{
 
 
 #ifdef __CC__
@@ -43,7 +45,6 @@ typedef __pformatreader pformatreader;
 
 }
 
-
 /* ... */
 
 
@@ -53,4 +54,3 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 }
-

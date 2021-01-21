@@ -46,12 +46,17 @@
 %[default:section(".text.crt{|.dos}.fs.dir")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/dirent.h>
+)]%[insert:prefix(
 #include <bits/os/dirent.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 __SYSDECL_BEGIN
 

@@ -27,10 +27,13 @@
 %[define_partial_replacement(argc = ___argc)]
 %[define_partial_replacement(argv = ___argv)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 /*
  * Note that the KOS implementations of these functions was written entirely

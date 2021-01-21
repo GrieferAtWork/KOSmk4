@@ -18,12 +18,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
+}%[insert:prefix(
 #include <malloc.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

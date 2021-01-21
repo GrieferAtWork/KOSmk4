@@ -23,14 +23,19 @@
 
 %[define_replacement(errno_t = __errno_t)]
 
-%{
-#include <err.h>
+%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
-__SYSDECL_BEGIN
+}%[insert:prefix(
+#include <err.h>
+)]%{
 
 #ifdef __CC__
+__SYSDECL_BEGIN
+
 }
 
 %[insert:extern(warnc)]
@@ -39,9 +44,8 @@ __SYSDECL_BEGIN
 %[insert:extern(verrc)]
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
-

@@ -35,11 +35,15 @@
 %[define_replacement(gid_t = __gid_t)]
 %[default:section(".text.crt{|.dos}.database.group")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/db/group.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #if defined(__USE_POSIX) && defined(__USE_MISC)
 #define NSS_BUFLEN_GROUP 1024
@@ -77,26 +81,32 @@ __NAMESPACE_STD_USING(FILE)
 }
 
 
+@@>> getgrgid(3), getgrgid_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 struct group *getgrgid($gid_t gid);
 
+@@>> getgrnam(3), getgrnam_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>")]]
 struct group *getgrnam([[nonnull]] char const *__restrict name);
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+@@>> setgrent(3)
 [[cp]]
 void setgrent();
 
+@@>> endgrent(3)
 [[cp_nokos]]
 void endgrent();
 
+@@>> getgrent(3), getgrent_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>")]]
 struct group *getgrent();
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
 %#ifdef __USE_GNU
+@@>> putgrent(3)
 [[cp, decl_include("<bits/crt/db/group.h>")]]
 int putgrent([[nonnull]] struct group const *__restrict entry,
              [[nonnull]] $FILE *__restrict stream);
@@ -135,17 +145,21 @@ int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
 
 %
 %#ifdef __USE_MISC
+@@>> fgetgrent(3), fgetgrent_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>")]]
 struct group *fgetgrent([[nonnull]] $FILE *__restrict stream);
 
+@@>> setgroups(2)
 [[cp, decl_include("<bits/types.h>")]]
 int setgroups(size_t count, [[inp_opt(count)]] $gid_t const *groups);
 
+@@>> getgrouplist(3)
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrouplist([[nonnull]] char const *user, $gid_t group,
                  [[outp(*ngroups)]] $gid_t *groups,
                  [[nonnull]] int *ngroups);
 
+@@>> initgroups(3)
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int initgroups([[nonnull]] char const *user, $gid_t group);
 %#endif /* __USE_MISC */

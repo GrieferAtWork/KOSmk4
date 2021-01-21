@@ -26,8 +26,9 @@
 
 %[default:section(".text.crt{|.dos}.string.encrypt")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 #ifdef __USE_GNU
 #include <bits/crt/crypt_data.h>

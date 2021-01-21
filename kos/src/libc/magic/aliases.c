@@ -44,11 +44,15 @@
 %[define_replacement(sigset_t = "struct __sigset_struct")]
 %[default:section(".text.crt{|.dos}.database.aliases")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/db/aliases.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

@@ -19,11 +19,13 @@
  */
 %[default:section(".text.crt{|.dos}.system.rtm")]
 
-%{
+%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
 #include <kos/asm/rtm.h> /* [__RTM_STARTED, ...], __RTM_NOSYS */
-}%[insert:prefix(
+)]%[insert:prefix(
 #include <kos/bits/rtm.h>
 )]%{
 

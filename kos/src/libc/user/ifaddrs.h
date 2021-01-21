@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe539340 */
+/* HASH CRC-32:0x1ac48f5a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> getifaddrs(3) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap);
+/* >> freeifaddrs(3) */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa);
 #endif /* !__KERNEL__ */
 

@@ -24,11 +24,17 @@
 }
 
 %{
+}%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/_diskfree_t.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -36,9 +36,11 @@
 %[define_partial_replacement(envp = ___envp)]
 %[default:section(".text.crt{|.dos}.application.options")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 /* Documentation taken from Glibc /usr/include/getopt.h */
 /* Declarations for getopt.

@@ -36,9 +36,11 @@
 #include "../libc/globals.h" /* For norel access to global variables */
 }
 
-%{
+%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/error.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
@@ -241,4 +243,3 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 }
-

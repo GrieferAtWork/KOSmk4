@@ -28,15 +28,14 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
 
-%{
-
+%[insert:prefix(
 #include <features.h>
-
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
-
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 #ifndef _A_NORMAL
 #define _A_NORMAL 0x00
@@ -48,6 +47,7 @@ __SYSDECL_BEGIN
 #endif /* !_A_NORMAL */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
@@ -437,9 +437,8 @@ struct __finddata64_t {
 #endif /* !__USE_TIME_BITS64 */
 #endif /* !_FINDDATA_T_DEFINED */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_IO_H)
@@ -452,5 +451,3 @@ __SYSDECL_END
 //TODO:#ifdef __USE_DOS
 //TODO:#include "parts/dos/wio.h"
 //TODO:#endif /* __USE_DOS */
-
-

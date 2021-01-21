@@ -36,12 +36,17 @@
 %[default:section(".text.crt{|.dos}.math.float")]
 
 %(c, ccompat)#ifndef __NO_FPU
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/floatcore.h>
+)]%[insert:prefix(
 #include <hybrid/host.h> /* TODO: Get rid of this #include! */
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 #ifdef __USE_DOS
 #include <bits/types.h>

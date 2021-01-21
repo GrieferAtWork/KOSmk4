@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe058d009 */
+/* HASH CRC-32:0xcfe508ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,8 +91,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Search MNT->mnt_opts for an option matching OPT.
- * Returns the address of the substring, or null if none found */
+/* >> hasmntopt(3)
+ * Check if `mnt->mnt_opts' contains an option matching `opt'.
+ * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
+ * @return: NULL: No option `opt' found in `mnt->mnt_opts' */
 __LOCAL_LIBC(hasmntopt) __ATTR_PURE __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hasmntopt))(struct mntent const *__mnt, char const *__opt) {
 	char *__str;

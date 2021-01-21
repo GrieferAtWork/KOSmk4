@@ -22,10 +22,13 @@
 %[define_replacement(except_handler_t = __except_handler_t)]
 %[define_type_class(__except_handler_t = "TP")]
 
-%{
+%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
 #include <kos/except.h>
+)]%[insert:prefix(
 #include <kos/bits/except-handler.h>
+)]%{
 
 #ifndef __EXCEPT_HANDLER_CC
 #define __EXCEPT_HANDLER_CC  /* nothing */

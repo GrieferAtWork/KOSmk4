@@ -19,12 +19,15 @@
  */
 %[default:section(".text.crt{|.dos}.syscall.hop")]
 
-%{
-
+%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 #if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
 #define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }

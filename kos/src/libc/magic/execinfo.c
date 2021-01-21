@@ -25,10 +25,13 @@
 
 %[default:section(".text.crt{|.dos}.debug")]
 
-%{
+%[insert:prefix(
 #include <features.h> /* __STDC_INT_AS_UINT_T */
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h> /* $fd_t */
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

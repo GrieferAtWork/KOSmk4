@@ -22,10 +22,9 @@
 %[default:section(".text.crt{|.dos}.errno")]
 
 
-%{
-
-#include <__stdinc.h>
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

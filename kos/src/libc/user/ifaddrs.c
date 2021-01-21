@@ -31,7 +31,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_getifaddrs,hash:CRC-32=0xcc098cbb]]]*/
+/*[[[head:libc_getifaddrs,hash:CRC-32=0x8515e015]]]*/
+/* >> getifaddrs(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") int
 NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 /*[[[body:libc_getifaddrs]]]*/
@@ -43,7 +44,8 @@ NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 }
 /*[[[end:libc_getifaddrs]]]*/
 
-/*[[[head:libc_freeifaddrs,hash:CRC-32=0x7c3aa91c]]]*/
+/*[[[head:libc_freeifaddrs,hash:CRC-32=0xbbd2a106]]]*/
+/* >> freeifaddrs(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") void
 NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 /*[[[body:libc_freeifaddrs]]]*/

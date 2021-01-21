@@ -33,8 +33,9 @@
 
 %[default:section(".text.crt{|.dos}.string.match")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
 /* TODO: These constants should go into <asm/crt/fnmatch.h> */
 #define FNM_PATHNAME    0x01 /* The wildcard character ('*') doesn't match slashes ('/') */

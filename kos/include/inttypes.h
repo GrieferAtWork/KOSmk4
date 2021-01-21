@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dc95a8b */
+/* HASH CRC-32:0xf33d1a65 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,6 @@ __NAMESPACE_STD_USING(wcstoumax)
 #include <xlocale.h>
 #endif /* __USE_DOS */
 
-__SYSDECL_BEGIN
 
 /* printf(): (u)int8_t */
 #ifdef __PRI1_PREFIX
@@ -451,6 +450,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef ____imaxdiv_struct_defined
 #define ____imaxdiv_struct_defined 1
@@ -938,9 +938,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ 
 #endif /* !____gwchar_t_defined */
 #endif /* !__INTELLISENSE__ */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_INTTYPES_H)

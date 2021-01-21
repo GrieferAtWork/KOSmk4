@@ -27,8 +27,7 @@
 
 %[default:section(".text.crt{|.dos}.fs.fts")]
 
-%{
-}%[insert:prefix(
+%[insert:prefix(
 #include <features.h>
 )]%{
 
@@ -37,6 +36,7 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%{
+
 #include <sys/types.h>
 
 
@@ -264,8 +264,6 @@ int fts64_set([[nonnull]] FTS64 *ftsp,
               __STDC_INT_AS_UINT_T instr);
 
 %#endif /* __USE_LARGEFILE64 */
-
-
 
 
 %{

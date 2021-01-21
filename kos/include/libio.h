@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b1245d4 */
+/* HASH CRC-32:0xecb26be4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,35 +34,6 @@
 #include <asm/os/stdio.h>
 #include <asm/crt/stdio.h>
 
-/* Partially derived from GNU C /usr/include/libio.h */
-
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-   Written by Per Bothner <bothner@cygnus.com>.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.
-
-   As a special exception, if you link the code in this file with
-   files compiled with a GNU compiler to produce an executable,
-   that does not cause the resulting executable to be covered by
-   the GNU Lesser General Public License. This exception does not
-   however invalidate any other reasons why the executable file
-   might be covered by the GNU Lesser General Public License.
-   This exception applies to code released by its copyright holders
-   in files containing the exception.  */
-
 #if !defined(EOF) && defined(__EOF)
 #define EOF __EOF
 #endif /* !EOF && __EOF */
@@ -71,9 +42,8 @@
 #define NULL __NULLPTR
 #endif /* !NULL */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __USE_ISOC_PURE
 #ifndef __wint_t_defined
@@ -82,33 +52,44 @@ typedef __WINT_TYPE__ wint_t;
 #endif /* !__wint_t_defined */
 #endif /* !__USE_ISOC_PURE */
 
-/* Functions to do I/O and file management for a stream. */
+/* Prototypes for user-defined FILE I/O functions. */
 
-/* Read NBYTES bytes from COOKIE into a buffer pointed to by BUF.
- * Return number of bytes read. */
+/* User-defined read function:
+ * @param: cookie:   Pointer to custom user-data.
+ * @param: buf:      Output buffer for where read data should be put.
+ * @param: num_byts: The max # of bytes to read.
+ * @return: * :      The actual # of bytes read.
+ * @return: 0 :      Error. */
 typedef __ssize_t (__LIBKCALL __io_read_fn)(void *__cookie, char *__buf, __size_t __num_bytes);
 
-/* Write N bytes pointed to by BUF to COOKIE. Write all N bytes
- * unless there is an error. Return number of bytes written. If
- * there is an error, return 0 and do not write anything. If the file
- * has been opened for append (mode.append set), then set the file
- * pointer to the end of the file and then do the write; if not, just
- * write at the current file pointer. */
+/* User-defined write function:
+ * @param: cookie:   Pointer to custom user-data.
+ * @param: buf:      Input buffer of data to write.
+ * @param: num_byts: The max # of bytes to write.
+ * @return: * :      The actual # of bytes written.
+ * @return: 0 :      Error. */
 typedef __ssize_t (__LIBKCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __num_bytes);
 
-/* Move COOKIE's file position to *POS bytes from the
- * beginning of the file (if WHENCE is SEEK_SET),
- * the current position (if WHENCE is SEEK_CUR),
- * or the end of the file (if WHENCE is SEEK_END).
- * Set *POS to the new file position.
- * Returns zero if successful, nonzero if not. */
+/* User-defined seek function:
+ * @param: cookie:   Pointer to custom user-data.
+ * @param: pos:      [in] The position/offset by which to move the R/W pointer:
+ *                        whence == SEEK_SET: Let R/W be BASE + POS
+ *                        whence == SEEK_CUR: Let R/W be R/W + POS
+ *                        whence == SEEK_END: Let R/W be END + POS
+ *                   [out] The new R/W pointer position (offset from BASE)
+ * @param: num_byts: The max # of bytes to write.
+ * @return: == 0:    Success.
+ * @return: != 0:    Error. */
 #ifdef __USE_KOS_ALTERATIONS
 typedef int (__LIBKCALL __io_seek_fn)(void *__cookie, __pos64_t *__pos, int __whence);
 #else /* __USE_KOS_ALTERATIONS */
 typedef int (__LIBKCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __whence);
 #endif /* !__USE_KOS_ALTERATIONS */
 
-/* Close COOKIE. */
+/* User-defined file close function:
+ * @param: cookie:   Pointer to custom user-data.
+ * @return: == 0:    Success.
+ * @return: != 0:    Error. */
 typedef int (__LIBKCALL __io_close_fn)(void *__cookie);
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -122,12 +103,12 @@ typedef int (__LIBKCALL __io_close_fn)(void *__cookie);
 #undef seek
 #undef close
 
-/* The structure with the cookie function pointers.  */
+/* Container for user-defined I/O Callback functions. */
 typedef struct {
-	__io_read_fn  *read;   /* Read bytes.  */
-	__io_write_fn *write;  /* Write bytes.  */
-	__io_seek_fn  *seek;   /* Seek/tell file position.  */
-	__io_close_fn *close;  /* Close file.  */
+	__io_read_fn  *read;   /* [0..1] Read callback. */
+	__io_write_fn *write;  /* [0..1] Write callback. */
+	__io_seek_fn  *seek;   /* [0..1] Seek/tell callback. */
+	__io_close_fn *close;  /* [0..1] Close callback. */
 } _IO_cookie_io_functions_t;
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -138,7 +119,7 @@ typedef struct {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #ifdef __USE_GNU
-/* User-visible names for the above.  */
+/* Public API name aliases. */
 typedef __io_read_fn cookie_read_function_t;
 typedef __io_write_fn cookie_write_function_t;
 typedef __io_seek_fn cookie_seek_function_t;
@@ -150,8 +131,7 @@ typedef _IO_cookie_io_functions_t cookie_io_functions_t;
 #endif /* __USE_GNU */
 
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBIO_H */

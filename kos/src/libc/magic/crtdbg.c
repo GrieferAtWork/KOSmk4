@@ -25,19 +25,26 @@
 %[define_replacement(size_t = __SIZE_TYPE__)]
 %[default:section(".text.crt.dos.heap.debug_malloc")]
 
-%{
-
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <hybrid/__assert.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <parts/assert.h>
+)]%{
 
+}%[insert:prefix(
 #include <crtdefs.h>
+)]%{
 
-__SYSDECL_BEGIN
 
 #ifndef NULL
 #define NULL __NULLPTR
@@ -95,6 +102,7 @@ __SYSDECL_BEGIN
 #endif /* !_STATIC_ASSERT */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 typedef void *_HFILE;
 #ifndef _M_CEE_PURE
@@ -844,8 +852,7 @@ __NAMESPACE_STD_END
 
 #endif /* _DEBUG */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

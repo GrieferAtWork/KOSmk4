@@ -37,91 +37,60 @@
 %[define_ccompat_header("clocale")]
 %[define_replacement(locale_t = __locale_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/crt/locale.h>
+)]%[insert:prefix(
 #include <bits/crt/lconv.h>
+)]%{
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
-/* Partially derived from GNU C /usr/include/locale.h */
-
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-   Written by Per Bothner <bothner@cygnus.com>.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.
-
-   As a special exception, if you link the code in this file with
-   files compiled with a GNU compiler to produce an executable,
-   that does not cause the resulting executable to be covered by
-   the GNU Lesser General Public License. This exception does not
-   however invalidate any other reasons why the executable file
-   might be covered by the GNU Lesser General Public License.
-   This exception applies to code released by its copyright holders
-   in files containing the exception.  */
-
-
-/* These are the possibilities for the first argument to setlocale.
- * The code assumes that the lowest LC_* symbol has the value zero. */
-#ifdef __LC_CTYPE
+/* Values for `setlocale(3)::category' */
+#if !defined(LC_CTYPE) && defined(__LC_CTYPE)
 #define LC_CTYPE __LC_CTYPE
-#endif /* __LC_CTYPE */
-#ifdef __LC_NUMERIC
+#endif /* !LC_CTYPE && __LC_CTYPE */
+#if !defined(LC_NUMERIC) && defined(__LC_NUMERIC)
 #define LC_NUMERIC __LC_NUMERIC
-#endif /* __LC_NUMERIC */
-#ifdef __LC_TIME
+#endif /* !LC_NUMERIC && __LC_NUMERIC */
+#if !defined(LC_TIME) && defined(__LC_TIME)
 #define LC_TIME __LC_TIME
-#endif /* __LC_TIME */
-#ifdef __LC_COLLATE
+#endif /* !LC_TIME && __LC_TIME */
+#if !defined(LC_COLLATE) && defined(__LC_COLLATE)
 #define LC_COLLATE __LC_COLLATE
-#endif /* __LC_COLLATE */
-#ifdef __LC_MONETARY
+#endif /* !LC_COLLATE && __LC_COLLATE */
+#if !defined(LC_MONETARY) && defined(__LC_MONETARY)
 #define LC_MONETARY __LC_MONETARY
-#endif /* __LC_MONETARY */
-#ifdef __LC_MESSAGES
+#endif /* !LC_MONETARY && __LC_MONETARY */
+#if !defined(LC_MESSAGES) && defined(__LC_MESSAGES)
 #define LC_MESSAGES __LC_MESSAGES
-#endif /* __LC_MESSAGES */
-#ifdef __LC_ALL
+#endif /* !LC_MESSAGES && __LC_MESSAGES */
+#if !defined(LC_ALL) && defined(__LC_ALL)
 #define LC_ALL __LC_ALL
-#endif /* __LC_ALL */
-#ifdef __LC_PAPER
+#endif /* !LC_ALL && __LC_ALL */
+#if !defined(LC_PAPER) && defined(__LC_PAPER)
 #define LC_PAPER __LC_PAPER
-#endif /* __LC_PAPER */
-#ifdef __LC_NAME
+#endif /* !LC_PAPER && __LC_PAPER */
+#if !defined(LC_NAME) && defined(__LC_NAME)
 #define LC_NAME __LC_NAME
-#endif /* __LC_NAME */
-#ifdef __LC_ADDRESS
+#endif /* !LC_NAME && __LC_NAME */
+#if !defined(LC_ADDRESS) && defined(__LC_ADDRESS)
 #define LC_ADDRESS __LC_ADDRESS
-#endif /* __LC_ADDRESS */
-#ifdef __LC_TELEPHONE
+#endif /* !LC_ADDRESS && __LC_ADDRESS */
+#if !defined(LC_TELEPHONE) && defined(__LC_TELEPHONE)
 #define LC_TELEPHONE __LC_TELEPHONE
-#endif /* __LC_TELEPHONE */
-#ifdef __LC_MEASUREMENT
+#endif /* !LC_TELEPHONE && __LC_TELEPHONE */
+#if !defined(LC_MEASUREMENT) && defined(__LC_MEASUREMENT)
 #define LC_MEASUREMENT __LC_MEASUREMENT
-#endif /* __LC_MEASUREMENT */
-#ifdef __LC_IDENTIFICATION
+#endif /* !LC_MEASUREMENT && __LC_MEASUREMENT */
+#if !defined(LC_IDENTIFICATION) && defined(__LC_IDENTIFICATION)
 #define LC_IDENTIFICATION __LC_IDENTIFICATION
-#endif /* __LC_IDENTIFICATION */
+#endif /* !LC_IDENTIFICATION && __LC_IDENTIFICATION */
 
 #ifdef __USE_XOPEN2K8
-/* These are the bits that can be set in the CATEGORY_MASK argument to
- * `newlocale'. In the GNU implementation, LC_FOO_MASK has the value
- * of (1 << LC_FOO), but this is not a part of the interface that
- * callers can assume will be true. */
+/* Flags for `newlocale(3)::category_mask' */
 #ifdef __LC_CTYPE
 #define LC_CTYPE_MASK               (1 << __LC_CTYPE)
 #define __PRIVATE_OPT_LC_CTYPE_MASK (1 << __LC_CTYPE)
@@ -209,8 +178,7 @@
 	 __PRIVATE_OPT_LC_MEASUREMENT_MASK | \
 	 __PRIVATE_OPT_LC_IDENTIFICATION_MASK)
 
-/* This value can be passed to `uselocale' and may be returned by it.
- * Passing this value to any other function has undefined behavior. */
+/* For use-with/return-from `uselocale()': Use the global locale. */
 #define LC_GLOBAL_LOCALE (__CCAST(__locale_t)(-1))
 #endif /* __USE_XOPEN2K8 */
 
@@ -223,49 +191,46 @@ __SYSDECL_BEGIN
 %[insert:std]
 
 
-@@Set and/or return the current locale
+@@>> setlocale(3)
+@@Get or set the current locale
+@@@param: category: One of `LC_*'
+@@@param: locale:   Name of the locale (e.g. "C")
+@@                  When `NULL', don't change the locale.
+@@@return: * :      The current locale set for `category'
+@@@return: NULL:    Error
 [[std]]
 char *setlocale(int category, char const *locale);
 
-@@Return the numeric/monetary information for the current locale
+@@>> localeconv(3)
+@@Return numeric and monetary information for the current locale
 [[std, decl_include("<bits/crt/lconv.h>")]]
-[[nonnull]] struct lconv *localeconv();
+[[wunused, nonnull]] struct lconv *localeconv();
 
 %
 %#ifdef __USE_XOPEN2K8
-%/* The concept of one static locale per category is not very well
-% * thought out. Many applications will need to process its data using
-% * information from several different locales. Another application is
-% * the implementation of the internationalization handling in the
-% * upcoming ISO C++ standard library. To support this another set of
-% * the functions using locale data exist which have an additional
-% * argument.
-% *
-% * Attention: all these functions are *not* standardized in any form.
-% * This is a proof-of-concept implementation. */
 
-@@Return a reference to a data structure representing a set of locale
-@@datasets. Unlike for the CATEGORY parameter for `setlocale' the
-@@CATEGORY_MASK parameter here uses a single bit for each category,
-@@made by OR'ing together LC_*_MASK bits above
+@@>> newlocale(3)
+@@@param: category_mask: Set of `LC_*_MASK'
 [[export_alias("__newlocale")]]
 $locale_t newlocale(int category_mask, char const *locale, $locale_t base);
 
-@@Return a duplicate of the set of locale in DATASET.
-@@All usage counters are increased if necessary
+@@>> duplocale(3)
+@@Duplicate the given locale `dataset'
 [[export_alias("__duplocale")]]
 $locale_t duplocale($locale_t dataset);
 
-@@Free the data associated with a locale dataset
-@@previously returned by a call to `setlocale_r'
+@@>> freelocale(3)
 [[export_alias("__freelocale")]]
 void freelocale($locale_t dataset);
 
-@@Switch the current thread's locale to DATASET.
-@@If DATASET is null, instead just return the current setting.
-@@The special value LC_GLOBAL_LOCALE is the initial setting
-@@for all threads and can also be installed any time, meaning
-@@the thread uses the global settings controlled by `setlocale'
+@@>> uselocale(3)
+@@Set the calling thread's current default locale to `dataset'
+@@@param: dataset: NULL:             Don't change the calling thread's locale
+@@@param: dataset: LC_GLOBAL_LOCALE: Use the global locale (s.a. `setlocale(3)')
+@@@param: dataset: * :               The new locale to set
+@@@return: NULL:             Error
+@@@return: LC_GLOBAL_LOCALE: The calling thread uses the global locale (default)
+@@@return: * :               The currently used locale
 [[export_alias("__uselocale")]]
 $locale_t uselocale($locale_t dataset);
 
@@ -273,8 +238,7 @@ $locale_t uselocale($locale_t dataset);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

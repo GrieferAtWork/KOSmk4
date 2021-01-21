@@ -31,9 +31,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_setmntent,hash:CRC-32=0x425b46a0]]]*/
-/* Prepare to begin reading and/or writing mount table
- * entries from the beginning of FILE.  MODE is as for `fopen' */
+/*[[[head:libc_setmntent,hash:CRC-32=0x3147db9f]]]*/
+/* >> setmntent(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
                                      char const *mode)
@@ -47,9 +46,8 @@ NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
 }
 /*[[[end:libc_setmntent]]]*/
 
-/*[[[head:libc_getmntent,hash:CRC-32=0x78c8c9c7]]]*/
-/* Read one mount table entry from STREAM.  Returns a pointer to storage
- * reused on the next call, or null for EOF or error (use feof/ferror to check) */
+/*[[[head:libc_getmntent,hash:CRC-32=0x22c04d99]]]*/
+/* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
 /*[[[body:libc_getmntent]]]*/
@@ -61,8 +59,8 @@ NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
 }
 /*[[[end:libc_getmntent]]]*/
 
-/*[[[head:libc_getmntent_r,hash:CRC-32=0xeca4e26d]]]*/
-/* Reentrant version of the above function */
+/*[[[head:libc_getmntent_r,hash:CRC-32=0x45a07216]]]*/
+/* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2, 3)) struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
                                        struct mntent *__restrict result,
@@ -80,9 +78,8 @@ NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
 }
 /*[[[end:libc_getmntent_r]]]*/
 
-/*[[[head:libc_addmntent,hash:CRC-32=0xfea49365]]]*/
-/* Write the mount table entry described by MNT to STREAM.
- * Return zero on success, nonzero on failure */
+/*[[[head:libc_addmntent,hash:CRC-32=0x66abfa93]]]*/
+/* >> addmntent(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
                                      struct mntent const *__restrict mnt)
@@ -96,8 +93,8 @@ NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
 }
 /*[[[end:libc_addmntent]]]*/
 
-/*[[[head:libc_endmntent,hash:CRC-32=0xe276ba32]]]*/
-/* Close a stream opened with `setmntent' */
+/*[[[head:libc_endmntent,hash:CRC-32=0x16157864]]]*/
+/* >> endmntent(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) int
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 /*[[[body:libc_endmntent]]]*/

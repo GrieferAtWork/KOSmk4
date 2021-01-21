@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd668398 */
+/* HASH CRC-32:0x8abcf83 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,26 +31,33 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Set and/or return the current locale */
+/* >> setlocale(3)
+ * Get or set the current locale
+ * @param: category: One of `LC_*'
+ * @param: locale:   Name of the locale (e.g. "C")
+ *                   When `NULL', don't change the locale.
+ * @return: * :      The current locale set for `category'
+ * @return: NULL:    Error */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_setlocale)(int category, char const *locale);
-/* Return the numeric/monetary information for the current locale */
-INTDEF ATTR_RETNONNULL struct lconv *NOTHROW_NCX(LIBCCALL libc_localeconv)(void);
-/* Return a reference to a data structure representing a set of locale
- * datasets. Unlike for the CATEGORY parameter for `setlocale' the
- * CATEGORY_MASK parameter here uses a single bit for each category,
- * made by OR'ing together LC_*_MASK bits above */
+/* >> localeconv(3)
+ * Return numeric and monetary information for the current locale */
+INTDEF ATTR_RETNONNULL WUNUSED struct lconv *NOTHROW_NCX(LIBCCALL libc_localeconv)(void);
+/* >> newlocale(3)
+ * @param: category_mask: Set of `LC_*_MASK' */
 INTDEF locale_t NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask, char const *locale, locale_t base);
-/* Return a duplicate of the set of locale in DATASET.
- * All usage counters are increased if necessary */
+/* >> duplocale(3)
+ * Duplicate the given locale `dataset' */
 INTDEF locale_t NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset);
-/* Free the data associated with a locale dataset
- * previously returned by a call to `setlocale_r' */
+/* >> freelocale(3) */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset);
-/* Switch the current thread's locale to DATASET.
- * If DATASET is null, instead just return the current setting.
- * The special value LC_GLOBAL_LOCALE is the initial setting
- * for all threads and can also be installed any time, meaning
- * the thread uses the global settings controlled by `setlocale' */
+/* >> uselocale(3)
+ * Set the calling thread's current default locale to `dataset'
+ * @param: dataset: NULL:             Don't change the calling thread's locale
+ * @param: dataset: LC_GLOBAL_LOCALE: Use the global locale (s.a. `setlocale(3)')
+ * @param: dataset: * :               The new locale to set
+ * @return: NULL:             Error
+ * @return: LC_GLOBAL_LOCALE: The calling thread uses the global locale (default)
+ * @return: * :               The currently used locale */
 INTDEF locale_t NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset);
 #endif /* !__KERNEL__ */
 
