@@ -1493,7 +1493,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	copy->mp_flags = (self->mp_flags & MPART_F_MLOCK) | MPART_F_NO_GLOBAL_REF | MPART_F_LOCKBIT;
 	copy->mp_file  = incref(&mfile_anon[self->mp_file->mf_blockshift]);
 	LIST_INIT(&copy->mp_share);
-	SLIST_INIT(&copy->mp_deadnodes);
+	SLIST_INIT(&copy->mp_lockops);
 	DBG_inval(copy->mp_changed);
 	copy->mp_minaddr = self->mp_minaddr + bounds.ucb_mapmin;
 	copy->mp_maxaddr = self->mp_minaddr + bounds.ucb_mapmax;

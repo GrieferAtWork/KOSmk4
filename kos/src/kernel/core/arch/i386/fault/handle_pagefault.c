@@ -434,8 +434,11 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			 * other CPUs which may still be accessing a mem-node which
 			 * is currently being split. */
 			mman_kernel_hintinit_inuse_inc();
+#ifndef CONFIG_NO_SMP
 			hinted_node = (struct mnode *)pagedir_gethint(addr);
-			if likely(hinted_node != NULL) {
+			if likely(hinted_node != NULL)
+#endif /* !CONFIG_NO_SMP */
+			{
 				/* Deal with hinted nodes. */
 				mnode_hinted_mmap(hinted_node, mf.mfl_addr);
 				mman_kernel_hintinit_inuse_dec();

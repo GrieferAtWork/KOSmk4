@@ -52,7 +52,7 @@
 #define MNODE_F_NO_MERGE  0x0080 /* [const] Don't allow this mem-node to be merged. When set, this flag
                                   *         guaranties that munmap() will _always_ succeed without ever
                                   *         resulting in an `E_BADALLOC' exception. */
-#define MNODE_F_COREPART  0x0100 /* [const] Core part (affects how this mnode is freed) */
+#define MNODE_F_COREPART  0x0100 /* [const] Core part (free this node using `mcoreheap_free()' instead of `kfree()') */
 #define MNODE_F_KERNPART  0x0200 /* [const] This node describes part of the static kernel core and must
                                   *         not be modified or removed. Attempting to do so anyways will
                                   *         result in kernel panic. */
@@ -84,7 +84,7 @@
                                   *  - mn_part->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS
                                   *  - mn_part->mp_flags & MPART_F_MLOCK
                                   *  - mn_part->mp_flags & MPART_F_MLOCK_FROZEN // Not strictly enforced
-                                  *  - mn_part->mp_flags & MPART_F_DONT_SPLIT
+                                  *  - mn_part->mp_flags & MPART_F_NO_SPLIT
                                   *  - mn_part->mp_flags & MPART_F_NO_GLOBAL_REF
                                   *  - MPART_ST_INMEM(mn_part->mp_state) */
 #define MNODE_F_MLOCK     0x2000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
@@ -106,6 +106,15 @@ struct directory_entry;
 typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 
+#define __ALIGNOF_MNODE __SIZEOF_POINTER__
+#if __SIZEOF_POINTER__ == 4
+#define __SIZEOF_MNODE 60
+#elif __SIZEOF_POINTER__ == 8
+#define __SIZEOF_MNODE 120
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported pointer size"
+#endif /* __SIZEOF_POINTER__ != ... */
+
 struct mnode {
 	/* WARNING: Because mem-nodes aren't reference counter, they are always
 	 *          implicitly owned by the associated mman, such that you really
@@ -114,13 +123,13 @@ struct mnode {
 	 *          the part that is being mapped), else you have no guaranty that
 	 *          the node won't just be free'd, and you'll end up accessing dead
 	 *          memory! */
-	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
+	union {
+		RBTREE_NODE(struct mnode)       mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
+		SLIST_ENTRY(mnode)             _mn_dead;     /* [lock(ATOMIC)] Internal chain of dead nodes */
+	};
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
-	union {
-		SLIST_ENTRY(mnode)             _mn_dead;     /* [lock(ATOMIC)] Chain of dead nodes (for use with `struct mpart::mp_deadnodes') */
-		RBTREE_NODE(struct mnode)       mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
-	};
+	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	REF struct mpart                   *mn_part;     /* [0..1][const] The bound mem-part.
 	                                                  * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */

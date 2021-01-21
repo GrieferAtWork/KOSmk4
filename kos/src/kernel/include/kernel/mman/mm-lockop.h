@@ -56,7 +56,7 @@ typedef unsigned int gfp_t;
  *                else before.
  *                The return value will (eventually) be re-queued as through it
  *                had been passed in a call to `mman_kernel_lockop_many()' */
-typedef NOBLOCK struct mlockop *
+typedef NOBLOCK NONNULL((1)) struct mlockop *
 /*NOTHROW*/ (FCALL *mlockop_callback_t)(struct mlockop *__restrict self, gfp_t flags);
 
 /* Memory-manager locked operation.
@@ -95,9 +95,10 @@ NOTHROW(FCALL mman_kernel_lockop_many)(struct mlockop *op, gfp_t flags DFL(0x040
 extern "C++" {
 template<class T> FORCELOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(mman_kernel_lockop)(T *__restrict obj,
-                            NOBLOCK struct mlockop * /*NOTHROW*/ (KCALL *cb)(T *__restrict self)) {
+                            NOBLOCK struct mlockop *
+                            /*NOTHROW*/ (FCALL *cb)(T *__restrict self, gfp_t flags)) {
 	struct mlockop *pend;
-	pend = (struct mlockop *)obj;
+	pend           = (struct mlockop *)obj;
 	pend->mlo_func = (mlockop_callback_t)cb;
 	mman_kernel_lockop(pend);
 }

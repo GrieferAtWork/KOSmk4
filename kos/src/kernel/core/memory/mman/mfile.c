@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_FILE_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_FILE_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -651,7 +651,7 @@ mfile_private_makepart(struct mfile *__restrict self,
 	result->mp_file   = incref(self);
 	LIST_INIT(&result->mp_copy);
 	LIST_INIT(&result->mp_share);
-	SLIST_INIT(&result->mp_deadnodes);
+	SLIST_INIT(&result->mp_lockops);
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	result->mp_minaddr = addr;
 	result->mp_maxaddr = addr + num_bytes - 1;
@@ -1104,9 +1104,6 @@ PUBLIC struct mfile_ops mfile_anon_ops[BITSOF(void *)] = {
 #undef ANON_LOADBLOCKS_CALLBACK
 };
 
-
-
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_FILE_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C */

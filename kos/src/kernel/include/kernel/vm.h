@@ -49,7 +49,7 @@
 #define VM_DATAPART_FLAG_CHANGED                      MPART_F_CHANGED
 #define VM_DATAPART_FLAG_KEEPRAM                      MPART_F_DONT_FREE
 #define VM_DATAPART_FLAG_COREPRT                      MPART_F_COREPART
-#define VM_DATAPART_FLAG_KERNPRT                      MPART_F_DONT_SPLIT
+#define VM_DATAPART_FLAG_KERNPRT                      MPART_F_NO_SPLIT
 #define VM_DATAPART_STATE_ABSENT                      MPART_ST_VOID
 #define VM_DATAPART_STATE_INCORE                      MPART_ST_MEM
 #define VM_DATAPART_STATE_INSWAP                      MPART_ST_SWP
@@ -57,7 +57,6 @@
 #define dp_refcnt                                     mp_refcnt
 #define dp_crefs                                      mp_copy.lh_first
 #define dp_srefs                                      mp_share.lh_first
-#define dp_stale                                      mp_deadnodes.slh_first
 #define dp_block                                      mp_file
 #define dp_flags                                      mp_flags
 #define dp_state                                      mp_state
@@ -317,7 +316,7 @@ DECL_END
 #define vm_getfree(self, hint, num_bytes, min_alignment, mode) \
 	mman_findunmapped(self, hint, num_bytes, mode, min_alignment)
 #define vm_get_aslr_disabled() (mman_getunmapped_extflags & MAP_NOASLR)
-#define vm_set_aslr_disabled(v)                                                                        \
+#define vm_set_aslr_disabled(v)                                                        \
 	((v) ? __hybrid_atomic_or(mman_getunmapped_extflags, MAP_NOASLR, __ATOMIC_SEQ_CST) \
 	     : __hybrid_atomic_and(mman_getunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST))
 #define vm_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \

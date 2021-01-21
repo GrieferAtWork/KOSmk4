@@ -58,7 +58,7 @@ typedef unsigned int gfp_t;
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
  *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_VCBASE:       Allocate the mnode and mpart from the core-part heap.
+ *   - GFP_VCBASE:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
  *                       This also causes the `MNODE_F_COREPART' / `MPART_F_COREPART'
  *                       flags to be set for each resp. This flag is used internally
  *                       to resolve the dependency loop between this function needing
@@ -111,7 +111,7 @@ NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
  *                  break...
  *                  Must always contain at least `GFP_ATOMIC' */
 FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
                                      gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
 
@@ -123,7 +123,7 @@ NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
  *                lock-operation which the caller must enqueue for execution.
  *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
 FUNDEF WUNUSED NOBLOCK struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                             PAGEDIR_PAGEALIGNED size_t num_bytes,
                                             gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
 

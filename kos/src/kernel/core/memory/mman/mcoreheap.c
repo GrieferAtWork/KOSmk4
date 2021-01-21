@@ -1,0 +1,500 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MCOREHEAP_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MCOREHEAP_C 1
+#define _KOS_SOURCE 1
+
+#include <kernel/compiler.h>
+
+#include <kernel/mman.h>
+#include <kernel/mman/mcoreheap.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mm-lockop.h>
+#include <kernel/mman/mm-unmapped.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
+#include <kernel/paging.h>
+#include <kernel/printk.h>
+#include <kernel/types.h>
+
+#include <hybrid/align.h>
+
+#include <kos/except.h>
+#include <kos/kernel/paging.h>
+#include <sys/param.h>
+
+#include <assert.h>
+#include <stdalign.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
+
+#ifdef CONFIG_USE_NEW_VM       /* TODO: REMOVE_ME */
+#include <kernel/vm.h>         /* TODO: REMOVE_ME */
+#endif /* CONFIG_USE_NEW_VM */ /* TODO: REMOVE_ME */
+
+DECL_BEGIN
+
+#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
+#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
+#else
+#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
+#endif
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+/* Assert that constants are correct. */
+STATIC_ASSERT(alignof(struct mpart) == __ALIGNOF_MPART);
+STATIC_ASSERT(alignof(struct mnode) == __ALIGNOF_MNODE);
+STATIC_ASSERT(alignof(union mcorepart) == __ALIGNOF_MCOREPART);
+STATIC_ASSERT(sizeof(struct mpart) == __SIZEOF_MPART);
+STATIC_ASSERT(sizeof(struct mnode) == __SIZEOF_MNODE);
+STATIC_ASSERT(sizeof(union mcorepart) == __SIZEOF_MCOREPART);
+
+/* Also make sure that `struct mcorepage' really fits into a single page! */
+STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
+
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
+#define HINT_GETADDR(x) HINT_ADDR x
+#define HINT_GETMODE(x) HINT_MODE x
+
+#ifndef SIZEOF_POINTER
+#define SIZEOF_POINTER __SIZEOF_POINTER__
+#endif /* !SIZEOF_POINTER */
+
+#define INUSE_BITSET_INDEXOF(index) ((index) / (SIZEOF_POINTER * NBBY))
+#define INUSE_BITSET_SHIFTOF(index) ((index) % (SIZEOF_POINTER * NBBY))
+#define INUSE_BITSET_GET(page, index) \
+	(((page)->mcp_used[INUSE_BITSET_INDEXOF(index)] >> INUSE_BITSET_SHIFTOF(index)) & 1)
+#define INUSE_BITSET_TURNOFF(page, index) \
+	((page)->mcp_used[INUSE_BITSET_INDEXOF(index)] &= ~((uintptr_t)1 << INUSE_BITSET_SHIFTOF(index)))
+#define INUSE_BITSET_TURNON(page, index) \
+	((page)->mcp_used[INUSE_BITSET_INDEXOF(index)] |= ((uintptr_t)1 << INUSE_BITSET_SHIFTOF(index)))
+
+
+/* The initial mem-core page. (needed to kick-start the mem-core system) */
+PRIVATE ATTR_ALIGNED(PAGESIZE) struct mcorepage _mcore_initpage = {
+	/* .mcp_link = */ { NULL, &mcoreheap_freelist.lh_first },
+	/* .mcp_used = */ { 0, },
+	/* ... */
+};
+
+/* [0..n][lock(mman_kernel.mm_lock)]
+ * List of (fully; as in: all bits in `mcp_used' are set) mcoreheap pages. */
+PUBLIC struct mcorepage_list mcoreheap_usedlist = LIST_HEAD_INITIALIZER(&mcoreheap_usedlist);
+
+/* [1..n][lock(mman_kernel.mm_lock)]
+ * List of mcoreheap pages that still contain available parts.
+ * NOTE: This list must _always_ be non-empty, and there must
+ *       _always_ be at least 2 additional core parts ready
+ *       for allocation at any time. This is required, because
+ *       in order to allocate additional pages, the mcoreheap
+ *       allocator itself already requires 2 parts in order to
+ *       do the actual allocation! */
+PUBLIC struct mcorepage_list mcoreheap_freelist = { &_mcore_initpage };
+
+/* [>= 2][lock(mman_kernel.mm_lock)]
+ * The total # of free core parts currently available through `mcoreheap_free' */
+PUBLIC size_t mcoreheap_freecount = MCOREPAGE_PARTCOUNT;
+
+
+
+/************************************************************************/
+/* Mem-Core-Heap low-level alloc/free functions.                        */
+/************************************************************************/
+
+/* The max # of still-valid bits in `mcorepage::mcp_used[MCOREPAGE_BITSET_LENGTH - 1]' */
+#define LAST_BITSET_WORD_PARTS (MCOREPAGE_PARTCOUNT % (SIZEOF_POINTER * NBBY))
+/* Mask for all valid bits in `mcorepage::mcp_used[MCOREPAGE_BITSET_LENGTH - 1]' */
+#define LAST_BITSET_WORD_ALLUSED (((uintptr_t)1 << LAST_BITSET_WORD_PARTS) - 1)
+
+/* Check if the given mcorepage is fully in-use. */
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL mcorepage_allused)(struct mcorepage *__restrict self) {
+#if LAST_BITSET_WORD_PARTS == 0
+#if MCOREPAGE_BITSET_LENGTH == 1
+	return self->mcp_used[0] == (uintptr_t)-1;
+#else /* MCOREPAGE_BITSET_LENGTH == 1 */
+	unsigned int i;
+	for (i = 0; i < MCOREPAGE_BITSET_LENGTH; ++i) {
+		if (self->mcp_used[i] != (uintptr_t)-1)
+			return false; /* Still contains free slots! */
+	}
+#endif /* MCOREPAGE_BITSET_LENGTH != 1 */
+#else /* LAST_BITSET_WORD_PARTS == 0 */
+#if MCOREPAGE_BITSET_LENGTH == 1
+	return (self->mcp_used[0] & LAST_BITSET_WORD_ALLUSED) == LAST_BITSET_WORD_ALLUSED;
+#else /* MCOREPAGE_BITSET_LENGTH == 1 */
+	unsigned int i;
+	for (i = 0; i < (MCOREPAGE_BITSET_LENGTH - 1); ++i) {
+		if (self->mcp_used[i] != (uintptr_t)-1)
+			return false; /* Still contains free slots! */
+	}
+	/* Check the incomplete last word of the bitset for fully-in-use. */
+	return (self->mcp_used[MCOREPAGE_BITSET_LENGTH - 1] &
+	        LAST_BITSET_WORD_ALLUSED) == LAST_BITSET_WORD_ALLUSED;
+#endif /* MCOREPAGE_BITSET_LENGTH != 1 */
+#endif /* LAST_BITSET_WORD_PARTS != 0 */
+}
+
+/* Find and return a free (unused) part index. */
+LOCAL NOBLOCK WUNUSED unsigned int
+NOTHROW(FCALL mcorepage_findfree)(struct mcorepage *__restrict self) {
+	unsigned int word_index;
+	uintptr_t word;
+#if LAST_BITSET_WORD_PARTS == 0
+#if MCOREPAGE_BITSET_LENGTH == 1
+	word_index = 0;
+	word       = self->mcp_used[0];
+#else /* MCOREPAGE_BITSET_LENGTH == 1 */
+	for (word_index = 0;; ++word_index) {
+		assert(word_index < MCOREPAGE_BITSET_LENGTH);
+		word = self->mcp_used[word_index];
+		if (word != (uintptr_t)-1)
+			break;
+	}
+#endif /* MCOREPAGE_BITSET_LENGTH != 1 */
+#else /* LAST_BITSET_WORD_PARTS == 0 */
+#if MCOREPAGE_BITSET_LENGTH == 1
+	word_index = 0;
+	word       = self->mcp_used[0];
+	assert((word & LAST_BITSET_WORD_ALLUSED) != LAST_BITSET_WORD_ALLUSED);
+#else /* MCOREPAGE_BITSET_LENGTH == 1 */
+	for (word_index = 0; word_index < (MCOREPAGE_BITSET_LENGTH - 1); ++word_index) {
+		word = self->mcp_used[word_index];
+		if (word != (uintptr_t)-1)
+			goto got_word;
+	}
+	word = self->mcp_used[word_index];
+	assert((word & LAST_BITSET_WORD_ALLUSED) != LAST_BITSET_WORD_ALLUSED);
+got_word:
+#endif /* MCOREPAGE_BITSET_LENGTH != 1 */
+#endif /* LAST_BITSET_WORD_PARTS != 0 */
+	assert(word != (uintptr_t)-1);
+	word_index *= (SIZEOF_POINTER * NBBY);
+	while (word & 1) {
+		++word_index;
+		word >>= 1;
+	}
+	return word_index;
+}
+
+
+/* Unconditionally allocate a mem-core-part from `mcoreheap_freelist'.
+ * The caller must ensure that parts are available, and that the 2
+ * reserved parts aren't used inappropriately. */
+PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL ATTR_MALLOC union mcorepart *
+NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
+	union mcorepart *result;
+	struct mcorepage *page;
+	unsigned int index;
+
+	/* Pick the first known free-list. */
+	page = LIST_FIRST(&mcoreheap_freelist);
+	assert(!mcorepage_allused(page));
+	index  = mcorepage_findfree(page);
+	result = &page->mcp_part[index];
+
+	/* Mark the chosed part as in-use. */
+	INUSE_BITSET_TURNON(page, index);
+	--mcoreheap_freecount;
+
+	/* Check if the page has become fully in-use. */
+	if (mcorepage_allused(page)) {
+		/* Remove from the free-list, and add to the fully-used list. */
+		LIST_REMOVE(page, mcp_link);
+		LIST_INSERT_HEAD(&mcoreheap_usedlist, page, mcp_link);
+	}
+	return result;
+}
+
+/* Initialize and register the given `page' for dynamic allocations. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
+
+	/* Initialize the in-use bitset to all-free. */
+	memset(page->mcp_used, 0, sizeof(page->mcp_used));
+
+	/* Insert the page into the free-list. */
+	LIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
+
+	/* Account for all of the newly added parts. */
+	mcoreheap_freecount += MCOREPAGE_PARTCOUNT;
+}
+
+/* Try to replicate the mem-core-heap by extending a previously
+ * allocated extension further.
+ * If this fails, return `false'. Otherwise, return `true' on success. */
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL mcoreheap_replicate_extend)(void) {
+	struct mcorepage *page;
+	LIST_FOREACH (page, &mcoreheap_usedlist, mcp_link) {
+		struct mnode *node;
+		if (page == &_mcore_initpage)
+			continue; /* We can never extend this one... */
+		node = mnode_tree_locate(mman_kernel.mm_mappings, page);
+		assert(node);
+		if (mnode_getminaddr(node) == page) {
+			struct mnode *prev = mnode_tree_prevnode(node);
+			if (!prev || mnode_getendaddr(prev) < mnode_getaddr(node)) {
+				/* TODO: Try to extend `node' below */
+			}
+		}
+		if ((void *)((byte_t *)mnode_getendaddr(node) - PAGESIZE) == page) {
+			struct mnode *next = mnode_tree_nextnode(node);
+			if (!next || mnode_getendaddr(node) < mnode_getaddr(next)) {
+				/* TODO: Try to extend `node' above */
+			}
+		}
+	}
+	return false;
+}
+
+
+/* Self-replicate the mem-core-heap to expand into yet another page.
+ * For this purpose, _always_ inherit the given `node' and `part',
+ * even if they don't end up being used for the replication (as is
+ * the case when this function is able to extend an older mem-core-
+ * heap page)
+ * NOTE: The given `node' and `part' are assumed to be allocated by `mcoreheap_alloc_impl()'!
+ * @return: true:  Successfully replicated the core heap. In this case, the
+ *                 caller may assume that at least `MCOREPAGE_PARTCOUNT'
+ *                 additional core parts have become available for allocation.
+ * @return: false: Insufficient physical memory (`page_malloc()' failed, or
+ *                 failed to find a free spot within the kernel-space mman) */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict part,
+                                   /*inherit(always)*/ struct mnode *__restrict node) {
+	/* Check if we might be able to extend a pre-existing mcoreheap node/part pair. */
+	if (mcoreheap_replicate_extend()) {
+		/* Noice :) */
+		mcoreheap_free_locked(container_of(part, union mcorepart, mcp_part));
+		mcoreheap_free_locked(container_of(node, union mcorepart, mcp_node));
+		return true;
+	}
+
+	/* Must actually create a new node/part pair! */
+	node->mn_minaddr = (byte_t *)mman_findunmapped(&mman_kernel,
+	                                               HINT_GETADDR(KERNEL_VMHINT_COREPAGE), PAGESIZE,
+	                                               HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
+	if unlikely(node->mn_minaddr == MAP_FAILED) {
+		printk(KERN_CRIT "[mcore] low-level OOM: Unable to find spot to place a new core-page\n");
+		return false;
+	}
+
+	/* Allocate the physical page that'll be holding the core-page */
+	part->mp_mem.mc_start = page_mallocone();
+	if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID) {
+		printk(KERN_CRIT "[mcore] low-level OOM: Unable to allocate physical memory\n");
+		return false;
+	}
+
+	/* Make sure that the backing page directory is prepared. */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if (!pagedir_prepare_map(node->mn_minaddr, PAGESIZE)) {
+		page_ccfree(part->mp_mem.mc_start, 1);
+		printk(KERN_CRIT "[mcore] low-level OOM: Unable to prepare page directory\n");
+		return false;
+	}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+	/* Initialize the (remainder of the) mem-part */
+	part->mp_refcnt = 1;
+	part->mp_flags  = MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                  MPART_F_BLKST_INL | MPART_F_COREPART |
+	                  MPART_F_MLOCK_FROZEN | MPART_F_MLOCK;
+	part->mp_state  = MPART_ST_MEM;
+	part->mp_file   = incref(&mfile_zero);
+	LIST_INIT(&part->mp_copy);
+	part->mp_share.lh_first = node;
+	SLIST_INIT(&part->mp_lockops);
+	LIST_ENTRY_UNBOUND_INIT(part, mp_allparts);
+	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
+	part->mp_minaddr = (pos_t)(0);
+	part->mp_maxaddr = (pos_t)(PAGESIZE - 1);
+	DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+	part->mp_blkst_inl   = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+	part->mp_mem.mc_size = 1;
+	part->mp_meta        = NULL;
+
+	/* Initialize the (remainder of the) mem-node */
+	node->mn_maxaddr      = node->mn_minaddr + PAGESIZE - 1;
+	node->mn_flags        = MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_SHARED |
+	                        MNODE_F_COREPART | MNODE_F_MLOCK;
+	node->mn_part         = part;
+	node->mn_fspath       = NULL;
+	node->mn_fsname       = NULL;
+	node->mn_mman         = &mman_kernel;
+	node->mn_partoff      = 0;
+	node->mn_link.le_next = NULL;
+	node->mn_link.le_prev = &part->mp_share.lh_first;
+
+	/* Load the mem-node into the kernel mman. */
+	LIST_INSERT_HEAD(&mman_kernel.mm_writable, node, mn_writable);
+	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+
+	/* And finally: immediately map the new core-page into the kernel mman. */
+	pagedir_mapone(node->mn_minaddr,
+	               physpage2addr(part->mp_mem.mc_start),
+	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+
+	/* With everything mapped, register the new page for use. */
+	mcoreheap_provide_page((struct mcorepage *)node->mn_minaddr);
+
+	/* And we're done! */
+	return true;
+}
+
+/* Allocate an additional core part from the core heap.
+ * The caller must be holding a lock to the kernel mman, but should also
+ * be aware that a call to this function may result in additional nodes
+ * to be mapped into the kernel mman (meaning that the caller must be
+ * able to deal with the kernel mman's mappings-tree changing as a result
+ * of a call to this function)
+ * @return: * :   The base-address of the newly allocated mem-core-part.
+ * @return: NULL: Insufficient physical/virtual memory. This is only ever
+ *                returned when memory has actually run out, since this
+ *                function doesn't actually need to do any locking.
+ *                As such, a NULL-return-value here means that the system
+ *                has run out of memory on the lowest, possible level.
+ *                That is: `page_malloc()' failed. */
+PUBLIC NOBLOCK WUNUSED ATTR_MALLOC union mcorepart *
+NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
+	union mcorepart *result;
+	assert(mcoreheap_freecount >= 2);
+
+	/* Allocate the part. */
+	result = mcoreheap_alloc_impl();
+
+	/* Check if there are still enough parts left for self-replication. */
+	if (mcoreheap_freecount >= 2)
+		return result;
+
+	/* We're down to the last couple of (for this purpose reserved) nodes.
+	 * As such, use the last 2 of them to replicate the core-heap. */
+	if unlikely(!mcoreheap_replicate(&result->mcp_part,
+	                                 &mcoreheap_alloc_impl()->mcp_node))
+		return NULL;
+
+	/* At this point, there should be at least 3 parts, since we statically
+	 * assert that a mem-core-page is capable of holding at least that many
+	 * core-parts. */
+	assert(mcoreheap_freecount >= 3);
+	return mcoreheap_alloc_impl();
+}
+
+
+
+/* Do all of the necessary locking and throw an exception if the allocation failed.
+ * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC union mcorepart *FCALL
+mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	union mcorepart *result;
+	mman_lock_acquire(&mman_kernel);
+	result = mcoreheap_alloc_locked_nx();
+	mman_lock_release(&mman_kernel);
+	if unlikely(!result)
+		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, sizeof(*result));
+	return result;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) struct mlockop *
+NOTHROW(FCALL mlockop_coreheap_free_callback)(union mcorepart *__restrict self,
+                                              gfp_t UNUSED(flags)) {
+	mcoreheap_free_locked(self);
+	return NULL;
+}
+
+
+/* Free the given mem-core-heap part. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		mcoreheap_free_locked(part);
+		mman_lock_release(&mman_kernel);
+	} else {
+		/* Must enqueue a lock operation for the kernel mman. */
+		mman_kernel_lockop(part, &mlockop_coreheap_free_callback);
+	}
+}
+
+
+/* Same as `mcoreheap_free()', but no need to just through all of the hoops
+ * of enqueuing the free of `part' as a mlockop when no lock can be acquired
+ * to the kernel mman, since the caller allows us to assume that they've
+ * already acquired a lock to the kernel mman. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
+	unsigned int index;
+	struct mcorepage *page;
+	bool was_all_used;
+
+	/* Extract the associated page from `part' */
+	page  = (struct mcorepage *)FLOOR_ALIGN((uintptr_t)part, PAGESIZE);
+	index = (unsigned int)(part - page->mcp_part);
+	assertf(part == &page->mcp_part[index],
+	        "Bad part pointer %p doesn't equal part %p at index %u of page %p",
+	        part, &page->mcp_part[index], index, page);
+	assertf(INUSE_BITSET_GET(page, index),
+	        "Part at %p (index %u in page at %p) not marked as allocated",
+	        part, index, page);
+	was_all_used = mcorepage_allused(page);
+
+	/* Clear the in-use bit of the part. */
+	INUSE_BITSET_TURNOFF(page, index);
+	++mcoreheap_freecount;
+
+	if (was_all_used) {
+		/* Move the page from the `mcoreheap_usedlist'
+		 * list into the `mcoreheap_freelist' list */
+		LIST_REMOVE(page, mcp_link);
+		LIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
+	} else if (mcoreheap_freecount > (MCOREPAGE_PARTCOUNT + 2)) {
+		/* TODO: If the page was fully free'd, then unmap
+		 *       the backing memory from the kernel mman.
+		 * Note that (with the exception of `_mcore_initpage'), we can
+		 * just use `mman_unmap_kernel_ram_locked()' to free the page! */
+	}
+}
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MCOREHEAP_C */

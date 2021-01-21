@@ -537,7 +537,7 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
  *    the current page directory, using `perm'.
  * This function is used to implement handling of hinted
  * mem-nodes when encountered by the #PF handler. */
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -548,13 +548,14 @@ NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
 
 	/* Some hinted-node-related assertions that we can make
 	 * without the need of knowing the accessing mem-node. */
+	assert(!PREEMPTION_ENABLED());
 	assert(self->mp_copy.lh_first == NULL);
 	assert(self->mp_file != NULL);
 	assert(ADDR_ISKERN(self->mp_file));
 	assert(self->mp_file->mf_blockshift == PAGESHIFT);
 	assert(self->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS);
 	assert(self->mp_flags & MPART_F_MLOCK);
-	assert(self->mp_flags & MPART_F_DONT_SPLIT);
+	assert(self->mp_flags & MPART_F_NO_SPLIT);
 	assert(self->mp_flags & MPART_F_NO_GLOBAL_REF);
 	assert(MPART_ST_INMEM(self->mp_state));
 
@@ -572,20 +573,17 @@ again_read_st:
 #endif /* !CONFIG_NO_SMP */
 	st = mpart_getblockstate(self, block_index);
 	if (st != MPART_BLOCK_ST_CHNG) {
-		/* When another CPU is currently initializing this same page,
-		 * then we must wait for it to finish doing so before we can
-		 * proceed. */
-		pflag_t was;
-		typeof(self->mp_file->mf_ops->mo_loadblocks) mo_loadblocks;
-
 #ifdef CONFIG_NO_SMP
 		assert(st != MPART_BLOCK_ST_INIT);
 #else /* CONFIG_NO_SMP */
+		/* When another CPU is currently initializing this same page,
+		 * then we must wait for it to finish doing so before we can
+		 * proceed. */
 		if (st == MPART_BLOCK_ST_INIT) {
-			task_tryyield_or_pause();
+			/* Another CPU is currently doing the INIT */
+			task_pause();
 			goto again_read_st;
 		}
-#endif /* !CONFIG_NO_SMP */
 
 		/* Must lazily initialize this block!
 		 * For this purpose, we must disable preemption, since being
@@ -593,28 +591,31 @@ again_read_st:
 		 * attempt to access the same page that we're trying to init
 		 * would result in a dead-lock, where it will just keep on
 		 * seeing `MPART_BLOCK_ST_INIT' for all of eternity... */
-		was = PREEMPTION_PUSHOFF();
 		if (!mpart_atomic_cmpxch_blockstate(self, block_index, st,
 		                                    MPART_BLOCK_ST_INIT)) {
 			/* Someone else was faster... -> Just re-read the status! */
-			PREEMPTION_POP(was);
 			goto again_read_st;
 		}
-		mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
-		if (mo_loadblocks != NULL) {
-			/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW! */
-			(*mo_loadblocks)(self->mp_file,
-			                 (mfile_block_t)((mpart_getminaddr(self) >>
-			                                  PAGESHIFT) +
-			                                 block_index),
-			                 pl.mppl_addr, 1);
+#endif /* !CONFIG_NO_SMP */
+
+		if (st == MPART_BLOCK_ST_NDEF) {
+			typeof(self->mp_file->mf_ops->mo_loadblocks) mo_loadblocks;
+			mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
+			if (mo_loadblocks != NULL) {
+				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW! */
+				(*mo_loadblocks)(self->mp_file,
+				                 (mfile_block_t)((mpart_getminaddr(self) >>
+				                                  PAGESHIFT) +
+				                                 block_index),
+				                 pl.mppl_addr, 1);
+			}
 		}
+
 		/* And with that, the init is done. -> Mark the block as CHNG.
 		 * Also note that we don't have to deal with `MPART_F_MAYBE_BLK_INIT'
 		 * or `self->mp_file->mf_initdone'. - None of those matter for hinted
 		 * memory nodes! */
 		mpart_setblockstate(self, block_index, MPART_BLOCK_ST_CHNG);
-		PREEMPTION_POP(was);
 	}
 
 	/* At this point, we know that the accessed page has surely been
@@ -632,7 +633,7 @@ again_read_st:
 }
 
 /* Convenience wrapper for `mpart_hinted_mmap()' */
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *fault_page) {
 	struct mpart *part;

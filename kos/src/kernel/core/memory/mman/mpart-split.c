@@ -798,7 +798,7 @@ release_and_return_null:
 		assertf(data.msd_offset != 0, "Invalid split-offset: 0");
 		assertf(mfile_addr_aligned(file, data.msd_offset),
 		        "Badly aligned offset %#" PRIxSIZ, data.msd_offset);
-		assertf(!(self->mp_flags & MPART_F_DONT_SPLIT),
+		assertf(!(self->mp_flags & MPART_F_NO_SPLIT),
 		        "You're not allowed to split this part!");
 	
 		/* Step #1: Acquire references to all affected mmans. This way,
@@ -827,8 +827,8 @@ relock_with_data:
 			file = self->mp_file;
 			assertf(mfile_addr_aligned(file, data.msd_offset),
 			        "Internal error: file alignment changed");
-			assertf(!(self->mp_flags & MPART_F_DONT_SPLIT),
-			        "Internal error: MPART_F_DONT_SPLIT flag was modified");
+			assertf(!(self->mp_flags & MPART_F_NO_SPLIT),
+			        "Internal error: MPART_F_NO_SPLIT flag was modified");
 			mpart_foreach_mmans_incref(self);
 			if (!mpart_lock_all_mmans_or_unlock_and_decref(self))
 				goto relock_with_data;
@@ -881,7 +881,7 @@ relock_with_data:
 	hipart->mp_file  = incref(file);
 	LIST_INIT(&hipart->mp_copy);
 	LIST_INIT(&hipart->mp_share);
-	SLIST_INIT(&hipart->mp_deadnodes);
+	SLIST_INIT(&hipart->mp_lockops);
 	/*hipart->mp_allparts;*/ /* Initialized below */
 	/*hipart->mp_changed;*/  /* Initialized below */
 	hipart->mp_minaddr = lopart->mp_minaddr + data.msd_offset;

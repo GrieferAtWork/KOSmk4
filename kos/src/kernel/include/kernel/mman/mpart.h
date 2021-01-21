@@ -69,11 +69,11 @@
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The backing block-state bitset exists in-line. */
 /*efine MPART_F_               0x0020  * ... */
-#define MPART_F_DONT_SPLIT     0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
+#define MPART_F_NO_SPLIT       0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
                                        *         then the attempt will instead result in kernel panic. Similarly,
                                        *         this flag also prevents the part from being merged. */
 #define MPART_F_DONT_FREE      0x0080 /* [const] Don't page_free() backing physical memory or swap. */
-#define MPART_F_COREPART       0x0100 /* [const] Core part (affects how this mpart is freed) */
+#define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 /*efine MPART_F_               0x0200  * ... */
 /*efine MPART_F_               0x0400  * ... */
 /*efine MPART_F_               0x0800  * ... */
@@ -154,6 +154,26 @@ struct mchunkvec {
 };
 
 
+struct mpart_lockop;
+SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
+/* Callback for mem-part lock operations. */
+typedef NOBLOCK NONNULL((1, 2)) void
+/*NOTHROW*/ (FCALL *mpart_lockop_callback_t)(struct mpart_lockop *__restrict self,
+                                             struct mpart *__restrict part);
+struct mpart_lockop {
+	SLIST_ENTRY(mpart_lockop) mplo_link; /* [0..1] Lock operations list entry. */
+	mpart_lockop_callback_t   mplo_func; /* [1..1] Function to invoke in the context of holding
+	                                      *        alock to the associated mem-part. */
+};
+
+#define __ALIGNOF_MPART 8
+#if __SIZEOF_POINTER__ == 4
+#define __SIZEOF_MPART 88
+#elif __SIZEOF_POINTER__ == 8
+#define __SIZEOF_MPART 144
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported pointer size"
+#endif /* __SIZEOF_POINTER__ != ... */
 
 struct mpart {
 	WEAK refcnt_t                 mp_refcnt;    /* Reference counter. */
@@ -177,11 +197,11 @@ struct mpart {
 	 *          have been added to the dead-nodes chain of the associated part. */
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
-	struct mnode_slist            mp_deadnodes; /* [0..n][lock(ATOMIC)] List of dead mem-nodes (to-be removed from `mp_copy' or `mp_share'). */
+	struct mpart_lockop_slist     mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_deadnodes_reap()') */
 	union {
 		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
 		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
-		                                         * Chain of all mem-parts in existence.
+		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts)
 		                                         * NOTE: For VIO parts, this list entry is initialized as unbound! */
 	};
 	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
@@ -194,8 +214,10 @@ struct mpart {
 	                                             * file, since this list contains references, rather than weak pointers. */
 	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [const] In-file starting address of this part.
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
-	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || :mfile::mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
-	                                             *       WRITE(MPART_F_LOCKBIT && :mfile::mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
+	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
+	                                             *       WRITE(MPART_F_LOCKBIT && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
+	                                             *                                \--------------/
+	                                             *                                 Only if not anonymous!
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file max address of this part. */
@@ -280,10 +302,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_destroy_later)(struct mpart *__restrict self);
 
 
-/* Reap dead nodes of `self' */
+/* Reap lock operations enqueued for execution when `self' can be locked. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_deadnodes_reap)(struct mpart *__restrict self);
 #define mpart_deadnodes_mustreap(self) \
-	(__hybrid_atomic_load((self)->mp_deadnodes.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+	(__hybrid_atomic_load((self)->mp_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
 #define mpart_deadnodes_reap(self) _mpart_deadnodes_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
@@ -825,14 +847,14 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
  *    the current page directory, using `perm'.
  * This function is used to implement handling of hinted
  * mem-nodes when encountered by the #PF handler. */
-FUNDEF NOBLOCK NONNULL((1)) void
+FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                                  u16 perm);
 
 /* Convenience wrapper for `mpart_hinted_mmap()' */
-FUNDEF NOBLOCK NONNULL((1)) void
+FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *fault_page);
 

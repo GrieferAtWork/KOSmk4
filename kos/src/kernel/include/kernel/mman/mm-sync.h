@@ -36,12 +36,12 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_syncone_p)(struct mman *__re
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_syncall_p)(struct mman *__restrict self);
 
 #ifndef CONFIG_NO_SMP
-/* Same as `mman_sync_p(THIS_MMAN, ...)' (The sync is done on every CPU that uses the caller's VM) */
+/* Same as `mman_sync_p(THIS_MMAN, ...)' (The sync is done on every CPU that uses the caller's mman) */
 FUNDEF NOBLOCK void NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(FCALL mman_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL mman_syncall)(void);
 
-/* Same as `mman_sync_p(&mman_kernel, ...)' (The sync is performed on every CPU, for any VM) */
+/* Same as `mman_sync_p(&mman_kernel, ...)' (The sync is performed on every CPU, for any mman) */
 FUNDEF NOBLOCK void NOTHROW(FCALL mman_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(FCALL mman_supersyncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL mman_supersyncall)(void);

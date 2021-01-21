@@ -838,7 +838,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 #endif /* MNODE_F_MLOCK != MPART_F_MLOCK */
 			copy->mp_file = incref(&mfile_anon[part->mp_file->mf_blockshift]);
 			LIST_INIT(&copy->mp_share);
-			SLIST_INIT(&copy->mp_deadnodes);
+			SLIST_INIT(&copy->mp_lockops);
 			DBG_inval(copy->mp_changed);
 			copy->mp_minaddr = part->mp_minaddr + acc_offs;
 			copy->mp_maxaddr = copy->mp_minaddr + acc_size - 1;

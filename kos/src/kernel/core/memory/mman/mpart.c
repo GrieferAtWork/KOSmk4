@@ -19,12 +19,14 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -81,9 +83,10 @@ typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_free)(struct mpart *__restrict self) {
 	if (self->mp_flags & MPART_F_COREPART) {
-		/* TODO: Must use the corebase free() function! */
+		mcoreheap_free(container_of(self, union mcorepart, mcp_part));
+	} else {
+		kfree(self);
 	}
-	kfree(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -116,15 +119,11 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	assert(!LIST_EMPTY(&self->mp_share));
 	assert(!(self->mp_flags & MPART_F_NO_GLOBAL_REF));
 	/* Make sure that we've served _all_ dead nodes that may have still been there. */
-	while (!SLIST_EMPTY(&self->mp_deadnodes)) {
-		struct mnode *node;
-		node = SLIST_FIRST(&self->mp_deadnodes);
-		SLIST_REMOVE_HEAD(&self->mp_deadnodes, _mn_dead);
-		/* Deleted nodes will still be holding references to their mman!
-		 * However, that's the only thing they'll still be holding. */
-		weakdecref(node->mn_mman);
-		/* Free the node. */
-		mnode_free(node);
+	while (!SLIST_EMPTY(&self->mp_lockops)) {
+		struct mpart_lockop *lop;
+		lop = SLIST_FIRST(&self->mp_lockops);
+		SLIST_REMOVE_HEAD(&self->mp_lockops, mplo_link);
+		(*lop->mplo_func)(lop, self);
 	}
 	/* If valid, free the block-status extension vector. */
 	if (MPART_ST_HASST(self->mp_state) && !(self->mp_flags & MPART_F_BLKST_INL))
@@ -231,25 +230,53 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 }
 
 
+INTERN NOBLOCK NONNULL((1, 2)) void /* NOTE: "INTERN" because used in other CUs, too! */
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
+                                             struct mpart *__restrict part) {
+	struct mnode *node;
+	node = (struct mnode *)self;
+	LIST_REMOVE(node, mn_link);
+	if ((node->mn_flags & (MNODE_F_MLOCK)) &&
+	    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
+		mpart_maybe_clear_mlock(part);
+	weakdecref(node->mn_mman);
+	mnode_free(node);
+}
+
+
+
 
 /* Reap dead nodes of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mpart_deadnodes_reap)(struct mpart *__restrict self) {
-	struct mnode *node;
+	struct mpart_lockop *lop, *next;
+	struct mpart_lockop_slist lops;
 	struct mnode_slist deadnodes;
 	bool must_recheck_mlock;
 again:
 	if (!mpart_lock_tryacquire(self))
 		return;
-	deadnodes.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_deadnodes);
+	lops.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
 
 	/* Unlink all of the deleted nodes. */
+	SLIST_INIT(&deadnodes);
 	must_recheck_mlock = false;
-	SLIST_FOREACH (node, &deadnodes, _mn_dead) {
-		assert(wasdestroyed(node->mn_mman) || (node->mn_flags & MNODE_F_UNMAPPED));
-		LIST_REMOVE(node, mn_link);
-		if (node->mn_flags & MNODE_F_MLOCK)
-			must_recheck_mlock = true;
+	for (lop = SLIST_FIRST(&lops); lop; lop = next) {
+		next = SLIST_NEXT(lop, mplo_link);
+		/* Special handling for the destruction of mem-nodes. */
+		if (lop->mplo_func == &mnode_unlink_from_part_lockop) {
+			struct mnode *node;
+			node = (struct mnode *)lop;
+			assert(wasdestroyed(node->mn_mman) || (node->mn_flags & MNODE_F_UNMAPPED));
+			LIST_REMOVE(node, mn_link);
+			if (node->mn_flags & MNODE_F_MLOCK)
+				must_recheck_mlock = true;
+			SLIST_INSERT(&deadnodes, node, _mn_dead);
+		} else {
+			/* Invoke generic lock operations. */
+			(*lop->mplo_func)(lop, self);
+		}
+		lop = next;
 	}
 
 	/* If we have to, then clear the MLOCK flag. */
@@ -257,17 +284,19 @@ again:
 	    (self->mp_flags & (MPART_F_MLOCK |
 	                       MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
 		mpart_maybe_clear_mlock(self);
-
-	mpart_lock_release(self);
+	mpart_lock_release_f(self);
 
 	/* Free all of the unlinked nodes, and drop the weak references
 	 * they were still holding to their respective (now-destroyed) mmans. */
 	while (!SLIST_EMPTY(&deadnodes)) {
+		struct mnode *node;
 		node = SLIST_FIRST(&deadnodes);
 		SLIST_REMOVE_HEAD(&deadnodes, _mn_dead);
 		weakdecref(node->mn_mman);
 		mnode_free(node);
 	}
+
+	/* Check if more work has shown up. */
 	if (mpart_deadnodes_mustreap(self))
 		goto again;
 }

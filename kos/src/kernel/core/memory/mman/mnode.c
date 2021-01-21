@@ -27,6 +27,7 @@
 #include <fs/vfs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
@@ -54,9 +55,10 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_free)(struct mnode *__restrict self) {
 	if (self->mn_flags & MNODE_F_COREPART) {
-		/* TODO: Must use the corebase free() function! */
+		mcoreheap_free(container_of(self, union mcorepart, mcp_node));
+	} else {
+		kfree(self);
 	}
-	kfree(self);
 }
 
 
@@ -81,13 +83,17 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 
 
+INTDEF NOBLOCK NONNULL((1, 2)) void /* From "mpart.c" */
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
+                                             struct mpart *__restrict part);
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	REF struct mpart *part;
 	assertf((self->mn_flags & MNODE_F_UNMAPPED) || wasdestroyed(self->mn_mman),
 	        "A mem-node may only be destroyed if it's marked as UNMAPPED, "
 	        "or belonges to a dead memory manager");
-	if ((self->mn_flags & MNODE_F_MPREPARED)) {
+	if (self->mn_flags & MNODE_F_MPREPARED) {
 		REF struct mman *mm = self->mn_mman;
 		if (tryincref(mm)) {
 			pagedir_phys_t pd = self->mn_mman->mm_pdir_phys;
@@ -108,20 +114,23 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			mpart_lock_release(part);
 			decref_unlikely(part);
 		} else {
+			struct mpart_lockop *lop;
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
 			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
 
-			/* Insert into the dead-nodes list of `part'
+			/* Insert into the lock-operations list of `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
-			SLIST_ATOMIC_INSERT(&part->mp_deadnodes, self, _mn_dead);
+			lop = (struct mpart_lockop *)self;
+			lop->mplo_func = &mnode_unlink_from_part_lockop;
+			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, mplo_link);
 
 			/* Try to reap dead nodes. */
-			mpart_deadnodes_reap(part);
+			_mpart_deadnodes_reap(part);
 
 			/* Drop our old reference to the associated part. */
-			decref_unlikely(part);
+			decref(part);
 			return;
 		}
 	}

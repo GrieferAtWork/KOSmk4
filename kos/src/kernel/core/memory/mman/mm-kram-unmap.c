@@ -23,19 +23,24 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
+#include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <kernel/swap.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <sys/mmio.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -43,6 +48,40 @@
 #include <string.h>
 
 DECL_BEGIN
+
+#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
+#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
+#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
+#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
+#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
+#else
+#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
+#endif
+
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+#ifdef __INTELLISENSE__
+typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
+#else /* __INTELLISENSE__ */
+#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
+#endif /* !__INTELLISENSE__ */
+#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 STATIC_ASSERT_MSG(GFP_ATOMIC == 0x0400,
                   "This is currently hard-coded in "
@@ -266,7 +305,7 @@ NOTHROW(FCALL mman_kernel_lockop_many)(struct mlockop *op, gfp_t flags) {
  *                  better pass `false'. If you lie here, calloc() might arbitrarily
  *                  break... */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
                                      gfp_t flags) {
 	struct mlockop_kram *lockop;
@@ -290,6 +329,560 @@ do_schedule_lockop:
 	}
 }
 
+
+INTDEF NOBLOCK NONNULL((1, 2)) void /* From "mpart.c" */
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
+                                             struct mpart *__restrict part);
+
+
+PRIVATE NOBLOCK void
+NOTHROW(FCALL mnode_destroy_kram)(struct mnode *__restrict self) {
+	REF struct mpart *part;
+	part = self->mn_part;
+	if unlikely(self->mn_fspath != NULL)
+		decref(self->mn_fspath);
+	if unlikely(self->mn_fsname != NULL)
+		decref(self->mn_fsname);
+
+	/* Try to unlink the node from the copy- or share-chain of the associated part. */
+	if (mpart_lock_tryacquire(part)) {
+		LIST_REMOVE(self, mn_link);
+		if ((self->mn_flags & (MNODE_F_MLOCK)) &&
+		    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
+			ATOMIC_AND(part->mp_flags, ~MPART_F_MLOCK);
+		mpart_lock_release(part);
+		decref_unlikely(part);
+	} else {
+		struct mpart_lockop *lop;
+		/* Must insert the node into the part's list of deleted nodes. */
+		weakincref(&mman_kernel); /* A weak reference here is required by the ABI */
+		DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
+
+		/* Insert into the lock-operations list of `part'
+		 * The act of doing this is what essentially causes
+		 * ownership of our node to be transfered to `part' */
+		lop = (struct mpart_lockop *)self;
+		lop->mplo_func = &mnode_unlink_from_part_lockop;
+		SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, mplo_link);
+
+		/* Try to reap dead nodes. */
+		_mpart_deadnodes_reap(part);
+
+		/* Drop our old reference to the associated part. */
+		decref_likely(part);
+		return;
+	}
+	mnode_free(self);
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mchunkvec_truncate)(struct mchunkvec *__restrict self,
+                                  physpagecnt_t total_pages,
+                                  bool is_swap, gfp_t flags,
+                                  bool maybe_hinted) {
+#define FREE_PHYS(base, num_pages)        \
+	(is_swap ? swap_free(base, num_pages) \
+	         : page_ffree(base, num_pages, (flags & GFP_CALLOC) != 0))
+	size_t i;
+	physpagecnt_t total = 0;
+	assert(total_pages != 0);
+	for (i = 0;; ++i) {
+		assert(i < self->ms_c);
+		total += self->ms_v[i].mc_size;
+		if (total > total_pages) {
+			size_t keep;
+			total -= self->ms_v[i].mc_size;
+			keep = total_pages - total;
+			assert(keep != 0);
+			assert(keep <= self->ms_v[i].mc_size);
+			if (keep < self->ms_v[i].mc_size) {
+				FREE_PHYS(self->ms_v[i].mc_start + keep,
+				          self->ms_v[i].mc_size - keep);
+				self->ms_v[i].mc_size = keep;
+			}
+			if (i < (self->ms_c - 1)) {
+				size_t new_count = i;
+				for (++i; i < self->ms_c; ++i) {
+					FREE_PHYS(self->ms_v[i].mc_start,
+					          self->ms_v[i].mc_size);
+				}
+				if (maybe_hinted) {
+					krealloc_in_place_nx(self->ms_v,
+					                     new_count * sizeof(struct mchunk),
+					                     flags & ~GFP_CALLOC);
+				} else {
+					struct mchunk *vec;
+					vec = (struct mchunk *)krealloc_nx(self->ms_v,
+					                                   new_count * sizeof(struct mchunk),
+					                                   flags & ~GFP_CALLOC);
+					if likely(vec != NULL)
+						self->ms_v = vec;
+				}
+				self->ms_c = new_count;
+			}
+		}
+	}
+#undef FREE_PHYS
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mchunkvec_truncate_leading)(struct mchunkvec *__restrict self,
+                                          physpagecnt_t remove_pages,
+                                          bool is_swap, gfp_t flags) {
+	struct mchunk *vec;
+#define FREE_PHYS(base, num_pages)        \
+	(is_swap ? swap_free(base, num_pages) \
+	         : page_ffree(base, num_pages, (flags & GFP_CALLOC) != 0))
+	for (;;) {
+		physpagecnt_t count;
+		assert(self->ms_c != 0);
+		count = self->ms_v[0].mc_size;
+		if (count > remove_pages)
+			break;
+		/* Drop the first chunk. */
+		FREE_PHYS(self->ms_v[0].mc_start, count);
+		--self->ms_c;
+		memmovedown(&self->ms_v[0], &self->ms_v[1],
+		            self->ms_c, sizeof(struct mchunk));
+		remove_pages -= count;
+	}
+	if (remove_pages != 0) {
+		/* Truncate leading pages from the first chunk. */
+		FREE_PHYS(self->ms_v[0].mc_start, remove_pages);
+		self->ms_v[0].mc_start += remove_pages;
+		self->ms_v[0].mc_size -= remove_pages;
+	}
+
+	/* Try to free unused memory. */
+	vec = (struct mchunk *)krealloc_nx(self->ms_v,
+	                                   self->ms_c * sizeof(struct mchunk),
+	                                   flags & ~GFP_CALLOC);
+	if likely(vec != NULL)
+		self->ms_v = vec;
+#undef FREE_PHYS
+}
+
+PRIVATE NOBLOCK void
+NOTHROW(FCALL unmap_and_unprepare_and_sync_memory)(void *addr, size_t num_bytes) {
+	/* Unmap the affected address range & sync in every mman. */
+	pagedir_unmap(addr, num_bytes);
+	mman_supersync(addr, num_bytes);
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_map(addr, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+#if !defined(NDEBUG) && !defined(CONFIG_NO_SMP)
+	/* This check right here only serves to turn fully undefined behavior
+	 * when another CPU is currently initializing a page which we've just
+	 * unmapped (which would indicate an error elsewhere within the kernel)
+	 * into something that's a bit easier to narrow down:
+	 * Instead of (possibly) failing anywhere within the hinted-page-mapping
+	 * function, fail with a normal #PF upon access to bad memory. */
+	while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
+		task_pause();
+#endif /* !NDEBUG && !CONFIG_NO_SMP */
+}
+
+PRIVATE NOBLOCK void
+NOTHROW(FCALL movedown_bits)(bitset_word_t *__restrict bitset,
+                             size_t dst_index, size_t src_index,
+                             size_t num_bits) {
+#define BITSET_INDEX(index) ((index) / BITSOF(bitset_word_t))
+#define BITSET_SHIFT(index) ((index) % BITSOF(bitset_word_t))
+#define GETBIT(index)       ((bitset[BITSET_INDEX(index)] >> BITSET_SHIFT(index)) & 1)
+#define SETBIT_OFF(index)   ((bitset[BITSET_INDEX(index)] &= ~((bitset_word_t)1 << BITSET_SHIFT(index))))
+#define SETBIT_ON(index)    ((bitset[BITSET_INDEX(index)] |= ((bitset_word_t)1 << BITSET_SHIFT(index))))
+	while (num_bits) {
+		--num_bits;
+		if (GETBIT(src_index)) {
+			SETBIT_ON(dst_index);
+		} else {
+			SETBIT_OFF(dst_index);
+		}
+		++dst_index;
+		++src_index;
+	}
+#undef SETBIT_ON
+#undef SETBIT_OFF
+#undef GETBIT
+#undef BITSET_SHIFT
+#undef BITSET_INDEX
+}
+
+
+
+/* (try to) unmap the given sub-range of virtual (kernel)
+ * memory that is mapped by `node', which is backed by `part'.
+ *
+ * This function is called while holding a lock to both `part',
+ * as well as the kernel mman.
+ *
+ * @return: true:  Unmap successful.
+ * @return: false: Insufficient memory to do the unmap right now (try again later) */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
+                                          struct mpart *__restrict part,
+                                          byte_t *unmap_minaddr,
+                                          byte_t *unmap_maxaddr,
+                                          gfp_t flags) {
+	size_t unmap_size;
+	assert(flags & GFP_ATOMIC);
+	assert(mman_lock_acquired(&mman_kernel));
+	assert(mpart_lock_acquired(part));
+	assert(!(part->mp_flags & MPART_F_NO_SPLIT));
+	assert(!(node->mn_flags & MNODE_F_NO_SPLIT));
+	assert(unmap_minaddr >= node->mn_minaddr);
+	assert(unmap_maxaddr <= node->mn_maxaddr);
+	assertf(unmap_minaddr != node->mn_minaddr || unmap_maxaddr != node->mn_maxaddr,
+	        "This case should be handled by the caller");
+	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
+
+	/* Check for simple case: Truncate the node/part at the back. */
+	if (unmap_minaddr == node->mn_minaddr) {
+		size_t part_size;
+		physpagecnt_t part_pages;
+
+		/* Truncate at the back. */
+		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+
+		/* Unmap the affected address range & sync in every mman. */
+		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+
+		COMPILER_WRITE_BARRIER();
+		node->mn_maxaddr = unmap_minaddr - 1;
+		part_size        = node->mn_partoff + (size_t)(unmap_minaddr - node->mn_minaddr);
+		assert(part->mp_maxaddr > part->mp_minaddr + part_size - 1);
+		part->mp_maxaddr = part->mp_minaddr + part_size - 1;
+		if (!(part->mp_flags & MPART_F_BLKST_INL) && part->mp_blkst_ptr != NULL) {
+			size_t word_count, block_count;
+			block_count = part_size >> part->mp_file->mf_blockshift;
+			word_count  = CEILDIV(block_count, BITSET_ITEMS_PER_WORD);
+			if (node->mn_flags & MNODE_F_MHINT) {
+				krealloc_in_place_nx(part->mp_blkst_ptr,
+				                     word_count * sizeof(bitset_word_t),
+				                     flags & ~GFP_CALLOC);
+			} else {
+				bitset_word_t *bitset;
+				bitset = (bitset_word_t *)krealloc_nx(part->mp_blkst_ptr,
+				                                      word_count * sizeof(bitset_word_t),
+				                                      flags & ~GFP_CALLOC);
+				if likely(bitset != NULL)
+					part->mp_blkst_ptr = bitset;
+			}
+		}
+		part_pages = (physpagecnt_t)(part_size >> PAGESHIFT);
+		/* Free unused memory from the part backing data store. */
+		switch (part->mp_state) {
+
+		case MPART_ST_SWP:
+			assert(part->mp_swp.mc_size > part_pages);
+			swap_free(part->mp_swp.mc_start + part_pages,
+			          part->mp_swp.mc_size - part_pages);
+			part->mp_swp.mc_size = part_pages;
+			break;
+
+		case MPART_ST_MEM:
+			assert(part->mp_mem.mc_size > part_pages);
+			page_ffree(part->mp_mem.mc_start + part_pages,
+			           part->mp_mem.mc_size - part_pages,
+			           (flags & GFP_CALLOC) != 0);
+			part->mp_mem.mc_size = part_pages;
+			break;
+
+		case MPART_ST_SWP_SC:
+			mchunkvec_truncate(&part->mp_swp_sc, part_pages, true, flags,
+			                   (node->mn_flags & MNODE_F_MHINT) != 0);
+			break;
+
+		case MPART_ST_MEM_SC:
+			mchunkvec_truncate(&part->mp_mem_sc, part_pages, false, flags,
+			                   (node->mn_flags & MNODE_F_MHINT) != 0);
+			break;
+
+		default:
+			break;
+		}
+
+		/* Re-insert the (now truncated) node into the kernel mman. */
+		COMPILER_WRITE_BARRIER();
+		mnode_tree_insert(&mman_kernel.mm_mappings, node);
+		return true;
+	}
+
+	/* Either truncate a node at the front, or cut out a chunk in the middle.
+	 * In either case, we have to make sure that (in case of a hinted node),
+	 * all pages above the to-be unmapped area have been fully initialized,
+	 * thus ensuring that no other CPU (or thread) might possibly try to load
+	 * pages from that upper area when we need to change its backing pointers. */
+	if (node->mn_flags & MNODE_F_MHINT) {
+		byte_t *tail_minaddr, *tail_endaddr;
+		tail_minaddr = unmap_maxaddr + 1;
+		tail_endaddr = (byte_t *)mnode_getendaddr(node);
+		/* We keep the lazy initialization of hinted nodes simple, and let
+		 * the #PF handler to most of the work. As such, all we really have
+		 * to do is ensure that every page from the tail-range has been
+		 * accessed at least once. */
+		do {
+			peekb(tail_minaddr);
+			tail_minaddr += PAGESIZE;
+		} while (tail_minaddr < tail_endaddr);
+
+#ifndef CONFIG_NO_SMP
+		/* Make sure that any other CPU is still initializing hinted pages,
+		 * which may overlap with the address range we've just loaded. */
+		while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
+			task_pause();
+#endif /* !CONFIG_NO_SMP */
+	}
+
+	/* Check for slightly more complicated case: Truncate a node at the front. */
+	if (unmap_minaddr == node->mn_minaddr) {
+		size_t remove_size, remove_blocks;
+		physpagecnt_t remove_pages;
+		/* We can truncate the node at the front. */
+		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+		remove_size   = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
+		remove_pages  = remove_size >> PAGESHIFT;
+		remove_blocks = remove_size >> part->mp_file->mf_blockshift;
+		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+		COMPILER_WRITE_BARRIER();
+		node->mn_minaddr += remove_size;
+		part->mp_maxaddr -= remove_size;
+		if (part->mp_flags & MPART_F_BLKST_INL) {
+			part->mp_blkst_inl >>= remove_blocks * MPART_BLOCK_STBITS;
+		} else if (part->mp_blkst_ptr != NULL) {
+			bitset_word_t *bitset;
+			size_t word_count, keep_blocks;
+			keep_blocks = mpart_getblockcount(part, part->mp_file);
+			movedown_bits(part->mp_blkst_ptr,
+			              0, remove_blocks * MPART_BLOCK_STBITS,
+			              keep_blocks);
+			word_count = CEILDIV(keep_blocks, BITSET_ITEMS_PER_WORD);
+			/* Try to release unused memory. */
+			bitset = (bitset_word_t *)krealloc_nx(part->mp_blkst_ptr,
+			                                      word_count * sizeof(bitset_word_t),
+			                                      flags & ~GFP_CALLOC);
+			if likely(bitset != NULL)
+				part->mp_blkst_ptr = bitset;
+		}
+
+		/* Free unused memory from the part backing data store. */
+		switch (part->mp_state) {
+
+		case MPART_ST_SWP:
+			assert(part->mp_swp.mc_size > remove_pages);
+			swap_free(part->mp_swp.mc_start, remove_pages);
+			part->mp_swp.mc_start += remove_pages;
+			part->mp_swp.mc_size -= remove_pages;
+			break;
+
+		case MPART_ST_MEM:
+			assert(part->mp_mem.mc_size > remove_pages);
+			page_ffree(part->mp_mem.mc_start, remove_pages,
+			           (flags & GFP_CALLOC) != 0);
+			part->mp_mem.mc_start += remove_pages;
+			part->mp_mem.mc_size -= remove_pages;
+			break;
+
+		case MPART_ST_SWP_SC:
+			mchunkvec_truncate_leading(&part->mp_swp_sc, remove_pages, true, flags);
+			break;
+
+		case MPART_ST_MEM_SC:
+			mchunkvec_truncate_leading(&part->mp_mem_sc, remove_pages, false, flags);
+			break;
+
+		default:
+			break;
+		}
+
+		/* Re-insert the (now truncated) node into the kernel mman. */
+		COMPILER_WRITE_BARRIER();
+		mnode_tree_insert(&mman_kernel.mm_mappings, node);
+		return true;
+	}
+
+	/* TODO: Cut-out a hole in the middle.
+	 * Note that for this purpose, we may even use `mcoreheap_alloc_locked_nx()'
+	 * in order to dynamically allocate the required additional data structures! */
+	return false;
+}
+
+
+/* Insert `lop' into the lock-operations list of `mman_kernel',
+ * and return `true', or don't insert it into the list, acquire
+ * a lock to `mman_kernel', and return `false' */
+PRIVATE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL mman_lockop_insert_or_lock)(struct mlockop *__restrict lop) {
+	bool did_remove;
+	struct mlockop_slist locklist;
+	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, mlo_link);
+	if likely(!mman_lock_tryacquire(&mman_kernel))
+		return true;
+	/* Welp... We've got the lock... -> Try to remove `lop' once again. */
+	locklist.slh_first = SLIST_ATOMIC_CLEAR(&mman_kernel_lockops);
+	did_remove         = true;
+	SLIST_TRYREMOVE(&locklist, lop, mlo_link, {
+		did_remove = false;
+	});
+	if (locklist.slh_first != NULL) {
+		/* Re-queue all removed elements. */
+		struct mlockop *lastop;
+		lastop = SLIST_FIRST(&locklist);
+		while (SLIST_NEXT(lastop, mlo_link))
+			lastop = SLIST_NEXT(lastop, mlo_link);
+		SLIST_ATOMIC_INSERT_R(&mman_kernel_lockops,
+		                      SLIST_FIRST(&locklist),
+		                      lastop, mlo_link);
+	}
+	if (!did_remove) {
+		/* Lock acquired, but `lop' was already executed.
+		 * Act as though we had never acquired the lock in the first place! */
+		mman_lock_release(&mman_kernel);
+		return true;
+	}
+	/* Lock acquired, and `lop' not added to the lock-op list. */
+	return false;
+}
+
+
+struct mpart_lockop_truncate: mpart_lockop {
+	PAGEDIR_PAGEALIGNED size_t mplot_size;  /* Total size (in bytes of the region)  */
+	gfp_t                      mplot_flags; /* Set of `0 | GFP_CALLOC' */
+};
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_lockop_truncate_cb)(struct mpart_lockop *__restrict self,
+                                        struct mpart *__restrict part) {
+	struct mpart_lockop_truncate *me;
+	struct mnode *node;
+	byte_t *unmap_minaddr, *unmap_maxaddr;
+	gfp_t flags;
+	me            = (struct mpart_lockop_truncate *)self;
+	unmap_minaddr = (byte_t *)me;
+	unmap_maxaddr = (byte_t *)me + me->mplot_size - 1;
+	flags         = me->mplot_flags | GFP_ATOMIC;
+	if (flags & GFP_CALLOC)
+		memset(me, 0, sizeof(*me));
+	if (!mman_lock_tryacquire(&mman_kernel)) {
+		struct mlockop_kram *lop;
+		lop = (struct mlockop_kram *)me;
+		lop->mlo_func  = &mlockop_kram_cb;
+		lop->lkr_size  = (size_t)(unmap_maxaddr - (byte_t *)me) + 1;
+		lop->lkr_flags = flags;
+		if (mman_lockop_insert_or_lock(lop))
+			return;
+		if (flags & GFP_CALLOC)
+			memset(lop, 0, sizeof(*lop));
+	}
+
+	/* At this point, we're holding a lock to both the mman, as
+	 * well as (what is supposed to be) the backing mem-part.
+	 *
+	 * As such, start out by validating that this is actually the case. */
+	node = mnode_tree_locate(mman_kernel.mm_mappings, unmap_minaddr);
+	assertf(node != NULL, "Address %p not mapped", unmap_minaddr);
+	assert(mnode_getminaddr(node) >= unmap_minaddr);
+	assert(mnode_getmaxaddr(node) <= unmap_maxaddr);
+	if unlikely(node->mn_flags & MNODE_F_KERNPART) {
+		kernel_panic("Attempted to unmap kernel part at %p-%p (via unmap-kram %p-%p)",
+		             mnode_getminaddr(node), mnode_getmaxaddr(node),
+		             unmap_minaddr, unmap_maxaddr);
+	}
+	assert(node->mn_mman == &mman_kernel);
+	assert(node->mn_flags & MNODE_F_PREAD);
+	assert(node->mn_flags & MNODE_F_PWRITE);
+	assert(node->mn_flags & MNODE_F_SHARED);
+	assert(mnode_iskern(node));
+	assert(node->mn_part);
+	assert(node->mn_part->mp_flags & MPART_F_NO_GLOBAL_REF);
+	assert(LIST_EMPTY(&node->mn_part->mp_copy));
+	assert(LIST_FIRST(&node->mn_part->mp_share) == node);
+	assert(LIST_NEXT(node, mn_link) == NULL);
+	assert(mfile_isanon(node->mn_part->mp_file));
+#ifdef MPART_ST_VIO
+	assert(node->mn_part->mp_state != MPART_ST_VIO);
+#endif /* MPART_ST_VIO */
+
+	if unlikely(node->mn_part != part)
+		goto changed;
+	if unlikely(unmap_minaddr < mnode_getminaddr(node))
+		goto changed;
+	if unlikely(unmap_maxaddr > mnode_getmaxaddr(node))
+		goto changed;
+	if unlikely(unmap_minaddr == mnode_getminaddr(node) &&
+	            unmap_maxaddr == mnode_getmaxaddr(node))
+		goto changed;
+	if unlikely(node->mn_flags & MNODE_F_NO_SPLIT)
+		goto changed;
+	if unlikely(part->mp_flags & MPART_F_NO_SPLIT)
+		goto changed;
+	/* Everything looks in order.
+	 * -> Try to do the actual sub-range unmapping! */
+	if (!mman_unmap_mpart_subregion(node, part,
+	                                unmap_minaddr,
+	                                unmap_maxaddr,
+	                                flags))
+		goto changed; /* Handle allocation errors by re-attempting later. */
+	mman_lock_release(&mman_kernel);
+	return;
+changed:
+	/* Failed to unmap the sub-region.
+	 * Resolve this issue by re-queue a pending lock operation for
+	 * execution within the context of holding a lock to the kernel
+	 * memory manager. */
+	{
+		struct mlockop_kram *lop;
+		lop = (struct mlockop_kram *)me;
+		lop->mlo_func  = &mlockop_kram_cb;
+		lop->lkr_size  = (size_t)(unmap_maxaddr - (byte_t *)me) + 1;
+		lop->lkr_flags = flags;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, mlo_link);
+	}
+	mman_lock_release_f(&mman_kernel);
+	_mman_lockops_reap();
+}
+
+
+/* Insert `lop' into the lock-operations list of `self', and
+ * return `true', or don't insert it into the list, acquire a
+ * lock to `self', and return `false' */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
+                                           struct mpart_lockop *__restrict lop) {
+	bool did_remove;
+	struct mpart_lockop_slist locklist;
+	SLIST_ATOMIC_INSERT(&self->mp_lockops, lop, mplo_link);
+	if likely(!mpart_lock_tryacquire(self))
+		return true;
+	/* Welp... We've got the lock... -> Try to remove `lop' once again. */
+	locklist.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
+	did_remove         = true;
+	SLIST_TRYREMOVE(&locklist, lop, mplo_link, {
+		did_remove = false;
+	});
+	if (locklist.slh_first != NULL) {
+		/* Re-queue all removed elements. */
+		struct mpart_lockop *lastop;
+		lastop = SLIST_FIRST(&locklist);
+		while (SLIST_NEXT(lastop, mplo_link))
+			lastop = SLIST_NEXT(lastop, mplo_link);
+		SLIST_ATOMIC_INSERT_R(&self->mp_lockops,
+		                      SLIST_FIRST(&locklist),
+		                      lastop, mplo_link);
+	}
+	if (!did_remove) {
+		/* Lock acquired, but `lop' was already executed.
+		 * Act as though we had never acquired the lock in the first place! */
+		mpart_lock_release(self);
+		return true;
+	}
+	/* Lock acquired, and `lop' not added to the lock-op list. */
+	return false;
+}
+
+
 /* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
  * @param: flags: Set of `GFP_*'
  * @return: NULL: Successfully unmapped kernel ram.
@@ -298,37 +891,45 @@ do_schedule_lockop:
  *                lock-operation which the caller must enqueue for execution.
  *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
 PUBLIC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                             PAGEDIR_PAGEALIGNED size_t num_bytes,
                                             gfp_t flags) {
-	struct mnode *node;
+	byte_t *maxaddr;
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(num_bytes != 0);
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
 	assert(IS_ALIGNED(num_bytes, PAGESIZE));
 	assert(flags & GFP_ATOMIC);
+	maxaddr = (byte_t *)addr + num_bytes - 1;
 	for (;;) {
+		struct mnode *node;
+		struct mpart *part;
+		byte_t *unmap_minaddr;
+		byte_t *unmap_maxaddr;
+		size_t unmap_size;
+
 		node = mnode_tree_locate(mman_kernel.mm_mappings, addr);
 		assertf(node != NULL, "Address %p not mapped", addr);
 		assert(mnode_getminaddr(node) >= addr);
 		assert(mnode_getmaxaddr(node) <= addr);
 		if unlikely(node->mn_flags & MNODE_F_KERNPART) {
 			kernel_panic("Attempted to unmap kernel part at %p-%p (via unmap-kram %p-%p)",
-			             mnode_getminaddr(node), mnode_getmaxaddr(node),
-			             addr, (byte_t *)addr + num_bytes - 1);
+			             mnode_getminaddr(node), mnode_getmaxaddr(node), addr, maxaddr);
 		}
+		assert(node->mn_mman == &mman_kernel);
 		assert(node->mn_flags & MNODE_F_PREAD);
 		assert(node->mn_flags & MNODE_F_PWRITE);
 		assert(node->mn_flags & MNODE_F_SHARED);
 		assert(mnode_iskern(node));
-		assert(node->mn_part);
-		assert(node->mn_part->mp_flags & MPART_F_NO_GLOBAL_REF);
-		assert(LIST_EMPTY(&node->mn_part->mp_copy));
-		assert(LIST_FIRST(&node->mn_part->mp_share) == node);
+		part = node->mn_part;
+		assert(part);
+		assert(part->mp_flags & MPART_F_NO_GLOBAL_REF);
+		assert(LIST_EMPTY(&part->mp_copy));
+		assert(LIST_FIRST(&part->mp_share) == node);
 		assert(LIST_NEXT(node, mn_link) == NULL);
-		assert(mfile_isanon(node->mn_part->mp_file));
+		assert(mfile_isanon(part->mp_file));
 #ifdef MPART_ST_VIO
-		assert(node->mn_part->mp_state != MPART_ST_VIO);
+		assert(part->mp_state != MPART_ST_VIO);
 #endif /* MPART_ST_VIO */
 
 		/* In order to unmap a sub-segment of a hinted mem-node, the following must be done:
@@ -388,15 +989,87 @@ NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *
 		 * USABLE: Fully initialized memory
 		 */
 
+		/* Figure out the actual bounds which we wish to unmap. */
+		unmap_minaddr = (byte_t *)addr;
+		unmap_maxaddr = maxaddr;
+		if (unmap_minaddr > (byte_t *)mnode_getminaddr(node))
+			unmap_minaddr = (byte_t *)mnode_getminaddr(node);
+		if (unmap_maxaddr < (byte_t *)mnode_getmaxaddr(node))
+			unmap_maxaddr = (byte_t *)mnode_getmaxaddr(node);
+		unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 
-		if (mnode_getminaddr(node) != addr) {
-			/* TODO */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		/* Make sure that the (accessed) address range has been prepared. */
+		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
+			if (!pagedir_prepare_map(unmap_minaddr, unmap_size))
+				goto failed;
+			ATOMIC_OR(node->mn_flags, MNODE_F_MPREPARED);
+		}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+		/* Check for simple case: unmap a node as a whole. */
+		if (unmap_minaddr == mnode_getminaddr(node) &&
+		    unmap_maxaddr == mnode_getmaxaddr(node)) {
+			mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+
+			/* Unmap the affected address range & sync in every mman. */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+
+			/* Just delete the node as a whole! */
+			mnode_destroy_kram(node);
+			goto continue_nextpart;
 		}
 
-		/* TODO */
-		goto failed;
-	}
+		/* In order to do this unmap, we'll have to split the node.
+		 * Check if we're allowed to do this. */
+		if unlikely((node->mn_flags & MNODE_F_NO_SPLIT) ||
+		            (part->mp_flags & MPART_F_NO_SPLIT)) {
+			/* Not allowed... (keep on re-attempting the unmap in hopes
+			 * that `_mman_lockops_reap()' will join us together with
+			 * another unmap request, which then allows the node as a
+			 * whole to be unmapped). */
+			if (maxaddr > unmap_maxaddr) {
+				/* XXX: We could still try to unmap memory further above */
+			}
+			goto failed;
+		}
 
+		/* We'll need to somehow split the part, meaning that we'll be
+		 * needing to acquire a lock to said part! */
+		if (!mpart_lock_tryacquire(part)) {
+			struct mpart_lockop_truncate *lop;
+			/* Try to do the truncate later... */
+			lop = (struct mpart_lockop_truncate *)unmap_minaddr;
+			lop->mplo_func   = &mpart_lockop_truncate_cb;
+			lop->mplot_size  = unmap_size;
+			lop->mplot_flags = flags & GFP_CALLOC;
+			if (mpart_lockop_insert_or_lock(part, lop))
+				goto continue_nextpart;
+			if (flags & GFP_CALLOC)
+				memset(lop, 0, sizeof(*lop));
+		}
+
+		/* At this point, we've got a lock to the part, so try to unmap it! */
+		{
+			bool unmap_ok;
+			incref(part);
+			unmap_ok = mman_unmap_mpart_subregion(node, part,
+			                                      unmap_minaddr,
+			                                      unmap_maxaddr,
+			                                      flags);
+			mpart_lock_release(part);
+			decref_unlikely(part);
+			if (!unmap_ok)
+				goto failed;
+		}
+
+		/* Continue after the successfully unmapped address range. */
+continue_nextpart:
+		addr = unmap_maxaddr + 1;
+		if (addr > maxaddr)
+			break;
+	}
 	return NULL;
 	{
 		struct mlockop_kram *mlo;
@@ -404,7 +1077,7 @@ failed:
 		mlo = (struct mlockop_kram *)addr;
 		mlo->mlo_func          = &mlockop_kram_cb;
 		mlo->mlo_link.sle_next = NULL; /* Only a single element. */
-		mlo->lkr_size          = num_bytes;
+		mlo->lkr_size          = (size_t)(maxaddr - (byte_t *)addr) + 1;
 		mlo->lkr_flags         = flags & GFP_CALLOC;
 		return mlo;
 	}
