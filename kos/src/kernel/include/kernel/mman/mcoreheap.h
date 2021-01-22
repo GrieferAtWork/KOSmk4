@@ -70,9 +70,17 @@ union mcorepart {
 
 /* Figure out how many parts we can cram into a single page, while still
  * maintaining at least pointer-alignment for all of them,  */
-#define _MCOREPAGE_PARTCOUNT             (PAGESIZE / __SIZEOF_MCOREPART)
+#if __ALIGNOF_MCOREPART > __SIZEOF_POINTER__
+/* NOTE: 3*pointer is the smallest possible header, since we always need
+ *       at least 2 pointers for the list-link, and 1 more pointer for
+ *       the smallest-sized in-use bitset. But also align that offset
+ *       to match the alignment requirements of core-heap-parts. */
+#define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (((3 * __SIZEOF_POINTER__) + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))) / __SIZEOF_MCOREPART)
+#else /* __ALIGNOF_MCOREPART > __SIZEOF_POINTER__ */
+#define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (3 * __SIZEOF_POINTER__)) / __SIZEOF_MCOREPART)
+#endif /* __ALIGNOF_MCOREPART <= __SIZEOF_POINTER__ */
 #define _MCOREPAGE_BITSET_LENGTH         ((_MCOREPAGE_PARTCOUNT + (__SIZEOF_POINTER__ * __CHAR_BIT__) - 1) / (__SIZEOF_POINTER__ * __CHAR_BIT__))
-#define _MCOREPAGE_BITSET_SIZE           ((_MCOREPAGE_PARTCOUNT + __SIZEOF_POINTER__ - 1) & ~(__SIZEOF_POINTER__ - 1))
+#define _MCOREPAGE_BITSET_SIZE           (_MCOREPAGE_BITSET_LENGTH * __SIZEOF_POINTER__)
 #define _MCOREPAGE_HEADER_SIZE_UNALIGNED ((2 * __SIZEOF_POINTER__) + _MCOREPAGE_BITSET_SIZE)
 #if __ALIGNOF_MCOREPART > __SIZEOF_POINTER__
 #define _MCOREPAGE_HEADER_SIZE ((_MCOREPAGE_HEADER_SIZE_UNALIGNED + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))

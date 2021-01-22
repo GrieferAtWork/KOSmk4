@@ -20,14 +20,20 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_C_INL
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_C_INL 1
 #define _KOS_SOURCE 1
-#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1
+#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1 /* TODO: Remove once `CONFIG_USE_NEW_VM' becomes the default */
+#define __MMAN_INTERNAL_EXCLUDE_PAGEDIR 1
 #define __OMIT_PAGING_CONSTANT_P_WRAPPERS 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/memory.h>
 #include <kernel/paging.h>
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman.h>
+#include <kernel/mman/_mm-archinit.h>
+#else /* CONFIG_USE_NEW_VM */
 #include <kernel/vm.h>
+#endif /* !CONFIG_USE_NEW_VM */
 #include <sched/cpu.h>
 #include <sched/userkern.h>
 #include <sched/x86/tss.h>
@@ -78,6 +84,14 @@
 
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_VM
+
+/* Define the kernel mman */
+INTERN ATTR_SECTION(".data.permman.head")
+struct mman mman_kernel_head = { _MMAN_KERNEL_INIT };
+
+#else /* CONFIG_USE_NEW_VM */
+
 INTDEF byte_t __kernel_pervm_size[];
 
 /* Define the kernel VM */
@@ -119,6 +133,8 @@ struct vm vm_kernel_head = {
 		/* .vn_guard  = */ 0
 	}
 };
+#endif /* !CONFIG_USE_NEW_VM */
+
 
 /* Allocate BSS memory for the initial shared+identity mapping
  * that will later be shared with, and re-appear in all other

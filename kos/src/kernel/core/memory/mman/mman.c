@@ -32,7 +32,17 @@
 
 #include <kos/except.h>
 
+#include <assert.h>
+
 DECL_BEGIN
+
+typedef NONNULL((1)) void (KCALL *pervm_init_t)(struct vm *__restrict self) /*THROWS(...)*/;
+typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *pervm_fini_t)(struct vm *__restrict self);
+INTDEF pervm_init_t __kernel_pervm_init_start[];
+INTDEF pervm_init_t __kernel_pervm_init_end[];
+INTDEF pervm_fini_t __kernel_pervm_fini_start[];
+INTDEF pervm_fini_t __kernel_pervm_fini_end[];
+
 
 /* List of callbacks that should be invoked after mman_exec()
  * These are called alongside stuff like `handle_manager_cloexec()'
@@ -56,7 +66,20 @@ NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
+	assert(self != THIS_MMAN);
+	assert(self != &mman_kernel);
 	pagedir_fini2(&self->mm_pagedir, self->mm_pdir_phys);
+	assert(LIST_EMPTY(&self->mm_threads));
+
+	/* Invoke per-VM finalizer callbacks. */
+	mman_onfini_callbacks(self);
+	{
+		pervm_fini_t *iter = __kernel_pervm_fini_start;
+		for (; iter < __kernel_pervm_fini_end; ++iter)
+			(**iter)(self);
+		assert(iter == __kernel_pervm_fini_end);
+	}
+
 	/* TODO */
 	weakdecref(self);
 }

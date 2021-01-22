@@ -636,12 +636,13 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 			if (ADDRRANGE_ISKERN_PARTIAL((byte_t *)addr,
 			                             (byte_t *)addr + num_bytes) &&
 			    self != &mman_kernel) {
+disallow_mmap:
 				mman_lock_release(self);
 				unlockinfo_xunlock(unlock);
 				THROW(E_BADALLOC_ADDRESS_ALREADY_EXISTS,
 				      addr, maxaddr, KS_MINADDR, KS_MAXADDR);
 			}
-			/* Check if we must split mem-nodes in order to fulfil the request. */
+			/* Check if we must split mem-nodes in order to fulfill the request. */
 			mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
 			assert(mima.mm_min && mima.mm_max);
 			/* TODO: If we were to work together without our caller (mman_map()),
@@ -650,6 +651,8 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 			 *       range is fully contained within a single, pre-existing node! */
 			if (mnode_getminaddr(mima.mm_min) != result) {
 				/* Must split this node! */
+				if (mima.mm_min->mn_flags & MNODE_F_NO_SPLIT)
+					goto disallow_mmap; /* Not allowed! */
 				if (!mnode_split_or_unlock(self, mima.mm_min, result, unlock))
 					goto must_retry;
 				mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
@@ -660,6 +663,8 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 			max_mapaddr = (byte_t *)result + num_bytes - 1;
 			if (mnode_getmaxaddr(mima.mm_max) != max_mapaddr) {
 				/* Must split this node! */
+				if (mima.mm_min->mn_flags & MNODE_F_NO_SPLIT)
+					goto disallow_mmap; /* Not allowed! */
 				if (!mnode_split_or_unlock(self, mima.mm_max, max_mapaddr + 1, unlock))
 					goto must_retry;
 			}

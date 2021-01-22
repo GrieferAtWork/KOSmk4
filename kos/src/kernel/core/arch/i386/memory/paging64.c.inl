@@ -20,7 +20,8 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_C_INL
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_C_INL 1
 #define _KOS_SOURCE 1
-#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1
+#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1 /* TODO: Remove once `CONFIG_USE_NEW_VM' becomes the default */
+#define __MMAN_INTERNAL_EXCLUDE_PAGEDIR 1
 #define __OMIT_PAGING_CONSTANT_P_WRAPPERS 1
 
 #include <kernel/compiler.h>
@@ -35,7 +36,12 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman.h>
+#include <kernel/mman/_mm-archinit.h>
+#else /* CONFIG_USE_NEW_VM */
 #include <kernel/vm.h>
+#endif /* !CONFIG_USE_NEW_VM */
 #include <kernel/vm/phys.h>
 #include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
@@ -173,6 +179,13 @@ again_calculate_vecN:
 
 
 
+#ifdef CONFIG_USE_NEW_VM
+
+/* Define the kernel mman */
+INTERN ATTR_SECTION(".data.permman.head")
+struct mman mman_kernel_head = { _MMAN_KERNEL_INIT };
+
+#else /* CONFIG_USE_NEW_VM */
 INTDEF byte_t __kernel_pervm_size[];
 
 /* Define the kernel VM */
@@ -215,6 +228,7 @@ struct vm vm_kernel_head = {
 		/* .vn_guard  = */ 0
 	}
 };
+#endif /* !CONFIG_USE_NEW_VM */
 
 
 typedef struct {

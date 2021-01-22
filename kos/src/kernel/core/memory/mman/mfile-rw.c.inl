@@ -85,7 +85,8 @@ DECL_BEGIN
 #endif /* !... */
 
 PUBLIC NONNULL((1)) void KCALL
-LOCAL_mfile_vio_rw(struct mfile *__restrict self, struct mpart *part,
+LOCAL_mfile_vio_rw(struct mfile *__restrict self,
+                   struct mpart *part,
                    LOCAL_buffer_t buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
                    size_t buf_offset,

@@ -172,10 +172,17 @@ SECTIONS {
 		DEFINE_CALLBACK_VECTOR(pertask_fini, .rodata.callback.pertask.fini)
 		DEFINE_CALLBACK_VECTOR(pertask_clone, .rodata.callback.pertask.clone)
 		DEFINE_CALLBACK_VECTOR(pertask_onexit, .rodata.callback.pertask.onexit)
+#ifdef CONFIG_USE_NEW_VM
+		DEFINE_CALLBACK_VECTOR(permman_init, .rodata.callback.permman.init)
+		DEFINE_CALLBACK_VECTOR(permman_fini, .rodata.callback.permman.fini)
+		DEFINE_CALLBACK_VECTOR(permman_clone, .rodata.callback.permman.clone)
+		DEFINE_CALLBACK_VECTOR(permman_onexec, .rodata.callback.permman.onexec)
+#else /* CONFIG_USE_NEW_VM */
 		DEFINE_CALLBACK_VECTOR(pervm_init, .rodata.callback.pervm.init)
 		DEFINE_CALLBACK_VECTOR(pervm_fini, .rodata.callback.pervm.fini)
 		DEFINE_CALLBACK_VECTOR(pervm_clone, .rodata.callback.pervm.clone)
 		DEFINE_CALLBACK_VECTOR(pervm_onexec, .rodata.callback.pervm.onexec)
+#endif /* !CONFIG_USE_NEW_VM */
 		DEFINE_CALLBACK_VECTOR(validatable_heaps, .rodata.heaps.validatable)
 
 		*(.rodata.local.* .rodata.cold .rodata.unlikely .rodata.cold.*)
@@ -206,10 +213,17 @@ SECTIONS {
 		KEEP(*(.data.pertask))
 	})
 
+#ifdef CONFIG_USE_NEW_VM
+	PEROBJECT_SECTION_EX(.permman, __kernel_permman, PAGEDIR_SIZE, {
+		KEEP(*(.data.permman.head))
+		KEEP(*(.data.permman))
+	})
+#else /* CONFIG_USE_NEW_VM */
 	PEROBJECT_SECTION_EX(.pervm, __kernel_pervm, PAGEDIR_SIZE, {
 		KEEP(*(.data.pervm.head))
 		KEEP(*(.data.pervm))
 	})
+#endif /* !CONFIG_USE_NEW_VM */
 
 #ifndef CONFIG_NO_SMP
 	PEROBJECT_SECTION(.percpu, __kernel_percpu, {
@@ -398,11 +412,19 @@ SECTIONS {
 		. += __kernel_pertask_size;
 
 		IP_ALIGN(PAGEDIR_ALIGN);
+#ifdef CONFIG_USE_NEW_VM
+		PROVIDE(mman_kernel = ABSOLUTE(.));
+#else /* CONFIG_USE_NEW_VM */
 		PROVIDE(vm_kernel = ABSOLUTE(.));
+#endif /* !CONFIG_USE_NEW_VM */
 		PROVIDE(pagedir_kernel = ABSOLUTE(.));
 		PROVIDE(pagedir_kernel_phys = ABSOLUTE(pagedir_kernel) - KERNEL_CORE_BASE);
 		. += PAGEDIR_SIZE;
+#ifdef CONFIG_USE_NEW_VM
+		. += __kernel_permman_size;
+#else /* CONFIG_USE_NEW_VM */
 		. += __kernel_pervm_size;
+#endif /* !CONFIG_USE_NEW_VM */
 
 		PROVIDE_HIDDEN(__debug_malloc_tracked_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__debug_malloc_tracked_size = ABSOLUTE(ABSOLUTE(__debug_malloc_tracked_end) - ABSOLUTE(__debug_malloc_tracked_start)));
