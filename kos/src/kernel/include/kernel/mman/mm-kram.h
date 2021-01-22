@@ -39,7 +39,7 @@ typedef unsigned int gfp_t;
 
 
 /************************************************************************/
-/* Additional GFP_* flags for `mmap_map_kernel_ram()'                   */
+/* Additional GFP_* flags for `mmap_map_kram()'                   */
 /************************************************************************/
 
 #define GFP_MAP_32BIT        0x0040 /* The backing _physical_ memory will use 32-bit addresses.
@@ -76,16 +76,16 @@ typedef unsigned int gfp_t;
  *   - Other flags are silently ignored, but will be forwarded onto
  *     other calls to kmalloc() that may need to be made internally. */
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kernel_ram(PAGEDIR_PAGEALIGNED void *hint,
-                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                    gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
-/* Non-throwing version of `mmap_map_kernel_ram()'. Returns `MAP_FAILED' on error. */
+mmap_map_kram(PAGEDIR_PAGEALIGNED void *hint,
+              PAGEDIR_PAGEALIGNED size_t num_bytes,
+              gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
+/* Non-throwing version of `mmap_map_kram()'. Returns `MAP_FAILED' on error. */
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
-NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
+NOTHROW(FCALL mmap_map_kram_nx)(PAGEDIR_PAGEALIGNED void *hint,
+                                PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
 
-/* Error return value for `mmap_map_kernel_ram_nx()' */
+/* Error return value for `mmap_map_kram_nx()' */
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED
 #endif /* !MAP_FAILED && __MAP_FAILED */
@@ -111,9 +111,9 @@ NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
  *                  break...
  *                  Must always contain at least `GFP_ATOMIC' */
 FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
-                                     PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                     gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
 
 /* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
  * @param: flags: Set of `GFP_*' (Must always contain at least `GFP_ATOMIC')
@@ -123,15 +123,16 @@ NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
  *                lock-operation which the caller must enqueue for execution.
  *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
 FUNDEF WUNUSED NOBLOCK struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
-                                               PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                               gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
-/* Same as `mman_unmap_kernel_ram_locked_ex()', but automatically enqueue a
+NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
+                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                         gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+
+/* Same as `mman_unmap_kram_locked_ex()', but automatically enqueue a
  * possibly returned mlockop object into the kernel mman. */
 FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                            gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
+                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                      gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
 
 DECL_END
 #endif /* __CC__ */

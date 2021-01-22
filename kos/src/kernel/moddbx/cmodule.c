@@ -1658,7 +1658,7 @@ create_mixed_symbol:
 						/* When `DW_AT_external' appeared, then create a mixed symbol, since this debug-info
 						 * entry is referencing a symbol that would be visible from other CUs, and the stuff
 						 * we've loaded from .symtab is used to indicate the same!
-						 * For more information, see the explaination with `__libm_Q' as example above. */
+						 * For more information, see the explanation with `__libm_Q' as example above. */
 						if (address_status == CMODULE_EVALUATE_SYMBOL_ADDRESS_EXTERN)
 							goto create_mixed_symbol;
 

@@ -430,7 +430,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		hinted_node = (struct mnode *)pagedir_gethint(addr);
 		if (hinted_node != NULL) {
 			/* Count how # CPUs are doing hinted-node initialization, so
-			 * that `mman_unmap_kernel_ram_locked()' can sync itself with
+			 * that `mman_unmap_kram_locked()' can sync itself with
 			 * other CPUs which may still be accessing a mem-node which
 			 * is currently being split. */
 			mman_kernel_hintinit_inuse_inc();

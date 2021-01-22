@@ -29,6 +29,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/paging.h>
@@ -48,26 +49,6 @@
 #include <string.h>
 
 DECL_BEGIN
-
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
 
 #ifdef NDEBUG
 #define DBG_memset(ptr, byte, num_bytes) (void)0
@@ -99,14 +80,6 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 	for (i = 0; i < count; ++i)
 		mchunk_freeswp(&vec[i]);
 }
-
-
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 
 /************************************************************************/
@@ -437,9 +410,9 @@ err_badalloc_after_unlock:
 
 
 #define bitset_getstate(base, partrel_block_index)                              \
-	(((base)[(partrel_block_index) / BITSET_ITEMS_PER_WORD] >>                  \
-	  (((partrel_block_index) % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS)) & \
-	 (((bitset_word_t)1 << MPART_BLOCK_STBITS) - 1))
+	(((base)[(partrel_block_index) / MPART_BLKST_BLOCKS_PER_WORD] >>                  \
+	  (((partrel_block_index) % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS)) & \
+	 (((mpart_blkst_word_t)1 << MPART_BLOCK_STBITS) - 1))
 #define setcore_ex_bitset_getstate(self, partrel_block_index) \
 	bitset_getstate((self)->scd_bitset, partrel_block_index)
 
@@ -450,13 +423,13 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
                                 size_t num_blocks,
                                 gfp_t gfp_flags) {
 	size_t avl_size, req_size;
-	bitset_word_t *new_bitset;
+	mpart_blkst_word_t *new_bitset;
 	/* Must actually allocate the block-status bitset! */
 	avl_size = kmalloc_usable_size(data->scd_bitset);
-	req_size = CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD);
+	req_size = CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD);
 	if likely(req_size > avl_size) {
 		/* Must allocate a larger bitset. */
-		new_bitset = (bitset_word_t *)krealloc_nx(data->scd_bitset, req_size,
+		new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->scd_bitset, req_size,
 		                                          GFP_LOCKED | GFP_ATOMIC |
 		                                          GFP_PREFLT | gfp_flags);
 		if unlikely(!new_bitset) {
@@ -464,7 +437,7 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 			mpart_lock_release_f(self);
 			unlockinfo_xunlock(unlock);
 			TRY {
-				data->scd_bitset = (bitset_word_t *)krealloc(data->scd_bitset, req_size,
+				data->scd_bitset = (mpart_blkst_word_t *)krealloc(data->scd_bitset, req_size,
 				                                             GFP_LOCKED | GFP_PREFLT | gfp_flags);
 			} EXCEPT {
 				mpart_deadnodes_reap(self);
@@ -474,7 +447,7 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 		}
 		data->scd_bitset = new_bitset;
 	} else if (req_size < avl_size) {
-		new_bitset = (bitset_word_t *)krealloc_nx(data->scd_bitset, req_size,
+		new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->scd_bitset, req_size,
 		                                          GFP_LOCKED | GFP_ATOMIC |
 		                                          GFP_PREFLT | gfp_flags);
 		if likely(new_bitset != NULL)
@@ -531,7 +504,7 @@ setcore_ex_load_from_swap_impl(struct mchunkvec *__restrict dst_vec,
 PRIVATE NONNULL((1, 2, 3)) void FCALL
 setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
                           struct mchunkvec *__restrict src_vec,
-                          bitset_word_t const *__restrict bitset,
+                          mpart_blkst_word_t const *__restrict bitset,
                           unsigned int block_shift,
                           size_t num_blocks) {
 #define GETSTATE(index) bitset_getstate(bitset, index)
@@ -591,7 +564,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 
 	case MPART_ST_VOID:
 		/* Make sure that we've got sufficient space for the block-state bitset. */
-		if (num_blocks <= BITSET_ITEMS_PER_WORD) {
+		if (num_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Can use the inline bitset. */
 			if unlikely(data->scd_bitset != NULL) {
 				kfree(data->scd_bitset);
@@ -662,12 +635,12 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		 * of the bitset into our local heap-copy, so we still know which
 		 * parts we're supposed to initialize from swap once we're done here! */
 		{
-			bitset_word_t *src = self->mp_blkst_ptr;
+			mpart_blkst_word_t *src = self->mp_blkst_ptr;
 			if (self->mp_flags & MPART_F_BLKST_INL)
 				src = &self->mp_blkst_inl;
 			memcpy(data->scd_bitset, src,
-			       CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD),
-			       sizeof(bitset_word_t));
+			       CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD),
+			       sizeof(mpart_blkst_word_t));
 		}
 		/* Release our lock to `self' so we can safely invoke swap-callbacks. */
 		incref(self);
@@ -1168,23 +1141,23 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
                                 struct mpart_unsharecow_data *__restrict data,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t block_count, reqsize;
-	bitset_word_t *bitset;
+	mpart_blkst_word_t *bitset;
 	/* We need to copy the block-status bitset. */
 	block_count = num_bytes >> self->mp_file->mf_blockshift;
-	if (block_count <= BITSET_ITEMS_PER_WORD)
+	if (block_count <= MPART_BLKST_BLOCKS_PER_WORD)
 		return true; /* A single word is enough! */
 	if (self->mp_blkst_ptr == NULL)
 		return true; /* We can just mirror the NULL-bitset. */
 	/* This is the case where we need the dynamically allocated block-status bitset. */
-	reqsize = CEILDIV(block_count, BITSET_ITEMS_PER_WORD) * sizeof(bitset_word_t);
-	bitset  = (bitset_word_t *)krealloc_nx(data->ucd_ucmem.scd_bitset, reqsize,
+	reqsize = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
+	bitset  = (mpart_blkst_word_t *)krealloc_nx(data->ucd_ucmem.scd_bitset, reqsize,
 	                                       GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 	if unlikely(!bitset) {
 		/* Must allocate while blocking. */
 		mpart_lock_release_f(self);
 		unlockinfo_xunlock(unlock);
 		TRY {
-			bitset = (bitset_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
+			bitset = (mpart_blkst_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
 			                                   GFP_LOCKED | GFP_PREFLT);
 		} EXCEPT {
 			mpart_deadnodes_reap(self);
@@ -1502,9 +1475,9 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 
 	/* We need to copy the block-status bitset. */
 	block_count = bounds.ucb_mapsize >> copy->mp_file->mf_blockshift;
-	if (block_count <= BITSET_ITEMS_PER_WORD) {
+	if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 		/* A single word is enough! */
-		bitset_word_t word;
+		mpart_blkst_word_t word;
 		word = self->mp_blkst_inl;
 		if (!(self->mp_flags & MPART_F_BLKST_INL)) {
 			word = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
@@ -1524,13 +1497,13 @@ free_unused_block_status:
 		/* This is the case where we need the dynamically allocated block-status bitset. */
 		assert(data->ucd_ucmem.scd_bitset != NULL);
 		assert((kmalloc_usable_size(data->ucd_ucmem.scd_bitset) *
-		        BITSET_ITEMS_PER_WORD) >= block_count);
+		        MPART_BLKST_BLOCKS_PER_WORD) >= block_count);
 		assert(block_count <= mpart_getblockcount(self, self->mp_file));
 		/* Copy over block-status bitset data. */
-		copy->mp_blkst_ptr = (bitset_word_t *)memcpy(data->ucd_ucmem.scd_bitset,
+		copy->mp_blkst_ptr = (mpart_blkst_word_t *)memcpy(data->ucd_ucmem.scd_bitset,
 		                                             self->mp_blkst_ptr,
-		                                             block_count / BITSET_ITEMS_PER_WORD,
-		                                             sizeof(bitset_word_t));
+		                                             block_count / MPART_BLKST_BLOCKS_PER_WORD,
+		                                             sizeof(mpart_blkst_word_t));
 		DBG_inval(data->ucd_ucmem.scd_bitset);
 	}
 

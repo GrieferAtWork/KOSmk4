@@ -66,20 +66,20 @@ DECL_BEGIN
  *   - Other flags are silently ignored, but will be forwarded onto
  *     other calls to kmalloc() that may need to be made internally. */
 PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kernel_ram(PAGEDIR_PAGEALIGNED void *hint,
-                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                    gfp_t gfp, size_t min_alignment) {
+mmap_map_kram(PAGEDIR_PAGEALIGNED void *hint,
+              PAGEDIR_PAGEALIGNED size_t num_bytes,
+              gfp_t gfp, size_t min_alignment) {
 	/* TODO */
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 
 
-/* Non-throwing version of `mmap_map_kernel_ram()'. Returns `MAP_FAILED' on error. */
+/* Non-throwing version of `mmap_map_kram()'. Returns `MAP_FAILED' on error. */
 PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
-NOTHROW(FCALL mmap_map_kernel_ram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t gfp, size_t min_alignment) {
+NOTHROW(FCALL mmap_map_kram_nx)(PAGEDIR_PAGEALIGNED void *hint,
+                                PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                gfp_t gfp, size_t min_alignment) {
 	/* TODO */
 	return MAP_FAILED;
 }

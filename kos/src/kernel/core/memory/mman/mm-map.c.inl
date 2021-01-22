@@ -77,15 +77,15 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 				/* Pre-initialize all blocks as CHNG, so-as to give the caller
 				 * write-permissions from the get-go. */
 				part->mp_blkst_ptr = NULL;
-			} else if (num_bytes <= (BITSET_ITEMS_PER_WORD * PAGESIZE)) {
+			} else if (num_bytes <= (MPART_BLKST_BLOCKS_PER_WORD * PAGESIZE)) {
 				part->mp_flags |= MPART_F_BLKST_INL;
 				part->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
 			} else {
-				bitset_word_t *bitset;
+				mpart_blkst_word_t *bitset;
 				size_t num_words;
-				num_words = CEILDIV(num_bytes >> PAGESHIFT, BITSET_ITEMS_PER_WORD);
+				num_words = CEILDIV(num_bytes >> PAGESHIFT, MPART_BLKST_BLOCKS_PER_WORD);
 				assert(num_words >= 2);
-				bitset = (bitset_word_t *)kmalloc(num_words * sizeof(bitset_word_t),
+				bitset = (mpart_blkst_word_t *)kmalloc(num_words * sizeof(mpart_blkst_word_t),
 #if MPART_BLOCK_ST_NDEF == 0
 				                                  GFP_CALLOC |
 #endif /* MPART_BLOCK_ST_NDEF == 0 */

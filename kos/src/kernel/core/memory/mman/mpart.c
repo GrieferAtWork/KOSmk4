@@ -29,6 +29,7 @@
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/swap.h>
@@ -44,39 +45,11 @@
 
 DECL_BEGIN
 
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
-
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
-
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 
 /* Reference counting control for `struct mpart' */
@@ -347,7 +320,7 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
                                    size_t partrel_block_index) {
-	bitset_word_t word;
+	mpart_blkst_word_t word;
 	unsigned int shift;
 	assert(mpart_lock_acquired(self));
 	assert(partrel_block_index < mpart_getblockcount(self, self->mp_file));
@@ -356,10 +329,10 @@ NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
 	} else {
 		size_t index;
 		assert(self->mp_blkst_ptr);
-		index = partrel_block_index / BITSET_ITEMS_PER_WORD;
+		index = partrel_block_index / MPART_BLKST_BLOCKS_PER_WORD;
 		word  = self->mp_blkst_ptr[index];
 	}
-	shift = (unsigned int)((partrel_block_index % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS);
+	shift = (unsigned int)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
 	return (unsigned int)(word >> shift) & (((unsigned int)1 << MPART_BLOCK_STBITS) - 1);
 }
 
@@ -367,18 +340,18 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
                                    size_t partrel_block_index,
                                    unsigned int st) {
-	bitset_word_t *pword, mask, val, oldval, newval;
+	mpart_blkst_word_t *pword, mask, val, oldval, newval;
 	unsigned int shift;
 	assert(st < ((unsigned int)1 << MPART_BLOCK_STBITS));
-	shift = (unsigned int)((partrel_block_index % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS);
-	mask  = (bitset_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
-	val   = (bitset_word_t)st << shift;
+	shift = (unsigned int)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
+	mask  = (mpart_blkst_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
+	val   = (mpart_blkst_word_t)st << shift;
 	if (self->mp_flags & MPART_F_BLKST_INL) {
 		pword = &self->mp_blkst_inl;
 	} else {
 		size_t index;
 		assert(self->mp_blkst_ptr);
-		index = partrel_block_index / BITSET_ITEMS_PER_WORD;
+		index = partrel_block_index / MPART_BLKST_BLOCKS_PER_WORD;
 		pword = &self->mp_blkst_ptr[index];
 	}
 	do {
@@ -469,25 +442,25 @@ again:
 		 * means that currently all blocks are considered `MPART_BLOCK_ST_CHNG'
 		 *
 		 * This is unlikely to happen, but is a well-defined scenario. */
-		if (block_count <= BITSET_ITEMS_PER_WORD) {
+		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Just use the in-line bitset. */
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
 			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
 		} else {
 			size_t bitset_size;
-			bitset_word_t *bitset;
+			mpart_blkst_word_t *bitset;
 			/* Must allocate the bitset on the heap! */
 			bitset_size = CEILDIV(block_count,
-			                      BITSOF(bitset_word_t) /
+			                      BITSOF(mpart_blkst_word_t) /
 			                      MPART_BLOCK_STBITS) *
-			              sizeof(bitset_word_t);
-			bitset = (bitset_word_t *)kmalloc_nx(bitset_size,
+			              sizeof(mpart_blkst_word_t);
+			bitset = (mpart_blkst_word_t *)kmalloc_nx(bitset_size,
 			                                     GFP_ATOMIC | GFP_LOCKED |
 			                                     GFP_PREFLT);
 			if unlikely(!bitset) {
 				/* Must allocate the new bitset while blocking! */
 				mpart_lock_release_f(self);
-				bitset = (bitset_word_t *)kmalloc(bitset_size, GFP_LOCKED | GFP_PREFLT);
+				bitset = (mpart_blkst_word_t *)kmalloc(bitset_size, GFP_LOCKED | GFP_PREFLT);
 				TRY {
 					mpart_lock_acquire_and_setcore_unwrite_nodma(self);
 				} EXCEPT {

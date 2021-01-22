@@ -26,6 +26,7 @@
 #include <debugger/rt.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <sched/task.h>
@@ -38,16 +39,16 @@
 DECL_BEGIN
 
 #ifndef vector_getblockstatus
-#define vector_getblockstatus(vector, i)                      \
-	(((vector)[(i) / BITSET_ITEMS_PER_WORD] >>                \
-	  (((i) % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS)) & \
+#define vector_getblockstatus(vector, i)                            \
+	(((vector)[(i) / MPART_BLKST_BLOCKS_PER_WORD] >>                \
+	  (((i) % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS)) & \
 	 (((unsigned int)1 << MPART_BLOCK_STBITS) - 1))
 #endif /* !vector_getblockstatus */
 
 
 #ifdef DEFINE_mpart_mmap_p
 PRIVATE NOBLOCK u16
-NOTHROW(FCALL mpart_mmap_p_impl)(bitset_word_t const *bitset, unsigned int shift,
+NOTHROW(FCALL mpart_mmap_p_impl)(mpart_blkst_word_t const *bitset, unsigned int shift,
                                  physaddr_t baseaddr, PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED size_t chunk_size,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t baseaddr_offset,
@@ -59,7 +60,7 @@ NOTHROW(FCALL mpart_mmap_p_impl)(bitset_word_t const *bitset, unsigned int shift
 #elif defined(DEFINE_mpart_mmap)
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
 PRIVATE NOBLOCK u16
-NOTHROW(FCALL mpart_mmap_impl)(bitset_word_t const *bitset, unsigned int shift,
+NOTHROW(FCALL mpart_mmap_impl)(mpart_blkst_word_t const *bitset, unsigned int shift,
                                physaddr_t baseaddr, PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t chunk_size,
                                PAGEDIR_PAGEALIGNED mpart_reladdr_t baseaddr_offset,
@@ -287,7 +288,7 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
 {
 	u16 result;
 	unsigned int shift;
-	bitset_word_t const *bitset;
+	mpart_blkst_word_t const *bitset;
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
 	assert(IS_ALIGNED(size, PAGESIZE));
 	assert(IS_ALIGNED(offset, PAGESIZE));

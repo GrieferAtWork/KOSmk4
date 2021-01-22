@@ -32,6 +32,7 @@
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -51,39 +52,11 @@
 
 DECL_BEGIN
 
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
-
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
-
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 STATIC_ASSERT_MSG(GFP_ATOMIC == 0x0400,
                   "This is currently hard-coded in "
@@ -93,11 +66,11 @@ STATIC_ASSERT_MSG(GFP_ATOMIC == 0x0400,
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
  * This counter behaves similar to the in-use counter found in ATOMIC_REF, and is needed in order
- * to allow for syncing of internal re-trace operations in `mman_unmap_kernel_ram_locked()' with
+ * to allow for syncing of internal re-trace operations in `mman_unmap_kram_locked()' with
  * other CPUs having previously started initializing hinted pages.
  *
- * For more information on the data race solved by this counter, see the detailed explaination
- * of `mman_kernel_hintinit_inuse' within `mman_unmap_kernel_ram_locked()' */
+ * For more information on the data race solved by this counter, see the detailed explanation
+ * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */
 INTERN WEAK unsigned int mman_kernel_hintinit_inuse = 0;
 #endif /* !CONFIG_NO_SMP */
 
@@ -124,7 +97,7 @@ NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self, gfp_t flags) {
 	if (flags & GFP_CALLOC)
 		memset(me, 0, sizeof(*me)); /* Ensure consistent zero-initialized-ness */
 	/* (try to) do the actual unmapping. */
-	return mman_unmap_kernel_ram_locked_ex(self, size, flags);
+	return mman_unmap_kram_locked_ex(self, size, flags);
 }
 
 
@@ -307,9 +280,9 @@ NOTHROW(FCALL mman_kernel_lockop_many)(struct mlockop *op, gfp_t flags) {
  *                  better pass `false'. If you lie here, calloc() might arbitrarily
  *                  break... */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void
-NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
-                                     PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                     gfp_t flags) {
+NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               gfp_t flags) {
 	struct mlockop_kram *lockop;
 	assert(num_bytes != 0);
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
@@ -317,7 +290,7 @@ NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
 	assert(flags & GFP_ATOMIC);
 	if (mman_lock_tryacquire(&mman_kernel)) {
 		/* Directly try to unmap kernel ram. */
-		lockop = (struct mlockop_kram *)mman_unmap_kernel_ram_locked_ex(addr, num_bytes, flags);
+		lockop = (struct mlockop_kram *)mman_unmap_kram_locked_ex(addr, num_bytes, flags);
 		mman_lock_release(&mman_kernel);
 		if unlikely(lockop != NULL)
 			goto do_schedule_lockop;
@@ -528,15 +501,15 @@ NOTHROW(FCALL unmap_and_unprepare_and_sync_memory)(void *addr, size_t num_bytes)
 }
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL movedown_bits)(bitset_word_t *__restrict dst_bitset,
-                             bitset_word_t const *__restrict src_bitset,
+NOTHROW(FCALL movedown_bits)(mpart_blkst_word_t *__restrict dst_bitset,
+                             mpart_blkst_word_t const *__restrict src_bitset,
                              size_t dst_index, size_t src_index,
                              size_t num_bits) {
-#define BITSET_INDEX(index) ((index) / BITSOF(bitset_word_t))
-#define BITSET_SHIFT(index) ((index) % BITSOF(bitset_word_t))
+#define BITSET_INDEX(index) ((index) / BITSOF(mpart_blkst_word_t))
+#define BITSET_SHIFT(index) ((index) % BITSOF(mpart_blkst_word_t))
 #define GETBIT(index)       ((src_bitset[BITSET_INDEX(index)] >> BITSET_SHIFT(index)) & 1)
-#define SETBIT_OFF(index)   ((dst_bitset[BITSET_INDEX(index)] &= ~((bitset_word_t)1 << BITSET_SHIFT(index))))
-#define SETBIT_ON(index)    ((dst_bitset[BITSET_INDEX(index)] |= ((bitset_word_t)1 << BITSET_SHIFT(index))))
+#define SETBIT_OFF(index)   ((dst_bitset[BITSET_INDEX(index)] &= ~((mpart_blkst_word_t)1 << BITSET_SHIFT(index))))
+#define SETBIT_ON(index)    ((dst_bitset[BITSET_INDEX(index)] |= ((mpart_blkst_word_t)1 << BITSET_SHIFT(index))))
 	while (num_bits) {
 		--num_bits;
 		if (GETBIT(src_index)) {
@@ -603,15 +576,15 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		if (!(part->mp_flags & MPART_F_BLKST_INL) && part->mp_blkst_ptr != NULL) {
 			size_t word_count, block_count;
 			block_count = part_size >> part->mp_file->mf_blockshift;
-			word_count  = CEILDIV(block_count, BITSET_ITEMS_PER_WORD);
+			word_count  = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD);
 			if (node->mn_flags & MNODE_F_MHINT) {
 				krealloc_in_place_nx(part->mp_blkst_ptr,
-				                     word_count * sizeof(bitset_word_t),
+				                     word_count * sizeof(mpart_blkst_word_t),
 				                     flags & ~GFP_CALLOC);
 			} else {
-				bitset_word_t *bitset;
-				bitset = (bitset_word_t *)krealloc_nx(part->mp_blkst_ptr,
-				                                      word_count * sizeof(bitset_word_t),
+				mpart_blkst_word_t *bitset;
+				bitset = (mpart_blkst_word_t *)krealloc_nx(part->mp_blkst_ptr,
+				                                      word_count * sizeof(mpart_blkst_word_t),
 				                                      GFP_LOCKED | GFP_PREFLT |
 				                                      (flags & ~GFP_CALLOC));
 				if likely(bitset != NULL)
@@ -705,13 +678,13 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		if (part->mp_flags & MPART_F_BLKST_INL) {
 			part->mp_blkst_inl >>= remove_blocks * MPART_BLOCK_STBITS;
 		} else if (part->mp_blkst_ptr != NULL) {
-			bitset_word_t *bitset;
+			mpart_blkst_word_t *bitset;
 			size_t word_count, keep_blocks;
 			keep_blocks = mpart_getblockcount(part, part->mp_file);
 			movedown_bits(part->mp_blkst_ptr, part->mp_blkst_ptr,
 			              0, remove_blocks * MPART_BLOCK_STBITS,
 			              keep_blocks * MPART_BLOCK_STBITS);
-			word_count = CEILDIV(keep_blocks, BITSET_ITEMS_PER_WORD);
+			word_count = CEILDIV(keep_blocks, MPART_BLKST_BLOCKS_PER_WORD);
 			assert(word_count >= 0);
 			if (word_count == 1) {
 				/* Switch over to using an in-line bitset. */
@@ -721,8 +694,8 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				kfree(bitset);
 			} else {
 				/* Try to release unused memory. */
-				bitset = (bitset_word_t *)krealloc_nx(part->mp_blkst_ptr,
-				                                      word_count * sizeof(bitset_word_t),
+				bitset = (mpart_blkst_word_t *)krealloc_nx(part->mp_blkst_ptr,
+				                                      word_count * sizeof(mpart_blkst_word_t),
 				                                      GFP_LOCKED | GFP_PREFLT |
 				                                      (flags & ~GFP_CALLOC));
 				if likely(bitset != NULL)
@@ -810,15 +783,15 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		hipart->mp_blkst_ptr = NULL;
 		if (!(lopart->mp_flags & MPART_F_BLKST_INL) && lopart->mp_blkst_ptr != NULL) {
 			size_t bitset_bytes_per_word;
-			bitset_bytes_per_word = BITSET_ITEMS_PER_WORD << part->mp_file->mf_blockshift;
+			bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << part->mp_file->mf_blockshift;
 			if (losize > bitset_bytes_per_word && hisize > bitset_bytes_per_word) {
-				bitset_word_t *bitset;
+				mpart_blkst_word_t *bitset;
 				size_t new_bitset_bytes, new_bitset_blocks, new_bitset_words;
 				new_bitset_bytes  = MIN(losize, hisize);
 				new_bitset_blocks = new_bitset_bytes >> part->mp_file->mf_blockshift;
-				new_bitset_words  = CEILDIV(new_bitset_blocks, BITSET_ITEMS_PER_WORD);
+				new_bitset_words  = CEILDIV(new_bitset_blocks, MPART_BLKST_BLOCKS_PER_WORD);
 				assert(new_bitset_words >= 2);
-				bitset = (bitset_word_t *)kmalloc_nx(new_bitset_words * sizeof(bitset_word_t),
+				bitset = (mpart_blkst_word_t *)kmalloc_nx(new_bitset_words * sizeof(mpart_blkst_word_t),
 				                                     GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC));
 				if unlikely(!bitset) {
 					mpart_free(hipart);
@@ -974,7 +947,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			unsigned int blockshift;
 			blockshift            = part->mp_file->mf_blockshift;
 			hioffset_blocks       = hioffset >> blockshift;
-			bitset_bytes_per_word = BITSET_ITEMS_PER_WORD << blockshift;
+			bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << blockshift;
 			loblocks              = losize >> blockshift;
 			hiblocks              = hisize >> blockshift;
 			if (losize > bitset_bytes_per_word && hisize > bitset_bytes_per_word) {
@@ -985,19 +958,19 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 					              hiblocks * MPART_BLOCK_STBITS);
 				} else {
 					/* Must swap bitsets */
-					bitset_word_t *loset, *hiset, *smaller_bitset;
+					mpart_blkst_word_t *loset, *hiset, *smaller_bitset;
 					loset = hipart->mp_blkst_ptr;
 					hiset = lopart->mp_blkst_ptr;
 					memcpy(loset, hiset,
-					       CEILDIV(loblocks, BITSET_ITEMS_PER_WORD),
-					       sizeof(bitset_word_t));
+					       CEILDIV(loblocks, MPART_BLKST_BLOCKS_PER_WORD),
+					       sizeof(mpart_blkst_word_t));
 					movedown_bits(hiset, hiset, 0,
 					              hioffset_blocks * MPART_BLOCK_STBITS,
 					              hiblocks * MPART_BLOCK_STBITS);
 					/* Try to release unused memory. */
-					smaller_bitset = (bitset_word_t *)krealloc_nx(hiset,
-					                                              CEILDIV(hiblocks, BITSET_ITEMS_PER_WORD) *
-					                                              sizeof(bitset_word_t),
+					smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
+					                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
+					                                              sizeof(mpart_blkst_word_t),
 					                                              GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC));
 					if likely(smaller_bitset != NULL)
 						hiset = smaller_bitset;
@@ -1006,7 +979,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 					hipart->mp_blkst_ptr = hiset;
 				}
 			} else if (hisize > bitset_bytes_per_word) {
-				bitset_word_t *hiset, *smaller_bitset;
+				mpart_blkst_word_t *hiset, *smaller_bitset;
 				/* Re-use the bitset from `lopart' in `hipart', and
 				 * change `lopart' to make use of the inline bitset. */
 				hiset = lopart->mp_blkst_ptr;
@@ -1017,16 +990,16 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				              hiblocks * MPART_BLOCK_STBITS);
 
 				/* Try to release unused memory. */
-				smaller_bitset = (bitset_word_t *)krealloc_nx(hiset,
-				                                              CEILDIV(hiblocks, BITSET_ITEMS_PER_WORD) *
-				                                              sizeof(bitset_word_t),
+				smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
+				                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
+				                                              sizeof(mpart_blkst_word_t),
 				                                              GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC));
 				if likely(smaller_bitset != NULL)
 					hiset = smaller_bitset;
 				hipart->mp_blkst_ptr = hiset;
 			} else {
 				/* (possibly) keep the bitset in lopart, but use the inline-bitset in hipart. */
-				bitset_word_t *loset = lopart->mp_blkst_ptr;
+				mpart_blkst_word_t *loset = lopart->mp_blkst_ptr;
 				movedown_bits(&hipart->mp_blkst_inl, loset, 0,
 				              hioffset_blocks * MPART_BLOCK_STBITS,
 				              hiblocks * MPART_BLOCK_STBITS);
@@ -1299,9 +1272,9 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
  *                lock-operation which the caller must enqueue for execution.
  *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
 PUBLIC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
-                                               PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                               gfp_t flags) {
+NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
+                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                         gfp_t flags) {
 	byte_t *maxaddr;
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(num_bytes != 0);
@@ -1496,14 +1469,14 @@ failed:
 
 }
 
-/* Same as `mman_unmap_kernel_ram_locked_ex()', but automatically enqueue a
+/* Same as `mman_unmap_kram_locked_ex()', but automatically enqueue a
  * possibly returned mlockop object into the kernel mman. */
 PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                            gfp_t flags) {
+NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
+                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                      gfp_t flags) {
 	struct mlockop *lop;
-	lop = mman_unmap_kernel_ram_locked_ex(addr, num_bytes, flags);
+	lop = mman_unmap_kram_locked_ex(addr, num_bytes, flags);
 	if (lop != NULL)
 		mman_kernel_lockop(lop);
 }

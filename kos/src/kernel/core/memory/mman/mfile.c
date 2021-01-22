@@ -26,6 +26,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/vm/phys.h>
 #include <sched/task.h>
@@ -46,39 +47,11 @@
 
 DECL_BEGIN
 
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
-
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
-
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -664,15 +637,15 @@ mfile_private_makepart(struct mfile *__restrict self,
 		size_t num_blocks;
 		num_blocks = num_bytes >> self->mf_blockshift;
 		/* Allocate the block-status bitset. */
-		if (num_blocks <= BITSET_ITEMS_PER_WORD) {
+		if (num_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
 			result->mp_flags |= MPART_F_BLKST_INL;
 			result->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
 		} else {
-			bitset_word_t *bitset;
+			mpart_blkst_word_t *bitset;
 			size_t num_words;
-			num_words = CEILDIV(num_blocks, BITSET_ITEMS_PER_WORD);
+			num_words = CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD);
 			TRY {
-				bitset = (bitset_word_t *)kmalloc(num_words * sizeof(bitset_word_t),
+				bitset = (mpart_blkst_word_t *)kmalloc(num_words * sizeof(mpart_blkst_word_t),
 #if MPART_BLOCK_ST_NDEF == 0
 				                                  GFP_CALLOC |
 #endif /* MPART_BLOCK_ST_NDEF == 0 */

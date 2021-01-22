@@ -31,6 +31,7 @@
 #include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mm-unmapped.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
@@ -54,26 +55,6 @@
 #endif /* CONFIG_USE_NEW_VM */ /* TODO: REMOVE_ME */
 
 DECL_BEGIN
-
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -714,11 +695,11 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 		 * from the kernel mman.
 		 *
 		 * Note that (with the exception of `_mcore_initpage'), we can
-		 * just use `mman_unmap_kernel_ram_locked()' to free the page! */
+		 * just use `mman_unmap_kram_locked()' to free the page! */
 		if (page != &_mcore_initpage && mcorepage_allfree(page)) {
 			LIST_REMOVE(page, mcp_link);
 			mcoreheap_freecount -= MCOREPAGE_PARTCOUNT;
-			mman_unmap_kernel_ram_locked(page, PAGESIZE);
+			mman_unmap_kram_locked(page, PAGESIZE);
 		}
 	}
 }

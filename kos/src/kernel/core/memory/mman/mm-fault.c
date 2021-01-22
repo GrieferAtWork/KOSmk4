@@ -32,6 +32,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-fault.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 
@@ -48,39 +49,12 @@
 
 DECL_BEGIN
 
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
-
 #ifdef NDEBUG
 #define DBG_memset(ptr, byte, num_bytes) (void)0
 #else /* NDEBUG */
 #define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
 #endif /* !NDEBUG */
 #define DBG_inval(obj) DBG_memset(&(obj), 0xcc, sizeof(obj))
-
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 
 
@@ -846,9 +820,9 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 			/* We need to copy the block-status bitset. */
 			block_count = acc_size >> copy->mp_file->mf_blockshift;
-			if (block_count <= BITSET_ITEMS_PER_WORD) {
+			if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 				/* A single word is enough! */
-				bitset_word_t word;
+				mpart_blkst_word_t word;
 				word = part->mp_blkst_inl;
 				if (!(part->mp_flags & MPART_F_BLKST_INL)) {
 					word = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
@@ -868,13 +842,13 @@ pcopy_free_unused_block_status:
 				/* This is the case where we need the dynamically allocated block-status bitset. */
 				assert(self->mfl_ucdat.ucd_ucmem.scd_bitset != NULL);
 				assert((kmalloc_usable_size(self->mfl_ucdat.ucd_ucmem.scd_bitset) *
-				        BITSET_ITEMS_PER_WORD) >= block_count);
+				        MPART_BLKST_BLOCKS_PER_WORD) >= block_count);
 				assert(block_count <= mpart_getblockcount(part, part->mp_file));
 				/* Copy over block-status bitset data. */
-				copy->mp_blkst_ptr = (bitset_word_t *)memcpy(self->mfl_ucdat.ucd_ucmem.scd_bitset,
+				copy->mp_blkst_ptr = (mpart_blkst_word_t *)memcpy(self->mfl_ucdat.ucd_ucmem.scd_bitset,
 				                                             part->mp_blkst_ptr,
-				                                             block_count / BITSET_ITEMS_PER_WORD,
-				                                             sizeof(bitset_word_t));
+				                                             block_count / MPART_BLKST_BLOCKS_PER_WORD,
+				                                             sizeof(mpart_blkst_word_t));
 				DBG_inval(self->mfl_ucdat.ucd_ucmem.scd_bitset);
 			}
 

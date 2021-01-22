@@ -26,6 +26,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <sched/task.h>
 
@@ -41,13 +42,6 @@
 #include <string.h>
 
 DECL_BEGIN
-
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
 
 /* Load the bounds of the longest consecutive physical memory address range
  * that starts at `partrel_offset', has been populated with meaningful data
@@ -503,21 +497,21 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
                                               size_t partrel_block_index,
                                               unsigned int old_st,
                                               unsigned int new_st) {
-	bitset_word_t *pword, mask, oldword, newword;
-	bitset_word_t old_val, new_val;
+	mpart_blkst_word_t *pword, mask, oldword, newword;
+	mpart_blkst_word_t old_val, new_val;
 	unsigned int shift;
 	assert(old_st < ((unsigned int)1 << MPART_BLOCK_STBITS));
 	assert(new_st < ((unsigned int)1 << MPART_BLOCK_STBITS));
-	shift   = (unsigned int)((partrel_block_index % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS);
-	mask    = (bitset_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
-	old_val = (bitset_word_t)old_st << shift;
-	new_val = (bitset_word_t)new_st << shift;
+	shift   = (unsigned int)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
+	mask    = (mpart_blkst_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
+	old_val = (mpart_blkst_word_t)old_st << shift;
+	new_val = (mpart_blkst_word_t)new_st << shift;
 	if (self->mp_flags & MPART_F_BLKST_INL) {
 		pword = &self->mp_blkst_inl;
 	} else {
 		size_t index;
 		assert(self->mp_blkst_ptr);
-		index = partrel_block_index / BITSET_ITEMS_PER_WORD;
+		index = partrel_block_index / MPART_BLKST_BLOCKS_PER_WORD;
 		pword = &self->mp_blkst_ptr[index];
 	}
 	do {

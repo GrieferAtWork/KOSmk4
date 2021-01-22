@@ -29,6 +29,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>
@@ -57,47 +58,19 @@ DECL_BEGIN
 			(ptr) = _new_ptr;                                              \
 	}	__WHILE0
 
-#if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0x5555555555555555) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0x5555) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 2
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0x55) * (st))
-#elif __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT32_C(0xffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT64_C(0xffffffffffffffff) * (st))
-#elif __SIZEOF_POINTER__ == 2 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT16_C(0xffff) * (st))
-#elif __SIZEOF_POINTER__ == 1 && MPART_BLOCK_STBITS == 1
-#define MPART_BLOCK_REPEAT(st) (__UINT8_C(0xff) * (st))
-#else
-#error "Unsupported __SIZEOF_POINTER__ and/or MPART_BLOCK_STBITS"
-#endif
-
 #ifdef NDEBUG
 #define DBG_memset(ptr, byte, num_bytes) (void)0
 #else /* NDEBUG */
 #define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
 #endif /* !NDEBUG */
 
-#ifdef __INTELLISENSE__
-typedef typeof(((struct mpart *)0)->mp_blkst_inl) bitset_word_t;
-#else /* __INTELLISENSE__ */
-#define bitset_word_t typeof(((struct mpart *)0)->mp_blkst_inl)
-#endif /* !__INTELLISENSE__ */
-#define BITSET_ITEMS_PER_WORD (BITSOF(bitset_word_t) / MPART_BLOCK_STBITS)
-
-
-#define vector_getblockstatus(vector, i)                      \
-	(((vector)[(i) / BITSET_ITEMS_PER_WORD] >>                \
-	  (((i) % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS)) & \
+#define vector_getblockstatus(vector, i)                            \
+	(((vector)[(i) / MPART_BLKST_BLOCKS_PER_WORD] >>                \
+	  (((i) % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS)) & \
 	 (((unsigned int)1 << MPART_BLOCK_STBITS) - 1))
-#define zvector_setblockstatus(vector, i, val) \
-	((vector)[(i) / BITSET_ITEMS_PER_WORD] |=  \
-	 ((bitset_word_t)(val) << (((i) % BITSET_ITEMS_PER_WORD) * MPART_BLOCK_STBITS)))
+#define zvector_setblockstatus(vector, i, val)      \
+	((vector)[(i) / MPART_BLKST_BLOCKS_PER_WORD] |= \
+	 ((mpart_blkst_word_t)(val) << (((i) % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS)))
 
 
 
@@ -358,7 +331,7 @@ struct mpart_split_data {
 	struct mpartmeta                   *msd_himeta;   /* [0..1][owned] Meta-data controller for `msd_hipart'. */
 	struct mnode_slist                  msd_hinodes;  /* [0..n][owned] Linked list (via `_mn_alloc') of mem-nodes for the hi-part. */
 	size_t                              msd_hinodec;  /* # of nodes within the `msd_hinodes' list. */
-	bitset_word_t                      *msd_hibitset; /* [0..1][owned] block-state bitset for the hi-part. */
+	mpart_blkst_word_t                      *msd_hibitset; /* [0..1][owned] block-state bitset for the hi-part. */
 	struct mchunk                      *msd_himvec;   /* [0..1][owned] Dynamically allocated vector of mem-chunks. */
 };
 
@@ -561,19 +534,19 @@ mpart_split_data_alloc_hibitset(struct mpart_split_data *__restrict self) {
 	hi_num_bytes   = mpart_getsize(lopart) - self->msd_offset;
 	hi_block_count = hi_num_bytes >> lopart->mp_file->mf_blockshift;
 	assert(hi_block_count != 0);
-	if (hi_block_count > BITSET_ITEMS_PER_WORD) {
+	if (hi_block_count > MPART_BLKST_BLOCKS_PER_WORD) {
 		size_t reqsize;
-		bitset_word_t *hi_bitset;
-		reqsize = CEILDIV(hi_block_count, BITSET_ITEMS_PER_WORD) * sizeof(bitset_word_t);
+		mpart_blkst_word_t *hi_bitset;
+		reqsize = CEILDIV(hi_block_count, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
 		/* Allocate a total of `reqsize' bytes. */
-		hi_bitset = (bitset_word_t *)krealloc_nx(self->msd_hibitset, reqsize,
+		hi_bitset = (mpart_blkst_word_t *)krealloc_nx(self->msd_hibitset, reqsize,
 		                                         GFP_ATOMIC | GFP_CALLOC |
 		                                         GFP_LOCKED | GFP_PREFLT);
 		if unlikely(!hi_bitset) {
 			unlockall(lopart);
 			/* Must allocate while blocking */
 			hi_bitset = self->msd_hibitset;
-			hi_bitset = (bitset_word_t *)krealloc(self->msd_hibitset, reqsize,
+			hi_bitset = (mpart_blkst_word_t *)krealloc(self->msd_hibitset, reqsize,
 			                                      GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 			self->msd_hibitset = hi_bitset;
 			return false;
@@ -1113,7 +1086,7 @@ maybe_free_unused_mvec:
 		size_t lo_block_count;
 		lo_block_count = data.msd_offset >> file->mf_blockshift;
 		assert(lo_block_count != 0);
-		assert(lo_block_count <= BITSET_ITEMS_PER_WORD);
+		assert(lo_block_count <= MPART_BLKST_BLOCKS_PER_WORD);
 		hipart->mp_blkst_inl = lopart->mp_blkst_inl >> (lo_block_count * MPART_BLOCK_STBITS);
 maybe_free_unused_hibitset:
 		if unlikely(data.msd_hibitset != NULL) {
@@ -1125,15 +1098,15 @@ maybe_free_unused_hibitset:
 		goto maybe_free_unused_hibitset;
 	} else {
 		size_t i, hi_num_bytes, lo_block_count, hi_block_count;
-		bitset_word_t *lo_bitset;
+		mpart_blkst_word_t *lo_bitset;
 		hi_num_bytes   = mpart_getsize(lopart) - data.msd_offset;
 		lo_block_count = data.msd_offset >> file->mf_blockshift;
 		hi_block_count = hi_num_bytes >> file->mf_blockshift;
 		lo_bitset      = lopart->mp_blkst_ptr;
 		assert(hi_block_count != 0);
-		if (hi_block_count <= BITSET_ITEMS_PER_WORD) {
+		if (hi_block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Can use the inline bitset. */
-			bitset_word_t word = 0;
+			mpart_blkst_word_t word = 0;
 			for (i = 0; i < hi_block_count; ++i) {
 				unsigned int st;
 				st = vector_getblockstatus(lo_bitset, lo_block_count + i);
@@ -1144,10 +1117,10 @@ maybe_free_unused_hibitset:
 			goto maybe_free_unused_hibitset;
 		} else {
 			size_t reqsize;
-			bitset_word_t *hi_bitset = data.msd_hibitset;
+			mpart_blkst_word_t *hi_bitset = data.msd_hibitset;
 			assert(hi_bitset);
-			reqsize = CEILDIV(hi_block_count, BITSET_ITEMS_PER_WORD) *
-			          sizeof(bitset_word_t);
+			reqsize = CEILDIV(hi_block_count, MPART_BLKST_BLOCKS_PER_WORD) *
+			          sizeof(mpart_blkst_word_t);
 			assert(kmalloc_usable_size(hi_bitset) >= reqsize);
 			assert(memxchr(hi_bitset, 0, reqsize) == NULL); /* We're assuming that `hi_bitset' is zero-initialized! */
 			/* Try to truncate the actual vector length to what we need. */
@@ -1297,10 +1270,10 @@ maybe_free_unused_hibitset:
 	 *       asserted to not be the case (s.a. `mpart_lock_acquire_and_initdone_nodma()') */
 	if (!(self->mp_flags & MPART_F_BLKST_INL)) {
 		size_t block_count;
-		bitset_word_t *bitset;
+		mpart_blkst_word_t *bitset;
 		bitset      = self->mp_blkst_ptr;
 		block_count = mpart_getblockcount(self, file);
-		if (block_count <= BITSET_ITEMS_PER_WORD) {
+		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Switch over to the inline bitset. */
 			self->mp_blkst_inl = bitset[0];
 			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
@@ -1308,10 +1281,10 @@ maybe_free_unused_hibitset:
 		} else {
 			/* Truncate the bitset. */
 			size_t reqsize;
-			reqsize = CEILDIV(block_count, BITSET_ITEMS_PER_WORD) *
-			          sizeof(bitset_word_t);
+			reqsize = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD) *
+			          sizeof(mpart_blkst_word_t);
 			assert(kmalloc_usable_size(bitset) >= reqsize);
-			bitset = (bitset_word_t *)krealloc_nx(bitset, reqsize,
+			bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, reqsize,
 			                                      GFP_ATOMIC | GFP_LOCKED |
 			                                      GFP_PREFLT);
 			if likely(bitset != NULL)

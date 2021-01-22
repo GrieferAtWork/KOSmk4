@@ -341,7 +341,7 @@ DECL_END
 #define VM_UNMAP_ANYTHING         0
 #define vm_unmap(...)             mman_unmap(__VA_ARGS__)
 #define vm_protect(...)           mman_protect(__VA_ARGS__)
-#define vm_unmap_kernel_ram(...)  mman_unmap_kernel_ram(__VA_ARGS__)
+#define vm_unmap_kernel_ram(...)  mman_unmap_kram(__VA_ARGS__)
 #define vm_syncmem(self, addr, num_bytes) \
 	(mman_syncmem(self, addr, num_bytes), (u64)0)
 #define vm_read_nopf(...)               mman_read_nopf(__VA_ARGS__)
