@@ -122,7 +122,7 @@ NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self, gfp_t flags) {
 	if (flags & GFP_CALLOC)
 		memset(me, 0, sizeof(*me)); /* Ensure consistent zero-initialized-ness */
 	/* (try to) do the actual unmapping. */
-	return mman_unmap_kernel_ram_locked(self, size, flags);
+	return mman_unmap_kernel_ram_locked_ex(self, size, flags);
 }
 
 
@@ -315,7 +315,7 @@ NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
 	assert(flags & GFP_ATOMIC);
 	if (mman_lock_tryacquire(&mman_kernel)) {
 		/* Directly try to unmap kernel ram. */
-		lockop = (struct mlockop_kram *)mman_unmap_kernel_ram_locked(addr, num_bytes, flags);
+		lockop = (struct mlockop_kram *)mman_unmap_kernel_ram_locked_ex(addr, num_bytes, flags);
 		mman_lock_release(&mman_kernel);
 		if unlikely(lockop != NULL)
 			goto do_schedule_lockop;
@@ -891,9 +891,9 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
  *                lock-operation which the caller must enqueue for execution.
  *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
 PUBLIC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) struct mlockop *
-NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                            gfp_t flags) {
+NOTHROW(FCALL mman_unmap_kernel_ram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
+                                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                               gfp_t flags) {
 	byte_t *maxaddr;
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(num_bytes != 0);
@@ -1083,6 +1083,19 @@ failed:
 	}
 
 }
+
+/* Same as `mman_unmap_kernel_ram_locked_ex()', but automatically enqueue a
+ * possibly returned mlockop object into the kernel mman. */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
+                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                            gfp_t flags) {
+	struct mlockop *lop;
+	lop = mman_unmap_kernel_ram_locked_ex(addr, num_bytes, flags);
+	if (lop != NULL)
+		mman_kernel_lockop(lop);
+}
+
 
 DECL_END
 

@@ -53,11 +53,12 @@
 #define KERNEL_PHYS2VIRT_MAX  __UINT64_C(0xffffc7ffffffffff) /* Greatest address apart of the physical identity mapping */
 
 /* Accessor macros for physical identity translation. */
-#define PHYS_IS_IDENTITY(base, num_bytes) (((__u64)(base) + (__u64)(num_bytes)) <= KERNEL_PHYS2VIRT_SIZE)
-#define PHYS_TO_IDENTITY(base)            ((void *)((__u64)(base) + KERNEL_PHYS2VIRT_BASE))
-#define PHYS_IS_IDENTITY_PAGE(pageno)     ((__u64)(pageno) < __UINT64_C(0x400000000))
-#define PHYS_TO_IDENTITY_PAGE(pageno)     ((void *)(((__u64)(pageno) * 4096) + KERNEL_PHYS2VIRT_BASE))
-#endif
+#define PHYS_IS_IDENTITY(base, num_bytes) (((__UINT64_TYPE__)(base) + (__UINT64_TYPE__)(num_bytes)) <= KERNEL_PHYS2VIRT_SIZE)
+#define PHYS_TO_IDENTITY(base)            ((__BYTE_TYPE__ *)((__UINT64_TYPE__)(base) + KERNEL_PHYS2VIRT_BASE))
+#define PHYS_IS_IDENTITY_PAGE(pageno)     ((__UINT64_TYPE__)(pageno) < __UINT64_C(0x400000000))
+#define PHYS_TO_IDENTITY_PAGE(pageno)     ((__BYTE_TYPE__ *)(((__UINT64_TYPE__)(pageno) * 4096) + KERNEL_PHYS2VIRT_BASE))
+#endif /* Phys-identity-enabled */
+
 
 /* NOTE: All non-canonical bits must be equal to the most significant canonical bit.
  *       In other words: Memory addresses behave as signed with the bits 48-63 being

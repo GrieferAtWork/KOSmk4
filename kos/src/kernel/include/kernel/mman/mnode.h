@@ -135,11 +135,11 @@ struct mnode {
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 	union {
-		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 		WEAK REF struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
 		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
 		                                              *       and the node has to be inserted into the associated part's dead-node-list.
 		                                              *       Unless this has happened, this is just a regular, old pointer! */
+		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 	};
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */

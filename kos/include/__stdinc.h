@@ -736,18 +736,33 @@
 #endif /* !__COMPILER_REDIRECT */
 
 #ifdef __CC__
-#if defined(__SIZE_TYPE__) && defined(__UINTPTR_TYPE__)
-#define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
-#define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
-#elif defined(__INTELLISENSE_SIZE_TYPE__)
-/* Don't include <hybrid/typecore.h> unconditionally to keep the namespace clean (if possible) */
-#define __COMPILER_OFFSETAFTER(s, m)               ((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
-#define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__INTELLISENSE_SIZE_TYPE__)(ptr) - __builtin_offsetof(type, member)))
-#else /* ... */
+#ifdef __INTELLISENSE__
+#ifndef __INTELLISENSE_SIZE_TYPE__
 #include "hybrid/typecore.h"
+#define __INTELLISENSE_SIZE_TYPE__ __SIZE_TYPE__
+#endif /* !__INTELLISENSE_SIZE_TYPE__ */
+#define __COMPILER_OFFSETAFTER(s, m) \
+	((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
+#if defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_builtin_types_compatible_p)
+/* Syntax highlighting for improper use of `container_of' (typeof(*ptr) != typeof(type::member))
+ * Only do this with intellisense, since GCC's VLA extension might try to turn int(*)[expr(-1)]
+ * into a runtime expression `alloca((size_t)-1)' if (for some reason) it's unable to evaluate
+ * the array length expression at compile-time. */
+#define __COMPILER_CONTAINER_OF(ptr, type, member)                                 \
+	((type *)(int(*)[__builtin_types_compatible_p(__typeof__(((type *)0)->member), \
+	                                              __typeof__(*(ptr))) ? 1 : -1])   \
+	 ((__INTELLISENSE_SIZE_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#else
+#define __COMPILER_CONTAINER_OF(ptr, type, member) \
+	((type *)((__INTELLISENSE_SIZE_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#endif
+#else /* __INTELLISENSE__ */
+#if !defined(__SIZE_TYPE__) || !defined(__UINTPTR_TYPE__)
+#include "hybrid/typecore.h"
+#endif /* !__SIZE_TYPE__ || !__UINTPTR_TYPE__ */
 #define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
 #define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
-#endif /* !... */
+#endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */
 
 #ifdef __KOS_SYSTEM_HEADERS__

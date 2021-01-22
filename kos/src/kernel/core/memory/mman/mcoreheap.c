@@ -26,10 +26,13 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
+#include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mm-unmapped.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
@@ -108,6 +111,11 @@ STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
 	((page)->mcp_used[INUSE_BITSET_INDEXOF(index)] |= ((uintptr_t)1 << INUSE_BITSET_SHIFTOF(index)))
 
 
+/* The memory-file to which internal self-replication parts belong.
+ * This file must be (and is assumed to be) anonymous! */
+#define mcore_file mfile_zero
+
+
 /* The initial mem-core page. (needed to kick-start the mem-core system) */
 PRIVATE ATTR_ALIGNED(PAGESIZE) struct mcorepage _mcore_initpage = {
 	/* .mcp_link = */ { NULL, &mcoreheap_freelist.lh_first },
@@ -169,6 +177,35 @@ NOTHROW(FCALL mcorepage_allused)(struct mcorepage *__restrict self) {
 	/* Check the incomplete last word of the bitset for fully-in-use. */
 	return (self->mcp_used[MCOREPAGE_BITSET_LENGTH - 1] &
 	        LAST_BITSET_WORD_ALLUSED) == LAST_BITSET_WORD_ALLUSED;
+#endif /* MCOREPAGE_BITSET_LENGTH != 1 */
+#endif /* LAST_BITSET_WORD_PARTS != 0 */
+}
+
+/* Check if the given mcorepage is fully free. */
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL mcorepage_allfree)(struct mcorepage *__restrict self) {
+#if LAST_BITSET_WORD_PARTS == 0
+#if MCOREPAGE_BITSET_LENGTH == 1
+	return self->mcp_used[0] == 0;
+#else /* MCOREPAGE_BITSET_LENGTH == 1 */
+	unsigned int i;
+	for (i = 0; i < MCOREPAGE_BITSET_LENGTH; ++i) {
+		if (self->mcp_used[i] != 0)
+			return false; /* Still contains free slots! */
+	}
+#endif /* MCOREPAGE_BITSET_LENGTH != 1 */
+#else /* LAST_BITSET_WORD_PARTS == 0 */
+#if MCOREPAGE_BITSET_LENGTH == 1
+	return (self->mcp_used[0] & LAST_BITSET_WORD_ALLUSED) == 0;
+#else /* MCOREPAGE_BITSET_LENGTH == 1 */
+	unsigned int i;
+	for (i = 0; i < (MCOREPAGE_BITSET_LENGTH - 1); ++i) {
+		if (self->mcp_used[i] != 0)
+			return false; /* Still contains free slots! */
+	}
+	/* Check the incomplete last word of the bitset for fully-in-use. */
+	return (self->mcp_used[MCOREPAGE_BITSET_LENGTH - 1] &
+	        LAST_BITSET_WORD_ALLUSED) == 0;
 #endif /* MCOREPAGE_BITSET_LENGTH != 1 */
 #endif /* LAST_BITSET_WORD_PARTS != 0 */
 }
@@ -258,6 +295,168 @@ NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
 	mcoreheap_freecount += MCOREPAGE_PARTCOUNT;
 }
 
+
+/* Check if the given `node' has all of the
+ * required properties of a core-heap mem-node. */
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL is_coreheap_node)(struct mnode *__restrict node) {
+	struct mpart *part = node->mn_part;
+	if unlikely(!part)
+		goto nope;
+
+	/* Make sure that `part' isn't externally visible.
+	 * This is requried since we don't intend on locking the part,
+	 * meaning that we have to be certain that holding a lock to
+	 * the kernel mman will be enough to keep anyone else from
+	 * seeing the part in question. */
+	if (isshared(part))
+		goto nope;
+	if (part->mp_flags != (MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                       MPART_F_COREPART | MPART_F_MLOCK_FROZEN |
+	                       MPART_F_MLOCK))
+		goto nope;
+	if (LIST_ISBOUND(part, mp_allparts))
+		goto nope;
+	if (part->mp_file != &mcore_file)
+		goto nope;
+	if (!LIST_EMPTY(&part->mp_copy))
+		goto nope;
+	if (LIST_FIRST(&part->mp_share) != node)
+		goto nope;
+	if (LIST_NEXT(node, mn_link) != NULL)
+		goto nope;
+
+	/* Now just validate the rest. */
+	if (part->mp_state != MPART_ST_MEM)
+		goto nope;
+	if (part->mp_minaddr != 0)
+		goto nope;
+	if (part->mp_maxaddr != (pos_t)(mnode_getsize(node) - 1))
+		goto nope;
+	if (part->mp_blkst_ptr != NULL)
+		goto nope;
+	if (part->mp_meta != NULL)
+		goto nope;
+	if (node->mn_flags != (MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_SHARED |
+	                       MNODE_F_COREPART | MNODE_F_MLOCK))
+		goto nope;
+	if (node->mn_fspath != NULL)
+		goto nope;
+	if (node->mn_fsname != NULL)
+		goto nope;
+	if (node->mn_partoff != 0)
+		goto nope;
+	assert(node->mn_mman == &mman_kernel);
+	assert(node->mn_link.le_prev == &part->mp_share.lh_first);
+	assert(((size_t)part->mp_mem.mc_size * PAGESIZE) == mnode_getsize(node));
+	return true;
+nope:
+	return false;
+}
+
+
+/* Try to extend the given node by 1 page below. */
+PRIVATE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
+	struct mpart *part;
+	physpage_t ppage;
+	part  = node->mn_part;
+	ppage = part->mp_mem.mc_start - 1;
+	if (page_malloc_at(ppage) != PAGE_MALLOC_AT_SUCCESS)
+		goto fail;
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	/* If necessary, make sure that the new page is prepared! */
+	if (!pagedir_prepare_mapone(node->mn_minaddr - PAGESIZE)) {
+		page_ccfree(part->mp_mem.mc_start - 1, 1);
+		goto fail;
+	}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+	/* Success! (Start by physically mapping the new page) */
+	pagedir_mapone(node->mn_minaddr - PAGESIZE, physpage2addr(ppage),
+	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_mapone(node->mn_minaddr - PAGESIZE);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+	/* Update the node/part */
+	mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+	node->mn_minaddr -= PAGESIZE;
+	part->mp_mem.mc_start -= 1;
+	part->mp_mem.mc_size += 1;
+	part->mp_maxaddr += PAGESIZE;
+	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	return true;
+fail:
+	return false;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
+	struct mpart *part;
+	physpage_t ppage;
+	part  = node->mn_part;
+	ppage = part->mp_mem.mc_start + part->mp_mem.mc_size;
+	if (page_malloc_at(ppage) != PAGE_MALLOC_AT_SUCCESS)
+		goto fail;
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	/* If necessary, make sure that the new page is prepared! */
+	if (!pagedir_prepare_mapone(node->mn_maxaddr + 1)) {
+		page_ccfree(part->mp_mem.mc_start - 1, 1);
+		goto fail;
+	}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+	/* Success! (Start by physically mapping the new page) */
+	pagedir_mapone(node->mn_maxaddr + 1, physpage2addr(ppage),
+	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_mapone(node->mn_maxaddr + 1);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+	/* Update the node/part */
+	mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+	part->mp_mem.mc_size += 1;
+	node->mn_maxaddr += PAGESIZE;
+	part->mp_maxaddr += PAGESIZE;
+	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	return true;
+fail:
+	return false;
+}
+
+/* Try to merge the 2 given nodes.
+ * The caller has already ensured that the 2 nodes are adjacent, and that
+ * both of them fulfill the conditions checked for by `is_coreheap_node()' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
+                                         struct mnode *__restrict hi) {
+	struct mpart *lopart, *hipart;
+	lopart = lo->mn_part;
+	hipart = hi->mn_part;
+	/* Try to merge memory. */
+	if ((lopart->mp_mem.mc_start + lopart->mp_mem.mc_size) == hipart->mp_mem.mc_start) {
+		/* Simple (but rather unlikely) case: the lo- and hi-parts are physically consecutive */
+		lopart->mp_mem.mc_size += hipart->mp_mem.mc_size;
+	} else {
+		/* Cannot merge (attempting to realloc physical memory would be
+		 * prone to race conditions, since we'd have to make sure that
+		 * no-one is writing to the region we're trying to modify in the
+		 * mean time, which we can't safely do) */
+		return;
+	}
+
+	/* Fix-up mappings. */
+	mnode_tree_removenode(&mman_kernel.mm_mappings, lo);
+	mnode_tree_removenode(&mman_kernel.mm_mappings, hi);
+	lo->mn_maxaddr = hi->mn_maxaddr;
+	lopart->mp_maxaddr += mnode_getsize(hi);
+	mnode_tree_insert(&mman_kernel.mm_mappings, lo);
+	/* Destroy the existing mapping. */
+	mcoreheap_free_locked(container_of(hipart, union mcorepart, mcp_part));
+	mcoreheap_free_locked(container_of(hi, union mcorepart, mcp_node));
+}
+
 /* Try to replicate the mem-core-heap by extending a previously
  * allocated extension further.
  * If this fails, return `false'. Otherwise, return `true' on success. */
@@ -270,20 +469,41 @@ NOTHROW(FCALL mcoreheap_replicate_extend)(void) {
 			continue; /* We can never extend this one... */
 		node = mnode_tree_locate(mman_kernel.mm_mappings, page);
 		assert(node);
+		if unlikely(!is_coreheap_node(node)) /* Should always be the case, but better be sure. */
+			continue;
 		if (mnode_getminaddr(node) == page) {
 			struct mnode *prev = mnode_tree_prevnode(node);
 			if (!prev || mnode_getendaddr(prev) < mnode_getaddr(node)) {
-				/* TODO: Try to extend `node' below */
+				/* Try to extend `node' below */
+				if (mcoreheap_replicate_extend_below(node)) {
+					/* Try to merge nodes if possible. */
+					if (prev && mnode_getendaddr(prev) == mnode_getaddr(node) && is_coreheap_node(prev)) {
+						mcoreheap_try_merge_nodes(prev, node);
+					}
+					page = (struct mcorepage *)((byte_t *)page - PAGESIZE);
+					goto ok;
+				}
 			}
 		}
 		if ((void *)((byte_t *)mnode_getendaddr(node) - PAGESIZE) == page) {
 			struct mnode *next = mnode_tree_nextnode(node);
 			if (!next || mnode_getendaddr(node) < mnode_getaddr(next)) {
-				/* TODO: Try to extend `node' above */
+				/* Try to extend `node' above */
+				if (mcoreheap_replicate_extend_above(node)) {
+					/* Try to merge nodes if possible. */
+					if (next && mnode_getendaddr(node) == mnode_getaddr(next) && is_coreheap_node(next))
+						mcoreheap_try_merge_nodes(node, next);
+					page = (struct mcorepage *)((byte_t *)page + PAGESIZE);
+					goto ok;
+				}
 			}
 		}
 	}
 	return false;
+ok:
+	/* Provide the newly added page to the allocator. */
+	mcoreheap_provide_page(page);
+	return true;
 }
 
 
@@ -337,10 +557,10 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	/* Initialize the (remainder of the) mem-part */
 	part->mp_refcnt = 1;
 	part->mp_flags  = MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	                  MPART_F_BLKST_INL | MPART_F_COREPART |
-	                  MPART_F_MLOCK_FROZEN | MPART_F_MLOCK;
+	                  MPART_F_COREPART | MPART_F_MLOCK_FROZEN |
+	                  MPART_F_MLOCK;
 	part->mp_state  = MPART_ST_MEM;
-	part->mp_file   = incref(&mfile_zero);
+	part->mp_file   = incref(&mcore_file);
 	LIST_INIT(&part->mp_copy);
 	part->mp_share.lh_first = node;
 	SLIST_INIT(&part->mp_lockops);
@@ -349,7 +569,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	part->mp_minaddr = (pos_t)(0);
 	part->mp_maxaddr = (pos_t)(PAGESIZE - 1);
 	DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
-	part->mp_blkst_inl   = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+	part->mp_blkst_ptr   = NULL;
 	part->mp_mem.mc_size = 1;
 	part->mp_meta        = NULL;
 
@@ -373,6 +593,9 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	pagedir_mapone(node->mn_minaddr,
 	               physpage2addr(part->mp_mem.mc_start),
 	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_map(node->mn_minaddr, PAGESIZE);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* With everything mapped, register the new page for use. */
 	mcoreheap_provide_page((struct mcorepage *)node->mn_minaddr);
@@ -487,10 +710,16 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 		LIST_REMOVE(page, mcp_link);
 		LIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
 	} else if (mcoreheap_freecount > (MCOREPAGE_PARTCOUNT + 2)) {
-		/* TODO: If the page was fully free'd, then unmap
-		 *       the backing memory from the kernel mman.
+		/* If the page was fully free'd, then unmap the backing memory
+		 * from the kernel mman.
+		 *
 		 * Note that (with the exception of `_mcore_initpage'), we can
 		 * just use `mman_unmap_kernel_ram_locked()' to free the page! */
+		if (page != &_mcore_initpage && mcorepage_allfree(page)) {
+			LIST_REMOVE(page, mcp_link);
+			mcoreheap_freecount -= MCOREPAGE_PARTCOUNT;
+			mman_unmap_kernel_ram_locked(page, PAGESIZE);
+		}
 	}
 }
 

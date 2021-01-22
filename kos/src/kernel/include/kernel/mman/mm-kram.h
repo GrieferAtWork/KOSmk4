@@ -123,6 +123,12 @@ NOTHROW(FCALL mman_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
  *                lock-operation which the caller must enqueue for execution.
  *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
 FUNDEF WUNUSED NOBLOCK struct mlockop *
+NOTHROW(FCALL mman_unmap_kernel_ram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
+                                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                               gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+/* Same as `mman_unmap_kernel_ram_locked_ex()', but automatically enqueue a
+ * possibly returned mlockop object into the kernel mman. */
+FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kernel_ram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                             PAGEDIR_PAGEALIGNED size_t num_bytes,
                                             gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
