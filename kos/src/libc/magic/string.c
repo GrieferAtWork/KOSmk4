@@ -4146,6 +4146,52 @@ mempatq([[nonnull]] void *__restrict dst,
 }
 %#endif /* __UINT64_TYPE__ */
 
+%{
+
+/* memsetc() and mempsetc() */
+#if defined(__cplusplus) && defined(__INTELLISENSE__)
+extern "C++" {
+template<class __T, class = decltype((int)(*(__T *)0 >> 0))> __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1))
+void *__NOTHROW_NCX(memsetc)(void *__restrict __dst, __T __byte, size_t __word_count, size_t __word_size);
+template<class __T, class = decltype((int)(*(__T *)0 >> 0))> __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1))
+void *__NOTHROW_NCX(mempsetc)(void *__restrict __dst, __T __byte, size_t __word_count, size_t __word_size);
+} /* extern "C++" */
+#elif defined(__UINT64_TYPE__)
+#define memsetc(dst, word, word_count, word_size)                                       \
+	((word_size) == 1                                                                   \
+	 ? (void *)__NAMESPACE_STD_SYM memset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                                 \
+	   ? (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count)                      \
+	   : (word_size) == 4                                                               \
+	     ? (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count)                    \
+	     : (void *)memsetq(dst, (__UINT64_TYPE__)(word), word_count))
+#define mempsetc(dst, word, word_count, word_size)                    \
+	((word_size) == 1                                                 \
+	 ? (void *)mempset(dst, (int)(__UINT8_TYPE__)(word), word_count)  \
+	 : (word_size) == 2                                               \
+	   ? (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count)   \
+	   : (word_size) == 4                                             \
+	     ? (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count) \
+	     : (void *)mempsetq(dst, (__UINT64_TYPE__)(word), word_count))
+#else /* __UINT64_TYPE__ */
+#define memsetc(dst, word, word_count, word_size)                                       \
+	((word_size) == 1                                                                   \
+	 ? (void *)__NAMESPACE_STD_SYM memset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                                 \
+	   ? (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count)                      \
+	   : (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count))
+#define mempsetc(dst, word, word_count, word_size)                   \
+	((word_size) == 1                                                \
+	 ? (void *)mempset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                              \
+	   ? (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count)  \
+	   : (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count))
+#endif /* !__UINT64_TYPE__ */
+
+}
+
+
+
 [[decl_include("<hybrid/typecore.h>")]]
 [[kernel, wunused, pure, alias("memicmp", "_memicmp")]]
 [[if(!defined(__KERNEL__)), export_as("memicmp", "_memicmp")]]
@@ -6801,6 +6847,63 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
 #endif /* !__NO_XBLOCK */
 #endif /* __USE_GNU && __hybrid_alloca */
 
+
+/* >> void *memset(void *dst, int byte, size_t num_bytes);
+ * >> void *memset(void *dst, T word, size_t word_count, size_t word_size);
+ * >> void *mempset(void *dst, int byte, size_t num_bytes);
+ * >> void *mempset(void *dst, T word, size_t word_count, size_t word_size); */
+#if defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
+#if defined(__cplusplus) && defined(__INTELLISENSE__)
+extern "C++" {
+template<class __T, class = decltype((int)(*(__T *)0 >> 0))> __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1))
+void *__NOTHROW_NCX(memset)(void *__restrict __dst, __T __byte, size_t __word_count, size_t __word_size);
+#ifdef __USE_KOS
+template<class __T, class = decltype((int)(*(__T *)0 >> 0))> __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1))
+void *__NOTHROW_NCX(mempset)(void *__restrict __dst, __T __byte, size_t __word_count, size_t __word_size);
+#endif /* __USE_KOS */
+} /* extern "C++" */
+#else /* __cplusplus && __INTELLISENSE__ */
+#define __PRIVATE_memset_3 (memset)
+#ifdef __USE_KOS
+#define __PRIVATE_memset_4  memsetc
+#define __PRIVATE_mempset_3 (mempset)
+#define __PRIVATE_mempset_4 mempsetc
+#undef mempset
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define mempset(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempset_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define mempset(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempset_, (args))(args)
+#endif /* ... */
+#else /* __USE_KOS */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#ifdef __UINT64_TYPE__
+#define __PRIVATE_memset_4(dst, word, word_count, word_size)                \
+	((word_size) == 1                                                       \
+	 ? (void *)__libc_memset(dst, (int)(__UINT8_TYPE__)(word), word_count)  \
+	 : (word_size) == 2                                                     \
+	   ? (void *)__libc_memsetw(dst, (__UINT16_TYPE__)(word), word_count)   \
+	   : (word_size) == 4                                                   \
+	     ? (void *)__libc_memsetl(dst, (__UINT32_TYPE__)(word), word_count) \
+	     : (void *)__libc_memsetq(dst, (__UINT64_TYPE__)(word), word_count))
+#else /* __UINT64_TYPE__ */
+#define __PRIVATE_memset_4(dst, word, word_count, word_size)               \
+	((word_size) == 1                                                      \
+	 ? (void *)__libc_memset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                    \
+	   ? (void *)__libc_memsetw(dst, (__UINT16_TYPE__)(word), word_count)  \
+	   : (void *)__libc_memsetl(dst, (__UINT32_TYPE__)(word), word_count))
+#endif /* !__UINT64_TYPE__ */
+#endif /* !__USE_KOS */
+#undef memset
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define memset(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memset_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define memset(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memset_, (args))(args)
+#endif /* ... */
+#endif /* !__cplusplus || !__INTELLISENSE__ */
+#endif /* __USE_STRING_OVERLOADS && __HYBRID_PP_VA_OVERLOAD */
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads:

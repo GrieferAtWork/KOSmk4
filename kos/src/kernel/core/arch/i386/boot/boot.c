@@ -657,6 +657,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      on itself, its branch should simply be ignored (but if all branches
 	 *      end up being ignored, unwinding also fails) */
 
+	/* TODO: Go through all uses of `memset()' and `mempset()' and make use of
+	 *       the new 4-argument overload where appropriate. */
+
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * from inside KOS:
