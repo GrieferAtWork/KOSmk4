@@ -331,7 +331,7 @@ struct mpart_split_data {
 	struct mpartmeta                   *msd_himeta;   /* [0..1][owned] Meta-data controller for `msd_hipart'. */
 	struct mnode_slist                  msd_hinodes;  /* [0..n][owned] Linked list (via `_mn_alloc') of mem-nodes for the hi-part. */
 	size_t                              msd_hinodec;  /* # of nodes within the `msd_hinodes' list. */
-	mpart_blkst_word_t                      *msd_hibitset; /* [0..1][owned] block-state bitset for the hi-part. */
+	mpart_blkst_word_t                 *msd_hibitset; /* [0..1][owned] block-state bitset for the hi-part. */
 	struct mchunk                      *msd_himvec;   /* [0..1][owned] Dynamically allocated vector of mem-chunks. */
 };
 
@@ -540,14 +540,14 @@ mpart_split_data_alloc_hibitset(struct mpart_split_data *__restrict self) {
 		reqsize = CEILDIV(hi_block_count, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
 		/* Allocate a total of `reqsize' bytes. */
 		hi_bitset = (mpart_blkst_word_t *)krealloc_nx(self->msd_hibitset, reqsize,
-		                                         GFP_ATOMIC | GFP_CALLOC |
-		                                         GFP_LOCKED | GFP_PREFLT);
+		                                              GFP_ATOMIC | GFP_CALLOC |
+		                                              GFP_LOCKED | GFP_PREFLT);
 		if unlikely(!hi_bitset) {
 			unlockall(lopart);
 			/* Must allocate while blocking */
 			hi_bitset = self->msd_hibitset;
 			hi_bitset = (mpart_blkst_word_t *)krealloc(self->msd_hibitset, reqsize,
-			                                      GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
+			                                           GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 			self->msd_hibitset = hi_bitset;
 			return false;
 		}
@@ -1285,8 +1285,8 @@ maybe_free_unused_hibitset:
 			          sizeof(mpart_blkst_word_t);
 			assert(kmalloc_usable_size(bitset) >= reqsize);
 			bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, reqsize,
-			                                      GFP_ATOMIC | GFP_LOCKED |
-			                                      GFP_PREFLT);
+			                                           GFP_ATOMIC | GFP_LOCKED |
+			                                           GFP_PREFLT);
 			if likely(bitset != NULL)
 				self->mp_blkst_ptr = bitset;
 		}

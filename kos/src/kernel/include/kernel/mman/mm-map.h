@@ -229,7 +229,13 @@ mman_map_res(struct mman *__restrict self,
                                          * once, and fail with an E_SEGFAULT otherwise. When not set, unmapped
                                          * portions of the given address range are silently ignored. */
 #define MMAN_UNMAP_NOSPLIT       0x0002 /* Don't split nodes in order to be able to partially unmap one of them.
-                                         * Instead, only unmap whole nodes, or nothing at all. */
+                                         * Instead, only unmap whole nodes, or nothing at all. When set, all nodes
+                                         * that overlap with the given address address range will be unmapped.
+                                         * NOTE: When this flag isn't given, and an attempt is made to unmap
+                                         *       node with the `MNODE_F_NO_SPLIT' flag set, then the node won't
+                                         *       be split, but the affected address range is expanded to include
+                                         *       that node in its entirety, the same way this would also be done
+                                         *       had the `MMAN_UNMAP_NOSPLIT' been given. */
 #define MMAN_UNMAP_NOKERNPART    0x0004 /* Instead of causing kernel panic when attempting to unmap
                                          * a kernel part, simply ignore the request (this flag is set
                                          * when user-space tries to unmap memory) */
@@ -249,19 +255,19 @@ mman_unmap(struct mman *__restrict self,
 
 
 /* Update access protection flags within the given address range.
- * @param: addr:       The base address at which to start changing protection.
- * @param: num_bytes:  The number of continuous bytes of memory to change, starting at `addr'
- * @param: prot_mask:  Mask of protection bits that should be kept (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
- *                     Other bits are silently ignored.
- * @param: prot_flags: Set of protection bits that should be added (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
- *                     Other bits are silently ignored.
- * @param: flags:      Set of `MMAN_UNMAP_*'
- * @return: * :        The actual # of (possibly) altered bytes of memory. */
+ * @param: addr:      The base address at which to start changing protection.
+ * @param: num_bytes: The number of continuous bytes of memory to change, starting at `addr'
+ * @param: prot_mask: Mask of protection bits that should be kept (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
+ *                    Other bits are silently ignored.
+ * @param: prot_more: Set of protection bits that should be added (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
+ *                    Other bits are silently ignored.
+ * @param: flags:     Set of `MMAN_UNMAP_*'
+ * @return: * :       The actual # of (possibly) altered bytes of memory. */
 FUNDEF NONNULL((1)) size_t KCALL
 mman_protect(struct mman *__restrict self,
              UNCHECKED void *addr, size_t num_bytes,
-             unsigned int prot_mask, unsigned int prot_flags,
-             unsigned int how DFL(0))
+             unsigned int prot_mask, unsigned int prot_more,
+             unsigned int flags DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 

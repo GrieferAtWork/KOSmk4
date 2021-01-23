@@ -50,7 +50,7 @@ extern byte_t __kernel_pervm_size[];
 	/* .mm_weakrefcnt  = */ 1,                                                                     \
 	/* .mm_lock        = */ __MMAN_KERNEL_INIT_MM_LOCK,                                            \
 	/* .mm_mappings    = */ __NULLPTR, /* XXX: Statically initialize the initial mappings tree? */ \
-	/* .mm_pdir_phys   = */ pagedir_kernel_phys,                                                   \
+	/* .mm_pagedir_p   = */ pagedir_kernel_phys,                                                   \
 	/* .mm_writable    = */ LIST_HEAD_INITIALIZER(&mman_kernel.mm_writable),                       \
 	/* .mm_heapsize    = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,                            \
 	/* .mm_threads     = */ LIST_HEAD_INITIALIZER(&mman_kernel.mm_threads),                        \

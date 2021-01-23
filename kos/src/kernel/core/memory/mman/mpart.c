@@ -455,8 +455,8 @@ again:
 			                      MPART_BLOCK_STBITS) *
 			              sizeof(mpart_blkst_word_t);
 			bitset = (mpart_blkst_word_t *)kmalloc_nx(bitset_size,
-			                                     GFP_ATOMIC | GFP_LOCKED |
-			                                     GFP_PREFLT);
+			                                          GFP_ATOMIC | GFP_LOCKED |
+			                                          GFP_PREFLT);
 			if unlikely(!bitset) {
 				/* Must allocate the new bitset while blocking! */
 				mpart_lock_release_f(self);

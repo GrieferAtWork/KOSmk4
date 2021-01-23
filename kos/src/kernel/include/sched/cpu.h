@@ -245,9 +245,9 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 #define cpu_setvm(current_vm) cpu_setvm_ex(THIS_CPU, current_vm)
 #define cpu_setmman_ex(me, current_mm)                 \
 	(__hybrid_atomic_store((me)->c_pdir,               \
-	                       (current_mm)->mm_pdir_phys, \
+	                       (current_mm)->mm_pagedir_p, \
 	                       __ATOMIC_RELEASE),          \
-	 pagedir_set((current_mm)->mm_pdir_phys))
+	 pagedir_set((current_mm)->mm_pagedir_p))
 #define cpu_setmman(current_mm) cpu_setmman_ex(THIS_CPU, current_mm)
 
 /* Return the set of CPUs that are currently mapped to make use of `self'
@@ -278,15 +278,15 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 
 /* Return the set of CPUs using the page directory of the given VM. */
 #define vm_getcpus(self, result)   pagedir_getcpus((self)->v_pdir_phys, result)
-#define mman_getcpus(self, result) pagedir_getcpus((self)->mm_pdir_phys, result)
+#define mman_getcpus(self, result) pagedir_getcpus((self)->mm_pagedir_p, result)
 
 #else /* !CONFIG_NO_SMP */
 
 /* Set the current VM, and update the VM pointer of `self' */
 #define cpu_setvm_ex(me, current_vm)   pagedir_set((current_vm)->v_pdir_phys)
 #define cpu_setvm(current_vm)          pagedir_set((current_vm)->v_pdir_phys)
-#define cpu_setmman_ex(me, current_mm) pagedir_set((current_mm)->mm_pdir_phys)
-#define cpu_setmman(current_mm)        pagedir_set((current_mm)->mm_pdir_phys)
+#define cpu_setmman_ex(me, current_mm) pagedir_set((current_mm)->mm_pagedir_p)
+#define cpu_setmman(current_mm)        pagedir_set((current_mm)->mm_pagedir_p)
 
 #endif /* CONFIG_NO_SMP */
 

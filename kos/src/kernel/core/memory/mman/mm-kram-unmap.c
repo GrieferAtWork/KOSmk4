@@ -1121,9 +1121,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				              hiblocks * MPART_BLOCK_STBITS);
 				/* Try to release unused memory. */
 				smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
-				                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
-				                                              sizeof(mpart_blkst_word_t),
-				                                              flags);
+				                                                   CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
+				                                                   sizeof(mpart_blkst_word_t),
+				                                                   flags);
 				if likely(smaller_bitset != NULL)
 					hiset = smaller_bitset;
 				/* Write-back the updated bitsets. */
@@ -1143,9 +1143,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 			/* Try to release unused memory. */
 			smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
-			                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
-			                                              sizeof(mpart_blkst_word_t),
-			                                              flags);
+			                                                   CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
+			                                                   sizeof(mpart_blkst_word_t),
+			                                                   flags);
 			if likely(smaller_bitset != NULL)
 				hiset = smaller_bitset;
 			hipart->mp_blkst_ptr = hiset;

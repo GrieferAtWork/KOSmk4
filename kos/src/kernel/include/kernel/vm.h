@@ -162,7 +162,7 @@
 #define VM_NODE_NEXT(self)                            mnode_tree_nextnode(self)
 #define VM_NODE_PREV(self)                            mnode_tree_prevnode(self)
 #define v_pagedir                                     mm_pagedir
-#define v_pdir_phys                                   mm_pdir_phys
+#define v_pdir_phys                                   mm_pagedir_p
 #define v_refcnt                                      mm_refcnt
 #define v_weakrefcnt                                  mm_weakrefcnt
 #define v_tree                                        mm_mappings

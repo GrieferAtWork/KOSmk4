@@ -79,6 +79,26 @@ DECL_BEGIN
 	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0) |   \
 	 (((prot)&PROT_SHARED) ? MNODE_F_SHARED : 0))
 #endif /* !... */
+#if (PROT_NONE == 0 &&               \
+     PROT_EXEC == MNODE_F_PEXEC &&   \
+     PROT_WRITE == MNODE_F_PWRITE && \
+     PROT_READ == MNODE_F_PREAD)
+#define mnodeflags_from_prot_noshared(prot) \
+	((prot) & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD))
+#else /* ... */
+#define mnodeflags_from_prot_noshared(prot)       \
+	((((prot)&PROT_EXEC) ? MNODE_F_PEXEC : 0) |   \
+	 (((prot)&PROT_WRITE) ? MNODE_F_PWRITE : 0) | \
+	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0))
+#endif /* !... */
+
+
+/* Evaluates to non-zero if `after' is more restrictive than `before',
+ * in that at least one of the permissions from `before' is no longer
+ * apart of `after'. */
+#define mnodeflags_prot_more_restrictive(before, after) \
+	((((before) & ~(after)) & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) != 0)
+
 
 /* >> unsigned int mapflags_from_gfp(gfp_t gfp);
  * Convert `GFP_*' to `MAP_*':

@@ -43,46 +43,6 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
-/* Unmap all memory mappings within the given address range.
- * The actual range is widened to include all whole pages that overlap the given range.
- * @param: addr:      The base address at which to start unmapping memory.
- * @param: num_bytes: The # of continuous bytes of memory to unmap, starting at `addr'
- * @param: flags:     Set of `MMAN_UNMAP_*'
- * @return: * :       The actual # of unmapped bytes of memory. */
-PUBLIC NONNULL((1)) size_t KCALL
-mman_unmap(struct mman *__restrict self,
-           UNCHECKED void *addr, size_t num_bytes,
-           unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-
-
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
-
-/* Update access protection flags within the given address range.
- * @param: addr:       The base address at which to start changing protection.
- * @param: num_bytes:  The number of continuous bytes of memory to change, starting at `addr'
- * @param: prot_mask:  Mask of protection bits that should be kept (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
- *                     Other bits are silently ignored.
- * @param: prot_flags: Set of protection bits that should be added (Set of `PROT_EXEC | PROT_WRITE | PROT_READ').
- *                     Other bits are silently ignored.
- * @param: flags:      Set of `MMAN_UNMAP_*'
- * @return: * :        The actual # of (possibly) altered bytes of memory. */
-PUBLIC NONNULL((1)) size_t KCALL
-mman_protect(struct mman *__restrict self,
-             UNCHECKED void *addr, size_t num_bytes,
-             unsigned int prot_mask, unsigned int prot_flags,
-             unsigned int how)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
-
 /* Sync all changes made to file mappings within the given
  * address range with on-disk file images. (s.a. `mfile_sync()')
  * NOTE: Memory ranges that aren't actually mapped, aren't mapped

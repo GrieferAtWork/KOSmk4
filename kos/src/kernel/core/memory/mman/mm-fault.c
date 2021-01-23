@@ -852,9 +852,9 @@ pcopy_free_unused_block_status:
 				assert(block_count <= mpart_getblockcount(part, part->mp_file));
 				/* Copy over block-status bitset data. */
 				copy->mp_blkst_ptr = (mpart_blkst_word_t *)memcpy(self->mfl_ucdat.ucd_ucmem.scd_bitset,
-				                                             part->mp_blkst_ptr,
-				                                             block_count / MPART_BLKST_BLOCKS_PER_WORD,
-				                                             sizeof(mpart_blkst_word_t));
+				                                                  part->mp_blkst_ptr,
+				                                                  block_count / MPART_BLKST_BLOCKS_PER_WORD,
+				                                                  sizeof(mpart_blkst_word_t));
 				DBG_inval(self->mfl_ucdat.ucd_ucmem.scd_bitset);
 			}
 

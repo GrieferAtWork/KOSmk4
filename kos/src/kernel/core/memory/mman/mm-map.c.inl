@@ -20,12 +20,13 @@
 #ifdef __INTELLISENSE__
 #include "mm-map.c"
 //#define DEFINE_mman_map
-//#define DEFINE_mman_map_subrange
-#define DEFINE_mman_map_res
+#define DEFINE_mman_map_subrange
+//#define DEFINE_mman_map_res
 #endif /* __INTELLISENSE__ */
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-flags.h>
@@ -33,6 +34,7 @@
 #include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mm-unmapped.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <misc/unlockinfo.h>
@@ -87,16 +89,16 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 				assert(num_words >= 2);
 				bitset = (mpart_blkst_word_t *)kmalloc(num_words * sizeof(mpart_blkst_word_t),
 #if MPART_BLOCK_ST_NDEF == 0
-				                                  GFP_CALLOC |
+				                                       GFP_CALLOC |
 #endif /* MPART_BLOCK_ST_NDEF == 0 */
-				                                  GFP_LOCKED | GFP_PREFLT);
+				                                       GFP_LOCKED | GFP_PREFLT);
 				part->mp_blkst_ptr = bitset;
 			}
 			part->mp_state = MPART_ST_VOID;
 			part->mp_file  = &mfile_zero; /* incref'd later! */
 			LIST_INIT(&part->mp_copy);
 			LIST_INIT(&part->mp_share);
-			SLIST_INIT(&part->mp_deadnodes);
+			SLIST_INIT(&part->mp_lockops);
 			LIST_ENTRY_UNBOUND_INIT(part, mp_allparts);
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 			part->mp_minaddr = (pos_t)0;
@@ -396,7 +398,7 @@ again_lock_mfile_map:
 				goto again_lock_mfile_map; /* Locks were released -> Try again */
 
 			/* Make sure that the target address range is prepared within the page directory. */
-			if (!pagedir_prepare_map_p(self->mm_pdir_phys, result, num_bytes)) {
+			if (!pagedir_prepare_map_p(self->mm_pagedir_p, result, num_bytes)) {
 				/* Failed to prepare the backing page directory... :( */
 #ifdef HAVE_FILE
 				mfile_map_release(&map.mmwu_map);
@@ -483,7 +485,7 @@ do_insert_mappings:
 				       LIST_NEXT(node, mn_link) != NULL || !mfile_isanon(part->mp_file)))
 					map_prot &= ~PAGEDIR_MAP_FWRITE; /* Must do lazy unshare! */
 			}
-			map_prot = mpart_mmap_p(part, self->mm_pdir_phys,
+			map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
 			                        mnode_getaddr(node),
 			                        mnode_getsize(node),
 			                        node->mn_partoff,
@@ -526,7 +528,7 @@ do_insert_mappings:
 		node->mn_mman = self;
 		node->mn_minaddr += (uintptr_t)result;
 		node->mn_maxaddr += (uintptr_t)result;
-		map_prot = mpart_mmap_p(part, self->mm_pdir_phys,
+		map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
 		                        mnode_getaddr(node),
 		                        mnode_getsize(node),
 		                        node->mn_partoff,
@@ -545,13 +547,13 @@ do_insert_mappings:
 #ifdef DEFINE_mman_map_res
 	/* Since it essentially got replaced with nothing, unmap any pre-existing mappings. */
 	if (!SLIST_EMPTY(&old_mappings))
-		pagedir_unmap_p(self->mm_pdir_phys, result, num_bytes);
+		pagedir_unmap_p(self->mm_pagedir_p, result, num_bytes);
 #endif /* DEFINE_mman_map_res */
 
 	/* If we're not supposed to keep the mappings prepared, then
 	 * clear unprepare them now. */
 	if (!(flags & MAP_PREPARED))
-		pagedir_unprepare_map_p(self->mm_pdir_phys, result, num_bytes);
+		pagedir_unprepare_map_p(self->mm_pagedir_p, result, num_bytes);
 
 	/* If some other mapping was there before, then we must invalidate
 	 * the page directory cache so-as to prevent any stale entires.

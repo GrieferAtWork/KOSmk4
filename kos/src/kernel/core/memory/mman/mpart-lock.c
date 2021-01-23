@@ -430,15 +430,16 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 	if likely(req_size > avl_size) {
 		/* Must allocate a larger bitset. */
 		new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->scd_bitset, req_size,
-		                                          GFP_LOCKED | GFP_ATOMIC |
-		                                          GFP_PREFLT | gfp_flags);
+		                                               GFP_LOCKED | GFP_ATOMIC |
+		                                               GFP_PREFLT | gfp_flags);
 		if unlikely(!new_bitset) {
 			/* Must allocate the bitset while blocking. */
 			mpart_lock_release_f(self);
 			unlockinfo_xunlock(unlock);
 			TRY {
 				data->scd_bitset = (mpart_blkst_word_t *)krealloc(data->scd_bitset, req_size,
-				                                             GFP_LOCKED | GFP_PREFLT | gfp_flags);
+				                                                  GFP_LOCKED | GFP_PREFLT |
+				                                                  gfp_flags);
 			} EXCEPT {
 				mpart_deadnodes_reap(self);
 				RETHROW();
@@ -448,8 +449,8 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 		data->scd_bitset = new_bitset;
 	} else if (req_size < avl_size) {
 		new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->scd_bitset, req_size,
-		                                          GFP_LOCKED | GFP_ATOMIC |
-		                                          GFP_PREFLT | gfp_flags);
+		                                               GFP_LOCKED | GFP_ATOMIC |
+		                                               GFP_PREFLT | gfp_flags);
 		if likely(new_bitset != NULL)
 			data->scd_bitset = new_bitset;
 	}
@@ -1151,14 +1152,14 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
 	/* This is the case where we need the dynamically allocated block-status bitset. */
 	reqsize = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
 	bitset  = (mpart_blkst_word_t *)krealloc_nx(data->ucd_ucmem.scd_bitset, reqsize,
-	                                       GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
+                                               GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 	if unlikely(!bitset) {
 		/* Must allocate while blocking. */
 		mpart_lock_release_f(self);
 		unlockinfo_xunlock(unlock);
 		TRY {
 			bitset = (mpart_blkst_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
-			                                   GFP_LOCKED | GFP_PREFLT);
+			                                        GFP_LOCKED | GFP_PREFLT);
 		} EXCEPT {
 			mpart_deadnodes_reap(self);
 			RETHROW();
@@ -1317,7 +1318,7 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
 			continue; /* Skip dead nodes. */
 		if (start_node->mn_flags & (MNODE_F_MPREPARED | MNODE_F_UNMAPPED))
 			continue; /* Skip nodes already prepared, or ones that were unmapped. */
-		pagedir_unprepare_map_p(start_node->mn_mman->mm_pdir_phys,
+		pagedir_unprepare_map_p(start_node->mn_mman->mm_pagedir_p,
 		                        mnode_getaddr(start_node),
 		                        mnode_getsize(start_node));
 	}
@@ -1338,7 +1339,7 @@ try_prepare_mmans_or_throw(struct mpart *__restrict self,
 			continue; /* Skip nodes that were unmapped. */
 		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 			/* Prepare the page directory. */
-			if unlikely(!pagedir_prepare_map_p(node->mn_mman->mm_pdir_phys,
+			if unlikely(!pagedir_prepare_map_p(node->mn_mman->mm_pagedir_p,
 			                                   mnode_getaddr(node),
 			                                   mnode_getsize(node)))
 				goto err_badalloc;
@@ -1501,9 +1502,9 @@ free_unused_block_status:
 		assert(block_count <= mpart_getblockcount(self, self->mp_file));
 		/* Copy over block-status bitset data. */
 		copy->mp_blkst_ptr = (mpart_blkst_word_t *)memcpy(data->ucd_ucmem.scd_bitset,
-		                                             self->mp_blkst_ptr,
-		                                             block_count / MPART_BLKST_BLOCKS_PER_WORD,
-		                                             sizeof(mpart_blkst_word_t));
+		                                                  self->mp_blkst_ptr,
+		                                                  block_count / MPART_BLKST_BLOCKS_PER_WORD,
+		                                                  sizeof(mpart_blkst_word_t));
 		DBG_inval(data->ucd_ucmem.scd_bitset);
 	}
 
@@ -1562,7 +1563,7 @@ free_unused_block_status:
 			if (ADDR_ISUSER(addr))
 				prot |= PAGEDIR_MAP_FUSER; /* XXX: Maybe get rid of this eventually? */
 
-			mpart_mmap_p(copy, mm->mm_pdir_phys, addr,
+			mpart_mmap_p(copy, mm->mm_pagedir_p, addr,
 			             size, node->mn_partoff, prot);
 
 			/* Unlink the node from the writable-chain. */
@@ -1571,7 +1572,7 @@ free_unused_block_status:
 
 			if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 				/* With the new mapping in place, unprepare the page directory. */
-				pagedir_unprepare_map_p(mm->mm_pdir_phys, addr, size);
+				pagedir_unprepare_map_p(mm->mm_pagedir_p, addr, size);
 			}
 
 			/* Sync memory within the affected area. After all: The backing

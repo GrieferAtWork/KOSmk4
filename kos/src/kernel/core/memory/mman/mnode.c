@@ -96,7 +96,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	if (self->mn_flags & MNODE_F_MPREPARED) {
 		REF struct mman *mm = self->mn_mman;
 		if (tryincref(mm)) {
-			pagedir_phys_t pd = self->mn_mman->mm_pdir_phys;
+			pagedir_phys_t pd = self->mn_mman->mm_pagedir_p;
 			pagedir_unprepare_map_p(pd, mnode_getaddr(self), mnode_getsize(self));
 			decref_unlikely(mm);
 		}
@@ -222,7 +222,7 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 	        "How could we have been added to the list of writable nodes "
 	        "when we're not actually supposed to be writable at all?");
 
-	pdir = mm->mm_pdir_phys;
+	pdir = mm->mm_pagedir_p;
 	addr = mnode_getaddr(self);
 	size = mnode_getsize(self);
 

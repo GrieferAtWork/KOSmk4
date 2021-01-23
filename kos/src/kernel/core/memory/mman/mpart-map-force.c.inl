@@ -48,6 +48,8 @@ NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t 
                                   u16 perm)
 #define LOCAL_pagedir_map(addr, num_bytes, phys) \
 	pagedir_map_p(pdir, addr, num_bytes, phys, perm)
+#define LOCAL_pagedir_unmap(addr, num_bytes) \
+	pagedir_unmap_p(pdir, addr, num_bytes)
 #elif defined(DEFINE_mpart_mmap_force)
 /* Same as `mpart_mmap_force_p()', but always map into the current page directory. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -58,6 +60,7 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
                                 u16 perm)
 #define LOCAL_pagedir_map(addr, num_bytes, phys) \
 	pagedir_map(addr, num_bytes, phys, perm)
+#define LOCAL_pagedir_unmap pagedir_unmap
 #else /* ... */
 #error "Bad configuration"
 #endif /* !... */
@@ -105,13 +108,15 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
 		}
 	}	break;
 
-	/* Other part-types can't be mapped into memory... */
 
 	default:
+		/* Other part-types can't be mapped into memory... */
+		LOCAL_pagedir_unmap(addr, size);
 		break;
 	}
 }
 
+#undef LOCAL_pagedir_unmap
 #undef LOCAL_pagedir_map
 
 DECL_END

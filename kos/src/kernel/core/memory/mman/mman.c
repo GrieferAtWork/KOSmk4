@@ -68,7 +68,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
 	assert(self != THIS_MMAN);
 	assert(self != &mman_kernel);
-	pagedir_fini2(&self->mm_pagedir, self->mm_pdir_phys);
+	pagedir_fini2(&self->mm_pagedir, self->mm_pagedir_p);
 	assert(LIST_EMPTY(&self->mm_threads));
 
 	/* Invoke per-VM finalizer callbacks. */

@@ -647,16 +647,16 @@ mfile_private_makepart(struct mfile *__restrict self,
 			TRY {
 				bitset = (mpart_blkst_word_t *)kmalloc(num_words * sizeof(mpart_blkst_word_t),
 #if MPART_BLOCK_ST_NDEF == 0
-				                                  GFP_CALLOC |
+				                                       GFP_CALLOC |
 #endif /* MPART_BLOCK_ST_NDEF == 0 */
-				                                  GFP_LOCKED | GFP_PREFLT);
+				                                       GFP_LOCKED | GFP_PREFLT);
 			} EXCEPT {
 				kfree(result);
 				RETHROW();
 			}
 #if MPART_BLOCK_ST_NDEF != 0
-			__libc_memsetc(bitset, MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF),
-			               num_words, __SIZEOF_POINTER__);
+			memset(bitset, MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF),
+			       num_words, sizeof(mpart_blkst_word_t));
 #endif /* MPART_BLOCK_ST_NDEF != 0 */
 			result->mp_blkst_ptr = bitset;
 		}
