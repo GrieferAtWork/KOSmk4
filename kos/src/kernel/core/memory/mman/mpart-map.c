@@ -38,6 +38,10 @@
 #include "mpart-map.c.inl"
 #define DEFINE_mpart_mmap_p
 #include "mpart-map.c.inl"
+#define DEFINE_mpart_mmap_force
+#include "mpart-map-force.c.inl"
+#define DEFINE_mpart_mmap_force_p
+#include "mpart-map-force.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_MAP_C */

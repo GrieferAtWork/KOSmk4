@@ -61,32 +61,30 @@
 #define MNODE_F_MPREPARED 0x0800 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
                                   *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
                                   *         within the new process will have this flag cleared) */
-#define MNODE_F_MHINT     0x1000 /* [const] The page directory is set-up to hint towards this node, allowing it
-                                  *         to still be initialized lazily, but without the need to acquire any
-                                  *         sort of lock. For this, the following invariants are assumed:
+#define MNODE_F_MHINT     0x1000 /* [lock(CLEAR_ONCE)]
+                                  * The page directory is set-up to hint towards this node, allowing it
+                                  * to still be initialized lazily, but without the need to acquire any
+                                  * sort of lock. For this, the following invariants are assumed:
                                   *  - ADDRRANGE_ISKERN(mnode_getaddr(this), mnode_getendaddr(this))
-                                  *  - mn_flags & MNODE_F_SHARED
-                                  *  - mn_flags & MNODE_F_MPREPARED
-                                  *  - mn_flags & MNODE_F_MLOCK
-                                  *  - mn_flags & MNODE_F_NO_SPLIT
-                                  *  - mn_flags & MNODE_F_NO_MERGE
                                   *  - mn_mman == &mman_kernel
                                   *  - mn_part != NULL
-                                  *  - mn_part->mp_share.lh_first == this
-                                  *  - mn_link.le_prev == &mn_part->mp_share.lh_first
+                                  *  - mn_link.le_prev == &(mn_flags & MNODE_F_SHARED ? mn_part->mp_share : mn_part->mp_copy).lh_first
+                                  *  - *mn_link.le_prev = this
                                   *  - mn_link.le_next == NULL
-                                  *  - mn_part->mp_copy.lh_first == NULL
+                                  *  - (mn_flags & MNODE_F_SHARED ? mn_part->mp_copy : mn_part->mp_share).lh_first == NULL
                                   *  - !isshared(mn_part) // Not strictly enforced, but assumed. - You are allowed to
                                   *                       // reference the part elsewhere, but you mustn't change it.
                                   *  - NOBLOCK(mn_part->mp_file->mf_ops->mo_loadblocks)
                                   *  - NOTHROW(mn_part->mp_file->mf_ops->mo_loadblocks)
                                   *  - mn_part->mp_file->mf_blockshift == PAGESHIFT
                                   *  - mn_part->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS
-                                  *  - mn_part->mp_flags & MPART_F_MLOCK
-                                  *  - mn_part->mp_flags & MPART_F_MLOCK_FROZEN // Not strictly enforced
-                                  *  - mn_part->mp_flags & MPART_F_NO_SPLIT
-                                  *  - mn_part->mp_flags & MPART_F_NO_GLOBAL_REF
-                                  *  - MPART_ST_INMEM(mn_part->mp_state) */
+                                  *  - MPART_ST_INMEM(mn_part->mp_state)
+                                  * You may force a node to no longer be hinted by ensuring that all of its
+                                  * pages have been accessed at least once (read-only access is enough for this),
+                                  * and (in SMP-only) waited until `mman_kernel_hintinit_inuse' became zero.
+                                  * Afterwards, you may clear this flag. But also note that before then, you
+                                  * must also be aware of the fact that requirements imposed by `MNODE_F_NO_SPLIT'
+                                  * and `MNODE_F_NO_MERGE' also apply to nodes that are hinted! */
 #define MNODE_F_MLOCK     0x2000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
 /*efine MNODE_F_          0x4000  * ... */
 #define MNODE_F__RBRED    0x8000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
@@ -304,6 +302,17 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct m
  * kernel mman itself, this field is undefined. */
 DATDEF ATTR_PERMMAN struct mnode mman_kernel_reservation;
 
+
+#ifndef CONFIG_NO_SMP
+/* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
+ * This counter behaves similar to the in-use counter found in ATOMIC_REF, and is needed in order
+ * to allow for syncing of internal re-trace operations in `mman_unmap_kram_locked()' with
+ * other CPUs having previously started initializing hinted pages.
+ *
+ * For more information on the data race solved by this counter, see the detailed explanation
+ * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */
+DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
+#endif /* !CONFIG_NO_SMP */
 
 DECL_END
 #endif /* __CC__ */

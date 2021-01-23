@@ -32,7 +32,6 @@
 #include <hybrid/__unaligned.h>
 #include <hybrid/typecore.h>
 
-#include <asm/pageid.h>        /* __ARCH_PAGEID_TYPE */
 #include <kos/kernel/paging.h> /* `PHYS_IS_IDENTITY()' */
 
 #ifdef __CC__

@@ -71,7 +71,7 @@ STATIC_ASSERT_MSG(GFP_ATOMIC == 0x0400,
  *
  * For more information on the data race solved by this counter, see the detailed explanation
  * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */
-INTERN WEAK unsigned int mman_kernel_hintinit_inuse = 0;
+PUBLIC WEAK unsigned int mman_kernel_hintinit_inuse = 0;
 #endif /* !CONFIG_NO_SMP */
 
 

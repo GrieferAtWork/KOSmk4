@@ -22,9 +22,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
+#include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-map.h>
-#include <kernel/mman/mpart.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -76,6 +78,43 @@ DECL_BEGIN
 	 (((prot)&PROT_WRITE) ? MNODE_F_PWRITE : 0) | \
 	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0) |   \
 	 (((prot)&PROT_SHARED) ? MNODE_F_SHARED : 0))
+#endif /* !... */
+
+/* >> unsigned int mapflags_from_gfp(gfp_t gfp);
+ * Convert `GFP_*' to `MAP_*':
+ *    GFP_MAP_32BIT  -> MAP_32BIT
+ *    GFP_MAP_BELOW  -> MAP_GROWSDOWN
+ *    GFP_MAP_ABOVE  -> MAP_GROWSUP
+ *    GFP_MAP_NOASLR -> MAP_NOASLR */
+#if (GFP_MAP_32BIT == __MAP_32BIT && GFP_MAP_BELOW == __MAP_GROWSDOWN && \
+     GFP_MAP_ABOVE == __MAP_GROWSUP && GFP_MAP_NOASLR == __MAP_NOASLR)
+#define mapflags_from_gfp(gfp) \
+	((gfp) & (GFP_MAP_32BIT | GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR))
+#else /* ... */
+#define mapflags_from_gfp(gfp)                      \
+	((((gfp)&GFP_MAP_32BIT) ? __MAP_32BIT : 0) |     \
+	 (((gfp)&GFP_MAP_BELOW) ? __MAP_GROWSDOWN : 0) | \
+	 (((gfp)&GFP_MAP_ABOVE) ? __MAP_GROWSUP : 0) |   \
+	 (((gfp)&GFP_MAP_NOASLR) ? __MAP_NOASLR : 0))
+#endif /* !... */
+
+
+/* >> unsigned int mnodeflags_from_gfp(gfp_t gfp);
+ * Convert `GFP_*' to `MNODE_F_*':
+ *    GFP_MAP_PREPARED -> MNODE_F_MPREPARED
+ *    GFP_LOCKED       -> MNODE_F_MLOCK */
+#if (GFP_MAP_PREPARED == MNODE_F_MPREPARED && \
+     GFP_LOCKED == MNODE_F_MLOCK)
+#define mnodeflags_from_gfp(gfp) \
+	((gfp) & (GFP_MAP_PREPARED | GFP_LOCKED))
+#elif (GFP_MAP_PREPARED == MNODE_F_MPREPARED)
+#define mnodeflags_from_gfp(gfp)    \
+	(((gfp) & (GFP_MAP_PREPARED)) | \
+	 (((gfp)&GFP_LOCKED) ? MNODE_F_MLOCK : 0))
+#else /* ... */
+#define mnodeflags_from_gfp(gfp)                          \
+	((((gfp)&GFP_MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
+	 (((gfp)&GFP_LOCKED) ? MNODE_F_MLOCK : 0))
 #endif /* !... */
 
 

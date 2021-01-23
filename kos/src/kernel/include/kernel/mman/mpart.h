@@ -839,6 +839,23 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
                           PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                           u16 perm);
 
+/* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
+ * matter what the block-status bitset of `self' might say of the matter. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
+                                  PAGEDIR_PAGEALIGNED void *addr,
+                                  PAGEDIR_PAGEALIGNED size_t size,
+                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
+                                  u16 perm);
+
+/* Same as `mpart_mmap_force_p()', but always map into the current page directory. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
+                                PAGEDIR_PAGEALIGNED void *addr,
+                                PAGEDIR_PAGEALIGNED size_t size,
+                                PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
+                                u16 perm);
+
 /* For use with `MNODE_F_MHINT':
  *  - Ensure that the pages (== block) at the given `offset'
  *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the

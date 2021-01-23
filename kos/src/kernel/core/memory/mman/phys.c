@@ -27,6 +27,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/nopf.h>
+#include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
@@ -45,48 +46,6 @@
 #include <string.h>
 
 DECL_BEGIN
-
-#ifdef NO_PHYS_IDENTITY
-#define IF_HAVE_PHYS_IDENTITY(...)               /* nothing */
-#define IF_PHYS_IDENTITY(addr, num_bytes, ...)   (void)0
-#define IF_PHYS_IDENTITY_PAGE(addr_of_page, ...) (void)0
-#else /* NO_PHYS_IDENTITY */
-#define IF_HAVE_PHYS_IDENTITY(...) __VA_ARGS__
-#define IF_PHYS_IDENTITY(addr, num_bytes, ...)         \
-	do {                                               \
-		if likely(PHYS_IS_IDENTITY(addr, num_bytes)) { \
-			__VA_ARGS__;                               \
-		}                                              \
-	}	__WHILE0
-#define IF_PHYS_IDENTITY_PAGE(addr_of_page, ...)                        \
-	do {                                                                \
-		if likely(PHYS_IS_IDENTITY_PAGE(physaddr2page(addr_of_page))) { \
-			__VA_ARGS__;                                                \
-		}                                                               \
-	}	__WHILE0
-#endif /* !NO_PHYS_IDENTITY */
-
-#define PHYS_VARS                           \
-	PAGEDIR_PAGEALIGNED byte_t *trampoline; \
-	pagedir_pushval_t _pp_oldval
-
-
-#define phys_pushpage(addr_or_page)                             \
-	(trampoline = THIS_TRAMPOLINE, COMPILER_BARRIER(),          \
-	 _pp_oldval = pagedir_push_mapone(trampoline, addr_or_page, \
-	                                  PAGEDIR_MAP_FREAD |       \
-	                                  PAGEDIR_MAP_FWRITE),      \
-	 pagedir_syncone(trampoline), COMPILER_BARRIER(), trampoline)
-#define phys_loadpage(addr_or_page)                          \
-	(COMPILER_BARRIER(),                                     \
-	 pagedir_mapone(trampoline, addr_or_page,                \
-	                PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE), \
-	 pagedir_syncone(trampoline),                            \
-	 COMPILER_BARRIER(), trampoline)
-#define phys_pushaddr(addr) (phys_pushpage((addr) & ~PAGEMASK) + (uintptr_t)((addr) & PAGEMASK))
-#define phys_loadaddr(addr) (phys_loadpage((addr) & ~PAGEMASK) + (uintptr_t)((addr) & PAGEMASK))
-#define phys_pop()          pagedir_pop_mapone(trampoline, _pp_oldval)
-
 
 typedef union {
 	u16 w;
@@ -857,15 +816,14 @@ copypagesfromphys(USER CHECKED void *dst,
 		return;
 	map = phys_pushpage(src);
 	TRY {
-		memcpy(dst, map, PAGESIZE);
 		for (;;) {
+			memcpy(dst, map, PAGESIZE);
 			num_bytes -= PAGESIZE;
 			if (!num_bytes)
 				break;
 			dst = (byte_t *)dst + PAGESIZE;
 			src += PAGESIZE;
 			map = phys_loadpage(src);
-			memcpy(dst, map, PAGESIZE);
 		}
 	} EXCEPT {
 		phys_pop();
@@ -891,15 +849,14 @@ copypagestophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 		return;
 	map = phys_pushpage(dst);
 	TRY {
-		memcpy(map, src, PAGESIZE);
 		for (;;) {
+			memcpy(map, src, PAGESIZE);
 			num_bytes -= PAGESIZE;
 			if (!num_bytes)
 				break;
 			src = (byte_t const *)src + PAGESIZE;
 			dst += PAGESIZE;
 			map = phys_loadpage(dst);
-			memcpy(map, src, PAGESIZE);
 		}
 	} EXCEPT {
 		phys_pop();
@@ -1027,14 +984,13 @@ NOTHROW(KCALL memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, int byte
 	if unlikely(!num_bytes)
 		return;
 	map = phys_pushpage(dst);
-	memset(map, byte, PAGESIZE);
 	for (;;) {
+		memset(map, byte, PAGESIZE);
 		num_bytes -= PAGESIZE;
 		if (!num_bytes)
 			break;
 		dst += PAGESIZE;
 		map = phys_loadpage(dst);
-		memset(map, byte, PAGESIZE);
 	}
 	phys_pop();
 }

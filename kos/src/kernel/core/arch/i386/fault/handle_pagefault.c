@@ -375,7 +375,6 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void *pc) 
 
 #ifdef CONFIG_USE_NEW_VM
 #ifndef CONFIG_NO_SMP
-INTDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 #define mman_kernel_hintinit_inuse_inc() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
 #define mman_kernel_hintinit_inuse_dec() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
 #else /* !CONFIG_NO_SMP */
@@ -1011,23 +1010,26 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	}
 
 	/* Re-map the freshly faulted memory. */
-	if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-		mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-		           mf.mfl_offs, mnode_getperm(mf.mfl_node));
-	} else {
-		if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
-			mpart_lock_release(mf.mfl_part);
-			mman_lock_release(mf.mfl_mman);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+	{
+		u16 perm;
+		if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
+			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
+			                  mf.mfl_offs, mnode_getperm(mf.mfl_node));
+		} else {
+			if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
+				mpart_lock_release(mf.mfl_part);
+				mman_lock_release(mf.mfl_mman);
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+			}
+			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
+			                  mf.mfl_offs, mnode_getperm(mf.mfl_node));
+			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
 		}
-		mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-		           mf.mfl_offs, mnode_getperm(mf.mfl_node));
-		pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+		mpart_lock_release(mf.mfl_part);
+		/* If write-access was granted, add the node to the list of writable nodes. */
+		if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+		    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 	}
-	mpart_lock_release(mf.mfl_part);
-	/* If write-access was granted, add the node to the list of writable nodes. */
-	if ((mf.mfl_flags & MMAN_FAULT_F_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
-	    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 	mman_lock_release(mf.mfl_mman);
 
 	/* And we're done! */

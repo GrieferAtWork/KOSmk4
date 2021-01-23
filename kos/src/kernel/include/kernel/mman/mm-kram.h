@@ -52,7 +52,8 @@ typedef unsigned int gfp_t;
 #define GFP_MAP_NOASLR   0x40000000 /* s.a. `MAP_NOASLR' */
 
 
-/* @param: gfp: Set of:
+
+/* @param: flags: Set of:
  *   - GFP_LOCKED:       Normal behavior
  *   - GFP_PREFLT:       Prefault everything
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
@@ -64,9 +65,9 @@ typedef unsigned int gfp_t;
  *                       to resolve the dependency loop between this function needing
  *                       to call kmalloc() and kmalloc() needing to call this function.
  *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
- *                       must be combined with `MAP_POPULATE', and should also
- *                       be combined with `GFP_LOCKED' to prevent the backing
- *                       physical memory from being altered.
+ *                       should be combined with `GFP_LOCKED' to prevent the backing
+ *                       physical memory from being altered (and thus having its
+ *                       physical location altered).
  *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
  *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
  *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
@@ -74,16 +75,21 @@ typedef unsigned int gfp_t;
  *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded onto
- *     other calls to kmalloc() that may need to be made internally. */
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
+ *     other calls to kmalloc() that may need to be made internally.
+ * Returned memory will be initialized as:
+ *   - GFP_CALLOC: All zero-initialized
+ *   - else:       #ifdef  CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
+ *                 #ifndef CONFIG_DEBUG_HEAP: Undefined */
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
 mmap_map_kram(PAGEDIR_PAGEALIGNED void *hint,
               PAGEDIR_PAGEALIGNED size_t num_bytes,
-              gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
+              gfp_t flags, size_t min_alignment DFL(PAGESIZE))
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
 /* Non-throwing version of `mmap_map_kram()'. Returns `MAP_FAILED' on error. */
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
 NOTHROW(FCALL mmap_map_kram_nx)(PAGEDIR_PAGEALIGNED void *hint,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                gfp_t gfp, size_t min_alignment DFL(PAGESIZE));
+                                gfp_t flags, size_t min_alignment DFL(PAGESIZE));
 
 /* Error return value for `mmap_map_kram_nx()' */
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)

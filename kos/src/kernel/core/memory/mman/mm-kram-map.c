@@ -23,67 +23,135 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman.h>
+#include <kernel/driver.h>
+#include <kernel/heap.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-kram.h>
-#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/paging.h>
-#include <kernel/panic.h>
+#include <kernel/mman/phys-access.h>
+#include <kernel/mman/phys.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
-
-#include <kos/except.h>
 
 #include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
 
-/* @param: gfp: Set of:
- *   - GFP_LOCKED:       Normal behavior
- *   - GFP_PREFLT:       Prefault everything
- *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
- *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
- *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_VCBASE:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
- *                       This also causes the `MNODE_F_COREPART' / `MPART_F_COREPART'
- *                       flags to be set for each resp. This flag is used internally
- *                       to resolve the dependency loop between this function needing
- *                       to call kmalloc() and kmalloc() needing to call this function.
- *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
- *                       must be combined with `MAP_POPULATE', and should also
- *                       be combined with `GFP_LOCKED' to prevent the backing
- *                       physical memory from being altered.
- *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
- *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
- *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
- *   - GFP_MAP_NOASLR:   s.a. `MAP_NOASLR'
- *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
- *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
- *   - Other flags are silently ignored, but will be forwarded onto
- *     other calls to kmalloc() that may need to be made internally. */
-PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kram(PAGEDIR_PAGEALIGNED void *hint,
-              PAGEDIR_PAGEALIGNED size_t num_bytes,
-              gfp_t gfp, size_t min_alignment) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+#ifdef CONFIG_DEBUG_HEAP
+PRIVATE NONNULL((1)) void KCALL
+mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
+                         mfile_block_t UNUSED(first_block),
+                         physaddr_t buffer, size_t num_blocks) {
+	PHYS_VARS;
+	byte_t *map;
+	assert(IS_ALIGNED(buffer, PAGESIZE));
+	IF_PHYS_IDENTITY(dst, num_blocks * PAGESIZE, {
+		mempatl(PHYS_TO_IDENTITY(dst),
+		        DEBUGHEAP_FRESH_MEMORY,
+		        num_blocks * PAGESIZE);
+		return;
+	});
+	if unlikely(!num_blocks)
+		return;
+	map = phys_pushpage(buffer);
+	for (;;) {
+		mempatl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE);
+		--num_blocks;
+		if (!num_blocks)
+			break;
+		buffer += PAGESIZE;
+		map = phys_loadpage(buffer);
+	}
+	phys_pop();
 }
 
 
+PRIVATE struct mfile_ops mfile_dbgheap_ops = {
+	/* .mo_destroy    = */ NULL,
+	/* .mo_initpart   = */ NULL,
+	/* .mo_loadblocks = */ &mfile_dbgheap_loadblocks,
+};
 
-/* Non-throwing version of `mmap_map_kram()'. Returns `MAP_FAILED' on error. */
-PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
-NOTHROW(FCALL mmap_map_kram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                gfp_t gfp, size_t min_alignment) {
-	/* TODO */
-	return MAP_FAILED;
+/* Special file used to initialize debug-heap memory. */
+PRIVATE struct mfile mfile_dbgheap = MFILE_INIT_ANON(&mfile_dbgheap_ops, PAGESHIFT);
+#endif /* CONFIG_DEBUG_HEAP */
+
+
+/* Zero-initialize physical pages, but skip those with `page_iszero()' */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL bzero_pages)(PAGEDIR_PAGEALIGNED void *vbase,
+                           physpage_t pbase, physpagecnt_t count) {
+	physpagecnt_t i;
+	for (i = 0; i < count; ++i) {
+		if (!page_iszero(pbase + i))
+			bzero(vbase, PAGESIZE);
+		vbase = (byte_t *)vbase + PAGESIZE;
+	}
 }
+
+
+/* Try some things to reclaim system memory. */
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL kram_reclaim_memory)(uintptr_t *__restrict p_cache_version,
+                                   gfp_t flags) {
+	if (!(flags & GFP_NOCLRC)) {
+		if (system_clearcaches_s(p_cache_version))
+			return true;
+	}
+	if (!(flags & GFP_NOSWAP)) {
+		/* TODO: Try to off-load memory to swap. */
+	}
+	return false;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL kram_freevec)(struct mchunk *__restrict vec,
+                            size_t count) {
+	while (count) {
+		--count;
+		page_ccfree(vec[count].mc_start,
+		            vec[count].mc_size);
+	}
+	kfree(vec);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL kram_part_destroy)(struct mpart *__restrict self) {
+	switch (self->mp_state) {
+
+	case MPART_ST_MEM:
+		page_ccfree(self->mp_mem.mc_start,
+		            self->mp_mem.mc_size);
+		break;
+
+	case MPART_ST_MEM_SC:
+		assert(self->mp_mem_sc.ms_c >= 1);
+		kram_freevec(self->mp_mem_sc.ms_v,
+		             self->mp_mem_sc.ms_c);
+		break;
+
+	default:
+		break;
+	}
+	mpart_free(self);
+}
+
 
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define DEFINE_mmap_map_kram
+#include "mm-kram-map.c.inl"
+#define DEFINE_mmap_map_kram_nx
+#include "mm-kram-map.c.inl"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C */

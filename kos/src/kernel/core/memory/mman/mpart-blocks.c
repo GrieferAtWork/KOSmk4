@@ -543,14 +543,10 @@ NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
 	/* Some hinted-node-related assertions that we can make
 	 * without the need of knowing the accessing mem-node. */
 	assert(!PREEMPTION_ENABLED());
-	assert(self->mp_copy.lh_first == NULL);
 	assert(self->mp_file != NULL);
 	assert(ADDR_ISKERN(self->mp_file));
 	assert(self->mp_file->mf_blockshift == PAGESHIFT);
 	assert(self->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS);
-	assert(self->mp_flags & MPART_F_MLOCK);
-	assert(self->mp_flags & MPART_F_NO_SPLIT);
-	assert(self->mp_flags & MPART_F_NO_GLOBAL_REF);
 	assert(MPART_ST_INMEM(self->mp_state));
 
 	/* Index of the block (aka. page) that is being accessed.
@@ -636,18 +632,19 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 	assert(ADDR_ISKERN(self));
 	assert(ADDRRANGE_ISKERN(mnode_getaddr(self),
 	                        mnode_getendaddr(self)));
-	assert(self->mn_flags & MNODE_F_SHARED);
-	assert(self->mn_flags & MNODE_F_MPREPARED);
-	assert(self->mn_flags & MNODE_F_MLOCK);
-	assert(self->mn_flags & MNODE_F_NO_SPLIT);
-	assert(self->mn_flags & MNODE_F_NO_MERGE);
+	assert(self->mn_flags & MNODE_F_MHINT);
 	assert(self->mn_mman == &mman_kernel);
 	part = self->mn_part;
 	assert(part != NULL);
 	assert(ADDR_ISKERN(part));
-	assert(part->mp_share.lh_first == self);
-	assert(self->mn_link.le_prev == &part->mp_share.lh_first);
+	assert(self->mn_link.le_prev ==
+	       ((self->mn_flags & MNODE_F_SHARED)
+	        ? &part->mp_share.lh_first
+	        : &part->mp_copy.lh_first));
+	assert(*self->mn_link.le_prev == self);
 	assert(self->mn_link.le_next == NULL);
+	assert((self->mn_flags & MNODE_F_SHARED) ? LIST_EMPTY(&part->mp_copy)
+	                                         : LIST_EMPTY(&part->mp_share));
 
 	/* Call forward to the mem-part-level hint handler. */
 	mpart_hinted_mmap(part, fault_page,

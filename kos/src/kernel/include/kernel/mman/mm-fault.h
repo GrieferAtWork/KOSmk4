@@ -243,12 +243,12 @@ struct mfault {
  * >>         RETHROW();
  * >>     }
  * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
- * >>     mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
- * >>                mf.mfl_offs, mnode_getperm(mf.mfl_node));
+ * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
+ * >>                       mf.mfl_offs, mnode_getperm(mf.mfl_node));
  * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
- * >>     if (is_write && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+ * >>     if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
  * >>         LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
  * >>     mman_lock_release(mf.mfl_mman);
  * >>     // NOTE: Don't call `mfault_fini(&mf)' here!
