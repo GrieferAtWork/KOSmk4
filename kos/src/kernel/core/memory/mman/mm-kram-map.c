@@ -53,7 +53,7 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 	byte_t *map;
 	assert(IS_ALIGNED(buffer, PAGESIZE));
 	IF_PHYS_IDENTITY(dst, num_blocks * PAGESIZE, {
-		mempatl(PHYS_TO_IDENTITY(dst),
+		memsetl(PHYS_TO_IDENTITY(dst),
 		        DEBUGHEAP_FRESH_MEMORY,
 		        num_blocks * PAGESIZE);
 		return;
@@ -62,7 +62,7 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 		return;
 	map = phys_pushpage(buffer);
 	for (;;) {
-		mempatl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE);
+		memsetl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE);
 		--num_blocks;
 		if (!num_blocks)
 			break;
@@ -148,9 +148,9 @@ NOTHROW(FCALL kram_part_destroy)(struct mpart *__restrict self) {
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define DEFINE_mmap_map_kram
+#define DEFINE_mman_map_kram
 #include "mm-kram-map.c.inl"
-#define DEFINE_mmap_map_kram_nx
+#define DEFINE_mman_map_kram_nx
 #include "mm-kram-map.c.inl"
 #endif /* !__INTELLISENSE__ */
 

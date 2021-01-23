@@ -137,11 +137,17 @@ struct x86_dbg_psp0threadstate {
 	struct vm_node        **dpts_this_kernel_stacknode_link_pself;           /* Saved `this_kernel_stacknode.vn_link.ln_pself' */
 	LLIST(struct vm_node)   dpts_this_kernel_stackpart_srefs;                /* Saved `this_kernel_stackpart.dp_srefs' */
 	struct vm_ramblock     *dpts_this_kernel_stackpart_ramdata_blockv;       /* Saved `this_kernel_stackpart.dp_ramdata.rd_blockv' */
+#ifdef CONFIG_USE_NEW_VM
+	byte_t                 *dpts_this_kernel_stacknode_node_vmin;            /* Saved `this_kernel_stacknode.vn_node.a_vmin' */
+	byte_t                 *dpts_this_kernel_stacknode_node_vmax;            /* Saved `this_kernel_stacknode.vn_node.a_vmax' */
+	pos_t                   dpts_this_kernel_stackpart_tree_vmax;            /* Saved `this_kernel_stackpart.dp_tree.a_vmax' */
+#else /* CONFIG_USE_NEW_VM */
 	pageid_t                dpts_this_kernel_stacknode_node_vmin;            /* Saved `this_kernel_stacknode.vn_node.a_vmin' */
 	pageid_t                dpts_this_kernel_stacknode_node_vmax;            /* Saved `this_kernel_stacknode.vn_node.a_vmax' */
-	physpage_t              dpts_this_kernel_stackpart_ramdata_block0_start; /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_start' */
 	datapage_t              dpts_this_kernel_stackpart_tree_vmax;            /* Saved `this_kernel_stackpart.dp_tree.a_vmax' */
-	size_t                  dpts_this_kernel_stackpart_ramdata_block0_size;  /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_size' */
+#endif /* !CONFIG_USE_NEW_VM */
+	physpage_t              dpts_this_kernel_stackpart_ramdata_block0_start; /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_start' */
+	physpagecnt_t           dpts_this_kernel_stackpart_ramdata_block0_size;  /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_size' */
 };
 struct x86_dbg_psp0state {
 	struct x86_dbg_psp0threadstate dps_thistask; /* Saved psp0 information about `THIS_TASK' */

@@ -30,6 +30,8 @@
 #include <kernel/mman/mm-event.h>
 #include <kernel/mman/mm-exec.h>
 #include <kernel/mman/mm-fault.h>
+#include <kernel/mman/mm-flags.h>
+#include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/mman/mm-map.h>
 #include <kernel/mman/mm-rw.h>
@@ -166,7 +168,6 @@
 #define v_refcnt                                      mm_refcnt
 #define v_weakrefcnt                                  mm_weakrefcnt
 #define v_tree                                        mm_mappings
-#define v_heap_size                                   mm_heapsize
 #define v_treelock                                    mm_lock
 #define v_tasks                                       mm_threads.lh_first
 #define v_tasklock                                    mm_threadslock
@@ -335,13 +336,15 @@ DECL_END
 #define vm_mapres(self, hint, num_bytes, min_alignment, getfree_mode, flag) \
 	mman_map_res(self, hint, num_bytes, (getfree_mode) | (flag), min_alignment)
 
+#define VM_UNMAP_NORMAL           0
+#define VM_UNMAP_GUARD            0
+#define VM_UNMAP_RESERVE          0
+#define VM_UNMAP_ANYTHING         0
 #define VM_UNMAP_SEGFAULTIFUNUSED MMAN_UNMAP_FAULTIFUNUSED
 #define VM_UNMAP_NOSPLIT          MMAN_UNMAP_NOSPLIT
 #define VM_UNMAP_NOKERNPART       MMAN_UNMAP_NOKERNPART
-#define VM_UNMAP_ANYTHING         0
 #define vm_unmap(...)             mman_unmap(__VA_ARGS__)
 #define vm_protect(...)           mman_protect(__VA_ARGS__)
-#define vm_unmap_kernel_ram(...)  mman_unmap_kram(__VA_ARGS__)
 #define vm_syncmem(self, addr, num_bytes) \
 	(mman_syncmem(self, addr, num_bytes), (u64)0)
 #define vm_read_nopf(...)               mman_read_nopf(__VA_ARGS__)
@@ -392,6 +395,20 @@ DECL_END
 #define DEFINE_PERVM_FINI   DEFINE_PERMMAN_FINI
 #define DEFINE_PERVM_CLONE  DEFINE_PERMMAN_CLONE
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+/* Misc. functions */
+#define vm_datapart_map_ram(self, addr, perm)                  mpart_mmap_force(self, addr, mpart_getsize(self), 0, perm)
+#define vm_datapart_map_ram_p(self, pdir, addr, perm)          mpart_mmap_force_p(self, pdir, addr, mpart_getsize(self), 0, perm)
+#define vm_datapart_map_ram_autoprop(self, addr, perm)         mpart_mmap(self, addr, mpart_getsize(self), 0, perm)
+#define vm_datapart_map_ram_autoprop_p(self, pdir, addr, perm) mpart_mmap_p(self, pdir, addr, mpart_getsize(self), 0, perm)
+#define vm_getnodeofaddress(self, addr)                        mnode_tree_locate((self)->mm_mappings, addr)
+#define vm_isused(self, addr, num_bytes)                       (mnode_tree_rlocate((self)->mm_mappings, addr, (byte_t *)(addr) + (num_bytes)-1) != __NULLPTR)
+#define vm_node_insert(self)                                   mnode_tree_insert(&(self)->mn_mman->mm_mappings, self)
+#define vm_node_remove(self, addr)                             mnode_tree_remove(&(self)->mm_mappings, addr)
+#define vm_unmap_kernel_ram(addr, um_bytes, is_zero)           mman_unmap_kram(addr, um_bytes, (is_zero) ? (GFP_ATOMIC | GFP_CALLOC) : GFP_ATOMIC)
+#define vm_unmap_kernel_mapping_locked(addr, num_bytes)        mman_unmap_kram_locked(addr, um_bytes)
+#define vm_get_kernreserve_node(self)                          (&FORMMAN(self, thismman_kernel_reservation))
+
 
 #else /* CONFIG_USE_NEW_VM */
 #include <kernel/driver-callbacks.h>
@@ -1526,6 +1543,8 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datablock_destroy)(struct vm_datablock *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct vm_datablock, db_refcnt, vm_datablock_destroy);
 
+#ifndef ____devfs_datablock_defined
+#define ____devfs_datablock_defined 1
 DATDEF struct vm_datablock __devfs_datablock ASMNAME("devfs");
 
 /* Devfs locking functions */
@@ -1542,6 +1561,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL devfs_lock_endwrite)(void);
 FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_endread)(void);
 FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_end)(void);
 FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_downgrade)(void);
+#endif /* !____devfs_datablock_defined */
 
 /* Locking functions for data blocks */
 #define vm_datablock_lock_read(self)             (unlikely((self) == &__devfs_datablock) ? devfs_lock_read() : (void)rwlock_read(&(self)->db_lock))
@@ -2031,6 +2051,8 @@ struct vm {
 	                                             * many special-case exceptions to various VM-related functions.
 	                                             * NOTE: For the kernel-VM itself, this node is unused. */
 };
+
+#define vm_get_kernreserve_node(self) (&(self)->v_kernreserve)
 
 DATDEF struct vm vm_kernel;
 

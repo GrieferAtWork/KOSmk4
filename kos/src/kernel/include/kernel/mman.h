@@ -82,7 +82,6 @@ struct mman {
 	RBTREE_ROOT(struct mnode)      mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
 	PHYS pagedir_phys_t            mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
 	struct mnode_list              mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
-	size_t                         mm_heapsize;    /* [const] Size of the heap pointer used to allocated this mman. */
 	struct task_list               mm_threads;     /* [0..n][lock(!PREEMPTION && SMP_LOCK(mm_threadslock))] */
 #ifndef CONFIG_NO_SMP
 	struct atomic_lock             mm_threadslock; /* SMP-lock for `mm_threads' */
@@ -206,7 +205,7 @@ NOTHROW(FCALL _mman_lockops_reap)(gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
 #define mman_lockops_mustreap(self) \
 	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define mman_lockops_reap(self) _mman_lockops_reap(self)
+#define mman_lockops_reap(self) _mman_lockops_reap()
 #else /* __OPTIMIZE_SIZE__ */
 #define mman_lockops_reap(self)                      \
 	(void)(!mman_lockops_mustreap(self) ||           \

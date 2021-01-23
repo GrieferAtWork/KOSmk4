@@ -94,6 +94,7 @@
 /* TODO: Adjust these hints to work better in a 64-bit address space */
 #define KERNEL_VMHINT_HEAP         __KERNEL_VMHINT(0xe1200000, 0xffffffffe1200000, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
 #define KERNEL_VMHINT_LHEAP        __KERNEL_VMHINT(0xe1a00000, 0xffffffffe1a00000, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
+#define KERNEL_VMHINT_MMAN         __KERNEL_VMHINT(0xe1a00000, 0xffffffffe1a00000, VM_GETFREE_ABOVE) /* Hint for memory managers. */
 #define KERNEL_VMHINT_SLAB         __KERNEL_VMHINT(0xe8000000, 0xffffffffe8000000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
 #define KERNEL_VMHINT_DHEAP        __KERNEL_VMHINT(0xe0000000, 0xffffffffe0000000, VM_GETFREE_BELOW) /* Hint for the kernel heap used for allocating debug controllers. */
 #define KERNEL_VMHINT_COREPAGE     __KERNEL_VMHINT(0xf0000000, 0xfffffffff0000000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */

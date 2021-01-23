@@ -43,8 +43,13 @@
 
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_VM
+#define CORE_PAGE_MALLOC_ERROR MAP_FAILED
+#define CORE_PAGE_MALLOC_AUTO  MAP_FAILED
+#else /* CONFIG_USE_NEW_VM */
 #define CORE_PAGE_MALLOC_ERROR ((void *)-1)
 #define CORE_PAGE_MALLOC_AUTO  ((void *)-1)
+#endif /* !CONFIG_USE_NEW_VM */
 /* @param: mapping_target: The target page number where memory should be mapped.
  *                         When `CORE_PAGE_MALLOC_AUTO', automatically search
  *                         for a suitable location, otherwise _always_ return
@@ -65,6 +70,36 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
                                         PAGEDIR_PAGEALIGNED size_t min_alignment,
                                         gfp_t flags) {
+#ifdef CONFIG_USE_NEW_VM
+	void *result;
+	if (mapping_target == CORE_PAGE_MALLOC_AUTO) {
+		void *mapping_hint;
+		unsigned int mapping_mode;
+		mapping_hint = ATOMIC_READ(self->h_hintaddr);
+		mapping_mode = ATOMIC_READ(self->h_hintmode);
+		result = FUNC(mman_map_kram)(mapping_hint,
+		                             num_bytes,
+		                             flags | gfp_from_mapflags(mapping_mode),
+		                             min_alignment);
+#ifdef HEAP_NX
+		if (result != MAP_FAILED)
+#endif /* HEAP_NX */
+		{
+			/* Update the hint for the next allocation to be adjacent to this one. */
+			ATOMIC_CMPXCH(self->h_hintaddr, mapping_hint,
+			              mapping_mode & MAP_GROWSDOWN
+			              ? (byte_t *)result
+			              : (byte_t *)result + num_bytes);
+		}
+	} else {
+		/* Try to map memory at the specified address. */
+		result = FUNC(mman_map_kram)(mapping_target,
+		                             num_bytes,
+		                             flags | GFP_MAP_FIXED,
+		                             min_alignment);
+	}
+	return result;
+#else /* CONFIG_USE_NEW_VM */
 #define CORE_ALLOC_FLAGS                                                         \
 	(GFP_LOCKED |                                                                \
 	 GFP_PREFLT |                                                                \
@@ -573,6 +608,7 @@ err:
 		RETHROW();
 #endif /* !HEAP_NX */
 	}
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 
@@ -582,6 +618,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
                                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
                                                    PAGEDIR_PAGEALIGNED size_t min_alignment,
                                                    gfp_t flags) {
+#ifndef CONFIG_USE_NEW_VM
 	bool is_used;
 	HEAP_ASSERT(mapping_target != CORE_PAGE_MALLOC_AUTO);
 	/* Checking beforehand is much faster if the memory is already in use.
@@ -602,6 +639,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
 	vm_kernel_treelock_endwrite(); /* TODO: A read-lock is sufficient for us! */
 	if (is_used)
 		return CORE_PAGE_MALLOC_ERROR;
+#endif /* !CONFIG_USE_NEW_VM */
 	return FUNC(core_page_alloc)(self,
 	                             mapping_target,
 	                             num_bytes,

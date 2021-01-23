@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "mm-kram-map.c"
-#define DEFINE_mmap_map_kram
-//#define DEFINE_mmap_map_kram_nx
+#define DEFINE_mman_map_kram
+//#define DEFINE_mman_map_kram_nx
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/heap.h>
@@ -48,7 +48,7 @@
 
 DECL_BEGIN
 
-#ifdef DEFINE_mmap_map_kram
+#ifdef DEFINE_mman_map_kram
 /* @param: flags: Set of:
  *   - GFP_LOCKED:       Normal behavior
  *   - GFP_PREFLT:       Prefault everything
@@ -60,6 +60,9 @@ DECL_BEGIN
  *                       flags to be set for each resp. This flag is used internally
  *                       to resolve the dependency loop between this function needing
  *                       to call kmalloc() and kmalloc() needing to call this function.
+ *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
+ *                       If memory has already been mapped at that address, then simply
+ *                       return `MAP_FAILED' unconditionally.
  *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
  *                       must be combined with `MAP_POPULATE', and should also
  *                       be combined with `GFP_LOCKED' to prevent the backing
@@ -77,15 +80,14 @@ DECL_BEGIN
  *   - else:       #ifdef  CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
  *                 #ifndef CONFIG_DEBUG_HEAP: Undefined */
 PUBLIC NOBLOCK_IF(flags &GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kram(PAGEDIR_PAGEALIGNED void *hint,
-              PAGEDIR_PAGEALIGNED size_t num_bytes,
+mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment)
 THROWS(E_BADALLOC, E_WOULDBLOCK)
-#elif defined(DEFINE_mmap_map_kram_nx)
-/* Non-throwing version of `mmap_map_kram()'. Returns `MAP_FAILED' on error. */
-PUBLIC NOBLOCK_IF(flags &GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *NOTHROW(FCALL mmap_map_kram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                                                                               PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                                                                               gfp_t flags, size_t min_alignment)
+#elif defined(DEFINE_mman_map_kram_nx)
+/* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
+PUBLIC NOBLOCK_IF(flags &GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
+NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
+                                gfp_t flags, size_t min_alignment)
 #define LOCAL_NX
 #endif /* ... */
 {
@@ -105,6 +107,7 @@ PUBLIC NOBLOCK_IF(flags &GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *NOTHROW(FCALL mma
 #define LOCAL_THROW                          THROW
 #endif /* !LOCAL_NX */
 	uintptr_t cache_version = 0;
+	uintptr_t addend = 0;
 	void *result;
 	struct mnode *node = NULL;
 	struct mpart *part = NULL;
@@ -142,11 +145,13 @@ PUBLIC NOBLOCK_IF(flags &GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *NOTHROW(FCALL mma
 	 *  - GFP_CALLOC: Not needed.
 	 *  - GFP_MAP_*:  Don't interfere with recursive mapping locations.
 	 */
+	num_pages = (num_bytes + PAGESIZE - 1) >> PAGESHIFT; /* CEILDIV-style */
+	num_bytes = num_pages << PAGESHIFT; /* This enforces page-alignment for `num_bytes'! */
 	inner_flags = flags;
 	inner_flags |= GFP_LOCKED | GFP_PREFLT | GFP_VCBASE | GFP_NOOVER;
 	inner_flags &= ~(GFP_CALLOC | GFP_MAP_32BIT | GFP_MAP_PREPARED |
-	                 GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR);
-	num_pages = num_bytes >> PAGESHIFT;
+	                 GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR |
+	                 GFP_MAP_FIXED);
 
 again_lock_mman:
 	LOCAL_IFX(TRY) {
@@ -160,13 +165,43 @@ again_lock_mman:
 			});
 		}
 
-		/* Figure out where the mapping's supposed to go. */
-		result = mman_findunmapped(&mman_kernel, hint, num_bytes,
-		                           mapflags_from_gfp(flags),
-		                           min_alignment);
-		if unlikely (result == MAP_FAILED)
-			goto err_nospace_for_mapping;
-		if unlikely (num_bytes == 0) {
+		/* Figure out where the mapping's supposed to go.
+		 * For this purpose, we also accept a special flag `GFP_MAP_FIXED'! */
+		if (flags & GFP_MAP_FIXED) {
+			struct mnode *existing_node;
+			if unlikely(IS_ALIGNED((uintptr_t)hint, PAGESIZE)) {
+				addend    = (uintptr_t)hint & PAGEMASK;
+				hint      = (void *)FLOOR_ALIGN((uintptr_t)hint, PAGESIZE);
+				num_bytes = CEIL_ALIGN(num_bytes + addend, PAGESIZE);
+				num_pages = num_bytes >> PAGESHIFT;
+			}
+			result = hint;
+			/* Check if the given address range is already in-use. */
+			existing_node = mnode_tree_rlocate(mman_kernel.mm_mappings,
+			                                   (byte_t *)result,
+			                                   (byte_t *)result + num_bytes - 1);
+			if (existing_node != NULL) {
+				/* Address range is already in use. */
+				mman_lock_release(&mman_kernel);
+				/* Unconditionally return MAP_FAILED. */
+#ifdef LOCAL_NX
+				goto err;
+#else /* LOCAL_NX */
+				if unlikely(node != NULL)
+					mnode_free(node);
+				if unlikely(part != NULL)
+					kram_part_destroy(part);
+				return MAP_FAILED;
+#endif /* !LOCAL_NX */
+			}
+		} else {
+			result = mman_findunmapped(&mman_kernel, hint, num_bytes,
+			                           mapflags_from_gfp(flags),
+			                           min_alignment);
+			if unlikely(result == MAP_FAILED)
+				goto err_nospace_for_mapping;
+		}
+		if unlikely(num_bytes == 0) {
 			assert(node == NULL);
 			assert(part == NULL);
 			goto unlock_and_done;
@@ -190,49 +225,49 @@ again_lock_mman:
 		((part)->mp_state = MPART_ST_VOID, (part)->mp_flags = (flags))
 		/* Allocate the required node/part pair. */
 		if (flags & GFP_VCBASE) {
-			if likely (!node) {
+			if likely(!node) {
 				union mcorepart *cp;
 				cp = mcoreheap_alloc_locked_nx();
-				if unlikely (!cp)
+				if unlikely(!cp)
 					goto err_noheap_for_corepart;
 				node           = &cp->mcp_node;
 				node->mn_flags = MNODE_F_COREPART;
 			}
-			if likely (!part) {
+			if likely(!part) {
 				union mcorepart *cp;
 				cp = mcoreheap_alloc_locked_nx();
-				if unlikely (!cp)
+				if unlikely(!cp)
 					goto err_noheap_for_corepart;
 				part = &cp->mcp_part;
 				LOCAL_INIT_PART(part, MPART_F_COREPART);
 			}
 		} else {
-			if likely (!node) {
+			if likely(!node) {
 				node = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
 				                                  inner_flags | GFP_ATOMIC);
-				if unlikely (!node) {
+				if unlikely(!node) {
 					mman_lock_release(&mman_kernel);
 					/* Must allocate without holding a lock to the kernel mman */
 					node = (struct mnode *)LOCAL_kmalloc(sizeof(struct mnode), inner_flags);
-					LOCAL_IFNX(if unlikely (!node) goto err);
+					LOCAL_IFNX(if unlikely(!node) goto err);
 					node->mn_flags = MNODE_F_NORMAL;
-					if likely (!part) {
+					if likely(!part) {
 						part = (struct mpart *)LOCAL_kmalloc(sizeof(struct mpart), inner_flags);
-						LOCAL_IFNX(if unlikely (!part) goto err);
+						LOCAL_IFNX(if unlikely(!part) goto err);
 						LOCAL_INIT_PART(part, MPART_F_NORMAL);
 					}
 					goto again_lock_mman;
 				}
 				node->mn_flags = MNODE_F_NORMAL;
 			}
-			if likely (!part) {
+			if likely(!part) {
 				part = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
 				                                  inner_flags | GFP_ATOMIC);
-				if unlikely (!part) {
+				if unlikely(!part) {
 					mman_lock_release(&mman_kernel);
 					/* Must allocate without holding a lock to the kernel mman */
 					part = (struct mpart *)LOCAL_kmalloc(sizeof(struct mpart), inner_flags);
-					LOCAL_IFNX(if unlikely (!part) goto err);
+					LOCAL_IFNX(if unlikely(!part) goto err);
 					LOCAL_INIT_PART(part, MPART_F_NORMAL);
 					goto again_lock_mman;
 				}
@@ -385,7 +420,7 @@ do_prefault:
 			} else {
 #ifdef CONFIG_DEBUG_HEAP
 				part->mp_file = &mfile_dbgheap;
-				mempatl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes);
+				memsetl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes);
 #else  /* CONFIG_DEBUG_HEAP */
 			part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_DEBUG_HEAP */
@@ -481,7 +516,7 @@ do_prefault:
 unlock_and_done:
 		mman_lock_release(&mman_kernel);
 		/* And we're done! */
-		return result;
+		return (byte_t *)result + addend;
 
 #ifndef LOCAL_NX
 err_nophys_for_backing:
@@ -545,5 +580,5 @@ err_preempt:
 
 DECL_END
 
-#undef DEFINE_mmap_map_kram
-#undef DEFINE_mmap_map_kram_nx
+#undef DEFINE_mman_map_kram
+#undef DEFINE_mman_map_kram_nx

@@ -344,8 +344,7 @@ NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64 value) {
 			__VA_ARGS__;                                                             \
 			(num_Twords) -= (buf_Twords);                                            \
 			if (!(num_Twords))                                                       \
-				;                                                                    \
-			break;                                                                   \
+				break;                                                               \
 			(addr) += _page_bytes;                                                   \
 			phys_loadpage(addr);                                                     \
 		}                                                                            \

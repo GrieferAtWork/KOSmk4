@@ -221,11 +221,7 @@ typedef unsigned int gfp_t;
                             * NOTE: This flag only affects newly allocated pages, but doesn't affect memory allocated from previous over-allocations! */
 #define GFP_CALLOC  0x0004 /* FLAG: Allocate zero-initialized memory. (for krealloc(): only newly allocated memory is zero-initialized) */
 #define GFP_NOCLRC  0x0008 /* FLAG: Don't clear kernel caches to free up memory. */
-#define GFP_NOOVER  0x0010 /* FLAG: Don't overallocate memory when allocating new pages.
-                            *       This only affects overallocation of full pages. Allocating
-                            *       heap memory in such a way that less than 1 page of overflow
-                            *       remains will still produce some overflow that will be reserved
-                            *       for future allocations. */
+/*      GFP_        0x0010  * s.a. `GFP_MAP_FIXED' */
 #define GFP_NOMMAP  0x0020 /* FLAG: Don't map more memory to serve the allocation. Only serve the request from pre-allocated pools / overallocations. */
 #define GFP_NOTRIM  0x0020 /* FLAG: Don't unmap free memory blocks of sufficient size, but keep them as part of the preallocated cache. */
 /*      GFP_        0x0040  * s.a. `GFP_MAP_32BIT' */
@@ -261,6 +257,12 @@ typedef unsigned int gfp_t;
                             *          For more information, see `Page fault handling & non-blocking-ness',
                             *          as documented in <kernel/vm.h> */
 /*      GFP_        0x0800  * s.a. `GFP_MAP_PREPARED' */
+#define GFP_NOOVER  0x1000 /* FLAG: Don't overallocate memory when allocating new pages.
+                            *       This only affects overallocation of full pages. Allocating
+                            *       heap memory in such a way that less than 1 page of overflow
+                            *       remains will still produce some overflow that will be reserved
+                            *       for future allocations. */
+/*efine GFP_        0x2000  * ... */
 #define GFP_VCBASE  0x4000 /* FLAG: Allocate page controllers using the core-base allocators. (VmCoreBASE) */
 #define GFP_NOMOVE  0x8000 /* FLAG: Only for `heap_realloc()' / `heap_realign()': use `realloc_in_place()' semantics,
                             *       returning `NULL' (even in exception-mode) when the re-allocation is impossible

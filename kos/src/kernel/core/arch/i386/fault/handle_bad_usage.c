@@ -960,12 +960,12 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	struct vm *myvm = THIS_VM;
 
 	/* The VIO emulation will span the entirety of the KERNRESERVE node. */
-	args.vea_ptrlo = vm_node_getmin(&myvm->v_kernreserve);
-	args.vea_ptrhi = vm_node_getmax(&myvm->v_kernreserve);
+	args.vea_ptrlo = vm_node_getmin(vm_get_kernreserve_node(myvm));
+	args.vea_ptrhi = vm_node_getmax(vm_get_kernreserve_node(myvm));
 
 	/* Load VM component pointers. */
-	args.vea_args.va_file = myvm->v_kernreserve.vn_block;
-	args.vea_args.va_part  = myvm->v_kernreserve.vn_part;
+	args.vea_args.va_file = vm_get_kernreserve_node(myvm)->vn_block;
+	args.vea_args.va_part = vm_get_kernreserve_node(myvm)->vn_part;
 	assert(args.vea_args.va_file);
 	assert(args.vea_args.va_part);
 	assert(args.vea_args.va_part->dp_block == args.vea_args.va_file);
@@ -1024,10 +1024,9 @@ assert_user_address_range(struct icpustate *__restrict state,
 	if unlikely(OVERFLOW_UADD((uintptr_t)addr, num_bytes, &endaddr) ||
 	            endaddr > KERNELSPACE_BASE) {
 		struct vm *myvm = THIS_VM;
-		pageid_t pageid = PAGEID_ENCODE((uintptr_t)addr);
 		/* Dispatch the current instruction through VIO */
-		if (pageid >= vm_node_getminpageid(&myvm->v_kernreserve) &&
-		    pageid <= vm_node_getmaxpageid(&myvm->v_kernreserve)) {
+		if ((byte_t *)addr >= vm_node_getmin(vm_get_kernreserve_node(myvm)) &&
+		    (byte_t *)addr <= vm_node_getmax(vm_get_kernreserve_node(myvm))) {
 			/* Rewind the kernel stack such that `%(r|e)sp = state' before calling this function!
 			 * There is no need to keep the instruction emulation payload of `handle_bad_usage()'
 			 * on-stack when re-starting emulation for the purpose of dispatching userkern VIO. */

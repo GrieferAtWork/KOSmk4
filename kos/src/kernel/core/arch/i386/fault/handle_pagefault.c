@@ -608,7 +608,7 @@ again_lock_mman:
 							goto got_node_and_lock;
 						}
 						/* Make sure that `v_kernreserve' hasn't already been extended. */
-						krs = &FORMMAN(mm, mman_kernel_reservation);
+						krs = &FORMMAN(mm, thismman_kernel_reservation);
 						assert(mnode_getaddr(krs) == (void *)KERNELSPACE_BASE ||
 						       mnode_getaddr(krs) == (void *)COMPAT_KERNELSPACE_BASE);
 						assert(krs->mn_mman == mm);

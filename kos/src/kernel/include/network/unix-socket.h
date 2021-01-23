@@ -121,9 +121,9 @@ struct unix_server {
 };
 
 /* Initialize the given Unix domain server */
-#define unix_server_init(self)                                                                  \
-	((self)->us_max_backlog = 0,                                                                \
-	 (self)->us_acceptme    = __NULLPTR,                                                        \
+#define unix_server_init(self)           \
+	((self)->us_max_backlog = 0,         \
+	 (self)->us_acceptme    = __NULLPTR, \
 	 sig_init(&(self)->us_acceptme_sig))
 
 /* Finalize the given Unix domain server */

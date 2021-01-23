@@ -3860,10 +3860,10 @@ driver_map_into_memory(struct driver *__restrict self,
 find_new_candidate:
 	vm_kernel_treelock_read();
 	loadaddr = (uintptr_t)vm_getfree(&vm_kernel,
-	                                  HINT_GETADDR(KERNEL_VMHINT_DRIVER),
-	                                  total_bytes,
-	                                  min_alignment,
-	                                  HINT_GETMODE(KERNEL_VMHINT_DRIVER));
+	                                 HINT_GETADDR(KERNEL_VMHINT_DRIVER),
+	                                 total_bytes,
+	                                 min_alignment,
+	                                 HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 	vm_kernel_treelock_endread();
 	if unlikely(loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
 		uintptr_t version;
@@ -3875,12 +3875,12 @@ find_new_candidate:
 find_new_candidate_tryhard:
 		vm_kernel_treelock_read();
 		loadaddr = (uintptr_t)vm_getfree(&vm_kernel,
-		                                  HINT_GETADDR(KERNEL_VMHINT_DRIVER),
-		                                  total_bytes,
-		                                  min_alignment,
-		                                  HINT_GETMODE(KERNEL_VMHINT_DRIVER));
+		                                 HINT_GETADDR(KERNEL_VMHINT_DRIVER),
+		                                 total_bytes,
+		                                 min_alignment,
+		                                 HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 		vm_kernel_treelock_endread();
-		if (loadaddr == (uintptr_t)VM_PAGED_GETFREE_ERROR) {
+		if (loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
 			if (system_clearcaches_s(&version))
 				goto find_new_candidate_tryhard;
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
@@ -4534,12 +4534,12 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 		                               flags);
 	} EXCEPT {
 		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
-		          VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
+		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 		RETHROW();
 	}
 	TRY {
 		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
-		          VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
+		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 	} EXCEPT {
 		decref(result);
 		RETHROW();

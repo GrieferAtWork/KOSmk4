@@ -183,6 +183,7 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #define HINT_GETMODE(x) HINT_MODE x
 
 #ifdef CONFIG_DEBUG_HEAP
+#ifndef CONFIG_USE_NEW_VM
 PRIVATE void
 NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
                                   datapage_t UNUSED(start),
@@ -228,6 +229,7 @@ PUBLIC struct vm_datablock vm_datablock_debugheap = {
 };
 
 DEFINE_DBG_BZERO_OBJECT(vm_datablock_debugheap.db_lock);
+#endif /* !CONFIG_USE_NEW_VM */
 #endif /* CONFIG_DEBUG_HEAP */
 
 

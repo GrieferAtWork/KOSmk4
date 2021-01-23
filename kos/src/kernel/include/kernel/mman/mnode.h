@@ -300,7 +300,7 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct m
 /* A special per-MMAN node that is used to cover the kernel core
  * with a reservation within user-space memory manager. Within the
  * kernel mman itself, this field is undefined. */
-DATDEF ATTR_PERMMAN struct mnode mman_kernel_reservation;
+DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
 
 
 #ifndef CONFIG_NO_SMP

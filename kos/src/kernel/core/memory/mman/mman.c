@@ -27,14 +27,27 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mm-event.h>
+#include <kernel/mman/mm-flags.h>
+#include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/paging.h>
 
 #include <kos/except.h>
+#include <kos/kernel/paging.h>
 
 #include <assert.h>
 
+#ifdef CONFIG_USE_NEW_VM       /* TODO: REMOVE_ME */
+#include <kernel/vm.h>         /* TODO: REMOVE_ME */
+#endif /* CONFIG_USE_NEW_VM */ /* TODO: REMOVE_ME */
+
 DECL_BEGIN
+
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
+#define HINT_GETADDR(x) HINT_ADDR x
+#define HINT_GETMODE(x) HINT_MODE x
+
 
 typedef NONNULL((1)) void (KCALL *pervm_init_t)(struct vm *__restrict self) /*THROWS(...)*/;
 typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *pervm_fini_t)(struct vm *__restrict self);
@@ -54,14 +67,25 @@ PUBLIC CALLBACK_LIST(void FCALL(struct mman *)) mman_onfini_callbacks = CALLBACK
 PUBLIC CALLBACK_LIST(void FCALL(struct mman * /*newmman*/, struct mman * /*oldmman*/)) mman_onclone_callbacks = CALLBACK_LIST_INIT;
 
 
+extern byte_t __kernel_pervm_size[];
+
+#define _sizeof_mman ((size_t)__kernel_pervm_size + PAGEDIR_SIZE)
+#define _mman_alloc()                                                                              \
+	(struct mman *)mman_map_kram(HINT_GETADDR(KERNEL_VMHINT_MMAN), _sizeof_mman,                   \
+	                             gfp_from_mapflags(HINT_GETMODE(KERNEL_VMHINT_MMAN)) |             \
+                                                                                                   \
+	                             GFP_MAP_32BIT | /*TODO: `GFP_MAP_32BIT' is only needed on i386!*/ \
+	                             GFP_LOCKED | GFP_PREFLT,                                          \
+	                             alignof(struct mman))
+#define _mman_free(self) \
+	mman_unmap_kram(self, _sizeof_mman)
+
+
 
 /* Memory manager reference counting control. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
-	heap_free(&kernel_locked_heap,
-	          self,
-	          self->mm_heapsize,
-	          GFP_NORMAL);
+	_mman_free(self);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -87,12 +111,22 @@ NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
 /* Memory manager construction functions. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_new(void) THROWS(E_BADALLOC, ...) {
+	REF struct mman *result;
+	result = _mman_alloc();
+
 	/* TODO */
+
+	return result;
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_fork(void) THROWS(E_BADALLOC, ...) {
+	REF struct mman *result;
+	result = _mman_alloc();
+
 	/* TODO */
+
+	return result;
 }
 
 /* Set the mman active within the calling thread, as well as

@@ -41,8 +41,6 @@ DECL_BEGIN
 #define __MMAN_KERNEL_INIT_MM_THREADSLOCK /* nothing */
 #endif /* CONFIG_NO_SMP */
 
-extern byte_t __kernel_pervm_size[];
-
 /* Field initializers for the kernel mman (but excluding `mm_pagedir')
  * This macro is used by the arch-specific initializer for `mman_kernel' */
 #define _MMAN_KERNEL_INIT                                                                          \
@@ -52,7 +50,6 @@ extern byte_t __kernel_pervm_size[];
 	/* .mm_mappings    = */ __NULLPTR, /* XXX: Statically initialize the initial mappings tree? */ \
 	/* .mm_pagedir_p   = */ pagedir_kernel_phys,                                                   \
 	/* .mm_writable    = */ LIST_HEAD_INITIALIZER(&mman_kernel.mm_writable),                       \
-	/* .mm_heapsize    = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,                            \
 	/* .mm_threads     = */ LIST_HEAD_INITIALIZER(&mman_kernel.mm_threads),                        \
 	/* .mm_threadslock = */ __MMAN_KERNEL_INIT_MM_THREADSLOCK
 

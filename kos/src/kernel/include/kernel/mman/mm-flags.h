@@ -110,12 +110,19 @@ DECL_BEGIN
      GFP_MAP_ABOVE == __MAP_GROWSUP && GFP_MAP_NOASLR == __MAP_NOASLR)
 #define mapflags_from_gfp(gfp) \
 	((gfp) & (GFP_MAP_32BIT | GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR))
+#define gfp_from_mapflags(gfp) \
+	((gfp) & (__MAP_32BIT | __MAP_GROWSDOWN | __MAP_GROWSUP | __MAP_NOASLR))
 #else /* ... */
-#define mapflags_from_gfp(gfp)                      \
+#define mapflags_from_gfp(gfp)                       \
 	((((gfp)&GFP_MAP_32BIT) ? __MAP_32BIT : 0) |     \
 	 (((gfp)&GFP_MAP_BELOW) ? __MAP_GROWSDOWN : 0) | \
 	 (((gfp)&GFP_MAP_ABOVE) ? __MAP_GROWSUP : 0) |   \
 	 (((gfp)&GFP_MAP_NOASLR) ? __MAP_NOASLR : 0))
+#define gfp_from_mapflags(gfp)                       \
+	((((gfp)&__MAP_32BIT) ? GFP_MAP_32BIT : 0) |     \
+	 (((gfp)&__MAP_GROWSDOWN) ? GFP_MAP_BELOW : 0) | \
+	 (((gfp)&__MAP_GROWSUP) ? GFP_MAP_ABOVE : 0) |   \
+	 (((gfp)&__MAP_NOASLR) ? GFP_MAP_NOASLR : 0))
 #endif /* !... */
 
 

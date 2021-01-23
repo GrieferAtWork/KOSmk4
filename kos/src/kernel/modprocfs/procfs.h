@@ -77,7 +77,7 @@ DECL_BEGIN
 #define PROCFS_INOTYPE_MAPFILES_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_MAPFILES_NUMMASK  UINT64_C(0x00ffffff80000000) /* Mapping number shift */
 #define PROCFS_INOTYPE_MAPFILES_NUMSHIFT 31
-#define PROCFS_INOMAKE_MAPFILES(pid, num)                 \
+#define PROCFS_INOMAKE_MAPFILES(pid, num)                      \
 	(((ino_t)PROCFS_INOTYPE_MAPFILES << PROCFS_INO_TYPESHFT) | \
 	 ((ino_t)(num) << PROCFS_INOTYPE_MAPFILES_NUMSHIFT) | (ino_t)(pid))
 

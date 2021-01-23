@@ -39,17 +39,21 @@ typedef unsigned int gfp_t;
 
 
 /************************************************************************/
-/* Additional GFP_* flags for `mmap_map_kram()'                   */
+/* Additional GFP_* flags for `mman_map_kram()'                   */
 /************************************************************************/
 
+
+#define GFP_MAP_FIXED        0x0010 /* Map new kernel ram at exactly the given address.
+                                     * If the given address is already in-use, fail by
+                                     * unconditionally returning `MAP_FAILED' */
 #define GFP_MAP_32BIT        0x0040 /* The backing _physical_ memory will use 32-bit addresses.
                                      * This differs from the normal meaning of the `MAP_32BIT' flag!!! */
 #define GFP_MAP_PREPARED     0x0800 /* Set the `MNODE_F_MPREPARED' node flag, and ensure that
                                      * the backing page directory address range is kept prepared
                                      * for the duration of the node's lifetime. */
-#define GFP_MAP_BELOW        0x0100 /* s.a. `MAP_GROWSDOWN' */
-#define GFP_MAP_ABOVE        0x0200 /* s.a. `MAP_GROWSUP' */
-#define GFP_MAP_NOASLR   0x40000000 /* s.a. `MAP_NOASLR' */
+#define GFP_MAP_BELOW        0x0100 /* [valid_if(!GFP_MAP_FIXED)] s.a. `MAP_GROWSDOWN' */
+#define GFP_MAP_ABOVE        0x0200 /* [valid_if(!GFP_MAP_FIXED)] s.a. `MAP_GROWSUP' */
+#define GFP_MAP_NOASLR   0x40000000 /* [valid_if(!GFP_MAP_FIXED)] s.a. `MAP_NOASLR' */
 
 
 
@@ -64,6 +68,9 @@ typedef unsigned int gfp_t;
  *                       flags to be set for each resp. This flag is used internally
  *                       to resolve the dependency loop between this function needing
  *                       to call kmalloc() and kmalloc() needing to call this function.
+ *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
+ *                       If memory has already been mapped at that address, then simply
+ *                       return `MAP_FAILED' unconditionally.
  *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
  *                       should be combined with `GFP_LOCKED' to prevent the backing
  *                       physical memory from being altered (and thus having its
@@ -81,17 +88,15 @@ typedef unsigned int gfp_t;
  *   - else:       #ifdef  CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
  *                 #ifndef CONFIG_DEBUG_HEAP: Undefined */
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
-mmap_map_kram(PAGEDIR_PAGEALIGNED void *hint,
-              PAGEDIR_PAGEALIGNED size_t num_bytes,
+mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
-/* Non-throwing version of `mmap_map_kram()'. Returns `MAP_FAILED' on error. */
+/* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
-NOTHROW(FCALL mmap_map_kram_nx)(PAGEDIR_PAGEALIGNED void *hint,
-                                PAGEDIR_PAGEALIGNED size_t num_bytes,
+NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
                                 gfp_t flags, size_t min_alignment DFL(PAGESIZE));
 
-/* Error return value for `mmap_map_kram_nx()' */
+/* Error return value for `mman_map_kram_nx()' */
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED
 #endif /* !MAP_FAILED && __MAP_FAILED */

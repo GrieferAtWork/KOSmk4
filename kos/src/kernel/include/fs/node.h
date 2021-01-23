@@ -838,6 +838,12 @@ struct inode
 #else /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 #define __inode_as_datablock(x)   (x)
 #endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
+#ifdef CONFIG_USE_NEW_VM
+	struct rwlock       i_lock;         /* Lock for this INode */
+#define __inode_lock(self) (&(self)->i_lock)
+#else /* CONFIG_USE_NEW_VM */
+#define __inode_lock(self) (&__inode_as_datablock(self)->db_lock)
+#endif /* !CONFIG_USE_NEW_VM */
 	struct inode_type  *i_type;         /* [1..1][const] INode type. */
 	REF struct superblock *i_super;     /* [1..1][const][REF_IF(!= this)] The associated superblock. */
 	struct inode_data  *i_fsdata;       /* [?..?][lock(this)] A pointer to inode-specific user-data. */
@@ -884,28 +890,48 @@ struct inode
 #if (!defined(__INTELLISENSE__) || \
      !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT))
 
+#ifndef ____devfs_datablock_defined
+#define ____devfs_datablock_defined 1
+DATDEF struct vm_datablock __devfs_datablock ASMNAME("devfs");
+
+/* Devfs locking functions */
+FUNDEF void KCALL devfs_lock_read(void) THROWS(E_BADALLOC, E_INTERRUPT, ...);
+FUNDEF void KCALL devfs_lock_write(void) THROWS(E_INTERRUPT, ...);
+FUNDEF bool KCALL devfs_lock_upgrade(void) THROWS(E_WOULDBLOCK, E_INTERRUPT, ...);
+FUNDEF bool NOTHROW(KCALL devfs_lock_read_nx)(void);
+FUNDEF bool NOTHROW(KCALL devfs_lock_write_nx)(void);
+FUNDEF unsigned int NOTHROW(KCALL devfs_lock_upgrade_nx)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_tryread)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_trywrite)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_tryupgrade)(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL devfs_lock_endwrite)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_endread)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_end)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_downgrade)(void);
+#endif /* !____devfs_datablock_defined */
+
 /* When locking an INode, it is no longer unlikely that that Inode is devfs.
  * For this reason, re-define sync functions for INodes to explicitly get
  * rid of the unlikely() for the DEVFS comparison. */
-#define inode_lock_read(self)             (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_read() : (void)rwlock_read(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_write(self)            (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_write() : (void)rwlock_write(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_upgrade(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_upgrade() : rwlock_upgrade(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_read_nx(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_read_nx() : rwlock_read_nx(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_write_nx(self)         (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_write_nx() : rwlock_write_nx(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_upgrade_nx(self)       (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_upgrade_nx() : rwlock_upgrade_nx(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_tryread(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_tryread() : rwlock_tryread(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_trywrite(self)         (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_trywrite() : rwlock_trywrite(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_tryupgrade(self)       (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_tryupgrade() : rwlock_tryupgrade(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_endwrite(self)         (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_endwrite() : rwlock_endwrite(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_endread(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_endread() : rwlock_endread(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_end(self)              (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_end() : rwlock_end(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_downgrade(self)        (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_downgrade() : rwlock_downgrade(&__inode_as_datablock(self)->db_lock))
-#define inode_lock_reading(self)          rwlock_reading(&__inode_as_datablock(self)->db_lock)
-#define inode_lock_writing(self)          rwlock_writing(&__inode_as_datablock(self)->db_lock)
-#define inode_lock_canread(self)          rwlock_canread(&__inode_as_datablock(self)->db_lock)
-#define inode_lock_canwrite(self)         rwlock_canwrite(&__inode_as_datablock(self)->db_lock)
-#define inode_lock_pollread(self)         rwlock_pollread(&__inode_as_datablock(self)->db_lock)
-#define inode_lock_connect_for_poll(self) rwlock_connect_for_poll(&__inode_as_datablock(self)->db_lock)
+#define inode_lock_read(self)             (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_read() : (void)rwlock_read(__inode_lock(self)))
+#define inode_lock_write(self)            (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_write() : (void)rwlock_write(__inode_lock(self)))
+#define inode_lock_upgrade(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_upgrade() : rwlock_upgrade(__inode_lock(self)))
+#define inode_lock_read_nx(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_read_nx() : rwlock_read_nx(__inode_lock(self)))
+#define inode_lock_write_nx(self)         (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_write_nx() : rwlock_write_nx(__inode_lock(self)))
+#define inode_lock_upgrade_nx(self)       (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_upgrade_nx() : rwlock_upgrade_nx(__inode_lock(self)))
+#define inode_lock_tryread(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_tryread() : rwlock_tryread(__inode_lock(self)))
+#define inode_lock_trywrite(self)         (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_trywrite() : rwlock_trywrite(__inode_lock(self)))
+#define inode_lock_tryupgrade(self)       (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_tryupgrade() : rwlock_tryupgrade(__inode_lock(self)))
+#define inode_lock_endwrite(self)         (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_endwrite() : rwlock_endwrite(__inode_lock(self)))
+#define inode_lock_endread(self)          (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_endread() : rwlock_endread(__inode_lock(self)))
+#define inode_lock_end(self)              (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_end() : rwlock_end(__inode_lock(self)))
+#define inode_lock_downgrade(self)        (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_downgrade() : rwlock_downgrade(__inode_lock(self)))
+#define inode_lock_reading(self)          rwlock_reading(__inode_lock(self))
+#define inode_lock_writing(self)          rwlock_writing(__inode_lock(self))
+#define inode_lock_canread(self)          rwlock_canread(__inode_lock(self))
+#define inode_lock_canwrite(self)         rwlock_canwrite(__inode_lock(self))
+#define inode_lock_pollread(self)         rwlock_pollread(__inode_lock(self))
+#define inode_lock_connect_for_poll(self) rwlock_connect_for_poll(__inode_lock(self))
 __DEFINE_SYNC_RWLOCK(struct inode,
                      inode_lock_tryread,
                      inode_lock_read,
