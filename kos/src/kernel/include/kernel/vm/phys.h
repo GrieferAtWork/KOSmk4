@@ -78,7 +78,6 @@
 #define vm_ptram_mappage(self, page, ...)                 mptram_mappage(self, page)
 #define vm_ptram_map_noidentity(self, addr, ...)          mptram_map_noidentity(self, addr)
 #define vm_ptram_map(self, addr, ...)                     mptram_map(self, addr)
-#endif /* __CC__ */
 
 #else /* CONFIG_USE_NEW_VM */
 
