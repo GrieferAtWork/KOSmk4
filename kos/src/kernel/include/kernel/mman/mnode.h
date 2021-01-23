@@ -151,6 +151,19 @@ struct mnode {
 	                                                  * with write-access enabled (which happens lazily upon first access)
 	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+	/* TODO: `struct usermod' and `struct driver' integration right here!
+	 *       For this, add a field [0..1] `union { REF struct usermod *, ... }',
+	 *       For `mman_kernel', it'll always be a `driver', and elsewhere a `usermod'
+	 * The field itself would simply behave the same as `mn_fspath'/`mn_fspath'
+	 * already do, with the addition of being [lock(mn_mman->mm_lock && WRITE_ONCE)],
+	 * thus allowing for lazy initialization. (But also note that in the case of a
+	 * driver, it shouldn't be a `REF', but rather an implicit weak-ref, since the
+	 * node shouldn't prevent the driver from being destroyed, and the driver should
+	 * automatically get rid of all nodes it may be mapping during unloading)
+	 *
+	 * NOTE: Since the current usermod/driver system isn't integrated into the old vm
+	 *       system, this is something that should only be tackled once the new mman
+	 *       has been enabled in all other aspects! */
 };
 
 

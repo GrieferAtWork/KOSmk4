@@ -433,9 +433,9 @@ NOTHROW(FCALL mchunkvec_truncate)(struct mchunkvec *__restrict self,
 				} else {
 					struct mchunk *vec;
 					vec = (struct mchunk *)krealloc_nx(self->ms_v,
-					                                   new_count * sizeof(struct mchunk),
-					                                   GFP_LOCKED | GFP_PREFLT |
-					                                   (flags & ~GFP_CALLOC));
+					                                   new_count *
+					                                   sizeof(struct mchunk),
+					                                   flags);
 					if likely(vec != NULL)
 						self->ms_v = vec;
 				}
@@ -472,9 +472,9 @@ NOTHROW(FCALL mchunkvec_truncate_leading)(struct mchunkvec *__restrict self,
 
 	/* Try to free unused memory. */
 	vec = (struct mchunk *)krealloc_nx(self->ms_v,
-	                                   self->ms_c * sizeof(struct mchunk),
-	                                   GFP_LOCKED | GFP_PREFLT |
-	                                   (flags & ~GFP_CALLOC));
+	                                   self->ms_c *
+	                                   sizeof(struct mchunk),
+	                                   flags);
 	if likely(vec != NULL)
 		self->ms_v = vec;
 }
@@ -529,6 +529,168 @@ NOTHROW(FCALL movedown_bits)(mpart_blkst_word_t *__restrict dst_bitset,
 
 
 
+
+/* Trim off the trailing data from the given mem-part to make
+ * its effective new size be equal to `part_size'.
+ * The caller must ensure all the proper locking, and the
+ * non-shared-ness of the given mem-part. */
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL mpart_truncate_trailing)(struct mpart *__restrict self,
+                                       size_t part_size,
+                                       freefun_t freefun, gfp_t flags,
+                                       uintptr_t node_flags) {
+	physpagecnt_t part_pages;
+	assert(self->mp_maxaddr > self->mp_minaddr + part_size - 1);
+	self->mp_maxaddr = self->mp_minaddr + part_size - 1;
+	if (!(self->mp_flags & MPART_F_BLKST_INL) && self->mp_blkst_ptr != NULL) {
+		size_t word_count, block_count;
+		block_count = part_size >> self->mp_file->mf_blockshift;
+		word_count  = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD);
+		if (node_flags & MNODE_F_MHINT) {
+			krealloc_in_place_nx(self->mp_blkst_ptr,
+			                     word_count * sizeof(mpart_blkst_word_t),
+			                     flags & ~GFP_CALLOC);
+		} else {
+			mpart_blkst_word_t *bitset;
+			bitset = (mpart_blkst_word_t *)krealloc_nx(self->mp_blkst_ptr,
+			                                           word_count *
+			                                           sizeof(mpart_blkst_word_t),
+			                                           flags);
+			if likely(bitset != NULL)
+				self->mp_blkst_ptr = bitset;
+		}
+	}
+	part_pages = (physpagecnt_t)(part_size >> PAGESHIFT);
+	/* Free unused memory from the part backing data store. */
+	switch (self->mp_state) {
+
+	case MPART_ST_SWP:
+	case MPART_ST_MEM:
+		assert(self->mp_mem.mc_size > part_pages);
+		(*freefun)(self->mp_mem.mc_start + part_pages,
+		           self->mp_mem.mc_size - part_pages,
+		           flags);
+		self->mp_mem.mc_size = part_pages;
+		break;
+
+	case MPART_ST_SWP_SC:
+	case MPART_ST_MEM_SC:
+		mchunkvec_truncate(&self->mp_mem_sc, part_pages, freefun, flags,
+		                   (node_flags & MNODE_F_MHINT) != 0);
+		break;
+
+	default:
+		break;
+	}
+}
+
+/* Trim off the leading `remove_size' bytes from the given mem-part.
+ * The caller must ensure all the proper locking, and the
+ * non-shared-ness of the given mem-part. */
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL mpart_truncate_leading)(struct mpart *__restrict self,
+                                      size_t remove_size,
+                                      freefun_t freefun, gfp_t flags) {
+	size_t remove_blocks;
+	physpagecnt_t remove_pages;
+	remove_pages  = remove_size >> PAGESHIFT;
+	remove_blocks = remove_size >> self->mp_file->mf_blockshift;
+	COMPILER_WRITE_BARRIER();
+	self->mp_maxaddr -= remove_size;
+	if (self->mp_flags & MPART_F_BLKST_INL) {
+		self->mp_blkst_inl >>= remove_blocks * MPART_BLOCK_STBITS;
+	} else if (self->mp_blkst_ptr != NULL) {
+		mpart_blkst_word_t *bitset;
+		size_t word_count, keep_blocks;
+		keep_blocks = mpart_getblockcount(self, self->mp_file);
+		movedown_bits(self->mp_blkst_ptr, self->mp_blkst_ptr,
+		              0, remove_blocks * MPART_BLOCK_STBITS,
+		              keep_blocks * MPART_BLOCK_STBITS);
+		word_count = CEILDIV(keep_blocks, MPART_BLKST_BLOCKS_PER_WORD);
+		assert(word_count >= 0);
+		if (word_count == 1) {
+			/* Switch over to using an in-line bitset. */
+			bitset = self->mp_blkst_ptr;
+			self->mp_blkst_inl = bitset[0];
+			self->mp_flags |= MPART_F_BLKST_INL;
+			kfree(bitset);
+		} else {
+			/* Try to release unused memory. */
+			bitset = (mpart_blkst_word_t *)krealloc_nx(self->mp_blkst_ptr,
+			                                           word_count *
+			                                           sizeof(mpart_blkst_word_t),
+			                                           flags);
+			if likely(bitset != NULL)
+				self->mp_blkst_ptr = bitset;
+		}
+	}
+
+	/* Free unused memory from the part backing data store. */
+	switch (self->mp_state) {
+
+	case MPART_ST_SWP:
+	case MPART_ST_MEM:
+		assert(self->mp_mem.mc_size > remove_pages);
+		(*freefun)(self->mp_mem.mc_start, remove_pages, flags);
+		self->mp_mem.mc_start += remove_pages;
+		self->mp_mem.mc_size -= remove_pages;
+		break;
+
+	case MPART_ST_SWP_SC:
+	case MPART_ST_MEM_SC:
+		mchunkvec_truncate_leading(&self->mp_mem_sc, remove_pages,
+		                           freefun, flags);
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+
+/* Free all pages within the given address range [lo,hi)-style */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mchunkvec_free_subrange)(struct mchunk *__restrict vec, freefun_t freefun, gfp_t flags,
+                                       size_t lo_split_chunk_index, physpagecnt_t lo_split_chunk_offset,
+                                       size_t hi_split_chunk_index, physpagecnt_t hi_split_chunk_offset) {
+	size_t i;
+	assert(lo_split_chunk_index <= hi_split_chunk_offset);
+	if (lo_split_chunk_index == hi_split_chunk_offset) {
+		assert(lo_split_chunk_offset < hi_split_chunk_offset);
+		/* Special case: the entire unmap-area is located within the last chunk. */
+		(*freefun)(vec[lo_split_chunk_index].mc_start + lo_split_chunk_offset,
+		           hi_split_chunk_offset - lo_split_chunk_offset, flags);
+	} else {
+		/* Free the tail after the last chunk of the first part. */
+		(*freefun)(vec[lo_split_chunk_index].mc_start + lo_split_chunk_offset,
+		           vec[lo_split_chunk_index].mc_size - lo_split_chunk_offset,
+		           flags);
+		/* Free all whole chunks being unmapped. */
+		for (i = lo_split_chunk_index + 1; i < hi_split_chunk_index; ++i)
+			(*freefun)(vec[i].mc_start, vec[i].mc_size, flags);
+		/* Free leading data before `hi_split_chunk_offset'. */
+		if (hi_split_chunk_offset != 0) {
+			(*freefun)(vec[hi_split_chunk_index].mc_start,
+			           hi_split_chunk_offset, flags);
+		}
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL try_truncate_mchunk_vector)(struct mchunk **__restrict p_vec,
+                                          size_t new_count, gfp_t flags) {
+	struct mchunk *newvec;
+	newvec = (struct mchunk *)krealloc_nx(*p_vec,
+	                                      new_count *
+	                                      sizeof(struct mchunk),
+	                                      flags);
+	if likely(newvec)
+		*p_vec = newvec;
+}
+
+
+
 /* (try to) unmap the given sub-range of virtual (kernel)
  * memory that is mapped by `node', which is backed by `part'.
  *
@@ -543,8 +705,12 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
                                           byte_t *unmap_minaddr,
                                           byte_t *unmap_maxaddr,
                                           gfp_t flags) {
+	struct mnode *hinode, *lonode;
+	struct mpart *hipart, *lopart;
+	size_t losize, hisize, hioffset;
 	size_t unmap_size;
 	freefun_t freefun;
+
 	assert(flags & GFP_ATOMIC);
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(mpart_lock_acquired(part));
@@ -556,6 +722,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	        "This case should be handled by the caller");
 	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 	freefun    = freefun_for_mpart(part);
+
+	/* Set-up malloc-flags for all of the (potential) calls below. */
+	flags = GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC);
 
 	/* Check for simple case: Truncate the node/part at the back. */
 	if (unmap_minaddr == node->mn_minaddr) {
@@ -571,51 +740,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		COMPILER_WRITE_BARRIER();
 		node->mn_maxaddr = unmap_minaddr - 1;
 		part_size        = node->mn_partoff + (size_t)(unmap_minaddr - node->mn_minaddr);
-		assert(part->mp_maxaddr > part->mp_minaddr + part_size - 1);
-		part->mp_maxaddr = part->mp_minaddr + part_size - 1;
-		if (!(part->mp_flags & MPART_F_BLKST_INL) && part->mp_blkst_ptr != NULL) {
-			size_t word_count, block_count;
-			block_count = part_size >> part->mp_file->mf_blockshift;
-			word_count  = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD);
-			if (node->mn_flags & MNODE_F_MHINT) {
-				krealloc_in_place_nx(part->mp_blkst_ptr,
-				                     word_count * sizeof(mpart_blkst_word_t),
-				                     flags & ~GFP_CALLOC);
-			} else {
-				mpart_blkst_word_t *bitset;
-				bitset = (mpart_blkst_word_t *)krealloc_nx(part->mp_blkst_ptr,
-				                                      word_count * sizeof(mpart_blkst_word_t),
-				                                      GFP_LOCKED | GFP_PREFLT |
-				                                      (flags & ~GFP_CALLOC));
-				if likely(bitset != NULL)
-					part->mp_blkst_ptr = bitset;
-			}
-		}
-		part_pages = (physpagecnt_t)(part_size >> PAGESHIFT);
-		/* Free unused memory from the part backing data store. */
-		switch (part->mp_state) {
-
-		case MPART_ST_SWP:
-		case MPART_ST_MEM:
-			assert(part->mp_mem.mc_size > part_pages);
-			(*freefun)(part->mp_mem.mc_start + part_pages,
-			           part->mp_mem.mc_size - part_pages,
-			           flags);
-			part->mp_mem.mc_size = part_pages;
-			break;
-
-		case MPART_ST_SWP_SC:
-		case MPART_ST_MEM_SC:
-			mchunkvec_truncate(&part->mp_mem_sc, part_pages, freefun, flags,
-			                   (node->mn_flags & MNODE_F_MHINT) != 0);
-			break;
-
-		default:
-			break;
-		}
-
-		/* Re-insert the (now truncated) node into the kernel mman. */
+		mpart_truncate_trailing(part, part_size, freefun, flags, node->mn_flags);
 		COMPILER_WRITE_BARRIER();
+		/* Re-insert the (now truncated) node into the kernel mman. */
 		mnode_tree_insert(&mman_kernel.mm_mappings, node);
 		return true;
 	}
@@ -647,20 +774,28 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	}
 
 	if unlikely(node->mn_partoff != 0) {
-		/* TODO: Truncate the leading address range that was never even mapped...
-		 *       All of the below code assumes that it is operating on a zero
-		 *       offset mnode->mpart mapping. */
+		/* Truncate the leading address range that was never even mapped...
+		 * All of the below code assumes that it is operating on a zero
+		 * offset mnode->mpart mapping. */
+		mpart_truncate_leading(part, node->mn_partoff, freefun, flags);
+		node->mn_partoff = 0;
 	}
+
 	{
 		size_t mpart_size;
 		mpart_size = mpart_getsize(part);
 		assert(mpart_size >= mnode_getsize(node));
 		if unlikely(mpart_size > mnode_getsize(node)) {
-			/* TODO: Truncate the trailing address range that was never even mapped.
-			 *       All of the below code assumes that the original part isn't larger
-			 *       than the associated node. */
+			/* Truncate the trailing address range that was never even mapped.
+			 * All of the below code assumes that the original part isn't larger
+			 * than the associated node. */
+			mpart_truncate_trailing(part, mpart_size, freefun, flags, 0);
 		}
 	}
+
+	/* Ensure that the node's and part's sizes match up exactly. */
+	assert(node->mn_partoff == 0);
+	assert(mpart_getsize(part) == mnode_getsize(node));
 
 	/* Check for slightly more complicated case: Truncate a node at the front. */
 	if (unmap_minaddr == node->mn_minaddr) {
@@ -668,64 +803,12 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		physpagecnt_t remove_pages;
 		/* We can truncate the node at the front. */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-		remove_size   = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
-		remove_pages  = remove_size >> PAGESHIFT;
-		remove_blocks = remove_size >> part->mp_file->mf_blockshift;
+		remove_size = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
 		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
-		COMPILER_WRITE_BARRIER();
+		mpart_truncate_leading(part, remove_size, freefun, flags);
+
+		/* Trim the node. */
 		node->mn_minaddr += remove_size;
-		part->mp_maxaddr -= remove_size;
-		if (part->mp_flags & MPART_F_BLKST_INL) {
-			part->mp_blkst_inl >>= remove_blocks * MPART_BLOCK_STBITS;
-		} else if (part->mp_blkst_ptr != NULL) {
-			mpart_blkst_word_t *bitset;
-			size_t word_count, keep_blocks;
-			keep_blocks = mpart_getblockcount(part, part->mp_file);
-			movedown_bits(part->mp_blkst_ptr, part->mp_blkst_ptr,
-			              0, remove_blocks * MPART_BLOCK_STBITS,
-			              keep_blocks * MPART_BLOCK_STBITS);
-			word_count = CEILDIV(keep_blocks, MPART_BLKST_BLOCKS_PER_WORD);
-			assert(word_count >= 0);
-			if (word_count == 1) {
-				/* Switch over to using an in-line bitset. */
-				bitset = part->mp_blkst_ptr;
-				part->mp_blkst_inl = bitset[0];
-				part->mp_flags |= MPART_F_BLKST_INL;
-				kfree(bitset);
-			} else {
-				/* Try to release unused memory. */
-				bitset = (mpart_blkst_word_t *)krealloc_nx(part->mp_blkst_ptr,
-				                                      word_count * sizeof(mpart_blkst_word_t),
-				                                      GFP_LOCKED | GFP_PREFLT |
-				                                      (flags & ~GFP_CALLOC));
-				if likely(bitset != NULL)
-					part->mp_blkst_ptr = bitset;
-			}
-		}
-
-		/* Free unused memory from the part backing data store. */
-		switch (part->mp_state) {
-
-		case MPART_ST_SWP:
-		case MPART_ST_MEM:
-			assert(part->mp_mem.mc_size > remove_pages);
-			(*freefun)(part->mp_mem.mc_start, remove_pages, flags);
-			part->mp_mem.mc_start += remove_pages;
-			part->mp_mem.mc_size -= remove_pages;
-			break;
-
-		case MPART_ST_SWP_SC:
-		case MPART_ST_MEM_SC:
-			mchunkvec_truncate_leading(&part->mp_mem_sc, remove_pages,
-			                           freefun, flags);
-			break;
-
-		default:
-			break;
-		}
-
-		/* Re-insert the (now truncated) node into the kernel mman. */
-		COMPILER_WRITE_BARRIER();
 		mnode_tree_insert(&mman_kernel.mm_mappings, node);
 		return true;
 	}
@@ -734,354 +817,428 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	 *
 	 * Note that for this purpose, we may even use `mcoreheap_alloc_locked_nx()'
 	 * in order to dynamically allocate the required additional data structures! */
-	{
-		struct mnode *hinode, *lonode = node;
-		struct mpart *hipart, *lopart = part;
-		size_t losize, hisize, hioffset;
+	lonode = node;
+	lopart = part;
 
-		/* Allocate new elements for the hi-node and hi-part. */
-		hinode = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
-		                                    GFP_LOCKED | GFP_PREFLT |
-		                                    (flags & ~GFP_CALLOC));
-		if (hinode) {
-			hinode->mn_flags = MNODE_F_NORMAL;
+	/* Allocate new elements for the hi-node and hi-part. */
+	hinode = (struct mnode *)kmalloc_nx(sizeof(struct mnode), flags);
+	if (hinode) {
+		hinode->mn_flags = MNODE_F_NORMAL;
+	} else {
+		union mcorepart *cp;
+		cp = mcoreheap_alloc_locked_nx();
+		if unlikely(cp == NULL)
+			goto fail;
+		hinode           = &cp->mcp_node;
+		hinode->mn_flags = MNODE_F_NORMAL | MNODE_F_COREPART;
+	}
+	hipart = (struct mpart *)kmalloc_nx(sizeof(struct mpart), flags);
+	if (hipart) {
+		hipart->mp_flags = MPART_F_NORMAL;
+	} else {
+		union mcorepart *cp;
+		cp = mcoreheap_alloc_locked_nx();
+		if unlikely(cp == NULL)
+			goto fail_hinode;
+		hipart           = &cp->mcp_part;
+		hipart->mp_flags = MPART_F_NORMAL | MPART_F_COREPART;
+	}
+
+	/* Figure out the eventual sizes of the lo- and hi-parts */
+	losize   = unmap_minaddr - node->mn_minaddr;
+	hisize   = node->mn_maxaddr - unmap_maxaddr;
+	hioffset = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
+	assert(losize != 0);
+	assert(hisize != 0);
+	assert(IS_ALIGNED(losize, PAGESIZE));
+	assert(IS_ALIGNED(hisize, PAGESIZE));
+
+	/* Check if we also need to allocate an additional
+	 * block-status bitset for use with `hipart' */
+	hipart->mp_blkst_ptr = NULL;
+	if (!(lopart->mp_flags & MPART_F_BLKST_INL) && lopart->mp_blkst_ptr != NULL) {
+		size_t bitset_bytes_per_word;
+		bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << part->mp_file->mf_blockshift;
+		if (losize > bitset_bytes_per_word && hisize > bitset_bytes_per_word) {
+			mpart_blkst_word_t *bitset;
+			size_t new_bitset_bytes, new_bitset_blocks, new_bitset_words;
+			new_bitset_bytes  = MIN(losize, hisize);
+			new_bitset_blocks = new_bitset_bytes >> part->mp_file->mf_blockshift;
+			new_bitset_words  = CEILDIV(new_bitset_blocks, MPART_BLKST_BLOCKS_PER_WORD);
+			assert(new_bitset_words >= 2);
+			bitset = (mpart_blkst_word_t *)kmalloc_nx(new_bitset_words *
+			                                          sizeof(mpart_blkst_word_t),
+			                                          flags);
+			if unlikely(!bitset)
+				goto fail_hinode_hipart;
+			hipart->mp_blkst_ptr = bitset;
 		} else {
-			union mcorepart *cp;
-			cp = mcoreheap_alloc_locked_nx();
-			if unlikely(cp == NULL)
-				goto fail;
-			hinode           = &cp->mcp_node;
-			hinode->mn_flags = MNODE_F_NORMAL | MNODE_F_COREPART;
+			/* We can just re-use the block-status bitset from `lopart',
+			 * and have the smaller part make use of `MPART_F_BLKST_INL' */
 		}
-		hipart = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
-		                                    GFP_LOCKED | GFP_PREFLT |
-		                                    (flags & ~GFP_CALLOC));
-		if (hipart) {
-			hipart->mp_flags = MPART_F_NORMAL;
+	}
+
+	/* Allocate dynamic memory that is necessary for splitting the backing storage. */
+	hipart->mp_state = lopart->mp_state;
+	switch (lopart->mp_state) {
+
+	case MPART_ST_SWP_SC:
+	case MPART_ST_MEM_SC: {
+		size_t lo_split_chunk_index, hi_split_chunk_index;
+		physpagecnt_t lo_split_chunk_offset, hi_split_chunk_offset;
+		size_t lo_chunks, hi_chunks, i;
+		struct mchunkvec vec;
+
+		/* We may have to allocate a new dynamic mem/swap vector.
+		 * First of all: Figure out where exactly the split needs
+		 * to happen, in terms of CHUNK_INDEX and CHUNK_OFFSET for
+		 * both where the lo-part will end, and where the hi-part
+		 * will start at. */
+		vec = lopart->mp_mem_sc;
+		lo_split_chunk_offset = losize >> PAGESHIFT;
+		for (lo_split_chunk_index = 0;;) {
+			physpagecnt_t count;
+			assert(lo_split_chunk_index < vec.ms_c);
+			count = vec.ms_v[lo_split_chunk_index].mc_size;
+			if (count > lo_split_chunk_offset)
+				break;
+			lo_split_chunk_offset -= count;
+			++lo_split_chunk_index;
+		}
+		hi_split_chunk_index  = lo_split_chunk_index;
+		hi_split_chunk_offset = lo_split_chunk_offset + (hioffset - losize) >> PAGESHIFT;
+		for (;;) {
+			physpagecnt_t count;
+			assert(hi_split_chunk_index < vec.ms_c);
+			count = vec.ms_v[hi_split_chunk_index].mc_size;
+			if (count > hi_split_chunk_offset)
+				break;
+			hi_split_chunk_offset -= count;
+			++hi_split_chunk_index;
+		}
+		/* We now have to adjust the backing storage, such that:
+		 * >> lopart->mp_mem_sc = { [0...<lo_split_chunk_index:lo_split_chunk_offset>) }
+		 * >> hipart->mp_mem_sc = { [<hi_split_chunk_index:hi_split_chunk_offset>...n) }
+		 * For this, start out by figuring out exactly how many chunks we'll be needing
+		 * for the lo- and hi-part's chunk-vectors. */
+		lo_chunks = lo_split_chunk_index;
+		if (lo_split_chunk_offset != 0) {
+			assert(lo_split_chunk_index != 0);
+			++lo_chunks;
+		}
+		hi_chunks = vec.ms_c - hi_split_chunk_index;
+		assert(lo_chunks >= 1);
+		assert(hi_chunks >= 1);
+		/* Handle the simple cases where one of the 2 parts can
+		 * be implemented without the need of a chunk-vector. */
+		if (lo_chunks == 1 && hi_chunks == 1) {
+			/* Both parts only need a single chunk. */
+			assert(lo_split_chunk_index == 0);
+			assert(lo_split_chunk_offset != 0);
+			assert(hi_split_chunk_index == vec.ms_c - 1);
+			lopart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
+			hipart->mp_state = lopart->mp_state;
+			lopart->mp_mem.mc_start = vec.ms_v[0].mc_start;
+			lopart->mp_mem.mc_size  = lo_split_chunk_offset;
+			hipart->mp_mem.mc_start = vec.ms_v[hi_split_chunk_index].mc_start + hi_split_chunk_offset;
+			hipart->mp_mem.mc_size  = vec.ms_v[hi_split_chunk_index].mc_size - hi_split_chunk_offset;
+			/* === Point of no return */
+
+			/* Unmap the requested address range. */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+
+			/* Free physical memory. */
+			mchunkvec_free_subrange(vec.ms_v, freefun, flags,
+			                        lo_split_chunk_index, lo_split_chunk_offset,
+			                        hi_split_chunk_index, hi_split_chunk_offset);
+			kfree(vec.ms_v);
+		} else if (lo_chunks == 1) {
+			/* `hipart' must use a vector, while `lopart' uses a single chunk. */
+			assert(hipart->mp_state == lopart->mp_state);
+			assert(lo_split_chunk_index == 0);
+			/* === Point of no return */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+			lopart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
+			lopart->mp_mem.mc_start = vec.ms_v[0].mc_start;
+			lopart->mp_mem.mc_size  = lo_split_chunk_offset;
+			mchunkvec_free_subrange(vec.ms_v, freefun, flags,
+			                        lo_split_chunk_index, lo_split_chunk_offset,
+			                        hi_split_chunk_index, hi_split_chunk_offset);
+			/* Shift down the still-remaining hi-part. */
+			vec.ms_c -= hi_split_chunk_index;
+			memmovedown(&vec.ms_v[0],
+			            &vec.ms_v[hi_split_chunk_index],
+			            vec.ms_c, sizeof(struct mchunk));
+			vec.ms_v[0].mc_start += hi_split_chunk_offset;
+			vec.ms_v[0].mc_size -= hi_split_chunk_offset;
+
+			/* Try to free unused memory. */
+			try_truncate_mchunk_vector(&vec.ms_v, vec.ms_c, flags);
+
+			/* Now just set `vec' as the vector used by `hipart' */
+			hipart->mp_mem_sc = vec;
+		} else if (hi_chunks == 1) {
+			/* `lopart' must stay as a vector, and `hipart' becomes a single chunk. */
+			assert(lo_chunks > 1);
+			assert(hi_split_chunk_index == vec.ms_c - 1);
+			hipart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
+			/* === Point of no return */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+			hipart->mp_mem = vec.ms_v[hi_split_chunk_index];
+			hipart->mp_mem.mc_start += hi_split_chunk_offset;
+			hipart->mp_mem.mc_size -= hi_split_chunk_offset;
+			/* Now to free all of the backing physical memory to-be removed. */
+			mchunkvec_free_subrange(vec.ms_v, freefun, flags,
+			                        lo_split_chunk_index, lo_split_chunk_offset,
+			                        hi_split_chunk_index, hi_split_chunk_offset);
+			/* Update the vector information for `lopart' */
+			vec.ms_v[lo_split_chunk_index].mc_size = lo_split_chunk_offset;
+			vec.ms_c = lo_chunks;
+
+			/* Try to free unused memory. */
+			try_truncate_mchunk_vector(&vec.ms_v, vec.ms_c, flags);
+
+			/* Write-back the chunk-vector. */
+			lopart->mp_mem_sc = vec;
 		} else {
-			union mcorepart *cp;
-			cp = mcoreheap_alloc_locked_nx();
-			if unlikely(cp == NULL) {
-				mnode_free(hinode);
-				goto fail;
-			}
-			hipart           = &cp->mcp_part;
-			hipart->mp_flags = MPART_F_NORMAL | MPART_F_COREPART;
-		}
+			/* `lopart' must stay as a vector, and an additional
+			 * vector needs to be allocated for use by `hipart'. */
+			struct mchunk *newvec;
+			assert(lo_chunks >= 2);
+			assert(hi_chunks >= 2);
+			/* Allocate a vector for the smaller of the 2 requirements. */
+			newvec = (struct mchunk *)kmalloc_nx(MIN(lo_chunks, hi_chunks) *
+			                                     sizeof(struct mchunk),
+			                                     flags);
+			if unlikely(!newvec)
+				goto fail_hinode_hipart_bitset;
+			/* === Point of no return */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 
-		/* Figure out the eventual sizes of the lo- and hi-parts */
-		losize   = unmap_minaddr - node->mn_minaddr;
-		hisize   = node->mn_maxaddr - unmap_maxaddr;
-		hioffset = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
-		assert(losize != 0);
-		assert(hisize != 0);
-		assert(IS_ALIGNED(losize, PAGESIZE));
-		assert(IS_ALIGNED(hisize, PAGESIZE));
+			/* Free accessed memory. */
+			mchunkvec_free_subrange(vec.ms_v, freefun, flags,
+			                        lo_split_chunk_index, lo_split_chunk_offset,
+			                        hi_split_chunk_index, hi_split_chunk_offset);
 
-		/* Check if we also need to allocate an additional
-		 * block-status bitset for use with `hipart' */
-		hipart->mp_blkst_ptr = NULL;
-		if (!(lopart->mp_flags & MPART_F_BLKST_INL) && lopart->mp_blkst_ptr != NULL) {
-			size_t bitset_bytes_per_word;
-			bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << part->mp_file->mf_blockshift;
-			if (losize > bitset_bytes_per_word && hisize > bitset_bytes_per_word) {
-				mpart_blkst_word_t *bitset;
-				size_t new_bitset_bytes, new_bitset_blocks, new_bitset_words;
-				new_bitset_bytes  = MIN(losize, hisize);
-				new_bitset_blocks = new_bitset_bytes >> part->mp_file->mf_blockshift;
-				new_bitset_words  = CEILDIV(new_bitset_blocks, MPART_BLKST_BLOCKS_PER_WORD);
-				assert(new_bitset_words >= 2);
-				bitset = (mpart_blkst_word_t *)kmalloc_nx(new_bitset_words * sizeof(mpart_blkst_word_t),
-				                                     GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC));
-				if unlikely(!bitset) {
-					mpart_free(hipart);
-					mnode_free(hinode);
-					goto fail;
-				}
-				hipart->mp_blkst_ptr = bitset;
+			if (hi_chunks <= lo_chunks) {
+				/* Use `newvec' for `hipart' */
+				memcpy(&newvec[0],
+				       &vec.ms_v[hi_split_chunk_index],
+				       hi_chunks, sizeof(struct mchunk));
+				newvec[0].mc_start += hi_split_chunk_offset;
+				newvec[0].mc_size -= hi_split_chunk_offset;
+				hipart->mp_mem_sc.ms_c = hi_chunks;
+				hipart->mp_mem_sc.ms_v = newvec;
+
+				/* Trim the last chunk still apart of the truncated `lopart' */
+				vec.ms_v[lo_split_chunk_index].mc_size = lo_split_chunk_offset;
+
+				/* Write-back the truncated vector into `lopart' */
+				try_truncate_mchunk_vector(&lopart->mp_mem_sc.ms_v, lo_chunks, flags);
+				lopart->mp_mem_sc.ms_c = lo_chunks;
 			} else {
-				/* We can just re-use the block-status bitset from `lopart',
-				 * and have the smaller part make use of `MPART_F_BLKST_INL' */
-			}
-		}
-
-		/* Allocate dynamic memory that is necessary for splitting the backing storage. */
-		hipart->mp_state = lopart->mp_state;
-		switch (lopart->mp_state) {
-
-		case MPART_ST_SWP_SC:
-		case MPART_ST_MEM_SC: {
-			size_t lo_split_chunk_index, hi_split_chunk_index;
-			physpagecnt_t lo_split_chunk_offset, hi_split_chunk_offset;
-			size_t lo_chunks, hi_chunks, i;
-			struct mchunkvec vec;
-
-			/* We may have to allocate a new dynamic mem/swap vector.
-			 * First of all: Figure out where exactly the split needs
-			 * to happen, in terms of CHUNK_INDEX and CHUNK_OFFSET for
-			 * both where the lo-part will end, and where the hi-part
-			 * will start at. */
-			vec = lopart->mp_mem_sc;
-			lo_split_chunk_offset = losize >> PAGESHIFT;
-			for (lo_split_chunk_index = 0;;) {
-				physpagecnt_t count;
-				assert(lo_split_chunk_index < vec.ms_c);
-				count = vec.ms_v[lo_split_chunk_index].mc_size;
-				if (count > lo_split_chunk_offset)
-					break;
-				lo_split_chunk_offset -= count;
-				++lo_split_chunk_index;
-			}
-			hi_split_chunk_index  = lo_split_chunk_index;
-			hi_split_chunk_offset = lo_split_chunk_offset + (hioffset - losize) >> PAGESHIFT;
-			for (;;) {
-				physpagecnt_t count;
-				assert(hi_split_chunk_index < vec.ms_c);
-				count = vec.ms_v[hi_split_chunk_index].mc_size;
-				if (count > hi_split_chunk_offset)
-					break;
-				hi_split_chunk_offset -= count;
-				++hi_split_chunk_index;
-			}
-			/* We now have to adjust the backing storage, such that:
-			 * >> lopart->mp_mem_sc = { [0...<lo_split_chunk_index:lo_split_chunk_offset>) }
-			 * >> hipart->mp_mem_sc = { [<hi_split_chunk_index:hi_split_chunk_offset>...n) }
-			 * For this, start out by figuring out exactly how many chunks we'll be needing
-			 * for the lo- and hi-part's chunk-vectors. */
-			lo_chunks = lo_split_chunk_index;
-			if (lo_split_chunk_offset != 0) {
-				assert(lo_split_chunk_index != 0);
-				++lo_chunks;
-			}
-			hi_chunks = vec.ms_c - hi_split_chunk_index;
-			assert(lo_chunks >= 1);
-			assert(hi_chunks >= 1);
-			/* Handle the simple cases where one of the 2 parts can
-			 * be implemented without the need of a chunk-vector. */
-			if (lo_chunks == 1 && hi_chunks == 1) {
-				/* Both parts only need a single chunk. */
-				assert(lo_split_chunk_index == 0);
-				assert(hi_split_chunk_index == vec.ms_c - 1);
-				lopart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
-				hipart->mp_state = lopart->mp_state;
-				lopart->mp_mem.mc_start = vec.ms_v[0].mc_start;
-				lopart->mp_mem.mc_size  = lo_split_chunk_offset;
-				hipart->mp_mem.mc_start = vec.ms_v[hi_split_chunk_index].mc_start + hi_split_chunk_offset;
-				hipart->mp_mem.mc_size  = vec.ms_v[hi_split_chunk_index].mc_size - hi_split_chunk_offset;
-				/* === Point of no return */
-
-				/* Unmap the requested address range. */
-				unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-
-				/* Free physical memory. */
+				/* Use `newvec' for `lopart', and re-purpose the
+				 * old vector from `lopart' for use in `hipart' */
+				memcpy(&newvec[0], &vec.ms_v[0], lo_chunks, sizeof(struct mchunk));
 				if (lo_split_chunk_offset != 0) {
-					/* Free apart of the first chunk. */
-					(*freefun)(vec.ms_v[0].mc_start + lo_split_chunk_offset,
-					           vec.ms_v[0].mc_size - lo_split_chunk_offset,
-					           flags);
+					assert(lo_split_chunk_index == lo_chunks - 1);
+					newvec[lo_split_chunk_index].mc_size -= lo_split_chunk_offset;
 				}
-				/* Free all intermediate chunks. */
-				for (i = 1; i < hi_split_chunk_index; ++i) {
-					(*freefun)(vec.ms_v[i].mc_start,
-					           vec.ms_v[i].mc_size,
-					           flags);
-				}
-				/* Free the lead-up to `hipart's chunk */
-				if (hi_split_chunk_offset != 0) {
-					(*freefun)(vec.ms_v[hi_split_chunk_index].mc_start,
-					           hi_split_chunk_offset,
-					           flags);
-				}
-				kfree(vec.ms_v);
-			} else if (lo_chunks == 1) {
-				/* TODO: `hipart' must use a vector, while `lopart' uses a single chunk. */
-				/* === Point of no return */
-				unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-			} else if (hi_chunks == 1) {
-				/* TODO: `lopart' must stay as a vector, and `hipart' becomes a single chunk. */
-				/* === Point of no return */
-				unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-			} else {
-				/* TODO: `lopart' must stay as a vector, and an additional vector needs to
-				 *       be allocated for use by `hipart'. */
-				/* === Point of no return */
-				unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+				lopart->mp_mem_sc.ms_c = lo_chunks;
+				lopart->mp_mem_sc.ms_v = newvec;
+
+				/* Shift-down the chunks for `hipart' */
+				vec.ms_c = hi_chunks;
+				memmovedown(&vec.ms_v[0],
+				            &vec.ms_v[hi_split_chunk_index],
+				            vec.ms_c, sizeof(struct mchunk));
+				vec.ms_v[0].mc_start += hi_split_chunk_offset;
+				vec.ms_v[0].mc_size -= hi_split_chunk_offset;
+
+				/* Write-back the truncated vector into `hipart' */
+				try_truncate_mchunk_vector(&vec.ms_v, vec.ms_c, flags);
+				hipart->mp_mem_sc = vec;
 			}
-			/* TODO */
-		}	break;
-
-		case MPART_ST_SWP:
-		case MPART_ST_MEM: {
-			physpagecnt_t losize_pages;
-			physpagecnt_t hioffset_pages;
-			losize_pages   = losize >> PAGESHIFT;
-			hioffset_pages = hioffset >> PAGESHIFT;
-			hipart->mp_mem = lopart->mp_mem;
-			hipart->mp_mem.mc_start += hioffset_pages;
-			hipart->mp_mem.mc_size -= hioffset_pages;
-			/* === Point of no return */
-			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-			(*freefun)(lopart->mp_mem.mc_start + losize_pages,
-			           lopart->mp_mem.mc_size - losize_pages,
-			           flags);
-			lopart->mp_mem.mc_size = losize_pages;
-		}	break;
-
-		default:
-			/* === Point of no return */
-			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-			break;
 		}
+	}	break;
 
-		/* Remove the old node from the kernel mman. */
-		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+	case MPART_ST_SWP:
+	case MPART_ST_MEM: {
+		physpagecnt_t losize_pages;
+		physpagecnt_t hioffset_pages;
+		losize_pages   = losize >> PAGESHIFT;
+		hioffset_pages = hioffset >> PAGESHIFT;
+		hipart->mp_mem = lopart->mp_mem;
+		hipart->mp_mem.mc_start += hioffset_pages;
+		hipart->mp_mem.mc_size -= hioffset_pages;
+		/* === Point of no return */
+		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+		(*freefun)(lopart->mp_mem.mc_start + losize_pages,
+		           lopart->mp_mem.mc_size - losize_pages,
+		           flags);
+		lopart->mp_mem.mc_size = losize_pages;
+	}	break;
 
-		if (lopart->mp_flags & MPART_F_BLKST_INL) {
-			size_t hioffset_blocks;
-			hioffset_blocks      = hioffset >> part->mp_file->mf_blockshift;
-			hipart->mp_blkst_inl = lopart->mp_blkst_inl >> (hioffset_blocks * MPART_BLOCK_STBITS);
-			hipart->mp_flags |= MPART_F_BLKST_INL;
-		} else if (lopart->mp_blkst_ptr != NULL) {
-			size_t bitset_bytes_per_word, hioffset_blocks;
-			size_t loblocks, hiblocks;
-			unsigned int blockshift;
-			blockshift            = part->mp_file->mf_blockshift;
-			hioffset_blocks       = hioffset >> blockshift;
-			bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << blockshift;
-			loblocks              = losize >> blockshift;
-			hiblocks              = hisize >> blockshift;
-			if (losize > bitset_bytes_per_word && hisize > bitset_bytes_per_word) {
-				if (losize >= hisize) {
-					movedown_bits(hipart->mp_blkst_ptr,
-					              lopart->mp_blkst_ptr,
-					              0, hioffset_blocks * MPART_BLOCK_STBITS,
-					              hiblocks * MPART_BLOCK_STBITS);
-				} else {
-					/* Must swap bitsets */
-					mpart_blkst_word_t *loset, *hiset, *smaller_bitset;
-					loset = hipart->mp_blkst_ptr;
-					hiset = lopart->mp_blkst_ptr;
-					memcpy(loset, hiset,
-					       CEILDIV(loblocks, MPART_BLKST_BLOCKS_PER_WORD),
-					       sizeof(mpart_blkst_word_t));
-					movedown_bits(hiset, hiset, 0,
-					              hioffset_blocks * MPART_BLOCK_STBITS,
-					              hiblocks * MPART_BLOCK_STBITS);
-					/* Try to release unused memory. */
-					smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
-					                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
-					                                              sizeof(mpart_blkst_word_t),
-					                                              GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC));
-					if likely(smaller_bitset != NULL)
-						hiset = smaller_bitset;
-					/* Write-back the updated bitsets. */
-					lopart->mp_blkst_ptr = loset;
-					hipart->mp_blkst_ptr = hiset;
-				}
-			} else if (hisize > bitset_bytes_per_word) {
-				mpart_blkst_word_t *hiset, *smaller_bitset;
-				/* Re-use the bitset from `lopart' in `hipart', and
-				 * change `lopart' to make use of the inline bitset. */
+	default:
+		/* === Point of no return */
+		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+		break;
+	}
+
+	/* Remove the old node from the kernel mman. */
+	mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+
+	if (lopart->mp_flags & MPART_F_BLKST_INL) {
+		size_t hioffset_blocks;
+		hioffset_blocks      = hioffset >> part->mp_file->mf_blockshift;
+		hipart->mp_blkst_inl = lopart->mp_blkst_inl >> (hioffset_blocks * MPART_BLOCK_STBITS);
+		hipart->mp_flags |= MPART_F_BLKST_INL;
+	} else if (lopart->mp_blkst_ptr != NULL) {
+		size_t bitset_bytes_per_word, hioffset_blocks;
+		size_t loblocks, hiblocks;
+		unsigned int blockshift;
+		blockshift            = part->mp_file->mf_blockshift;
+		hioffset_blocks       = hioffset >> blockshift;
+		bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << blockshift;
+		loblocks              = losize >> blockshift;
+		hiblocks              = hisize >> blockshift;
+		if (losize > bitset_bytes_per_word && hisize > bitset_bytes_per_word) {
+			if (losize >= hisize) {
+				movedown_bits(hipart->mp_blkst_ptr,
+				              lopart->mp_blkst_ptr,
+				              0, hioffset_blocks * MPART_BLOCK_STBITS,
+				              hiblocks * MPART_BLOCK_STBITS);
+			} else {
+				/* Must swap bitsets */
+				mpart_blkst_word_t *loset, *hiset, *smaller_bitset;
+				loset = hipart->mp_blkst_ptr;
 				hiset = lopart->mp_blkst_ptr;
-				lopart->mp_blkst_inl = hiset[0];
-				lopart->mp_flags |= MPART_F_BLKST_INL;
+				memcpy(loset, hiset,
+				       CEILDIV(loblocks, MPART_BLKST_BLOCKS_PER_WORD),
+				       sizeof(mpart_blkst_word_t));
 				movedown_bits(hiset, hiset, 0,
 				              hioffset_blocks * MPART_BLOCK_STBITS,
 				              hiblocks * MPART_BLOCK_STBITS);
-
 				/* Try to release unused memory. */
 				smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
 				                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
 				                                              sizeof(mpart_blkst_word_t),
-				                                              GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC));
+				                                              flags);
 				if likely(smaller_bitset != NULL)
 					hiset = smaller_bitset;
+				/* Write-back the updated bitsets. */
+				lopart->mp_blkst_ptr = loset;
 				hipart->mp_blkst_ptr = hiset;
-			} else {
-				/* (possibly) keep the bitset in lopart, but use the inline-bitset in hipart. */
-				mpart_blkst_word_t *loset = lopart->mp_blkst_ptr;
-				movedown_bits(&hipart->mp_blkst_inl, loset, 0,
-				              hioffset_blocks * MPART_BLOCK_STBITS,
-				              hiblocks * MPART_BLOCK_STBITS);
-				hipart->mp_flags |= MPART_F_BLKST_INL;
-				if (losize <= bitset_bytes_per_word) {
-					/* Free the dynamic bitset in lopart, and replace with the inline bitset. */
-					lopart->mp_blkst_inl = loset[0];
-					lopart->mp_flags |= MPART_F_BLKST_INL;
-					kfree(loset);
-				}
+			}
+		} else if (hisize > bitset_bytes_per_word) {
+			mpart_blkst_word_t *hiset, *smaller_bitset;
+			/* Re-use the bitset from `lopart' in `hipart', and
+			 * change `lopart' to make use of the inline bitset. */
+			hiset = lopart->mp_blkst_ptr;
+			lopart->mp_blkst_inl = hiset[0];
+			lopart->mp_flags |= MPART_F_BLKST_INL;
+			movedown_bits(hiset, hiset, 0,
+			              hioffset_blocks * MPART_BLOCK_STBITS,
+			              hiblocks * MPART_BLOCK_STBITS);
+
+			/* Try to release unused memory. */
+			smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
+			                                              CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
+			                                              sizeof(mpart_blkst_word_t),
+			                                              flags);
+			if likely(smaller_bitset != NULL)
+				hiset = smaller_bitset;
+			hipart->mp_blkst_ptr = hiset;
+		} else {
+			/* (possibly) keep the bitset in lopart, but use the inline-bitset in hipart. */
+			mpart_blkst_word_t *loset = lopart->mp_blkst_ptr;
+			movedown_bits(&hipart->mp_blkst_inl, loset, 0,
+			              hioffset_blocks * MPART_BLOCK_STBITS,
+			              hiblocks * MPART_BLOCK_STBITS);
+			hipart->mp_flags |= MPART_F_BLKST_INL;
+			if (losize <= bitset_bytes_per_word) {
+				/* Free the dynamic bitset in lopart, and replace with the inline bitset. */
+				lopart->mp_blkst_inl = loset[0];
+				lopart->mp_flags |= MPART_F_BLKST_INL;
+				kfree(loset);
 			}
 		}
-
-		/* With all of the complicated stuff out of the way, move on
-		 * to initializing the new hinode/hipart pair, as well as to
-		 * truncate the old lonode/lopart pair near the top. */
-		hinode->mn_minaddr = unmap_maxaddr + 1;
-		hinode->mn_maxaddr = lonode->mn_maxaddr;
-		lonode->mn_maxaddr = unmap_minaddr - 1;
-		lopart->mp_maxaddr = lopart->mp_minaddr;
-		hinode->mn_flags  |= lonode->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE |
-		                                         MNODE_F_PREAD | MNODE_F_SHARED |
-		                                         MNODE_F_MPREPARED | MNODE_F_MLOCK);
-		hinode->mn_part    = hipart; /* Inherit reference */
-		hinode->mn_fspath  = xincref(lonode->mn_fspath);
-		hinode->mn_fsname  = xincref(lonode->mn_fsname);
-		hinode->mn_mman    = &mman_kernel;
-		hinode->mn_partoff = 0;
-		/*hinode->mn_link  = ...;*/ /* Initialized below */
-
-		/* Have the hi-node mirror the is-writable attribute of the lo-node */
-		LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
-		if (LIST_ISBOUND(lonode, mn_writable)) {
-			LIST_INSERT_HEAD(&mman_kernel.mm_writable,
-			                 hinode, mn_writable);
-		}
-
-		/* Initialize the hi-part. */
-		hipart->mp_refcnt = 1;
-		hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT | MPART_F_NO_GLOBAL_REF |
-		                                        MPART_F_CHANGED | MPART_F_DONT_FREE |
-		                                        MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
-		/*hipart->mp_state = ...;*/ /* Alraedy initialized above */
-		hipart->mp_file = incref(lopart->mp_file);
-		LIST_INIT(&hipart->mp_copy);
-		LIST_INIT(&hipart->mp_share);
-		hinode->mn_link.le_next = NULL;
-		if (lonode->mn_flags & MNODE_F_SHARED) {
-			hinode->mn_link.le_prev = &hipart->mp_share.lh_first;
-		} else {
-			hinode->mn_link.le_prev = &hipart->mp_copy.lh_first;
-		}
-		*hinode->mn_link.le_prev = hinode;
-		SLIST_INIT(&hipart->mp_lockops);
-		/*LIST_ENTRY_UNBOUND_INIT(hipart, mp_allparts);*/ /* Initialized below */
-		DBG_memset(&hipart->mp_changed, 0xcc, sizeof(hipart->mp_changed));
-		hipart->mp_minaddr = 0;
-		hipart->mp_maxaddr = (pos_t)(hisize - 1);
-		DBG_memset(&hipart->mp_filent, 0xcc, sizeof(hipart->mp_filent));
-		/*hipart->mp_blkst_ptr = ...;*/ /* Initialized above */
-		/*hipart->mp_mem       = ...;*/ /* Initialized above */
-		hipart->mp_meta = NULL;
-
-		/* Mirror the part-of-global-list status of `lopart' in `hipart' */
-		if (LIST_ISBOUND(hipart, mp_allparts)) {
-			if (!(lopart->mp_flags & MPART_F_NO_GLOBAL_REF))
-				hipart->mp_refcnt = 2; /* +1 for the global list. */
-			mpart_all_list_insert(hipart);
-		} else {
-		    LIST_ENTRY_UNBOUND_INIT(hipart, mp_allparts);
-			assertf(lopart->mp_flags & MPART_F_NO_GLOBAL_REF,
-			        "How can you have a global ref, but not be part of the global list?");
-		}
-
-		/* Insert the lo- and hi-nodes now that they've been updated
-		 * to include the requested gap in-between. */
-		mnode_tree_insert(&mman_kernel.mm_mappings, lonode);
-		mnode_tree_insert(&mman_kernel.mm_mappings, hinode);
-
-		/* And we're done! */
-		return true;
 	}
+
+	/* With all of the complicated stuff out of the way, move on
+	 * to initializing the new hinode/hipart pair, as well as to
+	 * truncate the old lonode/lopart pair near the top. */
+	hinode->mn_minaddr = unmap_maxaddr + 1;
+	hinode->mn_maxaddr = lonode->mn_maxaddr;
+	lonode->mn_maxaddr = unmap_minaddr - 1;
+	lopart->mp_maxaddr = lopart->mp_minaddr;
+	hinode->mn_flags  |= lonode->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE |
+	                                         MNODE_F_PREAD | MNODE_F_SHARED |
+	                                         MNODE_F_MPREPARED | MNODE_F_MLOCK);
+	hinode->mn_part    = hipart; /* Inherit reference */
+	hinode->mn_fspath  = xincref(lonode->mn_fspath);
+	hinode->mn_fsname  = xincref(lonode->mn_fsname);
+	hinode->mn_mman    = &mman_kernel;
+	hinode->mn_partoff = 0;
+	/*hinode->mn_link  = ...;*/ /* Initialized below */
+
+	/* Have the hi-node mirror the is-writable attribute of the lo-node */
+	LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
+	if (LIST_ISBOUND(lonode, mn_writable)) {
+		LIST_INSERT_HEAD(&mman_kernel.mm_writable,
+		                 hinode, mn_writable);
+	}
+
+	/* Initialize the hi-part. */
+	hipart->mp_refcnt = 1;
+	hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT | MPART_F_NO_GLOBAL_REF |
+	                                        MPART_F_CHANGED | MPART_F_DONT_FREE |
+	                                        MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
+	/*hipart->mp_state = ...;*/ /* Alraedy initialized above */
+	hipart->mp_file = incref(lopart->mp_file);
+	LIST_INIT(&hipart->mp_copy);
+	LIST_INIT(&hipart->mp_share);
+	hinode->mn_link.le_next = NULL;
+	if (lonode->mn_flags & MNODE_F_SHARED) {
+		hinode->mn_link.le_prev = &hipart->mp_share.lh_first;
+	} else {
+		hinode->mn_link.le_prev = &hipart->mp_copy.lh_first;
+	}
+	*hinode->mn_link.le_prev = hinode;
+	SLIST_INIT(&hipart->mp_lockops);
+	/*LIST_ENTRY_UNBOUND_INIT(hipart, mp_allparts);*/ /* Initialized below */
+	DBG_memset(&hipart->mp_changed, 0xcc, sizeof(hipart->mp_changed));
+	hipart->mp_minaddr = 0;
+	hipart->mp_maxaddr = (pos_t)(hisize - 1);
+	DBG_memset(&hipart->mp_filent, 0xcc, sizeof(hipart->mp_filent));
+	/*hipart->mp_blkst_ptr = ...;*/ /* Initialized above */
+	/*hipart->mp_mem       = ...;*/ /* Initialized above */
+	hipart->mp_meta = NULL;
+
+	/* Mirror the part-of-global-list status of `lopart' in `hipart' */
+	if (LIST_ISBOUND(hipart, mp_allparts)) {
+		if (!(lopart->mp_flags & MPART_F_NO_GLOBAL_REF))
+			hipart->mp_refcnt = 2; /* +1 for the global list. */
+		mpart_all_list_insert(hipart);
+	} else {
+	    LIST_ENTRY_UNBOUND_INIT(hipart, mp_allparts);
+		assertf(lopart->mp_flags & MPART_F_NO_GLOBAL_REF,
+		        "How can you have a global ref, but not be part of the global list?");
+	}
+
+	/* Insert the lo- and hi-nodes now that they've been updated
+	 * to include the requested gap in-between. */
+	mnode_tree_insert(&mman_kernel.mm_mappings, lonode);
+	mnode_tree_insert(&mman_kernel.mm_mappings, hinode);
+
+	/* And we're done! */
+	return true;
+fail_hinode_hipart_bitset:
+	kfree(hipart->mp_blkst_ptr);
+fail_hinode_hipart:
+	mpart_free(hipart);
+fail_hinode:
+	mnode_free(hinode);
 fail:
 	return false;
 }
