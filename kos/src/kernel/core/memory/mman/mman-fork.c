@@ -17,44 +17,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT__OBJECTS_S
-#define GUARD_KERNEL_CORE_ARCH_I386_BOOT__OBJECTS_S 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C 1
 
 #include <kernel/compiler.h>
 
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
-#include <kernel/x86/cpuid.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/tss.h>
+#include <kos/except.h>
 
-#define EXPORT_AS_OBJECT(name) \
-	.type name, @object;       \
-	.global name;
-#define EXPORT_AS_OBJECT_EX(name, size_) \
-	EXPORT_AS_OBJECT(name)               \
-	.size name, size_;
-#ifdef CONFIG_USE_NEW_VM
-EXPORT_AS_OBJECT(mman_kernel)
-EXPORT_AS_OBJECT_EX(mman_kernel_lockops, __SIZEOF_POINTER__)
-#else /* CONFIG_USE_NEW_VM */
-EXPORT_AS_OBJECT(vm_kernel)
-#endif /* !CONFIG_USE_NEW_VM */
-EXPORT_AS_OBJECT(thiscpu_idle)
-EXPORT_AS_OBJECT(_bootcpu)
-EXPORT_AS_OBJECT(_bootidle)
-EXPORT_AS_OBJECT(_boottask)
-EXPORT_AS_OBJECT_EX(pagedir_kernel, PAGEDIR_SIZE)
-EXPORT_AS_OBJECT_EX(pagedir_kernel_phys, PAGEDIR_SIZE)
-EXPORT_AS_OBJECT_EX(thiscpu_x86_tss, SIZEOF_TSS)
-EXPORT_AS_OBJECT_EX(thiscpu_x86_iob, 8192)
-EXPORT_AS_OBJECT_EX(this_x86_kernel_psp0, __SIZEOF_POINTER__)
-EXPORT_AS_OBJECT_EX(bootcpu_x86_cpufeatures, 2)
-EXPORT_AS_OBJECT_EX(bootcpu_x86_cpuid, SIZEOF_CPUID_CPUINFO)
-EXPORT_AS_OBJECT_EX(bootcpu_x86_gdt, SEGMENT_COUNT * 8)
-EXPORT_AS_OBJECT_EX(thiscpu_idle_sstate, __SIZEOF_POINTER__)
-EXPORT_AS_OBJECT_EX(thiscpu_idle_x86_kernel_psp0, __SIZEOF_POINTER__)
-#undef EXPORT_AS_OBJECT_EX
-#undef EXPORT_AS_OBJECT
+DECL_BEGIN
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_BOOT__OBJECTS_S */
+/* Memory manager construction functions.
+ * NOTE: mman_fork() will fork the current mman. */
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
+mman_fork(void) THROWS(E_BADALLOC, ...) {
+	REF struct mman *newmm;
+	struct mman *oldmm;
+	oldmm = THIS_MMAN;
+	newmm = mman_new();
+	TRY {
+
+		/* TODO */
+
+	} EXCEPT {
+		decref_likely(newmm);
+		RETHROW();
+	}
+	return newmm;
+}
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C */

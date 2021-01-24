@@ -314,7 +314,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	x86_initialize_commandline_himem();
 
 	/* Allocate and set the user-space VM for /bin/init */
-	kernel_initialize_user_vm();
+	kernel_initialize_user_mman();
 
 	/* Evaluate commandline options defined as `DEFINE_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_stable();

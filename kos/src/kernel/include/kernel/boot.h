@@ -41,11 +41,11 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_early)(void
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_stable)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_late)(void);
 
-/* Allocate an set a new VM for /bin/init during booting.
- * This function is used to assign a new VM for the initial user-space process,
- * so-as not to launch that process in the context of the special `kernel_vm',
+/* Allocate an set a new mman for /bin/init during booting.
+ * This function is used to assign a new mman for the initial user-space process,
+ * so-as not to launch that process in the context of the special `mman_kernel',
  * which shouldn't contain mappings for anything user-space related. */
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_user_vm)(void);
+INTDEF FREE void NOTHROW(KCALL kernel_initialize_user_mman)(void);
 
 /* Initialize (link, relocation & initialize) all drivers
  * loaded via the kernel commandline as bootloader modules.

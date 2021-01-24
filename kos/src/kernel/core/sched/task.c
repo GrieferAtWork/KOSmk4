@@ -447,7 +447,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 			                               self,
 			                               self->t_heapsz,
 			                               MAX(MAX(COMPILER_OFFSETAFTER(struct task, t_mman_tasks),
-			                                       KEY_task_vm_dead__next_offsetafter),
+			                                       KEY_task__next_offsetafter),
 			                                   COMPILER_OFFSETAFTER(struct task, t_heapsz)),
 			                               GFP_NORMAL);
 			/* Schedule our task for pending removal within its associated VM.
@@ -455,7 +455,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 			 * we will be removed automatically, and finally freed. */
 			do {
 				next = ATOMIC_READ(myvm->v_deltasks);
-				ATOMIC_WRITE(KEY_task_vm_dead__next(self), next);
+				ATOMIC_WRITE(KEY_task__next(self), next);
 			} while (!ATOMIC_CMPXCH_WEAK(myvm->v_deltasks, next, self));
 			vm_tasklock_tryservice(myvm);
 		} else {

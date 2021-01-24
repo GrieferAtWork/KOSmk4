@@ -2033,7 +2033,7 @@ struct vm {
 	                                             *          tasks that haven't yet started, or even tasks
 	                                             *          with a reference counter of ZERO(0)! */
 	struct atomic_rwlock       v_tasklock;      /* Lock for `v_tasks' */
-	WEAK REF struct task      *v_deltasks;      /* [0..1][CHAIN(key:KEY_task_vm_dead__next)]
+	WEAK REF struct task      *v_deltasks;      /* [0..1][CHAIN(key:KEY_task__next)]
 	                                             * Chain of tasks that are pending deletion from `v_tasks',
 	                                             * as well as follow-up `heap_free()' of the task in question.
 	                                             * NOTE: All other components of the task will have already been destroyed. */

@@ -58,7 +58,7 @@
 #endif /* !NDEBUG */
 
 /* Internal key used to chain threads that have to be destroyed. */
-#define sig_destroylater_next(thread) KEY_task_vm_dead__next(thread)
+#define sig_destroylater_next(thread) KEY_task__next(thread)
 
 DECL_BEGIN
 

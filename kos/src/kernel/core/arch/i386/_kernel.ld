@@ -414,6 +414,7 @@ SECTIONS {
 		IP_ALIGN(PAGEDIR_ALIGN);
 #ifdef CONFIG_USE_NEW_VM
 		PROVIDE(mman_kernel = ABSOLUTE(.));
+		PROVIDE(mman_kernel_lockops = ABSOLUTE(mman_kernel + thismman_lockops));
 #else /* CONFIG_USE_NEW_VM */
 		PROVIDE(vm_kernel = ABSOLUTE(.));
 #endif /* !CONFIG_USE_NEW_VM */

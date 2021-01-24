@@ -108,13 +108,13 @@ struct task {
 	LLIST_NODE(struct task) t_mman_tasks; /* [lock(t_mman->v_tasklock)] Chain of tasks using `t_mman' */
 	size_t                  t_heapsz;     /* [const] Allocated heap size of this task. */
 	union {
-		struct task        *_t_next;      /* [0..1][lock(INTERNAL)] Next dead VM within the same VM. */
+		struct task        *_t_next;      /* [0..1][lock(INTERNAL)] Next thread in an out-of-bad listing. */
 		struct scpustate   *t_state;      /* [lock(PRIVATE(t_cpu == THIS_CPU))]
 		                                   * [valid_if(t_self != FORCPU(t_cpu, thiscpu_sched_current))]
 		                                   * The CPU state to-be restored when execution of this task continues. */
 	};
-#define KEY_task_vm_dead__next_offsetafter __COMPILER_OFFSETAFTER(struct task, _t_next)
-#define KEY_task_vm_dead__next(thread)     (thread)->_t_next
+#define KEY_task__next_offsetafter __COMPILER_OFFSETAFTER(struct task, _t_next)
+#define KEY_task__next(thread)     (thread)->_t_next
 	/* ATTR_PERTASK-data goes here. */
 };
 

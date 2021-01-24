@@ -385,7 +385,7 @@ PRIVATE ATTR_FREETEXT void KCALL assert_int128(void) {
  * so-as not to launch that process in the context of the special `kernel_vm',
  * which shouldn't contain mappings for anything user-space related. */
 INTERN ATTR_FREETEXT void
-NOTHROW(KCALL kernel_initialize_user_vm)(void) {
+NOTHROW(KCALL kernel_initialize_user_mman)(void) {
 	REF struct vm *uvm;
 	uvm = vm_alloc();
 	task_setvm(uvm);
