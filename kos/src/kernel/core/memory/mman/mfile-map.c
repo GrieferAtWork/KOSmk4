@@ -114,10 +114,14 @@ _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 	block_aligned_size = (block_aligned_size + file->mf_part_amask) & ~file->mf_part_amask;
 
 	SLIST_INIT(&self->mfm_nodes);
-	SLIST_INIT(&self->mfm_flist);
 	/* Allocate the initial node! */
-	node = (struct mnode *)kmalloc(sizeof(struct mnode),
-	                               GFP_LOCKED | GFP_PREFLT);
+	node = SLIST_FIRST(&self->mfm_flist);
+	if (node != NULL) {
+		SLIST_REMOVE_HEAD(&self->mfm_flist, _mn_alloc);
+	} else {
+		node = (struct mnode *)kmalloc(sizeof(struct mnode),
+		                               GFP_LOCKED | GFP_PREFLT);
+	}
 	TRY {
 again_getpart:
 		part = mfile_getpart(file,
@@ -616,6 +620,53 @@ again:
 	if (self->mfm_flags & MAP_POPULATE) {
 		/* TODO */
 	}
+	return true;
+fail:
+	return false;
+}
+
+
+/* Essentially does the same as `mfile_map_acquire_or_unlock()', however the
+ * caller must already be holding locks to every mem-part mapped by `self'
+ * However, use of `mfile_map_acquire_or_unlock()' is still more efficient,
+ * since that function can do some tricks which this one can't (see impl)! */
+PUBLIC WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
+                           struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct mfile *file;
+	pos_t block_aligned_addr;
+	size_t block_aligned_size;
+	file = self->mfm_file;
+	assert(IS_ALIGNED(self->mfm_addr, PAGESIZE));
+	assert(IS_ALIGNED(self->mfm_size, PAGESIZE));
+	block_aligned_addr = self->mfm_addr & ~file->mf_part_amask;
+	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
+	block_aligned_size = (block_aligned_size + file->mf_part_amask) & ~file->mf_part_amask;
+
+	/* Essentially do the same stuff as `mfile_map_acquire_or_unlock()' */
+	mfile_map_unlock_and_remove_non_overlapping_parts(self);
+	mnode_slist_adjusted_mapped_ranges(&self->mfm_nodes,
+	                                   self->mfm_addr,
+	                                   self->mfm_addr + self->mfm_size - 1);
+
+	if (!mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size)) {
+		/* This is where the control-flow differs from `mfile_map_acquire_or_unlock()'
+		 * Because the caller is responsible for locking the parts from our node-list,
+		 * we are unable to re-acquire those locks, also meaning we have unconditionally
+		 * unlock everything here, rather than still having the chance to do stuff w/o
+		 * having to unlock everything. */
+		mfile_map_release(self);
+		unlockinfo_xunlock(unlock);
+		if (mfile_map_fill_holes(self, NULL))
+			assert(mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size));
+		goto fail;
+	}
+
+	if (self->mfm_flags & MAP_POPULATE) {
+		/* TODO */
+	}
+
 	return true;
 fail:
 	return false;

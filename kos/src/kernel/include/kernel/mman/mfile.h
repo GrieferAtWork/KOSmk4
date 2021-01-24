@@ -327,7 +327,9 @@ struct mfile_map {
 	                                       *  - mn_fspath, mn_fsname */
 	struct mnode_slist         mfm_flist; /* [0..n][owned] Internal list of free nodes.
 	                                       * Required/superfluous mem-nodes are added/removed from
-	                                       * this list for the purpose of allocation/deallocation */
+	                                       * this list for the purpose of allocation/deallocation.
+	                                       * NOTE: Nodes in this list are free'd using `kfree()'!
+	                                       *       No mcorepart support here! */
 };
 
 /* Lookup/create all parts to span the given address range, as
@@ -363,7 +365,7 @@ mfile_map_init(struct mfile_map *__restrict self,
 #define mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags) \
 	((self)->mfm_file = (file), (self)->mfm_addr = (addr),                   \
 	 (self)->mfm_prot = (prot), (self)->mfm_flags = (flags),                 \
-	 _mfile_map_init_and_acquire(self))
+	 SLIST_INIT(&(self)->mfm_flist), _mfile_map_init_and_acquire(self))
 #define mfile_map_init(self, file, addr, num_bytes, prot, flags)           \
 	(mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags), \
 	 mfile_map_release(self))
@@ -371,6 +373,8 @@ mfile_map_init(struct mfile_map *__restrict self,
 FUNDEF NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+#define _mfile_map_init(self) \
+	(_mfile_map_init_and_acquire(self), mfile_map_release(self))
 
 
 
@@ -400,6 +404,15 @@ NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
                             struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Essentially does the same as `mfile_map_acquire_or_unlock()', however the
+ * caller must already be holding locks to every mem-part mapped by `self'
+ * However, use of `mfile_map_acquire_or_unlock()' is still more efficient,
+ * since that function can do some tricks which this one can't (see impl)! */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
+                           struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Finalize a given mem-node-allocator.

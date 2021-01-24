@@ -28,66 +28,67 @@
 #include <kernel/paging.h>
 
 /* Values for `struct mnode::mn_flags' */
-#define MNODE_F_NORMAL    0x0000 /* Normal flags. */
-#define MNODE_F_PEXEC     0x0001 /* Data can be executed. */
-#define MNODE_F_PWRITE    0x0002 /* Data can be written. */
-#define MNODE_F_PREAD     0x0004 /* Data can be read. */
-/*efine MNODE_F_          0x0008  * ... */
-/*efine MNODE_F_          0x0010  * ... */
-#define MNODE_F_SHARED    0x0020 /* Changes made by this memory mapping are shared.
-                                  * When not set, attempting to write to this node will instead
-                                  * replace `mn_part' with an identical, but anonymous copy:
-                                  * >>     // Is the part accessible from its file?
-                                  * >>     self->mn_part->mp_file->mf_parts != MFILE_PARTS_ANONYMOUS ||
-                                  * >>
-                                  * >>     // Is there some part that wants shared access to the part?
-                                  * >>     !LIST_EMPTY(&self->mn_part->mp_share) ||
-                                  * >>
-                                  * >>     // Are there any other nodes with copy-on-write for this part?
-                                  * >>     (LIST_FIRST(&self->mn_part->mp_copy) != self ||
-                                  * >>      LIST_NEXT(self, mn_link) != NULL)
-                                  * If any of these checks succeed, then `mn_part' is replaced with
-                                  * the required private copy, thus allowing for copy-on-write */
-#define MNODE_F_NO_SPLIT  0x0040 /* [const] Don't allow this mem-node to be split. */
-#define MNODE_F_NO_MERGE  0x0080 /* [const] Don't allow this mem-node to be merged. When set, this flag
-                                  *         guaranties that munmap() will _always_ succeed without ever
-                                  *         resulting in an `E_BADALLOC' exception. */
-#define MNODE_F_COREPART  0x0100 /* [const] Core part (free this node using `mcoreheap_free()' instead of `kfree()') */
-#define MNODE_F_KERNPART  0x0200 /* [const] This node describes part of the static kernel core and must
-                                  *         not be modified or removed. Attempting to do so anyways will
-                                  *         result in kernel panic. */
-#define MNODE_F_UNMAPPED  0x0400 /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
-                                  * NOTE: You should never see this flag on any node still part of an mman's node-tree! */
-#define MNODE_F_MPREPARED 0x0800 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
-                                  *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
-                                  *         within the new process will have this flag cleared) */
-#define MNODE_F_MHINT     0x1000 /* [lock(CLEAR_ONCE)]
-                                  * The page directory is set-up to hint towards this node, allowing it
-                                  * to still be initialized lazily, but without the need to acquire any
-                                  * sort of lock. For this, the following invariants are assumed:
-                                  *  - ADDRRANGE_ISKERN(mnode_getaddr(this), mnode_getendaddr(this))
-                                  *  - mn_mman == &mman_kernel
-                                  *  - mn_part != NULL
-                                  *  - mn_link.le_prev == &(mn_flags & MNODE_F_SHARED ? mn_part->mp_share : mn_part->mp_copy).lh_first
-                                  *  - *mn_link.le_prev = this
-                                  *  - mn_link.le_next == NULL
-                                  *  - (mn_flags & MNODE_F_SHARED ? mn_part->mp_copy : mn_part->mp_share).lh_first == NULL
-                                  *  - !isshared(mn_part) // Not strictly enforced, but assumed. - You are allowed to
-                                  *                       // reference the part elsewhere, but you mustn't change it.
-                                  *  - NOBLOCK(mn_part->mp_file->mf_ops->mo_loadblocks)
-                                  *  - NOTHROW(mn_part->mp_file->mf_ops->mo_loadblocks)
-                                  *  - mn_part->mp_file->mf_blockshift == PAGESHIFT
-                                  *  - mn_part->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS
-                                  *  - MPART_ST_INMEM(mn_part->mp_state)
-                                  * You may force a node to no longer be hinted by ensuring that all of its
-                                  * pages have been accessed at least once (read-only access is enough for this),
-                                  * and (in SMP-only) waited until `mman_kernel_hintinit_inuse' became zero.
-                                  * Afterwards, you may clear this flag. But also note that before then, you
-                                  * must also be aware of the fact that requirements imposed by `MNODE_F_NO_SPLIT'
-                                  * and `MNODE_F_NO_MERGE' also apply to nodes that are hinted! */
-#define MNODE_F_MLOCK     0x2000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
-/*efine MNODE_F_          0x4000  * ... */
-#define MNODE_F__RBRED    0x8000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
+#define MNODE_F_NORMAL    0x0000  /* Normal flags. */
+#define MNODE_F_PEXEC     0x0001  /* Data can be executed. */
+#define MNODE_F_PWRITE    0x0002  /* Data can be written. */
+#define MNODE_F_PREAD     0x0004  /* Data can be read. */
+/*efine MNODE_F_          0x0008   * ... */
+/*efine MNODE_F_          0x0010   * ... */
+#define MNODE_F_SHARED    0x0020  /* Changes made by this memory mapping are shared.
+                                   * When not set, attempting to write to this node will instead
+                                   * replace `mn_part' with an identical, but anonymous copy:
+                                   * >>     // Is the part accessible from its file?
+                                   * >>     self->mn_part->mp_file->mf_parts != MFILE_PARTS_ANONYMOUS ||
+                                   * >>
+                                   * >>     // Is there some part that wants shared access to the part?
+                                   * >>     !LIST_EMPTY(&self->mn_part->mp_share) ||
+                                   * >>
+                                   * >>     // Are there any other nodes with copy-on-write for this part?
+                                   * >>     (LIST_FIRST(&self->mn_part->mp_copy) != self ||
+                                   * >>      LIST_NEXT(self, mn_link) != NULL)
+                                   * If any of these checks succeed, then `mn_part' is replaced with
+                                   * the required private copy, thus allowing for copy-on-write */
+#define MNODE_F_NO_SPLIT  0x0040  /* [const] Don't allow this mem-node to be split. */
+#define MNODE_F_NO_MERGE  0x0080  /* [const] Don't allow this mem-node to be merged. When set, this flag
+                                   *         guaranties that munmap() will _always_ succeed without ever
+                                   *         resulting in an `E_BADALLOC' exception. */
+#define MNODE_F_COREPART  0x0100  /* [const] Core part (free this node using `mcoreheap_free()' instead of `kfree()') */
+#define MNODE_F_KERNPART  0x0200  /* [const] This node describes part of the static kernel core and must
+                                   *         not be modified or removed. Attempting to do so anyways will
+                                   *         result in kernel panic. */
+#define MNODE_F_UNMAPPED  0x0400  /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
+                                   * NOTE: You should never see this flag on any node still part of an mman's node-tree! */
+#define MNODE_F_MPREPARED 0x0800  /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
+                                   *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
+                                   *         within the new process will have this flag cleared) */
+#define MNODE_F_MHINT     0x1000  /* [lock(CLEAR_ONCE)]
+                                   * The page directory is set-up to hint towards this node, allowing it
+                                   * to still be initialized lazily, but without the need to acquire any
+                                   * sort of lock. For this, the following invariants are assumed:
+                                   *  - ADDRRANGE_ISKERN(mnode_getaddr(this), mnode_getendaddr(this))
+                                   *  - mn_mman == &mman_kernel
+                                   *  - mn_part != NULL
+                                   *  - mn_link.le_prev == &(mn_flags & MNODE_F_SHARED ? mn_part->mp_share : mn_part->mp_copy).lh_first
+                                   *  - *mn_link.le_prev = this
+                                   *  - mn_link.le_next == NULL
+                                   *  - (mn_flags & MNODE_F_SHARED ? mn_part->mp_copy : mn_part->mp_share).lh_first == NULL
+                                   *  - !isshared(mn_part) // Not strictly enforced, but assumed. - You are allowed to
+                                   *                       // reference the part elsewhere, but you mustn't change it.
+                                   *  - NOBLOCK(mn_part->mp_file->mf_ops->mo_loadblocks)
+                                   *  - NOTHROW(mn_part->mp_file->mf_ops->mo_loadblocks)
+                                   *  - mn_part->mp_file->mf_blockshift == PAGESHIFT
+                                   *  - mn_part->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS
+                                   *  - MPART_ST_INMEM(mn_part->mp_state)
+                                   * You may force a node to no longer be hinted by ensuring that all of its
+                                   * pages have been accessed at least once (read-only access is enough for this),
+                                   * and (in SMP-only) waited until `mman_kernel_hintinit_inuse' became zero.
+                                   * Afterwards, you may clear this flag. But also note that before then, you
+                                   * must also be aware of the fact that requirements imposed by `MNODE_F_NO_SPLIT'
+                                   * and `MNODE_F_NO_MERGE' also apply to nodes that are hinted! */
+#define MNODE_F_MLOCK     0x2000  /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
+#define MNODE_F__RBRED    0x4000  /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
+#define MBNODE_F_POPULATE 0x08000 /* Used internally by `struct mbnode' */
+#define MBNODE_F_NONBLOCK 0x10000 /* Used internally by `struct mbnode' */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -162,6 +163,7 @@ struct mnode {
 	 * NOTE: Since the current usermod/driver system isn't integrated into the old vm
 	 *       system, this is something that should only be tackled once the new mman
 	 *       has been enabled in all other aspects! */
+	void *_mn_module;
 };
 
 

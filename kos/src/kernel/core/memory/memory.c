@@ -710,6 +710,11 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
+	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	 *       interface that does the allocation while possibly clearing caches!
+	 * I totally forgot that this happens in here, and there are many places
+	 * that aren't designed to efficiently deal with system caches being cleared
+	 * in this manner! */
 	if (system_clearcaches_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
@@ -758,6 +763,11 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
+	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	 *       interface that does the allocation while possibly clearing caches!
+	 * I totally forgot that this happens in here, and there are many places
+	 * that aren't designed to efficiently deal with system caches being cleared
+	 * in this manner! */
 	if (system_clearcaches_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
@@ -855,6 +865,11 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
+	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	 *       interface that does the allocation while possibly clearing caches!
+	 * I totally forgot that this happens in here, and there are many places
+	 * that aren't designed to efficiently deal with system caches being cleared
+	 * in this manner! */
 	if (system_clearcaches_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
@@ -1065,6 +1080,11 @@ again:
 		}
 
 	} while ((zone = zone->mz_prev) != NULL);
+	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	 *       interface that does the allocation while possibly clearing caches!
+	 * I totally forgot that this happens in here, and there are many places
+	 * that aren't designed to efficiently deal with system caches being cleared
+	 * in this manner! */
 	if (system_clearcaches_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;

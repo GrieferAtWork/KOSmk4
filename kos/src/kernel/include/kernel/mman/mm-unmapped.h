@@ -169,9 +169,15 @@ DATDEF unsigned int mman_getunmapped_extflags;
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Error: No free space matching requirements was found. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
-NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
-                                 void *addr, size_t num_bytes, unsigned int flags,
+NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self, void *addr,
+                                 size_t num_bytes, unsigned int flags,
                                  size_t min_alignment DFL(PAGESIZE));
+/* Given a `struct mnode **p_tree_root', try to find a free uesr-space location.
+ * Don't use this function. - It's a kind-of hacky work-around to allow for the
+ * use of `mman_findunmapped()' in implementing `mbuilder_findunmapped()' */
+#define mman_findunmapped_in_usertree(p_tree_root, ...) \
+	mman_findunmapped(COMPILER_CONTAINER_OF(p_tree_root, struct mman, mm_mappings), __VA_ARGS__)
+
 
 /* Similar to `mman_findunmapped()', but never return `MAP_FAILED', and automatically split
  * mem-nodes at the resulting min/max bounds when `MAX_FIXED' w/o `MAP_FIXED_NOREPLACE' is

@@ -186,7 +186,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
 	struct mnode_tree_minmax mima;
 	PAGEDIR_PAGEALIGNED void *allow_minaddr, *allow_maxaddr;
 	PAGEDIR_PAGEALIGNED void *avail_minaddr, *avail_maxaddr;
-	assert(mman_lock_acquired(self));
+	/*assert(mman_lock_acquired(self));*/ /* Cannot be asserted because of `mman_findunmapped_in_usertree()' */
 
 	/* Load additional flags. */
 	flags |= mman_getunmapped_extflags;
@@ -328,9 +328,9 @@ do_set_automatic_userspace_hint:
 
 	/* Check if the hinted address range is available. */
 	mnode_tree_minmaxlocate(self->mm_mappings,
-	                              avail_minaddr,
-	                              avail_maxaddr,
-	                              &mima);
+	                        avail_minaddr,
+	                        avail_maxaddr,
+	                        &mima);
 	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
 	if (mima.mm_min == NULL) {
 		uintptr_t retindex;
@@ -350,7 +350,7 @@ select_from_avail_range:
 		if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
 			if (avail_minaddr > allow_minaddr) {
 				mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
-				                              (byte_t *)avail_minaddr - 1, &mima);
+				                        (byte_t *)avail_minaddr - 1, &mima);
 				if (mima.mm_max != NULL)
 					avail_minaddr = mnode_getmaxaddr(mima.mm_max) + 1;
 			}
@@ -360,8 +360,8 @@ select_from_avail_range:
 		} else if (MMAN_GETUNMAPPED_ISABOVE(flags)) {
 			if (avail_maxaddr < allow_maxaddr) {
 				mnode_tree_minmaxlocate(self->mm_mappings,
-				                              (byte_t *)avail_maxaddr + 1,
-				                              (byte_t *)allow_maxaddr, &mima);
+				                        (byte_t *)avail_maxaddr + 1,
+				                        (byte_t *)allow_maxaddr, &mima);
 				if (mima.mm_min != NULL)
 					avail_minaddr = mnode_getminaddr(mima.mm_min) - 1;
 			}
@@ -372,14 +372,14 @@ select_from_avail_range:
 		} else {
 			if (avail_minaddr > allow_minaddr) {
 				mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
-				                              (byte_t *)avail_minaddr - 1, &mima);
+				                        (byte_t *)avail_minaddr - 1, &mima);
 				if (mima.mm_max != NULL)
 					avail_minaddr = mnode_getmaxaddr(mima.mm_max) + 1;
 			}
 			if (avail_maxaddr < allow_maxaddr) {
 				mnode_tree_minmaxlocate(self->mm_mappings,
-				                              (byte_t *)avail_maxaddr + 1,
-				                              (byte_t *)allow_maxaddr, &mima);
+				                        (byte_t *)avail_maxaddr + 1,
+				                        (byte_t *)allow_maxaddr, &mima);
 				if (mima.mm_min != NULL)
 					avail_minaddr = mnode_getminaddr(mima.mm_min) - 1;
 			}

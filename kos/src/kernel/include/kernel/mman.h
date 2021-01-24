@@ -101,13 +101,6 @@ template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T
 #endif /* !FORMMAN */
 
 
-/* TODO: fork() should not have to truely create a new page directory.
- *              Instead, try to make it so that dynamic elements of the
- *              page directory can be shared between multiple mmans! */
-/* TODO: exec() should use `mman_new()' to create an actual, new memory
- *              manager from scratch. */
-
-
 /* The kernel's own memory manager. */
 DATDEF struct mman mman_kernel;
 
@@ -145,12 +138,6 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
  * >>     pagedir_fork(result->mn_pdir);
  * >>     ...
  * >> }
- *
- * pagedir_fork:
- *    Use the `v_unused*_ign' bits of the entries of all of the
- *    dynamically allocated vectors within the page directory
- *    as a data-stream to encode a reference counter for the
- *    surrounding page-vector. (s.a. `p32_pagedir_refe2_incref')
  *
  * NOTE: The pagedir_fork() idea may be possible to implement,
  *       but the whole copy-on-write memory-mappings-tree idea

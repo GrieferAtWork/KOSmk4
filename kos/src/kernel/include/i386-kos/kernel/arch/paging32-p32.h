@@ -289,27 +289,6 @@ NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self);
 
-/* Initialize `self' as a fork-copy of the current page directory:
- *   - Initialize kernel-space of `self' completely normal.
- *   - Clear the WRITABLE bit for all user-space pages
- *   - (try to) increment the reference counter for all currently
- *     allocated vectors in `P32_PDIR_E2_IDENTITY'. Where this is
- *     impossible (due to a refcnt overflow), a hard copy of the
- *     associated vector is made. */
-INTDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL p32_pagedir_fork)(VIRT struct p32_pdir *__restrict self,
-                                PHYS struct p32_pdir *phys_self);
-
-
-
-/* Reference counter control for `P32_PDIR_E2_IDENTITY[vec2]'
- * NOTE: Reference counting is implemented by combining the `d_unused1_ign'
- *       fields of all of the E1-entires pointed to by the indexed E2-vector.
- */
-INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_incref)(unsigned int vec2); /* true: OK; false: Failed to incref */
-INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_decref)(unsigned int vec2); /* true: OK; false: Last ref has gone away (you must free the vector now) */
-INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_isshrd)(unsigned int vec2); /* true: At least 2 references; false: 1 reference */
-
 /* Prepare the page directory for a future map() operation.
  * The full cycle of a single mapping then looks like this:
  * >> p32_pagedir_prepare_map(...);

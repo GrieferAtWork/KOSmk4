@@ -54,6 +54,38 @@ DECL_BEGIN
 	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0))
 #endif /* !... */
 
+/* >> uintptr_t mbnodeflags_from_mapflags(unsigned int prot);
+ * Convert `MAP_*' to `MNODE_F_*' | `MBNODE_F_*':
+ *   - 0            -> MNODE_F_NORMAL
+ *   - MAP_PREPARED -> MNODE_F_MPREPARED
+ *   - MAP_LOCKED   -> MNODE_F_MLOCK
+ *   - MAP_POPULATE -> MBNODE_F_POPULATE
+ *   - MAP_NONBLOCK -> MBNODE_F_NONBLOCK
+ */
+#if (0 == MNODE_F_NORMAL &&               \
+     MAP_PREPARED == MNODE_F_MPREPARED && \
+     MAP_LOCKED == MNODE_F_MLOCK &&       \
+     MAP_POPULATE == MBNODE_F_POPULATE && \
+     MAP_NONBLOCK == MBNODE_F_NONBLOCK)
+#define mbnodeflags_from_mapflags(mapflags)            \
+	((mapflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK | \
+	               MBNODE_F_POPULATE | MBNODE_F_NONBLOCK))
+#define mapflags_from_mbnodeflags(mbnodeflags)    \
+	((mbnodeflags) & (MAP_PREPARED | MAP_LOCKED | \
+	                  MAP_POPULATE | MAP_NONBLOCK))
+#else /* ... */
+#define mbnodeflags_from_mapflags(mapflags)                \
+	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
+	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0) |       \
+	 (((mapflags)&MAP_POPULATE) ? MBNODE_F_POPULATE : 0) | \
+	 (((mapflags)&MAP_NONBLOCK) ? MBNODE_F_NONBLOCK : 0))
+#define mapflags_from_mbnodeflags(mbnodeflags)                \
+	((((mbnodeflags)&MNODE_F_MPREPARED) ? MAP_PREPARED : 0) | \
+	 (((mbnodeflags)&MNODE_F_MLOCK) ? MAP_LOCKED : 0) |       \
+	 (((mbnodeflags)&MBNODE_F_POPULATE) ? MAP_POPULATE : 0) | \
+	 (((mbnodeflags)&MBNODE_F_NONBLOCK) ? MAP_NONBLOCK : 0))
+#endif /* !... */
+
 
 
 /* >> uintptr_t mnodeflags_from_prot(unsigned int prot);
@@ -72,12 +104,20 @@ DECL_BEGIN
 #define mnodeflags_from_prot(prot)              \
 	((prot) & (MNODE_F_PEXEC | MNODE_F_PWRITE | \
 	           MNODE_F_PREAD | MNODE_F_SHARED))
+#define prot_from_mnodeflags(mnodeflags)      \
+	((mnodeflags) & (PROT_EXEC | PROT_WRITE | \
+	                 PROT_READ | PROT_SHARED))
 #else /* ... */
 #define mnodeflags_from_prot(prot)                \
 	((((prot)&PROT_EXEC) ? MNODE_F_PEXEC : 0) |   \
 	 (((prot)&PROT_WRITE) ? MNODE_F_PWRITE : 0) | \
 	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0) |   \
 	 (((prot)&PROT_SHARED) ? MNODE_F_SHARED : 0))
+#define prot_from_mnodeflags(mnodeflags)                \
+	((((mnodeflags)&MNODE_F_PEXEC) ? PROT_EXEC : 0) |   \
+	 (((mnodeflags)&MNODE_F_PWRITE) ? PROT_WRITE : 0) | \
+	 (((mnodeflags)&MNODE_F_PREAD) ? PROT_READ : 0) |   \
+	 (((mnodeflags)&MNODE_F_SHARED) ? PROT_SHARED : 0))
 #endif /* !... */
 #if (PROT_NONE == 0 &&               \
      PROT_EXEC == MNODE_F_PEXEC &&   \
@@ -85,11 +125,17 @@ DECL_BEGIN
      PROT_READ == MNODE_F_PREAD)
 #define mnodeflags_from_prot_noshared(prot) \
 	((prot) & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD))
+#define prot_from_mnodeflags_noshared(mnodeflags) \
+	((mnodeflags) & (PROT_EXEC | PROT_WRITE | PROT_READ))
 #else /* ... */
 #define mnodeflags_from_prot_noshared(prot)       \
 	((((prot)&PROT_EXEC) ? MNODE_F_PEXEC : 0) |   \
 	 (((prot)&PROT_WRITE) ? MNODE_F_PWRITE : 0) | \
 	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0))
+#define prot_from_mnodeflags_noshared(mnodeflags)       \
+	((((mnodeflags)&MNODE_F_PEXEC) ? PROT_EXEC : 0) |   \
+	 (((mnodeflags)&MNODE_F_PWRITE) ? PROT_WRITE : 0) | \
+	 (((mnodeflags)&MNODE_F_PREAD) ? PROT_READ : 0))
 #endif /* !... */
 
 
