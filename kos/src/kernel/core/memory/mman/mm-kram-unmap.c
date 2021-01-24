@@ -383,7 +383,7 @@ NOTHROW(FCALL freefun_for_mpart)(struct mpart const *__restrict self) {
 	case MPART_ST_MEM:
 	case MPART_ST_MEM_SC:
 		result = &freefun_phys;
-		if (self->mp_flags & MPART_F_DONT_FREE)
+		if (self->mp_flags & MPART_F_NO_FREE)
 			result = &freefun_noop;
 		break;
 
@@ -1192,7 +1192,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	/* Initialize the hi-part. */
 	hipart->mp_refcnt = 1;
 	hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT | MPART_F_NO_GLOBAL_REF |
-	                                        MPART_F_CHANGED | MPART_F_DONT_FREE |
+	                                        MPART_F_CHANGED | MPART_F_NO_FREE |
 	                                        MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
 	/*hipart->mp_state = ...;*/ /* Alraedy initialized above */
 	hipart->mp_file = incref(lopart->mp_file);

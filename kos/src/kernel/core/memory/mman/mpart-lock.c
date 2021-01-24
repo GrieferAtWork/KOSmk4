@@ -158,8 +158,7 @@ mpart_hasmeta_or_unlock(struct mpart *__restrict self,
 	if (self->mp_meta == NULL) {
 		struct mpartmeta *meta;
 		meta = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta),
-		                                      GFP_ATOMIC | GFP_CALLOC |
-		                                      GFP_LOCKED | GFP_PREFLT);
+		                                      GFP_ATOMIC | GFP_CALLOC);
 		if (meta == NULL) {
 			/* Must allocate while blocking. */
 			incref(self);
@@ -167,8 +166,7 @@ mpart_hasmeta_or_unlock(struct mpart *__restrict self,
 			unlockinfo_xunlock(unlock);
 			FINALLY_DECREF_UNLIKELY(self);
 			meta = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
-			                                   GFP_CALLOC | GFP_LOCKED |
-			                                   GFP_PREFLT);
+			                                   GFP_CALLOC);
 			mpartmeta_cinit(meta);
 			/* Remember that meta-data has been allocated. */
 			if unlikely(!ATOMIC_CMPXCH(self->mp_meta, NULL, meta))

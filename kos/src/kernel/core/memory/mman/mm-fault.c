@@ -234,8 +234,7 @@ mman_forcefault(struct mman *__restrict self,
 again_mfault_init:
 		pagealigned_addr = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 		pagealigned_size = CEIL_ALIGN(num_bytes + ((uintptr_t)addr - (uintptr_t)pagealigned_addr), PAGESIZE);
-		mfault_init(&mf, ADDR_ISKERN(addr) ? &mman_kernel : THIS_MMAN,
-		            pagealigned_addr, pagealigned_size, flags);
+		mfault_init(&mf, self, pagealigned_addr, pagealigned_size, flags);
 		TRY {
 again:
 			mman_lock_acquire(mf.mfl_mman);
@@ -253,7 +252,7 @@ again:
 				mfault_fini(&mf);
 				if (flags & MMAN_FAULT_F_NOVIO)
 					goto err_unmapped_now;
-				old_end_addr = (void *)addr + num_bytes;
+				old_end_addr = (byte_t *)addr + num_bytes;
 				new_end_addr = mnode_getendaddr(mf.mfl_node);
 				if (new_end_addr >= old_end_addr)
 					goto done;
@@ -300,10 +299,11 @@ again:
 	}
 done:
 	return;
+/*
 unlock_and_done:
 	mman_lock_release(mf.mfl_mman);
 	mfault_fini(&mf);
-	goto done;
+	goto done;*/
 err_unmapped:
 	mman_lock_release(mf.mfl_mman);
 	mfault_fini(&mf);

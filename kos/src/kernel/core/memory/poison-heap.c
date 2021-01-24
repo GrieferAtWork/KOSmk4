@@ -83,6 +83,12 @@ DECL_BEGIN
 PRIVATE ATTR_COLDTEXT PAGEDIR_PAGEALIGNED void *
 NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     gfp_t flags) {
+#ifdef CONFIG_USE_NEW_VM
+	return mman_map_kram(NULL, num_bytes,
+	                     GFP_LOCKED | GFP_PREFLT |
+	                     GFP_VCBASE | GFP_NOCLRC |
+	                     GFP_NOSWAP | flags);
+#else /* CONFIG_USE_NEW_VM */
 	PAGEDIR_PAGEALIGNED void *mapping_target;
 	struct vm_corepair_ptr corepair;
 	physpage_t block0_addr;
@@ -153,6 +159,7 @@ err_corepair:
 	vm_node_free(corepair.cp_node);
 	vm_datapart_free(corepair.cp_part);
 	return NULL;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 struct ph_unused {

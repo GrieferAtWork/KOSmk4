@@ -40,6 +40,7 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <kernel/mman/ramfile.h>
 
 #define VM_DATAPART_PPP_UNINITIALIZED                 MPART_BLOCK_ST_NDEF
 #define VM_DATAPART_PPP_INITIALIZING                  MPART_BLOCK_ST_INIT
@@ -49,7 +50,7 @@
 #define VM_DATAPART_FLAG_NORMAL                       MPART_F_NORMAL
 #define VM_DATAPART_FLAG_LOCKED                       MPART_F_MLOCK
 #define VM_DATAPART_FLAG_CHANGED                      MPART_F_CHANGED
-#define VM_DATAPART_FLAG_KEEPRAM                      MPART_F_DONT_FREE
+#define VM_DATAPART_FLAG_KEEPRAM                      MPART_F_NO_FREE
 #define VM_DATAPART_FLAG_COREPRT                      MPART_F_COREPART
 #define VM_DATAPART_FLAG_KERNPRT                      MPART_F_NO_SPLIT
 #define VM_DATAPART_STATE_ABSENT                      MPART_ST_VOID
@@ -190,15 +191,6 @@
 #define vm_supersync(...)                             mman_supersync(__VA_ARGS__)
 #define vm_supersyncone(...)                          mman_supersyncone(__VA_ARGS__)
 #define vm_supersyncall(...)                          mman_supersyncall(__VA_ARGS__)
-#define fc_tree                                       mpm_ftx
-#define fc_dead                                       mpm_ftx_dead.slh_first
-#define fc_rtm_vers                                   mpm_rtm_vers
-#define vm_futex                                      mfutex
-#define vmf_refcnt                                    mfu_refcnt
-#define vmf_part                                      mfu_part
-#define vmf_tree                                      mfu_mtaent
-#define vmf_signal                                    mfu_signal
-#define vmf_ndead                                     _mfu_dead.sle_next
 #define VM_FORCEFAULT_FLAG_READ                       MMAN_FAULT_F_NORMAL
 #define VM_FORCEFAULT_FLAG_WRITE                      MMAN_FAULT_F_WRITE
 #define VM_FORCEFAULT_FLAG_NOVIO                      MMAN_FAULT_F_NOVIO

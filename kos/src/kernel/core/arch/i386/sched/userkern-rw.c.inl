@@ -47,6 +47,8 @@
 
 #include <stddef.h>
 
+#include <libvio/vio.h>
+
 #ifndef USERKERN_STRUCT
 #if USERKERN_WIDTH == 4
 #include <kos/kernel/cpu-state32.h>

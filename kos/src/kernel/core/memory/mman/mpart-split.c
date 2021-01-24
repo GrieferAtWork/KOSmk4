@@ -500,14 +500,12 @@ mpart_split_data_alloc_himeta(struct mpart_split_data *__restrict self) {
 	if likely(self->msd_himeta == NULL) {
 		struct mpartmeta *himeta;
 		himeta = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta),
-		                                        GFP_ATOMIC | GFP_CALLOC |
-		                                        GFP_LOCKED | GFP_PREFLT);
+		                                        GFP_ATOMIC | GFP_CALLOC);
 		if unlikely(!himeta) {
 			/* Must allocate while blocking. */
 			unlockall(self->msd_lopart);
 			himeta = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
-			                                     GFP_CALLOC | GFP_LOCKED |
-			                                     GFP_PREFLT);
+			                                     GFP_CALLOC);
 			mpartmeta_cinit(himeta);
 			self->msd_himeta = himeta;
 			return false;
@@ -844,7 +842,7 @@ relock_with_data:
 	/* Fill in flags for the new pat. */
 	hipart->mp_flags = (lopart->mp_flags & (MPART_F_NO_GLOBAL_REF |
 	                                        MPART_F_CHANGED |
-	                                        MPART_F_DONT_FREE |
+	                                        MPART_F_NO_FREE |
 	                                        MPART_F_BLKST_INL)) |
 	                   (MPART_F_LOCKBIT);
 

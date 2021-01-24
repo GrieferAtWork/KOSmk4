@@ -106,23 +106,23 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	switch (self->mp_state) {
 
 	case MPART_ST_SWP:
-		if (!(self->mp_flags & MPART_F_DONT_FREE))
+		if (!(self->mp_flags & MPART_F_NO_FREE))
 			mchunk_freeswp(&self->mp_swp);
 		break;
 
 	case MPART_ST_MEM:
-		if (!(self->mp_flags & MPART_F_DONT_FREE))
+		if (!(self->mp_flags & MPART_F_NO_FREE))
 			mchunk_freemem(&self->mp_mem);
 		break;
 
 	case MPART_ST_SWP_SC:
-		if (!(self->mp_flags & MPART_F_DONT_FREE))
+		if (!(self->mp_flags & MPART_F_NO_FREE))
 			mchunkvec_freeswp(self->mp_swp_sc.ms_v, self->mp_swp_sc.ms_c);
 		kfree(self->mp_swp_sc.ms_v);
 		break;
 
 	case MPART_ST_MEM_SC:
-		if (!(self->mp_flags & MPART_F_DONT_FREE))
+		if (!(self->mp_flags & MPART_F_NO_FREE))
 			mchunkvec_freemem(self->mp_mem_sc.ms_v, self->mp_mem_sc.ms_c);
 		kfree(self->mp_mem_sc.ms_v);
 		break;

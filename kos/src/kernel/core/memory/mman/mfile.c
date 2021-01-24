@@ -836,7 +836,7 @@ memfile_phys_initpart(struct mfile *__restrict UNUSED(self),
 		kfree(part->mp_blkst_ptr);
 	/* (re-)configure the part to point to static, physical memory. */
 	part->mp_flags = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN |
-	                 MPART_F_NO_GLOBAL_REF | MPART_F_DONT_FREE;
+	                 MPART_F_NO_GLOBAL_REF | MPART_F_NO_FREE;
 	part->mp_state        = MPART_ST_MEM;
 	part->mp_blkst_ptr    = NULL; /* Disable block status (thus having the system act like all
 	                               * blocks were using `MPART_BLOCK_ST_CHNG' as their status) */

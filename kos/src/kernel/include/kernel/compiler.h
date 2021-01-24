@@ -57,9 +57,11 @@
 #define vm_datablock_type   mfile_ops
 #define vm_node             mnode
 #define vm                  mman
+#define vm_futex            mfutex
 #define vm_futex_controller mpartmeta
 #define vm_ramblock         mchunk
 #define vm_swpblock         mchunk
+#define vm_ramfile          mramfile
 #define ln_pself            le_prev
 #define ln_next             le_next
 #endif /* CONFIG_USE_NEW_VM */

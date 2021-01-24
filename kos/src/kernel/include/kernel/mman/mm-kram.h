@@ -27,7 +27,8 @@
 
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
 
-#include <asm/os/mman.h> /* __MAP_FAILED */
+#include <asm/os/mman.h>       /* __MAP_FAILED */
+#include <kos/kernel/paging.h> /* KERNEL_VMHINT_HEAP */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -86,13 +87,34 @@ typedef unsigned int gfp_t;
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
  *   - else:       #ifdef  CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
- *                 #ifndef CONFIG_DEBUG_HEAP: Undefined */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *FCALL
+ *                 #ifndef CONFIG_DEBUG_HEAP: Undefined
+ *
+ * @param: hint:          Hint for where the mapping should go. This argument is
+ *                        passed onto `mman_findunmapped()', alongside certain bits
+ *                        from `flags': `GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR'
+ *                        You may pass `NULL' to use either `KERNEL_VMHINT_HEAP' or
+ *                        `KERNEL_VMHINT_LHEAP' (based on `GFP_LOCKED') instead.
+ *                        When `GFP_MAP_FIXED' is set, this is the (possibly unaligned)
+ *                        address of where the mapping should go. If not page-aligned,
+ *                        then the sub-page-misalignment will be carried over into the
+ *                        return value. If another mapping already exists at the given
+ *                        location, then unconditionally return `MAP_FAILED'
+ * @param: num_bytes:     The # of bytes to allocate. The actual amount is ceil-
+ *                        aligned to multiples of pages (after also including a
+ *                        possibly sub-page-misalignment from GFP_MAP_FIXED+hint)
+ * @param: flags:         Allocation option flags (see above)
+ * @param: min_alignment: The minimum alignment for the returned pointer. Ignored when
+ *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value greater
+ *                        than `PAGESIZE' can be used to ensure that the returned pointer
+ *                        is aligned by multiple pages. s.a. `mman_findunmapped()' */
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
+
+
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) PAGEDIR_PAGEALIGNED void *
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
                                 gfp_t flags, size_t min_alignment DFL(PAGESIZE));
 

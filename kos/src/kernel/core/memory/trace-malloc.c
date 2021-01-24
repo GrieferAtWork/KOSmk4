@@ -50,6 +50,7 @@
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sequence/rbtree.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -316,7 +317,7 @@ DEFINE_DBG_BZERO_OBJECT(smplock);
 
 
 /* [0..1] Tree of traced nodes */
-PRIVATE ATTR_MALL_UNTRACKED ATREE_HEAD(struct trace_node) nodes = NULL;
+PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(struct trace_node) nodes = NULL;
 
 /* Debug-heap used for allocating `struct trace_node' objects. */
 INTERN struct heap trace_heap =
@@ -1477,8 +1478,8 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 	/* Step #1: Calculate the xref total for every node. */
 	for (leak = leaks; leak; leak = trace_node_leak_next(leak)) {
 		/* XXX: Only use this slow O(N^2) approach when there are only a couple of leaks,
-		 *      (say: less than 64), and try to re-construct an ATREE for O(1) lookup of
-		 *      addr->node which can then be used to only have to enumerate memory of
+		 *      (say: less than 64), and try to re-construct an RBTREE for faster lookup
+		 *      of addr->node which can then be used to only have to enumerate memory of
 		 *      nodes once. */
 		struct trace_node *leak2;
 		uintptr_t leak_min, leak_max;

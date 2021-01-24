@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
@@ -504,5 +505,6 @@ NOTHROW(KCALL vm_corepage_freepart)(void *__restrict part) {
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_COREBASE_C */

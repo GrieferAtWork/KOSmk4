@@ -48,7 +48,7 @@ DECL_BEGIN
  * the given `self' may point to, meaning it should not be called when `self'
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
- *       and will pass that value on-to `mfile_alloc_physmem()'! */
+ *       and will pass that value onto `mfile_alloc_physmem()'! */
 PUBLIC NONNULL((1)) void KCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages) {

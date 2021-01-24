@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
 #include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
@@ -121,8 +122,7 @@ struct vm_corepair_ptr {
 INTDEF struct vm_corepair_ptr KCALL vm_corepair_alloc(gfp_t flags, bool nothrow);
 
 
-
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_COREBASE_H */

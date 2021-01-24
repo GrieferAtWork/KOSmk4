@@ -84,6 +84,7 @@ DECL_BEGIN
 
 
 struct sheap {
+	/* TODO: Use SLIST_ENTRY() for `sh_next' */
 	struct sheap  *sh_next; /* [0..1] Next heap. */
 	struct vm_node sh_node; /* [valid_if(sh_next)] VM node for allocating another heap. */
 	size_t         sh_size; /* Heap size (== runtime_sizeof(*self)). */
@@ -197,8 +198,13 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 
 	/* Reserve the associated address range to prevent the kernel
 	 * from re-assigning its address range for other purposes. */
+#ifdef CONFIG_USE_NEW_VM
+	last_heap->sh_node.mn_minaddr = (byte_t *)new_heap;
+	last_heap->sh_node.mn_maxaddr = (byte_t *)new_heap + min_size - 1;
+#else /* CONFIG_USE_NEW_VM */
 	last_heap->sh_node.vn_node.a_vmin   = PAGEID_ENCODE((byte_t *)new_heap);
 	last_heap->sh_node.vn_node.a_vmax   = PAGEID_ENCODE((byte_t *)new_heap + min_size - 1);
+#endif /* !CONFIG_USE_NEW_VM */
 	last_heap->sh_node.vn_prot          = VM_PROT_READ | VM_PROT_WRITE;
 	last_heap->sh_node.vn_flags         = VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE;
 	last_heap->sh_node.vn_vm            = &vm_kernel;
@@ -208,7 +214,9 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap->sh_node.vn_fsname        = NULL;
 	last_heap->sh_node.vn_link.ln_pself = NULL;
 	last_heap->sh_node.vn_link.ln_next  = NULL;
-	last_heap->sh_node.vn_guard         = 0;
+#ifndef CONFIG_USE_NEW_VM
+	last_heap->sh_node.vn_guard = 0;
+#endif /* !CONFIG_USE_NEW_VM */
 	vm_node_insert(&last_heap->sh_node);
 	/* Remember the new heap. */
 	new_heap->sh_next  = NULL;
@@ -483,7 +491,7 @@ PRIVATE void KCALL clear_heap(void) {
 		}
 		pred->sh_next = NULL;
 		/* Unmap the node. */
-		node = vm_paged_node_remove(&vm_kernel, pred->sh_node.vn_node.a_vmin);
+		node = vm_node_remove(&vm_kernel, vm_node_getmin(&pred->sh_node));
 		if unlikely(node != &pred->sh_node) {
 			/* Shouldn't happen... */
 			vm_node_insert(node);

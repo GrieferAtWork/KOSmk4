@@ -72,7 +72,7 @@
 #define MPART_F_NO_SPLIT       0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
                                        *         then the attempt will instead result in kernel panic. Similarly,
                                        *         this flag also prevents the part from being merged. */
-#define MPART_F_DONT_FREE      0x0080 /* [const] Don't page_free() backing physical memory or swap. */
+#define MPART_F_NO_FREE        0x0080 /* [const] Don't page_free() backing physical memory or swap. */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 /*efine MPART_F_               0x0200  * ... */
 /*efine MPART_F_               0x0400  * ... */
@@ -166,7 +166,7 @@ struct mpart_lockop {
 	                                      *        alock to the associated mem-part. */
 };
 
-#define __ALIGNOF_MPART 8
+#define __ALIGNOF_MPART __ALIGNOF_INT64__
 #if __SIZEOF_POINTER__ == 4
 #define __SIZEOF_MPART 88
 #elif __SIZEOF_POINTER__ == 8
@@ -199,10 +199,10 @@ struct mpart {
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
 	struct mpart_lockop_slist     mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_deadnodes_reap()') */
 	union {
-		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
 		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
 		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts)
 		                                         * NOTE: For VIO parts, this list entry is initialized as unbound! */
+		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
 	};
 	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
 	                                             *                         !mfile_isanon(mp_file) && MPART_F_CHANGED)]
@@ -214,24 +214,22 @@ struct mpart {
 	                                             * file, since this list contains references, rather than weak pointers. */
 	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [const] In-file starting address of this part.
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
-	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
-	                                             *       WRITE(MPART_F_LOCKBIT && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
-	                                             *                                \--------------/
-	                                             *                                 Only if not anonymous!
+	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
+	                                             *       WRITE(MPART_F_LOCKBIT && mp_meta->mpm_ftxlock && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
+	                                             *                                \------------------/    \--------------/
+	                                             *                                 Only if allocated       Only if not anon!
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file max address of this part. */
 	union {
-		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
 		RBTREE_NODE(struct mpart) mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
 		                                         * Entry with the associated file's tree. */
+		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
 	};
 	union {
 		/* Block-state bitset. Note that the size of a block is measured in bytes,
 		 * may be smaller than a single page, and its actual size is fixed, and is
 		 * described by the associated mfile. (s.a. `MPART_BLOCK_ST_*') */
-		uintptr_t                 mp_blkst_inl; /* [lock(MPART_F_LOCKBIT)]
-		                                         * [valid_if(MPART_ST_HASST && MPART_F_BLKST_INL)] */
 		uintptr_t                *mp_blkst_ptr; /* [lock(MPART_F_LOCKBIT)][0..1][lock(MPART_F_LOCKBIT || EXISTS(MPART_BLOCK_ST_INIT))]
 		                                         * [valid_if(MPART_ST_HASST && !MPART_F_BLKST_INL)]
 		                                         * NOTE: When set to `NULL', then monitoring the part for changes becomes
@@ -241,6 +239,8 @@ struct mpart {
 		                                         *       doesn't really make any sense, such as `mfile_phys'.
 		                                         * NOTE: Changing the state of block that used to be `MPART_BLOCK_ST_INIT' to
 		                                         *       anything else may be done atomically, and without holding any locks. */
+		uintptr_t                 mp_blkst_inl; /* [lock(MPART_F_LOCKBIT)]
+		                                         * [valid_if(MPART_ST_HASST && MPART_F_BLKST_INL)] */
 	};
 	union {
 		/* NOTE: Everything in here is implicitly:
@@ -270,9 +270,9 @@ struct mpart {
 		 * assume that any unchanged block can always be re-constructed at a later point
 		 * in time by making use of the `mo_loadblocks' operator.
 		 *
-		 * Also note that parts with the `MPART_F_DONT_FREE' flag set should never be off-
+		 * Also note that parts with the `MPART_F_NO_FREE' flag set should never be off-
 		 * loaded into swap: If not only because doing so wouldn't actually free up physical
-		 * memory, doing so might actually cause problems (since `MPART_F_DONT_FREE' is set
+		 * memory, doing so might actually cause problems (since `MPART_F_NO_FREE' is set
 		 * by special files such as `mfile_phys')
 		 */
 		struct mchunk             mp_swp;       /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
@@ -280,6 +280,29 @@ struct mpart {
 	};
 	struct mpartmeta             *mp_meta;      /* [0..1][owned][lock(WRITE_ONCE)] Runtime meta-data for futex and RTM support. */
 };
+
+
+#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)          \
+	{                                                                     \
+		/* .mp_refcnt      = */ 1,                                        \
+		/* .mp_flags       = */ MPART_F_NO_GLOBAL_REF | MPART_F_NO_FREE | \
+		/*                   */ MPART_F_NO_SPLIT | MPART_F_MLOCK |        \
+		/*                   */ MPART_F_MLOCK_FROZEN,                     \
+		/* .mp_state       = */ MPART_ST_MEM,                             \
+		{ /* .mp_file      = */ file },                                   \
+		/* .mp_copy        = */ LIST_HEAD_INITIALIZER(~),                 \
+		/* .mp_share       = */ LIST_HEAD_INITIALIZER(~),                 \
+		/* .mp_lockops     = */ SLIST_HEAD_INITIALIZER(~),                \
+		{ /* .mp_allparts  = */ LIST_ENTRY_UNBOUND_INITIALIZER },         \
+		/* .mp_changed     = */ {},                                       \
+		/* .mp_minaddr     = */ 0,                                        \
+		/* .mp_maxaddr     = */ (pos_t)((num_bytes) - 1),                 \
+		{ /* .mp_filent    = */ {} },                                     \
+		{ /* .mp_blkst_ptr = */ __NULLPTR},                               \
+		{ /* .mp_mem       = */ { first_page, page_count } },             \
+		/* .mp_meta        = */ __NULLPTR                                 \
+	}
+
 
 
 /* Get bounds for the given mem-node. */
@@ -377,7 +400,7 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
  * the given `self' may point to, meaning it should not be called when `self'
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
- *       and will pass that value on-to `mfile_alloc_physmem()'! */
+ *       and will pass that value onto `mfile_alloc_physmem()'! */
 FUNDEF NONNULL((1)) void KCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages);

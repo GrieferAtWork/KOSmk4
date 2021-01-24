@@ -33,7 +33,39 @@
 #include <hybrid/sync/atomic-rwlock.h>
 #endif /* ARCH_VM_HAVE_RTM */
 
-#ifndef CONFIG_USE_NEW_VM
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman/mpartmeta.h>
+
+#define fc_tree     mpm_ftx
+#define fc_dead     mpm_ftx_dead.slh_first
+#define fc_rtm_vers mpm_rtm_vers
+#define vmf_refcnt  mfu_refcnt
+#define vmf_part    mfu_part
+#define vmf_tree    mfu_mtaent
+#define vmf_signal  mfu_signal
+#define vmf_ndead   _mfu_dead.sle_next
+
+#define vm_futex_alloc()                         ((struct mfutex *)kmalloc(sizeof(struct mfutex), GFP_NORMAL))
+#define vm_futex_allocf(gfp_flags)               ((struct mfutex *)kmalloc(sizeof(struct mfutex), gfp_flags))
+#define vm_futex_allocf_nx(gfp_flags)            ((struct mfutex *)kmalloc_nx(sizeof(struct mfutex), gfp_flags))
+#define vm_futex_free(p)                         mfutex_free(p)
+#define vm_futex_destroy(self)                   mfutex_destroy(self)
+#define vm_futex_controller_alloc()              ((struct mpartmeta *)kmalloc(sizeof(struct mpartmeta), GFP_CALLOC))
+#define vm_futex_controller_allocf(gfp_flags)    ((struct mpartmeta *)kmalloc(sizeof(struct mpartmeta), (gfp_flags) | GFP_CALLOC))
+#define vm_futex_controller_allocf_nx(gfp_flags) ((struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta), (gfp_flags) | GFP_CALLOC))
+#define vm_futex_controller_free(p)              kfree(p)
+
+/* Futex API */
+#define VM_DATAPART_GETFUTEX_OUTOFRANGE                      MPART_FUTEX_OOB
+#define vm_datapart_getfutex(self, datapart_offset)          mpart_createfutex(self, datapart_offset)
+#define vm_datapart_getfutex_existing(self, datapart_offset) mpart_lookupfutex(self, datapart_offset)
+#define vm_datablock_getfutex(self, offset)                  mfile_createfutex(self, offset)
+#define vm_datablock_getfutex_existing(self, offset)         mfile_lookupfutex(self, offset)
+#define vm_getfutex(effective_vm, addr)                      mman_createfutex(effective_vm, addr)
+#define vm_getfutex_existing(effective_vm, addr)             mman_lookupfutex(effective_vm, addr)
+#define vm_futex_broadcast(futex_address)                    mman_broadcastfutex(futex_address)
+
+#else /* CONFIG_USE_NEW_VM */
 DECL_BEGIN
 
 struct vm_futex;

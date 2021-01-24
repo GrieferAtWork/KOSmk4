@@ -954,6 +954,9 @@
 #ifndef E_SEGFAULT_CONTEXT_EXEC
 #define E_SEGFAULT_CONTEXT_EXEC     0x0010 /* The instruction pointer's location caused the fault */
 #endif /* !E_SEGFAULT_CONTEXT_EXEC */
+#ifndef E_SEGFAULT_CONTEXT_FUTEX
+#define E_SEGFAULT_CONTEXT_FUTEX    0x2000 /* Attempted to create a futex at an unmapped address */
+#endif /* !E_SEGFAULT_CONTEXT_FUTEX */
 #ifndef E_SEGFAULT_CONTEXT_UNMAP
 #define E_SEGFAULT_CONTEXT_UNMAP    0x4000 /* Attempted to unmap an undefined memory address */
 #endif /* !E_SEGFAULT_CONTEXT_UNMAP */
