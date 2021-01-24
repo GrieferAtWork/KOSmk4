@@ -1695,21 +1695,21 @@ done:
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_emulate_xbegin(struct icpustate *__restrict state,
                    uintptr_t fallback_ip) {
-	REF struct vm_rtm_driver_hooks *hooks;
+	REF struct mrtm_driver_hooks *hooks;
 	/* Lookup RTM hooks. */
-	hooks = vm_rtm_hooks.get();
+	hooks = mrtm_hooks.get();
 	if unlikely(!hooks) {
 		REF struct driver *rtm_driver;
 		/* Lazily load the RTM driver. */
 		TRY {
-			rtm_driver = driver_insmod(ARCH_VM_RTM_DRIVER_NAME);
+			rtm_driver = driver_insmod(ARCH_RTM_DRIVER_NAME);
 		} EXCEPT {
 			goto throw_illegal_op;
 		}
 		/* Check if hooks have become available now. */
 		{
 			FINALLY_DECREF_UNLIKELY(rtm_driver);
-			hooks = vm_rtm_hooks.get();
+			hooks = mrtm_hooks.get();
 		}
 		if unlikely(!hooks)
 			goto throw_illegal_op;

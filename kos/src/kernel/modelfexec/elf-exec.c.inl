@@ -302,6 +302,9 @@ err_overlap:
 			vmb_fini(&builder);
 			RETHROW();
 		}
+#ifdef WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY
+		vmb_fini(&builder);
+#endif /* WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY */
 
 		{
 			REF struct vm *oldvm = THIS_VM;

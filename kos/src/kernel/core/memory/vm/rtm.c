@@ -24,7 +24,7 @@
 
 #include <kernel/vm/rtm.h>
 
-#ifdef ARCH_VM_HAVE_RTM
+#ifdef ARCH_HAVE_RTM
 #include <kernel/except.h>
 #include <kernel/syscall.h>
 #include <kernel/vm.h>
@@ -35,34 +35,34 @@
 #include <errno.h>
 #include <stddef.h>
 
-#ifndef ARCH_VM_RTM_DRIVER_NAME
-#error "Arch forgot to `#define ARCH_VM_RTM_DRIVER_NAME'"
-#endif /* !ARCH_VM_RTM_DRIVER_NAME */
+#ifndef ARCH_RTM_DRIVER_NAME
+#error "Arch forgot to `#define ARCH_RTM_DRIVER_NAME'"
+#endif /* !ARCH_RTM_DRIVER_NAME */
 
 DECL_BEGIN
 
 /* [0..1] The currently installed RTM driver hooks. */
-PUBLIC XATOMIC_WEAKLYREF(struct vm_rtm_driver_hooks)
-vm_rtm_hooks = XATOMIC_WEAKLYREF_INIT(NULL);
+PUBLIC XATOMIC_WEAKLYREF(struct mrtm_driver_hooks)
+mrtm_hooks = XATOMIC_WEAKLYREF_INIT(NULL);
 
 #ifdef __ARCH_WANT_SYSCALL_RTM_BEGIN
 INTERN struct icpustate *FCALL
 sys_rtm_begin_impl(struct icpustate *__restrict state) {
-	REF struct vm_rtm_driver_hooks *hooks;
+	REF struct mrtm_driver_hooks *hooks;
 	/* Lookup RTM hooks. */
-	hooks = vm_rtm_hooks.get();
+	hooks = mrtm_hooks.get();
 	if unlikely(!hooks) {
 		REF struct driver *rtm_driver;
 		/* Lazily load the RTM driver. */
 		TRY {
-			rtm_driver = driver_insmod(ARCH_VM_RTM_DRIVER_NAME);
+			rtm_driver = driver_insmod(ARCH_RTM_DRIVER_NAME);
 		} EXCEPT {
 			goto throw_illegal_op;
 		}
 		/* Check if hooks have become available now. */
 		{
 			FINALLY_DECREF_UNLIKELY(rtm_driver);
-			hooks = vm_rtm_hooks.get();
+			hooks = mrtm_hooks.get();
 		}
 		if unlikely(!hooks)
 			goto throw_illegal_op;
@@ -70,11 +70,11 @@ sys_rtm_begin_impl(struct icpustate *__restrict state) {
 	{
 		FINALLY_DECREF_UNLIKELY(hooks);
 		/* Perform an RTM operation for user-space. */
-		state = vm_rtm_execute(&hooks->rdh_hooks, state);
+		state = mrtm_exec(&hooks->rdh_hooks, state);
 		return state;
 	}
 throw_illegal_op:
-	vm_rtm_set_nosys(state);
+	mrtm_setnosys(state);
 	return state;
 }
 
@@ -83,23 +83,23 @@ syscall_rtm_begin_rpc(void *UNUSED(arg),
                       struct icpustate *__restrict state,
                       unsigned int reason,
                       struct rpc_syscall_info const *UNUSED(sc_info)) {
-	REF struct vm_rtm_driver_hooks *hooks;
+	REF struct mrtm_driver_hooks *hooks;
 	if (reason != TASK_RPC_REASON_SYSCALL)
 		return state;
 	/* Lookup RTM hooks. */
-	hooks = vm_rtm_hooks.get();
+	hooks = mrtm_hooks.get();
 	if unlikely(!hooks) {
 		REF struct driver *rtm_driver;
 		/* Lazily load the RTM driver. */
 		TRY {
-			rtm_driver = driver_insmod(ARCH_VM_RTM_DRIVER_NAME);
+			rtm_driver = driver_insmod(ARCH_RTM_DRIVER_NAME);
 		} EXCEPT {
 			goto throw_illegal_op;
 		}
 		/* Check if hooks have become available now. */
 		{
 			FINALLY_DECREF_UNLIKELY(rtm_driver);
-			hooks = vm_rtm_hooks.get();
+			hooks = mrtm_hooks.get();
 		}
 		if unlikely(!hooks)
 			goto throw_illegal_op;
@@ -107,11 +107,11 @@ syscall_rtm_begin_rpc(void *UNUSED(arg),
 	{
 		FINALLY_DECREF_UNLIKELY(hooks);
 		/* Perform an RTM operation for user-space. */
-		state = vm_rtm_execute(&hooks->rdh_hooks, state);
+		state = mrtm_exec(&hooks->rdh_hooks, state);
 		return state;
 	}
 throw_illegal_op:
-	vm_rtm_set_nosys(state);
+	mrtm_setnosys(state);
 	return state;
 }
 
@@ -153,6 +153,6 @@ DEFINE_SYSCALL0(syscall_ulong_t, rtm_test) {
 #endif /* __ARCH_WANT_SYSCALL_RTM_TEST */
 
 DECL_END
-#endif /* ARCH_VM_HAVE_RTM */
+#endif /* ARCH_HAVE_RTM */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_VM_RTM_C */

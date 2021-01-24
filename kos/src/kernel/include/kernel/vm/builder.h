@@ -31,7 +31,56 @@
 #include <compat/config.h> /* __ARCH_HAVE_COMPAT */
 
 #ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/mm-builder.h>
+#include <kernel/mman/mbuilder.h>
+#define VMB_INIT       MBUILDER_INIT
+#define vmb_init(self) mbuilder_init(self)
+#define vmb_fini(self) mbuilder_fini(self)
+#define WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY
+
+#ifdef __CC__
+#include <kos/except.h>
+DECL_BEGIN
+
+FORCELOCAL WUNUSED NONNULL((1, 4)) bool
+vmb_mapat(struct vmb *__restrict self,
+          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+          PAGEDIR_PAGEALIGNED size_t num_bytes,
+          struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+          struct path *fspath DFL(__NULLPTR),
+          struct directory_entry *fsname DFL(__NULLPTR),
+          PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+          uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+          uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	(void)guard;
+	TRY {
+		mbuilder_map(self, addr, num_bytes, prot,
+		             MAP_FIXED | MAP_FIXED_NOREPLACE | flag,
+		             data, fspath, fsname, data_start_offset);
+	} EXCEPT {
+		if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+			return false;
+		RETHROW();
+	}
+	return true;
+}
+DECL_END
+#endif /* __CC__ */
+
+#define vmb_getfree(self, hint, num_bytes, min_alignment, mode) \
+	mbuilder_findunmapped(self, hint, num_bytes, mode, min_alignment)
+#define vmb_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \
+                fspath, fsname, data_start_offset, prot, flag, guard)     \
+	mbuilder_map(self, hint, num_bytes, prot, (getfree_mode) | (flags),   \
+	             data, fspath, fsname, data_start_offset, min_alignment)
+#define vmb_getnodeofaddress(self, addr) \
+	((struct vm_node *)mbnode_tree_locate((self)->mb_mappings, addr))
+#define vmb_apply(...) mbuilder_apply(__VA_ARGS__)
+#define VMB_APPLY_AA_NOTHING      MBUILDER_APPLY_AA_NOTHING
+#define VMB_APPLY_AA_TERMTHREADS  MBUILDER_APPLY_AA_TERMTHREADS
+#define VMB_APPLY_AA_SETEXECINFO  MBUILDER_APPLY_AA_SETEXECINFO
+
 #else /* CONFIG_USE_NEW_VM */
 DECL_BEGIN
 
@@ -92,6 +141,7 @@ NOTHROW(KCALL vmb_init)(struct vmb *__restrict self);
  */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self);
+#undef WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY
 
 
 

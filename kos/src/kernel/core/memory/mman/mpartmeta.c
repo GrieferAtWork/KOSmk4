@@ -288,13 +288,13 @@ mpart_lookupfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
  * @param: addr: Absolute file-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally)
  * WARNING: Using this function when `self' has been, or always was anonymous, will
- *          cause the data part associated with the returned futex to also be anonymous,
+ *          cause the mem-part associated with the returned futex to also be anonymous,
  *          meaning that the part would get freshly allocated, and repeated calls with
  *          the same arguments would not yield the same futex object!
  *       -> As such, in the most common case of a futex lookup where you wish to find
  *          the futex associated with some given `uintptr_t', the process would be to
  *          to determine the `mnode' of the address, and using that node then determine
- *          the associated mpart, and relative offset into that datapart. If a lookup
+ *          the associated mpart, and relative offset into that mem-part. If a lookup
  *          of the futex then returns `MPART_FUTEX_OOB', loop back around
  *          and once again lookup the `mnode'.
  *       -> In the end, there exists no API also found on linux that would make use of this

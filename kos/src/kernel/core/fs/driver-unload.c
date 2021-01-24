@@ -59,7 +59,7 @@ driver_clear_globals(struct driver *__restrict self)
 	 *   - vm_onclone_callbacks
 	 *   - isr_register()
 	 *   - syslog_sink_register()
-	 *   - vm_rtm_hooks
+	 *   - mrtm_hooks
 	 *   - register_async_worker()              (Delete all workers with callbacks apart of `self')
 	 *   - async_job_start()                    (Cancel all running jobs with callbacks apart of `self')
 	 *   - realtime_clock

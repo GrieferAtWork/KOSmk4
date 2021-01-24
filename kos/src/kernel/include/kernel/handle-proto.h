@@ -1222,6 +1222,68 @@ INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__r
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
+#ifdef CONFIG_USE_NEW_VM
+#define HANDLE_TYPE_MFILE        HANDLE_TYPE_DATABLOCK
+#define handle_mfile_refcnt      handle_datablock_refcnt
+#define handle_mfile_incref      handle_datablock_incref
+#define handle_mfile_decref      handle_datablock_decref
+#define handle_mfile_tryincref   handle_datablock_tryincref
+#define handle_mfile_weakgetref  handle_datablock_weakgetref
+#define handle_mfile_weaklckref  handle_datablock_weaklckref
+#define handle_mfile_weakdecref  handle_datablock_weakdecref
+#define handle_mfile_read        handle_datablock_read
+#define handle_mfile_write       handle_datablock_write
+#define handle_mfile_pread       handle_datablock_pread
+#define handle_mfile_pwrite      handle_datablock_pwrite
+#define handle_mfile_readv       handle_datablock_readv
+#define handle_mfile_writev      handle_datablock_writev
+#define handle_mfile_preadv      handle_datablock_preadv
+#define handle_mfile_pwritev     handle_datablock_pwritev
+#define handle_mfile_readdir     handle_datablock_readdir
+#define handle_mfile_seek        handle_datablock_seek
+#define handle_mfile_ioctl       handle_datablock_ioctl
+#define handle_mfile_truncate    handle_datablock_truncate
+#define handle_mfile_mmap        handle_datablock_mmap
+#define handle_mfile_allocate    handle_datablock_allocate
+#define handle_mfile_sync        handle_datablock_sync
+#define handle_mfile_datasync    handle_datablock_datasync
+#define handle_mfile_stat        handle_datablock_stat
+#define handle_mfile_pollconnect handle_datablock_pollconnect
+#define handle_mfile_polltest    handle_datablock_polltest
+#define handle_mfile_hop         handle_datablock_hop
+#define handle_mfile_tryas       handle_datablock_tryas
+
+/* Handle operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mfile_refcnt)(struct mfile const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_incref)(struct mfile *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_decref)(REF struct mfile *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_mfile_tryincref)(struct mfile *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_mfile_weakgetref)(struct mfile *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mfile *NOTHROW(FCALL handle_mfile_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_pread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_pwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_readv(struct mfile *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_writev(struct mfile *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_preadv(struct mfile *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_pwritev(struct mfile *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_readdir(struct mfile *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mfile_seek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_truncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct mfile *KCALL handle_mfile_mmap(struct mfile *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pmfile_fspath, REF struct directory_entry **__restrict pmfile_fsname) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mfile_allocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_sync(struct mfile *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_datasync(struct mfile *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_stat(struct mfile *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_pollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mfile_polltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+#endif /* CONFIG_USE_NEW_VM */
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_PROTO_H */

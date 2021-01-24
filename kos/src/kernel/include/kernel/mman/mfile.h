@@ -90,12 +90,27 @@ struct mfile_ops {
 	                                         physaddr_t buffer, size_t num_blocks);
 	/* [0..1] VIO file operators. (when non-NULL, then this file is backed by VIO,
 	 *        and the `mo_loadblocks' and `mo_saveblocks' operators are ignored) */
-	struct vio_operators *mo_vio;
+	struct vio_operators const *mo_vio;
+	/* TODO: Operator `mo_changed': Called when the backing memory of a part is modified. */
+	/* TODO: Operator `mo_attr_changed': Called when one of the file's attribute fields changed. */
+
+	/* TODO: Additional operator callbacks for handle integration:
+	 *  - read   (note: pread() is implemented via `mfile_read()')
+	 *  - write  (note: pwrite() is implemented via `mfile_write()')
+	 *  - pollconnect
+	 *  - polltest
+	 *  - seek
+	 *  - stat
+	 *  - ioctl
+	 *  - truncate    (override for the default action, which does a split and uses
+	 *                 `mfile_makeanon_subrange()' to mark all whole parts above the
+	 *                 given address as anonymous)
+	 */
 };
 
 struct mfile {
 	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */
-	struct mfile_ops           *mf_ops;        /* [1..1][const] File operators. */
+	struct mfile_ops const     *mf_ops;        /* [1..1][const] File operators. */
 	struct atomic_rwlock        mf_lock;       /* Lock for this file. */
 	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
@@ -107,11 +122,29 @@ struct mfile {
 	                                            * NOTE: Set to `MFILE_PARTS_ANONYMOUS' if changed parts should
 	                                            *       always be ignored unconditionally. This should also be
 	                                            *       done when `mf_ops->mo_saveblocks' is `NULL'! */
-	unsigned int                mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
 	size_t                      mf_part_amask; /* [const] == MAX(PAGESIZE, 1 << mf_blockshift) - 1
 	                                            * This field describes the minimum alignment of file positions
 	                                            * described by parts, minus one (meaning it can be used as a
 	                                            * mask) */
+	unsigned int                mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
+	/* TODO: File size field: (with [lock(mf_lock)])
+	 *   - Attempting to map memory beyond file's end should either
+	 *     fail, or cause anon+zero'd memory to be mapped instead.
+	 *     XXX: Investigate what mmap(2) does here...
+	 *   - Automatically increased when new data is written:
+	 *      - Use of `mfile_write()' can increase this value
+	 *      - writes done via modifications to mapped mem-parts don't
+	 *   - Lowering causes all mem-parts above to be anonymized at the next greater page-boundary
+	 *   - An additional [lock(WRITE_ONCE)]-flag should exist which can be set to make the field [const]
+	 *
+	 * NOTE: Using this field, we can also implement `mfile_write_append()',
+	 *       which does all of the necessary work to atomically append data
+	 *       at the end of a file.
+	 *
+	 * XXX: It may also make sense to directly integrate access/modified timestamps
+	 *      right here. That way, they can be updated at the appropriate spots!
+	 *
+	 */
 };
 
 #define MFILE_INIT_EX(refcnt, ops, parts, blockshift)                                  \
@@ -476,26 +509,26 @@ FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_readv_p(struct mfile *__restrict sel
 FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_writev_p(struct mfile *__restrict self, struct mpart *part, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Builtin mem files */
-DATDEF struct mfile /*    */ mfile_phys;     /* Physical memory access (file position is physical memory address) */
-DATDEF struct mfile_ops /**/ mfile_phys_ops; /* ... */
+DATDEF struct mfile /*     */ mfile_phys;     /* Physical memory access (file position is physical memory address) */
+DATDEF struct mfile_ops const mfile_phys_ops; /* ... */
 #ifndef __mfile_ndef_defined
 #define __mfile_ndef_defined 1
-DATDEF struct mfile /*    */ mfile_ndef;     /* Random, uninitialized, anonymous memory. */
+DATDEF struct mfile /*     */ mfile_ndef;     /* Random, uninitialized, anonymous memory. */
 #endif /* !__mfile_ndef_defined */
-DATDEF struct mfile_ops /**/ mfile_ndef_ops; /* ... */
+DATDEF struct mfile_ops const mfile_ndef_ops; /* ... */
 #ifndef __mfile_zero_defined
 #define __mfile_zero_defined 1
-DATDEF struct mfile /*    */ mfile_zero;     /* Zero-initialized, anonymous memory. */
+DATDEF struct mfile /*     */ mfile_zero;     /* Zero-initialized, anonymous memory. */
 #endif /* !__mfile_zero_defined */
-DATDEF struct mfile_ops /**/ mfile_zero_ops; /* ... */
+DATDEF struct mfile_ops const mfile_zero_ops; /* ... */
 
 /* Fallback files for anonymous memory. These behave the same as `mfile_zero',
  * but one exists for every possible `mf_blockshift' (where the index into this
  * array is equal to that file's `mf_blockshift' value)
  * As such, these files are used by `mfile_makeanon()' as replacement mappings
  * of the original file. */
-DATDEF struct mfile /*    */ mfile_anon[BITSOF(void *)];
-DATDEF struct mfile_ops /**/ mfile_anon_ops[BITSOF(void *)];
+DATDEF struct mfile /*     */ mfile_anon[BITSOF(void *)];
+DATDEF struct mfile_ops const mfile_anon_ops[BITSOF(void *)];
 
 
 DECL_END

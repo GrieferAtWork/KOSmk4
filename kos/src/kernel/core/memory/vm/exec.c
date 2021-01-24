@@ -201,7 +201,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	vm_exec_assert_regular(args.ea_xnode);
 
 	/* Fill in the remaining fields of `args' (which we make use of) */
-	args.ea_mman          = THIS_VM;
+	args.ea_mman        = THIS_VM;
 	args.ea_argc_inject = 1;
 	args.ea_argv_inject = (char **)kmalloc(1 * sizeof(char *), GFP_NORMAL);
 	{

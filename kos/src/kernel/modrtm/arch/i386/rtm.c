@@ -1546,7 +1546,7 @@ rtm_failure:
 	return state;
 }
 
-INTERN struct vm_rtm_driver_hooks rtm_hooks = {
+INTERN struct mrtm_driver_hooks rtm_hooks = {
 	/* .rdh_driver = */ &drv_self,
 	/* .rdh_hooks  = */ {
 		/* .rh_xbegin = */ &x86_emulate_xbegin

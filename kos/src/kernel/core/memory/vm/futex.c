@@ -61,10 +61,10 @@ NOTHROW(KCALL vm_datapart_maybe_delete_futex_controller)(struct vm_datapart *__r
 	assert(fc);
 	if (fc->fc_tree != NULL)
 		return; /* Still in use -> Can't destroy. */
-#ifdef ARCH_VM_HAVE_RTM
+#ifdef ARCH_HAVE_RTM
 	if (fc->fc_rtm_vers != 0)
 		return; /* Custom RTM version has been set -> Can't destroy. */
-#endif /* ARCH_VM_HAVE_RTM */
+#endif /* ARCH_HAVE_RTM */
 	/* XXX: This right here doesn't ~need~ to be done.
 	 *      We could also just keep the futex controller alive, so that it
 	 *      may be re-used by future futex operations. In essence, we'd need

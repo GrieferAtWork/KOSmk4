@@ -62,6 +62,7 @@
 #define vm_ramblock         mchunk
 #define vm_swpblock         mchunk
 #define vm_ramfile          mramfile
+#define vmb                 mbuilder
 #define ln_pself            le_prev
 #define ln_next             le_next
 #endif /* CONFIG_USE_NEW_VM */

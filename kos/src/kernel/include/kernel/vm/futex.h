@@ -22,17 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/vm-rtm.h>
-#include <kernel/types.h>
-#include <kernel/vm.h>
-#include <misc/atomic-ref.h>
-
-#include <hybrid/sequence/atree.h>
-
-#ifdef ARCH_VM_HAVE_RTM
-#include <hybrid/sync/atomic-rwlock.h>
-#endif /* ARCH_VM_HAVE_RTM */
-
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman/mpartmeta.h>
 
@@ -66,6 +55,17 @@
 #define vm_futex_broadcast(futex_address)                    mman_broadcastfutex(futex_address)
 
 #else /* CONFIG_USE_NEW_VM */
+#include <kernel/arch/mman/rtm.h>
+#include <kernel/types.h>
+#include <kernel/vm.h>
+#include <misc/atomic-ref.h>
+
+#include <hybrid/sequence/atree.h>
+
+#ifdef ARCH_HAVE_RTM
+#include <hybrid/sync/atomic-rwlock.h>
+#endif /* ARCH_HAVE_RTM */
+
 DECL_BEGIN
 
 struct vm_futex;
@@ -110,14 +110,14 @@ struct vm_futex_controller {
 	unsigned int                     fc_leve0; /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
 	WEAK struct vm_futex            *fc_dead;  /* [0..1][LINK(->vmf_ndead)] Chain of dead futex objects.
 	                                            * This chain is serviced at the same time as `dp_stale' */
-#ifdef ARCH_VM_HAVE_RTM
+#ifdef ARCH_HAVE_RTM
 	/* We keep the RTM version and lock fields in the futex controller, such that
 	 * they don't take up space in the base vm_datapart structure, but only exist
 	 * conditionally, and upon first access. */
 	uintptr_t                        fc_rtm_vers; /* [lock(:dp_lock)]
 	                                               * RTM version (incremented for every RTM-driven
 	                                               * modifications made to memory). */
-#endif /* ARCH_VM_HAVE_RTM */
+#endif /* ARCH_HAVE_RTM */
 };
 
 #define vm_futex_controller_alloc()              ((struct vm_futex_controller *)kmalloc(sizeof(struct vm_futex_controller), GFP_CALLOC))

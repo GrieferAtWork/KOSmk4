@@ -102,6 +102,7 @@
 #include <kos/except.h>
 
 #include <libvio/userviofd.h>
+#include <libvio/vio.h>
 
 /* Max # of UVIO requests that can be in use at the
  * same time for any given UVIO datablock object. */

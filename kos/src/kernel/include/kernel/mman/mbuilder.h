@@ -344,14 +344,14 @@ mbuilder_apply(struct mbuilder *__restrict self,
 
 /* MBuilder-version of `mman_findunmapped()' */
 #ifdef __INTELLISENSE__
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
-NOTHROW(FCALL mbuilder_findunmapped)(struct mbuilder *__restrict self, void *addr,
-                                    size_t num_bytes, unsigned int flags,
-                                    size_t min_alignment DFL(PAGESIZE));
+NOBLOCK WUNUSED NONNULL((1)) void *
+NOTHROW(mbuilder_findunmapped)(struct mbuilder *__restrict self, void *addr,
+                              size_t num_bytes, unsigned int flags,
+                              size_t min_alignment DFL(PAGESIZE));
 #else /* __INTELLISENSE__ */
-#endif /* !__INTELLISENSE__ */
 #define mbuilder_findunmapped(self, ...) \
 	mman_findunmapped_in_usertree((struct mnode **)&(self)->mb_mappings, __VA_ARGS__)
+#endif /* !__INTELLISENSE__ */
 
 /* MBuilder-version of `mman_getunmapped_or_unlock()' (without the unlock-part)
  * But note that unlike `mman_getunmapped_or_unlock()', this version always

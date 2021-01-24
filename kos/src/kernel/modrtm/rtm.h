@@ -25,9 +25,9 @@
 #include <kernel/vm/rtm.h>
 #include <kernel/types.h>
 
-#ifndef ARCH_VM_HAVE_RTM
+#ifndef ARCH_HAVE_RTM
 #error "Architecture doesn't have RTM support (please don't compile this driver for this architecture)"
-#endif /* !ARCH_VM_HAVE_RTM */
+#endif /* !ARCH_HAVE_RTM */
 
 /* Config option: CONFIG_RTM_USERSPACE_ONLY
  * When enabled, RTM can only be used in user-space.
@@ -197,7 +197,7 @@ DECL_BEGIN
  * >> }
  */
 
-INTDEF struct vm_rtm_driver_hooks rtm_hooks;
+INTDEF struct mrtm_driver_hooks rtm_hooks;
 
 DECL_END
 

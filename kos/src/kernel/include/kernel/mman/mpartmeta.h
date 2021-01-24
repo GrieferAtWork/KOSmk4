@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/vm-rtm.h>
+#include <kernel/arch/mman/rtm.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
@@ -129,26 +129,26 @@ struct mpartmeta {
 	WEAK refcnt_t                     mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
 	                                                 * # of DMA locks referencing the associated part. */
 	struct sig                        mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
-#ifdef ARCH_VM_HAVE_RTM
+#ifdef ARCH_HAVE_RTM
 	/* We keep the RTM version and field in the futex controller, such that
 	 * they don't take up space in the base `mpart' structure, but only exist
 	 * conditionally, and upon first access. */
 	uintptr_t                         mpm_rtm_vers; /* [lock(:dp_lock)]
 	                                                 * RTM version (incremented for every RTM-driven
 	                                                 * modifications made to memory). */
-#endif /* ARCH_VM_HAVE_RTM */
+#endif /* ARCH_HAVE_RTM */
 };
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 
-#ifdef ARCH_VM_HAVE_RTM
+#ifdef ARCH_HAVE_RTM
 #define __mpartmeta_init_rtm(self)  , (self)->mpm_rtm_vers = 0
 #define __mpartmeta_cinit_rtm(self) , __hybrid_assert((self)->mpm_rtm_vers == 0)
-#else /* ARCH_VM_HAVE_RTM */
+#else /* ARCH_HAVE_RTM */
 #define __mpartmeta_init_rtm(self)
 #define __mpartmeta_cinit_rtm(self)
-#endif /* !ARCH_VM_HAVE_RTM */
+#endif /* !ARCH_HAVE_RTM */
 #define mpartmeta_init(self)                   \
 	(atomic_rwlock_init(&(self)->mpm_ftxlock), \
 	 (self)->mpm_ftx = __NULLPTR,              \
@@ -268,13 +268,13 @@ mpart_lookupfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
  * @param: addr: Absolute file-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally)
  * WARNING: Using this function when `self' has been, or always was anonymous, will
- *          cause the data part associated with the returned futex to also be anonymous,
+ *          cause the mem-part associated with the returned futex to also be anonymous,
  *          meaning that the part would get freshly allocated, and repeated calls with
  *          the same arguments would not yield the same futex object!
  *       -> As such, in the most common case of a futex lookup where you wish to find
  *          the futex associated with some given `uintptr_t', the process would be to
  *          to determine the `mnode' of the address, and using that node then determine
- *          the associated mpart, and relative offset into that datapart. If a lookup
+ *          the associated mpart, and relative offset into that mem-part. If a lookup
  *          of the futex then returns `MPART_FUTEX_OOB', loop back around
  *          and once again lookup the `mnode'.
  *       -> In the end, there exists no API also found on linux that would make use of this

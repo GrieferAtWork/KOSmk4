@@ -17,34 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODRTM_RTM_C
-#define GUARD_MODRTM_RTM_C 1
-
-#include "rtm.h"
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MMAN_RTM_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MMAN_RTM_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
-#include <kernel/except.h>
-#include <kernel/vm/rtm.h>
-
-#include <stddef.h>
-
-DECL_BEGIN
-
-/* Define driver init/fini callbacks to register RTM hooks */
-PRIVATE DRIVER_INIT void KCALL rtm_init(void) {
-	/* Install our RTM hooks.
-	 * If RTM hooks had already been installed, throw an exception */
-	if (!mrtm_hooks.cmpxch(NULL, &rtm_hooks))
-		THROW(E_ILLEGAL_OPERATION);
-}
-
-PRIVATE DRIVER_FINI void KCALL rtm_fini(void) {
-	/* Uninstall our RTM hooks */
-	mrtm_hooks.cmpxch(&rtm_hooks, NULL);
-}
-
-DECL_END
-
-#endif /* !GUARD_MODRTM_RTM_C */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MMAN_RTM_H */

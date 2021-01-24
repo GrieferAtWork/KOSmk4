@@ -848,14 +848,14 @@ memfile_phys_initpart(struct mfile *__restrict UNUSED(self),
 	DEFINE_PUBLIC_SYMBOL(mfile_zero_ops, &mfile_anon_ops[PAGESHIFT], sizeof(struct mfile_ops));
 }
 
-PUBLIC struct mfile_ops mfile_phys_ops = {
+PUBLIC struct mfile_ops const mfile_phys_ops = {
 	/* .mo_destroy    = */ NULL,
 	/* .mo_initpart   = */ &memfile_phys_initpart,
 	/* .mo_loadblocks = */ NULL,
 	/* .mo_saveblocks = */ NULL,
 };
 
-PUBLIC struct mfile_ops mfile_ndef_ops = {
+PUBLIC struct mfile_ops const mfile_ndef_ops = {
 	/* .mo_destroy    = */ NULL,
 	/* .mo_initpart   = */ NULL,
 	/* .mo_loadblocks = */ NULL,
@@ -992,7 +992,7 @@ mfile_zero_loadblocks(struct mfile *__restrict self,
 
 
 
-PUBLIC struct mfile_ops mfile_anon_ops[BITSOF(void *)] = {
+PUBLIC struct mfile_ops const mfile_anon_ops[BITSOF(void *)] = {
 #define INIT_ANON_OPS(i)                                    \
 	{                                                       \
 		/* .mo_destroy    = */ NULL,                        \

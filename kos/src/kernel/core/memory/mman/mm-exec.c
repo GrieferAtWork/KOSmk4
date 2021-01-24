@@ -23,11 +23,22 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
+#include <kernel/debugtrap.h>
+#include <kernel/driver-param.h>
+#include <kernel/driver.h>
+#include <kernel/execabi.h>
+#include <kernel/mman.h>
 #include <kernel/mman/mm-exec.h>
+#include <sched/rpc.h> /* task_serve() */
 
-#include <kos/except.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/noexec.h>
 
-#include <stdbool.h>
+#include <signal.h>
+#include <string.h>
+
 
 DECL_BEGIN
 
@@ -52,8 +63,138 @@ PUBLIC NONNULL((1)) void KCALL
 mman_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT,
 		       E_NOT_EXECUTABLE, E_IOERROR) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	REF struct execabis_struct *abis;
+	size_t i;
+again_getabis:
+	abis = execabis.get();
+again_loadheader:
+	TRY {
+		size_t read_bytes;
+		/* Load the file header. */
+		read_bytes = inode_read(args->ea_xnode, args->ea_header, sizeof(args->ea_header), 0);
+		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
+			memset(args->ea_header + read_bytes, 0, CONFIG_EXECABI_MAXHEADER - read_bytes);
+	} EXCEPT {
+		decref_unlikely(abis);
+		RETHROW();
+	}
+	for (i = 0; i < abis->eas_count; ++i) {
+		unsigned int status;
+		struct execabi *abi = &abis->eas_abis[i];
+		/* Check if the magic for this ABI matches. */
+		if (memcmp(args->ea_header, abi->ea_magic, abi->ea_magsiz) != 0)
+			continue;
+		if (!tryincref(abi->ea_driver))
+			continue;
+		/* Try to invoke the exec loader of this ABI */
+		TRY {
+			status = (*abi->ea_exec)(args);
+		} EXCEPT {
+			decref_unlikely(abi->ea_driver);
+			/* Handle `E_NOT_EXECUTABLE_NOT_A_BINARY' the same as a NULL-return-value
+			 * from the `ea_exec' callback, except when appearing in the last ABI, in
+			 * which case there aren't any more abis which we could try. */
+			if (i >= abis->eas_count - 1 || !was_thrown(E_NOT_EXECUTABLE_NOT_A_BINARY)) {
+				decref_unlikely(abis);
+				RETHROW();
+			}
+			continue;
+		}
+		decref_unlikely(abi->ea_driver);
+		if (status == EXECABI_EXEC_SUCCESS) {
+			decref_unlikely(abis);
+			return; /* Got it! */
+		}
+		/* If requested to, restart the exec process.
+		 * This is used to implement interpreter redirection, as used by #!-scripts. */
+		if (status == EXECABI_EXEC_RESTART) {
+			/* Make sure to service RPC functions before restarting.
+			 * A malicious user may have set-up #!-files in a loop, and
+			 * we must ensure that some other user remains the ability
+			 * to kill(2) or CTRL+C our process (in order words: we must
+			 * guaranty to be able to service RPCs when looping back) */
+			task_serve();
+			goto again_loadheader;
+		}
+	}
+	decref_unlikely(abis);
+	if unlikely(abis != execabis.m_pointer) {
+		/* The available set of ABIs has changed. - Try again. */
+		goto again_getabis;
+	}
+	/* Fallback: File isn't a recognized binary. */
+	THROW(E_NOT_EXECUTABLE_NOT_A_BINARY);
+}
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* System initialization loader (initial-exec for /bin/init)            */
+/************************************************************************/
+
+#ifndef CONFIG_DEFAULT_USERSPACE_INIT
+#define CONFIG_DEFAULT_USERSPACE_INIT "/bin/init"
+#endif /* !CONFIG_DEFAULT_USERSPACE_INIT */
+
+/* Commandline configuration for the initial user-space binary to execute. */
+INTERN_CONST ATTR_FREERODATA char const kernel_init_binary_default[] = CONFIG_DEFAULT_USERSPACE_INIT;
+INTERN ATTR_FREEDATA char const *kernel_init_binary = kernel_init_binary_default;
+DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_init_binary,
+                                 KERNEL_COMMANDLINE_OPTION_TYPE_STRING, "init");
+
+
+/* Update the given cpu state to start executing /bin/init, or whatever
+ * was passed as argument in a `init=...' kernel commandline option. */
+INTERN ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
+	struct execargs args;
+	bzero(&args, sizeof(args)); /* For fields which we don't use */
+	args.ea_xnode = (REF struct regular_node *)path_traversefull(THIS_FS,
+	                                                             kernel_init_binary,
+	                                                             true,
+	                                                             FS_MODE_FNORMAL,
+	                                                             NULL,
+	                                                             &args.ea_xpath,
+	                                                             NULL,
+	                                                             &args.ea_xdentry);
+	/* Can only execute regular files. */
+	/*vm_exec_assert_regular(args.ea_xnode);*/ /* TODO */
+
+	/* Fill in the remaining fields of `args' (which we make use of) */
+	args.ea_mman        = THIS_MMAN;
+	args.ea_argc_inject = 1;
+	args.ea_argv_inject = (char **)kmalloc(1 * sizeof(char *), GFP_NORMAL);
+	{
+		size_t binlen = (strlen(kernel_init_binary) + 1) * sizeof(char);
+		args.ea_argv_inject[0] = (char *)memcpy(kmalloc(binlen, GFP_NORMAL),
+		                                        kernel_init_binary, binlen);
+	}
+
+	/* Do the actual exec */
+	args.ea_state = state;
+	mman_exec(&args);
+	state = args.ea_state;
+
+	/* Finalize exec arguments. */
+	execargs_fini(&args);
+
+	if (kernel_debugtrap_enabled()) {
+		struct debugtrap_reason r;
+		r.dtr_signo  = SIGTRAP;
+		r.dtr_reason = DEBUGTRAP_REASON_EXEC;
+		/* FIXME: Should re-print the path using `path_sprintent()', since the path
+		 *        given by the bootloader may be ambiguous (or contain/be a symlink) */
+		r.dtr_strarg = kernel_init_binary;
+		state = kernel_debugtrap_r(state, &r);
+	}
+	return state;
 }
 
 DECL_END
