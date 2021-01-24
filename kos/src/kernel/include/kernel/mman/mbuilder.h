@@ -44,7 +44,7 @@ struct unlockinfo;
 struct mbnode;
 struct mnode;
 struct mman;
-struct mman_execinfo_struct;
+struct mexecinfo;
 
 LIST_HEAD(mbnode_list, mbnode);
 SLIST_HEAD(mbnode_slist, mbnode);
@@ -104,16 +104,25 @@ struct mbnode {
 	};
 	union {
 		struct {
-			LIST_ENTRY(mbnode)          mbn_nxtuprt;  /* [0..1] Next builder node that references a
-			                                           *        unique `mbn_part' with a similar hash. */
-			/* The next 3 fields are [valid_if(this IN :mb_files)]
-			 * If this is the case, our `mbn_filnxt' (if non-NULL) points
-			 * to the second node that is being used to map this file. */
-			SLIST_ENTRY(mbnode)         mbn_nxtfile;  /* [0..1] First node of the next separate file mapping. */
-			REF struct mfile           *mbn_file;     /* [0..1][const] The file that is being mapped. */
+			/* The 3 fields
+			 *    - mbn_nxtfile
+			 *    - mbn_file
+			 *    - mbn_filpos
+			 * are [valid_if(this IN :mb_files)]. If this is the case,
+			 * our `mbn_filnxt' (if non-NULL) points to the second node
+			 * that is being used to map this file. */
 			pos_t                       mbn_filpos;   /* [const] Absolute position of where `mbn_part' is (supposed)
 			                                           * to start. Ignored when `mbn_file' is an anonymous file.
 			                                           * NOTE: Access using `mnode_mbn_filpos_(get|set)' */
+#if __SIZEOF_POS_T__ < (__SIZEOF_POINTER__ * 2)
+			byte_t __mbn_pad[(__SIZEOF_POINTER__ * 2) - __SIZEOF_POS_T__];
+#endif /* __SIZEOF_POS_T__ < (__SIZEOF_POINTER__ * 2) */
+			SLIST_ENTRY(mbnode)         mbn_nxtfile;  /* [0..1] First node of the next separate file mapping. */
+			LIST_ENTRY(mbnode)          mbn_nxtuprt;  /* [0..1] Next builder node that references a
+			                                           *        unique `mbn_part' with a similar hash.
+			                                           * NOTE: This field shares it's address with `_mbn_writable',
+			                                           *       which is intentional, and important! */
+			REF struct mfile           *mbn_file;     /* [0..1][const] The file that is being mapped. */
 		};
 		struct {
 			/* Fields from `struct mnode' */
@@ -179,11 +188,14 @@ struct mbnode_partset {
 	(void)0
 
 
+struct rpc_entry;
 struct mbuilder {
 #ifdef __INTELLISENSE__
-	struct mbnode             *mb_mappings; /* [0..n] Tree of mem-nodes. */
+	struct mbnode             *mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
+	struct mnode              *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #else /* __INTELLISENSE__ */
-	RBTREE_ROOT(struct mbnode) mb_mappings; /* [0..n] Tree of mem-nodes. */
+	RBTREE_ROOT(struct mbnode) mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
+	RBTREE_ROOT(struct mnode)  mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #endif /* !__INTELLISENSE__ */
 	struct mbnode_partset      mb_uparts;   /* [0..n] Set of nodes mapping unique parts. */
 	struct mbnode_slist        mb_files;    /* [0..n][link(mbn_nxtfile)] List of file mappings. */
@@ -191,6 +203,9 @@ struct mbuilder {
 		struct mbnode_slist   _mb_fbnodes;  /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 		struct mnode_slist    _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 	};
+	struct rpc_entry          *mb_killrpc;  /* [0..n][link(re_next)] List of pre-allocated RPC
+	                                         * descriptors, as used by `mbuilder_apply()' in order
+	                                         * to terminate threads using the given target mman. */
 };
 
 /* Initialize the given mem-builder. */
@@ -201,18 +216,21 @@ struct mbuilder {
 		SLIST_HEAD_INITIALIZER(~),    \
 		{                             \
 			SLIST_HEAD_INITIALIZER(~) \
-		}                             \
+		},                            \
+		__NULLPTR                     \
 	}
 #define mbuilder_init(self)                   \
 	((self)->mb_mappings = __NULLPTR,         \
 	 mbnode_partset_init(&(self)->mb_uparts), \
 	 SLIST_INIT(&(self)->mb_files),           \
-	 SLIST_INIT(&(self)->mb_fparts))
+	 SLIST_INIT(&(self)->mb_fparts),          \
+	 (self)->mb_killrpc = __NULLPTR)
 #define mbuilder_cinit(self)                            \
 	(__hybrid_assert((self)->mb_mappings == __NULLPTR), \
 	 mbnode_partset_cinit(&(self)->mb_uparts),          \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_uparts)),  \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_fparts)))
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_fparts)),  \
+	 __hybrid_assert((self)->mb_killrpc == __NULLPTR))
 
 /* Finalize the given mem-builder. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -246,61 +264,74 @@ NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self);
 
 /* Apply all of the mappings from `self' onto `target', whilst simultaneously deleting
  * any memory mapping still present within `target' (except for the kernel-reserve node)
- * This function is guarantied to operate atomically in a way that allows the caller
- * to assume that no memory mappings (or anything else for that matter) changes if the
- * function fails and returns by throwing an error, and that everything happens exactly
- * as intended if it returns normally.
- * If doing all of this isn't possible, try to do what's necessary so that a repeated
- * call _will_ be able to do this atomically, release a lock to `target' and `unlock',
- * and return `false'.
- * NOTE: Upon success, `self' will have been finalized.
- * @param: self:   The VM Builder object from which to take mappings to-be applied to `target'
+ * NOTES:
+ *  - When calling this function, the caller must ensure that:
+ *     - mbuilder_partlocks_acquire(self)    (was called)
+ *     - mman_lock_acquired(target)
+ *  - Upon return, this function will have released all of the part-locks originally
+ *    acquired by `mbuilder_partlocks_acquire()', however the mman-lock to `target'
+ *    will _not_ have been released yet, and the caller must release that lock once
+ *    they've finished doing other additional builder-apply operations.
+ *  - This function doesn't actually modify the page directory of `target'.
+ *    The caller is responsible for doing this by calling `pagedir_unmap_userspace()'
+ * @param: self:   The mman Builder object from which to take mappings to-be applied to `target'
  *                 Upon success, the contents of `self' are left undefined and must either be
  *                 re-initialized, or not be attempted to be finalized.
- * @param: target: The target VM to which to apply the new memory mappings.
- *                 Upon success, this VM will only contain the mappings from `self', with all
+ * @param: target: The target mman to which to apply the new memory mappings.
+ *                 Upon success, this mman will only contain the mappings from `self', with all
  *                 of its old mappings having been deleted.
- *                 NOTE: This argument must not be the kernel VM
- * @param: additional_actions: Additional actions to be atomically performed alongside
- *                 the application of the new memory mappings (set of `VMB_APPLY_AA_*')
+ *                 NOTE: This argument must not be the kernel mman */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
+                                   struct mman *__restrict target);
+
+/* Terminate all threads bound to `target', other than the calling
+ * thread by sending an RPC that throws an E_EXIT_THREAD exception
+ * to each of them.
+ * For this purpose, first pre-allocate a set of RPC descriptors
+ * for every target thread, before sending them all at once.
+ * If the allocation cannot be done without blocking, do the usual
+ * unlock+return_false. Otherwise, when this function returns `true',
+ * then you know that no thread other than yourself is still making
+ * any use of the given `target' mman.
+ *
+ * NOTE: This function is used to implement `MBUILDER_APPLY_AA_TERMTHREADS'
  *
  * Locking logic:
  *   in:   mbuilder_partlocks_acquire(self) && mman_lock_acquired(target) && HELD(unlock)
  *   out:  return == true:
- *           - mbuilder_partlocks_release(self); mbuilder_fini(self)
+ *           - mbuilder_partlocks_release(self);
  *           - mman_lock_acquired(target) && HELD(unlock)
  *         return == false || EXCEPT:
  *           - mbuilder_partlocks_release(self);
  *           - mman_lock_release(target);
  *           - unlock(); */
 FUNDEF NONNULL((1, 2)) __BOOL KCALL
-mbuilder_apply_and_fini_or_unlock(/*inherit(on_success)*/ struct mbuilder *__restrict self,
-                                  struct mman *__restrict target,
-                                  unsigned int additional_actions,
-                                  struct mman_execinfo_struct *execinfo DFL(__NULLPTR),
-                                  struct unlockinfo *unlock)
+mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
+                               struct mman *__restrict target,
+                               struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
+
+
+/* Slightly simplified version of `mbuilder_apply_or_unlock()'
+ * that should be called while not already holding any locks, and will
+ * automatically acquire necessary locks, do the requested calls, and
+ * finally release all locks acquired, and still held at that point.
+ * @param: additional_actions: Additional actions to be atomically performed
+ *                             alongside the setting of the new mem-node
+ *                             mappings (set of `MBUILDER_APPLY_AA_*') */
+FUNDEF NONNULL((1, 2)) void KCALL
+mbuilder_apply(struct mbuilder *__restrict self,
+               struct mman *__restrict target,
+               unsigned int additional_actions,
+               struct mexecinfo *execinfo DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define MBUILDER_APPLY_AA_NOTHING      0x0000 /* No additional actions */
 #define MBUILDER_APPLY_AA_TERMTHREADS  0x0001 /* Terminate all threads using `target', excluding the caller.
                                                * If the calling thread isn't using `target', simply terminate
                                                * all threads that are using `target' */
-#define MBUILDER_APPLY_AA_SETEXECINFO  0x0002 /* Set the given `execinfo' for the given VM */
-
-
-/* Slightly simplified version of `mbuilder_apply_and_fini_or_unlock()'
- * that should be called while not already holding any locks, and will
- * automatically acquire necessary locks, do the call until it succeeds,
- * and finally release all locks acquired, and still held at that point.
- * Locking logic:
- *   in:   -
- *   out:  return: mbuilder_fini(self)
- *         EXCEPT: - */
-FUNDEF NONNULL((1, 2)) void KCALL
-mbuilder_apply_and_fini(/*inherit(on_success)*/ struct mbuilder *__restrict self,
-                        struct mman *__restrict target,
-                        unsigned int additional_actions,
-                        struct mman_execinfo_struct *execinfo DFL(__NULLPTR))
-		THROWS(E_BADALLOC, E_WOULDBLOCK);
+#define MBUILDER_APPLY_AA_SETEXECINFO  0x0002 /* Set the given `execinfo' for the given mman.
+                                               * When `execinfo' is `NULL', delete exec info. */
 
 
 

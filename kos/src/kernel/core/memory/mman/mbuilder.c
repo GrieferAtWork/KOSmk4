@@ -58,6 +58,11 @@ STATIC_ASSERT(offsetof(struct mnode, mn_mman) == offsetof(struct mbnode, _mbn_mm
 STATIC_ASSERT(offsetof(struct mnode, mn_partoff) == offsetof(struct mbnode, _mbn_partoff));
 STATIC_ASSERT(offsetof(struct mnode, mn_link) == offsetof(struct mbnode, _mbn_link));
 STATIC_ASSERT(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, _mbn_writable));
+STATIC_ASSERT_MSG(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, mbn_nxtuprt),
+                  "This is needed so that all non-unique-part nodes already have their writable "
+                  "link initialized as unbound, and all unique-part nodes can still be enumerated "
+                  "in `mbuilder_apply_impl' after the new node-tree has been assigned to the target "
+                  "mman, and all of the part<->node links have been set-up.");
 
 
 #ifndef NDEBUG
@@ -69,7 +74,7 @@ STATIC_ASSERT(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, _mb
 #define file_mbnode_destroy(self) \
 	(decref((self)->mbn_file), mbnode_destroy(self))
 
-PUBLIC NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbnode_destroy)(struct mbnode *__restrict self) {
 	decref(self->mbn_part);
 	xdecref(self->mbn_fspath);
@@ -77,7 +82,7 @@ NOTHROW(FCALL mbnode_destroy)(struct mbnode *__restrict self) {
 	kfree(self);
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_destroy_tree)(struct mbnode *__restrict self) {
 	struct mbnode *lo, *hi;
 again:
@@ -87,6 +92,25 @@ again:
 	if (lo) {
 		if (hi)
 			mbuilder_destroy_tree(hi);
+		self = lo;
+		goto again;
+	}
+	if (hi) {
+		self = hi;
+		goto again;
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_tree_destroy)(struct mnode *__restrict self) {
+	struct mnode *lo, *hi;
+again:
+	lo = self->mn_mement.rb_lhs;
+	hi = self->mn_mement.rb_rhs;
+	mnode_destroy(self);
+	if (lo) {
+		if (hi)
+			mnode_tree_destroy(hi);
 		self = lo;
 		goto again;
 	}
@@ -107,8 +131,12 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 	}
 
 	/* Destroy the tree of mappings. */
-	if (self->mb_mappings != NULL)
+	if unlikely(self->mb_mappings != NULL)
 		mbuilder_destroy_tree(self->mb_mappings);
+	if likely(self->mb_oldmap != NULL)
+		mnode_tree_destroy(self->mb_oldmap);
+
+	/* TODO: Finalize `self->mb_killrpc' */
 
 	/* Free all nodes that remained within the free-list. */
 	iter = SLIST_FIRST(&self->_mb_fbnodes);
@@ -162,20 +190,22 @@ mbuilder_insert_anon_file_node(struct mbuilder *__restrict self,
 
 
 
-PRIVATE WUNUSED ATTR_RETNONNULL struct mbnode *FCALL
+PRIVATE WUNUSED ATTR_RETNONNULL struct mnode *FCALL
 mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	struct mbnode *result;
-	result = (struct mbnode *)kmalloc(sizeof(struct mbnode), GFP_LOCKED);
-	result->mbn_minaddr = (byte_t *)addr;
-	result->mbn_maxaddr = (byte_t *)addr + num_bytes - 1;
-	result->mbn_part    = NULL; /* Reserved node */
-	result->mbn_fspath  = NULL;
-	result->mbn_fsname  = NULL;
-	result->mbn_filnxt  = NULL;
-	DBG_memset(&result->mbn_nxtfile, 0xcc, sizeof(result->mbn_nxtfile));
-	DBG_memset(&result->mbn_file, 0xcc, sizeof(result->mbn_file));
-	DBG_memset(&result->mbn_filpos, 0xcc, sizeof(result->mbn_filpos));
+	struct mnode *result;
+	result = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_LOCKED);
+	result->mn_minaddr  = (byte_t *)addr;
+	result->mn_maxaddr  = (byte_t *)addr + num_bytes - 1;
+	result->mn_part     = NULL; /* Reserved node */
+	result->mn_fspath   = NULL;
+	result->mn_fsname   = NULL;
+	result->mn_mman     = NULL;
+	result->mn_partoff  = 0;
+	DBG_memset(&result->mn_mman, 0xcc, sizeof(result->mn_mman));
+	DBG_memset(&result->_mn_module, 0xcc, sizeof(result->_mn_module));
+	DBG_memset(&result->mn_link, 0xcc, sizeof(result->mn_link));
+	LIST_ENTRY_UNBOUND_INIT(result, mn_writable);
 	return result;
 }
 
@@ -456,7 +486,7 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 		struct mbnode *fmnode;
 
 		/* Construct the memory-reservation node. */
-		fmnode = mbuilder_create_res_file_node(baseaddr, num_bytes);
+		fmnode = (struct mbnode *)mbuilder_create_res_file_node(baseaddr, num_bytes);
 
 		/* Insert the node into the mem-builder.
 		 * Note that we don't add the part to the files- or uparts lists,

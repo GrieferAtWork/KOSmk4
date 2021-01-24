@@ -630,7 +630,7 @@ fail:
  * caller must already be holding locks to every mem-part mapped by `self'
  * However, use of `mfile_map_acquire_or_unlock()' is still more efficient,
  * since that function can do some tricks which this one can't (see impl)! */
-PUBLIC WUNUSED NONNULL((1)) __BOOL FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
                            struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {

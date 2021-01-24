@@ -17,38 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_VM_EXEC_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_VM_EXEC_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXECINFO_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXECINFO_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
-#include <kernel/vm.h>
-
-#ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/mm-execinfo.h>
-#define vm_execinfo_struct mexecinfo
-#define ei_node            mei_node
-#define ei_dent            mei_dent
-#define ei_path            mei_path
-#define thisvm_execinfo    thismman_execinfo
-#else /* CONFIG_USE_NEW_VM */
+#ifdef __CC__
 DECL_BEGIN
 
 struct inode;
 struct directory_entry;
 struct path;
 
-struct vm_execinfo_struct {
-	REF struct inode           *ei_node; /* [0..1][lock(:THIS_VM)] Exec INode */
-	REF struct directory_entry *ei_dent; /* [0..1][lock(:THIS_VM)] Exec directory entry */
-	REF struct path            *ei_path; /* [0..1][lock(:THIS_VM)] Exec path */
+struct mexecinfo {
+	REF struct inode           *mei_node; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
+	REF struct directory_entry *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
+	REF struct path            *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
 };
 
-/* VM exec() information */
-DATDEF ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo;
+/* MMan exec() information */
+DATDEF ATTR_PERMMAN struct mexecinfo thismman_execinfo;
 
 DECL_END
-#endif /* !CONFIG_USE_NEW_VM */
+#endif /* __CC__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_EXEC_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXECINFO_H */

@@ -130,32 +130,6 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 
-/*
- * Idea on how to implement an O(1) fork(2) system call:
- *
- * >> struct mman *mman_fork() {
- * >>     struct mman *result = malloc(...);
- * >>     pagedir_fork(result->mn_pdir);
- * >>     ...
- * >> }
- *
- * NOTE: The pagedir_fork() idea may be possible to implement,
- *       but the whole copy-on-write memory-mappings-tree idea
- *       would be _way_ too complicated, and wouldn't actually
- *       given us that great of a performance boost, since the
- *       first time either process does a write, half of their
- *       shared tree would have to be unshared.
- *       This is because only unsharing a single node wouldn't
- *       do, since we always have to unshare all nodes along the
- *       way to the actual node that we want to modify.
- *       And then there's the problem of syncing memory access
- *       to all of the nodes: With shared trees, simply locking
- *       the memory manager isn't good enough, since there would
- *       be more than 1 mman involved!
- */
-
-
-
 struct mlockop;
 #ifndef __mlockop_slist_defined
 #define __mlockop_slist_defined 1

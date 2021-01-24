@@ -85,8 +85,8 @@
                                        * or has its MNODE_F_MLOCK flag cleared, all mappings of the mem-part are scanned
                                        * in search for other locked mappings. If any are found, then this flag will remain
                                        * set. If none are found, then this flag is cleared. */
-/*efine MPART_F_               0x4000  * ... */
-#define MPART_F__RBRED         0x8000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
+#define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
+/*efine MPART_F_               0x8000  * ... */
 
 
 /* Possible values for `struct mpart::mp_state' */

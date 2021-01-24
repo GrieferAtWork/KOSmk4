@@ -22,8 +22,11 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mm-event.h>
+#include <kernel/mman/mm-execinfo.h>
 #include <kernel/mman/mm-flags.h>
 #include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mnode.h>
@@ -66,6 +69,15 @@ DECL_BEGIN
 #define KS_MINADDR ((uintptr_t)KERNELSPACE_BASE)
 #define KS_MAXADDR ((uintptr_t)(KERNELSPACE_END - 1))
 #endif /* !KERNELSPACE_...MEM */
+
+/* MMan exec() information */
+PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
+	/* .mei_node = */ NULL,
+	/* .mei_dent = */ NULL,
+	/* .mei_path = */ NULL
+};
+
+
 
 /* A special per-MMAN node that is used to cover the kernel core
  * with a reservation within user-space memory manager. Within the
@@ -193,6 +205,11 @@ NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
 			(**iter)(self);
 		assert(iter == __kernel_permman_fini_end);
 	}
+
+	/* Finalize `thismman_execinfo' */
+	xdecref(FORMMAN(self, thismman_execinfo).mei_node);
+	xdecref(FORMMAN(self, thismman_execinfo).mei_dent);
+	xdecref(FORMMAN(self, thismman_execinfo).mei_path);
 
 	/* Destroy all of the memory-mappings within the tree. */
 	mnode_tree_destroy(self->mm_mappings,
