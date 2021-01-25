@@ -379,7 +379,7 @@ reload_lonode_after_mman_lock:
 	incref(part); /* The reference stored in `hinode->mn_part' */
 done_nopart:
 	/* Copy the is-writable attribute form `lonode' into `hinode' */
-	LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
+	LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 	if (LIST_ISBOUND(lonode, mn_writable))
 		LIST_INSERT_HEAD(&self->mm_writable, hinode, mn_writable);
 
@@ -412,9 +412,9 @@ DECL_END
 #define RBTREE_GETNODE(self)   (self)->mn_mement
 #define RBTREE_GETMINKEY(self) mnode_getminaddr(self)
 #define RBTREE_GETMAXKEY(self) mnode_getmaxaddr(self)
-#define RBTREE_ISRED(self)     ((self)->mp_flags & MNODE_F__RBRED)
-#define RBTREE_SETRED(self)    (void)((self)->mp_flags |= MNODE_F__RBRED)
-#define RBTREE_SETBLACK(self)  (void)((self)->mp_flags &= ~MNODE_F__RBRED)
+#define RBTREE_ISRED(self)     ((self)->mn_flags & MNODE_F__RBRED)
+#define RBTREE_SETRED(self)    (void)((self)->mn_flags |= MNODE_F__RBRED)
+#define RBTREE_SETBLACK(self)  (void)((self)->mn_flags &= ~MNODE_F__RBRED)
 #define RBTREE_CC              FCALL
 #define RBTREE_NOTHROW         NOTHROW
 #define RBTREE_DECL            FUNDEF

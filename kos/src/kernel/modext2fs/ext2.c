@@ -690,18 +690,10 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	if unlikely(!num_block_groups)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
-	self->sd_block_shift = 10 + LETOH32(super.e_log2_blocksz);
+	mfile_init_blockshift(self, 10 + LETOH32(super.e_log2_blocksz));
 	if unlikely(self->sd_block_shift >= PAGESHIFT)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
-
-	self->sd_blocksize     = (size_t)1 << self->sd_block_shift;
-	self->sd_blockmask     = self->sd_blocksize - 1;
-	self->sd_ind_blocksize = self->sd_blocksize / 4;
-	self->db_pageshift     = PAGESHIFT - self->sd_block_shift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-	self->db_pagealign     = (size_t)1 << self->db_pageshift;
-	self->db_pagemask      = self->db_pagealign - 1;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+	self->sd_ind_blocksize = ((size_t)1 << self->sd_block_shift) / 4;
 
 
 #if 1 /* I'm guessing this is the right answer, but the wiki really isn't clear...                \

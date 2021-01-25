@@ -171,7 +171,11 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 	if (clone_flags & CLONE_VM) {
 		result_vm = incref(caller->t_mman);
 	} else {
+#ifdef CONFIG_USE_NEW_VM
+		result_vm = mman_fork();
+#else /* CONFIG_USE_NEW_VM */
 		result_vm = vm_clone(caller->t_mman, false);
+#endif /* !CONFIG_USE_NEW_VM */
 	}
 	TRY {
 		/* Allocate a new task structure. */
@@ -200,23 +204,23 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 			vm_datapart_do_allocram(&FORTASK(result, this_kernel_stackpart_));
 			TRY {
 				uintptr_t cache_version;
-				void *stack_addr;
-				void *trampoline_addr;
+				byte_t *stack_addr;
+				byte_t *trampoline_addr;
 				cache_version = 0;
 again_lock_vm:
 				sync_write(&vm_kernel.v_treelock);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-				stack_addr = vm_getfree(&vm_kernel,
-				                        HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
-				                        CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
-				                        PAGESIZE,
-				                        HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
+				stack_addr = (byte_t *)vm_getfree(&vm_kernel,
+				                                  HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+				                                  CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
+				                                  PAGESIZE,
+				                                  HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-				stack_addr = vm_getfree(&vm_kernel,
-				                        HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
-				                        CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
-				                        PAGESIZE,
-				                        HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
+				stack_addr = (byte_t *)vm_getfree(&vm_kernel,
+				                                  HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+				                                  CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
+				                                  PAGESIZE,
+				                                  HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 				if unlikely(stack_addr == VM_GETFREE_ERROR) {
 					sync_endwrite(&vm_kernel.v_treelock);
@@ -225,40 +229,33 @@ again_lock_vm:
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 					      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
 				}
-				{
-					pageid_t stackpage;
-					stackpage = PAGEID_ENCODE((byte_t *)stack_addr);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-					FORTASK(result, this_kernel_stackguard_).vn_node.a_vmin = stackpage;
-					FORTASK(result, this_kernel_stackguard_).vn_node.a_vmax = stackpage;
-					FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin  = stackpage + 1;
-					FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax  = stackpage + 1 + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-					stack_addr = (byte_t *)stack_addr + PAGESIZE;
-#else  /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-					FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin = stackpage;
-					FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax = stackpage + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-#endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
-				}
+				vm_node_setminaddr(&FORTASK(result, this_kernel_stackguard_), stack_addr);
+				vm_node_setmaxaddr(&FORTASK(result, this_kernel_stackguard_), stack_addr + PAGESIZE - 1);
+				stack_addr = (byte_t *)stack_addr + PAGESIZE;
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+				vm_node_setminaddr(&FORTASK(result, this_kernel_stacknode_), stack_addr);
+				vm_node_setmaxaddr(&FORTASK(result, this_kernel_stacknode_), stack_addr + KERNEL_STACKSIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if unlikely(!pagedir_prepare_map(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
+				if unlikely(!pagedir_prepare_map(stack_addr, KERNEL_STACKSIZE)) {
 					sync_endwrite(&vm_kernel.v_treelock);
-					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, KERNEL_STACKSIZE);
 				}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 				/* Map the trampoline node. */
-				trampoline_addr = vm_getfree(&vm_kernel,
-				                             HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
-				                             PAGESIZE, PAGESIZE,
-				                             HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+				trampoline_addr = (byte_t *)vm_getfree(&vm_kernel,
+				                                       HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
+				                                       PAGESIZE, PAGESIZE,
+				                                       HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 				if unlikely(trampoline_addr == VM_GETFREE_ERROR) {
 					sync_endwrite(&vm_kernel.v_treelock);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 				}
-				FORTASK(result, this_trampoline_node).vn_node.a_vmin = PAGEID_ENCODE(trampoline_addr);
-				FORTASK(result, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(trampoline_addr);
+				vm_node_setminaddr(&FORTASK(result, this_trampoline_node), trampoline_addr);
+				vm_node_setmaxaddr(&FORTASK(result, this_trampoline_node), trampoline_addr + PAGESIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 				if unlikely(!pagedir_prepare_mapone(trampoline_addr))
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -274,6 +271,9 @@ again_lock_vm:
 				vm_datapart_map_ram(&FORTASK(result, this_kernel_stackpart_),
 				                    stack_addr,
 				                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+				pagedir_unprepare_map(stack_addr, KERNEL_STACKSIZE);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				sync_endwrite(&vm_kernel.v_treelock);
 			} EXCEPT {
 				vm_datapart_do_ccfreeram(&FORTASK(result, this_kernel_stackpart_));
@@ -297,7 +297,7 @@ again_lock_vm:
 		struct scpustate *state;
 		void *kernel_stack;
 		/* Initial the task's initial CPU state. */
-		kernel_stack = (void *)vm_node_getend(&FORTASK(result, this_kernel_stacknode));
+		kernel_stack = (void *)vm_node_getendaddr(&FORTASK(result, this_kernel_stacknode));
 
 #ifdef __x86_64__
 		state = icpustate_to_scpustate_p_ex(init_state,

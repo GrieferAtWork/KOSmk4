@@ -298,6 +298,10 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 
 			/* Add the part to its file's changed-list. */
 			SLIST_ATOMIC_INSERT(&file->mf_changed, self, mp_changed);
+
+			/* If defined, invoke the part-changed callback. */
+			if (file->mf_ops->mo_changed != NULL)
+				(*file->mf_ops->mo_changed)(file, self);
 		}
 	}
 	return num_bytes;
@@ -488,6 +492,10 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 
 		/* Add the part to its file's changed-list. */
 		SLIST_ATOMIC_INSERT(&file->mf_changed, self, mp_changed);
+
+		/* If defined, invoke the part-changed callback. */
+		if (file->mf_ops->mo_changed != NULL)
+			(*file->mf_ops->mo_changed)(file, self);
 	}
 }
 
@@ -589,8 +597,7 @@ again_read_st:
 #endif /* !CONFIG_NO_SMP */
 
 		if (st == MPART_BLOCK_ST_NDEF) {
-			typeof(self->mp_file->mf_ops->mo_loadblocks) mo_loadblocks;
-			mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
+			auto mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
 			if (mo_loadblocks != NULL) {
 				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW! */
 				(*mo_loadblocks)(self->mp_file,

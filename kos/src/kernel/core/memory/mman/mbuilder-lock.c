@@ -251,7 +251,7 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder *__restrict se
 
 		/* If this part isn't already being used, insert it into
 		 * the list of unique mem-parts used by our mem-builder. */
-		LIST_ENTRY_UNBOUND_INIT(iter, mbn_nxtuprt);
+		LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
 
 		/* Insert the node as the holder of the associated unique part.
 		 * Note that upon success (i.e. `mfile_map_reflow_or_unlock()'

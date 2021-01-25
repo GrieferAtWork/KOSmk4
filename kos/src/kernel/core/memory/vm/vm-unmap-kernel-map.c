@@ -80,17 +80,17 @@ NOTHROW(FCALL vm_unmap_kernel_mapping_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void
 		        /*             */ (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE),
 		        "node: %p...%p\n"
 		        "node->vn_flags = %#" PRIxSIZ,
-		        vm_node_getmin(node),
-		        vm_node_getmax(node),
+		        vm_node_getminaddr(node),
+		        vm_node_getmaxaddr(node),
 		        node->vn_flags);
 		next = VM_NODE_NEXT(node);
 		assert(vm_node_getminpageid(node) >= minpageid);
 		assert(vm_node_getmaxpageid(node) <= maxpageid);
 		if unlikely(node->vn_flags & VM_NODE_FLAG_KERNPRT) {
 			kernel_panic("Attempted to munmap() a kernel part at %p...%p",
-			             vm_node_getmin(node), vm_node_getmax(node));
+			             vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 		}
-		pagedir_unmap(vm_node_getstart(node),
+		pagedir_unmap(vm_node_getaddr(node),
 		              vm_node_getsize(node));
 		/* Remove the node from the VM. */
 		vm_nodetree_remove(&vm_kernel.v_tree, vm_node_getstartpageid(node));

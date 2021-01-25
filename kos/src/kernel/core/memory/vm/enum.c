@@ -115,7 +115,7 @@ again_lock_tree_and_search_for_first_node:
 			struct vm_mapinfo *ent;
 			/* Gather information about this node. */
 			ent = &pending[num_pending];
-			ent->vmi_min = vm_node_getmin(node);
+			ent->vmi_min = vm_node_getminaddr(node);
 			if (num_pending) {
 				struct vm_mapinfo *prev;
 				prev = ent - 1;
@@ -143,11 +143,11 @@ again_lock_tree_and_search_for_first_node:
 						goto node_is_not_an_extension;
 				}
 				/* This _is_ an extension to the previous node! */
-				prev->vmi_max = vm_node_getmax(node);
+				prev->vmi_max = vm_node_getmaxaddr(node);
 				goto continue_with_next_node;
 			}
 node_is_not_an_extension:
-			ent->vmi_max    = vm_node_getmax(node);
+			ent->vmi_max    = vm_node_getmaxaddr(node);
 			ent->vmi_prot   = node->vn_prot;
 			ent->vmi_block  = xincref(node->vn_block);
 			ent->vmi_offset = node->vn_part ? vm_datapart_minbyte(node->vn_part) : 0;

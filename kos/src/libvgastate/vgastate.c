@@ -440,7 +440,11 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 		                                     NULL,
 		                                     VGA_VM86_BIOS_SIZE,
 		                                     PAGESIZE,
+#ifdef CONFIG_USE_NEW_VM
+		                                     VM_GETFREE_ABOVE,
+#else /* CONFIG_USE_NEW_VM */
 		                                     VM_GETFREE_ABOVE | VM_GETFREE_ASLR,
+#endif /* !CONFIG_USE_NEW_VM */
 		                                     &vm_datablock_physical,
 		                                     NULL,
 		                                     NULL,

@@ -545,7 +545,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	LIST_INIT(&part->mp_copy);
 	part->mp_share.lh_first = node;
 	SLIST_INIT(&part->mp_lockops);
-	LIST_ENTRY_UNBOUND_INIT(part, mp_allparts);
+	LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 	part->mp_minaddr = (pos_t)(0);
 	part->mp_maxaddr = (pos_t)(PAGESIZE - 1);

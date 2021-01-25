@@ -149,7 +149,7 @@ throw_segfault:
 			                        << VM_DATABLOCK_ADDRSHIFT(args.va_file));
 			/* Figure out the staring VIO address that is being accessed. */
 			vio_addr = ((pos_t)vm_datapart_mindpage(part) << VM_DATABLOCK_ADDRSHIFT(args.va_file)) +
-			            (pos_t)((byte_t *)addr - (byte_t *)vm_node_getmin(node));
+			            (pos_t)((byte_t *)addr - (byte_t *)vm_node_getminaddr(node));
 
 			sync_endread(part);
 			args.va_ops = args.va_file->db_vio;

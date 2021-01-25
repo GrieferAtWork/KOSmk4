@@ -33,6 +33,14 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#undef CONFIG_MFILE_LEGACY_VIO_OPS
+#if 1 /* TODO: Currently required for backwards compatibility to the old mman.
+       * The plan is to eventually disable this option, and merge `inode_type'
+       * with `mfile_ops', which should then contain a pointer for VIO operators.
+       * With this option enabled, the old behavior is used, instead. */
+#define CONFIG_MFILE_LEGACY_VIO_OPS
+#endif
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -89,9 +97,19 @@ struct mfile_ops {
 	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self,
 	                                         mfile_block_t first_block,
 	                                         physaddr_t buffer, size_t num_blocks);
+	/* [0..1] Called the first time the `MPART_F_CHANGED' flag is set for `part'.
+	 * WARNING: This function is called while a lock to `part' is held!
+	 * NOTE: Not invoked if a new change part is created as the result
+	 *       of an already-known-as-changed part being split. */
+	NOBLOCK NONNULL((1, 2)) void
+	/*NOTHROW*/ (KCALL *mo_changed)(struct mfile *__restrict self,
+	                                struct mpart *__restrict part);
+#ifndef CONFIG_MFILE_LEGACY_VIO_OPS
 	/* [0..1] VIO file operators. (when non-NULL, then this file is backed by VIO,
 	 *        and the `mo_loadblocks' and `mo_saveblocks' operators are ignored) */
 	struct vio_operators const *mo_vio;
+#endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
+
 	/* TODO: Operator `mo_changed': Called when the backing memory of a part is modified. */
 	/* TODO: Operator `mo_attr_changed': Called when one of the file's attribute fields changed. */
 
@@ -113,6 +131,9 @@ struct mfile_ops {
 struct mfile {
 	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */
 	struct mfile_ops const     *mf_ops;        /* [1..1][const] File operators. */
+#ifdef CONFIG_MFILE_LEGACY_VIO_OPS
+	struct vio_operators const *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
+#endif /* CONFIG_MFILE_LEGACY_VIO_OPS */
 	struct atomic_rwlock        mf_lock;       /* Lock for this file. */
 	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
@@ -149,6 +170,64 @@ struct mfile {
 	 */
 };
 
+
+#ifdef CONFIG_MFILE_LEGACY_VIO_OPS
+#define __mfile_init_vio(self)  (self)->mf_vio = __NULLPTR,
+#define __mfile_cinit_vio(self) __hybrid_assert((self)->mf_vio == __NULLPTR),
+#else /* CONFIG_MFILE_LEGACY_VIO_OPS */
+#define __mfile_init_vio(self)  /* nothing */
+#define __mfile_cinit_vio(self) /* nothing */
+#endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
+
+#define mfile_init_blockshift(self, block_shift)                               \
+	((self)->mf_blockshift = (block_shift),                                    \
+	 (self)->mf_part_amask = (size_t)1 << (((self)->mf_blockshift) > PAGESHIFT \
+	                                       ? ((self)->mf_blockshift)           \
+	                                       : PAGESHIFT))
+#define mfile_init(self, ops, block_shift) \
+	((self)->mf_refcnt = 1,                \
+	 (self)->mf_ops    = (ops),            \
+	 __mfile_init_vio(self)                \
+	 atomic_rwlock_init(&(self)->mf_lock), \
+	 (self)->mf_parts = __NULLPTR,         \
+	 sig_init(&(self)->mf_initdone),       \
+	 SLIST_INIT(&(self)->mf_deadparts),    \
+	 SLIST_INIT(&(self)->mf_changed),      \
+	 mfile_init_blockshift(self, block_shift))
+#define mfile_cinit(self, ops, block_shift)               \
+	((self)->mf_refcnt = 1,                               \
+	 (self)->mf_ops    = (ops),                           \
+	 __mfile_cinit_vio(self)                              \
+	 atomic_rwlock_cinit(&(self)->mf_lock),               \
+	 __hybrid_assert((self)->mf_parts == __NULLPTR),      \
+	 sig_cinit(&(self)->mf_initdone),                     \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_deadparts)), \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_changed)),   \
+	 mfile_init_blockshift(self, block_shift))
+
+/* Get a [0..1]-pointer to the VIO operators of `self' */
+#ifdef CONFIG_MFILE_LEGACY_VIO_OPS
+#define mfile_getvio(self) ((self)->mf_vio)
+#else /* CONFIG_MFILE_LEGACY_VIO_OPS */
+#define mfile_getvio(self) ((self)->mf_ops->mo_vio)
+#endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
+
+
+#ifdef CONFIG_MFILE_LEGACY_VIO_OPS
+#define MFILE_INIT_EX(refcnt, ops, parts, blockshift)                                  \
+	{                                                                                  \
+		/* .mf_refcnt     = */ refcnt,                                                 \
+		/* .mf_ops        = */ ops,                                                    \
+		/* .mf_vio        = */ __NULLPTR,                                              \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,                                     \
+		/* .mf_parts      = */ parts,                                                  \
+		/* .mf_initdone   = */ SIG_INIT,                                               \
+		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),                              \
+		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                              \
+		/* .mf_blockshift = */ blockshift,                                             \
+		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
+	}
+#else /* CONFIG_MFILE_LEGACY_VIO_OPS */
 #define MFILE_INIT_EX(refcnt, ops, parts, blockshift)                                  \
 	{                                                                                  \
 		/* .mf_refcnt     = */ refcnt,                                                 \
@@ -161,6 +240,7 @@ struct mfile {
 		/* .mf_blockshift = */ blockshift,                                             \
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
 	}
+#endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
 #define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, blockshift)
 #define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, blockshift)
 
@@ -323,7 +403,7 @@ struct mfile_map {
 	 * >>         node->mn_flags = MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_SHARED;
 	 * >>         node->mn_mman  = mm;
 	 * >>         LIST_INSERT_HEAD(&node->mn_part->mp_share, node, mn_link);
-	 * >>         LIST_ENTRY_UNBOUND_INIT(node, mn_writable);
+	 * >>         LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 	 * >>         node->mn_fspath = NULL;
 	 * >>         node->mn_fsname = NULL;
 	 * >>         node->mn_minaddr += (uintptr_t)addr;

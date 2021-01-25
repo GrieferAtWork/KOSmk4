@@ -1112,20 +1112,17 @@ NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 /************************************************************************/
 /* A mem-node used to describe a single, reserved page. */
 PUBLIC ATTR_PERTASK struct mnode this_trampoline_node = {
-	{
-		/* .mn_mement = */ { NULL, NULL, NULL },
-	},
+	/* .mn_mement   = */ { {} },
 	/* .mn_minaddr  = */ (byte_t *)(0),
 	/* .mn_maxaddr  = */ (byte_t *)(PAGESIZE - 1),
-	/* .mn_flags    = */ (MNODE_F_PWRITE | MNODE_F_PREAD | MNODE_F_SHARED |
-	                      MNODE_F_NO_SPLIT | MNODE_F_NO_MERGE | MNODE_F_MPREPARED |
-	                      MNODE_F_MLOCK),
+	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
+	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
+	/*                */ MNODE_F_NO_MERGE | MNODE_F_MPREPARED |
+	/*                */ MNODE_F_MLOCK,
 	/* .mn_part     = */ NULL,
 	/* .mn_fspath   = */ NULL,
 	/* .mn_fsname   = */ NULL,
-	{
-		/* .mn_mman = */ &mman_kernel,
-	},
+	/* .mn_mman     = */ { &mman_kernel },
 	/* .mn_partoff  = */ 0,
 	/* .mn_link     = */ LIST_ENTRY_UNBOUND_INITIALIZER,
 	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,

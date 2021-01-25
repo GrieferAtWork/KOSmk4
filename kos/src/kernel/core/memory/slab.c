@@ -35,6 +35,9 @@
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/types.h>
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman/mm-kram.h>
+#endif /* CONFIG_USE_NEW_VM */
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -46,7 +49,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifndef CONFIG_USE_NEW_VM
 #include "corebase.h"
+#endif /* !CONFIG_USE_NEW_VM */
 
 DECL_BEGIN
 
@@ -228,6 +233,99 @@ again:
 	if unlikely(ATOMIC_READ(pool->sp_count) != 0)
 		goto again;
 	/* Must allocate a new slab page. */
+#ifdef CONFIG_USE_NEW_VM
+again_lock_vm:
+	if (flags & GFP_ATOMIC) {
+		if unlikely(!mman_lock_tryacquire(&mman_kernel))
+			goto err;
+	} else {
+		if unlikely(!mman_lock_acquire_nx(&mman_kernel))
+			goto err;
+	}
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
+#define HINT_GETADDR(x) HINT_ADDR x
+#define HINT_GETMODE(x) HINT_MODE x
+	{
+		void *next_slab_addr;
+		void *slab_end_addr;
+		slab_end_addr  = kernel_slab_break;
+		/* Make sure that sufficient memory is available within the slab-region. */
+		next_slab_addr = mman_findunmapped(&mman_kernel,
+		                                   HINT_GETADDR(KERNEL_VMHINT_SLAB), PAGESIZE,
+		                                   HINT_GETMODE(KERNEL_VMHINT_SLAB));
+		mman_lock_release(&mman_kernel);
+#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+		if (next_slab_addr == MAP_FAILED || next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
+#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+		if (next_slab_addr == MAP_FAILED || next_slab_addr > (byte_t *)slab_end_addr)
+#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+		{
+			uintptr_t version;
+			mman_lock_release(&mman_kernel);
+			version = 0;
+again_next_slab_page_tryhard:
+			if (flags & GFP_ATOMIC) {
+				if unlikely(!mman_lock_tryacquire(&mman_kernel))
+					goto err;
+			} else {
+				if unlikely(!mman_lock_acquire_nx(&mman_kernel))
+					goto err;
+			}
+			next_slab_addr = vm_getfree(&vm_kernel,
+			                            HINT_GETADDR(KERNEL_VMHINT_SLAB),
+			                            PAGESIZE, PAGESIZE,
+			                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
+			vm_kernel_treelock_endwrite();
+#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+			if (next_slab_addr != VM_GETFREE_ERROR &&
+			    next_slab_addr >= (byte_t *)slab_end_addr - PAGESIZE)
+				goto gotaddr;
+#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+			if (next_slab_addr != VM_PAGED_GETFREE_ERROR &&
+			    next_slab_addr <= (byte_t *)slab_end_addr)
+				goto gotaddr;
+#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+			if (system_clearcaches_s(&version))
+				goto again_next_slab_page_tryhard;
+			goto err;
+		}
+gotaddr:
+		/* Make use of the KRAM mapping system to map more slab memory. */
+		result = (struct slab *)mman_map_kram_nx(next_slab_addr, PAGESIZE,
+		                                         GFP_MAP_FIXED | (flags & ~(GFP_MAP_32BIT |
+		                                                                    GFP_MAP_PREPARED |
+		                                                                    GFP_MAP_BELOW |
+		                                                                    GFP_MAP_ABOVE |
+		                                                                    GFP_MAP_NOASLR)));
+		if unlikely(result == MAP_INUSE)
+			goto again_lock_vm; /* Race condition: our picked address got used in the meantime... */
+		if unlikely(result == MAP_FAILED)
+			goto err; /* Allocation failed :( */
+
+		/* Update the slab-break end-pointer if necessary. */
+#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+		if ((byte_t *)result < (byte_t *)slab_end_addr) {
+			while (!ATOMIC_CMPXCH_WEAK(kernel_slab_break, slab_end_addr, result)) {
+				slab_end_addr = ATOMIC_READ(kernel_slab_break);
+				if ((byte_t *)result >= (byte_t *)slab_end_addr)
+					break;
+			}
+		}
+#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+		if ((byte_t *)result >= (byte_t *)slab_end_addr) {
+			while (!ATOMIC_CMPXCH_WEAK(kernel_slab_break, slab_end_addr,
+			                           (byte_t *)result + PAGESIZE)) {
+				slab_end_addr = ATOMIC_READ(kernel_slab_break);
+				if ((byte_t *)result < (byte_t *)slab_end_addr)
+					break;
+			}
+		}
+#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+
+		return result;
+	}
+#else /* CONFIG_USE_NEW_VM */
 	{
 		struct vm_corepair_ptr corepair;
 		if (flags & GFP_VCBASE) {
@@ -378,6 +476,7 @@ err_corepair:
 		vm_node_free(corepair.cp_node);
 		vm_datapart_free(corepair.cp_part);
 	}
+#endif /* !CONFIG_USE_NEW_VM */
 err:
 	return NULL;
 }

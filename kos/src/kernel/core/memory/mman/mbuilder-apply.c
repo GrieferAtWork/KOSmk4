@@ -176,7 +176,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 			mpart_lock_release(iter->mbn_part);
 
 			/* Initialize the writable-link as unbound. */
-			LIST_ENTRY_UNBOUND_INIT(next, _mbn_writable);
+			LIST_ENTRY_UNBOUND_INIT(&next->_mbn_writable);
 			iter = next;
 		}
 	}

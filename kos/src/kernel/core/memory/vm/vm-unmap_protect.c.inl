@@ -125,13 +125,13 @@ do_throw_base_unmapped:
 				void *first_unmapped;
 				struct vm_node *next;
 				if unlikely(!SHOULD_UPDATE(iter)) {
-					first_unmapped = vm_node_getstart(iter);
+					first_unmapped = vm_node_getaddr(iter);
 					goto do_throw_first_unmapped;
 				}
 				next = iter->vn_byaddr.ln_next;
 				assert(vm_node_getendpageid(iter) <= vm_node_getstartpageid(next));
 				if unlikely(vm_node_getendpageid(iter) != vm_node_getstartpageid(next)) {
-					first_unmapped = vm_node_getend(iter);
+					first_unmapped = vm_node_getendaddr(iter);
 do_throw_first_unmapped:
 					sync_endwrite(self);
 					THROW(E_SEGFAULT_UNMAPPED,
@@ -156,9 +156,9 @@ do_throw_first_unmapped:
 				    (node->vn_flags & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_PARTITIONED)) !=
 				    VM_NODE_FLAG_PREPARED) {
 					if unlikely(!((self == myvm || vm_node_iskernelspace(node))
-					              ? pagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
+					              ? pagedir_prepare_map(vm_node_getaddr(node), vm_node_getsize(node))
 					              : pagedir_prepare_map_p(self->v_pdir_phys,
-					                                      vm_node_getstart(node),
+					                                      vm_node_getaddr(node),
 					                                      vm_node_getsize(node)))) {
 						sync_endwrite(self);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -181,12 +181,12 @@ do_throw_first_unmapped:
 			} else if unlikely(minmax.mm_min->vn_flags & VM_NODE_FLAG_KERNPRT) {
 #ifdef VM_DEFINE_PROTECT
 				kernel_panic("Attempted to mprotect() a kernel part at %p...%p",
-				             vm_node_getmin(minmax.mm_min),
-				             vm_node_getmax(minmax.mm_min));
+				             vm_node_getminaddr(minmax.mm_min),
+				             vm_node_getmaxaddr(minmax.mm_min));
 #else /* VM_DEFINE_PROTECT */
 				kernel_panic("Attempted to munmap a kernel part at %p...%p",
-				             vm_node_getmin(minmax.mm_min),
-				             vm_node_getmax(minmax.mm_min));
+				             vm_node_getminaddr(minmax.mm_min),
+				             vm_node_getmaxaddr(minmax.mm_min));
 #endif /* !VM_DEFINE_PROTECT */
 #ifdef VM_DEFINE_UNMAP
 			} else if (!minmax.mm_min->vn_part) {
@@ -197,9 +197,9 @@ do_throw_first_unmapped:
 				if (maxpageid >= vm_node_getmaxpageid(minmax.mm_min)) {
 					printk(KERN_DEBUG "[vm] Unmap node at %p...%p (high_part of %p...%p)\n",
 					       PAGEID_DECODE(minpageid),
-					       vm_node_getmax(minmax.mm_min),
-					       vm_node_getmin(minmax.mm_min),
-					       vm_node_getmax(minmax.mm_min));
+					       vm_node_getmaxaddr(minmax.mm_min),
+					       vm_node_getminaddr(minmax.mm_min),
+					       vm_node_getmaxaddr(minmax.mm_min));
 					result += (size_t)(vm_node_getendpageid(minmax.mm_min) - minpageid);
 					minmax.mm_min->vn_node.a_vmax = minpageid - 1;
 					vm_node_insert(minmax.mm_min);
@@ -228,8 +228,8 @@ do_throw_first_unmapped:
 					printk(KERN_DEBUG "Unmap node at %p...%p (sub_segment of %p...%p)\n",
 					       PAGEID_DECODE(minpageid),
 					       (byte_t *)PAGEID_DECODE(maxpageid + 1) - 1,
-					       vm_node_getmin(minmax.mm_min),
-					       vm_node_getmax(minmax.mm_min));
+					       vm_node_getminaddr(minmax.mm_min),
+					       vm_node_getmaxaddr(minmax.mm_min));
 					assert(!(minmax.mm_min->vn_flags & VM_NODE_FLAG_HINTED));
 					result                   = (size_t)(maxpageid - minpageid) + 1;
 					new_node->vn_node.a_vmin = maxpageid + 1;
@@ -292,12 +292,12 @@ do_throw_first_unmapped:
 			} else if unlikely(minmax.mm_max->vn_flags & VM_NODE_FLAG_KERNPRT) {
 #ifdef VM_DEFINE_PROTECT
 				kernel_panic("Attempted to mprotect() a kernel part at %p...%p",
-				             vm_node_getmin(minmax.mm_max),
-				             vm_node_getmax(minmax.mm_max));
+				             vm_node_getminaddr(minmax.mm_max),
+				             vm_node_getmaxaddr(minmax.mm_max));
 #else /* VM_DEFINE_PROTECT */
 				kernel_panic("Attempted to munmap() a kernel part at %p...%p",
-				             vm_node_getmin(minmax.mm_max),
-				             vm_node_getmax(minmax.mm_max));
+				             vm_node_getminaddr(minmax.mm_max),
+				             vm_node_getmaxaddr(minmax.mm_max));
 #endif /* !VM_DEFINE_PROTECT */
 #ifdef VM_DEFINE_UNMAP
 			} else if (!minmax.mm_max->vn_part) {
@@ -361,22 +361,22 @@ do_throw_first_unmapped:
 					if unlikely(node->vn_flags & VM_NODE_FLAG_KERNPRT) {
 #ifdef VM_DEFINE_PROTECT
 						kernel_panic("Attempted to mprotect() a kernel part at %p...%p",
-						             vm_node_getmin(node), vm_node_getmax(node));
+						             vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 #else /* VM_DEFINE_PROTECT */
 						kernel_panic("Attempted to munmap() a kernel part at %p...%p",
-						             vm_node_getmin(node), vm_node_getmax(node));
+						             vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 #endif /* !VM_DEFINE_PROTECT */
 					}
 #ifdef VM_DEFINE_UNMAP
 					printk(KERN_DEBUG "Unmap node at %p...%p\n",
-					       vm_node_getmin(node), vm_node_getmax(node));
+					       vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 #endif /* VM_DEFINE_UNMAP */
 					result += vm_node_getpagecount(node);
 #ifdef VM_DEFINE_PROTECT
 					old_prot = node->vn_prot;
 					new_prot = (old_prot & prot_mask) | prot_flags;
 					printk(KERN_DEBUG "Mprotect node at %p...%p [%c%c%c%c%c to %c%c%c%c%c]\n",
-					       vm_node_getmin(node), vm_node_getmax(node),
+					       vm_node_getminaddr(node), vm_node_getmaxaddr(node),
 					       old_prot & VM_PROT_SHARED ? 's' : '-', old_prot & VM_PROT_LOOSE ? 'l' : '-',
 					       old_prot & VM_PROT_READ ? 'r' : '-', old_prot & VM_PROT_WRITE ? 'w' : '-',
 					       old_prot & VM_PROT_EXEC ? 'x' : '-',
@@ -467,11 +467,11 @@ do_update_page_directory:
 #endif /* VM_DEFINE_PROTECT */
 
 					if (self == myvm || vm_node_iskernelspace(node)) {
-						pagedir_unmap(vm_node_getstart(node),
+						pagedir_unmap(vm_node_getaddr(node),
 						              vm_node_getsize(node));
 					} else {
 						pagedir_unmap_p(self->v_pdir_phys,
-						                vm_node_getstart(node),
+						                vm_node_getaddr(node),
 						                vm_node_getsize(node));
 					}
 					must_sync = true;

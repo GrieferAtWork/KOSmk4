@@ -138,7 +138,7 @@ DEFINE_PERTASK_INIT(init_this_x86_kernel_psp0);
 INTERN NOBLOCK void
 NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
 	/* Initialize the kernel-sp0 valued to-be written during preemption. */
-	FORTASK(self, _this_x86_kernel_psp0) = (uintptr_t)vm_node_getend(&FORTASK(self, this_kernel_stacknode));
+	FORTASK(self, _this_x86_kernel_psp0) = (uintptr_t)vm_node_getendaddr(&FORTASK(self, this_kernel_stacknode));
 }
 
 

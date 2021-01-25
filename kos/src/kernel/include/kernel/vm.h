@@ -42,6 +42,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/ramfile.h>
 
+#define datapage_t                                    mfile_block_t
 #define VM_DATAPART_PPP_UNINITIALIZED                 MPART_BLOCK_ST_NDEF
 #define VM_DATAPART_PPP_INITIALIZING                  MPART_BLOCK_ST_INIT
 #define VM_DATAPART_PPP_INITIALIZED                   MPART_BLOCK_ST_LOAD
@@ -94,7 +95,11 @@
 #define db_refcnt                                     mf_refcnt
 #define db_lock                                       mf_lock
 #define db_type                                       mf_ops
+#ifdef CONFIG_MFILE_LEGACY_VIO_OPS
+#define db_vio                                        mf_vio
+#else /* CONFIG_MFILE_LEGACY_VIO_OPS */
 #define db_vio                                        mf_ops->mo_vio
+#endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
 #define db_parts                                      mf_parts
 #define db_addrshift                                  mf_blockshift
 #define vm_datablock_destroy(...)                     mfile_destroy(__VA_ARGS__)
@@ -118,14 +123,13 @@
 #define vm_datablock_vio_writev(...)                  mfile_vio_writev(__VA_ARGS__)
 #define vm_datablock_vio_readv_phys(...)              mfile_vio_readv_p(__VA_ARGS__)
 #define vm_datablock_vio_writev_phys(...)             mfile_vio_writev_p(__VA_ARGS__)
+#define vm_datablock_haschanged(self)                 mfile_haschanged(self)
 #define vm_datablock_physical                         mfile_phys
 #define vm_datablock_physical_type                    mfile_phys_ops
 #define vm_datablock_anonymous                        mfile_ndef
 #define vm_datablock_anonymous_type                   mfile_ndef_ops
 #define vm_datablock_anonymous_zero                   mfile_zero
 #define vm_datablock_anonymous_zero_type              mfile_zero_ops
-#define vm_datablock_anonymous_zero_vec               mfile_anon
-#define vm_datablock_anonymous_zero_type_vec          mfile_anon_ops
 #define VM_PROT_NONE                                  MNODE_F_NORMAL
 #define VM_PROT_EXEC                                  MNODE_F_PEXEC
 #define VM_PROT_WRITE                                 MNODE_F_PWRITE
@@ -153,10 +157,12 @@
 #define VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS           MNODE_CLEAR_WRITE_SUCCESS
 #define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK        MNODE_CLEAR_WRITE_WOULDBLOCK
 #define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC          MNODE_CLEAR_WRITE_BADALLOC
-#define vm_node_getmin(...)                           mnode_getminaddr(__VA_ARGS__)
-#define vm_node_getmax(...)                           mnode_getmaxaddr(__VA_ARGS__)
-#define vm_node_getstart(...)                         mnode_getaddr(__VA_ARGS__)
-#define vm_node_getend(...)                           mnode_getendaddr(__VA_ARGS__)
+#define vm_node_setminaddr(self, v)                   ((self)->mn_minaddr = (v))
+#define vm_node_setmaxaddr(self, v)                   ((self)->mn_maxaddr = (v))
+#define vm_node_getminaddr(...)                       mnode_getminaddr(__VA_ARGS__)
+#define vm_node_getmaxaddr(...)                       mnode_getmaxaddr(__VA_ARGS__)
+#define vm_node_getaddr(...)                          mnode_getaddr(__VA_ARGS__)
+#define vm_node_getendaddr(...)                       mnode_getendaddr(__VA_ARGS__)
 #define vm_node_getsize(...)                          mnode_getsize(__VA_ARGS__)
 #define vm_node_isuserspace(...)                      mnode_iskern(__VA_ARGS__)
 #define vm_node_iskernelspace(...)                    mnode_isuser(__VA_ARGS__)
@@ -170,7 +176,7 @@
 #define v_weakrefcnt                                  mm_weakrefcnt
 #define v_tree                                        mm_mappings
 #define v_treelock                                    mm_lock
-#define v_tasks                                       mm_threads.lh_first
+#define v_tasks                                       mm_threads
 #define v_tasklock                                    mm_threadslock
 #define vm_kernel                                     mman_kernel
 #define this_vm                                       this_mman
@@ -179,7 +185,6 @@
 #define vm_free(...)                                  mman_free(__VA_ARGS__)
 #define vm_destroy(...)                               mman_destroy(__VA_ARGS__)
 #define vm_alloc(...)                                 mman_new(__VA_ARGS__)
-#define vm_clone(...)                                 mman_fork(__VA_ARGS__)
 #define task_setvm(...)                               task_setmman(__VA_ARGS__)
 #define task_getvm(...)                               task_getmman(__VA_ARGS__)
 #define vm_sync(...)                                  mman_sync_p(__VA_ARGS__)
@@ -197,54 +202,58 @@
 #define vm_prefault(addr, num_bytes, for_writing)     mman_prefault(addr, num_bytes, (for_writing) ? MMAN_FAULT_F_WRITE : MMAN_FAULT_F_NORMAL)
 #define vm_forcefault(...)                            mman_forcefault(__VA_ARGS__)
 #define vm_forcefault_p(...)                          mman_forcefault(__VA_ARGS__)
-#define vm_kernel_treelock_writef(flags)              (((flags)&GFP_ATOMIC) ? mman_lock_tryacquire(&mman_kernel) : (mman_lock_acquire(&mman_kernel), 1))
-#define vm_kernel_treelock_writef_nx(flags)           (((flags)&GFP_ATOMIC) ? mman_lock_tryacquire(&mman_kernel) : mman_lock_acquire_nx(&mman_kernel))
-#define vm_kernel_treelock_write()                    mman_lock_acquire(&mman_kernel)
-#define vm_kernel_treelock_read()                     mman_lock_acquire(&mman_kernel)
-#define vm_kernel_treelock_trywrite()                 mman_lock_tryacquire(&mman_kernel)
-#define vm_kernel_treelock_write_nx()                 mman_lock_acquire_nx(&mman_kernel)
-#define vm_kernel_treelock_endwrite()                 mman_lock_release(&mman_kernel)
-#define vm_kernel_treelock_tryread()                  mman_lock_tryacquire(&mman_kernel)
-#define vm_kernel_treelock_read_nx()                  mman_lock_acquire_nx(&mman_kernel)
-#define vm_kernel_treelock_endread()                  mman_lock_release(&mman_kernel)
-#define vm_kernel_treelock_end()                      mman_lock_release(&mman_kernel)
+#define vm_kernel_treelock_writef(flags)              (((flags)&GFP_ATOMIC) ? mman_lock_trywrite(&mman_kernel) : (mman_lock_write(&mman_kernel), 1))
+#define vm_kernel_treelock_writef_nx(flags)           (((flags)&GFP_ATOMIC) ? mman_lock_trywrite(&mman_kernel) : mman_lock_write_nx(&mman_kernel))
+#define vm_kernel_treelock_write()                    mman_lock_write(&mman_kernel)
+#define vm_kernel_treelock_read()                     mman_lock_read(&mman_kernel)
+#define vm_kernel_treelock_trywrite()                 mman_lock_trywrite(&mman_kernel)
+#define vm_kernel_treelock_write_nx()                 mman_lock_write_nx(&mman_kernel)
+#define vm_kernel_treelock_endwrite()                 mman_lock_endwrite(&mman_kernel)
+#define vm_kernel_treelock_tryread()                  mman_lock_tryread(&mman_kernel)
+#define vm_kernel_treelock_read_nx()                  mman_lock_read_nx(&mman_kernel)
+#define vm_kernel_treelock_endread()                  mman_lock_endread(&mman_kernel)
+#define vm_kernel_treelock_writing()                  mman_lock_writing(&mman_kernel)
+#define vm_kernel_treelock_reading()                  mman_lock_reading(&mman_kernel)
+#define vm_kernel_treelock_end()                      mman_lock_end(&mman_kernel)
 #define vm_kernel_treelock_tryservice()               mman_lockops_reap(&mman_kernel)
-#define vm_treelock_write(self)                       mman_lock_acquire(self)
-#define vm_treelock_write_nx(self)                    mman_lock_acquire_nx(self)
-#define vm_treelock_trywrite(self)                    mman_lock_tryacquire(self)
-#define vm_treelock_endwrite(self)                    mman_lock_release(self)
-#define vm_treelock_read(self)                        mman_lock_acquire(self)
-#define vm_treelock_read_nx(self)                     mman_lock_acquire_nx(self)
-#define vm_treelock_tryread(self)                     mman_lock_tryacquire(self)
-#define vm_treelock_endread(self)                     mman_lock_release(self)
-#define vm_treelock_end(self)                         mman_lock_release(self)
-#define vm_treelock_reading(self)                     mman_lock_acquired(self)
-#define vm_treelock_writing(self)                     mman_lock_acquired(self)
-#define vm_treelock_canread(self)                     mman_lock_available(self)
-#define vm_treelock_canwrite(self)                    mman_lock_available(self)
-/*
-FUNDEF NONNULL((1)) void KCALL vm_tasklock_read(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) void KCALL vm_tasklock_write(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) bool KCALL vm_tasklock_upgrade(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_read_nx)(struct vm *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_write_nx)(struct vm *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL vm_tasklock_upgrade_nx)(struct vm *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_tryread)(struct vm *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_trywrite)(struct vm *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_tryupgrade)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endwrite)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endread)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_end)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_downgrade)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm *__restrict self);
-#define vm_tasklock_reading(self) atomic_rwlock_reading(&(self)->v_tasklock)
-#define vm_tasklock_writing(self) atomic_rwlock_writing(&(self)->v_tasklock)
-*/
+#define vm_treelock_write(self)                       mman_lock_write(self)
+#define vm_treelock_write_nx(self)                    mman_lock_write_nx(self)
+#define vm_treelock_trywrite(self)                    mman_lock_trywrite(self)
+#define vm_treelock_endwrite(self)                    mman_lock_endwrite(self)
+#define vm_treelock_read(self)                        mman_lock_read(self)
+#define vm_treelock_read_nx(self)                     mman_lock_read_nx(self)
+#define vm_treelock_tryread(self)                     mman_lock_tryread(self)
+#define vm_treelock_endread(self)                     mman_lock_endread(self)
+#define vm_treelock_end(self)                         mman_lock_end(self)
+#define vm_treelock_reading(self)                     mman_lock_reading(self)
+#define vm_treelock_writing(self)                     mman_lock_writing(self)
+#define vm_treelock_canread(self)                     mman_lock_canread(self)
+#define vm_treelock_canwrite(self)                    mman_lock_canwrite(self)
+#define vm_tasklock_read(self)                        mman_threadslock_acquire(self)
+#define vm_tasklock_write(self)                       mman_threadslock_acquire(self)
+#define vm_tasklock_upgrade(self)                     1
+#define vm_tasklock_read_nx(self)                     mman_threadslock_acquire(self)
+#define vm_tasklock_write_nx(self)                    mman_threadslock_acquire(self)
+#define vm_tasklock_upgrade_nx(self)                  mman_threadslock_acquire(self)
+#define vm_tasklock_endwrite(self)                    mman_threadslock_release(self)
+#define vm_tasklock_endread(self)                     mman_threadslock_release(self)
+#define vm_tasklock_end(self)                         mman_threadslock_release(self)
+#define vm_tasklock_downgrade(self)                   (void)0
+#define vm_tasklock_tryservice(self)                  (void)0
+#define vm_tasklock_reading(self)                     mman_threadslock_acquired(self)
+#define vm_tasklock_writing(self)                     mman_threadslock_acquired(self)
 #define VM_DATABLOCK_ADDRSHIFT(x)                     ((x)->mf_blockshift)
 #define VM_DATABLOCK_PAGESHIFT(x)                     (PAGESHIFT - (x)->mf_blockshift)
 #define VM_DATABLOCK_PAGEALIGN(x)                     ((size_t)1 << VM_DATABLOCK_PAGESHIFT(x))
 #define VM_DATABLOCK_PAGEMASK(x)                      (((size_t)1 << VM_DATABLOCK_PAGESHIFT(x)) - 1)
 #define VM_DATABLOCK_PAGESIZE(x)                      ((size_t)PAGESIZE >> VM_DATABLOCK_PAGESHIFT(x))
+#define rf_block                                      mrf_file
+#define rf_data                                       mrf_part.mp_mem
+#define dt_destroy                                    mo_destroy
+#define dt_initpart                                   mo_initpart
+#define dt_loadpart                                   mo_loadpart
+#define dt_savepart                                   mo_savepart
+#define dt_changed                                    mo_changed
 
 #ifdef __CC__
 #include <kos/except.h>
@@ -337,12 +346,12 @@ DECL_END
 	     : __hybrid_atomic_and(mman_getunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST))
 #define vm_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \
                fspath, fsname, data_start_offset, prot, flag, guard)     \
-	mman_map(self, hint, num_bytes, prot, (getfree_mode) | (flags),      \
+	mman_map(self, hint, num_bytes, prot, (getfree_mode) | (flag),       \
 	         data, fspath, fsname, data_start_offset, min_alignment)
 #define vm_map_subrange(self, hint, num_bytes, min_alignment, getfree_mode, data,   \
                         fspath, fsname, data_start_offset, data_subrange_minoffset, \
                         data_subrange_numbytes, prot, flag, guard)                  \
-	mman_map_subrange(self, hint, num_bytes, prot, (getfree_mode) | (flags),        \
+	mman_map_subrange(self, hint, num_bytes, prot, (getfree_mode) | (flag),         \
 	                  data, fspath, fsname,                                         \
 	                  (data_subrange_minoffset) + (data_start_offset),              \
 	                  data_subrange_minoffset,                                      \
@@ -368,7 +377,6 @@ DECL_END
 #define vm_read(...)                    mman_read(__VA_ARGS__)
 #define vm_write(...)                   mman_write(__VA_ARGS__)
 #define vm_memset(...)                  mman_memset(__VA_ARGS__)
-#define vm_dmalock                      mdmalock
 #define dl_part                         mdl_part
 #define vm_dmalock_release(...)         mman_dmalock_release(__VA_ARGS__)
 #define vm_startdma(effective_vm, prange, preset, arg, lockvec, lockcnt, vaddr, num_bytes, for_writing) \
@@ -419,13 +427,263 @@ DECL_END
 #define vm_getnodeofaddress(self, addr)                        mnode_tree_locate((self)->mm_mappings, addr)
 #define vm_isused(self, addr, num_bytes)                       (mnode_tree_rlocate((self)->mm_mappings, addr, (byte_t *)(addr) + (num_bytes)-1) != __NULLPTR)
 #define vm_node_insert(self)                                   mnode_tree_insert(&(self)->mn_mman->mm_mappings, self)
-#define vm_node_remove(self, addr)                             mnode_tree_remove(&(self)->mm_mappings, addr)
+#define vm_node_remove(self, addr)                             COMPILER_UNUSED(mnode_tree_remove(&(self)->mm_mappings, addr))
 #define vm_unmap_kernel_ram(addr, um_bytes, is_zero)           mman_unmap_kram(addr, um_bytes, (is_zero) ? (GFP_ATOMIC | GFP_CALLOC) : GFP_ATOMIC)
 #define vm_unmap_kernel_mapping_locked(addr, num_bytes)        mman_unmap_kram_locked(addr, um_bytes)
 #define vm_get_kernreserve_node(self)                          (&FORMMAN(self, thismman_kernel_reservation))
+#define vm_datapart_do_allocram(self)                          mpart_ll_allocmem(self, mpart_getsize(self) / PAGESIZE)
+#define vm_datapart_do_ccfreeram(self)                         mpart_ll_ccfreemem(self)
+#define vm_datapart_do_freeram(self)                           mpart_ll_freemem(self)
+#define vm_datapart_freeram(self)                              mpart_ll_freemem(self)
 
+#define vm_datablock_deanonymize(self) \
+	(void)0 /* TODO: Function was always racy, and isn't supported anymore */
 
 #else /* CONFIG_USE_NEW_VM */
+
+
+/************************************************************************/
+/* Forward-compatibility                                                */
+#undef CONFIG_USE_RWLOCK_FOR_MMAN
+#define CONFIG_USE_RWLOCK_FOR_MMAN
+#define mfile_block_t                                  datapage_t
+#define MNODE_F_NORMAL                                 VM_PROT_NONE
+#define MNODE_F_PEXEC                                  VM_PROT_EXEC
+#define MNODE_F_PWRITE                                 VM_PROT_WRITE
+#define MNODE_F_PREAD                                  VM_PROT_READ
+#define MPART_BLOCK_ST_NDEF                            VM_DATAPART_PPP_UNINITIALIZED
+#define MPART_BLOCK_ST_INIT                            VM_DATAPART_PPP_INITIALIZING
+#define MPART_BLOCK_ST_LOAD                            VM_DATAPART_PPP_INITIALIZED
+#define MPART_BLOCK_ST_CHNG                            VM_DATAPART_PPP_HASCHANGED
+#define MPART_BLOCK_STBITS                             VM_DATAPART_PPP_BITS
+#define MPART_F_NORMAL                                 VM_DATAPART_FLAG_NORMAL
+#define MPART_F_MLOCK                                  VM_DATAPART_FLAG_LOCKED
+#define MPART_F_CHANGED                                VM_DATAPART_FLAG_CHANGED
+#define MPART_F_NO_FREE                                VM_DATAPART_FLAG_KEEPRAM
+#define MPART_F_COREPART                               VM_DATAPART_FLAG_COREPRT
+#define mp_refcnt                                      dp_refcnt
+#define mp_file                                        dp_block
+#define mp_flags                                       dp_flags
+#define mp_state                                       dp_state
+#define mp_blkst_inl                                   dp_pprop
+#define mp_blkst_ptr                                   dp_pprop_p
+#define mp_meta                                        dp_futex
+#define mp_mem                                         dp_ramdata.rd_block0
+#define mrf_file                                       rf_block
+#define mc_start                                       rb_start
+#define mc_size                                        rb_size
+#define mpart_free(...)                                vm_datapart_free(__VA_ARGS__)
+#define mpart_destroy(...)                             vm_datapart_destroy(__VA_ARGS__)
+#define mpart_getsize(...)                             vm_datapart_numbytes(__VA_ARGS__)
+#define mpart_getminaddr(...)                          vm_datapart_minbyte(__VA_ARGS__)
+#define mpart_getmaxaddr(...)                          vm_datapart_maxbyte(__VA_ARGS__)
+#define mpart_getendaddr(...)                          vm_datapart_endbyte(__VA_ARGS__)
+#define mpart_read(...)                                vm_datapart_read(__VA_ARGS__)
+#define mpart_write(...)                               vm_datapart_write(__VA_ARGS__)
+#define mpart_read_p(...)                              vm_datapart_read_phys(__VA_ARGS__)
+#define mpart_write_p(...)                             vm_datapart_write_phys(__VA_ARGS__)
+#define mpart_readv(...)                               vm_datapart_readv(__VA_ARGS__)
+#define mpart_writev(...)                              vm_datapart_writev(__VA_ARGS__)
+#define mpart_readv_p(...)                             vm_datapart_readv_phys(__VA_ARGS__)
+#define mpart_writev_p(...)                            vm_datapart_writev_phys(__VA_ARGS__)
+#define mpart_split(...)                               vm_datapart_split(__VA_ARGS__)
+#define mpart_lock_acquire_and_setcore(...)            vm_datapart_lockwrite_setcore(__VA_ARGS__)
+#define mpart_lock_acquire_and_setcore_unsharecow(...) vm_datapart_lockwrite_setcore_unsharecow(__VA_ARGS__)
+#define mpart_getblockstate(...)                       vm_datapart_getstate(__VA_ARGS__)
+#define mpart_setblockstate(...)                       vm_datapart_setstate(__VA_ARGS__)
+#define mpart_hasblockstate(...)                       vm_datapart_isstatewritable(__VA_ARGS__)
+#define MFILE_PARTS_ANONYMOUS                          VM_DATABLOCK_ANONPARTS
+#define mf_refcnt                                      db_refcnt
+#define mf_ops                                         db_type
+#define mf_parts                                       db_parts
+#define mf_blockshift                                  db_addrshift
+#define mfile_destroy(...)                             vm_datablock_destroy(__VA_ARGS__)
+#define mfile_makeanon(...)                            vm_datablock_anonymize(__VA_ARGS__)
+#define mfile_isanon(...)                              vm_datablock_isanonymous(__VA_ARGS__)
+#define mfile_sync(...)                                vm_datablock_sync(__VA_ARGS__)
+#define mfile_getpart(...)                             vm_datablock_locatepart(__VA_ARGS__)
+#define mfile_read(...)                                vm_datablock_read(__VA_ARGS__)
+#define mfile_write(...)                               vm_datablock_write(__VA_ARGS__)
+#define mfile_read_p(...)                              vm_datablock_read_phys(__VA_ARGS__)
+#define mfile_write_p(...)                             vm_datablock_write_phys(__VA_ARGS__)
+#define mfile_readv(...)                               vm_datablock_readv(__VA_ARGS__)
+#define mfile_writev(...)                              vm_datablock_writev(__VA_ARGS__)
+#define mfile_readv_p(...)                             vm_datablock_readv_phys(__VA_ARGS__)
+#define mfile_writev_p(...)                            vm_datablock_writev_phys(__VA_ARGS__)
+#define mfile_vio_read(...)                            vm_datablock_vio_read(__VA_ARGS__)
+#define mfile_vio_write(...)                           vm_datablock_vio_write(__VA_ARGS__)
+#define mfile_vio_read_p(...)                          vm_datablock_vio_read_phys(__VA_ARGS__)
+#define mfile_vio_write_p(...)                         vm_datablock_vio_write_phys(__VA_ARGS__)
+#define mfile_vio_readv(...)                           vm_datablock_vio_readv(__VA_ARGS__)
+#define mfile_vio_writev(...)                          vm_datablock_vio_writev(__VA_ARGS__)
+#define mfile_vio_readv_p(...)                         vm_datablock_vio_readv_phys(__VA_ARGS__)
+#define mfile_vio_writev_p(...)                        vm_datablock_vio_writev_phys(__VA_ARGS__)
+#define mfile_phys                                     vm_datablock_physical
+#define mfile_phys_ops                                 vm_datablock_physical_type
+#define mfile_ndef                                     vm_datablock_anonymous
+#define mfile_ndef_ops                                 vm_datablock_anonymous_type
+#define mfile_zero                                     vm_datablock_anonymous_zero
+#define mfile_zero_ops                                 vm_datablock_anonymous_zero_type
+#define MNODE_F_NORMAL                                 VM_PROT_NONE
+#define MNODE_F_PEXEC                                  VM_PROT_EXEC
+#define MNODE_F_PWRITE                                 VM_PROT_WRITE
+#define MNODE_F_PREAD                                  VM_PROT_READ
+#define MNODE_F_SHARED                                 VM_PROT_SHARED
+#define mn_mman                                        vn_vm
+#define mn_part                                        vn_part
+#define mn_fspath                                      vn_fspath
+#define mn_fsname                                      vn_fsname
+#define mn_link                                        vn_link
+#define mnode_free(...)                                vm_node_free(__VA_ARGS__)
+#define mnode_destory(...)                             vm_node_destroy(__VA_ARGS__)
+#define mnode_clear_write(...)                         vm_node_update_write_access(__VA_ARGS__)
+#define mnode_clear_write_locked(...)                  vm_node_update_write_access_locked_vm(__VA_ARGS__)
+#define MNODE_CLEAR_WRITE_SUCCESS                      VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS
+#define MNODE_CLEAR_WRITE_WOULDBLOCK                   VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK
+#define MNODE_CLEAR_WRITE_BADALLOC                     VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC
+#define mnode_getminaddr(...)                          vm_node_getminaddr(__VA_ARGS__)
+#define mnode_getmaxaddr(...)                          vm_node_getmaxaddr(__VA_ARGS__)
+#define mnode_getaddr(...)                             vm_node_getaddr(__VA_ARGS__)
+#define mnode_getendaddr(...)                          vm_node_getendaddr(__VA_ARGS__)
+#define mnode_getsize(...)                             vm_node_getsize(__VA_ARGS__)
+#define mnode_iskern(...)                              vm_node_isuserspace(__VA_ARGS__)
+#define mnode_isuser(...)                              vm_node_iskernelspace(__VA_ARGS__)
+#define mm_pagedir                                     v_pagedir
+#define mm_pagedir_p                                   v_pdir_phys
+#define mm_refcnt                                      v_refcnt
+#define mm_weakrefcnt                                  v_weakrefcnt
+#define mm_mappings                                    v_tree
+#define mm_lock                                        v_treelock
+#define mm_threads                                     v_tasks
+#define mm_threadslock                                 v_tasklock
+#define mman_kernel                                    vm_kernel
+#define this_mman                                      this_vm
+#define THIS_MMAN                                      THIS_VM
+#define PERMMAN                                        PERVM
+#define mman_free(...)                                 vm_free(__VA_ARGS__)
+#define mman_destroy(...)                              vm_destroy(__VA_ARGS__)
+#define mman_new(...)                                  vm_alloc(__VA_ARGS__)
+#define mman_fork(...)                                 vm_clone(__VA_ARGS__)
+#define task_setmman(...)                              task_setvm(__VA_ARGS__)
+#define task_getmman(...)                              task_getvm(__VA_ARGS__)
+#define mman_sync_p(...)                               vm_sync(__VA_ARGS__)
+#define mman_syncone_p(...)                            vm_syncone(__VA_ARGS__)
+#define mman_syncall_p(...)                            vm_syncall(__VA_ARGS__)
+#define mman_sync(...)                                 this_vm_sync(__VA_ARGS__)
+#define mman_syncone(...)                              this_vm_syncone(__VA_ARGS__)
+#define mman_syncall(...)                              this_vm_syncall(__VA_ARGS__)
+#define mman_supersync(...)                            vm_supersync(__VA_ARGS__)
+#define mman_supersyncone(...)                         vm_supersyncone(__VA_ARGS__)
+#define mman_supersyncall(...)                         vm_supersyncall(__VA_ARGS__)
+#define MMAN_FAULT_F_NORMAL                            VM_FORCEFAULT_FLAG_READ
+#define MMAN_FAULT_F_WRITE                             VM_FORCEFAULT_FLAG_WRITE
+#define MMAN_FAULT_F_NOVIO                             VM_FORCEFAULT_FLAG_NOVIO
+#define mman_lock_write(self)                          vm_treelock_write(self)
+#define mman_lock_write_nx(self)                       vm_treelock_write_nx(self)
+#define mman_lock_trywrite(self)                       vm_treelock_trywrite(self)
+#define mman_lock_endwrite(self)                       vm_treelock_endwrite(self)
+#define mman_lock_read(self)                           vm_treelock_read(self)
+#define mman_lock_read_nx(self)                        vm_treelock_read_nx(self)
+#define mman_lock_tryread(self)                        vm_treelock_tryread(self)
+#define mman_lock_endread(self)                        vm_treelock_endread(self)
+#define mman_lock_end(self)                            vm_treelock_end(self)
+#define mman_lock_reading(self)                        vm_treelock_reading(self)
+#define mman_lock_writing(self)                        vm_treelock_writing(self)
+#define mman_lock_canread(self)                        vm_treelock_canread(self)
+#define mman_lock_canwrite(self)                       vm_treelock_canwrite(self)
+#define mman_lock_tryacquire(self)                     mman_lock_trywrite(self)
+#define mman_lock_acquire(self)                        mman_lock_write(self)
+#define mman_lock_acquire_nx(self)                     mman_lock_write_nx(self)
+#define mman_lock_release(self)                        mman_lock_endwrite(self)
+#define mman_lock_acquired(self)                       mman_lock_writing(self)
+#define mman_lock_available(self)                      mman_lock_canwrite(self)
+#define mman_threadslock_acquired(self)                vm_tasklock_writing(self)
+#define mman_mappings_locate(self, key)                vm_getnodeofaddress(self, key)
+#define mman_mappings_insert(self, node)               (__hybrid_assert((node)->vn_vm == (self)), vm_node_insert(node))
+#define mman_mappings_remove(self, key)                vm_node_remove(&(self)->mm_mappings, key)
+#define mman_mappings_removenode(self, node)           __hybrid_asserte(vm_paged_node_remove(self, (node)->vn_node.a_vmin) == node)
+#define mman_read_nopf(...)                            vm_read_nopf(__VA_ARGS__)
+#define mman_write_nopf(...)                           vm_write_nopf(__VA_ARGS__)
+#define mman_memset_nopf(...)                          vm_memset_nopf(__VA_ARGS__)
+#define mman_read(...)                                 vm_read(__VA_ARGS__)
+#define mman_write(...)                                vm_write(__VA_ARGS__)
+#define mman_memset(...)                               vm_memset(__VA_ARGS__)
+#define mdl_part                                       dl_part
+#define mman_dmalock_release(...)                      vm_dmalock_release(__VA_ARGS__)
+#define mman_enumdma(...)                              vm_enumdma(__VA_ARGS__)
+#define mman_enumdmav(...)                             vm_enumdmav(__VA_ARGS__)
+#define mman_stopdma(...)                              vm_stopdma(__VA_ARGS__)
+#define mman_exec(...)                                 vm_exec(__VA_ARGS__)
+#define mmapinfo                                       vm_mapinfo
+#define mmi_min                                        vmi_min
+#define mmi_max                                        vmi_max
+#define mmi_flags                                      vmi_prot
+#define mmi_file                                       vmi_block
+#define mmi_offset                                     vmi_offset
+#define mmi_fspath                                     vmi_fspath
+#define mmi_fsname                                     vmi_fsname
+#define mmi_index                                      vmi_index
+#define mmapinfo_size                                  vm_mapinfo_size
+#define mman_enum_callback_t                           vm_enum_callback_t
+#define mman_enum(...)                                 vm_enum(__VA_ARGS__)
+#define mlockop                                        vm_kernel_pending_operation
+#define mlockop_callback_t                             vm_kernel_pending_cb_t
+#define mlo_func                                       vkpo_exec
+#define mman_kernel_lockop(...)                        vm_kernel_locked_operation(__VA_ARGS__)
+#define mman_onexec_callbacks                          vm_onexec_callbacks
+#define mman_oninit_callbacks                          vm_oninit_callbacks
+#define mman_onfini_callbacks                          vm_onfini_callbacks
+#define mman_onclone_callbacks                         vm_onclone_callbacks
+#define mpart_ll_ccfreemem(self)                       vm_datapart_do_ccfreeram(self)
+#define mpart_ll_freemem(self)                         vm_datapart_freeram(self)
+#define mnode_tree_prevnode(self)                      VM_NODE_PREV(self) /* WARNING: Caller must ensure there is a predecessor! */
+#define mnode_tree_nextnode(self)                      VM_NODE_NEXT(self)
+#define mo_destroy                                     dt_destroy
+#define mo_initpart                                    dt_initpart
+#define mo_loadpart                                    dt_loadpart
+#define mo_savepart                                    dt_savepart
+#define mo_changed                                     dt_changed
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+#define DEFINE_PERMMAN_ONEXEC DEFINE_PERVM_ONEXEC
+#define DEFINE_PERMMAN_INIT   DEFINE_PERVM_INIT
+#define DEFINE_PERMMAN_FINI   DEFINE_PERVM_FINI
+#define DEFINE_PERMMAN_CLONE  DEFINE_PERVM_CLONE
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+/* NOTE: The new block_shift is the same as the old `db_addrshift'! */
+#define mfile_init_blockshift(self, block_shift)               \
+	((self)->db_addrshift = (block_shift),                     \
+	 (self)->db_pageshift = PAGESHIFT - (self)->db_addrshift,  \
+	 (self)->db_pagealign = (size_t)1 << (self)->db_pageshift, \
+	 (self)->db_pagemask  = (self)->db_pagealign - 1,          \
+	 (self)->db_pagesize  = PAGESIZE >> (self)->db_pageshift)
+#define mfile_init(self, ops, block_shift) \
+	((self)->db_refcnt = 1,                \
+	 rwlock_init(&(self)->db_lock),        \
+	 (self)->db_type  = (ops),             \
+	 (self)->db_vio   = __NULLPTR,         \
+	 (self)->db_parts = __NULLPTR,         \
+	 mfile_init_blockshift(self, block_shift))
+#define mfile_cinit(self, ops, block_shift)          \
+	((self)->db_refcnt = 1,                          \
+	 rwlock_cinit(&(self)->db_lock),                 \
+	 (self)->db_type = (ops),                        \
+	 __hybrid_assert((self)->db_vio == __NULLPTR),   \
+	 __hybrid_assert((self)->db_parts == __NULLPTR), \
+	 mfile_init_blockshift(self, block_shift))
+#define MFILE_INIT_EX(refcnt, ops, parts, blockshift)        \
+	{                                                        \
+		/* .db_refcnt = */ refcnt,                           \
+		/* .db_lock   = */ RWLOCK_INIT,                      \
+		/* .db_type   = */ ops,                              \
+		/* .db_vio    = */ __NULLPTR,                        \
+		/* .db_parts  = */ parts,                            \
+		VM_DATABLOCK_INIT_PAGEINFO(PAGESHIFT - (blockshift)) \
+	}
+#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, blockshift)
+#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, blockshift)
+/************************************************************************/
+
+
 #include <kernel/driver-callbacks.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
@@ -543,10 +801,7 @@ typedef __ARCH_PAGEID_TYPE pageid_t;
 
 
 #ifdef __CC__
-#ifndef __datapage_t_defined
-#define __datapage_t_defined 1
 __HYBRID_ALTINT_TYPEDEF(u64, datapage_t, false); /* Data part page number. */
-#endif /* !__datapage_t_defined */
 
 struct vm_ramblock {
 	physpage_t rb_start; /* Starting page number of physical memory associated with the ram block. */
@@ -871,20 +1126,14 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_freeswap)(struct vm_d
 FUNDEF NONNULL((1)) void KCALL
 vm_datapart_do_allocram(struct vm_datapart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) bool
-NOTHROW(KCALL vm_datapart_do_allocram_nx)(struct vm_datapart *__restrict self, gfp_t flags);
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_ccfreeram)(struct vm_datapart *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL vm_datapart_do_ffreeram)(struct vm_datapart *__restrict self, bool is_zero);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_freeram)(struct vm_datapart *__restrict self);
 #else /* __INTELLISENSE__ */
 #define vm_datapart_do_ccfreeram(self) \
 	vm_do_ccfreeram(&(self)->dp_ramdata.rd_block0, (self)->dp_ramdata.rd_blockv)
-#define vm_datapart_do_ffreeram(self, is_zero) \
-	vm_do_ffreeram(&(self)->dp_ramdata.rd_block0, (self)->dp_ramdata.rd_blockv, is_zero)
 #define vm_datapart_do_freeram(self) \
 	vm_do_freeram(&(self)->dp_ramdata.rd_block0, (self)->dp_ramdata.rd_blockv)
 #endif /* !__INTELLISENSE__ */
@@ -920,10 +1169,6 @@ NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_ccfreeram)(struct vm_ramblock *__restrict pblock0,
                                struct vm_ramblock *__restrict blocks);
-FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL vm_do_ffreeram)(struct vm_ramblock *__restrict pblock0,
-                              struct vm_ramblock *__restrict blocks,
-                              bool is_zero);
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
                              struct vm_ramblock *__restrict blocks);
@@ -1868,12 +2113,12 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 #define VM_NODE_FLAG_PARTITIONED  0x0002 /* Set if the node has been split when the associated data part was split.
                                           * This flag affects how the page directory is un-prepared when the node
                                           * gets unmapped. When set, associated memory must be unmapped as:
-                                          * >> pagedir_prepare_map(vm_node_getstart(self), vm_node_getsize(self)); // NOTE: This may cause an error!
-                                          * >> pagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
-                                          * >> pagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self));
+                                          * >> pagedir_prepare_map(vm_node_getaddr(self), vm_node_getsize(self)); // NOTE: This may cause an error!
+                                          * >> pagedir_unmap(vm_node_getaddr(self), vm_node_getsize(self));
+                                          * >> pagedir_unprepare_map(vm_node_getaddr(self), vm_node_getsize(self));
                                           * When not set, associated memory can simply be unmapped as:
-                                          * >> pagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
-                                          * >> pagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self)); */
+                                          * >> pagedir_unmap(vm_node_getaddr(self), vm_node_getsize(self));
+                                          * >> pagedir_unprepare_map(vm_node_getaddr(self), vm_node_getsize(self)); */
 #define VM_NODE_FLAG_GROWSUP      0x0004 /* When guarding, the node grows up rather than down. */
 #define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized pages apart of this node hint towards it.
                                           * This flag is set for memory mapping that can be initialized atomically.
@@ -1984,15 +2229,15 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 
 #ifdef __INTELLISENSE__
 /* Return the address range bounds of the given VM node. */
-#define vm_node_getmin   vm_node_getmin
-#define vm_node_getmax   vm_node_getmax
-#define vm_node_getstart vm_node_getstart
-#define vm_node_getend   vm_node_getend
+#define vm_node_getminaddr   vm_node_getminaddr
+#define vm_node_getmaxaddr   vm_node_getmaxaddr
+#define vm_node_getaddr vm_node_getaddr
+#define vm_node_getendaddr   vm_node_getendaddr
 #define vm_node_getsize  vm_node_getsize
-PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getmin)(struct vm_node const *__restrict self);
-void *(vm_node_getmax)(struct vm_node const *__restrict self);
-PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getstart)(struct vm_node const *__restrict self);
-PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getend)(struct vm_node const *__restrict self);
+PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getminaddr)(struct vm_node const *__restrict self);
+void *(vm_node_getmaxaddr)(struct vm_node const *__restrict self);
+PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getaddr)(struct vm_node const *__restrict self);
+PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getendaddr)(struct vm_node const *__restrict self);
 PAGEDIR_PAGEALIGNED size_t (vm_node_getsize)(struct vm_node const *__restrict self); /* in bytes */
 
 /* Return the internal page-indices used for mapping the given VM node. */
@@ -2013,11 +2258,11 @@ size_t (vm_node_getpagecount)(struct vm_node const *__restrict self);
 bool (vm_node_isuserspace)(struct vm_node const *__restrict self);
 bool (vm_node_iskernelspace)(struct vm_node const *__restrict self);
 #else /* __INTELLISENSE__ */
-#define vm_node_getmin(self)     PAGEID_DECODE((self)->vn_node.a_vmin)
-#define vm_node_getmax(self)     ((void *)((byte_t *)PAGEID_DECODE((self)->vn_node.a_vmax) + PAGESIZE - 1))
-#define vm_node_getstart(self)   PAGEID_DECODE((self)->vn_node.a_vmin)
-#define vm_node_getend(self)     PAGEID_DECODE((self)->vn_node.a_vmax + 1)
-#define vm_node_getsize(self)        ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1) * PAGESIZE)
+#define vm_node_getminaddr(self) PAGEID_DECODE((self)->vn_node.a_vmin)
+#define vm_node_getmaxaddr(self) ((void *)((byte_t *)PAGEID_DECODE((self)->vn_node.a_vmax) + PAGESIZE - 1))
+#define vm_node_getaddr(self)    PAGEID_DECODE((self)->vn_node.a_vmin)
+#define vm_node_getendaddr(self) PAGEID_DECODE((self)->vn_node.a_vmax + 1)
+#define vm_node_getsize(self)    ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1) * PAGESIZE)
 
 #define vm_node_getminpageid(self)   ((self)->vn_node.a_vmin)
 #define vm_node_getmaxpageid(self)   ((self)->vn_node.a_vmax)
@@ -2033,6 +2278,9 @@ bool (vm_node_iskernelspace)(struct vm_node const *__restrict self);
 #define vm_node_iskernelspace(self)  (vm_node_getminpageid(self) <= PAGEID_ENCODE(KERNELSPACE_END))
 #endif /* !KERNELSPACE_HIGHMEM */
 #endif /* !__INTELLISENSE__ */
+
+#define vm_node_setminaddr(self, v) ((self)->vn_node.a_vmin = PAGEID_ENCODE(v))
+#define vm_node_setmaxaddr(self, v) ((self)->vn_node.a_vmax = PAGEID_ENCODE((v) - (PAGESIZE - 1)))
 
 #define VM_NODE_HASNEXT(self, vm) ((self)->vn_byaddr.ln_next != __NULLPTR)
 #define VM_NODE_HASPREV(self, vm) ((self)->vn_byaddr.ln_pself != &LLIST_HEAD((vm)->v_byaddr))
@@ -2134,6 +2382,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_kernel_treelock_downgrade)(void);
 FUNDEF NOBLOCK WUNUSED bool NOTHROW(KCALL vm_kernel_treelock_tryupgrade)(void);
 FUNDEF WUNUSED unsigned int NOTHROW(KCALL vm_kernel_treelock_upgrade_nx)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_kernel_treelock_tryservice)(void);
+#define vm_kernel_treelock_writing()  atomic_rwlock_writing(&vm_kernel.v_treelock)
+#define vm_kernel_treelock_reading()  atomic_rwlock_reading(&vm_kernel.v_treelock)
 
 /* Acquire locks to the tree of the given VM */
 #define vm_treelock_write(self)      ((self) == &vm_kernel ? vm_kernel_treelock_write() : atomic_rwlock_write(&(self)->v_treelock))

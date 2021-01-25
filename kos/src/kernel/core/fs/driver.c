@@ -1852,7 +1852,7 @@ driver_disable_textrel(struct driver *__restrict self)
 				perm |= PAGEDIR_MAP_FEXEC;
 			/* Re-map the node's datapart without write-permissions */
 			vm_datapart_map_ram_autoprop(node->vn_part,
-			                             vm_node_getstart(node),
+			                             vm_node_getaddr(node),
 			                             perm);
 			must_sync_kernel = true;
 		}

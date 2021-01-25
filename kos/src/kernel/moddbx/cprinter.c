@@ -1395,7 +1395,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 				if (node->vn_fsname) {
 					pos_t mapping_offset;
 					mapping_offset = vm_datapart_startbyte(node->vn_part);
-					mapping_offset += (uintptr_t)ptr - (uintptr_t)vm_node_getstart(node);
+					mapping_offset += (uintptr_t)ptr - (uintptr_t)vm_node_getaddr(node);
 					FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
 					PRINTF("%#" PRIxPTR, ptr);
 					FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);

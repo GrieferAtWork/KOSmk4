@@ -281,16 +281,10 @@ again:
 #endif /* DEFINE_DIRECTORY_SYMLINK || DEFINE_DIRECTORY_MKDIR */
 
 			/* Initialize the new INode */
-			result->db_refcnt = 1;
-			rwlock_cinit_write(&result->db_lock);
-			result->db_type      = &inode_datablock_type;
-			result->db_pageshift = target_directory->db_pageshift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-			result->db_addrshift = target_directory->db_addrshift;
-			result->db_pagealign = target_directory->db_pagealign;
-			result->db_pagemask  = target_directory->db_pagemask;
-			result->db_pagesize  = target_directory->db_pagesize;
-#endif /* CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+			mfile_cinit(result, &inode_datablock_type, target_directory->mf_blockshift);
+#ifndef CONFIG_USE_NEW_VM
+			rwlock_cinit_write(__inode_lock(result));
+#endif /* !CONFIG_USE_NEW_VM */
 			result->i_super    = target_directory->i_super; /* NOTE: Incref()'d below. */
 			result->i_heapsize = resptr.hp_siz;
 			result->i_flags    = INODE_FATTRLOADED;

@@ -281,17 +281,9 @@ struct ext2_superblock: public superblock {
 	u32                 sd_feat_required; /* [const] Required features in use (Set of `EXT2_FEAT_REQ_F*') */
 	u32                 sd_feat_mountro;  /* [const] Mount-ro features in use (Set of `EXT2_FEAT_MRO_F*') */
 	unsigned int        sd_os;            /* [const] Operating system that was used to create the superblock (One of `EXT2_OS_F*'). */
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 #define sd_block_shift  db_addrshift      /* [const] Shift applied to block numbers to convert
 	                                       *         them into absolute on-disk locations. */
-#define sd_blocksize    db_pagesize       /* [const][== 1 << sd_block_shift] Size of a single block (in bytes) */
-#else /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
-	unsigned int        sd_block_shift;   /* [const] Shift applied to block numbers to convert
-	                                       *         them into absolute on-disk locations. */
-	size_t              sd_blocksize;     /* [const][== 1 << sd_block_shift] Size of a single block (in bytes) */
-#endif /* CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
-	size_t              sd_blockmask;     /* [const][== sd_blocksize-1] Block mask for extracting the offset within a block. */
-	size_t              sd_ind_blocksize; /* [const][== sd_blocksize / 4] Number of entries in an indirect block pointer block. */
+	size_t              sd_ind_blocksize; /* [const][== (1 << sd_block_shift) / 4] Number of entries in an indirect block pointer block. */
 	struct block_group *sd_groups;        /* [1..sd_bgroups_cnt][const][owned]
 	                                       * Vector of block group descriptors that have been loaded into memory. */
 };

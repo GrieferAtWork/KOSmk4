@@ -71,7 +71,7 @@ typedef unsigned int gfp_t;
  *                       to call kmalloc() and kmalloc() needing to call this function.
  *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
  *                       If memory has already been mapped at that address, then simply
- *                       return `MAP_FAILED' unconditionally.
+ *                       return `MAP_INUSE' unconditionally.
  *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
  *                       should be combined with `GFP_LOCKED' to prevent the backing
  *                       physical memory from being altered (and thus having its
@@ -98,7 +98,7 @@ typedef unsigned int gfp_t;
  *                        address of where the mapping should go. If not page-aligned,
  *                        then the sub-page-misalignment will be carried over into the
  *                        return value. If another mapping already exists at the given
- *                        location, then unconditionally return `MAP_FAILED'
+ *                        location, then unconditionally return `MAP_INUSE'
  * @param: num_bytes:     The # of bytes to allocate. The actual amount is ceil-
  *                        aligned to multiples of pages (after also including a
  *                        possibly sub-page-misalignment from GFP_MAP_FIXED+hint)
@@ -118,10 +118,14 @@ FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
                                 gfp_t flags, size_t min_alignment DFL(PAGESIZE));
 
+/* Return value of `mman_map_kram()' and `mman_map_kram_nx()' if GFP_MAP_FIXED
+ * is used with an address that is already being mapped by something else. */
+#define MAP_INUSE ((void *)((byte_t *)__MAP_FAILED - 1))
+
 /* Error return value for `mman_map_kram_nx()' */
-#if !defined(MAP_FAILED) && defined(__MAP_FAILED)
+#ifndef MAP_FAILED
 #define MAP_FAILED __MAP_FAILED
-#endif /* !MAP_FAILED && __MAP_FAILED */
+#endif /* !MAP_FAILED */
 
 
 /* Without blocking, unmap a given region of kernel RAM.

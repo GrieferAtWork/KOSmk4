@@ -120,15 +120,15 @@ DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
 		struct vm_datapart *part;
 		struct vm_datablock *block;
 		char const *state_name;
-		if (vm_node_getmax(iter) < minaddr)
+		if (vm_node_getmaxaddr(iter) < minaddr)
 			continue;
-		if (vm_node_getmin(iter) > maxaddr)
+		if (vm_node_getminaddr(iter) > maxaddr)
 			break;
 		part = iter->vn_part;
 		if (!part) {
 			dbg_printf(DBGSTR("%p-%p [%c%c%c%c] [%c%c%c%c%c%c] reserved\n"),
-			           vm_node_getmin(iter),
-			           vm_node_getmax(iter),
+			           vm_node_getminaddr(iter),
+			           vm_node_getmaxaddr(iter),
 			           (iter->vn_prot & VM_PROT_READ) ? 'r' : '-',
 			           (iter->vn_prot & VM_PROT_WRITE) ? 'w' : '-',
 			           (iter->vn_prot & VM_PROT_EXEC) ? 'x' : '-',
@@ -143,8 +143,8 @@ DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
 		}
 		block = iter->vn_block;
 		dbg_printf(DBGSTR("%p-%p [%c%c%c%c] [%c%c%c%c%c%c] [%c%c%c%c] "),
-		           vm_node_getmin(iter),
-		           vm_node_getmax(iter),
+		           vm_node_getminaddr(iter),
+		           vm_node_getmaxaddr(iter),
 		           (iter->vn_prot & VM_PROT_READ) ? 'r' : '-',
 		           (iter->vn_prot & VM_PROT_WRITE) ? 'w' : '-',
 		           (iter->vn_prot & VM_PROT_EXEC) ? 'x' : '-',

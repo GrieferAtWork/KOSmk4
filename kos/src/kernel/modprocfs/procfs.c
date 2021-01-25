@@ -55,8 +55,12 @@ INTERN struct superblock_type ProcFS_Type = {
 INTERN struct superblock ProcFS = {
 	/* .s_rootdir = */ {
 		/* .d_node = */ {
+#ifdef CONFIG_USE_NEW_VM
+			/* .i_datablock = */ MFILE_INIT_EX(2, &inode_datablock_type, NULL, PAGESHIFT),
+			/* .i_lock      = */ RWLOCK_INIT,
+#else /* CONFIG_USE_NEW_VM */
 			/* .i_datablock = */ {
-				/* .db_refcnt = */ 2, /* +1: devfs, +1: devfs_type.st_singleton */
+				/* .db_refcnt = */ 2,
 				/* .db_lock   = */ RWLOCK_INIT,
 				/* .db_type   = */ &inode_datablock_type,
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -65,6 +69,7 @@ INTERN struct superblock ProcFS = {
 				/* .db_parts  = */ NULL,
 				VM_DATABLOCK_INIT_PAGEINFO(0)
 			},
+#endif /* !CONFIG_USE_NEW_VM */
 			/* .i_type         = */ &ProcFS_RootDirectory_Type,
 			/* .i_super        = */ &ProcFS,
 			/* .i_fsdata       = */ (struct inode_data *)&ProcFS_RootDirectory_FsData,

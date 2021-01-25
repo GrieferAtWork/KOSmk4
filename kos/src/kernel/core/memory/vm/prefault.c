@@ -607,7 +607,7 @@ vm_prefault(USER CHECKED void const *addr,
 	 *     >>     break;
 	 *     >> }
 	 *     Where ITER_ADDR is initialized to `addr', and during `continue' is updated to
-	 *     instead refer to `vm_node_getend(CURRENT_NODE)'.
+	 *     instead refer to `vm_node_getendaddr(CURRENT_NODE)'.
 	 * Regardless of why iteration stops, always return `0' at this point, indicating that
 	 * at least some part of the given range can be accessed using direct I/O.
 	 */
@@ -804,8 +804,8 @@ again_acquire_part_lock:
 			        "minpageid - ... + ... - 1  = %p\n",
 			        (uintptr_t)vm_node_getminpageid(node),
 			        (uintptr_t)vm_node_getmaxpageid(node),
-			        (uintptr_t)vm_node_getmin(node),
-			        (uintptr_t)vm_node_getmax(node),
+			        (uintptr_t)vm_node_getminaddr(node),
+			        (uintptr_t)vm_node_getmaxaddr(node),
 			        minpageid,
 			        node_prefault_vpage_offset,
 			        fault_count,

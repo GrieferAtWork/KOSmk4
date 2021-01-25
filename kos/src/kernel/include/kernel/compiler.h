@@ -52,6 +52,7 @@
 
 
 #ifdef CONFIG_USE_NEW_VM
+/* Backward-compatibility */
 #define vm_datapart         mpart
 #define vm_datablock        mfile
 #define vm_datablock_type   mfile_ops
@@ -62,10 +63,24 @@
 #define vm_ramblock         mchunk
 #define vm_swpblock         mchunk
 #define vm_ramfile          mramfile
+#define vm_dmalock          mdmalock
 #define vmb                 mbuilder
 #define ln_pself            le_prev
 #define ln_next             le_next
-#endif /* CONFIG_USE_NEW_VM */
+#else /* CONFIG_USE_NEW_VM */
+/* Forward-compatibility */
+#define mpart     vm_datapart
+#define mfile     vm_datablock
+#define mfile_ops vm_datablock_type
+#define mnode     vm_node
+#define mman      vm
+#define mfutex    vm_futex
+#define mpartmeta vm_futex_controller
+#define mchunk    vm_ramblock
+#define mramfile  vm_ramfile
+#define mdmalock  vm_dmalock
+#define mbuilder  vmb
+#endif /* !CONFIG_USE_NEW_VM */
 
 
 

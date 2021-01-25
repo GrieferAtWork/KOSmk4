@@ -44,7 +44,85 @@
 
 DECL_BEGIN
 
-INTDEF byte_t __bootcpu_x86_iob_startpage[] ASMNAME("__x86_iob_empty_pageid");
+INTDEF byte_t __bootcpu_x86_df_stack[KERNEL_DF_STACKSIZE];
+
+/* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
+INTERN ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity = NULL;
+
+#ifdef CONFIG_USE_NEW_VM
+INTDEF byte_t __bootcpu_x86_iob_start[] ASMNAME("__x86_iob_empty_base");
+
+DATDEF ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ ASMNAME("thiscpu_x86_iobnode");
+DATDEF ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ ASMNAME("thiscpu_x86_dfstackpart");
+DATDEF ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ ASMNAME("thiscpu_x86_dfstacknode");
+
+/* The VM node used to represent the IOB mapping of the current CPU */
+PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ = {
+	/* .mn_mement   = */ { {} },
+	/* .mn_minaddr  = */ __bootcpu_x86_iob_start,
+	/* .mn_maxaddr  = */ __bootcpu_x86_iob_start + PAGESIZE - 1,
+	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
+	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
+	/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	/*                */ MNODE_F_MPREPARED | MNODE_F_MLOCK,
+	/* .mn_part     = */ NULL, /* Reserved node */
+	/* .mn_fspath   = */ NULL,
+	/* .mn_fsname   = */ NULL,
+	/* .mn_mman     = */ { &mman_kernel },
+	/* .mn_partoff  = */ 0,
+	/* .mn_link     = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	/* ._mn_module  = */ NULL
+};
+
+INTDEF byte_t __bootcpu_x86_df_stackpage_p[];
+INTDEF struct mnode __bootcpu_x86_dfstack_node;
+INTDEF struct mpart __bootcpu_x86_dfstack_part;
+
+PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
+	/* .mp_refcnt    = */ 2, /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode.mn_part' */
+	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	/* .mp_flags     = */ MPART_F_NO_FREE | MPART_F_NO_SPLIT |
+	/*                 */ MPART_F_NO_MERGE | MPART_F_MLOCK_FROZEN |
+	/*                 */ MPART_F_MLOCK,
+	/* .mp_state     = */ MPART_ST_MEM,
+	/* .mp_file      = */ { &mfile_ndef },
+	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_copy),
+	/* .mp_share     = */ { &__bootcpu_x86_dfstack_node },
+	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_lockops),
+	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
+	/* .mp_changed   = */ {},
+	/* .mp_minaddr   = */ (pos_t)0,
+	/* .mp_maxaddr   = */ (pos_t)KERNEL_DF_STACKSIZE - 1,
+	/* .mp_filent    = */ { {} },
+	/* .mp_blkst_ptr = */ { NULL },
+	/* .mp_mem       = */ { {
+		/* .mc_start = */ (physpage_t)__bootcpu_x86_df_stackpage_p,
+		/* .mc_size  = */ CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE),
+	} },
+	/* .mp_meta      = */ NULL
+};
+
+PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ = {
+	/* .mn_mement   = */ { {} },
+	/* .mn_minaddr  = */ __bootcpu_x86_df_stack,
+	/* .mn_maxaddr  = */ __bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE - 1,
+	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
+	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
+	/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,
+	/* .mn_part     = */ &__bootcpu_x86_dfstack_part,
+	/* .mn_fspath   = */ NULL,
+	/* .mn_fsname   = */ NULL,
+	/* .mn_mman     = */ { &mman_kernel },
+	/* .mn_partoff  = */ 0,
+	/* .mn_link     = */ { NULL, &__bootcpu_x86_dfstack_part.mp_share.lh_first },
+	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	/* ._mn_module  = */ NULL
+};
+
+#else /* CONFIG_USE_NEW_VM */
+INTDEF byte_t __bootcpu_x86_iob_startpage[] ASMNAME("__x86_iob_empty_page");
 
 /* The VM node used to represent the IOB mapping of the current CPU */
 PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
@@ -63,18 +141,13 @@ PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
 	/* .vn_guard  = */ 0
 };
 
-/* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
-INTERN ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity = NULL;
-
-
-
-INTDEF byte_t __bootcpu_x86_df_stackpageid[];
-INTDEF byte_t __bootcpu_x86_df_stackpageptr[];
+INTDEF byte_t __bootcpu_x86_df_stackpage[];
+INTDEF byte_t __bootcpu_x86_df_stackpage_p[];
 INTDEF struct vm_node __bootcpu_x86_dfstack_node;
 INTDEF struct vm_datapart __bootcpu_x86_dfstack_part;
 
 PUBLIC ATTR_PERCPU struct vm_datapart
-_current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
+thiscpu_x86_dfstackpart_ ASMNAME("thiscpu_x86_dfstackpart") = {
 	/* .dp_refcnt = */ 2, /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode' */
 	.dp_lock   = SHARED_RWLOCK_INIT,
 	{
@@ -95,7 +168,7 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 			.rd_blockv = &__bootcpu_x86_dfstack_part.dp_ramdata.rd_block0,
 			{
 				.rd_block0 = {
-					.rb_start = (physpage_t)__bootcpu_x86_df_stackpageptr,
+					.rb_start = (physpage_t)__bootcpu_x86_df_stackpage_p,
 					.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
 				}
 			}
@@ -110,12 +183,12 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 	},
 };
 
-PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_dfstacknode") = {
+PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_dfstacknode_ ASMNAME("thiscpu_x86_dfstacknode") = {
 	.vn_node = {
 		NULL,
 		NULL,
-		(pageid_t)__bootcpu_x86_df_stackpageid,
-		(pageid_t)__bootcpu_x86_df_stackpageid + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
+		(pageid_t)__bootcpu_x86_df_stackpage,
+		(pageid_t)__bootcpu_x86_df_stackpage + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
 	},
 	.vn_byaddr = LLIST_INITNODE,
 	.vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
@@ -128,11 +201,12 @@ PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_
 	.vn_link   = { NULL, &LLIST_HEAD(__bootcpu_x86_dfstack_part.dp_srefs) },
 	.vn_guard  = 0
 };
+#endif /* !CONFIG_USE_NEW_VM */
+
 
 
 #ifndef __x86_64__
 INTDEF void ASMCALL x86_idt_double_fault(void);
-INTDEF byte_t __bootcpu_x86_df_stack[KERNEL_DF_STACKSIZE];
 INTDEF byte_t _bootcpu_thiscpu_x86_tss[];
 
 PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
@@ -189,15 +263,15 @@ NOTHROW(KCALL get_stack_avail)(void) {
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = vm_node_getstart(node);
-		end   = vm_node_getend(node);
+		start = vm_node_getaddr(node);
+		end   = vm_node_getendaddr(node);
 	} else
 #endif /* !__x86_64__ */
 	{
 		struct vm_node const *node;
 		node  = THIS_KERNEL_STACK;
-		start = vm_node_getstart(node);
-		end   = vm_node_getend(node);
+		start = vm_node_getaddr(node);
+		end   = vm_node_getendaddr(node);
 	}
 	if likely(sp >= start && sp < end)
 		return (size_t)((byte_t *)sp - (byte_t *)start);
@@ -215,15 +289,15 @@ NOTHROW(KCALL get_stack_inuse)(void) {
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = vm_node_getstart(node);
-		end   = vm_node_getend(node);
+		start = vm_node_getaddr(node);
+		end   = vm_node_getendaddr(node);
 	} else
 #endif /* !__x86_64__ */
 	{
 		struct vm_node const *node;
 		node  = THIS_KERNEL_STACK;
-		start = vm_node_getstart(node);
-		end   = vm_node_getend(node);
+		start = vm_node_getaddr(node);
+		end   = vm_node_getendaddr(node);
 	}
 	if likely(sp >= start && sp < end)
 		return (size_t)((byte_t *)end - (byte_t *)sp);
@@ -241,15 +315,15 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = vm_node_getstart(node);
-		end   = vm_node_getend(node);
+		start = vm_node_getaddr(node);
+		end   = vm_node_getendaddr(node);
 	} else
 #endif /* !__x86_64__ */
 	{
 		struct vm_node const *node;
 		node  = THIS_KERNEL_STACK;
-		start = vm_node_getstart(node);
-		end   = vm_node_getend(node);
+		start = vm_node_getaddr(node);
+		end   = vm_node_getendaddr(node);
 	}
 	if likely(sp >= start && sp < end) {
 		*pbase = start;

@@ -958,7 +958,7 @@ again_lock_effective_vm:
 			}
 		}
 		/* Figure out how many bytes we actually want to access from `node' */
-		access_bytes = (size_t)((byte_t *)vm_node_getend(node) - (byte_t *)addr);
+		access_bytes = (size_t)((byte_t *)vm_node_getendaddr(node) - (byte_t *)addr);
 		if (access_bytes > num_bytes)
 			access_bytes = num_bytes;
 		/* Check for some additional region with which the given
@@ -1234,11 +1234,11 @@ do_create_far_region:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			assert(aliasing_node != node);
 			/* Figure out access offsets so we can translate `addr' */
-			access_offset_into_node    = (size_t)((byte_t *)addr - (byte_t *)vm_node_getstart(node));
-			aliasing_region_node_start = (byte_t *)vm_node_getstart(aliasing_node);
+			access_offset_into_node    = (size_t)((byte_t *)addr - (byte_t *)vm_node_getaddr(node));
+			aliasing_region_node_start = (byte_t *)vm_node_getaddr(aliasing_node);
 			RTM_DEBUG("[rtm] Region redirect: data from %p...%p is already mapped at %p...%p (map %p -> %p)\n",
-			          vm_node_getmin(node), vm_node_getmax(node),
-			          vm_node_getmin(aliasing_node), vm_node_getmax(aliasing_node),
+			          vm_node_getminaddr(node), vm_node_getmaxaddr(node),
+			          vm_node_getminaddr(aliasing_node), vm_node_getmaxaddr(aliasing_node),
 			          addr, aliasing_region_node_start + access_offset_into_node);
 #if !CONFIG_RTM_USERSPACE_ONLY
 			if unlikely(aliasing_node_vm != effective_vm)

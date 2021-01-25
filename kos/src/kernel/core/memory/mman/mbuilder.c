@@ -205,7 +205,7 @@ mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
 	DBG_memset(&result->mn_mman, 0xcc, sizeof(result->mn_mman));
 	DBG_memset(&result->_mn_module, 0xcc, sizeof(result->_mn_module));
 	DBG_memset(&result->mn_link, 0xcc, sizeof(result->mn_link));
-	LIST_ENTRY_UNBOUND_INIT(result, mn_writable);
+	LIST_ENTRY_UNBOUND_INIT(&result->mn_writable);
 	return result;
 }
 
@@ -287,7 +287,7 @@ mbuilder_map(struct mbuilder *__restrict self,
 		struct mbnode *next;
 		/* If this part isn't already being used, insert it into
 		 * the list of unique mem-parts used by our mem-builder. */
-		LIST_ENTRY_UNBOUND_INIT(iter, mbn_nxtuprt);
+		LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
 		if (!mbuilder_uparts_contains(self, iter->mbn_part))
 			mbuilder_uparts_insert(self, iter);
 		iter->mbn_flags = mbnodeflags_from_mapflags(flags) |
@@ -423,7 +423,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 
 				/* If this part isn't already being used, insert it into
 				 * the list of unique mem-parts used by our mem-builder. */
-				LIST_ENTRY_UNBOUND_INIT(iter, mbn_nxtuprt);
+				LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
 				if (!mbuilder_uparts_contains(self, iter->mbn_part))
 					mbuilder_uparts_insert(self, iter);
 
@@ -508,7 +508,7 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
 mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
                      size_t num_bytes, unsigned int flags,
-                     size_t min_alignment DFL(PAGESIZE))
+                     size_t min_alignment)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
 	void *result;

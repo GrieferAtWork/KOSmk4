@@ -41,12 +41,14 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_write
 #define LOCAL_mpart_rw     mpart_write
 #elif defined(DEFINE_mfile_read_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_buffer_t     physaddr_t
 #define LOCAL_ubuffer_t    physaddr_t
 #define LOCAL_mfile_vio_rw mfile_vio_read_p
 #define LOCAL_mfile_rw     mfile_read_p
 #define LOCAL_mpart_rw     mpart_read_p
 #elif defined(DEFINE_mfile_write_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_buffer_t     physaddr_t
 #define LOCAL_ubuffer_t    physaddr_t
 #define LOCAL_mfile_vio_rw mfile_vio_write_p
@@ -67,6 +69,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_writev
 #define LOCAL_mpart_rw     mpart_writev
 #elif defined(DEFINE_mfile_readv_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
 #define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
@@ -74,6 +77,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_readv_p
 #define LOCAL_mpart_rw     mpart_readv_p
 #elif defined(DEFINE_mfile_writev_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
 #define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
@@ -94,7 +98,7 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
                    size_t num_bytes, pos_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct vioargs args;
-	args.va_ops = self->mf_ops->mo_vio;
+	args.va_ops = mfile_getvio(self);
 	assert(args.va_ops);
 	args.va_acmap_page   = NULL;
 	args.va_acmap_offset = 0;
@@ -111,8 +115,14 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
 	vio_copytovio_from_phys(&args, (vio_addr_t)offset, (__physaddr_t)buffer, num_bytes);
 #elif defined(LOCAL_BUFFER_IS_AIO)
 	{
+#ifdef LOCAL_BUFFER_IS_PHYS
+		struct aio_pbuffer_entry ent;
+		AIO_PBUFFER_FOREACH(ent, buffer)
+#else /* LOCAL_BUFFER_IS_PHYS */
 		struct aio_buffer_entry ent;
-		AIO_BUFFER_FOREACH(ent, buffer) {
+		AIO_BUFFER_FOREACH(ent, buffer)
+#endif /* !LOCAL_BUFFER_IS_PHYS */
+		{
 			if (buf_offset) {
 				if (buf_offset >= ent.ab_size) {
 					buf_offset -= ent.ab_size;
@@ -152,7 +162,7 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 #endif /* LOCAL_BUFFER_IS_AIO */
                size_t num_bytes, pos_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	if (self->mf_parts == MFILE_PARTS_ANONYMOUS && self->mf_ops->mo_vio != NULL) {
+	if (self->mf_parts == MFILE_PARTS_ANONYMOUS && mfile_getvio(self) != NULL) {
 		/* Directly read to/from VIO */
 		LOCAL_mfile_vio_rw(self, NULL, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
@@ -187,6 +197,7 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 	}
 }
 
+#undef LOCAL_BUFFER_IS_PHYS
 #undef LOCAL_BUFFER_IS_AIO
 #undef LOCAL_BUFFER_IS_AIO_BUFFER
 #undef LOCAL_BUFFER_IS_AIO_PBUFFER

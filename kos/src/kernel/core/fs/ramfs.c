@@ -391,14 +391,8 @@ ramfs_open(struct superblock *__restrict self,
 		       E_IOERROR_BADBOUNDS, E_DIVIDE_BY_ZERO, E_OVERFLOW, E_INDEX_ERROR,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	self->s_features.sf_magic = RAMFS_MAGIC;
-	self->i_type       = &ramfs_directory_type;
-	self->db_pageshift = 0;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-	self->db_addrshift = PAGESHIFT;
-	self->db_pagealign = 1;
-	self->db_pagemask  = 0;
-	self->db_pagesize  = PAGESIZE;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+	self->i_type              = &ramfs_directory_type;
+	mfile_init_blockshift(self, PAGESHIFT);
 	self->i_fileino   = (ino_t)(uintptr_t)self;
 	self->i_filesize  = 0;
 	self->i_filemode  = S_IFDIR | 0755;

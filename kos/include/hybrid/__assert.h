@@ -71,5 +71,12 @@ __NAMESPACE_INT_END
 #endif /* ... */
 #endif /* !__hybrid_assertion_failedf */
 
+/* Assert-or-execute (the given expression is always evaluated) */
+#ifdef NDEBUG
+#define __hybrid_asserte(expr) (void)(expr)
+#else /* NDEBUG */
+#define __hybrid_asserte __hybrid_assert
+#endif /* !NDEBUG */
+
 
 #endif /* !__GUARD_HYBRID___ASSERT_H */

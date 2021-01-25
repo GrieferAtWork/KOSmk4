@@ -121,7 +121,7 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	 *       should ever get to the point they could be bothered by the missing
 	 *       integrity. */
 	assert(result->v_kernreserve.vn_part  == &userkern_segment_part);
-	assert(result->v_kernreserve.vn_block == &userkern_segment_block);
+	assert(result->v_kernreserve.vn_block == &userkern_segment_file);
 #else /* !CONFIG_NO_USERKERN_SEGMENT */
 	assert(result->v_kernreserve.vn_part  == NULL);
 	assert(result->v_kernreserve.vn_block == NULL);
@@ -196,14 +196,14 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 #ifndef NDEBUG
 #ifdef __ARCH_HAVE_COMPAT
 	if (self->v_kernreserve.vn_part == &userkern_segment_part_compat) {
-		assert(self->v_kernreserve.vn_block == &userkern_segment_block_compat);
+		assert(self->v_kernreserve.vn_block == &userkern_segment_file_compat);
 	} else {
 		assert(self->v_kernreserve.vn_part == &userkern_segment_part);
-		assert(self->v_kernreserve.vn_block == &userkern_segment_block);
+		assert(self->v_kernreserve.vn_block == &userkern_segment_file);
 	}
 #else /* __ARCH_HAVE_COMPAT */
 	assert(self->v_kernreserve.vn_part == &userkern_segment_part);
-	assert(self->v_kernreserve.vn_block == &userkern_segment_block);
+	assert(self->v_kernreserve.vn_block == &userkern_segment_file);
 #endif /* !__ARCH_HAVE_COMPAT */
 #endif /* !NDEBUG */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */

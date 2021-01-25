@@ -908,7 +908,7 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 	assert(v);
 	assertf(vm_node_getminpageid(self) <= vm_node_getmaxpageid(self),
 	        "Unordered node: MIN(%p) >= MAX(%p)",
-	        vm_node_getmin(self), vm_node_getmax(self));
+	        vm_node_getminaddr(self), vm_node_getmaxaddr(self));
 	assertf(vm_node_getmaxpageid(self) <= __ARCH_PAGEID_MAX,
 	        "Mapping of node covering pages %p-%p is out-of-bounds",
 	        vm_node_getminpageid(self), vm_node_getmaxpageid(self));
@@ -933,11 +933,11 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 	        "self           = %p (%p-%p)\n"
 	        "self->vn_flags = %#x\n",
 	        insert_before,
-	        vm_node_getmin(insert_before),
-	        vm_node_getmax(insert_before),
+	        vm_node_getminaddr(insert_before),
+	        vm_node_getmaxaddr(insert_before),
 	        self,
-	        vm_node_getmin(self),
-	        vm_node_getmax(self),
+	        vm_node_getminaddr(self),
+	        vm_node_getmaxaddr(self),
 	        (unsigned int)self->vn_flags);
 	/* Insert the self before `insert' at `pinsert' */
 	self->vn_byaddr.ln_pself = pinsert;
@@ -978,25 +978,6 @@ NOTHROW(KCALL vm_do_ccfreeram)(struct vm_ramblock *__restrict pblock0,
 }
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL vm_do_ffreeram)(struct vm_ramblock *__restrict pblock0,
-                              struct vm_ramblock *__restrict blocks,
-                              bool is_zero) {
-	if (blocks == pblock0) {
-		page_ffree(blocks->rb_start,
-		           blocks->rb_size,
-		           is_zero);
-	} else {
-		size_t i, count = *(size_t *)pblock0;
-		for (i = 0; i < count; ++i) {
-			page_ffree(blocks[i].rb_start,
-			           blocks[i].rb_size,
-			           is_zero);
-		}
-		kfree(blocks);
-	}
-}
-
-PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
                              struct vm_ramblock *__restrict blocks) {
 	if (blocks == pblock0) {
@@ -1021,20 +1002,6 @@ vm_datapart_do_allocram(struct vm_datapart *__restrict self)
 	                                            vm_datapart_numvpages(self),
 	                                            GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 }
-
-PUBLIC NONNULL((1)) bool
-NOTHROW(KCALL vm_datapart_do_allocram_nx)(struct vm_datapart *__restrict self,
-                                          gfp_t flags) {
-	struct vm_ramblock *blocks;
-	blocks = vm_do_allocram_nx(&self->dp_ramdata.rd_block0,
-	                           vm_datapart_numvpages(self),
-	                           flags);
-	if unlikely(!blocks)
-		return false;
-	self->dp_ramdata.rd_blockv = blocks;
-	return true;
-}
-
 
 /* Copy the physical memory backing of `src' into `dst'.
  * The caller is responsible to ensure that both parts are INCORE or LOCKED,
@@ -2300,10 +2267,10 @@ again_lock_datapart:
 					continue;
 				/* Make sure that the associated page mapping has been prepared. */
 				if unlikely(!(v == myvm || vm_node_iskernelspace(node)
-				              ? pagedir_prepare_map(vm_node_getstart(node),
+				              ? pagedir_prepare_map(vm_node_getaddr(node),
 				                                    vm_node_getsize(node))
 				              : pagedir_prepare_map_p(v->v_pdir_phys,
-				                                      vm_node_getstart(node),
+				                                      vm_node_getaddr(node),
 				                                      vm_node_getsize(node)))) {
 					vm_set_lockendwrite_all(&vms);
 					sync_endread(self);
@@ -2317,18 +2284,18 @@ again_lock_datapart:
 					perm |= PAGEDIR_MAP_FUSER;
 				if (v == myvm || vm_node_iskernelspace(node)) {
 					vm_datapart_map_ram_autoprop(self,
-					                             vm_node_getstart(node),
+					                             vm_node_getaddr(node),
 					                             perm);
 				} else {
 					vm_datapart_map_ram_autoprop_p(self,
 					                               v->v_pdir_phys,
-					                               vm_node_getstart(node),
+					                               vm_node_getaddr(node),
 					                               perm);
 				}
 				/* Synchronize the page directory for address range mapped by the node. */
 				/* FIXME: `vm_sync()' can throw E_WOULDBLOCK!
 				 *        Instead, we must acquire task chain locks alongside node tree locks above! */
-				vm_sync(v, vm_node_getstart(node), vm_node_getsize(node));
+				vm_sync(v, vm_node_getaddr(node), vm_node_getsize(node));
 			}
 		}
 		/* Unlock all of the affected VMs */
@@ -3002,10 +2969,10 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				{
 					pagedir_unprepare_map_p(self->vn_vm->v_pdir_phys,
-					                        vm_node_getstart(self),
+					                        vm_node_getaddr(self),
 					                        vm_node_getsize(self));
 				} else {
-					pagedir_unprepare_map(vm_node_getstart(self),
+					pagedir_unprepare_map(vm_node_getaddr(self),
 					                      vm_node_getsize(self));
 				}
 			}
@@ -3059,7 +3026,7 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 
 LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
 	printk(KERN_DEBUG "[vm] Update access rights of %p-%p\n",
-	       vm_node_getmin(self), vm_node_getmax(self));
+	       vm_node_getminaddr(self), vm_node_getmaxaddr(self));
 }
 
 
@@ -3090,7 +3057,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 	/* Just delete the mapping, so it has to be re-created, at which
 	 * point all of the intended copy-on-write mechanics will take
 	 * place. */
-	addr = vm_node_getstart(self);
+	addr = vm_node_getaddr(self);
 	size = vm_node_getsize(self);
 	log_updating_access_rights(self);
 	if (self->vn_vm == THIS_VM) {
@@ -3147,7 +3114,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 	/* Just delete the mapping, so it has to be re-created, at which
 	 * point all of the intended copy-on-write mechanics will take
 	 * place. */
-	addr = vm_node_getstart(self);
+	addr = vm_node_getaddr(self);
 	size = vm_node_getsize(self);
 	log_updating_access_rights(self);
 	if (self->vn_vm == THIS_VM) {
@@ -3202,7 +3169,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	assert(v);
 	assertf(vm_node_getminpageid(self) <= vm_node_getmaxpageid(self),
 	        "Unordered node: MIN(%p) >= MAX(%p)",
-	        vm_node_getmin(self), vm_node_getmax(self));
+	        vm_node_getminaddr(self), vm_node_getmaxaddr(self));
 	assertf(vm_node_getmaxpageid(self) <= __ARCH_PAGEID_MAX,
 	        "Mapping of node covering pages %p-%p is out-of-bounds",
 	        vm_node_getminpageid(self), vm_node_getmaxpageid(self));
@@ -3214,7 +3181,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part->dp_block       = %p\n"
 	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
 	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
@@ -3228,7 +3195,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part->dp_block       = %p\n"
 	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
 	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
@@ -3240,7 +3207,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part->dp_block       = %p\n"
 	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
 	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
@@ -3249,7 +3216,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self = %p (%p-%p)\n"
 	        "self->vn_part  = %p\n"
 	        "self->vn_block = %p\n",
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block);
 	assertf(!self->vn_part ||
 	        (self->vn_part->dp_block == self->vn_block ||
@@ -3264,7 +3231,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "vm_datablock_anonymous_zero_vec = { %p-%p }\n",
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
 	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax,
@@ -3281,7 +3248,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part->dp_block->db_pageshift = %u\n",
 	        vm_node_getpagecount(self), vm_node_getpagecount(self),
 	        vm_datapart_numvpages(self->vn_part), vm_datapart_numvpages(self->vn_part),
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        self->vn_part, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
 	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax,
@@ -3298,8 +3265,8 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "insert_before  = %p (%p-%p)\n"
 	        "self           = %p (%p-%p)\n"
 	        "self->vn_flags = %#x\n",
-	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
-	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        insert_before, vm_node_getminaddr(insert_before), vm_node_getmaxaddr(insert_before),
+	        self, vm_node_getminaddr(self), vm_node_getmaxaddr(self),
 	        (unsigned int)self->vn_flags);
 	/* Insert the self before `insert' at `pinsert' */
 	self->vn_byaddr.ln_pself = pinsert;

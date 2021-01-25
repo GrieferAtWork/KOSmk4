@@ -48,7 +48,7 @@ DATDEF ATTR_PERCPU struct tss thiscpu_x86_tss;
 DATDEF ATTR_PERCPU u8 thiscpu_x86_iob[65536 / 8];
 
 /* The VM node used to represent the IOB mapping of the current CPU */
-DATDEF ATTR_PERCPU struct vm_node thiscpu_x86_iobnode;
+DATDEF ATTR_PERCPU struct mnode thiscpu_x86_iobnode;
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
@@ -122,10 +122,10 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
 
 
 #ifndef CONFIG_NO_SMP
-/* VM node & datapart describing the #DF stack of the current CPU.
- * WARNING: These structures for the boot CPU are not actually part of the kernel VM! */
-DATDEF ATTR_PERCPU struct vm_node const thiscpu_x86_dfstacknode;
-DATDEF ATTR_PERCPU struct vm_datapart const thiscpu_x86_dfstackpart;
+/* Mem node & part describing the #DF stack of the current CPU.
+ * WARNING: These structures for the boot CPU are not actually part of the kernel mman! */
+DATDEF ATTR_PERCPU struct mnode const thiscpu_x86_dfstacknode;
+DATDEF ATTR_PERCPU struct mpart const thiscpu_x86_dfstackpart;
 #endif /* !CONFIG_NO_SMP */
 
 

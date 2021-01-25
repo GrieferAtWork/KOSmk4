@@ -240,7 +240,7 @@ again_reset:
 				goto err_unmapped;
 			assertf(!wasdestroyed(part),
 			        "Node %p at %p-%p points at destroyed data part at %p",
-			        node, vm_node_getmin(node), vm_node_getmax(node), part);
+			        node, vm_node_getminaddr(node), vm_node_getmaxaddr(node), part);
 			if unlikely(!sync_tryread(part)) {
 				/* Need to blocking wait for the lock, then try again. */
 wait_for_part_and_try_again:
@@ -378,7 +378,7 @@ unshare_copy_on_write_for_part:
 				vm_datapart_do_enumdma(part,
 				                       prange,
 				                       arg,
-				                       (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getstart(node)),
+				                       (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getaddr(node)),
 				                       num_bytes,
 				                       &lock);
 			}
@@ -392,7 +392,7 @@ unshare_copy_on_write_for_part:
 				vm_datapart_do_enumdma(part,
 				                       prange,
 				                       arg,
-				                       (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getstart(node)),
+				                       (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getaddr(node)),
 				                       num_bytes,
 				                       &lockvec[lock_used]);
 				++lock_used;
@@ -423,7 +423,7 @@ unshare_copy_on_write_for_part:
 					goto err_unmapped;
 				assertf(!wasdestroyed(part),
 				        "Node %p at %p-%p points at destroyed data part at %p",
-				        node, vm_node_getmin(node), vm_node_getmax(node), part);
+				        node, vm_node_getminaddr(node), vm_node_getmaxaddr(node), part);
 #ifdef LIBVIO_CONFIG_ENABLED
 				if unlikely(ATOMIC_READ(part->dp_state) == VM_DATAPART_STATE_VIOPRT)
 					goto err_unmapped;
@@ -468,11 +468,11 @@ unshare_copy_on_write_for_part:
 				assert(part->dp_state == VM_DATAPART_STATE_INCORE ||
 				       part->dp_state == VM_DATAPART_STATE_LOCKED);
 				noderel_startaddr = node == minmax.mm_min
-				                    ? (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getmin(node))
+				                    ? (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getminaddr(node))
 				                    : 0;
 				noderel_num_bytes = vm_node_getsize(node);
 				if (node == minmax.mm_max)
-					noderel_num_bytes = (size_t)(((byte_t *)vaddr + num_bytes) - (byte_t *)vm_node_getmin(node));
+					noderel_num_bytes = (size_t)(((byte_t *)vaddr + num_bytes) - (byte_t *)vm_node_getminaddr(node));
 #ifdef DMA_ENUM
 				{
 					struct vm_dmalock lock;

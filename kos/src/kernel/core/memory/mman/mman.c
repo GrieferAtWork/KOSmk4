@@ -90,10 +90,7 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 	/*                */ MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
-#ifndef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	/*                */ MNODE_F_MPREPARED |
-#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	/*                */ MNODE_F_KERNPART,
+	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART,
 	/* .mn_part     = */ NULL, /* Reserved node */
 	/* .mn_fspath   = */ NULL,
 	/* .mn_fsname   = */ NULL,

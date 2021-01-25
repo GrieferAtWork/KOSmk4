@@ -72,7 +72,7 @@ DECL_BEGIN
  *                       to call kmalloc() and kmalloc() needing to call this function.
  *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
  *                       If memory has already been mapped at that address, then simply
- *                       return `MAP_FAILED' unconditionally.
+ *                       return `MAP_INUSE' unconditionally.
  *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
  *                       must be combined with `MAP_POPULATE', and should also
  *                       be combined with `GFP_LOCKED' to prevent the backing
@@ -98,7 +98,7 @@ DECL_BEGIN
  *                        address of where the mapping should go. If not page-aligned,
  *                        then the sub-page-misalignment will be carried over into the
  *                        return value. If another mapping already exists at the given
- *                        location, then unconditionally return `MAP_FAILED'
+ *                        location, then unconditionally return `MAP_INUSE'
  * @param: num_bytes:     The # of bytes to allocate. The actual amount is ceil-
  *                        aligned to multiples of pages (after also including a
  *                        possibly sub-page-misalignment from GFP_MAP_FIXED+hint)
@@ -211,7 +211,7 @@ again_lock_mman:
 			if (existing_node != NULL) {
 				/* Address range is already in use. */
 				mman_lock_release(&mman_kernel);
-				/* Unconditionally return MAP_FAILED. */
+				/* Unconditionally return MAP_INUSE. */
 #ifdef LOCAL_NX
 				goto err;
 #else /* LOCAL_NX */
@@ -219,7 +219,7 @@ again_lock_mman:
 					mnode_free(node);
 				if unlikely(part != NULL)
 					kram_part_destroy(part);
-				return MAP_FAILED;
+				return MAP_INUSE;
 #endif /* !LOCAL_NX */
 			}
 		} else {
@@ -523,7 +523,7 @@ do_prefault:
 		node->mn_partoff      = 0;
 		node->mn_link.le_prev = &part->mp_share.lh_first;
 		node->mn_link.le_next = NULL;
-		LIST_ENTRY_UNBOUND_INIT(node, mn_writable);
+		LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 		part->mp_refcnt = 1;
 		part->mp_flags |= MPART_F_NORMAL |
 #if MNODE_F_MLOCK == MPART_F_MLOCK
@@ -538,7 +538,7 @@ do_prefault:
 		LIST_INIT(&part->mp_copy);
 		part->mp_share.lh_first = node;
 		SLIST_INIT(&part->mp_lockops);
-		LIST_ENTRY_UNBOUND_INIT(part, mp_allparts);
+		LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 		part->mp_minaddr = (pos_t)(0);
 		part->mp_maxaddr = (pos_t)(num_bytes - 1);

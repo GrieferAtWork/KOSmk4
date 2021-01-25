@@ -197,7 +197,7 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		FINALLY_DECREF_UNLIKELY(file);
 		/* The file may have been changed to something that doesn't support VIO
 		 * This is unlikely, but can happen if the file has been anonymized! */
-		if unlikely(file->mf_ops->mo_vio == NULL)
+		if unlikely(mfile_getvio(file) == NULL)
 			return 0;
 		LOCAL_mfile_vio_rw(file, self, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO

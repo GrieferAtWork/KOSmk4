@@ -903,7 +903,7 @@ relock_with_data:
 				} else {
 					LIST_INSERT_HEAD(&hipart->mp_copy, hinode, mn_link);
 				}
-				LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
+				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 				if (LIST_ISBOUND(lonode, mn_writable))
 					LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);
 				hinode->mn_fspath = xincref(lonode->mn_fspath);

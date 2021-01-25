@@ -121,7 +121,7 @@ PUBLIC
 		if unlikely(OVERFLOW_UADD(file_position, num_bytes, &file_end))
 			goto throw_bad_bounds;
 again:
-		rwlock_read(&self->db_lock);
+		rwlock_read(__inode_lock(self));
 		TRY {
 again_check_size:
 			if unlikely(file_end > self->i_filesize) {
@@ -129,7 +129,7 @@ again_check_size:
 					inode_loadattr(self);
 					goto again_check_size;
 				}
-				rwlock_endread(&self->db_lock);
+				rwlock_endread(__inode_lock(self));
 				goto throw_bad_bounds;
 			}
 #ifdef DEFINE_IO_ASYNC
@@ -145,11 +145,11 @@ again_check_size:
 			                         file_position);
 #endif /* !DEFINE_IO_ASYNC */
 		} EXCEPT {
-			if (rwlock_endread(&self->db_lock))
+			if (rwlock_endread(__inode_lock(self)))
 			    goto again;
 			RETHROW();
 		}
-		rwlock_endread(&self->db_lock);
+		rwlock_endread(__inode_lock(self));
 		return;
 throw_bad_bounds:
 		THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);

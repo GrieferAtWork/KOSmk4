@@ -152,7 +152,7 @@ NOTHROW(FCALL _mman_lockops_reap)(gfp_t flags) {
 	struct mlockop *iter;
 	assert(flags & GFP_ATOMIC);
 	assert(!(flags & GFP_CALLOC));
-again:
+/*again:*/
 	if (!mman_lock_tryacquire(&mman_kernel))
 		return;
 	lops.slh_first = SLIST_ATOMIC_CLEAR(&mman_kernel_lockops);
@@ -500,9 +500,9 @@ NOTHROW(FCALL unmap_and_unprepare_and_sync_memory)(void *addr, size_t num_bytes)
 #endif /* !NDEBUG && !CONFIG_NO_SMP */
 }
 
-PRIVATE NOBLOCK void
-NOTHROW(FCALL movedown_bits)(mpart_blkst_word_t *__restrict dst_bitset,
-                             mpart_blkst_word_t const *__restrict src_bitset,
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL movedown_bits)(mpart_blkst_word_t *dst_bitset,
+                             mpart_blkst_word_t const *src_bitset,
                              size_t dst_index, size_t src_index,
                              size_t num_bits) {
 #define BITSET_INDEX(index) ((index) / BITSOF(mpart_blkst_word_t))
@@ -729,7 +729,6 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	/* Check for simple case: Truncate the node/part at the back. */
 	if (unmap_minaddr == node->mn_minaddr) {
 		size_t part_size;
-		physpagecnt_t part_pages;
 
 		/* Truncate at the back. */
 		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
@@ -800,7 +799,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	/* Check for slightly more complicated case: Truncate a node at the front. */
 	if (unmap_minaddr == node->mn_minaddr) {
 		size_t remove_size, remove_blocks;
-		physpagecnt_t remove_pages;
+
 		/* We can truncate the node at the front. */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 		remove_size = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
@@ -886,7 +885,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	case MPART_ST_MEM_SC: {
 		size_t lo_split_chunk_index, hi_split_chunk_index;
 		physpagecnt_t lo_split_chunk_offset, hi_split_chunk_offset;
-		size_t lo_chunks, hi_chunks, i;
+		size_t lo_chunks, hi_chunks;
 		struct mchunkvec vec;
 
 		/* We may have to allocate a new dynamic mem/swap vector.
@@ -906,7 +905,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			++lo_split_chunk_index;
 		}
 		hi_split_chunk_index  = lo_split_chunk_index;
-		hi_split_chunk_offset = lo_split_chunk_offset + (hioffset - losize) >> PAGESHIFT;
+		hi_split_chunk_offset = lo_split_chunk_offset + ((hioffset - losize) >> PAGESHIFT);
 		for (;;) {
 			physpagecnt_t count;
 			assert(hi_split_chunk_index < vec.ms_c);
@@ -1183,7 +1182,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	/*hinode->mn_link  = ...;*/ /* Initialized below */
 
 	/* Have the hi-node mirror the is-writable attribute of the lo-node */
-	LIST_ENTRY_UNBOUND_INIT(hinode, mn_writable);
+	LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 	if (LIST_ISBOUND(lonode, mn_writable)) {
 		LIST_INSERT_HEAD(&mman_kernel.mm_writable,
 		                 hinode, mn_writable);
@@ -1206,7 +1205,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	}
 	*hinode->mn_link.le_prev = hinode;
 	SLIST_INIT(&hipart->mp_lockops);
-	/*LIST_ENTRY_UNBOUND_INIT(hipart, mp_allparts);*/ /* Initialized below */
+	/*LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);*/ /* Initialized below */
 	DBG_memset(&hipart->mp_changed, 0xcc, sizeof(hipart->mp_changed));
 	hipart->mp_minaddr = 0;
 	hipart->mp_maxaddr = (pos_t)(hisize - 1);
@@ -1221,7 +1220,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			hipart->mp_refcnt = 2; /* +1 for the global list. */
 		mpart_all_list_insert(hipart);
 	} else {
-	    LIST_ENTRY_UNBOUND_INIT(hipart, mp_allparts);
+	    LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);
 		assertf(lopart->mp_flags & MPART_F_NO_GLOBAL_REF,
 		        "How can you have a global ref, but not be part of the global list?");
 	}

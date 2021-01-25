@@ -121,7 +121,7 @@
  * [=============]   -- Sub-API: Check if an element is contained within a list,
  * [=============]               but removal requires *_UNBIND instead of *_REMOVE
  * [1     1 1 1  ]   *_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
- * [1     1 1 1  ]   *_ENTRY_UNBOUND_INIT(elem, key)     -- Runtime initializer for unbound elements
+ * [1     1 1 1  ]   *_ENTRY_UNBOUND_INIT(entry)         -- Runtime initializer for unbound elements
  * [1     1 1 1  ]   *_ISBOUND(elem, key)                -- Returns non-zero if element is bound (to a list)
  * [1         1  ]   *_UNBIND(elem, key)                 -- Remove element and mark as unbound
  * [      1 1    ]   *_UNBIND(self, elem, key)           -- *ditto*
@@ -221,8 +221,7 @@
 #define LIST_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
 #define LIST_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
-#define LIST_ENTRY_UNBOUND_INIT(elem, key)                            (void)(__HYBRID_Q_BADPTR((elem)->key.le_next), (elem)->key.le_prev = __NULLPTR)
-#define LIST_ENTRY_UNBOUND_INIT_P(elem, getpath)                      (void)(__HYBRID_Q_BADPTR(getpath(elem).le_next), getpath(elem).le_prev = __NULLPTR)
+#define LIST_ENTRY_UNBOUND_INIT(entry)                                (void)(__HYBRID_Q_BADPTR((entry)->le_next), (entry)->le_prev = __NULLPTR)
 #define LIST_CLEAR(self)                                              (void)((self)->lh_first = __NULLPTR)
 #define LIST_ISBOUND(elem, key)                                       ((elem)->key.le_prev != __NULLPTR)
 #define LIST_ISBOUND_P(elem, getpath)                                 (getpath(elem).le_prev != __NULLPTR)
@@ -1968,8 +1967,7 @@
 #define TAILQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
 #define TAILQ_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
-#define TAILQ_ENTRY_UNBOUND_INIT(elem, key)                                                  (void)((elem)->key.tqe_prev = __NULLPTR)
-#define TAILQ_ENTRY_UNBOUND_INIT_P(elem, getpath)                                            (void)(getpath(elem).tqe_prev = __NULLPTR)
+#define TAILQ_ENTRY_UNBOUND_INIT(entry)                                                      (void)(__HYBRID_Q_BADPTR((entry)->tqe_next), (entry)->tqe_prev = __NULLPTR)
 #define TAILQ_CLEAR(self)                                                                    (void)(*((self)->tqh_last = &(self)->tqh_first) = __NULLPTR)
 #define TAILQ_ISBOUND(elem, key)                                                             ((elem)->key.tqe_prev != __NULLPTR)
 #define TAILQ_ISBOUND_P(elem, getpath)                                                       (getpath(elem).tqe_prev != __NULLPTR)
@@ -2236,8 +2234,7 @@
 #define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
 #define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
-#define CIRCLEQ_ENTRY_UNBOUND_INIT(elem, key)       (void)((elem)->key.cqe_prev = __NULLPTR)
-#define CIRCLEQ_ENTRY_UNBOUND_INIT_P(elem, getpath) (void)(getpath(elem).cqe_prev = __NULLPTR)
+#define CIRCLEQ_ENTRY_UNBOUND_INIT(entry) (void)(__HYBRID_Q_BADPTR((entry)->cqe_next), (entry)->cqe_prev = __NULLPTR)
 #ifdef __cplusplus
 #define CIRCLEQ_CLEAR(self) (void)((self)->__cqh_first_ptr = (self)->__cqh_last_ptr = (void *)(self))
 #else /* __cplusplus */
@@ -2389,12 +2386,11 @@
 #define RINGQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
 #define RINGQ_ENTRY_UNBOUND_INITIALIZER \
 	{ __NULLPTR, __NULLPTR }
-#define RINGQ_ENTRY_UNBOUND_INIT(elem, key)       (void)((elem)->key.rqe_prev = __NULLPTR)
-#define RINGQ_ENTRY_UNBOUND_INIT_P(elem, getpath) (void)(getpath(elem).rqe_prev = __NULLPTR)
-#define RINGQ_ISBOUND(elem, key)                  ((elem)->key.rqe_prev != __NULLPTR)
-#define RINGQ_ISBOUND_P(elem, getpath)            (getpath(elem).rqe_prev != __NULLPTR)
-#define RINGQ_UNBIND(elem, key)                   __HYBRID_RINGQ_UNBIND(elem, __HYBRID_Q_KEY, key)
-#define RINGQ_UNBIND_P(elem, getpath)             __HYBRID_RINGQ_UNBIND(elem, __HYBRID_Q_PTH, getpath)
+#define RINGQ_ENTRY_UNBOUND_INIT(entry) (void)(__HYBRID_Q_BADPTR((entry)->rqe_next), (entry)->rqe_prev = __NULLPTR)
+#define RINGQ_ISBOUND(elem, key)        ((elem)->key.rqe_prev != __NULLPTR)
+#define RINGQ_ISBOUND_P(elem, getpath)  (getpath(elem).rqe_prev != __NULLPTR)
+#define RINGQ_UNBIND(elem, key)         __HYBRID_RINGQ_UNBIND(elem, __HYBRID_Q_KEY, key)
+#define RINGQ_UNBIND_P(elem, getpath)   __HYBRID_RINGQ_UNBIND(elem, __HYBRID_Q_PTH, getpath)
 
 /* RINGQ_INIT:          Initialize `elem' as the only element of a new ring.
  * RINGQ_NEXT:          Return the successor of `elem' within its ring.

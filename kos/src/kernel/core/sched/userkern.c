@@ -53,6 +53,17 @@
 #endif /* __ARCH_HAVE_COMPAT */
 
 
+#ifdef KERNELSPACE_HIGHMEM
+#define KS_MINADDR ((uintptr_t)KERNELSPACE_BASE)
+#define KS_MAXADDR ((uintptr_t)-1)
+#elif defined(KERNELSPACE_LOWMEM)
+#define KS_MINADDR ((uintptr_t)0)
+#define KS_MAXADDR ((uintptr_t)(KERNELSPACE_END - 1))
+#else /* KERNELSPACE_...MEM */
+#define KS_MINADDR ((uintptr_t)KERNELSPACE_BASE)
+#define KS_MAXADDR ((uintptr_t)(KERNELSPACE_END - 1))
+#endif /* !KERNELSPACE_...MEM */
+
 DECL_BEGIN
 
 /* These 2 functions must be overwritten to implement arch-specific behavior.
@@ -174,7 +185,26 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 #undef INIT_OPERATION_PTR_NULL
 #undef INIT_OPERATION_PTR
 
-PUBLIC struct vm_datapart userkern_segment_part = {
+PUBLIC struct mpart userkern_segment_part = {
+#ifdef CONFIG_USE_NEW_VM
+	/* .mp_refcnt    = */ 1,
+	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
+	/* .mp_state     = */ MPART_ST_VIO,
+	/* .mp_file      = */ { &mfile_ndef },
+	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(userkern_segment_part.mp_copy),
+	/* .mp_share     = */ LIST_HEAD_INITIALIZER(userkern_segment_part.mp_share),
+	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(userkern_segment_part.mp_lockops),
+	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
+	/* .mp_changed   = */ {},
+	/* .mp_minaddr   = */ (pos_t)(0),
+	/* .mp_maxaddr   = */ (pos_t)(KS_MAXADDR - KS_MINADDR),
+	/* .mp_filent    = */ { {} },
+	/* .mp_blkst_ptr = */ { NULL },
+	/* .mp_mem       = */ { {} },
+	/* .mp_meta      = */ NULL
+#else /* CONFIG_USE_NEW_VM */
 	/* .dp_refcnt = */ 1,
 	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 	{
@@ -192,7 +222,7 @@ PUBLIC struct vm_datapart userkern_segment_part = {
 	/* .dp_crefs  = */ LLIST_INIT,
 	/* .dp_srefs  = */ LLIST_INIT,
 	/* .dp_stale  = */ NULL,
-	/* .dp_block  = */ &userkern_segment_block,
+	/* .dp_block  = */ &userkern_segment_file,
 	/* .dp_flags  = */ (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_CHANGED |
 	                    VM_DATAPART_FLAG_KEEPRAM | VM_DATAPART_FLAG_HEAPPPP |
 	                    VM_DATAPART_FLAG_KERNPRT),
@@ -212,17 +242,31 @@ PUBLIC struct vm_datapart userkern_segment_part = {
 		/* .dp_pprop_p = */ 0
 	},
 	/* .dp_futex = */ NULL
+#endif /* !CONFIG_USE_NEW_VM */
 };
 
-PUBLIC struct vm_datablock userkern_segment_block = {
-	/* .db_refcnt = */ 2, /* +1: `userkern_segment_block', +1: `userkern_segment_part.dp_block' */
+
+PUBLIC struct mfile userkern_segment_file = {
+#ifdef CONFIG_USE_NEW_VM
+	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.dp_block' */
+	/* .mf_ops        = */ &mfile_ndef_ops,
+	/* .mf_vio        = */ &userkern_segment_vio,
+	/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,
+	/* .mf_parts      = */ &userkern_segment_part,
+	/* .mf_initdone   = */ SIG_INIT,
+	/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),
+	/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),
+	/* .mf_blockshift = */ PAGESHIFT,
+	/* .mf_part_amask = */ PAGEMASK,
+#else /* CONFIG_USE_NEW_VM */
+	/* .db_refcnt = */ 2,
 	/* .db_lock   = */ RWLOCK_INIT,
 	/* .db_type   = */ &vm_datablock_anonymous_type,
 	/* .db_vio    = */ &userkern_segment_vio,
 	/* .db_parts  = */ &userkern_segment_part,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
+#endif /* !CONFIG_USE_NEW_VM */
 };
-
 
 
 
@@ -304,6 +348,25 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 #undef INIT_OPERATION_PTR
 
 PUBLIC struct vm_datapart userkern_segment_part_compat = {
+#ifdef CONFIG_USE_NEW_VM
+	/* .mp_refcnt    = */ 1,
+	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
+	/* .mp_state     = */ MPART_ST_VIO,
+	/* .mp_file      = */ { &mfile_ndef },
+	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_copy),
+	/* .mp_share     = */ LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_share),
+	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_lockops),
+	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
+	/* .mp_changed   = */ {},
+	/* .mp_minaddr   = */ (pos_t)(0),
+	/* .mp_maxaddr   = */ (pos_t)((((COMPAT_KERNELSPACE_MAXPAGEID - COMPAT_KERNELSPACE_MINPAGEID) + 1) * PAGESIZE) - 1),
+	/* .mp_filent    = */ { {} },
+	/* .mp_blkst_ptr = */ { NULL },
+	/* .mp_mem       = */ { {} },
+	/* .mp_meta      = */ NULL
+#else /* CONFIG_USE_NEW_VM */
 	/* .dp_refcnt = */ 1,
 	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 	{
@@ -321,7 +384,7 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 	/* .dp_crefs  = */ LLIST_INIT,
 	/* .dp_srefs  = */ LLIST_INIT,
 	/* .dp_stale  = */ NULL,
-	/* .dp_block  = */ &userkern_segment_block_compat,
+	/* .dp_block  = */ &userkern_segment_file_compat,
 	/* .dp_flags  = */ (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_CHANGED |
 	                    VM_DATAPART_FLAG_KEEPRAM | VM_DATAPART_FLAG_HEAPPPP |
 	                    VM_DATAPART_FLAG_KERNPRT),
@@ -341,15 +404,29 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 		/* .dp_pprop_p = */ 0
 	},
 	/* .dp_futex = */ NULL
+#endif /* !CONFIG_USE_NEW_VM */
 };
 
-PUBLIC struct vm_datablock userkern_segment_block_compat = {
-	/* .db_refcnt = */ 2, /* +1: `userkern_segment_block', +1: `userkern_segment_part.dp_block' */
+PUBLIC struct vm_datablock userkern_segment_file_compat = {
+#ifdef CONFIG_USE_NEW_VM
+	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.dp_block' */
+	/* .mf_ops        = */ &mfile_ndef_ops,
+	/* .mf_vio        = */ &userkern_segment_vio_compat,
+	/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,
+	/* .mf_parts      = */ &userkern_segment_part_compat,
+	/* .mf_initdone   = */ SIG_INIT,
+	/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),
+	/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),
+	/* .mf_blockshift = */ PAGESHIFT,
+	/* .mf_part_amask = */ PAGEMASK,
+#else /* CONFIG_USE_NEW_VM */
+	/* .db_refcnt = */ 2,
 	/* .db_lock   = */ RWLOCK_INIT,
 	/* .db_type   = */ &vm_datablock_anonymous_type,
 	/* .db_vio    = */ &userkern_segment_vio_compat,
 	/* .db_parts  = */ &userkern_segment_part_compat,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
+#endif /* !CONFIG_USE_NEW_VM */
 };
 #endif /* __ARCH_HAVE_COMPAT */
 

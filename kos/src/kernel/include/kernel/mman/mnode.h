@@ -26,6 +26,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <kernel/paging.h>
+#include <kernel/arch/paging.h> /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 /* Values for `struct mnode::mn_flags' */
 #define MNODE_F_NORMAL    0x0000  /* Normal flags. */
@@ -54,8 +55,8 @@
                                    *         resulting in an `E_BADALLOC' exception. */
 #define MNODE_F_COREPART  0x0100  /* [const] Core part (free this node using `mcoreheap_free()' instead of `kfree()') */
 #define MNODE_F_KERNPART  0x0200  /* [const] This node describes part of the static kernel core and must
-                                   *         not be modified or removed. Attempting to do so anyways will
-                                   *         result in kernel panic. */
+                                   *         not be modified or removed (by conventional means). Attempting
+                                   *         to do so anyways will result in kernel panic. */
 #define MNODE_F_UNMAPPED  0x0400  /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
                                    * NOTE: You should never see this flag on any node still part of an mman's node-tree! */
 #define MNODE_F_MPREPARED 0x0800  /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
@@ -90,6 +91,15 @@
 #define MBNODE_F_POPULATE 0x08000 /* Used internally by `struct mbnode' */
 #define MBNODE_F_NONBLOCK 0x10000 /* Used internally by `struct mbnode' */
 
+
+/* Expand to `MNODE_F_MPREPARED' if kernel-space is automatically prepared.
+ * Otherwise, expand to `0'. May be used by static initializers. */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#define _MNODE_F_MPREPARED_KERNEL 0
+#else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#define _MNODE_F_MPREPARED_KERNEL MNODE_F_MPREPARED
+#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -113,6 +123,24 @@ typedef size_t mpart_reladdr_t;
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported pointer size"
 #endif /* __SIZEOF_POINTER__ != ... */
+
+#if 0 /* Static initializer template: */
+	/* .mn_mement   = */ { {} },
+	/* .mn_minaddr  = */ FILL_ME,
+	/* .mn_maxaddr  = */ FILL_ME - 1,
+	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
+	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
+	/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,
+	/* .mn_part     = */ FILL_ME,
+	/* .mn_fspath   = */ NULL,
+	/* .mn_fsname   = */ NULL,
+	/* .mn_mman     = */ { &mman_kernel },
+	/* .mn_partoff  = */ 0,
+	/* .mn_link     = */ { NULL, FILL_ME },
+	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	/* ._mn_module  = */ NULL
+#endif
 
 struct mnode {
 	/* WARNING: Because mem-nodes aren't reference counter, they are always
@@ -297,6 +325,16 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_removenode)(struct 
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_prevnode)(struct mnode *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_nextnode)(struct mnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, void const *minkey, void const *maxkey, struct mnode_tree_minmax *__restrict result);
+
+/* Helper macros for operating on the mappings tree of a given mman. */
+#define mman_mappings_locate(self, key)                          mnode_tree_locate((self)->mm_mappings, key)
+#define mman_mappings_rlocate(self, minkey, maxkey)              mnode_tree_rlocate((self)->mm_mappings, minkey, maxkey)
+#define mman_mappings_insert(self, node)                         mnode_tree_insert(&(self)->mm_mappings, node)
+#define mman_mappings_tryinsert(self, node)                      mnode_tree_tryinsert(&(self)->mm_mappings, node)
+#define mman_mappings_remove(self, key)                          mnode_tree_remove(&(self)->mm_mappings, key)
+#define mman_mappings_rremove(self, minkey, maxkey)              mnode_tree_rremove(&(self)->mm_mappings, minkey, maxkey)
+#define mman_mappings_removenode(self, node)                     mnode_tree_removenode(&(self)->mm_mappings, node)
+#define mman_mappings_minmaxlocate(self, minkey, maxkey, result) mnode_tree_minmaxlocate((self)->mm_mappings, minkey, maxkey, result)
 
 
 /* A special per-MMAN node that is used to cover the kernel core

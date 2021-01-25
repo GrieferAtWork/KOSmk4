@@ -170,8 +170,17 @@ DATDEF struct heap kernel_default_heap; /* == &kernel_heaps[GFP_NORMAL] */
 DATDEF struct heap kernel_locked_heap;  /* == &kernel_heaps[GFP_LOCKED] */
 
 #ifdef CONFIG_DEBUG_HEAP
+#ifndef CONFIG_USE_NEW_VM
 DATDEF struct vm_datablock_type vm_datablock_debugheap_type;
 DATDEF struct vm_datablock vm_datablock_debugheap;
+#define mfile_dbgheap_ops vm_datablock_debugheap_type
+#define mfile_dbgheap     vm_datablock_debugheap
+#else /* !CONFIG_USE_NEW_VM */
+DATDEF struct mfile_ops const mfile_dbgheap_ops;
+DATDEF struct mfile /*     */ mfile_dbgheap;
+#define vm_datablock_debugheap_type mfile_dbgheap_ops
+#define vm_datablock_debugheap      mfile_dbgheap
+#endif /* !CONFIG_USE_NEW_VM */
 #endif /* CONFIG_DEBUG_HEAP */
 
 

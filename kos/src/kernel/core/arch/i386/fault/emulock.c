@@ -253,7 +253,7 @@ handle_vio_or_not_faulted:
 			}
 		}
 #ifdef LIBVIO_CONFIG_ENABLED
-		node_minaddr = vm_node_getmin(node);
+		node_minaddr = vm_node_getminaddr(node);
 		block        = incref(node->vn_block);
 		part         = xincref(node->vn_part);
 #endif /* LIBVIO_CONFIG_ENABLED */

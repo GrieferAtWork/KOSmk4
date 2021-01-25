@@ -1973,16 +1973,16 @@ directory_getnode(struct directory_node *__restrict self,
 	struct directory_entry *entry;
 	REF struct inode *result;
 again:
-	rwlock_read(&self->db_lock);
+	rwlock_read(__inode_lock(self));
 	TRY {
 		/* Load a reference to the entry. */
 		entry = directory_getentry(self, name, namelen, hash);
 	} EXCEPT {
-		if (rwlock_endread(&self->db_lock))
+		if (rwlock_endread(__inode_lock(self)))
 			goto again;
 		RETHROW();
 	}
-	rwlock_endread(&self->db_lock);
+	rwlock_endread(__inode_lock(self));
 	if (!entry)
 		return NULL;
 	TRY {
@@ -2010,16 +2010,16 @@ directory_getcasenode(struct directory_node *__restrict self,
 	struct directory_entry *entry;
 	REF struct inode *result;
 again:
-	rwlock_read(&self->db_lock);
+	rwlock_read(__inode_lock(self));
 	TRY {
 		/* Load a reference to the entry. */
 		entry = directory_getcaseentry(self, name, namelen, hash);
 	} EXCEPT {
-		if (rwlock_endread(&self->db_lock))
+		if (rwlock_endread(__inode_lock(self)))
 			goto again;
 		RETHROW();
 	}
-	rwlock_endread(&self->db_lock);
+	rwlock_endread(__inode_lock(self));
 	if (!entry)
 		return NULL;
 	TRY {
@@ -2269,7 +2269,7 @@ directory_remove(struct directory_node *__restrict self,
 	if (premoved_path)
 		*premoved_path = NULL;
 again:
-	rwlock_read(&self->db_lock);
+	rwlock_read(__inode_lock(self));
 	TRY {
 		inode_check_deleted(self, E_FILESYSTEM_DELETED_PATH);
 		pentry = (mode & DIRECTORY_REMOVE_FNOCASE) ? directory_getcaseentry_p(self, name, namelen, hash, &oneshot_entry)
@@ -2471,11 +2471,11 @@ again:
 		}
 		xdecref(oneshot_entry);
 	} EXCEPT {
-		if (rwlock_endread(&self->db_lock))
+		if (rwlock_endread(__inode_lock(self)))
 			goto again;
 		RETHROW();
 	}
-	rwlock_endread(&self->db_lock);
+	rwlock_endread(__inode_lock(self));
 	/* Pass inheritable data to the caller. */
 	if (premoved_inode) {
 		*premoved_inode = node;
@@ -2493,7 +2493,7 @@ again:
 	}
 	return result;
 unlock_directory_and_start_again:
-	rwlock_endread(&self->db_lock);
+	rwlock_endread(__inode_lock(self));
 	decref(node);
 	xdecref(oneshot_entry);
 	task_yield();
@@ -3310,8 +3310,8 @@ NOTHROW(KCALL inode_set_closed)(struct inode *__restrict self) {
 	 * Any piece of code that won't understand this part will
 	 * just have to deal with a sporadic wake-up, which is
 	 * allowed to happen irregardless. */
-	sig_broadcast(&self->db_lock.rw_chmode);
-	sig_broadcast(&self->db_lock.rw_unshare);
+	sig_broadcast(&__inode_lock(self)->rw_chmode);
+	sig_broadcast(&__inode_lock(self)->rw_unshare);
 }
 
 LOCAL NOBLOCK NONNULL((1)) void
@@ -4057,16 +4057,7 @@ check_result_for_deletion:
 		}
 
 		/* Initialize common INode members. */
-		result->db_refcnt = 1;
-		rwlock_cinit(&result->db_lock);
-		result->db_type      = &inode_datablock_type;
-		result->db_pageshift = self->db_pageshift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-		result->db_addrshift = self->db_addrshift;
-		result->db_pagealign = self->db_pagealign;
-		result->db_pagemask  = self->db_pagemask;
-		result->db_pagesize  = self->db_pagesize;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+		__inode_cinit_base(result, self->mf_blockshift);
 		result->i_super    = (struct superblock *)incref(self);
 		result->i_heapsize = resptr.hp_siz;
 #if INODE_FNORMAL != 0
@@ -4384,10 +4375,18 @@ superblock_open(struct superblock_type *__restrict type,
 		TRY {
 			assert(resptr.hp_siz >= type->st_sizeof_superblock);
 
-			result            = (struct superblock *)resptr.hp_ptr;
-			result->db_refcnt = 1;
-			rwlock_cinit(&result->db_lock);
-			result->db_type     = &inode_datablock_type;
+			result = (struct superblock *)resptr.hp_ptr;
+			result->mf_refcnt = 1;
+			result->mf_ops      = &inode_datablock_type;
+#ifdef CONFIG_USE_NEW_VM
+			atomic_rwlock_cinit(&result->mf_lock);
+			assert(result->mf_vio == NULL);
+			assert(result->mf_parts == NULL);
+			sig_cinit(&result->mf_initdone);
+			assert(SLIST_EMPTY(&result->mf_deadparts));
+			assert(SLIST_EMPTY(&result->mf_changed));
+#endif /* CONFIG_USE_NEW_VM */
+			rwlock_cinit(__inode_lock(result));
 			result->i_super     = result;
 			result->i_heapsize  = resptr.hp_siz;
 			result->i_filemode  = S_IFDIR;
@@ -4458,12 +4457,14 @@ superblock_open(struct superblock_type *__restrict type,
 		assert(result->db_refcnt != 0);
 		assert(result->i_type != NULL);
 		assert(result->s_type == type);
+#ifndef CONFIG_USE_NEW_VM
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 		result->db_addrshift = PAGESHIFT - result->db_pageshift;
 		result->db_pagealign = (size_t)1 << result->db_pageshift;
 		result->db_pagemask  = result->db_pagealign - 1;
 		result->db_pagesize  = (size_t)PAGESIZE >> result->db_pageshift;
 #endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+#endif /* !CONFIG_USE_NEW_VM */
 		/* Add the new superblock to the chain of known file-systems. */
 		OLD_SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);
 	} EXCEPT {
@@ -4606,7 +4607,11 @@ db_inode_loadpart(struct inode *__restrict self, datapage_t start,
 		size_t num_bytes;
 		pos_t daddr, filesize;
 		struct aio_multihandle_generic hand;
-		daddr     = VM_DATABLOCK_DPAGE2DADDR(self, start);
+#ifdef CONFIG_USE_NEW_VM
+		daddr = (pos_t)start << self->mf_blockshift;
+#else /* CONFIG_USE_NEW_VM */
+		daddr = VM_DATABLOCK_DPAGE2DADDR(self, start);
+#endif /* !CONFIG_USE_NEW_VM */
 		num_bytes = num_data_pages << VM_DATABLOCK_ADDRSHIFT(self);
 		filesize  = self->i_filesize;
 		COMPILER_READ_BARRIER();
@@ -4656,7 +4661,11 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 		size_t num_bytes;
 		pos_t daddr, filesize;
 		struct aio_multihandle_generic hand;
-		daddr     = VM_DATABLOCK_DPAGE2DADDR(self, start);
+#ifdef CONFIG_USE_NEW_VM
+		daddr = (pos_t)start << self->mf_blockshift;
+#else /* CONFIG_USE_NEW_VM */
+		daddr = VM_DATABLOCK_DPAGE2DADDR(self, start);
+#endif /* !CONFIG_USE_NEW_VM */
 		num_bytes = num_data_pages << VM_DATABLOCK_ADDRSHIFT(self);
 		filesize  = self->i_filesize;
 		COMPILER_READ_BARRIER();
@@ -4687,9 +4696,9 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 	}
 }
 
-PRIVATE NONNULL((1, 2)) void KCALL
-db_inode_changed(struct inode *__restrict self,
-                 struct vm_datapart *__restrict UNUSED(part)) {
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL db_inode_changed)(struct inode *__restrict self,
+                                struct mpart *__restrict UNUSED(part)) {
 	inode_changed(self, INODE_FCHANGED);
 }
 

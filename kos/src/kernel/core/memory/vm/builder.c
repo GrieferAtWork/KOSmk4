@@ -359,7 +359,7 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 	struct vm_node **pinsert, *insert_before;
 	assertf(vm_node_getminpageid(node) <= vm_node_getmaxpageid(node),
 	        "Unordered node: MIN(%p) >= MAX(%p)",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(vm_node_getmaxpageid(node) <= __ARCH_PAGEID_MAX,
 	        "Mapping of node covering pages %p...%p is out-of-bounds",
 	        vm_node_getminpageid(node), vm_node_getmaxpageid(node));
@@ -383,11 +383,11 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 	        "node           = %p:%p...%p\n"
 	        "node->vn_flags = %#x\n",
 	        insert_before,
-	        vm_node_getmin(insert_before),
-	        vm_node_getmax(insert_before),
+	        vm_node_getminaddr(insert_before),
+	        vm_node_getmaxaddr(insert_before),
 	        node,
-	        vm_node_getmin(node),
-	        vm_node_getmax(node),
+	        vm_node_getminaddr(node),
+	        vm_node_getmaxaddr(node),
 	        (unsigned int)node->vn_flags);
 	/* Insert the node before `insert' at `pinsert' */
 	node->vn_byaddr.ln_pself = pinsert;
@@ -905,8 +905,8 @@ handle_remove_write_error:
 					LLIST_INSERT(node->vn_part->dp_crefs, node, vn_link);
 				}
 				printk(KERN_DEBUG "Map %p...%p against 1 data part\n",
-				       vm_node_getmin(node),
-				       vm_node_getmax(node));
+				       vm_node_getminaddr(node),
+				       vm_node_getmaxaddr(node));
 			} while ((node = node->vn_byaddr.ln_next) != NULL);
 		}
 
@@ -943,7 +943,7 @@ handle_remove_write_error:
 		 */
 #if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_USERKERN_SEGMENT)
 		if (target->v_kernreserve.vn_part == &userkern_segment_part_compat) {
-			assert(target->v_kernreserve.vn_block == &userkern_segment_block_compat);
+			assert(target->v_kernreserve.vn_block == &userkern_segment_file_compat);
 #ifdef KERNELSPACE_HIGHMEM
 #if defined(COMPAT_KERNELSPACE_BASE) && COMPAT_KERNELSPACE_BASE != KERNELSPACE_BASE
 			target->v_kernreserve.vn_node.a_vmin = KERNELSPACE_MINPAGEID;
@@ -956,7 +956,7 @@ handle_remove_write_error:
 #endif /* COMPAT_KERNELSPACE_END && COMPAT_KERNELSPACE_END != KERNELSPACE_END */
 #endif /* !KERNELSPACE_HIGHMEM */
 			target->v_kernreserve.vn_part  = &userkern_segment_part;
-			target->v_kernreserve.vn_block = &userkern_segment_block;
+			target->v_kernreserve.vn_block = &userkern_segment_file;
 		}
 #endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
 

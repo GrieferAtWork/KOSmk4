@@ -1583,7 +1583,7 @@ next_pid:
 	pid->tp_refcnt = 1;
 	xatomic_weaklyref_init(&pid->tp_thread, self);
 	sig_init(&pid->tp_changed);
-	LIST_ENTRY_UNBOUND_INIT(pid, tp_siblings);
+	LIST_ENTRY_UNBOUND_INIT(&pid->tp_siblings);
 	pid->tp_pidns = incref(ns);
 	COMPILER_WRITE_BARRIER();
 

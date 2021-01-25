@@ -285,8 +285,8 @@ NOTHROW(KCALL pmemzone_init_bits)(struct pmemzone *__restrict self,
 
 
 /* VM part/node for describing the page data structures */
-INTDEF struct vm_datapart kernel_vm_part_pagedata;
-INTDEF struct vm_node kernel_vm_node_pagedata;
+INTDEF struct mpart kernel_meminfo_mpart;
+INTDEF struct mnode kernel_meminfo_mnode;
 
 #if defined(__i386__) || defined(__x86_64__)
 INTDEF byte_t __kernel_start[];
@@ -491,19 +491,24 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	 * pages, as it would otherwise go unused forever, since page_malloc()
 	 * is not capable of allocating sub-page memory. */
 	req_pages = CEILDIV(req_bytes, PAGESIZE);
-	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start = minfo_allocate_part_pagedata(req_bytes);
+	kernel_meminfo_mpart.mp_mem.mc_start = minfo_allocate_part_pagedata(req_bytes);
 	printk(FREESTR(KERN_DEBUG "[mem] Allocate paging control structures at "
 	                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
 	                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) " "
 	                          "(%" PRIuSIZ " bytes in %" PRIuSIZ " pages)\n"),
-	       (physaddr_t)(physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start)),
-	       (physaddr_t)(physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1),
+	       (physaddr_t)(physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start)),
+	       (physaddr_t)(physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start) + req_bytes - 1),
 	       req_bytes, req_pages);
-	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size = req_pages;
-	kernel_vm_part_pagedata.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
-	buffer = (byte_t *)(KERNEL_CORE_BASE + physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
-	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(buffer);
-	kernel_vm_node_pagedata.vn_node.a_vmax = kernel_vm_node_pagedata.vn_node.a_vmin + req_pages - 1;
+	kernel_meminfo_mpart.mp_mem.mc_size = req_pages;
+#ifdef CONFIG_USE_NEW_VM
+	kernel_meminfo_mpart.mp_maxaddr = (pos_t)((req_pages * PAGESIZE) - 1);
+#else /* CONFIG_USE_NEW_VM */
+	kernel_meminfo_mpart.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
+#endif /* !CONFIG_USE_NEW_VM */
+	buffer = (byte_t *)(KERNEL_CORE_BASE + physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start));
+	vm_node_setminaddr(&kernel_meminfo_mnode, buffer);
+	vm_node_setmaxaddr(&kernel_meminfo_mnode, buffer + (req_pages * PAGESIZE) - 1);
+
 	/* With the required buffer now allocated, we can move on to populating it with data.
 	 * NOTE: Since `minfo_allocate_part_pagedata()' only changed pages marked as `PMEMBANK_TYPE_RAM'
 	 *       to become `PMEMBANK_TYPE_ALLOCATED', both of which have the same properties when it
@@ -638,14 +643,14 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* Now just allocate the last part as the relocated memory information vector. */
 	minfo.mb_banks = (struct pmembank *)buffer;
 	assertf((buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank)) <=
-	        ((byte_t *)vm_node_getstart(&kernel_vm_node_pagedata) + req_bytes),
+	        ((byte_t *)vm_node_getaddr(&kernel_meminfo_mnode) + req_bytes),
 	        "Too little memory allocated for memory construct structures\n"
 	        "buffer     = %p\n"
 	        "buffer_min = %p\n"
 	        "buffer_max = %p\n",
 	        buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank),
-	        vm_node_getstart(&kernel_vm_node_pagedata),
-	        (byte_t *)vm_node_getstart(&kernel_vm_node_pagedata) + req_bytes - 1);
+	        vm_node_getaddr(&kernel_meminfo_mnode),
+	        (byte_t *)vm_node_getaddr(&kernel_meminfo_mnode) + req_bytes - 1);
 	memcpy(buffer, kernel_membanks_initial,
 	       minfo.mb_bankc + 1,
 	       sizeof(struct pmembank));
@@ -675,7 +680,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	byte_t *dest, *old_addr;
 	ptrdiff_t relocation_offset;
 	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
-	num_bytes = vm_node_getsize(&kernel_vm_node_pagedata);
+	num_bytes = vm_node_getsize(&kernel_meminfo_mnode);
 	dest = (byte_t *)vm_getfree(&vm_kernel,
 	                            HINT_GETADDR(KERNEL_VMHINT_PHYSINFO),
 	                            num_bytes, PAGESIZE,
@@ -688,20 +693,12 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	       dest, dest + num_bytes - 1);
 
 	/* Pop the node concerning the memory information, so we can modify it. */
-#ifdef NDEBUG
-	vm_paged_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
-#else /* NDEBUG */
-	{
-		struct vm_node *node;
-		node = vm_paged_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
-		assert(node == &kernel_vm_node_pagedata);
-	}
-#endif /* !NDEBUG */
-	old_addr = (byte_t *)vm_node_getstart(&kernel_vm_node_pagedata);
+	mman_mappings_removenode(&mman_kernel, &kernel_meminfo_mnode);
+	old_addr = (byte_t *)vm_node_getaddr(&kernel_meminfo_mnode);
 	relocation_offset = dest - old_addr;
-	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(dest);
-	kernel_vm_node_pagedata.vn_node.a_vmax = PAGEID_ENCODE(dest + num_bytes - 1);
-	vm_node_insert(&kernel_vm_node_pagedata);
+	vm_node_setminaddr(&kernel_meminfo_mnode, dest);
+	vm_node_setmaxaddr(&kernel_meminfo_mnode, dest + num_bytes - 1);
+	vm_node_insert(&kernel_meminfo_mnode);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if unlikely(!pagedir_prepare_map(dest, num_bytes)) {
 		kernel_panic(FREESTR("Failed to prepare VM for relocated memory "
@@ -710,11 +707,11 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 		return;
 	}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	assert(vm_datapart_numdpages(&kernel_vm_part_pagedata) == num_bytes / PAGESIZE);
-	assert(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size == num_bytes / PAGESIZE);
+	assert(vm_datapart_numbytes(&kernel_meminfo_mpart) == num_bytes);
+	assert(kernel_meminfo_mpart.mp_mem.mc_size == num_bytes / PAGESIZE);
 	/* Create a new page directory mapping. */
 	pagedir_map(dest, num_bytes,
-	            physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
+	            physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start),
 	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_map(dest, num_bytes);

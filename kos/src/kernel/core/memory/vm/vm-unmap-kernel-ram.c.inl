@@ -473,17 +473,17 @@ again:
 	        (byte_t *)addr, (byte_t *)addr + num_bytes - 1);
 	assertf(!(node->vn_flags & VM_NODE_FLAG_KERNPRT),
 	        "Attempted to unmap node at %p...%p, which is part of the kernel core",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(node->vn_prot & VM_PROT_SHARED,
 	        "Attempted to unmap copy-on-write node at %p...%p as RAM (RAM nodes must be shared mappings)",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(node->vn_flags & VM_NODE_FLAG_PREPARED,
 	        "Attempted to unmap unprepared node at %p...%p as RAM "
 	        "(RAM nodes must remain prepared for the duration of their lifetime)",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(node->vn_vm == &vm_kernel,
 	        "Kernel-space node at %p...%p has a corrupt VM pointer (%p != %p)",
-	        vm_node_getmin(node), vm_node_getmax(node),
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node),
 	        node->vn_vm, &vm_kernel);
 	/* Check if the unmap request was split across multiple nodes. */
 	effective_pages = num_pages;
@@ -492,20 +492,20 @@ again:
 	part = node->vn_part;
 	assertf(part->dp_crefs == NULL,
 	        "Datapart backing anonymous kernel-space node at %p...%p has copy-on-write references",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(part->dp_srefs == node && node->vn_link.ln_next == NULL,
 	        "Datapart backing anonymous kernel-space node at %p...%p is shared by other nodes",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(node->vn_link.ln_pself == &part->dp_srefs,
 	        "Corrupted datalink self-pointer in anonymous kernel-space node at %p...%p",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(!(part->dp_flags & VM_DATAPART_FLAG_KERNPRT),
 	        "Attempted to unmap kernel-space node at %p...%p, backed "
 	        "by a data part referring to a part of the kernel core",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(part->dp_block->db_parts == VM_DATABLOCK_ANONPARTS,
 	        "Cannot unmap non-anonymous kernel-space node at %p...%p as RAM",
-	        vm_node_getmin(node), vm_node_getmax(node));
+	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(part->dp_tree.a_vmin == 0,
 	        "Data parts must be allocated with offset=0 to be usable as RAM\n"
 	        "part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
@@ -532,7 +532,7 @@ again:
 				refcnt_t refcnt;
 				refcnt = ATOMIC_FETCHDEC(part->dp_refcnt);
 				assertf(refcnt != 0, "Part %p of node %p at %p-%p was already destroyed",
-				        part, node, vm_node_getmin(node), vm_node_getmax(node));
+				        part, node, vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 				if (refcnt == 1)
 					vm_datapart_destroy(part, is_zero);
 			}

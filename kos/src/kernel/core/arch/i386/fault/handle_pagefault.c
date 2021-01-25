@@ -759,8 +759,8 @@ do_handle_iob_node_access:
 				 * To prevent the possibility of repeating the access to the IOB vector during
 				 * this check (in case a bad jump caused IP to end up within the IOB vector),
 				 * also make sure that `pc' isn't apart of said vector! */
-				if ((byte_t const *)pc >= vm_node_getmin(mf.mfl_node) &&
-				    (byte_t const *)pc <= vm_node_getmax(mf.mfl_node))
+				if ((byte_t const *)pc >= vm_node_getminaddr(mf.mfl_node) &&
+				    (byte_t const *)pc <= vm_node_getmaxaddr(mf.mfl_node))
 					goto pop_connections_and_throw_segfault;
 				/* If we got here cause of an I/O instruction, just return to the caller and
 				 * have them attempt the access once again, hopefully without accessing  */
@@ -807,7 +807,7 @@ do_handle_iob_node_access:
 				RETHROW();
 			}
 			args.vea_args.va_file = incref(args.vea_args.va_part->mp_file);
-			args.vea_args.va_ops  = args.vea_args.va_file->mf_ops->mo_vio;
+			args.vea_args.va_ops  = mfile_getvio(args.vea_args.va_file);
 			mpart_lock_release(args.vea_args.va_part);
 
 			/* Ensure that VIO operators are present. */
@@ -952,7 +952,7 @@ do_normal_vio:
 					real_ss = icpustate32_getkernelss(args.vea_args.va_state);
 				if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
 					real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
-				regload_area = (u32 *)vm_node_getstart(THIS_KERNEL_STACK);
+				regload_area = (u32 *)vm_node_getaddr(THIS_KERNEL_STACK);
 				/* Fill in the register save area to match what's going to
 				 * get loaded by `x86_vio_kernel_esp_bootstrap_loader()' */
 				regload_area[0] = real_ss;
@@ -1405,7 +1405,7 @@ again_lookup_node:
 #endif /* !NDEBUG */
 								node->vn_node.a_vmin = PAGEID_ENCODE(COMPAT_KERNELSPACE_BASE);
 								node->vn_part  = &userkern_segment_part_compat;
-								node->vn_block = &userkern_segment_block_compat;
+								node->vn_block = &userkern_segment_file_compat;
 								assert(node->vn_fspath == NULL);
 								assert(node->vn_fsname == NULL);
 								/* Re-insert the node and continue operating as if we'd found
@@ -1526,8 +1526,8 @@ do_handle_iob_node_access:
 					 * To prevent the possibility of repeating the access to the IOB vector during
 					 * this check (in case a bad jump caused IP to end up within the IOB vector),
 					 * also make sure that `pc' isn't apart of said vector! */
-					if (pc >= (uintptr_t)vm_node_getmin(node) &&
-					    pc <= (uintptr_t)vm_node_getmax(node))
+					if (pc >= (uintptr_t)vm_node_getminaddr(node) &&
+					    pc <= (uintptr_t)vm_node_getmaxaddr(node))
 						goto pop_connections_and_throw_segfault;
 					/* If we got here cause of an I/O instruction, just return to the caller and
 					 * have them attempt the access once again, hopefully without accessing  */
@@ -1734,7 +1734,7 @@ do_normal_vio:
 							real_ss = icpustate32_getkernelss(args.vea_args.va_state);
 						if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
 							real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
-						regload_area = (u32 *)vm_node_getstart(THIS_KERNEL_STACK);
+						regload_area = (u32 *)vm_node_getaddr(THIS_KERNEL_STACK);
 						/* Fill in the register save area to match what's going to
 						 * get loaded by `x86_vio_kernel_esp_bootstrap_loader()' */
 						regload_area[0] = real_ss;

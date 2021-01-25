@@ -158,7 +158,7 @@ handle_path_pollconnect(struct path *__restrict self,
 		node = (REF struct inode *)incref(self->p_inode);
 		sync_endread(self);
 		FINALLY_DECREF_UNLIKELY(node);
-		rwlock_pollconnect(&node->db_lock);
+		rwlock_pollconnect(__inode_lock(node));
 	}
 }
 
@@ -171,10 +171,10 @@ handle_path_polltest(struct path *__restrict self,
 	node = (REF struct inode *)incref(self->p_inode);
 	sync_endread(self);
 	if (what & POLLOUTMASK) {
-		if (rwlock_canwrite(&node->db_lock))
+		if (rwlock_canwrite(__inode_lock(node)))
 			result = POLLOUTMASK | POLLINMASK;
 	} else if (what & POLLINMASK) {
-		if (rwlock_canread(&node->db_lock))
+		if (rwlock_canread(__inode_lock(node)))
 			result = POLLINMASK;
 	}
 	decref(node);

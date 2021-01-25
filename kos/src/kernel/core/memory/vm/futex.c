@@ -532,7 +532,7 @@ again:
 		      addr,
 		      E_SEGFAULT_CONTEXT_FAULT);
 	}
-	node_minaddr = vm_node_getmin(node);
+	node_minaddr = vm_node_getminaddr(node);
 	incref(part);
 	sync_endread(effective_vm);
 	{
@@ -569,7 +569,7 @@ again:
 		      addr,
 		      E_SEGFAULT_CONTEXT_FAULT);
 	}
-	node_minaddr = vm_node_getmin(node);
+	node_minaddr = vm_node_getminaddr(node);
 	incref(part);
 	sync_endread(effective_vm);
 	{

@@ -794,7 +794,7 @@ unlock_and_nope:
 	map_inode_path   = xincref(node->vn_fspath);
 	map_inode_name   = xincref(node->vn_fsname);
 	map_inode_offset = vm_datapart_startbyte(node->vn_part);
-	map_inode_addr   = vm_node_getstart(node);
+	map_inode_addr   = vm_node_getaddr(node);
 	sync_endread(self);
 	/* Construct the usermod object. */
 	result = usermod_create_from_mapping(self,
@@ -1085,7 +1085,7 @@ again:
 				map_inode_path   = xincref(node->vn_fspath);
 				map_inode_name   = xincref(node->vn_fsname);
 				map_inode_offset = vm_datapart_startbyte(node->vn_part);
-				map_inode_addr   = vm_node_getstart(node);
+				map_inode_addr   = vm_node_getaddr(node);
 				sync_endread(self);
 				/* Try to construct a usermod from the mapping we've found. */
 				new_result = usermod_create_from_mapping(self,

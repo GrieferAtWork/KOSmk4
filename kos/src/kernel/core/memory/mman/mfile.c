@@ -629,9 +629,9 @@ mfile_private_makepart(struct mfile *__restrict self,
 	result->mp_minaddr = addr;
 	result->mp_maxaddr = addr + num_bytes - 1;
 	result->mp_meta    = NULL;
-	if (self->mf_ops->mo_vio) {
+	if (mfile_getvio(self) != NULL) {
 		result->mp_state = MPART_ST_VIO;
-		LIST_ENTRY_UNBOUND_INIT(result, mp_allparts);
+		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 		result->mp_blkst_ptr = NULL;
 	} else {
 		size_t num_blocks;
@@ -754,7 +754,7 @@ again_locate:
 	/* Construct the new part. */
 	result = mfile_private_makepart(self, addr, max_num_bytes);
 	TRY {
-again_lock_after_result_created:
+/*again_lock_after_result_created:*/
 		mfile_lock_write(self);
 		/* Make sure that nothing else appeared in the mean time. */
 		if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS) {
@@ -795,7 +795,7 @@ again_lock_after_result_created:
 	}
 	/* The insert failed because of an overlap. */
 	mfile_lock_endwrite(self);
-	LIST_ENTRY_UNBOUND_INIT(result, mp_allparts);
+	LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 	destroy(result);
 	goto again_locate;
 }
@@ -848,14 +848,14 @@ memfile_phys_initpart(struct mfile *__restrict UNUSED(self),
 	DEFINE_PUBLIC_SYMBOL(mfile_zero_ops, &mfile_anon_ops[PAGESHIFT], sizeof(struct mfile_ops));
 }
 
-PUBLIC struct mfile_ops const mfile_phys_ops = {
+PUBLIC_CONST struct mfile_ops const mfile_phys_ops = {
 	/* .mo_destroy    = */ NULL,
 	/* .mo_initpart   = */ &memfile_phys_initpart,
 	/* .mo_loadblocks = */ NULL,
 	/* .mo_saveblocks = */ NULL,
 };
 
-PUBLIC struct mfile_ops const mfile_ndef_ops = {
+PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
 	/* .mo_destroy    = */ NULL,
 	/* .mo_initpart   = */ NULL,
 	/* .mo_loadblocks = */ NULL,

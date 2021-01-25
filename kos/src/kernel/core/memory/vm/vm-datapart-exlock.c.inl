@@ -407,9 +407,9 @@ again_scan_nodes:
 				/* Must re-prepare the address range before we
 				 * can safely load new physical memory targets. */
 				if unlikely(!(node->vn_vm == v || node->vn_vm == &vm_kernel
-				              ? pagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
+				              ? pagedir_prepare_map(vm_node_getaddr(node), vm_node_getsize(node))
 				              : pagedir_prepare_map_p(node->vn_vm->v_pdir_phys,
-				                                      vm_node_getstart(node),
+				                                      vm_node_getaddr(node),
 				                                      vm_node_getsize(node)))) {
 					vm_set_lockendwrite_all(&vms);
 #ifdef EXLOCK_NX
@@ -437,15 +437,15 @@ again_scan_nodes:
 				if (node->vn_vm != &vm_kernel)
 					perm |= PAGEDIR_MAP_FUSER;
 				if (node->vn_vm == v || node->vn_vm == &vm_kernel) {
-					vm_datapart_map_ram_autoprop(copy, vm_node_getstart(node), perm);
+					vm_datapart_map_ram_autoprop(copy, vm_node_getaddr(node), perm);
 				} else {
 					vm_datapart_map_ram_autoprop_p(copy,
 					                               node->vn_vm->v_pdir_phys,
-					                               vm_node_getstart(node),
+					                               vm_node_getaddr(node),
 					                               perm);
 				}
 				vm_sync(node->vn_vm,
-				        vm_node_getstart(node),
+				        vm_node_getaddr(node),
 				        vm_node_getsize(node));
 			} while ((node = node->vn_link.ln_next) != NULL);
 

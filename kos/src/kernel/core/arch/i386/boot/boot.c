@@ -207,7 +207,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Initialize SMP.
 	 * NOTE: This must be done while the physical identity mapping is still
-	 *       in effect (aka: before `x86_initialize_kernel_vm()' is called)
+	 *       in effect (aka: before `x86_initialize_mman_kernel()' is called)
 	 *       Additionally, do this before memory zones have been finalized,
 	 *       so we can manually add SMP descriptor memory regions as available
 	 *       physical memory, while still preventing them from being overwritten
@@ -268,11 +268,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the kernel, which was left in tact until this point in order to
 	 *       simplify initialization of SMP control structures (or anything
 	 *       left in physical memory below the 1GiB mark). */
-	x86_initialize_kernel_vm();
+	x86_initialize_mman_kernel();
 
 	/* Load generic text alternatives.
-	 * Must happen after `x86_initialize_kernel_vm', since this one checks for
-	 * the presence of a LAPIC, which gets mapped in `x86_initialize_kernel_vm()' */
+	 * Must happen after `x86_initialize_mman_kernel', since this one checks for
+	 * the presence of a LAPIC, which gets mapped in `x86_initialize_mman_kernel()' */
 	x86_initialize_alternatives();
 
 	/* Relocate memory information into higher memory, moving it away from
@@ -305,7 +305,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 #endif /* CONFIG_FPU */
 
 	/* Make the kernel's .text and .rodata sections read-only. */
-	x86_initialize_kernel_vm_readonly();
+	x86_initialize_mman_kernel_rdonly();
 
 	/* Initialize the PID sub-system for the boot task. */
 	kernel_initialize_bootpid();

@@ -68,11 +68,11 @@
                                        * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The backing block-state bitset exists in-line. */
-/*efine MPART_F_               0x0020  * ... */
+#define MPART_F_NO_FREE        0x0020 /* [const] Don't page_free() backing physical memory or swap. */
 #define MPART_F_NO_SPLIT       0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
                                        *         then the attempt will instead result in kernel panic. Similarly,
                                        *         this flag also prevents the part from being merged. */
-#define MPART_F_NO_FREE        0x0080 /* [const] Don't page_free() backing physical memory or swap. */
+#define MPART_F_NO_MERGE       0x0080 /* [const] Don't allow this mem-part to be merged. */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 /*efine MPART_F_               0x0200  * ... */
 /*efine MPART_F_               0x0400  * ... */
@@ -174,6 +174,29 @@ struct mpart_lockop {
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported pointer size"
 #endif /* __SIZEOF_POINTER__ != ... */
+
+#if 0 /* Static initializer template: */
+	/* .mp_refcnt    = */ FILLME,
+	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
+	/* .mp_state     = */ MPART_ST_MEM,
+	/* .mp_file      = */ { &mfile_ndef },
+	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(FILLME.mp_copy),
+	/* .mp_share     = */ LIST_HEAD_INITIALIZER(FILLME.mp_share),
+	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(FILLME.mp_lockops),
+	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
+	/* .mp_changed   = */ {},
+	/* .mp_minaddr   = */ (pos_t)0,
+	/* .mp_maxaddr   = */ (pos_t)FILLME - 1,
+	/* .mp_filent    = */ { {} },
+	/* .mp_blkst_ptr = */ { NULL },
+	/* .mp_mem       = */ { {
+		/* .mc_start = */ (physpage_t)FILLME,
+		/* .mc_size  = */ CEILDIV(FILLME, PAGESIZE),
+	} },
+	/* .mp_meta      = */ NULL
+#endif
 
 struct mpart {
 	WEAK refcnt_t                 mp_refcnt;    /* Reference counter. */
@@ -359,6 +382,8 @@ mpart_lock_acquire_nx(struct mpart *__restrict self) {
 }
 #define mpart_lock_acquired(self)  (__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT)
 #define mpart_lock_available(self) (!(__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
+
+/*
 __DEFINE_SYNC_MUTEX(struct mpart,
                     mpart_lock_tryacquire,
                     mpart_lock_acquire,
@@ -366,6 +391,7 @@ __DEFINE_SYNC_MUTEX(struct mpart,
                     mpart_lock_release,
                     mpart_lock_acquired,
                     mpart_lock_available)
+*/
 
 
 
@@ -403,7 +429,18 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
  *       and will pass that value onto `mfile_alloc_physmem()'! */
 FUNDEF NONNULL((1)) void KCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
-                  size_t total_pages);
+                  size_t total_pages)
+		THROWS(E_BADALLOC);
+
+/* Free backing memory using `page_free()'. When an mchunkvec was used,
+ * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mpart_ll_freemem)(struct mpart *__restrict self);
+
+/* Free backing memory using `page_ccfree()'. When an mchunkvec was used,
+ * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
 
 
 
@@ -532,7 +569,7 @@ struct mpart_unsharecow_data {
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that no alive copy-nodes still exist! */
-FUNDEF NONNULL((1, 2)) __BOOL FCALL
+FUNDEF NONNULL((1, 3)) __BOOL FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data);

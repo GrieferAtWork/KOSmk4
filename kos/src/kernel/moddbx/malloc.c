@@ -491,7 +491,7 @@ PRIVATE void KCALL clear_heap(void) {
 		}
 		pred->sh_next = NULL;
 		/* Unmap the node. */
-		node = vm_node_remove(&vm_kernel, vm_node_getmin(&pred->sh_node));
+		node = vm_node_remove(&vm_kernel, vm_node_getminaddr(&pred->sh_node));
 		if unlikely(node != &pred->sh_node) {
 			/* Shouldn't happen... */
 			vm_node_insert(node);

@@ -841,9 +841,18 @@ struct inode
 #ifdef CONFIG_USE_NEW_VM
 	struct rwlock       i_lock;         /* Lock for this INode */
 #define __inode_lock(self) (&(self)->i_lock)
+#define __inode_cinit_base(self, block_shift)                                     \
+	(mfile_cinit(__inode_as_datablock(self), &inode_datablock_type, block_shift), \
+	 rwlock_cinit(&(self)->i_lock))
+#define __inode_init_base(self, block_shift)                                     \
+	(mfile_init(__inode_as_datablock(self), &inode_datablock_type, block_shift), \
+	 rwlock_init(&(self)->i_lock))
 #else /* CONFIG_USE_NEW_VM */
-#define __inode_lock(self) (&__inode_as_datablock(self)->db_lock)
+#define __inode_lock(self)                    (&__inode_as_datablock(self)->db_lock)
+#define __inode_cinit_base(self, block_shift) mfile_cinit(__inode_as_datablock(self), &inode_datablock_type, block_shift)
+#define __inode_init_base(self, block_shift)  mfile_init(__inode_as_datablock(self), &inode_datablock_type, block_shift)
 #endif /* !CONFIG_USE_NEW_VM */
+
 	struct inode_type  *i_type;         /* [1..1][const] INode type. */
 	REF struct superblock *i_super;     /* [1..1][const][REF_IF(!= this)] The associated superblock. */
 	struct inode_data  *i_fsdata;       /* [?..?][lock(this)] A pointer to inode-specific user-data. */
@@ -887,7 +896,16 @@ struct inode
 #define INODE_ISSOCK(x)  S_ISSOCK((x)->i_filemode) /* Check if `x' is a `struct socket_node' */
 
 
-#if (!defined(__INTELLISENSE__) || \
+#ifndef vm_datablock_isinode
+/* The data block type used to identify INodes. */
+DATDEF struct vm_datablock_type inode_datablock_type;
+
+/* Check if a given `struct vm_datablock *x' is an INode. */
+#define vm_datablock_isinode(x) ((x)->db_type == &inode_datablock_type)
+#endif /* !vm_datablock_isinode */
+
+
+#if (!defined(__INTELLISENSE__) || defined(CONFIG_USE_NEW_VM) || \
      !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT))
 
 #ifndef ____devfs_datablock_defined

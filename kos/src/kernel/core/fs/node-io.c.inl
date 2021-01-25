@@ -579,7 +579,7 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 		if unlikely(OVERFLOW_UADD(file_position, num_bytes, &file_end))
 			file_end = (pos_t)-1, num_bytes = (size_t)((pos_t)-1 - file_position);
 again:
-		rwlock_read(&self->db_lock);
+		rwlock_read(__inode_lock(self));
 		TRY {
 again_check_size:
 			if unlikely(file_end > self->i_filesize) {
@@ -588,7 +588,7 @@ again_check_size:
 					goto again_check_size;
 				}
 				if (file_position >= self->i_filesize) {
-					rwlock_endread(&self->db_lock);
+					rwlock_endread(__inode_lock(self));
 					goto eof;
 				}
 				num_bytes = (size_t)(self->i_filesize - file_position);
@@ -603,11 +603,11 @@ again_check_size:
 #endif /* DEFINE_IO_ASYNC */
 			              );
 		} EXCEPT {
-			if (rwlock_endread(&self->db_lock))
+			if (rwlock_endread(__inode_lock(self)))
 				goto again;
 			RETHROW();
 		}
-		rwlock_endread(&self->db_lock);
+		rwlock_endread(__inode_lock(self));
 		return num_bytes;
 	}
 #ifdef DEFINE_IO_ASYNC
@@ -690,7 +690,7 @@ eof:
 	if unlikely(OVERFLOW_UADD(file_position, num_bytes, &file_end))
 		file_end = (pos_t)-1,num_bytes = (size_t)((pos_t)-1 - file_position);
 again:
-	rwlock_read(&self->db_lock);
+	rwlock_read(__inode_lock(self));
 	TRY {
 again_check_size:
 		if unlikely(file_end > self->i_filesize) {
@@ -712,16 +712,16 @@ again_check_size:
 #endif /* DEFINE_IO_ASYNC */
 		              );
 	} EXCEPT {
-		if (rwlock_endread(&self->db_lock))
+		if (rwlock_endread(__inode_lock(self)))
 			goto again;
 		RETHROW();
 	}
-	rwlock_endread(&self->db_lock);
+	rwlock_endread(__inode_lock(self));
 	return num_bytes;
 wait_for_data:
-	rwlock_endread(&self->db_lock);
+	rwlock_endread(__inode_lock(self));
 	for (;;) {
-		task_connect_for_poll(&self->db_lock.rw_chmode);
+		task_connect_for_poll(&__inode_lock(self)->rw_chmode);
 		COMPILER_READ_BARRIER();
 		if (file_position < self->i_filesize) {
 			COMPILER_READ_BARRIER();

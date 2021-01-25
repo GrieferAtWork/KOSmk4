@@ -44,8 +44,8 @@
 DECL_BEGIN
 
 /* VM nodes / datapart for the LAPIC identity mapping. */
-INTDEF struct vm_datapart x86_vm_part_lapic;
-INTDEF struct vm_node x86_vm_node_lapic;
+INTDEF struct mpart x86_lapic_mpart;
+INTDEF struct mnode x86_lapic_mnode;
 
 PRIVATE ATTR_PURE ATTR_FREETEXT byte_t
 NOTHROW(KCALL smp_memsum)(void const *__restrict p, size_t n_bytes) {
@@ -141,10 +141,15 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	       ((uintptr_t)fps - KERNEL_CORE_BASE), fps->mp_specrev, fps->mp_defcfg);
 	if (fps->mp_defcfg) {
 		/* Default configuration. */
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(UINT32_C(0xfee00000) / PAGESIZE);
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
-		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
-		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
+		x86_lapic_mpart.mp_mem.mc_start = physaddr2page(UINT32_C(0xfee00000));
+		x86_lapic_mpart.mp_mem.mc_size  = 1;
+#ifdef CONFIG_USE_NEW_VM
+		x86_lapic_mpart.mp_minaddr = (pos_t)(0);
+		x86_lapic_mpart.mp_maxaddr = (pos_t)(PAGESIZE - 1);
+#else /* CONFIG_USE_NEW_VM */
+		x86_lapic_mpart.dp_tree.a_vmin = (datapage_t)0;
+		x86_lapic_mpart.dp_tree.a_vmax = (datapage_t)0;
+#endif /* !CONFIG_USE_NEW_VM */
 		FORCPU(&_bootcpu, thiscpu_x86_lapicid_)         = 0xff; /* Read later using the LAPIC */
 		FORCPU(&_bootcpu, thiscpu_x86_lapicversion_)    = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
@@ -162,15 +167,25 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	/* Remember the LAPIC base address. */
 	if (table->tab_lapicaddr & PAGEMASK) {
 		x86_lapicbase_ = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(table->tab_lapicaddr / PAGESIZE);
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 2;
-		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
-		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)1;
+		x86_lapic_mpart.mp_mem.mc_start = (physpage_t)physaddr2page(table->tab_lapicaddr);
+		x86_lapic_mpart.mp_mem.mc_size  = 2;
+#ifdef CONFIG_USE_NEW_VM
+		x86_lapic_mpart.mp_minaddr = (pos_t)(0);
+		x86_lapic_mpart.mp_maxaddr = (pos_t)((2 * PAGESIZE) - 1);
+#else /* CONFIG_USE_NEW_VM */
+		x86_lapic_mpart.dp_tree.a_vmin  = (datapage_t)0;
+		x86_lapic_mpart.dp_tree.a_vmax  = (datapage_t)1;
+#endif /* !CONFIG_USE_NEW_VM */
 	} else {
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(table->tab_lapicaddr / PAGESIZE);
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
-		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
-		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
+		x86_lapic_mpart.mp_mem.mc_start = (physpage_t)physaddr2page(table->tab_lapicaddr);
+		x86_lapic_mpart.mp_mem.mc_size  = 1;
+#ifdef CONFIG_USE_NEW_VM
+		x86_lapic_mpart.mp_minaddr = (pos_t)(0);
+		x86_lapic_mpart.mp_maxaddr = (pos_t)(PAGESIZE - 1);
+#else /* CONFIG_USE_NEW_VM */
+		x86_lapic_mpart.dp_tree.a_vmin  = (datapage_t)0;
+		x86_lapic_mpart.dp_tree.a_vmax  = (datapage_t)0;
+#endif /* !CONFIG_USE_NEW_VM */
 	}
 	/* Process configuration entries. */
 	{

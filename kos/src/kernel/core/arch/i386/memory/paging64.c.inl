@@ -216,7 +216,7 @@ struct vm vm_kernel_head = {
 		/* .vn_vm     = */ (struct vm *)UINT64_C(0xcccccccccccccccc),
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 		/* .vn_part   = */ &userkern_segment_part,
-		/* .vn_block  = */ &userkern_segment_block,
+		/* .vn_block  = */ &userkern_segment_file,
 #else /* !CONFIG_NO_USERKERN_SEGMENT */
 		/* .vn_part   = */ NULL,
 		/* .vn_block  = */ NULL,

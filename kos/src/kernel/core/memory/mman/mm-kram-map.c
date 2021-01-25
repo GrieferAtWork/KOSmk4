@@ -73,14 +73,14 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 }
 
 
-PRIVATE struct mfile_ops mfile_dbgheap_ops = {
+PUBLIC_CONST struct mfile_ops const mfile_dbgheap_ops = {
 	/* .mo_destroy    = */ NULL,
 	/* .mo_initpart   = */ NULL,
 	/* .mo_loadblocks = */ &mfile_dbgheap_loadblocks,
 };
 
 /* Special file used to initialize debug-heap memory. */
-PRIVATE struct mfile mfile_dbgheap = MFILE_INIT_ANON(&mfile_dbgheap_ops, PAGESHIFT);
+PUBLIC struct mfile mfile_dbgheap = MFILE_INIT_ANON(&mfile_dbgheap_ops, PAGESHIFT);
 #endif /* CONFIG_DEBUG_HEAP */
 
 

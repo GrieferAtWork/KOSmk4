@@ -310,7 +310,6 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 					RETHROW();
 				}
 			}
-			vec;
 			data->scd_copy_mem_sc.ms_v = vec;
 			data->scd_copy_mem_sc.ms_c = 1;
 			data->scd_copy_state       = MPART_ST_MEM_SC;
@@ -337,7 +336,7 @@ do_realloc_in_extend_after_unlock:
 					data->scd_copy_mem_sc.ms_v = vec;
 				}
 				/* Allocate the new chunk. */
-				chunk.mc_start = mfile_alloc_physmem(self->mp_file, total_pages, &chunk.mc_size);
+				chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
 				if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 					goto err_badalloc_after_unlock; /* Insufficient physical memory. */
 				data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
@@ -382,7 +381,7 @@ extend_vector:
 			data->scd_copy_mem_sc.ms_v = vec;
 		}
 		/* Allocate the new chunk. */
-		chunk.mc_start = mfile_alloc_physmem(self->mp_file, total_pages, &chunk.mc_size);
+		chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
 		if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 			goto err_badalloc; /* Insufficient physical memory. */
 		data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;

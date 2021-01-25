@@ -99,7 +99,7 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 			LIST_INIT(&part->mp_copy);
 			LIST_INIT(&part->mp_share);
 			SLIST_INIT(&part->mp_lockops);
-			LIST_ENTRY_UNBOUND_INIT(part, mp_allparts);
+			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 			part->mp_minaddr = (pos_t)0;
 			part->mp_maxaddr = (pos_t)num_bytes - 1;
@@ -128,7 +128,7 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 			node->mn_link.le_prev = prot & PROT_SHARED ? &part->mp_share.lh_first
 			                                           : &part->mp_copy.lh_first;
 			*node->mn_link.le_prev = node;
-			LIST_ENTRY_UNBOUND_INIT(node, mn_writable);
+			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 		} EXCEPT {
 			kfree(part);
 			RETHROW();
@@ -459,7 +459,7 @@ do_insert_mappings:
 			node->mn_fsname = xincref(file_fsname);
 			node->mn_minaddr += file_base_offset + (uintptr_t)result;
 			node->mn_maxaddr += file_base_offset + (uintptr_t)result;
-			LIST_ENTRY_UNBOUND_INIT(node, mn_writable);
+			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 
 			/* Set the MLOCK flag for the backing mem-part when MAP_LOCKED is given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */

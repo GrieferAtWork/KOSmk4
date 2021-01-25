@@ -331,16 +331,16 @@ handle_file_stat(struct file *__restrict self,
 INTERN void KCALL
 handle_file_pollconnect(struct file *__restrict self, poll_mode_t what) {
 	if (what & (POLLINMASK | POLLOUTMASK))
-		rwlock_pollconnect(&self->f_node->db_lock);
+		rwlock_pollconnect(__inode_lock(self->f_node));
 }
 
 INTERN poll_mode_t KCALL
 handle_file_polltest(struct file *__restrict self, poll_mode_t what) {
 	if (what & POLLOUTMASK) {
-		if (rwlock_canwrite(&self->f_node->db_lock))
+		if (rwlock_canwrite(__inode_lock(self->f_node)))
 			return POLLOUTMASK | POLLINMASK;
 	} else if (what & POLLINMASK) {
-		if (rwlock_canread(&self->f_node->db_lock))
+		if (rwlock_canread(__inode_lock(self->f_node)))
 			return POLLINMASK;
 	}
 	return 0;
@@ -442,7 +442,7 @@ again:
 		atomic_rwlock_endread(&self->f_curlck);
 		orig_entry = entry;
 
-		vm_datablock_lock_read(self->f_node);
+		rwlock_read(__inode_lock(self->f_node));
 		TRY {
 			if (!entry) {
 read_entry_pos_0:
@@ -524,12 +524,12 @@ got_next_entry:
 				--entry_pos;
 			}
 		} EXCEPT {
-			if (vm_datablock_lock_endread(self->f_node))
+			if (rwlock_endread(__inode_lock(self->f_node)))
 				goto again;
 			RETHROW();
 		}
 		incref(entry);
-		vm_datablock_lock_endread(self->f_node);
+		rwlock_endread(__inode_lock(self->f_node));
 		/* Exchange the current entry. */
 		atomic_rwlock_write(&self->f_curlck);
 		if unlikely(self->f_curent != orig_entry) {
@@ -592,7 +592,7 @@ got_next_entry:
 	}
 	return result;
 eof_unlock_node:
-	vm_datablock_lock_endread(self->f_node);
+	rwlock_endread(__inode_lock(self->f_node));
 	return 0;
 }
 

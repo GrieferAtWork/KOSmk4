@@ -91,15 +91,17 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 		                  NULL,
 		                  (pos_t)minpageaddr,
 		                  VM_PROT_READ | VM_PROT_SHARED,
-		                  VM_NODE_FLAG_NOMERGE);
+		                  VM_NODE_FLAG_NOMERGE, 0);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
 			                                 (byte_t *)tempbase + ((ptrdiff_t)src & PAGEMASK),
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
+			/* TODO: This form of cleanup can result in exceptions! */
 			vm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 			RETHROW();
 		}
+		/* TODO: This form of cleanup can result in exceptions! */
 		vm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 	}
 }
