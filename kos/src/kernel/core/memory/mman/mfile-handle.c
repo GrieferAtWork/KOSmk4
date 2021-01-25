@@ -36,6 +36,7 @@ DECL_BEGIN
 /* Handle operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
 
+#if 0 /* TODO */
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_read(struct mfile *__restrict self,
                   USER CHECKED void *dst,
@@ -111,7 +112,7 @@ handle_mfile_preadv(struct mfile *__restrict self,
                     struct aio_buffer *__restrict dst,
                     size_t num_bytes, pos_t addr,
                     iomode_t mode) THROWS(...) {
-	mfile_readv(self, dst);
+	mfile_readv(self, dst, 0, num_bytes, addr);
 }
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
@@ -142,6 +143,7 @@ INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTERN NONNULL((1)) REF void *KCALL
 handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+#endif
 
 
 DECL_END

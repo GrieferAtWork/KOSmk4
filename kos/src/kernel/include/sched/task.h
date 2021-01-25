@@ -105,7 +105,7 @@ struct task {
 	                                       *             write(THIS_TASK && INTERN(lock)))]
 	                                       * The VM used to host this task.
 	                                       * NOTE: Also accessible via the `this_vm' field. */
-	LLIST_NODE(struct task) t_mman_tasks; /* [lock(t_mman->v_tasklock)] Chain of tasks using `t_mman' */
+	LIST_ENTRY(task)        t_mman_tasks; /* [lock(t_mman->v_tasklock)] Chain of tasks using `t_mman' */
 	size_t                  t_heapsz;     /* [const] Allocated heap size of this task. */
 	union {
 		struct task        *_t_next;      /* [0..1][lock(INTERNAL)] Next thread in an out-of-bad listing. */

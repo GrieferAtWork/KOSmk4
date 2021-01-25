@@ -68,14 +68,14 @@ INTDEF byte_t __kernel_pertask_size[];
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")
 struct task task_header = {
-	/* .t_self     = */ NULL, /* Filled in by the initializer. */
-	/* .t_refcnt   = */ 1,
-	/* .t_flags    = */ TASK_FNORMAL,
-	/* .t_cpu      = */ &_bootcpu,
+	/* .t_self       = */ NULL, /* Filled in by the initializer. */
+	/* .t_refcnt     = */ 1,
+	/* .t_flags      = */ TASK_FNORMAL,
+	/* .t_cpu        = */ &_bootcpu,
 	/* .t_mman       = */ &vm_kernel,
-	/* .t_mman_tasks = */ LLIST_INITNODE,
-	/* .t_heapsz   = */ (size_t)__kernel_pertask_size,
-	/* .t_state    = */ NULL
+	/* .t_mman_tasks = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	/* .t_heapsz     = */ (size_t)__kernel_pertask_size,
+	/* .t_state      = */ NULL
 };
 
 INTDEF byte_t __kernel_boottask_stack_pageid[];
@@ -314,13 +314,13 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
 	FORTASK(&_bootidle, this_kernel_stacknode_).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
 
-	vm_kernel.v_tasks              = &_boottask;
-	_boottask.t_mman_tasks.ln_pself  = &vm_kernel.v_tasks;
-	_boottask.t_mman_tasks.ln_next   = &_asyncwork;
-	_asyncwork.t_mman_tasks.ln_pself = &_boottask.t_mman_tasks.ln_next;
-	_asyncwork.t_mman_tasks.ln_next  = &_bootidle;
-	_bootidle.t_mman_tasks.ln_pself  = &_asyncwork.t_mman_tasks.ln_next;
-	assert(_bootidle.t_mman_tasks.ln_next == NULL);
+	vm_kernel.v_tasks.lh_first      = &_boottask;
+	_boottask.t_mman_tasks.le_prev  = &vm_kernel.v_tasks.lh_first;
+	_boottask.t_mman_tasks.le_next  = &_asyncwork;
+	_asyncwork.t_mman_tasks.le_prev = &_boottask.t_mman_tasks.le_next;
+	_asyncwork.t_mman_tasks.le_next = &_bootidle;
+	_bootidle.t_mman_tasks.le_prev  = &_asyncwork.t_mman_tasks.le_next;
+	assert(_bootidle.t_mman_tasks.le_next == NULL);
 
 	_boottask.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `_boottask' */
 	_asyncwork.t_refcnt = 2; /* +1: scheduler chain, +1: intern symbol `_asyncwork' */
@@ -434,10 +434,10 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	{
 		REF struct vm *myvm = self->t_mman;
 		COMPILER_READ_BARRIER();
-		if (self->t_mman_tasks.ln_pself) {
+		if (LIST_ISBOUND(self, t_mman_tasks)) {
 			struct task *next;
 			if (vm_tasklock_trywrite(myvm)) {
-				LLIST_REMOVE(self, t_mman_tasks);
+				LIST_REMOVE(self, t_mman_tasks);
 				vm_tasklock_endwrite(myvm);
 				goto do_free_self;
 			}
@@ -617,11 +617,11 @@ again_lock_vm:
 	/* Run custom initializers. */
 	TRY {
 		pertask_init_t *iter;
-		assert(!result->t_mman_tasks.ln_pself);
+		assert(!LIST_ISBOUND(result, t_mman_tasks));
 
 		/* Insert the new task into the VM */
 		vm_tasklock_write(task_vm);
-		LLIST_INSERT(task_vm->v_tasks, result, t_mman_tasks);
+		LIST_INSERT_HEAD(&task_vm->v_tasks, result, t_mman_tasks);
 		vm_tasklock_endwrite(task_vm);
 
 		iter = __kernel_pertask_init_start;

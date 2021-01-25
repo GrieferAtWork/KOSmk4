@@ -240,6 +240,9 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 #endif /* !CONFIG_NO_SMP */
 
 	/* TODO: Allocate missing descriptors */
+	SLIST_FOREACH(thread, &target->mm_threads, t_)
+
+
 	/* TODO: Actually send out all of the RPCs to all of the target threads. */
 
 #ifndef CONFIG_NO_SMP

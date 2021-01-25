@@ -222,6 +222,29 @@
 #define vm_treelock_writing(self)                     mman_lock_acquired(self)
 #define vm_treelock_canread(self)                     mman_lock_available(self)
 #define vm_treelock_canwrite(self)                    mman_lock_available(self)
+/*
+FUNDEF NONNULL((1)) void KCALL vm_tasklock_read(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1)) void KCALL vm_tasklock_write(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1)) bool KCALL vm_tasklock_upgrade(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_read_nx)(struct vm *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_write_nx)(struct vm *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL vm_tasklock_upgrade_nx)(struct vm *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_tryread)(struct vm *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_trywrite)(struct vm *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_tryupgrade)(struct vm *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endwrite)(struct vm *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endread)(struct vm *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_end)(struct vm *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_downgrade)(struct vm *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm *__restrict self);
+#define vm_tasklock_reading(self) atomic_rwlock_reading(&(self)->v_tasklock)
+#define vm_tasklock_writing(self) atomic_rwlock_writing(&(self)->v_tasklock)
+*/
+#define VM_DATABLOCK_ADDRSHIFT(x)                     ((x)->mf_blockshift)
+#define VM_DATABLOCK_PAGESHIFT(x)                     (PAGESHIFT - (x)->mf_blockshift)
+#define VM_DATABLOCK_PAGEALIGN(x)                     ((size_t)1 << VM_DATABLOCK_PAGESHIFT(x))
+#define VM_DATABLOCK_PAGEMASK(x)                      (((size_t)1 << VM_DATABLOCK_PAGESHIFT(x)) - 1)
+#define VM_DATABLOCK_PAGESIZE(x)                      ((size_t)PAGESIZE >> VM_DATABLOCK_PAGESHIFT(x))
 
 #ifdef __CC__
 #include <kos/except.h>
@@ -2016,6 +2039,11 @@ bool (vm_node_iskernelspace)(struct vm_node const *__restrict self);
 #define VM_NODE_NEXT(self)        ((self)->vn_byaddr.ln_next)
 #define VM_NODE_PREV(self)        __COMPILER_CONTAINER_OF((self)->vn_byaddr.ln_pself,struct vm_node,vn_byaddr.ln_next)
 
+#ifndef __task_list_defined
+#define __task_list_defined 1
+LIST_HEAD(task_list, WEAK task);
+#endif /* !__task_list_defined */
+
 struct vm {
 	/* Top-level controller for virtual memory bindings. */
 #ifndef __VM_INTERNAL_EXCLUDE_PAGEDIR
@@ -2028,7 +2056,7 @@ struct vm {
 	LLIST(struct vm_node)      v_byaddr;        /* [lock(v_treelock)] By-address ordered list of nodes. */
 	size_t                     v_heap_size;     /* [const] Size of the heap pointer used to allocated this VM. */
 	struct atomic_rwlock       v_treelock;      /* Lock for this VM */
-	LLIST(struct task)         v_tasks;         /* [0..1][lock(v_tasklock)] Chain of threads using this VM.
+	struct task_list           v_tasks;         /* [0..1][lock(v_tasklock)] Chain of threads using this VM.
 	                                             * WARNING: This chain may contain terminated tasks,
 	                                             *          tasks that haven't yet started, or even tasks
 	                                             *          with a reference counter of ZERO(0)! */

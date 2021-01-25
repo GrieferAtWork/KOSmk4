@@ -341,11 +341,11 @@ again_lock_vm:
 	result->t_mman = result_vm; /* Inherit reference. */
 	TRY {
 		pertask_init_t *iter;
-		assert(!result->t_mman_tasks.ln_pself);
+		assert(!LIST_ISBOUND(result, t_mman_tasks));
 
 		/* Insert the new task into the VM */
 		vm_tasklock_write(result_vm);
-		LLIST_INSERT(result_vm->v_tasks, result, t_mman_tasks);
+		LIST_INSERT_HEAD(&result_vm->v_tasks, result, t_mman_tasks);
 		vm_tasklock_endwrite(result_vm);
 
 		iter = __kernel_pertask_init_start;

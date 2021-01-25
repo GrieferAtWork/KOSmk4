@@ -95,7 +95,7 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	result->v_byaddr    = &result->v_kernreserve;
 	result->v_heap_size = resptr.hp_siz;
 	/*atomic_rwlock_init(&result->v_treelock);*/
-	assert(result->v_tasks == NULL);
+	assert(LIST_EMPTY(&result->v_tasks));
 	/*atomic_rwlock_init(&result->v_tasklock);*/
 	assert(result->v_deltasks == NULL);
 	/*shared_rwlock_init(&result->v_dma_lock);*/
@@ -172,7 +172,7 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 	/* Destroy all remaining nodes. */
 	assert(self != THIS_VM);
 	assert(self != &vm_kernel);
-	assert(!self->v_tasks);
+	assert(LIST_EMPTY(&self->v_tasks));
 	assert(!self->v_deltasks);
 	assert(self->v_kernreserve.vn_vm == self);
 	/* Invoke per-VM finalizer callbacks. */
@@ -252,7 +252,7 @@ again:
 			vm_tasklock_endwrite(newvm);
 			goto again;
 		}
-		if (ATOMIC_READ(caller->t_mman_tasks.ln_pself) != NULL) {
+		if (ATOMIC_READ(caller->t_mman_tasks.le_prev) != NULL) {
 			if unlikely(!vm_tasklock_trywrite(oldvm)) {
 				incref(oldvm);
 				PREEMPTION_POP(was);
@@ -264,11 +264,11 @@ again:
 				goto again;
 			}
 			COMPILER_READ_BARRIER();
-			if likely(ATOMIC_READ(caller->t_mman_tasks.ln_pself) != NULL)
-				LLIST_REMOVE(caller, t_mman_tasks);
+			if likely(ATOMIC_READ(caller->t_mman_tasks.le_prev) != NULL)
+				LIST_REMOVE(caller, t_mman_tasks);
 			vm_tasklock_endwrite(oldvm);
 		}
-		LLIST_INSERT(newvm->v_tasks, caller, t_mman_tasks);
+		LIST_INSERT_HEAD(&newvm->v_tasks, caller, t_mman_tasks);
 		vm_tasklock_endwrite(newvm);
 		FORTASK(caller, this_vm) = incref(newvm);
 		cpu_setvm_ex(caller->t_cpu, newvm);

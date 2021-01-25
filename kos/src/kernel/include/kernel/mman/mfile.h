@@ -25,6 +25,7 @@
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
+#include <sched/atomic64.h>
 #include <sched/signal.h>
 
 #include <hybrid/__minmax.h>
@@ -107,6 +108,7 @@ struct mfile_ops {
 	 *                 given address as anonymous)
 	 */
 };
+
 
 struct mfile {
 	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */

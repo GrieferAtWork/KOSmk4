@@ -40,8 +40,8 @@ NOTHROW(KCALL vm_clear_pending_deltasks)(struct vm *__restrict self) {
 	while (iter) {
 		next = KEY_task__next(iter);
 		assert(iter->t_mman == self);
-		assert(iter->t_mman_tasks.ln_pself != NULL);
-		LLIST_REMOVE(iter, t_mman_tasks);
+		assert(LIST_ISBOUND(iter, t_mman_tasks));
+		LIST_REMOVE(iter, t_mman_tasks);
 		heap_free(&kernel_locked_heap, iter, iter->t_heapsz, GFP_NORMAL);
 		iter = next;
 	}
