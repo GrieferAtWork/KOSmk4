@@ -53,7 +53,7 @@ libvio_copytovio_from_phys(struct vioargs *__restrict args,
 		return;
 	/* TODO: Support for the phys2virt identity mapping! */
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (buf & PAGEMASK);

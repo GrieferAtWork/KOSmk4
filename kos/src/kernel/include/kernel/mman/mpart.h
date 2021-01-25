@@ -56,6 +56,7 @@
 #define MPART_F_NORMAL         0x0000 /* Normal flags. */
 #define MPART_F_LOCKBIT        0x0001 /* Lock-bit for this m-part */
 #define MPART_F_MAYBE_BLK_INIT 0x0002 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
+/* TODO: Invert the meaning of the `MPART_F_NO_GLOBAL_REF' flag and rename it! */
 #define MPART_F_NO_GLOBAL_REF  0x0004 /* [lock(WRITE_ONCE)] `mpart_all_list' doesn't hold a reference to this
                                        * part. When memory is running low, and the kernel tries to unload unused
                                        * memory parts, it will set this flag for all parts there are.
@@ -168,7 +169,7 @@ struct mpart_lockop {
 
 #define __ALIGNOF_MPART __ALIGNOF_INT64__
 #if __SIZEOF_POINTER__ == 4
-#define __SIZEOF_MPART 88
+#define __SIZEOF_MPART 80
 #elif __SIZEOF_POINTER__ == 8
 #define __SIZEOF_MPART 144
 #else /* __SIZEOF_POINTER__ == ... */
@@ -178,8 +179,8 @@ struct mpart_lockop {
 #if 0 /* Static initializer template: */
 	/* .mp_refcnt    = */ FILLME,
 	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
-	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
+	/*                 */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
 	/* .mp_state     = */ MPART_ST_MEM,
 	/* .mp_file      = */ { &mfile_ndef },
 	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(FILLME.mp_copy),
@@ -227,14 +228,6 @@ struct mpart {
 		                                         * NOTE: For VIO parts, this list entry is initialized as unbound! */
 		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
 	};
-	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
-	                                             *                         !mfile_isanon(mp_file) && MPART_F_CHANGED)]
-	                                             * Per-file chain of mem-parts that have changed.
-	                                             * When the associated file supports the `mo_saveblocks', then
-	                                             * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
-	                                             * into its file's `mf_changed' list.
-	                                             * Also note that changed mem-parts are kept alive by the associated
-	                                             * file, since this list contains references, rather than weak pointers. */
 	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [const] In-file starting address of this part.
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
 	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
@@ -244,6 +237,14 @@ struct mpart {
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file max address of this part. */
+	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
+	                                             *                         !mfile_isanon(mp_file) && MPART_F_CHANGED)]
+	                                             * Per-file chain of mem-parts that have changed.
+	                                             * When the associated file supports the `mo_saveblocks', then
+	                                             * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
+	                                             * into its file's `mf_changed' list.
+	                                             * Also note that changed mem-parts are kept alive by the associated
+	                                             * file, since this list contains references, rather than weak pointers. */
 	union {
 		RBTREE_NODE(struct mpart) mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
 		                                         * Entry with the associated file's tree. */
@@ -410,8 +411,8 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mpart_tree_tryinsert
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_remove)(struct mpart **__restrict proot, pos_t key);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_rremove)(struct mpart **__restrict proot, pos_t minkey, pos_t maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mpart_tree_removenode)(struct mpart **__restrict proot, struct mpart *__restrict node);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_prevnode)(struct mpart *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_nextnode)(struct mpart *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_prevnode)(struct mpart const *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mpart *NOTHROW(FCALL mpart_tree_nextnode)(struct mpart const *__restrict self);
 FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct mpart *root, pos_t minkey, pos_t maxkey, struct mpart_tree_minmax *__restrict result);
 
 

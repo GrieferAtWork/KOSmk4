@@ -798,7 +798,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 	/* Check for slightly more complicated case: Truncate a node at the front. */
 	if (unmap_minaddr == node->mn_minaddr) {
-		size_t remove_size, remove_blocks;
+		size_t remove_size;
 
 		/* We can truncate the node at the front. */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);

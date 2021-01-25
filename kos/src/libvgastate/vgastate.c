@@ -69,12 +69,12 @@ DECL_BEGIN
 #ifndef __KERNEL__
 PRIVATE fd_t dev_mem = -1;
 
-#define copyfromphys(/*void **/ dst, src, num_bytes)                 \
+#define vga_copyfromphys(/*void **/ dst, src, num_bytes)             \
 	(pread64(dev_mem, dst, num_bytes, (pos64_t)(src)) == (num_bytes) \
 	 ? VGA_STATE_ERROR_SUCCESS                                       \
 	 : VGA_STATE_ERROR_IO)
 
-#define copytophys(dst, /*void const **/ src, num_bytes)              \
+#define vga_copytophys(dst, /*void const **/ src, num_bytes)          \
 	(pwrite64(dev_mem, src, num_bytes, (pos64_t)(dst)) == (num_bytes) \
 	 ? VGA_STATE_ERROR_SUCCESS                                        \
 	 : VGA_STATE_ERROR_IO)
@@ -96,9 +96,9 @@ NOTHROW_KERNEL(CC init_phys)(void) {
 #else /* !__KERNEL__ */
 #define init_phys() \
 	VGA_STATE_ERROR_SUCCESS
-#define copyfromphys(/*void **/ dst, src, num_bytes) \
+#define vga_copyfromphys(/*void **/ dst, src, num_bytes) \
 	(vm_copyfromphys(/*void **/ dst, src, num_bytes), VGA_STATE_ERROR_SUCCESS)
-#define copytophys(dst, /*void const **/ src, num_bytes) \
+#define vga_copytophys(dst, /*void const **/ src, num_bytes) \
 	(vm_copytophys(dst, /*void const **/ src, num_bytes), VGA_STATE_ERROR_SUCCESS)
 #endif /* __KERNEL__ */
 
@@ -276,7 +276,7 @@ NOTHROW_KERNEL(CC save_vga_font)(struct vga_font *__restrict self) {
 	begin_vga_font_access(&regs);
 	result = VGA_STATE_ERROR_SUCCESS;
 	for (i = 0; i < 256; ++i) {
-		result = copyfromphys(&self->vf_blob[i], VGA_VRAM_BASE + src, 16);
+		result = vga_copyfromphys(&self->vf_blob[i], VGA_VRAM_BASE + src, 16);
 		if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 			break;
 		src += 32;
@@ -293,7 +293,7 @@ NOTHROW_KERNEL(CC load_vga_font)(struct vga_font const *__restrict self) {
 	begin_vga_font_access(&regs);
 	result = VGA_STATE_ERROR_SUCCESS;
 	for (i = 0; i < 256; ++i) {
-		result = copytophys(VGA_VRAM_BASE + src, &self->vf_blob[i], 16);
+		result = vga_copytophys(VGA_VRAM_BASE + src, &self->vf_blob[i], 16);
 		if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 			break;
 		src += 32;
@@ -373,7 +373,7 @@ NOTHROW_KERNEL(CC save_vga_text)(u16 textbuf[80 * 25]) {
 	begin_vga_text_access(&regs);
 
 	/* Save old text memory. */
-	result = copyfromphys(textbuf, VGA_VRAM_TEXT, 80 * 25 * 2);
+	result = vga_copyfromphys(textbuf, VGA_VRAM_TEXT, 80 * 25 * 2);
 
 	end_vga_text_access(&regs);
 	return result;
@@ -386,7 +386,7 @@ NOTHROW_KERNEL(CC load_vga_text)(u16 const textbuf[80 * 25]) {
 	begin_vga_text_access(&regs);
 
 	/* Save old text memory. */
-	result = copytophys(VGA_VRAM_TEXT, textbuf, 80 * 25 * 2);
+	result = vga_copytophys(VGA_VRAM_TEXT, textbuf, 80 * 25 * 2);
 
 	end_vga_text_access(&regs);
 	return result;

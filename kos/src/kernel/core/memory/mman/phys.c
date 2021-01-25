@@ -90,8 +90,7 @@ NOTHROW(FCALL peekphysb)(PHYS physaddr_t addr) {
 	 * NOTE: Because this page is unique for each thread, the user is not
 	 *       required to acquire a lock to the kernel mman when wishing to
 	 *       map something at this location! */
-	DEFINE_PUBLIC_SYMBOL(this_trampoline, this_trampoline_node.mn_minaddr,
-	                     sizeof(this_trampoline_node.mn_minaddr));
+	DEFINE_PUBLIC_SYMBOL(this_trampoline, &this_trampoline_node.mn_minaddr, sizeof(this_trampoline));
 	IF_PHYS_IDENTITY(addr, 1, {
 		return *(u8 const *)PHYS_TO_IDENTITY(addr);
 	});

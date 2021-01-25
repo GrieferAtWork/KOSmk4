@@ -72,7 +72,7 @@ DECL_END
 	mbuilder_findunmapped(self, hint, num_bytes, mode, min_alignment)
 #define vmb_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \
                 fspath, fsname, data_start_offset, prot, flag, guard)     \
-	mbuilder_map(self, hint, num_bytes, prot, (getfree_mode) | (flags),   \
+	mbuilder_map(self, hint, num_bytes, prot, (getfree_mode) | (flag),   \
 	             data, fspath, fsname, data_start_offset, min_alignment)
 #define vmb_getnodeofaddress(self, addr) \
 	((struct vm_node *)mbnode_tree_locate((self)->mb_mappings, addr))

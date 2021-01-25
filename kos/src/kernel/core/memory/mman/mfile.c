@@ -953,7 +953,7 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 	                  : &mfile_zero_loadblocks)
 
 PRIVATE NONNULL((1)) void KCALL
-mfile_zero_loadpages(struct mfile *__restrict self,
+mfile_zero_loadpages(struct mfile *__restrict UNUSED(self),
                      mfile_block_t UNUSED(first_block),
                      physaddr_t buffer, size_t num_blocks) {
 	/* Skip pages that were already zero-initialized before-hand! */
@@ -992,7 +992,7 @@ mfile_zero_loadblocks(struct mfile *__restrict self,
 
 
 
-PUBLIC struct mfile_ops const mfile_anon_ops[BITSOF(void *)] = {
+PUBLIC_CONST struct mfile_ops const mfile_anon_ops[BITSOF(void *)] = {
 #define INIT_ANON_OPS(i)                                    \
 	{                                                       \
 		/* .mo_destroy    = */ NULL,                        \

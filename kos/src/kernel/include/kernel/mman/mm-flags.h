@@ -22,11 +22,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/malloc-defs.h>
-#include <kernel/mman/mm-kram.h>
-#include <kernel/mman/mm-map.h>
-#include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart.h>
+#include <kernel/malloc-defs.h>  /* GFP_* */
+#include <kernel/mman/mm-kram.h> /* GFP_MAP_* */
+#include <kernel/mman/mm-map.h>  /* PROT_*, MAP_* */
+#include <kernel/mman/mnode.h>   /* MNODE_F_* */
+
+#include <elf.h> /* PF_* */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -189,6 +190,55 @@ DECL_BEGIN
 	((((gfp)&GFP_MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
 	 (((gfp)&GFP_LOCKED) ? MNODE_F_MLOCK : 0))
 #endif /* !... */
+
+
+
+/* >> unsigned int prot_from_elfpf(unsigned int elfpf);
+ * Convert ELF's `PF_*' to `PROT_*':
+ *    PF_X -> PROT_EXEC
+ *    PF_W -> PROT_WRITE
+ *    PF_R -> PROT_READ */
+#if (PF_X == PROT_EXEC && PF_W == PROT_WRITE && PF_R == PROT_READ)
+#define prot_from_elfpf(elfpf) \
+	((elfpf) & (PF_X | PF_W | PF_R))
+#define elfpf_from_prot(prot) \
+	((prot) & (PROT_EXEC | PROT_WRITE | PROT_READ))
+#else /* ... */
+#define prot_from_elfpf(elfpf)           \
+	((((elfpf)&PF_X) ? PROT_EXEC : 0) |  \
+	 (((elfpf)&PF_W) ? PROT_WRITE : 0) | \
+	 (((elfpf)&PF_R) ? PROT_READ : 0))
+#define elfpf_from_prot(prot)           \
+	((((prot)&PROT_EXEC) ? PF_X : 0) |  \
+	 (((prot)&PROT_WRITE) ? PF_W : 0) | \
+	 (((prot)&PROT_READ) ? PF_R : 0))
+#endif /* !... */
+
+
+
+/* >> uintptr_t mnodeflags_from_elfpf(unsigned int elfpf);
+ * Convert ELF's `PF_*' to `MNODE_F_P*':
+ *    PF_X -> MNODE_F_PEXEC
+ *    PF_W -> MNODE_F_PWRITE
+ *    PF_R -> MNODE_F_PREAD */
+#if (PF_X == MNODE_F_PEXEC &&  \
+     PF_W == MNODE_F_PWRITE && \
+     PF_R == MNODE_F_PREAD)
+#define mnodeflags_from_elfpf(elfpf) \
+	((elfpf) & (PF_X | PF_W | PF_R))
+#define elfpf_from_mnodeflags(mnodeflags) \
+	((mnodeflags) & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD))
+#else /* ... */
+#define mnodeflags_from_elfpf(elfpf)         \
+	((((elfpf)&PF_X) ? MNODE_F_PEXEC : 0) |  \
+	 (((elfpf)&PF_W) ? MNODE_F_PWRITE : 0) | \
+	 (((elfpf)&PF_R) ? MNODE_F_PREAD : 0))
+#define elfpf_from_mnodeflags(mnodeflags)         \
+	((((mnodeflags)&MNODE_F_PEXEC) ? PF_X : 0) |  \
+	 (((mnodeflags)&MNODE_F_PWRITE) ? PF_W : 0) | \
+	 (((mnodeflags)&MNODE_F_PREAD) ? PF_R : 0))
+#endif /* !... */
+
 
 
 DECL_END

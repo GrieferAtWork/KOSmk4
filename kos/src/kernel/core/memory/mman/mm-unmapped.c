@@ -182,7 +182,6 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
 #define HAS_EXTENDED_MIN_ALIGNMENT \
 	(min_alignment > PAGESIZE && IS_POWER_OF_TWO(min_alignment))
 	void *result;
-	struct mnode *node;
 	struct mnode_tree_minmax mima;
 	PAGEDIR_PAGEALIGNED void *allow_minaddr, *allow_maxaddr;
 	PAGEDIR_PAGEALIGNED void *avail_minaddr, *avail_maxaddr;
@@ -352,7 +351,7 @@ select_from_avail_range:
 				mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
 				                        (byte_t *)avail_minaddr - 1, &mima);
 				if (mima.mm_max != NULL)
-					avail_minaddr = mnode_getmaxaddr(mima.mm_max) + 1;
+					avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
 			}
 			retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
 			                                           (uintptr_t)addr >> alignshift,
@@ -363,7 +362,7 @@ select_from_avail_range:
 				                        (byte_t *)avail_maxaddr + 1,
 				                        (byte_t *)allow_maxaddr, &mima);
 				if (mima.mm_min != NULL)
-					avail_minaddr = mnode_getminaddr(mima.mm_min) - 1;
+					avail_minaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
 			}
 			avail_maxaddr = (byte_t *)((uintptr_t)avail_maxaddr - (num_bytes - 1));
 			retindex = select_random_integer_with_bias((uintptr_t)addr >> alignshift,
@@ -374,14 +373,14 @@ select_from_avail_range:
 				mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
 				                        (byte_t *)avail_minaddr - 1, &mima);
 				if (mima.mm_max != NULL)
-					avail_minaddr = mnode_getmaxaddr(mima.mm_max) + 1;
+					avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
 			}
 			if (avail_maxaddr < allow_maxaddr) {
 				mnode_tree_minmaxlocate(self->mm_mappings,
 				                        (byte_t *)avail_maxaddr + 1,
 				                        (byte_t *)allow_maxaddr, &mima);
 				if (mima.mm_min != NULL)
-					avail_minaddr = mnode_getminaddr(mima.mm_min) - 1;
+					avail_minaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
 			}
 			avail_maxaddr = (byte_t *)((uintptr_t)avail_maxaddr - (num_bytes - 1));
 			retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
@@ -422,8 +421,8 @@ again_find_below_above:
 				prev    = mnode_tree_prevnode(next);
 				gap_min = allow_minaddr;
 				if (prev != NULL)
-					gap_min = mnode_getmaxaddr(prev) + 1;
-				gap_max = mnode_getminaddr(next) - 1;
+					gap_min = (byte_t *)mnode_getmaxaddr(prev) + 1;
+				gap_max = (byte_t *)mnode_getminaddr(next) - 1;
 				if (gap_min >= gap_max)
 					goto continue_find_below;
 				gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
@@ -456,10 +455,10 @@ continue_find_below:
 				void *gap_min, *gap_max;
 				size_t gap_size;
 				next    = mnode_tree_nextnode(prev);
-				gap_min = mnode_getmaxaddr(prev) + 1;
+				gap_min = (byte_t *)mnode_getmaxaddr(prev) + 1;
 				gap_max = allow_maxaddr;
 				if (next != NULL)
-					gap_max = mnode_getminaddr(next) - 1;
+					gap_max = (byte_t *)mnode_getminaddr(next) - 1;
 				if (gap_min >= gap_max)
 					goto continue_find_above;
 				gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;

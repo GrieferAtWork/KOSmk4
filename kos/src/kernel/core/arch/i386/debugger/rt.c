@@ -112,8 +112,8 @@ PRIVATE ATTR_DBGTEXT void FCALL dbg_runhooks(dbg_hook_type_t type) {
 
 
 DATDEF ATTR_PERTASK uintptr_t this_x86_kernel_psp0_ ASMNAME("this_x86_kernel_psp0");
-DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
-DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
+DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
+DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 
 INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
@@ -550,42 +550,60 @@ PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_save_psp0_thread(struct x86_dbg_psp0threadstate *__restrict state,
                      struct task const *__restrict thread) {
-	state->dpts_this_psp0                                  = FORTASK(thread, this_x86_kernel_psp0_);
-	state->dpts_this_kernel_stacknode_part                 = FORTASK(thread, this_kernel_stacknode_).vn_part;
-	state->dpts_this_kernel_stacknode_link_pself           = FORTASK(thread, this_kernel_stacknode_).vn_link.ln_pself;
-	state->dpts_this_kernel_stackpart_srefs                = FORTASK(thread, this_kernel_stackpart_).dp_srefs;
-	state->dpts_this_kernel_stackpart_ramdata_blockv       = FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_blockv;
-	state->dpts_this_kernel_stacknode_node_vmin            = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin;
-	state->dpts_this_kernel_stacknode_node_vmax            = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax;
-	state->dpts_this_kernel_stackpart_ramdata_block0_start = FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start;
-	state->dpts_this_kernel_stackpart_tree_vmax            = FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmax;
-	state->dpts_this_kernel_stackpart_ramdata_block0_size  = FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size;
+	state->dpts_this_psp0 = FORTASK(thread, this_x86_kernel_psp0_);
+	memcpy(&state->dpts_this_kernel_stackpart, &FORTASK(thread, this_kernel_stackpart_), sizeof(struct mpart));
+	memcpy(&state->dpts_this_kernel_stacknode, &FORTASK(thread, this_kernel_stacknode_), sizeof(struct mnode));
 }
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_load_psp0_thread(struct x86_dbg_psp0threadstate const *__restrict state,
                      struct task *__restrict thread) {
-	FORTASK(thread, this_x86_kernel_psp0_)                                = state->dpts_this_psp0;
-	FORTASK(thread, this_kernel_stacknode_).vn_part                       = state->dpts_this_kernel_stacknode_part;
-	FORTASK(thread, this_kernel_stacknode_).vn_link.ln_pself              = state->dpts_this_kernel_stacknode_link_pself;
-	FORTASK(thread, this_kernel_stackpart_).dp_srefs                      = state->dpts_this_kernel_stackpart_srefs;
-	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_blockv          = state->dpts_this_kernel_stackpart_ramdata_blockv;
-	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin                = state->dpts_this_kernel_stacknode_node_vmin;
-	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax                = state->dpts_this_kernel_stacknode_node_vmax;
-	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = state->dpts_this_kernel_stackpart_ramdata_block0_start;
-	FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmax                = state->dpts_this_kernel_stackpart_tree_vmax;
-	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = state->dpts_this_kernel_stackpart_ramdata_block0_size;
+	FORTASK(thread, this_x86_kernel_psp0_) = state->dpts_this_psp0;
+	memcpy(&FORTASK(thread, this_kernel_stackpart_), &state->dpts_this_kernel_stackpart, sizeof(struct mpart));
+	memcpy(&FORTASK(thread, this_kernel_stacknode_), &state->dpts_this_kernel_stacknode, sizeof(struct mnode));
 }
 
+INTDEF byte_t __kernel_boottask_stack[];
 INTDEF byte_t __kernel_boottask_stack_page[];
 INTDEF byte_t __kernel_boottask_stack_page_p[];
+INTDEF byte_t __kernel_bootidle_stack[];
 INTDEF byte_t __kernel_bootidle_stack_page[];
 INTDEF byte_t __kernel_bootidle_stack_page_p[];
+INTDEF byte_t __kernel_asyncwork_stack[];
 INTDEF byte_t __kernel_asyncwork_stack_page[];
 INTDEF byte_t __kernel_asyncwork_stack_page_p[];
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
+#ifdef CONFIG_USE_NEW_VM
+	struct mnode *node = &FORTASK(thread, this_kernel_stacknode_);
+	struct mpart *part = &FORTASK(thread, this_kernel_stackpart_);
+	node->mn_part           = part;
+	node->mn_link.le_prev   = &part->mp_share.lh_first;
+	node->mn_link.le_next   = NULL;
+	part->mp_share.lh_first = node;
+	part->mp_flags &= ~(MPART_F_LOCKBIT);
+	if (thread == &_boottask) {
+		part->mp_state        = MPART_ST_MEM;
+		node->mn_minaddr      = __kernel_boottask_stack;
+		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_boottask_stack_page_p);
+	} else if (thread == &_bootidle) {
+		part->mp_state        = MPART_ST_MEM;
+		node->mn_minaddr      = __kernel_bootidle_stack;
+		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
+	} else if (thread == &_asyncwork) {
+		part->mp_state        = MPART_ST_MEM;
+		node->mn_minaddr      = __kernel_asyncwork_stack_page;
+		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);
+	}
+	if (part->mp_state != MPART_ST_MEM &&
+	    part->mp_state != MPART_ST_MEM_SC)
+		part->mp_state = MPART_ST_MEM;
+	if (part->mp_state == MPART_ST_MEM)
+		part->mp_mem.mc_size = stack_size / PAGESIZE;
+	node->mn_maxaddr = node->mn_minaddr + stack_size - 1;
+	part->mp_maxaddr = part->mp_minaddr + stack_size - 1;
+#else /* CONFIG_USE_NEW_VM */
 	FORTASK(thread, this_kernel_stacknode_).vn_part              = &FORTASK(thread, this_kernel_stackpart_);
 	FORTASK(thread, this_kernel_stacknode_).vn_link.ln_pself     = &LLIST_HEAD(FORTASK(thread, this_kernel_stackpart_).dp_srefs);
 	FORTASK(thread, this_kernel_stackpart_).dp_srefs             = &FORTASK(thread, this_kernel_stacknode_);
@@ -605,6 +623,7 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmax = FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmin +
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
 	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size = CEILDIV(stack_size, PAGESIZE);
+#endif /* !CONFIG_USE_NEW_VM */
 	init_this_x86_kernel_psp0(thread);
 }
 
@@ -618,7 +637,8 @@ x86_save_psp0(struct cpu *me, struct task *mythread) {
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_init_psp0(struct cpu *me, struct task *mythread) {
 	struct task *myidle = &FORCPU(me, thiscpu_idle);
-	x86_init_psp0_thread(mythread, KERNEL_STACKSIZE);
+	if (mythread != myidle)
+		x86_init_psp0_thread(mythread, KERNEL_STACKSIZE);
 	x86_init_psp0_thread(myidle, KERNEL_IDLE_STACKSIZE);
 }
 

@@ -1255,7 +1255,7 @@ _block_device_read_phys(struct block_device *__restrict self,
 	if unlikely(!num_bytes)
 		return;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	TRY {
 		for (;;) {
 			size_t page_bytes;
@@ -1299,7 +1299,7 @@ _block_device_write_phys(struct block_device *__restrict self,
 	if unlikely(!num_bytes)
 		return;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	TRY {
 		for (;;) {
 			size_t page_bytes;

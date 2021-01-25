@@ -193,7 +193,7 @@ NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
 	byte_t *tramp;
 	HEAP_ASSERT((buffer & PAGEMASK) == 0);
 	HEAP_ASSERT(num_data_pages != 0);
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp, buffer,
 	                             PAGEDIR_MAP_FREAD |
 	                             PAGEDIR_MAP_FWRITE);

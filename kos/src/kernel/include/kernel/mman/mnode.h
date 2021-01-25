@@ -117,9 +117,9 @@ typedef size_t mpart_reladdr_t;
 
 #define __ALIGNOF_MNODE __SIZEOF_POINTER__
 #if __SIZEOF_POINTER__ == 4
-#define __SIZEOF_MNODE 60
+#define __SIZEOF_MNODE 64
 #elif __SIZEOF_POINTER__ == 8
-#define __SIZEOF_MNODE 120
+#define __SIZEOF_MNODE 128
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported pointer size"
 #endif /* __SIZEOF_POINTER__ != ... */
@@ -322,8 +322,8 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mnode_tree_tryinsert
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_remove)(struct mnode **__restrict proot, void const *key);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, void const *minkey, void const *maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_removenode)(struct mnode **__restrict proot, struct mnode *__restrict node);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_prevnode)(struct mnode *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_nextnode)(struct mnode *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_prevnode)(struct mnode const *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_nextnode)(struct mnode const *__restrict self);
 FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, void const *minkey, void const *maxkey, struct mnode_tree_minmax *__restrict result);
 
 /* Helper macros for operating on the mappings tree of a given mman. */

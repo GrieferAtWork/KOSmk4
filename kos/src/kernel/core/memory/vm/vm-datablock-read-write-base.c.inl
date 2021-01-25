@@ -288,7 +288,7 @@ KCALL vm_datablock_vio_write
 	bool is_first;
 	if unlikely(!num_bytes) return;
 	is_first = true;
-	tramp = THIS_TRAMPOLINE_BASE;
+	tramp = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (buf & PAGEMASK);

@@ -60,6 +60,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
@@ -143,19 +149,19 @@ done:
 }
 #endif /* __ARCH_HAVE_COMPAT */
 
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vm_node *KCALL
-create_bss_overlap_node(struct regular_node *__restrict exec_node,
-                        pos_t file_data_offset,
-                        size_t bss_start_page_offset,
-                        size_t bss_num_bytes) {
-	struct vm_node *result_node;
-	struct vm_datapart *result_part;
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mbnode *KCALL
+create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
+                          pos_t file_data_offset,
+                          size_t bss_start_page_offset,
+                          size_t bss_num_bytes) {
+	struct mbnode *node;
+	struct mpart *part;
 	physpage_t overlap_page;
-	result_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
-	                                        GFP_LOCKED | GFP_PREFLT);
+	node = (struct mbnode *)kmalloc(sizeof(struct mbnode),
+	                                GFP_LOCKED | GFP_PREFLT);
 	TRY {
-		result_part = (struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
-		                                            GFP_LOCKED | GFP_PREFLT);
+		part = (struct mpart *)kmalloc(sizeof(struct mpart),
+		                                      GFP_LOCKED | GFP_PREFLT);
 		TRY {
 			overlap_page = page_mallocone();
 			if unlikely(overlap_page == PHYSPAGE_INVALID)
@@ -168,48 +174,83 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 				/* Check if we must zero-initialize the BSS portion. */
 				if (!page_iszero(overlap_page)) {
 					/* Zero-initialize the BSS portion */
-					vm_memsetphys(physpage2addr(overlap_page) + bss_start_page_offset,
-					              0, bss_num_bytes);
+					memsetphys(physpage2addr(overlap_page) + bss_start_page_offset,
+					           0, bss_num_bytes);
 				}
 			} EXCEPT {
 				page_free(overlap_page, 1);
 				RETHROW();
 			}
 		} EXCEPT {
-			kfree(result_part);
+			kfree(part);
 			RETHROW();
 		}
 	} EXCEPT {
-		kfree(result_node);
+		kfree(node);
 		RETHROW();
 	}
-	result_part->dp_refcnt = 1;
-	shared_rwlock_init(&result_part->dp_lock);
-	result_part->dp_tree.a_vmin                = 0;
-	result_part->dp_tree.a_vmax                = 0;
-	result_part->dp_crefs                      = NULL;
-	result_part->dp_srefs                      = NULL;
-	result_part->dp_stale                      = NULL;
-	result_part->dp_block                      = incref(&vm_datablock_anonymous_zero);
-	result_part->dp_flags                      = VM_DATAPART_FLAG_NORMAL;
-	result_part->dp_state                      = VM_DATAPART_STATE_INCORE;
-	result_part->dp_ramdata.rd_blockv          = &result_part->dp_ramdata.rd_block0;
-	result_part->dp_ramdata.rd_block0.rb_start = overlap_page;
-	result_part->dp_ramdata.rd_block0.rb_size  = 1;
-	result_part->dp_pprop                      = VM_DATAPART_PPP_INITIALIZED << (0 * VM_DATAPART_PPP_BITS);
-	result_part->dp_futex                      = NULL;
-	/* result_node->vn_node.a_vmin = ...; // Initialized by the caller */
-	/* result_node->vn_node.a_vmax = ...; // Initialized by the caller */
-	/* result_node->vn_prot        = ...; // Initialized by the caller */
-	result_node->vn_flags = VM_NODE_FLAG_NORMAL;
-	/* result_node->vn_vm          = ...; // Unused by vmb */
-	result_node->vn_part   = result_part; /* Inherit reference */
-	result_node->vn_block  = incref(&vm_datablock_anonymous_zero);
-	result_node->vn_fspath = NULL;
-	result_node->vn_fsname = NULL;
-	/* result_node->vn_link        = ...; // Unused by vmb */
-	result_node->vn_guard = 0;
-	return result_node;
+#ifdef CONFIG_USE_NEW_VM
+	/* Initialize... */
+	part->mp_refcnt = 1;
+	part->mp_flags  = MPART_F_NO_GLOBAL_REF;
+	part->mp_state  = MPART_ST_MEM;
+	part->mp_file   = incref(&mfile_zero);
+	LIST_INIT(&part->mp_copy);
+	LIST_INIT(&part->mp_share);
+	SLIST_INIT(&part->mp_lockops);
+	/*part->mp_allparts*/ /* Initialized by `mpart_all_list_insert' */
+	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
+	part->mp_minaddr      = (pos_t)(0);
+	part->mp_maxaddr      = (pos_t)(PAGESIZE - 1);
+	DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+	part->mp_blkst_ptr    = NULL;
+	part->mp_mem.mc_start = overlap_page;
+	part->mp_mem.mc_size  = 1;
+	part->mp_meta         = NULL;
+
+	/* Add the part to the list of all parts. */
+	mpart_all_list_insert(part);
+
+	/*node->mbn_minaddr;*/ /* Initialized by the caller */
+	/*node->mbn_maxaddr;*/ /* Initialized by the caller */
+	/*node->mbn_flags;*/   /* Initialized by the caller */
+	node->mbn_part   = part; /* Inherit reference */
+	node->mbn_filnxt = NULL; /* Single-node mapping */
+	node->mbn_fspath = NULL; /* Unused */
+	node->mbn_fsname = NULL; /* Unused */
+	node->mbn_filpos = 0;
+	node->mbn_file   = incref(&mfile_zero); /* Unused, but must be non-NULL */
+
+	return node;
+#else /* CONFIG_USE_NEW_VM */
+	part->dp_refcnt = 1;
+	shared_rwlock_init(&part->dp_lock);
+	part->dp_tree.a_vmin                = 0;
+	part->dp_tree.a_vmax                = 0;
+	part->dp_crefs                      = NULL;
+	part->dp_srefs                      = NULL;
+	part->dp_stale                      = NULL;
+	part->dp_block                      = incref(&vm_datablock_anonymous_zero);
+	part->dp_flags                      = VM_DATAPART_FLAG_NORMAL;
+	part->dp_state                      = VM_DATAPART_STATE_INCORE;
+	part->dp_ramdata.rd_blockv          = &part->dp_ramdata.rd_block0;
+	part->dp_ramdata.rd_block0.rb_start = overlap_page;
+	part->dp_ramdata.rd_block0.rb_size  = 1;
+	part->dp_pprop                      = VM_DATAPART_PPP_INITIALIZED << (0 * VM_DATAPART_PPP_BITS);
+	part->dp_futex                      = NULL;
+	/* node->vn_node.a_vmin = ...; // Initialized by the caller */
+	/* node->vn_node.a_vmax = ...; // Initialized by the caller */
+	/* node->vn_prot        = ...; // Initialized by the caller */
+	node->vn_flags = VM_NODE_FLAG_NORMAL;
+	/* node->vn_vm          = ...; // Unused by vmb */
+	node->vn_part   = part; /* Inherit reference */
+	node->vn_block  = incref(&vm_datablock_anonymous_zero);
+	node->vn_fspath = NULL;
+	node->vn_fsname = NULL;
+	/* node->vn_link        = ...; // Unused by vmb */
+	node->vn_guard = 0;
+	return node;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 

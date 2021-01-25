@@ -32,9 +32,13 @@
 #include <kernel/mman/mm-execinfo.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+
+#include <sys/wait.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -196,6 +200,13 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 
 
 
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+killthread_for_exec(void *UNUSED(arg), struct icpustate *__restrict state,
+                    unsigned int reason, struct rpc_syscall_info const *UNUSED(sc_info)) {
+	if (reason != TASK_RPC_REASON_SHUTDOWN)
+		THROW(E_EXIT_THREAD, W_EXITCODE(0, 0));
+	return state;
+}
 
 /* Terminate all threads bound to `target', other than the calling
  * thread by sending an RPC that throws an E_EXIT_THREAD exception
@@ -218,7 +229,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
  *           - mbuilder_partlocks_release(self);
  *           - mman_lock_release(target);
  *           - unlock(); */
-PUBLIC NONNULL((1, 2)) __BOOL KCALL
+PUBLIC NONNULL((1, 2)) bool KCALL
 mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
                                struct mman *__restrict target,
                                struct unlockinfo *unlock)
@@ -229,6 +240,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 	 * If some are missing, then allocate more _before_
 	 * doing anything, since once we start kill threads,
 	 * we've already reached the point of no return! */
+	bool result = true;
 	struct rpc_entry **p_rpc_desc;
 	struct task *thread, *caller;
 	pflag_t was;
@@ -239,16 +251,80 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 	atomic_lock_acquire_nopr(&target->mm_threadslock);
 #endif /* !CONFIG_NO_SMP */
 
-	/* TODO: Allocate missing descriptors */
-	SLIST_FOREACH(thread, &target->mm_threads, t_)
+	/* Allocate missing descriptors */
+	LIST_FOREACH (thread, &target->mm_threads, t_mman_tasks) {
+		struct rpc_entry *rpc;
+		if (thread == caller)
+			continue; /* Skip this one! */
+		rpc = *p_rpc_desc;
+		if (rpc == NULL) {
+			/* Try to allocate another RPC descriptor w/o blocking. */
+			rpc = task_alloc_user_rpc_nx(&killthread_for_exec, NULL,
+			                             TASK_RPC_FNORMAL, GFP_ATOMIC);
+			if unlikely(!rpc) {
+				if (result) {
+#ifndef CONFIG_NO_SMP
+					atomic_lock_release(&target->mm_threadslock);
+#endif /* !CONFIG_NO_SMP */
+					PREEMPTION_POP(was);
+					mbuilder_partlocks_release(self);
+					mman_lock_release(target);
+					unlockinfo_xunlock(unlock);
+					result = false;
+				}
+				/* Re-try the allocation while blocking, and with exceptions enabled. */
+				rpc = task_alloc_user_rpc(&killthread_for_exec, NULL,
+				                          TASK_RPC_FNORMAL, GFP_NORMAL);
+			}
+			/* Set the next-link to NULL. */
+			rpc->re_next = NULL;
+		}
+		p_rpc_desc = &rpc->re_next;
+	}
+	if (!result)
+		goto done;
 
+	/* === Pointer of no return:
+	 * Actually send out all of the RPCs to all of the target threads. */
+	LIST_FOREACH (thread, &target->mm_threads, t_mman_tasks) {
+		int error;
+		struct rpc_entry *rpc, *next;
+		if (thread == caller)
+			continue; /* Skip this one! */
+		rpc = self->mb_killrpc;
+		assert(rpc);
+		next = rpc->re_next;
+		COMPILER_BARRIER();
+		/* Send the RPC to `thread' */
+		error = task_deliver_rpc(thread, rpc,
+		                         /* Wait for IPI: If the thread is hosted by a different CPU, we need to wait
+		                          *               for that CPU to acknowledge the IPI before we can commence.
+		                          *               Otherwise, we end up with a race condition where some other
+		                          *               CPU is still hosting threads that are actively running within
+		                          *               our VM, simply because their CPU hasn't gotten the memo about
+		                          *               their termination request.
+		                          * NOTE: This only has an affect in SMP when `thread' is running on a different
+		                          *       core than the caller, where it is currently the thread with the active
+		                          *       quantum, spending its time in user-space. */
+		                         TASK_RPC_FWAITFOR);
+		COMPILER_BARRIER();
+		/* If the delivery was successfully (it might fail if `thread' had already
+		 * been terminated before we managed to get here), deal with the fact that
+		 * `task_deliver_rpc()' will have consumed the RPC descriptor.
+		 * Also: If there are any kernel-threads that are using `target',
+		 *       `task_deliver_rpc()' will have failed as well, though this
+		 *       isn't something that should normally happen... */
+		if (TASK_DELIVER_RPC_WASOK(error))
+			self->mb_killrpc = next;
+	}
 
-	/* TODO: Actually send out all of the RPCs to all of the target threads. */
-
+	/* And with that, all target threads have been killed. */
 #ifndef CONFIG_NO_SMP
 	atomic_lock_release(&target->mm_threadslock);
 #endif /* !CONFIG_NO_SMP */
 	PREEMPTION_POP(was);
+done:
+	return result;
 }
 
 

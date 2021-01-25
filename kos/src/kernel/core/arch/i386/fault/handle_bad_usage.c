@@ -1638,7 +1638,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 					 * In this case, we can simply use our trampoline to gain
 					 * write-access. */
 					pagedir_pushval_t pv;
-					byte_t *tramp = THIS_TRAMPOLINE_BASE;
+					byte_t *tramp = THIS_TRAMPOLINE;
 					pv = pagedir_push_mapone(tramp, pc_phys & ~PAGEMASK,
 					                         PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 					pagedir_syncone(tramp);

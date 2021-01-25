@@ -100,7 +100,7 @@ NOTHROW(KCALL FUNC(physb))(PHYS physaddr_t addr VALUE_ARG(u8)) {
 	if (PHYS_IS_IDENTITY(addr, 1))
 		DORW_AND_RETURN(8, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             addr & ~PAGEMASK,
 	                             USED_PAGEDIR_PROT);
@@ -121,7 +121,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS physaddr_t addr VALUE_ARG(u16)) {
 	if (PHYS_IS_IDENTITY(addr, 2))
 		DORW_AND_RETURN(16, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             addr & ~PAGEMASK,
 	                             USED_PAGEDIR_PROT);
@@ -162,7 +162,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS physaddr_t addr VALUE_ARG(u32)) {
 	if (PHYS_IS_IDENTITY(addr, 4))
 		DORW_AND_RETURN(32, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             addr & ~PAGEMASK,
 	                             USED_PAGEDIR_PROT);
@@ -227,7 +227,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS physaddr_t addr VALUE_ARG(u64)) {
 	if (PHYS_IS_IDENTITY(addr, 8))
 		DORW_AND_RETURN(64, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             addr & ~PAGEMASK,
 	                             USED_PAGEDIR_PROT);
@@ -293,7 +293,7 @@ NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, b_phys))(port_t port,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (buf & PAGEMASK);
@@ -345,7 +345,7 @@ NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, w_phys))(port_t port,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_words;
 		page_words = (PAGESIZE - (buf & PAGEMASK)) / 2;
@@ -409,7 +409,7 @@ NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, l_phys))(port_t port,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_dwords;
 		page_dwords = (PAGESIZE - (buf & PAGEMASK)) / 4;

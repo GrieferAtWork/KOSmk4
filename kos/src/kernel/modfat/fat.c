@@ -2393,19 +2393,19 @@ INTERN struct inode_type Fat32_RootDirectoryNodeOperators = {
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL
 Fat12_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
-	return (id + (id / 2)) / self->f_sectorsize;
+	return (id + (id / 2)) >> self->f_sectorshift;
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL
 Fat16_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
-	return (id * 2) / self->f_sectorsize;
+	return (id * 2) >> self->f_sectorshift;
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL
 Fat32_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
-	return (id * 4) / self->f_sectorsize;
+	return (id * 4) >> self->f_sectorshift;
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
@@ -2489,8 +2489,7 @@ Fat_GetFatIndirection(FatSuperblock *__restrict self,
 		SCOPED_WRITELOCK(&self->f_fat_lock);
 		/* Lazily load the fat table sector that hasn't been loaded yet. */
 		block_device_read(self->s_device,
-		                  (byte_t *)self->f_fat_table + (table_sector *
-		                                                 self->f_sectorsize),
+		                  (byte_t *)self->f_fat_table + (table_sector << self->f_sectorshift),
 		                  self->f_sectorsize,
 		                  FAT_SECTORADDR(self, self->f_fat_start + table_sector));
 		FAT_META_STLOAD(self, table_sector);
@@ -2513,8 +2512,7 @@ Fat_SetFatIndirection(FatSuperblock *__restrict self,
 	if (!FAT_META_GTLOAD(self, table_sector)) {
 		/* Must load missing table sectors. */
 		block_device_read(self->s_device,
-		                  (byte_t *)self->f_fat_table + (table_sector *
-		                                                 self->f_sectorsize),
+		                  (byte_t *)self->f_fat_table + (table_sector << self->f_sectorshift),
 		                  self->f_sectorsize,
 		                  FAT_SECTORADDR(self, self->f_fat_start + table_sector));
 		FAT_META_STLOAD(self, table_sector);
@@ -2610,6 +2608,12 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		    !disk_header.bpb.bpb_reserved_sectors) /* What's the first sector, then? */
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 		sector_size = LETOH16(disk_header.bpb.bpb_bytes_per_sector);
+#ifdef CONFIG_USE_NEW_VM
+		if unlikely(!IS_POWER_OF_TWO(sector_size))
+			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+		self->f_sectorsize = sector_size;
+		mfile_init_blockshift(self, CTZ(sector_size));
+#else /* CONFIG_USE_NEW_VM */
 #if PAGESIZE < 512
 #error "System page size is too small to support any FAT variation"
 #endif /* PAGESIZE < 512 */
@@ -2634,6 +2638,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		self->db_pagemask  = self->db_pagealign - 1;
 		self->db_pagesize  = sector_size;
 #endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+#endif /* !CONFIG_USE_NEW_VM */
 	}
 	/* Extract some common information. */
 	self->f_fat_start   = (FatSectorIndex)LETOH16(disk_header.bpb.bpb_reserved_sectors);
@@ -2841,9 +2846,8 @@ Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
 	assertf(fat_sector_index + num_sectors <= self->f_sec4fat,
 	        "Out-of-bounds FAT sector index: %" PRIu32 "+%" PRIu32 "(%" PRIu32 ") > %" PRIu32 "",
 	        fat_sector_index, num_sectors, fat_sector_index + num_sectors, self->f_sec4fat);
-	sector_buffer = (byte_t *)self->f_fat_table + (fat_sector_index *
-	                                               self->f_sectorsize);
-	sector_bytes  = (size_t)(num_sectors * self->f_sectorsize);
+	sector_buffer = (byte_t *)self->f_fat_table + ((size_t)fat_sector_index << self->f_sectorshift);
+	sector_bytes  = (size_t)num_sectors << self->f_sectorshift;
 	sector_start  = self->f_fat_start + fat_sector_index;
 	printk(KERN_INFO "[fat] Saving modified meta-sectors "
 	                 "%" PRIu32 "..%" PRIu32 " of 0..%" PRIu32 " (%" PRIu32 "..%" PRIu32 ")\n",

@@ -373,12 +373,18 @@ struct fat_superblock
 #define FAT_SECTORSIZE(x)   VM_DATABLOCK_PAGESIZE(x)  /* Size of a single sector (in bytes) */
 #define FAT_SECTORSHIFT(x)  VM_DATABLOCK_ADDRSHIFT(x) /* `x << FAT_SECTORSHIFT(fat) == x * FAT_SECTORSIZE(fat)' */
 #ifdef __INTELLISENSE__
+	size_t                  f_sectorshift; /* [const] ilog2(f_sectorsize) (in bytes). */
 	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
 #else /* __INTELLISENSE__ */
-#define f_sectorsize        db_pagesize    /* TODO: Make use of the page-shift values. */
+#define f_sectorshift       db_addrshift   /* [const] ilog2(f_sectorsize) (in bytes). */
+#ifdef CONFIG_USE_NEW_VM
+	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
+#else /* CONFIG_USE_NEW_VM */
+#define f_sectorsize        db_pagesize    /* [const] Size of a sector (in bytes). */
+#endif /* !CONFIG_USE_NEW_VM */
 #endif /* !__INTELLISENSE__ */
-	size_t                  f_clustersize; /* [const][== f_sec4clus * f_sectorsize] Size of a cluster (in bytes). */
-	size_t                  f_fat_size;    /* [const][== f_sec4fat * f_sectorsize] Size of a single FileAllocationTable (in bytes). */
+	size_t                  f_clustersize; /* [const][== f_sec4clus << f_sectorshift] Size of a cluster (in bytes). */
+	size_t                  f_fat_size;    /* [const][== f_sec4fat << f_sectorshift] Size of a single FileAllocationTable (in bytes). */
 	FatSectorIndex          f_sec4clus;    /* [const] Amount of sectors per cluster. */
 	FatSectorIndex          f_sec4fat;     /* [const] Amount of sectors per FileAllocationTable. */
 	FatSectorIndex          f_dat_start;   /* [const] First data sector. */

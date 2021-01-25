@@ -326,7 +326,7 @@ again:
 			return false;
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
-		e1_p = (union pae_pdir_e1 *)THIS_TRAMPOLINE_BASE;
+		e1_p = (union pae_pdir_e1 *)THIS_TRAMPOLINE;
 		backup = pae_pagedir_push_mapone(e1_p, (physaddr_t)((u64)new_e1_vector * 4096),
 		                                 PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e1_p);
@@ -373,7 +373,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		e1.p_word = e2.p_word & ~(PAE_PAGE_F2MIB | PAE_PAGE_FPAT_2MIB);
 		if (e2.p_word & PAE_PAGE_FPAT_2MIB)
 			e1.p_word |= PAE_PAGE_FPAT_4KIB;
-		e1_p   = (union pae_pdir_e1 *)THIS_TRAMPOLINE_BASE;
+		e1_p   = (union pae_pdir_e1 *)THIS_TRAMPOLINE;
 		backup = pae_pagedir_push_mapone(e1_p, (physaddr_t)((u64)new_e1_vector * 4096),
 		                                 PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e1_p);

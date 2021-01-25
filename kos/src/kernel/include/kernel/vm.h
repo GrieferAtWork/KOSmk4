@@ -335,6 +335,7 @@ DECL_END
 #endif /* __CC__ */
 
 
+#define VM_GETFREE_ASLR  0 /* Enabled by default. */
 #define VM_GETFREE_ABOVE MAP_GROWSUP
 #define VM_GETFREE_BELOW MAP_GROWSDOWN
 #define VM_GETFREE_ERROR MAP_FAILED
@@ -438,7 +439,21 @@ DECL_END
 
 #define vm_datablock_deanonymize(self) \
 	(void)0 /* TODO: Function was always racy, and isn't supported anymore */
-
+#define VM_DATABLOCK_INIT_VIO_EX(type, vio, parts, pageshift) \
+	{                                                         \
+		/* .mf_refcnt     = */ 1,                             \
+		/* .mf_ops        = */ type,                          \
+		/* .mf_vio        = */ vio,                           \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,            \
+		/* .mf_parts      = */ parts,                         \
+		/* .mf_initdone   = */ SIG_INIT,                      \
+		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),     \
+		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),     \
+		/* .mf_blockshift = */ PAGESHIFT - (pageshift),       \
+		/* .mf_part_amask = */ PAGESIZE - 1,                  \
+	}
+#define VM_DATABLOCK_INIT_VIO(vio) \
+	VM_DATABLOCK_INIT_VIO_EX(&mfile_ndef_ops, vio, __NULLPTR, 0)
 #else /* CONFIG_USE_NEW_VM */
 
 
@@ -1702,7 +1717,7 @@ struct vm_datablock {
 	                                         * The start, end and size (in data-pages) of any part must therefor be aligned by this. */
 	size_t                    db_pagemask;  /* [const][== (1 << db_pageshift) - 1]
 	                                         * The mask of bits that must be zero for the start, end and size (in data-pages) of any data-part. */
-	size_t                    db_pagesize;  /* [const][== PAGESIZE >> db_pageshift]
+	size_t                    db_pagesize;  /* [const][== PAGESIZE >> db_pageshift == 1 << db_addrshift]
 	                                         * The size of a single data page (in bytes). */
 #endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 };

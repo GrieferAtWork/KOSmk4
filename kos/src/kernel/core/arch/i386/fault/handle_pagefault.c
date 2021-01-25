@@ -1041,9 +1041,6 @@ pop_connections_and_return:
 	/************************************************************************/
 	/* Error handling...                                                    */
 	/************************************************************************/
-pop_connections_and_throw_segfault:
-	task_popconnections();
-	goto throw_segfault;
 #ifdef NEED_pop_connections_and_set_exception_pointers
 #undef NEED_pop_connections_and_set_exception_pointers
 pop_connections_and_set_exception_pointers:

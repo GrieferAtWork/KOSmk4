@@ -73,6 +73,7 @@
 #define mfile     vm_datablock
 #define mfile_ops vm_datablock_type
 #define mnode     vm_node
+#define mbnode    vm_node
 #define mman      vm
 #define mfutex    vm_futex
 #define mpartmeta vm_futex_controller

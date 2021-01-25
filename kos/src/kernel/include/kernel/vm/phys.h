@@ -67,7 +67,6 @@
 #define vm_memsetphyspages(dst, byte, num_pages)          memsetphyspages(dst, byte, (num_pages) * PAGESIZE)
 #define vm_copypagefromphys_nopf(dst, src)                copypagefromphys_nopf(dst, src)
 #define vm_copypagetophys_nopf(dst, src)                  copypagetophys_nopf(dst, src)
-#define THIS_TRAMPOLINE_BASE                              THIS_TRAMPOLINE
 #define vm_ptram                                          mptram
 #define pt_pushval                                        mpt_pushval
 #define VM_PTRAM_INIT                                     MPTRAM_INIT
@@ -80,6 +79,61 @@
 #define vm_ptram_map(self, addr, ...)                     mptram_map(self, addr)
 
 #else /* CONFIG_USE_NEW_VM */
+
+/* Forward-compatibility. */
+#define peekphysb(addr)                      vm_readphysb(addr)
+#define peekphysw(addr)                      vm_readphysw(addr)
+#define peekphysl(addr)                      vm_readphysl(addr)
+#define peekphysw_unaligned(addr)            vm_readphysw_unaligned(addr)
+#define peekphysl_unaligned(addr)            vm_readphysl_unaligned(addr)
+#define pokephysb(addr, value)               vm_writephysb(addr, value)
+#define pokephysw(addr, value)               vm_writephysw(addr, value)
+#define pokephysl(addr, value)               vm_writephysl(addr, value)
+#define pokephysw_unaligned(addr, value)     vm_writephysw_unaligned(addr, value)
+#define pokephysl_unaligned(addr, value)     vm_writephysl_unaligned(addr, value)
+#ifdef __UINT64_TYPE__
+#define peekphysq(addr)                  vm_readphysq(addr)
+#define peekphysq_unaligned(addr)        vm_readphysq_unaligned(addr)
+#define pokephysq(addr, value)           vm_writephysq(addr, value)
+#define pokephysq_unaligned(addr, value) vm_writephysq_unaligned(addr, value)
+#endif /* __UINT64_TYPE__ */
+#define insphysb(port, buf, num_bytes)                 vm_insb_phys(port, buf, num_bytes)
+#define insphysw(port, buf, num_words)                 vm_insw_phys(port, buf, num_words)
+#define insphysl(port, buf, num_dwords)                vm_insl_phys(port, buf, num_dwords)
+#define outsphysb(port, buf, num_bytes)                vm_outsb_phys(port, buf, num_bytes)
+#define outsphysw(port, buf, num_words)                vm_outsw_phys(port, buf, num_words)
+#define outsphysl(port, buf, num_dwords)               vm_outsl_phys(port, buf, num_dwords)
+#define copyfromphys(dst, src, num_bytes)              vm_copyfromphys(dst, src, num_bytes)
+#define copytophys(dst, src, num_bytes)                vm_copytophys(dst, src, num_bytes)
+#define copyinphys(dst, src, num_bytes)                vm_copyinphys(dst, src, num_bytes)
+#define memsetphys(dst, byte, num_bytes)               vm_memsetphys(dst, byte, num_bytes)
+#define copyfromphys_nopf(dst, src, num_bytes)         vm_copyfromphys_nopf(dst, src, num_bytes)
+#define copytophys_nopf(dst, src, num_bytes)           vm_copytophys_nopf(dst, src, num_bytes)
+#define copyfromphys_onepage(dst, src, num_bytes)      vm_copyfromphys_onepage(dst, src, num_bytes)
+#define copytophys_onepage(dst, src, num_bytes)        vm_copytophys_onepage(dst, src, num_bytes)
+#define copyinphys_onepage(dst, src, num_bytes)        vm_copyinphys_onepage(dst, src, num_bytes)
+#define memsetphys_onepage(dst, byte, num_bytes)       vm_memsetphys_onepage(dst, byte, num_bytes)
+#define copyfromphys_onepage_nopf(dst, src, num_bytes) vm_copyfromphys_onepage_nopf(dst, src, num_bytes)
+#define copytophys_onepage_nopf(dst, src, num_bytes)   vm_copytophys_onepage_nopf(dst, src, num_bytes)
+#define copypagefromphys(dst, src)                     vm_copypagefromphys(dst, src)
+#define copypagetophys(dst, src)                       vm_copypagetophys(dst, src)
+#define copypageinphys(dst, src)                       vm_copypageinphys(dst, src)
+#define copypagesinphys(dst, src, num_bytes)           vm_copypagesinphys(dst, src, (num_bytes) / PAGESIZE)
+#define memsetphyspage(dst, byte)                      vm_memsetphyspage(dst, byte)
+#define memsetphyspages(dst, byte, num_bytes)          vm_memsetphyspages(dst, byte, (num_bytes) / PAGESIZE)
+#define copypagefromphys_nopf(dst, src)                vm_copypagefromphys_nopf(dst, src)
+#define copypagetophys_nopf(dst, src)                  vm_copypagetophys_nopf(dst, src)
+#define mptram                                         vm_ptram
+#define mpt_pushval                                    pt_pushval
+#define MPTRAM_INIT                                    VM_PTRAM_INIT
+#define mptram_init(self)                              vm_ptram_init(self)
+#define mptram_cinit(self)                             vm_ptram_cinit(self)
+#define mptram_fini(self)                              vm_ptram_fini(self)
+#define mptram_mappage_noidentity(self, page)          vm_ptram_mappage_noidentity(self, page)
+#define mptram_mappage(self, page)                     vm_ptram_mappage(self, page)
+#define mptram_map_noidentity(self, addr)              vm_ptram_map_noidentity(self, addr)
+#define mptram_map(self, addr)                         vm_ptram_map(self, addr)
+
 
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
 #include <kernel/memory.h>      /* physpage2addr() */
@@ -271,9 +325,9 @@ DATDEF ATTR_PERTASK __ARCH_PAGEID_TYPE this_trampoline_page;
  *       optimizations for supporting `PHYS_IS_IDENTITY()' */
 #define THIS_TRAMPOLINE_PAGE PERTASK_GET(this_trampoline_page)
 #ifdef __ARCH_PAGEID_DECODE_KERNEL
-#define THIS_TRAMPOLINE_BASE ((byte_t *)__ARCH_PAGEID_DECODE_KERNEL(THIS_TRAMPOLINE_PAGE))
+#define THIS_TRAMPOLINE ((byte_t *)__ARCH_PAGEID_DECODE_KERNEL(THIS_TRAMPOLINE_PAGE))
 #else /* __ARCH_PAGEID_DECODE_KERNEL */
-#define THIS_TRAMPOLINE_BASE ((byte_t *)__ARCH_PAGEID_DECODE(THIS_TRAMPOLINE_PAGE))
+#define THIS_TRAMPOLINE ((byte_t *)__ARCH_PAGEID_DECODE(THIS_TRAMPOLINE_PAGE))
 #endif /* !__ARCH_PAGEID_DECODE_KERNEL */
 
 /* A VM node used to describe a single, reserved page. */
@@ -295,13 +349,13 @@ struct vm_ptram {
 #define vm_ptram_fini(self)                        \
 	((self)->pt_pushval == PAGEDIR_PUSHVAL_INVALID \
 	 ? (void)0                                     \
-	 : pagedir_pop_mapone(THIS_TRAMPOLINE_BASE, (self)->pt_pushval))
+	 : pagedir_pop_mapone(THIS_TRAMPOLINE, (self)->pt_pushval))
 
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
                                            physpage_t page, __BOOL writable DFL(true)) {
 	byte_t *tramp;
-	tramp = THIS_TRAMPOLINE_BASE;
+	tramp = THIS_TRAMPOLINE;
 	if (self->pt_pushval == PAGEDIR_PUSHVAL_INVALID) {
 		self->pt_pushval = pagedir_push_mapone(tramp, physpage2addr(page),
 		                                       writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE

@@ -314,29 +314,25 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 
 	{
 		u32 sector_size;
+		unsigned int block_shift;
 		sector_size = (u32)GET_LEBE(volume.vd_prim_volume.pv_sectorsize);
 		switch (sector_size) {
-		case 1: self->db_pageshift = PAGESHIFT; break;
-		case 2: self->db_pageshift = PAGESHIFT - 1; break;
-		case 4: self->db_pageshift = PAGESHIFT - 2; break;
-		case 8: self->db_pageshift = PAGESHIFT - 3; break;
-		case 16: self->db_pageshift = PAGESHIFT - 4; break;
-		case 32: self->db_pageshift = PAGESHIFT - 5; break;
-		case 64: self->db_pageshift = PAGESHIFT - 6; break;
-		case 128: self->db_pageshift = PAGESHIFT - 7; break;
-		case 256: self->db_pageshift = PAGESHIFT - 8; break;
-		case 512: self->db_pageshift = PAGESHIFT - 9; break;
-		case 1024: self->db_pageshift = PAGESHIFT - 10; break;
-		case 2048: self->db_pageshift = PAGESHIFT - 11; break;
-		case 4096: self->db_pageshift = PAGESHIFT - 12; break;
+		case 1: block_shift = 0; break;
+		case 2: block_shift = 1; break;
+		case 4: block_shift = 2; break;
+		case 8: block_shift = 3; break;
+		case 16: block_shift = 4; break;
+		case 32: block_shift = 5; break;
+		case 64: block_shift = 6; break;
+		case 128: block_shift = 7; break;
+		case 256: block_shift = 8; break;
+		case 512: block_shift = 9; break;
+		case 1024: block_shift = 10; break;
+		case 2048: block_shift = 11; break;
+		case 4096: block_shift = 12; break;
 		default: THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		}
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-		self->db_addrshift = PAGESHIFT - self->db_pageshift;
-		self->db_pagealign = (size_t)1 << self->db_pageshift;
-		self->db_pagemask  = self->db_pagealign - 1;
-		self->db_pagesize  = sector_size;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+		mfile_init_blockshift(self, block_shift);
 	}
 	{
 		DirectoryEntry *root;

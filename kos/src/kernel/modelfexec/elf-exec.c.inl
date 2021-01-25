@@ -35,6 +35,10 @@
 #endif /* !__x86_64__ */
 #endif /* __INTELLISENSE__ */
 
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman/mm-flags.h>
+#endif /* CONFIG_USE_NEW_VM */
+
 #ifdef LOCAL_EXEC_ARGV_SIZE
 #define LOCAL_STRINGARRAY_TYPE USER CHECKED void const *
 #else /* LOCAL_EXEC_ARGV_SIZE */
@@ -78,8 +82,8 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 					break;
 
 				case PT_LOAD: {
-					pageid_t page_index;
-					size_t num_pages, num_total;
+					byte_t *loadaddr;
+					size_t fil_bytes, mem_bytes;
 					uintptr_half_t prot;
 					size_t adjusted_filsize;
 					size_t adjusted_memsize;
@@ -92,19 +96,22 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT);
 					}
-					page_index = PAGEID_ENCODE(phdr_vector[i].p_vaddr);
+					loadaddr = (byte_t *)(phdr_vector[i].p_vaddr & ~PAGEMASK);
 					if (loadstart > phdr_vector[i].p_vaddr)
 						loadstart = phdr_vector[i].p_vaddr;
 					adjusted_filsize = (size_t)phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);
 					adjusted_memsize = (size_t)phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & PAGEMASK);
-					num_pages        = CEILDIV(adjusted_filsize, PAGESIZE);
-					num_total        = CEILDIV(adjusted_memsize, PAGESIZE);
+					fil_bytes        = CEIL_ALIGN(adjusted_filsize, PAGESIZE);
+					mem_bytes        = CEIL_ALIGN(adjusted_memsize, PAGESIZE);
 					bss_start        = (void *)(uintptr_t)(phdr_vector[i].p_vaddr + phdr_vector[i].p_filesz);
 					/* Check if we're going to need a .bss overlap fixup page */
 					if (adjusted_memsize > adjusted_filsize) {
 						if (((uintptr_t)bss_start & PAGEMASK) != 0)
-							--num_pages;
+							fil_bytes -= PAGESIZE;
 					}
+#ifdef CONFIG_USE_NEW_VM
+					prot = prot_from_elfpf(phdr_vector[i].p_flags);
+#else /* CONFIG_USE_NEW_VM */
 #if PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ
 					prot = phdr_vector[i].p_flags & (PF_X | PF_W | PF_R);
 #else /* PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ */
@@ -116,21 +123,18 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 					if (phdr_vector[i].p_flags & PF_R)
 						prot |= VM_PROT_READ;
 #endif /* PF_X != VM_PROT_EXEC || PF_W != VM_PROT_WRITE || PF_R != VM_PROT_READ */
-					map_ok = vmb_paged_mapat(&builder,
-					                         page_index,
-					                         num_pages,
-					                         args->ea_xnode,
-					                         args->ea_xpath,
-					                         args->ea_xdentry,
-					                         (pageid64_t)(phdr_vector[i].p_offset / PAGESIZE),
-					                         prot | VM_PROT_PRIVATE);
+#endif /* !CONFIG_USE_NEW_VM */
+					map_ok = vmb_mapat(&builder, loadaddr, fil_bytes,
+					                   args->ea_xnode, args->ea_xpath, args->ea_xdentry,
+					                   (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK),
+					                   prot | VM_PROT_PRIVATE);
 					if unlikely(!map_ok) {
 err_overlap:
 						THROW(E_NOT_EXECUTABLE_FAULTY,
 						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
 					}
-					if (num_total > num_pages) {
+					if (mem_bytes > fil_bytes) {
 						/* LD sometimes produces really weird .bss sections that are neither whole
 						 * pages, nor are placed such that they exist at the end of some given file.
 						 * Because of this, we must manually check for segments that end in a
@@ -154,9 +158,9 @@ err_overlap:
 						 * initialized to all ZEROes, causing the page to be faulted and become initialized properly.
 						 */
 						if (((uintptr_t)bss_start & PAGEMASK) != 0) {
-							pageid_t bss_overlap_page;
+							PAGEDIR_PAGEALIGNED byte_t *bss_overlap_addr;
 							size_t bss_start_offset, bss_overlap, bss_total_size;
-							struct vm_node *overlap_node;
+							struct mbnode *overlap_node;
 							assert(phdr_vector[i].p_memsz > phdr_vector[i].p_filesz);
 							bss_total_size = phdr_vector[i].p_memsz -
 							                 phdr_vector[i].p_filesz;
@@ -164,34 +168,40 @@ err_overlap:
 							bss_overlap = PAGESIZE - bss_start_offset;
 							if (bss_overlap > bss_total_size)
 								bss_overlap = bss_total_size;
-							bss_overlap_page = page_index + num_pages;
-							assert(bss_overlap_page == PAGEID_ENCODE(bss_start));
-							if unlikely(vmb_getnodeofpageid(&builder, bss_overlap_page) != NULL)
+							bss_overlap_addr = loadaddr + fil_bytes;
+							if unlikely(vmb_getnodeofaddress(&builder, bss_overlap_addr) != NULL)
 								goto err_overlap; /* Already in use... */
-							overlap_node = create_bss_overlap_node(args->ea_xnode,
-							                                       (pos_t)(phdr_vector[i].p_offset +
-							                                               phdr_vector[i].p_filesz -
-							                                               bss_start_offset),
-							                                       bss_start_offset,
-							                                       bss_overlap);
-							overlap_node->vn_node.a_vmin = bss_overlap_page;
-							overlap_node->vn_node.a_vmax = bss_overlap_page;
+							overlap_node = create_bss_overlap_mbnode(args->ea_xnode,
+							                                         (pos_t)(phdr_vector[i].p_offset +
+							                                                 phdr_vector[i].p_filesz -
+							                                                 bss_start_offset),
+							                                         bss_start_offset,
+							                                         bss_overlap);
+							/* Fill in remaining fields of `overlap_node' */
+#ifdef CONFIG_USE_NEW_VM
+							overlap_node->mbn_minaddr = bss_overlap_addr;
+							overlap_node->mbn_maxaddr = bss_overlap_addr + PAGESIZE - 1;
+							overlap_node->mbn_flags = prot | VM_PROT_PRIVATE;
+							mbuilder_insert_fmnode(&builder, overlap_node);
+#else /* CONFIG_USE_NEW_VM */
+							vm_node_setminaddr(overlap_node, bss_overlap_addr);
+							vm_node_setmaxaddr(overlap_node, bss_overlap_addr + PAGESIZE - 1);
 							assert(overlap_node->vn_part);
 							assert(overlap_node->vn_part->dp_block == &vm_datablock_anonymous_zero ||
 							       overlap_node->vn_part->dp_block == &vm_datablock_anonymous);
 							overlap_node->vn_prot = prot | VM_PROT_PRIVATE;
 							vmb_node_insert(&builder, overlap_node);
-							++num_pages; /* Adjust to not map the first (special) page of .bss */
+#endif /* !CONFIG_USE_NEW_VM */
+							fil_bytes += PAGESIZE; /* Adjust to not map the first (special) page of .bss */
 						}
 						/* Map BSS as anonymous, zero-initialized memory. */
-						map_ok = vmb_paged_mapat(&builder,
-						                   page_index + num_pages,
-						                   num_total - num_pages,
+						map_ok = vmb_mapat(&builder,
+						                   loadaddr + fil_bytes,
+						                   mem_bytes - fil_bytes,
 						                   &vm_datablock_anonymous_zero,
-						                   NULL,
-						                   NULL,
-						                   0,
-						                   prot | VM_PROT_PRIVATE);
+						                   NULL, NULL, 0,
+						                   prot | VM_PROT_PRIVATE,
+						                   0, 0);
 						if unlikely(!map_ok)
 							goto err_overlap;
 					}
@@ -209,7 +219,11 @@ err_overlap:
 				                      LOCAL_FUNC(execabi_system_rtld_size),
 				                      PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
+#ifdef CONFIG_USE_NEW_VM
+				                      MAP_GROWSUP | MAP_NOASLR,
+#else /* CONFIG_USE_NEW_VM */
 				                      VM_GETFREE_ABOVE,
+#endif /* !CONFIG_USE_NEW_VM */
 #else
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
@@ -326,9 +340,9 @@ err_overlap:
 				if (linker_base != (void *)-1) {
 					/* Initialize such that we make use of the dynamic linker. */
 					args->ea_state = LOCAL_FUNC(elfexec_init_rtld)(/* user_state:           */ args->ea_state,
-					                                               /* args->ea_xpath:            */ args->ea_xpath,
-					                                               /* args->ea_xdentry:          */ args->ea_xdentry,
-					                                               /* args->ea_xnode:            */ args->ea_xnode,
+					                                               /* exec_path:            */ args->ea_xpath,
+					                                               /* exec_dentry:          */ args->ea_xdentry,
+					                                               /* exec_node:            */ args->ea_xnode,
 					                                               /* ehdr:                 */ ehdr,
 					                                               /* phdr_vec:             */ phdr_vector,
 					                                               /* phdr_cnt:             */ ehdr->e_phnum,

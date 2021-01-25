@@ -244,7 +244,7 @@ again_read_e3_word:
 		unsigned int vec2;
 		pagedir_pushval_t pushval;
 		union p64_pdir_e2 e2, *e2_vector;
-		e2_vector = (union p64_pdir_e2 *)THIS_TRAMPOLINE_BASE;
+		e2_vector = (union p64_pdir_e2 *)THIS_TRAMPOLINE;
 		pushval   = pagedir_push_mapone(e2_vector, new_e3_word, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e2_vector);
 		/* Figure out which physical memory range should be mapped.

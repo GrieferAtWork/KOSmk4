@@ -419,7 +419,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
 	byte_t *tramp;
 	bool is_first;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (buf & PAGEMASK);

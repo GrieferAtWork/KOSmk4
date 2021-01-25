@@ -60,7 +60,7 @@ NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
                                                   size_t num_bytes) {
 	uintptr_t offset;
 	size_t result;
-	byte_t *vsrc = THIS_TRAMPOLINE_BASE;
+	byte_t *vsrc = THIS_TRAMPOLINE;
 	pagedir_pushval_t pv;
 	/* NOTE: We must still preserve the trampoline here, since the trampoline
 	 *       for _boottask is allocated past the end of the kernel's .free

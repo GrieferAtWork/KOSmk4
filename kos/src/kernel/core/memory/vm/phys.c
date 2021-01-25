@@ -76,7 +76,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 		return;
 	}
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (src & PAGEMASK);
@@ -130,7 +130,7 @@ vm_copytophys(PHYS physaddr_t dst,
 	if unlikely(!num_bytes)
 		return;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (dst & PAGEMASK);
@@ -187,7 +187,7 @@ NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst,
 	if unlikely(!num_bytes)
 		goto done;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes, copy_error;
 		page_bytes = PAGESIZE - (src & PAGEMASK);
@@ -240,7 +240,7 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS physaddr_t dst,
 	if unlikely(!num_bytes)
 		goto done;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes, copy_error;
 		page_bytes = PAGESIZE - (dst & PAGEMASK);
@@ -355,7 +355,7 @@ NOTHROW(KCALL vm_memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes) {
 	if unlikely(!num_bytes)
 		return;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_BASE;
+	tramp    = THIS_TRAMPOLINE;
 	for (;;) {
 		size_t page_bytes;
 		page_bytes = PAGESIZE - (dst & PAGEMASK);
@@ -413,7 +413,7 @@ vm_copyfromphys_onepage(USER CHECKED void *dst,
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp = THIS_TRAMPOLINE_BASE;
+	tramp = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             src & ~PAGEMASK,
 	                             PAGEDIR_MAP_FREAD);
@@ -446,7 +446,7 @@ vm_copytophys_onepage(PHYS physaddr_t dst,
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp = THIS_TRAMPOLINE_BASE;
+	tramp = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst & ~PAGEMASK,
 	                             PAGEDIR_MAP_FWRITE);
@@ -540,7 +540,7 @@ NOTHROW(KCALL vm_memsetphys_onepage)(PHYS physaddr_t dst,
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst & ~PAGEMASK,
 	                             PAGEDIR_MAP_FWRITE);
@@ -563,7 +563,7 @@ NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst,
 	if (PHYS_IS_IDENTITY(src, num_bytes))
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             src & ~PAGEMASK,
 	                             PAGEDIR_MAP_FREAD);
@@ -588,7 +588,7 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS physaddr_t dst,
 	if (PHYS_IS_IDENTITY(dst, num_bytes))
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst & ~PAGEMASK,
 	                             PAGEDIR_MAP_FWRITE);
@@ -616,7 +616,7 @@ vm_copypagefromphys(USER CHECKED void *dst,
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             src,
 	                             PAGEDIR_MAP_FREAD);
@@ -646,7 +646,7 @@ vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst,
 	                             PAGEDIR_MAP_FWRITE);
@@ -759,7 +759,7 @@ NOTHROW(KCALL vm_memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst,
 	                             PAGEDIR_MAP_FWRITE);
@@ -785,7 +785,7 @@ NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 		++dst;
 	}
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst,
 	                             PAGEDIR_MAP_FWRITE);
@@ -813,7 +813,7 @@ NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst,
 	if (PHYS_IS_IDENTITY(src, PAGESIZE))
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), PAGESIZE);
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             src,
 	                             PAGEDIR_MAP_FREAD);
@@ -835,7 +835,7 @@ NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	if (PHYS_IS_IDENTITY(dst, PAGESIZE))
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, PAGESIZE);
 #endif /* !NO_PHYS_IDENTITY */
-	tramp  = THIS_TRAMPOLINE_BASE;
+	tramp  = THIS_TRAMPOLINE;
 	backup = pagedir_push_mapone(tramp,
 	                             dst,
 	                             PAGEDIR_MAP_FWRITE);

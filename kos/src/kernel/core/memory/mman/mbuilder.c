@@ -31,6 +31,7 @@
 #include <kernel/mman/mm-flags.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <sched/rpc-internal.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
@@ -136,7 +137,19 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 	if likely(self->mb_oldmap != NULL)
 		mnode_tree_destroy(self->mb_oldmap);
 
-	/* TODO: Finalize `self->mb_killrpc' */
+	/* Free all RPC descriptors that may still be allocated */
+	{
+		struct rpc_entry *ent;
+		ent = self->mb_killrpc;
+		if unlikely(ent) {
+			do {
+				struct rpc_entry *next;
+				next = ent->re_next;
+				task_free_rpc(ent);
+				ent = next;
+			} while (ent);
+		}
+	}
 
 	/* Free all nodes that remained within the free-list. */
 	iter = SLIST_FIRST(&self->_mb_fbnodes);
@@ -313,6 +326,8 @@ mbuilder_map(struct mbuilder *__restrict self,
 	fmnode->mbn_file = incref(file);
 	mnode_mbn_filpos_set(fmnode, file_pos);
 
+	/* TODO: Merge adjacent nodes if possible */
+
 	/* Remember this mapping as a consistent file-mapping. */
 	SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
 done:
@@ -461,6 +476,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 	if (hinode != NULL)
 		mbuilder_insert_anon_file_node(self, hinode);
 
+	/* TODO: Merge adjacent nodes if possible */
 done:
 	return result;
 }
@@ -484,6 +500,8 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 
 	if likely(num_bytes > 0) {
 		struct mbnode *fmnode;
+
+		/* TODO: Extend adjacent nodes if possible */
 
 		/* Construct the memory-reservation node. */
 		fmnode = (struct mbnode *)mbuilder_create_res_file_node(baseaddr, num_bytes);
@@ -538,6 +556,60 @@ mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
 	return result;
 }
 
+
+
+/* Insert or remove a raw mem-node `fmnode' from self.
+ * This function does:
+ *  - assert(fmnode->mbn_part != NULL);
+ *  - assert(fmnode->mbn_file != NULL);
+ *  - fmnode->mbn_filnxt = NULL;       // Only single-nde initial mappings are supported.
+ *                                     // Additional required nodes are added lazily if necessary
+ *                                     // via the re-flow mechanism that is done as part of a call
+ *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
+ *  - SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
+ *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
+ *                                           fmnode->mbn_part),
+ *                     fmnode, mbn_nxtuprt);
+ *  - mbnode_tree_insert(&self->mb_mappings, fmnode);
+ * As such, the caller must initialize:
+ *  - fmnode->mbn_minaddr  (Mapping min address)
+ *  - fmnode->mbn_maxaddr  (Mapping max address)
+ *  - fmnode->mbn_flags    (Mapping flags)
+ *  - fmnode->mbn_part     (as some part from `fmnode->mbn_file')
+ *  - fmnode->mbn_fspath   (optional: filesystem path)
+ *  - fmnode->mbn_fsname   (optional: filesystem name)
+ *  - fmnode->mbn_filpos   (Wanted in-file mapping address)
+ *  - fmnode->mbn_file     (The actual file being mapped) */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
+                                      struct mbnode *__restrict fmnode) {
+	assert(fmnode->mbn_part != NULL);
+	assert(fmnode->mbn_file != NULL);
+	fmnode->mbn_filnxt = NULL;
+	SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
+	LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
+	                                       fmnode->mbn_part),
+	                 fmnode, mbn_nxtuprt);
+	mbnode_tree_insert(&self->mb_mappings, fmnode);
+}
+
+/* Remove `fmnode' from `self'. - Asserts that no secondary nodes have
+ * been allocated for use with `fmnode' (as could happen if the caller
+ * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior call
+ * to `mbuilder_insert_fmnode()' and the call to this function) */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
+                                      struct mbnode *__restrict fmnode) {
+	assert(fmnode->mbn_part != NULL);
+	assert(fmnode->mbn_file != NULL);
+	assert(fmnode->mbn_filnxt == NULL);
+	mbnode_tree_remove(&self->mb_mappings, fmnode);
+	LIST_REMOVE(fmnode, mbn_nxtuprt);
+	SLIST_REMOVE(&self->mb_files, fmnode, mbn_nxtfile); /* WARNING: O(n) operation! */
+	DBG_memset(&fmnode->mbn_mement, 0xcc, sizeof(fmnode->mbn_mement));
+	DBG_memset(&fmnode->mbn_nxtuprt, 0xcc, sizeof(fmnode->mbn_nxtuprt));
+	DBG_memset(&fmnode->mbn_nxtfile, 0xcc, sizeof(fmnode->mbn_nxtfile));
+}
 
 
 DECL_END

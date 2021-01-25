@@ -53,6 +53,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 struct rpc_entry {
+	/* TODO: Replace this with `SLIST_ENTRY(rpc_entry) re_next;' */
 	struct rpc_entry *re_next; /* [0..1][const] Next pending RPC function. */
 	task_rpc_t        re_func; /* [1..1][const][valid_if(!RPC_KIND_SRPC)] RPC function. */
 	void             *re_arg;  /* [?..?][const] RPC argument. */

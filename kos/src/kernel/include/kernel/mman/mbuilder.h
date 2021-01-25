@@ -24,6 +24,7 @@
 
 #include <kernel/mman/mm-map.h>
 #include <kernel/mman/mm-unmapped.h>
+#include <kernel/mman/mnode.h> /* __ALIGNOF_MNODE */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -235,6 +236,41 @@ struct mbuilder {
 /* Finalize the given mem-builder. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
+
+
+/* Insert or remove a raw mem-node `fmnode' from self.
+ * This function does:
+ *  - assert(fmnode->mbn_part != NULL);
+ *  - assert(fmnode->mbn_file != NULL);
+ *  - fmnode->mbn_filnxt = NULL;       // Only single-nde initial mappings are supported.
+ *                                     // Additional required nodes are added lazily if necessary
+ *                                     // via the re-flow mechanism that is done as part of a call
+ *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
+ *  - SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
+ *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
+ *                                           fmnode->mbn_part),
+ *                     fmnode, mbn_nxtuprt);
+ *  - mbnode_tree_insert(&self->mb_mappings, fmnode);
+ * As such, the caller must initialize:
+ *  - fmnode->mbn_minaddr  (Mapping min address)
+ *  - fmnode->mbn_maxaddr  (Mapping max address)
+ *  - fmnode->mbn_flags    (Mapping flags)
+ *  - fmnode->mbn_part     (as some part from `fmnode->mbn_file')
+ *  - fmnode->mbn_fspath   (optional: filesystem path)
+ *  - fmnode->mbn_fsname   (optional: filesystem name)
+ *  - fmnode->mbn_filpos   (Wanted in-file mapping address)
+ *  - fmnode->mbn_file     (The actual file being mapped) */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
+                                      struct mbnode *__restrict fmnode);
+/* Remove `fmnode' from `self'. - Asserts that no secondary nodes have
+ * been allocated for use with `fmnode' (as could happen if the caller
+ * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior call
+ * to `mbuilder_insert_fmnode()' and the call to this function) */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
+                                      struct mbnode *__restrict fmnode);
+
 
 /* Acquire locks to all of the parts being mapped by `self', and
  * ensure that all mappings within `self' are fully continuous.

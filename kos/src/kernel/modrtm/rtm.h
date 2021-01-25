@@ -126,6 +126,9 @@ DECL_BEGIN
  */
 
 
+/* TODO: With the new mman, RTM shouldn't lock the actual mem-parts,
+ *       but rather acquire DMA-locks to ensure that backing physical
+ *       memory can be accessed without any issues! */
 
 /*
  * How the kernel applies RTM memory modifications:

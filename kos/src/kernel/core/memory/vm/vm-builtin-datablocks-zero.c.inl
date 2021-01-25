@@ -71,7 +71,7 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 			phys += PAGESIZE;
 			continue;
 		}
-		tramp  = THIS_TRAMPOLINE_BASE;
+		tramp  = THIS_TRAMPOLINE;
 		backup = pagedir_push_mapone(tramp, phys,
 		                              PAGEDIR_MAP_FREAD |
 		                              PAGEDIR_MAP_FWRITE);

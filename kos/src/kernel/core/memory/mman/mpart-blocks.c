@@ -329,7 +329,8 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	physaddr_t min_addr;
 	assert(partrel_offset < mpart_getsize(self));
 	assert(mpart_hasblockstate(self));
-	min = (partrel_offset) >> file->mf_blockshift;
+	file = self->mp_file;
+	min  = partrel_offset >> file->mf_blockshift;
 
 	/* Check the status of the first part (the one pointed-to by `min'). */
 	st = mpart_getblockstate(self, min);
