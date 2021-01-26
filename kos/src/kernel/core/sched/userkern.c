@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_USERKERN_C
 #define GUARD_KERNEL_SRC_SCHED_USERKERN_C 1
+#define __WANT_MPART_INIT
 
 #include <kernel/compiler.h>
 
@@ -187,23 +188,23 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 
 PUBLIC struct mpart userkern_segment_part = {
 #ifdef CONFIG_USE_NEW_VM
-	/* .mp_refcnt    = */ 1,
-	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/*                 */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
-	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
-	/* .mp_state     = */ MPART_ST_VIO,
-	/* .mp_file      = */ { &mfile_ndef },
-	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(userkern_segment_part.mp_copy),
-	/* .mp_share     = */ LIST_HEAD_INITIALIZER(userkern_segment_part.mp_share),
-	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(userkern_segment_part.mp_lockops),
-	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_minaddr   = */ (pos_t)(0),
-	/* .mp_maxaddr   = */ (pos_t)(KS_MAXADDR - KS_MINADDR),
-	/* .mp_changed   = */ {},
-	/* .mp_filent    = */ { {} },
-	/* .mp_blkst_ptr = */ { NULL },
-	/* .mp_mem       = */ { {} },
-	/* .mp_meta      = */ NULL
+	MPART_INIT_mp_refcnt(1),
+	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
+	MPART_INIT_mp_state(MPART_ST_VIO),
+	MPART_INIT_mp_file(&mfile_ndef),
+	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(userkern_segment_part.mp_copy)),
+	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(userkern_segment_part.mp_share)),
+	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(userkern_segment_part.mp_lockops)),
+	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_minaddr(0),
+	MPART_INIT_mp_maxaddr(KS_MAXADDR - KS_MINADDR),
+	MPART_INIT_mp_changed({}),
+	MPART_INIT_mp_filent({}),
+	MPART_INIT_mp_blkst_ptr(NULL),
+	MPART_INIT_mp_mem(0, 0),
+	MPART_INIT_mp_meta(NULL)
 #else /* CONFIG_USE_NEW_VM */
 	/* .dp_refcnt = */ 1,
 	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
@@ -349,23 +350,23 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 
 PUBLIC struct vm_datapart userkern_segment_part_compat = {
 #ifdef CONFIG_USE_NEW_VM
-	/* .mp_refcnt    = */ 1,
-	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/* .mp_flags     = */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
-	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
-	/* .mp_state     = */ MPART_ST_VIO,
-	/* .mp_file      = */ { &mfile_ndef },
-	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_copy),
-	/* .mp_share     = */ LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_share),
-	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_lockops),
-	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_minaddr   = */ (pos_t)(0),
-	/* .mp_maxaddr   = */ (pos_t)((((COMPAT_KERNELSPACE_MAXPAGEID - COMPAT_KERNELSPACE_MINPAGEID) + 1) * PAGESIZE) - 1),
-	/* .mp_changed   = */ {},
-	/* .mp_filent    = */ { {} },
-	/* .mp_blkst_ptr = */ { NULL },
-	/* .mp_mem       = */ { {} },
-	/* .mp_meta      = */ NULL
+	MPART_INIT_mp_refcnt(1),
+	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
+	MPART_INIT_mp_state(MPART_ST_VIO),
+	MPART_INIT_mp_file(&mfile_ndef),
+	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_copy)),
+	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_share)),
+	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_lockops)),
+	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_minaddr(0),
+	MPART_INIT_mp_maxaddr((((COMPAT_KERNELSPACE_MAXPAGEID - COMPAT_KERNELSPACE_MINPAGEID) + 1) * PAGESIZE) - 1),
+	MPART_INIT_mp_changed({}),
+	MPART_INIT_mp_filent({}),
+	MPART_INIT_mp_blkst_ptr(NULL),
+	MPART_INIT_mp_mem(0, 0),
+	MPART_INIT_mp_meta(NULL)
 #else /* CONFIG_USE_NEW_VM */
 	/* .dp_refcnt = */ 1,
 	/* .dp_lock   = */ SHARED_RWLOCK_INIT,

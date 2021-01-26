@@ -272,8 +272,8 @@ SECTIONS {
 
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_rodata_end = ABSOLUTE(.));
-	PROVIDE_HIDDEN(__kernel_rodata_size = ABSOLUTE(ABSOLUTE(__kernel_rodata_end) - ABSOLUTE(__kernel_start)));
 	PROVIDE_HIDDEN(__kernel_rodata_endpage = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_rodata_size = ABSOLUTE(ABSOLUTE(__kernel_rodata_end) - ABSOLUTE(__kernel_rodata_start)));
 	PROVIDE_HIDDEN(__kernel_rodata_numpages = ABSOLUTE(ABSOLUTE(__kernel_rodata_endpage) - ABSOLUTE(__kernel_rodata_startpage)));
 
 	PROVIDE_HIDDEN(__debug_malloc_tracked_start = ABSOLUTE(.));

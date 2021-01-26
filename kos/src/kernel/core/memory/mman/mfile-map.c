@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MAP_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MAP_C 1
+#define __WANT_MNODE__mn_alloc
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

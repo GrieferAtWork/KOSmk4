@@ -171,7 +171,7 @@ struct ph_unused {
 PRIVATE ATTR_COLDBSS WEAK struct ph_unused *ph_unused_blocks = NULL;
 
 PRIVATE ATTR_COLDTEXT void *
-NOTHROW(KCALL phcore_unsued_alloc_nx)(size_t num_bytes, gfp_t flags,
+NOTHROW(KCALL phcore_unused_alloc_nx)(size_t num_bytes, gfp_t flags,
                                       size_t *__restrict palloc_bytes) {
 	void *result = NULL;
 	struct ph_unused *chain, **piter, *iter;
@@ -220,7 +220,7 @@ NOTHROW(KCALL phcore_unsued_alloc_nx)(size_t num_bytes, gfp_t flags,
 }
 
 PRIVATE ATTR_COLDTEXT void
-NOTHROW(KCALL phcore_unsued_append)(void *ptr, size_t num_bytes) {
+NOTHROW(KCALL phcore_unused_append)(void *ptr, size_t num_bytes) {
 	struct ph_unused *ent, *next;
 	if unlikely(num_bytes < sizeof(struct ph_unused))
 		return; /* Shouldn't happen. */
@@ -238,7 +238,7 @@ PRIVATE ATTR_COLDTEXT void *
 NOTHROW(KCALL phcore_core_alloc_nx)(size_t num_bytes, gfp_t flags,
                                     size_t *__restrict palloc_bytes) {
 	void *result;
-	result = phcore_unsued_alloc_nx(num_bytes, flags, palloc_bytes);
+	result = phcore_unused_alloc_nx(num_bytes, flags, palloc_bytes);
 	if (!result) {
 		PAGEDIR_PAGEALIGNED size_t page_bytes;
 		page_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
@@ -253,7 +253,7 @@ NOTHROW(KCALL phcore_core_alloc_nx)(size_t num_bytes, gfp_t flags,
 					real_alloc = page_bytes - unused_head;
 					/* In order to somewhat better deal with small allocations,
 					 * allow the unused tail to be re-used in later allocations. */
-					phcore_unsued_append(result, unused_head);
+					phcore_unused_append(result, unused_head);
 					result = (byte_t *)result + unused_head;
 				}
 			}

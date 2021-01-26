@@ -69,13 +69,12 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
 	assert(IS_ALIGNED(size, PAGESIZE));
 	assert(IS_ALIGNED(offset, PAGESIZE));
 	assert((offset + size) >= offset);
-	assert((offset + size) <= mpart_getsize(self));
-	__builtin_assume(&self->mp_blkst_inl != NULL);
 	switch (__builtin_expect(self->mp_state, MPART_ST_MEM)) {
 
 	case MPART_ST_MEM: {
 		/* Simplest case: we can just directly map the proper sub-range! */
 		physaddr_t baseaddr;
+		assert((offset + size) <= self->mp_mem.mc_size * PAGESIZE);
 		baseaddr = physpage2addr(self->mp_mem.mc_start);
 		LOCAL_pagedir_map(addr, size, baseaddr + offset);
 	}	break;

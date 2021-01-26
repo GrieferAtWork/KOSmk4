@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_C 1
+#define __WANT_MNODE_INIT
 
 #include <kernel/compiler.h>
 
@@ -83,26 +84,29 @@ PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
  * with a reservation within user-space memory manager. Within the
  * kernel mman itself, this field is undefined. */
 PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
-	/* .mn_mement   = */ { NULL, NULL, NULL },
-	/* .mn_minaddr  = */ (byte_t *)KS_MINADDR,
-	/* .mn_maxaddr  = */ (byte_t *)KS_MAXADDR,
-	/* .mn_flags    = */ MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-	/*                */ MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
+	MNODE_INIT_mn_mement({}),
+	MNODE_INIT_mn_minaddr(KS_MINADDR),
+	MNODE_INIT_mn_maxaddr(KS_MAXADDR),
+#ifdef CONFIG_NO_USERKERN_SEGMENT
+	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
+#else /* CONFIG_NO_USERKERN_SEGMENT */
+	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+	                    MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
+	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
-	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART,
-	/* .mn_part     = */ NULL, /* Reserved node */
-	/* .mn_fspath   = */ NULL,
-	/* .mn_fsname   = */ NULL,
-	/* .mn_mman     = */ NULL, /* Filled in during init */
-	/* .mn_partoff  = */ 0,
+	MNODE_INIT_mn_part(NULL), /* Reserved node */
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(NULL), /* Filled in during init */
+	MNODE_INIT_mn_partoff(0),
 	/* NOTE: The next-link of this is (ab-)used for `thismman_lockops'.
 	 *       This is because that field has the attribute [valid_if(le_prev != NULL)],
 	 *       which is never the case since this node is never linked to any mem-part,
 	 *       since it's always a reserved node. As such, we can simply re-use that
 	 *       field and not have to add yet another member to `struct mman' */
-	/* .mn_link     = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
 };
 
 /* ALIAS@thismman_kernel_reservation.mn_link.le_next */

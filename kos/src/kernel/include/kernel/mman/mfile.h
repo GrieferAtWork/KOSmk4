@@ -256,8 +256,8 @@ struct mfile {
 		/* .mf_initdone   = */ SIG_INIT,                                               \
 		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),                              \
 		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                              \
-		/* .mf_blockshift = */ blockshift,                                             \
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
+		/* .mf_blockshift = */ blockshift,                                             \
 	}
 #else /* CONFIG_MFILE_LEGACY_VIO_OPS */
 #define MFILE_INIT_EX(refcnt, ops, parts, blockshift)                                  \
@@ -269,8 +269,8 @@ struct mfile {
 		/* .mf_initdone   = */ SIG_INIT,                                               \
 		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),                              \
 		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                              \
-		/* .mf_blockshift = */ blockshift,                                             \
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
+		/* .mf_blockshift = */ blockshift,                                             \
 	}
 #endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
 #define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, blockshift)

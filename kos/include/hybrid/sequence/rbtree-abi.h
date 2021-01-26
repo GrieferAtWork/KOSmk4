@@ -1381,11 +1381,15 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
 }
 #endif /* RBTREE_WANT_RREMOVE */
 
-#ifdef RBTREE_WANT_PREV_NEXT_NODE
+#if defined(RBTREE_WANT_PREV_NEXT_NODE) || defined(RBTREE_WANT_MINMAXLOCATE)
 /* Return the next node with a key-range located below `node'
  * If no such node exists, return `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
+#ifdef RBTREE_WANT_PREV_NEXT_NODE
 RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
+#else /* RBTREE_WANT_PREV_NEXT_NODE */
+__PRIVATE __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
+#endif /* !RBTREE_WANT_PREV_NEXT_NODE */
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 	RBTREE_T *result;
 	result = RBTREE_GETLHS(node);
@@ -1411,7 +1415,11 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 /* Return the next node with a key-range located above `node'
  * If no such node exists, return `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
+#ifdef RBTREE_WANT_PREV_NEXT_NODE
 RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
+#else /* RBTREE_WANT_PREV_NEXT_NODE */
+__PRIVATE __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
+#endif /* !RBTREE_WANT_PREV_NEXT_NODE */
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node) {
 	RBTREE_T *result;
 	result = RBTREE_GETRHS(node);
@@ -1433,7 +1441,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node) {
 	}
 	return result;
 }
-#endif /* RBTREE_WANT_PREV_NEXT_NODE */
+#endif /* RBTREE_WANT_PREV_NEXT_NODE || RBTREE_WANT_MINMAXLOCATE */
 
 
 #ifdef RBTREE_WANT_MINMAXLOCATE
@@ -1539,6 +1547,26 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 			}
 			break;
 		}
+		/* Because the min/max-range may be spread across different sub-trees,
+		 * we must still check for the case where the predecessor/successor
+		 * the min/max node continues to be in-bounds! */
+		for (;;) {
+			iter = RBTREE(prevnode)(min_node);
+			if (!iter)
+				break;
+			if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(iter), minkey))
+				break;
+			min_node = iter;
+		}
+		for (;;) {
+			iter = RBTREE(nextnode)(max_node);
+			if (!iter)
+				break;
+			if (RBTREE_KEY_GR(RBTREE_GETMINKEY(iter), maxkey))
+				break;
+			max_node = iter;
+		}
+		/* Write-back our results. */
 		result->mm_min = min_node;
 		result->mm_max = max_node;
 		return;

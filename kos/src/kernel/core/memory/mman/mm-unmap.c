@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_UNMAP_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_UNMAP_C 1
+#define __WANT_MNODE__mn_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

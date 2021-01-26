@@ -19,7 +19,8 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_PHYS_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_PHYS_C 1
-#define __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS 1
+#define __WANT_MNODE_INIT
+#define __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -1111,20 +1112,20 @@ NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 /************************************************************************/
 /* A mem-node used to describe a single, reserved page. */
 PUBLIC ATTR_PERTASK struct mnode this_trampoline_node = {
-	/* .mn_mement   = */ { {} },
-	/* .mn_minaddr  = */ (byte_t *)(0),
-	/* .mn_maxaddr  = */ (byte_t *)(PAGESIZE - 1),
-	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	/*                */ MNODE_F_NOMERGE | MNODE_F_MPREPARED |
-	/*                */ MNODE_F_MLOCK,
-	/* .mn_part     = */ NULL,
-	/* .mn_fspath   = */ NULL,
-	/* .mn_fsname   = */ NULL,
-	/* .mn_mman     = */ { &mman_kernel },
-	/* .mn_partoff  = */ 0,
-	/* .mn_link     = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+	MNODE_INIT_mn_mement({}),
+	MNODE_INIT_mn_minaddr(0),
+	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
+	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                    MNODE_F_NOMERGE | MNODE_F_MPREPARED |
+	                    MNODE_F_MLOCK),
+	MNODE_INIT_mn_part(NULL),
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
 };
 /************************************************************************/
 

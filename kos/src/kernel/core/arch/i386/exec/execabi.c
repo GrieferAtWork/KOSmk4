@@ -19,7 +19,8 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXECABI_C
 #define GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXECABI_C 1
-#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define DISABLE_BRANCH_PROFILING /* Don't profile this file */
+#define __WANT_MPART_INIT
 
 #include <kernel/compiler.h>
 

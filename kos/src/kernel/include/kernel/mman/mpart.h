@@ -34,6 +34,9 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
 
+#if __SIZEOF_POS_T__ > __SIZEOF_POINTER__
+#include <hybrid/__byteorder.h>
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 
 /* Possible values that an mpart block-status can take. */
 #define MPART_BLOCK_ST_NDEF 0 /* Contents of backing memory are undefined. */
@@ -168,41 +171,58 @@ SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
 #endif /* __SIZEOF_POINTER__ != ... */
 
 #if 0 /* Static initializer template: */
-	/* .mp_refcnt    = */ FILLME,
-	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/*                 */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
-	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
-	/* .mp_state     = */ MPART_ST_MEM,
-	/* .mp_file      = */ { &mfile_ndef },
-	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(FILLME.mp_copy),
-	/* .mp_share     = */ LIST_HEAD_INITIALIZER(FILLME.mp_share),
-	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(FILLME.mp_lockops),
-	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_minaddr   = */ (pos_t)0,
-	/* .mp_maxaddr   = */ (pos_t)FILLME - 1,
-	/* .mp_changed   = */ {},
-	/* .mp_filent    = */ { {} },
-	/* .mp_blkst_ptr = */ { NULL },
-	/* .mp_mem       = */ { {
-		/* .mc_start = */ (physpage_t)FILLME,
-		/* .mc_size  = */ CEILDIV(FILLME, PAGESIZE),
-	} },
-	/* .mp_meta      = */ NULL
+	MPART_INIT_mp_refcnt(FILLME),
+	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
+	MPART_INIT_mp_state(MPART_ST_MEM),
+	MPART_INIT_mp_file(&mfile_ndef),
+	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(FILLME.mp_copy)),
+	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(FILLME.mp_share)),
+	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(FILLME.mp_lockops)),
+	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_minaddr(0),
+	MPART_INIT_mp_maxaddr(FILLME - 1),
+	MPART_INIT_mp_changed({}),
+	MPART_INIT_mp_filent({}),
+	MPART_INIT_mp_blkst_ptr(NULL),
+	MPART_INIT_mp_mem(FILLME, CEILDIV(FILLME, PAGESIZE)),
+	MPART_INIT_mp_meta(NULL)
 #endif
 
 struct mpart {
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_refcnt(mp_refcnt) mp_refcnt
+#define MPART_INIT_mp_flags(mp_flags)   mp_flags
+#define MPART_INIT_mp_state(mp_state)   mp_state
+#endif /* __WANT_MPART_INIT */
 	WEAK refcnt_t                 mp_refcnt;    /* Reference counter. */
 	uintptr_half_t                mp_flags;     /* Memory part flags (set of `MPART_F_*') */
 	uintptr_half_t                mp_state;     /* [lock(MPART_F_LOCKBIT)]
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * Memory part state (one of `MPART_ST_*') */
+#if defined(__WANT_MPART__mp_dead) || defined(__WANT_MPART__mp_oob2)
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_file(mp_file) { mp_file }
+#endif /* __WANT_MPART_INIT */
 	union {
 		REF struct mfile         *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
 		                                         * The associated file. (Cannot be altered as long as any `MPART_BLOCK_ST_INIT' blocks exist) */
+#ifdef __WANT_MPART__mp_dead
 		SLIST_ENTRY(mpart)       _mp_dead;      /* [lock(ATOMIC)] Chain of dead parts. */
+#endif /* __WANT_MPART__mp_dead */
+#ifdef __WANT_MPART__mp_oob2
 		SIMPLEQ_ENTRY(mpart)     _mp_oob2;      /* Internal, out-of-band chain of parts. */
+#endif /* __WANT_MPART__mp_oob2 */
 	};
+#else /* __WANT_MPART__mp_dead || __WANT_MPART__mp_oob2 */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_file(mp_file) mp_file
+#endif /* __WANT_MPART_INIT */
+	REF struct mfile             *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
+	                                             * The associated file. (Cannot be altered as long as any `MPART_BLOCK_ST_INIT' blocks exist) */
+#endif /* !__WANT_MPART__mp_dead && !__WANT_MPART__mp_oob2 */
 	/* WARNING: The following 2 lists may contain already-destroyed nodes.
 	 *          To check if a node has been destroyed, you may check if the
 	 *          pointed-to `mn_mman' was destroyed, since that field normally
@@ -210,15 +230,60 @@ struct mpart {
 	 *          MMAN got destroyed, then it will have attempted to unbind all of
 	 *          its remaining nodes, and those that it couldn't unbind will
 	 *          have been added to the dead-nodes chain of the associated part. */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_copy(...)    __VA_ARGS__
+#define MPART_INIT_mp_share(...)   __VA_ARGS__
+#define MPART_INIT_mp_lockops(...) __VA_ARGS__
+#endif /* __WANT_MPART_INIT */
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
 	struct mpart_lockop_slist     mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_deadnodes_reap()') */
+#ifdef __WANT_MPART__mp_newglobl
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_allparts(mp_allparts) { mp_allparts }
+#endif /* __WANT_MPART_INIT */
 	union {
 		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
 		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts)
 		                                         * NOTE: For VIO parts, this list entry is initialized as unbound! */
 		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
 	};
+#else /* __WANT_MPART__mp_newglobl */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_allparts(mp_allparts) mp_allparts
+#endif /* __WANT_MPART_INIT */
+	LIST_ENTRY(mpart)             mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
+	                                             * Chain of all mem-parts in existence. (may be unbound for certain parts)
+	                                             * NOTE: For VIO parts, this list entry is initialized as unbound! */
+#endif /* !__WANT_MPART__mp_newglobl */
+#if defined(__WANT_MPART_INIT) && __SIZEOF_POS_T__ > __SIZEOF_POINTER__
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define _MPART_INIT_ADDR(val) { { (uintptr_t)(val), 0 } }
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define _MPART_INIT_ADDR(val) { { 0, (uintptr_t)(val) } }
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#define MPART_INIT_mp_minaddr _MPART_INIT_ADDR
+#define MPART_INIT_mp_maxaddr _MPART_INIT_ADDR
+	union {
+		uintptr_t                _mp_static_minaddr[__SIZEOF_POS_T__ / __SIZEOF_POINTER__];
+		PAGEDIR_PAGEALIGNED pos_t mp_minaddr;   /* [const] In-file starting address of this part.
+		                                         * Aligned by PAGESIZE, and the associated file's block-size. */
+	};
+	union {
+		uintptr_t                _mp_static_maxaddr[__SIZEOF_POS_T__ / __SIZEOF_POINTER__];
+		pos_t                     mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
+		                                         *       WRITE(MPART_F_LOCKBIT && mp_meta->mpm_ftxlock && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
+		                                         *                                \------------------/    \--------------/
+		                                         *                                 Only if allocated       Only if not anon!
+		                                         * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
+		                                         *           mp_meta->mpm_dmalocks != 0)]
+		                                         * In-file max address of this part. */
+	};
+#else /* __WANT_MPART_INIT && __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_minaddr (pos_t)
+#define MPART_INIT_mp_maxaddr (pos_t)
+#endif /* __WANT_MPART_INIT */
 	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [const] In-file starting address of this part.
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
 	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
@@ -228,6 +293,10 @@ struct mpart {
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file max address of this part. */
+#endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_changed(...) __VA_ARGS__
+#endif /* __WANT_MPART_INIT */
 	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
 	                                             *                         !mfile_isanon(mp_file) && MPART_F_CHANGED)]
 	                                             * Per-file chain of mem-parts that have changed.
@@ -236,12 +305,27 @@ struct mpart {
 	                                             * into its file's `mf_changed' list.
 	                                             * Also note that changed mem-parts are kept alive by the associated
 	                                             * file, since this list contains references, rather than weak pointers. */
+#ifdef __WANT_MPART__mp_oob
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_filent(...) { __VA_ARGS__ }
+#endif /* __WANT_MPART_INIT */
 	union {
 		RBTREE_NODE(struct mpart) mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
 		                                         * Entry with the associated file's tree. */
 		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
 	};
+#else /* __WANT_MPART__mp_oob */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_filent(...) __VA_ARGS__
+#endif /* __WANT_MPART_INIT */
+	RBTREE_NODE(struct mpart)     mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
+	                                             * Entry with the associated file's tree. */
+#endif /* !__WANT_MPART__mp_oob */
 	union {
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_blkst_ptr(mp_blkst_ptr) { mp_blkst_ptr }
+#define MPART_INIT_mp_blkst_inl(mp_blkst_inl) { (uintptr_t *)(uintptr_t)(mp_blkst_inl) }
+#endif /* __WANT_MPART_INIT */
 		/* Block-state bitset. Note that the size of a block is measured in bytes,
 		 * may be smaller than a single page, and its actual size is fixed, and is
 		 * described by the associated mfile. (s.a. `MPART_BLOCK_ST_*') */
@@ -258,6 +342,9 @@ struct mpart {
 		                                         * [valid_if(MPART_ST_HASST && MPART_F_BLKST_INL)] */
 	};
 	union {
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_mem(mc_start, mc_size) { { mc_start, mc_size } }
+#endif /* __WANT_MPART_INIT */
 		/* NOTE: Everything in here is implicitly:
 		 * [lock(MPART_F_LOCKBIT)]
 		 * [const_if(EXISTS(MPART_BLOCK_ST_INIT) || mp_meta->mpm_dmalocks != 0)] */
@@ -293,30 +380,35 @@ struct mpart {
 		struct mchunk             mp_swp;       /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
 		struct mchunkvec          mp_swp_sc;    /* [valid_if(MPART_ST_SWP_SC)] Scattered swap */
 	};
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_meta(mp_meta) { mp_meta }
+#endif /* __WANT_MPART_INIT */
 	struct mpartmeta             *mp_meta;      /* [0..1][owned][lock(WRITE_ONCE)] Runtime meta-data for futex and RTM support. */
 };
 
 
-#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)          \
-	{                                                                     \
-		/* .mp_refcnt      = */ 1,                                        \
-		/* .mp_flags       = */ MPART_F_NO_GLOBAL_REF | MPART_F_NOFREE | \
-		/*                   */ MPART_F_NOSPLIT | MPART_F_MLOCK |        \
-		/*                   */ MPART_F_MLOCK_FROZEN,                     \
-		/* .mp_state       = */ MPART_ST_MEM,                             \
-		{ /* .mp_file      = */ file },                                   \
-		/* .mp_copy        = */ LIST_HEAD_INITIALIZER(~),                 \
-		/* .mp_share       = */ LIST_HEAD_INITIALIZER(~),                 \
-		/* .mp_lockops     = */ SLIST_HEAD_INITIALIZER(~),                \
-		{ /* .mp_allparts  = */ LIST_ENTRY_UNBOUND_INITIALIZER },         \
-		/* .mp_minaddr     = */ 0,                                        \
-		/* .mp_maxaddr     = */ (pos_t)((num_bytes) - 1),                 \
-		/* .mp_changed     = */ {},                                       \
-		{ /* .mp_filent    = */ {} },                                     \
-		{ /* .mp_blkst_ptr = */ __NULLPTR},                               \
-		{ /* .mp_mem       = */ { first_page, page_count } },             \
-		/* .mp_meta        = */ __NULLPTR                                 \
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)     \
+	{                                                                \
+		MPART_INIT_mp_refcnt(1),                                     \
+		MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_NOFREE | \
+		                    MPART_F_NOSPLIT | MPART_F_MLOCK |        \
+		                    MPART_F_MLOCK_FROZEN),                   \
+		MPART_INIT_mp_state(MPART_ST_MEM),                           \
+		MPART_INIT_mp_file(file),                                    \
+		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),                \
+		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),               \
+		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),            \
+		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),      \
+		MPART_INIT_mp_minaddr(0),                                    \
+		MPART_INIT_mp_maxaddr((num_bytes)-1),                        \
+		MPART_INIT_mp_changed({}),                                   \
+		MPART_INIT_mp_filent({}),                                    \
+		MPART_INIT_mp_blkst_ptr(__NULLPTR),                          \
+		MPART_INIT_mp_mem(first_page, page_count),                   \
+		MPART_INIT_mp_meta(__NULLPTR)                                \
 	}
+#endif /* __WANT_MPART_INIT */
 
 
 

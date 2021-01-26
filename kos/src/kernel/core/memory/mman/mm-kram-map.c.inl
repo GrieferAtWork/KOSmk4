@@ -438,6 +438,7 @@ do_prefault:
 			if (!(flags & GFP_MAP_PREPARED))
 				pagedir_unprepare_map(result, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+			pagedir_sync(result, num_bytes);
 
 			/* Pre-initialize backing physical memory */
 			if (flags & GFP_CALLOC) {
@@ -460,11 +461,15 @@ do_prefault:
 			} else {
 #ifdef CONFIG_DEBUG_HEAP
 				part->mp_file = &mfile_dbgheap;
-				memsetl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes);
+				memsetl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes / 4);
 #else  /* CONFIG_DEBUG_HEAP */
-			part->mp_file = &mfile_ndef;
+				part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_DEBUG_HEAP */
 			}
+
+			/* After prefaulting, we can simply set the block-status
+			 * bitset to NULL, thus marking all blocks as CHNG. */
+			part->mp_blkst_ptr = NULL;
 		} else {
 			/* Allocate the block-status bitset (if we have to)
 			 * Note that if this allocation fails, then we can just pre-fault

@@ -34,6 +34,7 @@
 #include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
+#include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -342,52 +343,52 @@ select_from_avail_range:
 		}
 		alignshift = PAGESHIFT;
 		if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
-			alignshift = ffs(min_alignment) - 1;
+			alignshift = CTZ(min_alignment);
 
 		/* Figure out the outer bounds of the available range, and
 		 * select a biased result value based on the original hint. */
-		if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
-			if (avail_minaddr > allow_minaddr) {
-				mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
-				                        (byte_t *)avail_minaddr - 1, &mima);
-				if (mima.mm_max != NULL)
-					avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
+		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
+		if (avail_minaddr > allow_minaddr) {
+			mnode_tree_minmaxlocate(self->mm_mappings,
+			                        (byte_t *)allow_minaddr,
+			                        (byte_t *)avail_minaddr - 1, &mima);
+			if (mima.mm_max != NULL) {
+				avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
+				if (avail_minaddr < allow_minaddr)
+					avail_minaddr = allow_minaddr;
+				if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
+					avail_minaddr = (void *)CEIL_ALIGN((uintptr_t)avail_minaddr, min_alignment);
 			}
-			retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
-			                                           (uintptr_t)addr >> alignshift,
-			                                           (uintptr_t)addr >> alignshift);
-		} else if (MMAN_GETUNMAPPED_ISABOVE(flags)) {
-			if (avail_maxaddr < allow_maxaddr) {
-				mnode_tree_minmaxlocate(self->mm_mappings,
-				                        (byte_t *)avail_maxaddr + 1,
-				                        (byte_t *)allow_maxaddr, &mima);
-				if (mima.mm_min != NULL)
-					avail_minaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
-			}
-			avail_maxaddr = (byte_t *)((uintptr_t)avail_maxaddr - (num_bytes - 1));
-			retindex = select_random_integer_with_bias((uintptr_t)addr >> alignshift,
-			                                           (uintptr_t)avail_maxaddr >> alignshift,
-			                                           (uintptr_t)addr >> alignshift);
-		} else {
-			if (avail_minaddr > allow_minaddr) {
-				mnode_tree_minmaxlocate(self->mm_mappings, allow_minaddr,
-				                        (byte_t *)avail_minaddr - 1, &mima);
-				if (mima.mm_max != NULL)
-					avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
-			}
-			if (avail_maxaddr < allow_maxaddr) {
-				mnode_tree_minmaxlocate(self->mm_mappings,
-				                        (byte_t *)avail_maxaddr + 1,
-				                        (byte_t *)allow_maxaddr, &mima);
-				if (mima.mm_min != NULL)
-					avail_minaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
-			}
-			avail_maxaddr = (byte_t *)((uintptr_t)avail_maxaddr - (num_bytes - 1));
-			retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
-			                                           (uintptr_t)avail_maxaddr >> alignshift,
-			                                           (uintptr_t)addr >> alignshift);
 		}
-		result = (void *)(retindex << alignshift);
+		if (avail_maxaddr < allow_maxaddr) {
+			mnode_tree_minmaxlocate(self->mm_mappings,
+			                        (byte_t *)avail_maxaddr + 1,
+			                        (byte_t *)allow_maxaddr, &mima);
+			if (mima.mm_min != NULL) {
+				avail_maxaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
+				if (avail_maxaddr > allow_maxaddr)
+					avail_maxaddr = allow_maxaddr;
+				if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
+					avail_maxaddr = (void *)(FLOOR_ALIGN((uintptr_t)avail_maxaddr + 1, min_alignment) - 1);
+			}
+		}
+		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
+		avail_maxaddr = (byte_t *)avail_maxaddr - num_bytes;
+		if (addr < avail_minaddr)
+			addr = avail_minaddr;
+		if (addr > (byte_t *)avail_maxaddr /*+ 1*/)
+			addr = (byte_t *)avail_maxaddr + 1;
+		if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
+			avail_maxaddr = addr;
+		} else if (MMAN_GETUNMAPPED_ISABOVE(flags)) {
+			avail_minaddr = addr;
+		}
+		retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
+		                                           (uintptr_t)avail_maxaddr >> alignshift,
+		                                           (uintptr_t)addr >> alignshift);
+		result   = (void *)(retindex << alignshift);
+		assertf(result >= avail_minaddr, "%p >= %p", result, avail_minaddr);
+		assertf(result <= avail_maxaddr, "%p <= %p", result, avail_maxaddr);
 	} else {
 		struct mnode *prev, *next;
 		bool want_below, want_above;
@@ -533,12 +534,14 @@ continue_find_above:
 select_from_lo_range:
 			avail_minaddr = lo_best_minaddr;
 			avail_maxaddr = lo_best_maxaddr;
+			assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
 			goto select_from_avail_range;
 		} else if (hi_best_minaddr <= hi_best_maxaddr) {
 			/* Select from above the hinted range. */
 select_from_hi_range:
 			avail_minaddr = hi_best_minaddr;
 			avail_maxaddr = hi_best_maxaddr;
+			assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
 			goto select_from_avail_range;
 		}
 
@@ -557,9 +560,19 @@ done_dynamic:
 	/* Have the return value point past the leading guard-page.
 	 * We've originally (tried) to allocate +1 page of additional
 	 * space for this very purpose! (see above) */
-	if (flags & MAP_STACK)
+	if (flags & MAP_STACK) {
 		result = (void *)((uintptr_t)result + PAGESIZE);
+#ifndef NDEBUG
+		num_bytes -= PAGESIZE * 2;
+#endif /* !NDEBUG */
+	}
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
+	/* Sanity check: assert that the found region really is unused. */
+	assertf(!mnode_tree_rlocate(self->mm_mappings,
+	                            (byte_t *)result,
+	                            (byte_t *)result + num_bytes - 1),
+	        "Address range %p-%p already in use?",
+	        (byte_t *)result, (byte_t *)result + num_bytes - 1);
 	return result;
 err:
 	return MAP_FAILED;

@@ -19,6 +19,9 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C 1
+#define __WANT_MPART__mp_newglobl
+#define __WANT_MPART__mp_oob2
+#define __WANT_MPART__mp_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -243,6 +246,9 @@ again_service_lops:
  * be holding a lock to the associated file. */
 DECL_END
 
+#ifndef NDEBUG       /* TODO: REMOVE_ME */
+#define RBTREE_DEBUG /* TODO: REMOVE_ME */
+#endif /* !NDEBUG */ /* TODO: REMOVE_ME */
 #undef RBTREE_LEFT_LEANING
 #define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_WANT_PREV_NEXT_NODE
@@ -291,7 +297,8 @@ NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
                                    size_t partrel_block_index) {
 	mpart_blkst_word_t word;
 	unsigned int shift;
-	assert(mpart_lock_acquired(self));
+	/* We're called from `mpart_hinted_mmap()', so we can't assert the lock! */
+	/*assert(mpart_lock_acquired(self));*/
 	assert(partrel_block_index < mpart_getblockcount(self, self->mp_file));
 	if (self->mp_flags & MPART_F_BLKST_INL) {
 		word = self->mp_blkst_inl;
@@ -671,7 +678,7 @@ again:
 	pending_parts = SLIST_ATOMIC_CLEAR(&mpart_all_pending);
 	while (pending_parts) {
 		struct mpart *next;
-		next = SLIST_NEXT(pending_parts, _mp_dead);
+		next = SLIST_NEXT(pending_parts, _mp_newglobl);
 		LIST_INSERT_HEAD(&mpart_all_list, pending_parts, mp_allparts);
 		decref_unlikely(pending_parts); /* The reference inherited from `mpart_all_pending' */
 		pending_parts = next;

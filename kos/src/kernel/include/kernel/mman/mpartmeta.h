@@ -152,7 +152,7 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 	 __mpartmeta_init_rtm(self))
 #define mpartmeta_cinit(self)                             \
 	(atomic_rwlock_cinit(&(self)->mpm_ftxlock),           \
-	 __hybrid_assert((self)->mpm_ftx = __NULLPTR),        \
+	 __hybrid_assert((self)->mpm_ftx == __NULLPTR),       \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mpm_ftx_dead)), \
 	 sig_cinit(&(self)->mpm_dma_done)                     \
 	 __mpartmeta_cinit_rtm(self))

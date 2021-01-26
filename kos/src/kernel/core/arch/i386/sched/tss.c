@@ -19,7 +19,9 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSS_C
 #define GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSS_C 1
-#define DISABLE_BRANCH_PROFILING 1
+#define DISABLE_BRANCH_PROFILING
+#define __WANT_MNODE_INIT
+#define __WANT_MPART_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -58,21 +60,21 @@ DATDEF ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ ASMNAME("thiscpu_x86_df
 
 /* The VM node used to represent the IOB mapping of the current CPU */
 PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ = {
-	/* .mn_mement   = */ { {} },
-	/* .mn_minaddr  = */ __bootcpu_x86_iob_start,
-	/* .mn_maxaddr  = */ __bootcpu_x86_iob_start + PAGESIZE - 1,
-	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	/*                */ MNODE_F_MPREPARED | MNODE_F_MLOCK,
-	/* .mn_part     = */ NULL, /* Reserved node */
-	/* .mn_fspath   = */ NULL,
-	/* .mn_fsname   = */ NULL,
-	/* .mn_mman     = */ { &mman_kernel },
-	/* .mn_partoff  = */ 0,
-	/* .mn_link     = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* ._mn_module  = */ NULL
+	MNODE_INIT_mn_mement({}),
+	MNODE_INIT_mn_minaddr(__bootcpu_x86_iob_start),
+	MNODE_INIT_mn_maxaddr(__bootcpu_x86_iob_start + PAGESIZE - 1),
+	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
+	                    MNODE_F_MPREPARED | MNODE_F_MLOCK),
+	MNODE_INIT_mn_part(NULL), /* Reserved node */
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT__mn_module(NULL)
 };
 
 INTDEF byte_t __bootcpu_x86_df_stackpage_p[];
@@ -80,45 +82,42 @@ INTDEF struct mnode __bootcpu_x86_dfstack_node;
 INTDEF struct mpart __bootcpu_x86_dfstack_part;
 
 PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
-	/* .mp_refcnt    = */ 2, /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode.mn_part' */
-	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/* .mp_flags     = */ MPART_F_NOFREE | MPART_F_NOSPLIT |
-	/*                 */ MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN |
-	/*                 */ MPART_F_MLOCK,
-	/* .mp_state     = */ MPART_ST_MEM,
-	/* .mp_file      = */ { &mfile_ndef },
-	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_copy),
-	/* .mp_share     = */ { &__bootcpu_x86_dfstack_node },
-	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_lockops),
-	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_minaddr   = */ (pos_t)0,
-	/* .mp_maxaddr   = */ (pos_t)KERNEL_DF_STACKSIZE - 1,
-	/* .mp_changed   = */ {},
-	/* .mp_filent    = */ { {} },
-	/* .mp_blkst_ptr = */ { NULL },
-	/* .mp_mem       = */ { {
-		/* .mc_start = */ (physpage_t)__bootcpu_x86_df_stackpage_p,
-		/* .mc_size  = */ CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE),
-	} },
-	/* .mp_meta      = */ NULL
+	MPART_INIT_mp_refcnt(2), /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode.mn_part' */
+	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                    MPART_F_NOFREE | MPART_F_NOSPLIT |
+	                    MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN |
+	                    MPART_F_MLOCK),
+	MPART_INIT_mp_state(MPART_ST_MEM),
+	MPART_INIT_mp_file(&mfile_ndef),
+	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_copy)),
+	MPART_INIT_mp_share({ &__bootcpu_x86_dfstack_node }),
+	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_lockops)),
+	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_minaddr(0),
+	MPART_INIT_mp_maxaddr(KERNEL_DF_STACKSIZE - 1),
+	MPART_INIT_mp_changed({}),
+	MPART_INIT_mp_filent({}),
+	MPART_INIT_mp_blkst_ptr(NULL),
+	MPART_INIT_mp_mem((physpage_t)__bootcpu_x86_df_stackpage_p, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)),
+	MPART_INIT_mp_meta(NULL)
 };
 
 PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ = {
-	/* .mn_mement   = */ { {} },
-	/* .mn_minaddr  = */ __bootcpu_x86_df_stack,
-	/* .mn_maxaddr  = */ __bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE - 1,
-	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,
-	/* .mn_part     = */ &__bootcpu_x86_dfstack_part,
-	/* .mn_fspath   = */ NULL,
-	/* .mn_fsname   = */ NULL,
-	/* .mn_mman     = */ { &mman_kernel },
-	/* .mn_partoff  = */ 0,
-	/* .mn_link     = */ { NULL, &__bootcpu_x86_dfstack_part.mp_share.lh_first },
-	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* ._mn_module  = */ NULL
+	MNODE_INIT_mn_mement({ {} }),
+	MNODE_INIT_mn_minaddr(__bootcpu_x86_df_stack),
+	MNODE_INIT_mn_maxaddr(__bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE - 1),
+	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
+	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
+	MNODE_INIT_mn_part(&__bootcpu_x86_dfstack_part),
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link({ NULL, &__bootcpu_x86_dfstack_part.mp_share.lh_first }),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT__mn_module(NULL)
 };
 
 #else /* CONFIG_USE_NEW_VM */

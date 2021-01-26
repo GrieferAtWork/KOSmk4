@@ -140,21 +140,21 @@ typedef size_t mpart_reladdr_t;
 #endif /* __SIZEOF_POINTER__ != ... */
 
 #if 0 /* Static initializer template: */
-	/* .mn_mement   = */ { {} },
-	/* .mn_minaddr  = */ FILL_ME,
-	/* .mn_maxaddr  = */ FILL_ME - 1,
-	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,
-	/* .mn_part     = */ FILL_ME,
-	/* .mn_fspath   = */ NULL,
-	/* .mn_fsname   = */ NULL,
-	/* .mn_mman     = */ { &mman_kernel },
-	/* .mn_partoff  = */ 0,
-	/* .mn_link     = */ { NULL, FILL_ME },
-	/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* ._mn_module  = */ NULL
+	MNODE_INIT_mn_mement({}),
+	MNODE_INIT_mn_minaddr(FILL_ME),
+	MNODE_INIT_mn_maxaddr(FILL_ME - 1),
+	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
+	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
+	MNODE_INIT_mn_part(FILL_ME),
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link({ NULL, FILL_ME }),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT__mn_module(NULL)
 #endif
 
 struct mnode {
@@ -169,10 +169,14 @@ struct mnode {
 	typedef RBTREE_NODE(struct mnode) _rbtree_node_mnode;
 	typedef SLIST_ENTRY(mnode) _slist_entry_mnode;
 	typedef LIST_ENTRY(mnode) _list_entry_mnode;
+#ifdef __WANT_MNODE__mn_dead
 	union {
 		_rbtree_node_mnode              mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 		_slist_entry_mnode             _mn_dead;     /* [lock(ATOMIC)] Internal chain of dead nodes */
 	};
+#else /* __WANT_MNODE__mn_dead */
+	_rbtree_node_mnode                  mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
+#endif /* !__WANT_MNODE__mn_dead */
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
@@ -180,6 +184,7 @@ struct mnode {
 	                                                  * When set to NULL, then this node represents a reserved node. */
 	/*REF*/ struct path                *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	/*REF*/ struct directory_entry     *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+#ifdef __WANT_MNODE__mn_alloc
 	union {
 		/*WEAK REF*/ struct mman       *mn_mman;     /* [1..1][const] Associated memory manager.
 		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
@@ -187,6 +192,12 @@ struct mnode {
 		                                              *       Unless this has happened, this is just a regular, old pointer! */
 		_slist_entry_mnode             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 	};
+#else /* __WANT_MNODE__mn_alloc */
+	/*WEAK REF*/ struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
+	                                                  * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
+	                                                  *       and the node has to be inserted into the associated part's dead-node-list.
+	                                                  *       Unless this has happened, this is just a regular, old pointer! */
+#endif /* !__WANT_MNODE__mn_alloc */
 	/*PAGEDIR_PAGEALIGNED*/ mpart_reladdr_t
 	                                    mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	_list_entry_mnode                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
@@ -199,10 +210,14 @@ struct mnode {
 	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 #else /* __INTELLISENSE__ */
+#ifdef __WANT_MNODE__mn_dead
 	union {
 		RBTREE_NODE(struct mnode)       mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 		SLIST_ENTRY(mnode)             _mn_dead;     /* [lock(ATOMIC)] Internal chain of dead nodes */
 	};
+#else /* __WANT_MNODE__mn_dead */
+	RBTREE_NODE(struct mnode)           mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
+#endif /* !__WANT_MNODE__mn_dead */
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
@@ -210,6 +225,7 @@ struct mnode {
 	                                                  * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+#ifdef __WANT_MNODE__mn_alloc
 	union {
 		WEAK REF struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
 		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
@@ -217,6 +233,12 @@ struct mnode {
 		                                              *       Unless this has happened, this is just a regular, old pointer! */
 		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 	};
+#else /* __WANT_MNODE__mn_alloc */
+	WEAK REF struct mman               *mn_mman;     /* [1..1][const] Associated memory manager.
+	                                                  * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
+	                                                  *       and the node has to be inserted into the associated part's dead-node-list.
+	                                                  *       Unless this has happened, this is just a regular, old pointer! */
+#endif /* !__WANT_MNODE__mn_alloc */
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
 	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Chain of nodes that (may) contain pages that
@@ -243,6 +265,29 @@ struct mnode {
 	 *       has been enabled in all other aspects! */
 	void *_mn_module;
 };
+
+#ifdef __WANT_MNODE_INIT
+#ifdef __WANT_MNODE__mn_dead
+#define MNODE_INIT_mn_mement(...)           { __VA_ARGS__ }
+#else /* __WANT_MNODE__mn_dead */
+#define MNODE_INIT_mn_mement(...)           __VA_ARGS__
+#endif /* !__WANT_MNODE__mn_dead */
+#define MNODE_INIT_mn_minaddr(mn_minaddr)   (byte_t *)(mn_minaddr)
+#define MNODE_INIT_mn_maxaddr(mn_maxaddr)   (byte_t *)(mn_maxaddr)
+#define MNODE_INIT_mn_flags(mn_flags)       mn_flags
+#define MNODE_INIT_mn_part(mn_part)         mn_part
+#define MNODE_INIT_mn_fspath(mn_fspath)     mn_fspath
+#define MNODE_INIT_mn_fsname(mn_fsname)     mn_fsname
+#ifdef __WANT_MNODE__mn_alloc
+#define MNODE_INIT_mn_mman(mn_mman)         { mn_mman }
+#else /* __WANT_MNODE__mn_alloc */
+#define MNODE_INIT_mn_mman(mn_mman)         mn_mman
+#endif /* !__WANT_MNODE__mn_alloc */
+#define MNODE_INIT_mn_partoff(mn_partoff)   mn_partoff
+#define MNODE_INIT_mn_link(...)             __VA_ARGS__
+#define MNODE_INIT_mn_writable(...)         __VA_ARGS__
+#define MNODE_INIT__mn_module(_mn_module)   _mn_module
+#endif /* __WANT_MNODE_INIT */
 
 
 

@@ -19,7 +19,9 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MMAN_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MMAN_C 1
-#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define DISABLE_BRANCH_PROFILING /* Don't profile this file */
+#define __WANT_MNODE_INIT
+#define __WANT_MPART_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -40,6 +42,7 @@
 #include <asm/intrin.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -173,29 +176,26 @@ INTDEF struct mnode x86_kernel_vm_nodes[];
 INTDEF struct mnode x86_vmnode_transition_reserve;
 
 #ifdef CONFIG_USE_NEW_VM
-#define INIT_MPART(self, node, pageptr, num_pages, num_bytes)           \
-	{                                                                   \
-		/* .mp_refcnt    = */ 2, /* 2 == 1(myself) + 1(node) */         \
-		/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED | \
-		/* .mp_flags     = */ MPART_F_NOSPLIT | MPART_F_NOMERGE |       \
-		/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |    \
-		/* .mp_flags     = */ MPART_F_NOFREE,                           \
-		/* .mp_state     = */ MPART_ST_MEM,                             \
-		/* .mp_file      = */ { &mfile_ndef },                          \
-		/* .mp_copy      = */ LIST_HEAD_INITIALIZER(self.mp_copy),      \
-		/* .mp_share     = */ { node },                                 \
-		/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(self.mp_lockops),  \
-		/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },       \
-		/* .mp_minaddr   = */ (pos_t)0,                                 \
-		/* .mp_maxaddr   = */ (pos_t)(num_bytes)-1,                     \
-		/* .mp_changed   = */ {},                                       \
-		/* .mp_filent    = */ { {} },                                   \
-		/* .mp_blkst_ptr = */ { NULL },                                 \
-		/* .mp_mem       = */ { {                                       \
-			/* .mc_start = */ (physpage_t)(pageptr),                    \
-			/* .mc_size  = */ (physpagecnt_t)(num_pages),               \
-		} },                                                            \
-		/* .mp_meta      = */ NULL                                      \
+#define INIT_MPART(self, node, pageptr, num_pages, num_bytes)                 \
+	{                                                                         \
+		MPART_INIT_mp_refcnt(2), /* 2 == 1(myself) + 1(node) */               \
+		MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |         \
+		                    MPART_F_NOSPLIT | MPART_F_NOMERGE |               \
+		                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |            \
+		                    MPART_F_NOFREE),                                  \
+		MPART_INIT_mp_state(MPART_ST_MEM),                                    \
+		MPART_INIT_mp_file(&mfile_ndef),                                      \
+		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(self.mp_copy)),              \
+		MPART_INIT_mp_share(node),                                            \
+		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(self.mp_lockops)),       \
+		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),               \
+		MPART_INIT_mp_minaddr(0),                                             \
+		MPART_INIT_mp_maxaddr((num_bytes)-1),                                 \
+		MPART_INIT_mp_changed({}),                                            \
+		MPART_INIT_mp_filent({}),                                             \
+		MPART_INIT_mp_blkst_ptr(NULL),                                        \
+		MPART_INIT_mp_mem((physpage_t)(pageptr), (physpagecnt_t)(num_pages)), \
+		MPART_INIT_mp_meta(NULL)                                      \
 	}
 #else /* CONFIG_USE_NEW_VM */
 #define INIT_MPART(self, node, pageptr, num_pages, num_bytes)                       \
@@ -253,37 +253,37 @@ INTERN struct mpart x86_kernel_vm_parts[6] = {
 #ifdef CONFIG_USE_NEW_VM
 #define INIT_MNODE_RESERVE(self, minaddr, maxaddr, minpage, maxpage, prot) \
 	{                                                                      \
-		/* .mn_mement   = */ { {} },                                       \
-		/* .mn_minaddr  = */ (byte_t *)(minaddr),                          \
-		/* .mn_maxaddr  = */ (byte_t *)(maxaddr),                          \
-		/* .mn_flags    = */ (prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT |   \
-		/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |          \
-		/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,    \
-		/* .mn_part     = */ NULL,                                         \
-		/* .mn_fspath   = */ NULL,                                         \
-		/* .mn_fsname   = */ NULL,                                         \
-		/* .mn_mman     = */ { &mman_kernel },                             \
-		/* .mn_partoff  = */ 0,                                            \
-		/* .mn_link     = */ LIST_ENTRY_UNBOUND_INITIALIZER,               \
-		/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,               \
-		/* ._mn_module  = */ NULL                                          \
+		MNODE_INIT_mn_mement({}),                                          \
+		MNODE_INIT_mn_minaddr(minaddr),                                    \
+		MNODE_INIT_mn_maxaddr(maxaddr),                                    \
+		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT |    \
+		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |           \
+		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),    \
+		MNODE_INIT_mn_part(NULL),                                          \
+		MNODE_INIT_mn_fspath(NULL),                                        \
+		MNODE_INIT_mn_fsname(NULL),                                        \
+		MNODE_INIT_mn_mman(&mman_kernel),                                  \
+		MNODE_INIT_mn_partoff(0),                                          \
+		MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),                \
+		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),            \
+		MNODE_INIT__mn_module(NULL)                                        \
 	}
 #define INIT_MNODE(self, minaddr, maxaddr, minpage, maxpage, prot, part) \
 	{                                                                    \
-		/* .mn_mement   = */ { {} },                                     \
-		/* .mn_minaddr  = */ (byte_t *)(minaddr),                        \
-		/* .mn_maxaddr  = */ (byte_t *)(maxaddr),                        \
-		/* .mn_flags    = */ (prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
-		/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |        \
-		/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,  \
-		/* .mn_part     = */ &(part),                                    \
-		/* .mn_fspath   = */ NULL,                                       \
-		/* .mn_fsname   = */ NULL,                                       \
-		/* .mn_mman     = */ { &mman_kernel },                           \
-		/* .mn_partoff  = */ 0,                                          \
-		/* .mn_link     = */ { NULL, &(part).mp_share.lh_first },        \
-		/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,             \
-		/* ._mn_module  = */ NULL                                        \
+		MNODE_INIT_mn_mement({}),                                        \
+		MNODE_INIT_mn_minaddr(minaddr),                                  \
+		MNODE_INIT_mn_maxaddr(maxaddr),                                  \
+		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT |  \
+		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |         \
+		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),  \
+		MNODE_INIT_mn_part(&(part)),                                     \
+		MNODE_INIT_mn_fspath(NULL),                                      \
+		MNODE_INIT_mn_fsname(NULL),                                      \
+		MNODE_INIT_mn_mman(&mman_kernel),                                \
+		MNODE_INIT_mn_partoff(0),                                        \
+		MNODE_INIT_mn_link({ NULL, &(part).mp_share.lh_first }),         \
+		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),          \
+		MNODE_INIT__mn_module(NULL)                                      \
 	}
 #else /* CONFIG_USE_NEW_VM */
 #define INIT_MNODE_RESERVE(self, minaddr, maxaddr, minpage, maxpage, prot)                      \
@@ -468,8 +468,11 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 #endif /* !CONFIG_USE_NEW_VM */
 	vm_node_insert(node);
 	part = node->vn_part;
-	assert(vm_node_getsize(node) == vm_datapart_numbytes(part));
-	addr = vm_node_getaddr(node);
+	assertf(mnode_getsize(node) == mpart_getsize(part),
+	        "mnode_getsize: %#" PRIxSIZ "\n"
+	        "mpart_getsize: %#" PRIxSIZ "\n",
+	        mnode_getsize(node), mpart_getsize(part));
+	addr = mnode_getaddr(node);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepare_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
@@ -579,7 +582,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 		byte_t *lapic_addr;
 		lapic_addr = (byte_t *)vm_getfree(&vm_kernel,
 		                                  HINT_GETADDR(KERNEL_VMHINT_LAPIC),
-		                                  vm_datapart_numbytes(&x86_lapic_mpart), PAGESIZE,
+		                                  mpart_getsize(&x86_lapic_mpart), PAGESIZE,
 		                                  HINT_GETMODE(KERNEL_VMHINT_LAPIC));
 		if unlikely(lapic_addr == VM_GETFREE_ERROR)
 			kernel_panic(FREESTR("Failed to map the LAPIC somewhere\n"));

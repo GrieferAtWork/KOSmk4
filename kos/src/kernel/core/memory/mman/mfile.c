@@ -19,6 +19,9 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C 1
+#define __WANT_MPART__mp_dead
+#define __WANT_MPART__mp_oob2
+#define __WANT_MPART__mp_oob
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

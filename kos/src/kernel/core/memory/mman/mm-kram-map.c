@@ -55,14 +55,14 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 	IF_PHYS_IDENTITY(dst, num_blocks * PAGESIZE, {
 		memsetl(PHYS_TO_IDENTITY(dst),
 		        DEBUGHEAP_FRESH_MEMORY,
-		        num_blocks * PAGESIZE);
+		        num_blocks * (PAGESIZE / 4));
 		return;
 	});
 	if unlikely(!num_blocks)
 		return;
 	map = phys_pushpage(buffer);
 	for (;;) {
-		memsetl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE);
+		memsetl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE / 4);
 		--num_blocks;
 		if (!num_blocks)
 			break;

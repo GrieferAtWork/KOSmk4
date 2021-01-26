@@ -19,6 +19,8 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_TASK_C
 #define GUARD_KERNEL_SRC_SCHED_TASK_C 1
+#define __WANT_MNODE_INIT
+#define __WANT_MPART_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -84,64 +86,62 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
-	/* .mp_refcnt    = */ 1,
-	/* .mp_flags     = */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
-	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
-	/*                 */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED,
-	/* .mp_state     = */ MPART_ST_MEM,
-	/* .mp_file      = */ { &mfile_zero },
-	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_copy),
-	/* .mp_share     = */ { &this_kernel_stacknode_ },
-	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_lockops),
-	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_minaddr   = */ (pos_t)0,
-	/* .mp_maxaddr   = */ (pos_t)KERNEL_STACKSIZE - 1,
-	/* .mp_changed   = */ {},
-	/* .mp_filent    = */ { {} },
-	/* .mp_blkst_ptr = */ { NULL },
-	/* .mp_mem       = */ { {
-		/* .mc_start = */ 0, /* Filled later */
-		/* .mc_size  = */ CEILDIV(KERNEL_STACKSIZE, PAGESIZE),
-	} },
-	/* .mp_meta      = */ NULL
+	MPART_INIT_mp_refcnt(1),
+	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
+	                    MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED),
+	MPART_INIT_mp_state(MPART_ST_MEM),
+	MPART_INIT_mp_file(&mfile_zero),
+	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_copy)),
+	MPART_INIT_mp_share({ &this_kernel_stacknode_ }),
+	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_lockops)),
+	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_minaddr(0),
+	MPART_INIT_mp_maxaddr(KERNEL_STACKSIZE - 1),
+	MPART_INIT_mp_changed({}),
+	MPART_INIT_mp_filent({ {} }),
+	MPART_INIT_mp_blkst_ptr({ NULL }),
+	MPART_INIT_mp_mem(0 /* Filled later */, CEILDIV(KERNEL_STACKSIZE, PAGESIZE)),
+	MPART_INIT_mp_meta(NULL)
 };
 
 PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
-	/* .mn_mement    = */ { {} },
-	/* .mn_minaddr   = */ (byte_t *)0,
-	/* .mn_maxaddr   = */ (byte_t *)KERNEL_STACKSIZE - 1,
-	/* .mn_flags     = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                 */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	/*                 */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	/*                 */ MNODE_F_MLOCK | _MNODE_F_MPREPARED_KERNEL,
-	/* .mn_part      = */ &this_kernel_stackpart_,
-	/* .mn_fspath    = */ NULL,
-	/* .mn_fsname    = */ NULL,
-	/* .mn_mman      = */ { &mman_kernel },
-	/* .mn_partoff   = */ 0,
-	/* .mn_link      = */ { NULL, &this_kernel_stackpart_.mp_share.lh_first },
-	/* .mn_writable  = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* ._mn_module   = */ NULL
+	MNODE_INIT_mn_mement({ {} }),
+	MNODE_INIT_mn_minaddr(0),
+	MNODE_INIT_mn_maxaddr(KERNEL_STACKSIZE - 1),
+	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
+	                    MNODE_F_MLOCK | _MNODE_F_MPREPARED_KERNEL),
+	MNODE_INIT_mn_part(&this_kernel_stackpart_),
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link({ NULL, &this_kernel_stackpart_.mp_share.lh_first }),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT__mn_module(NULL)
 };
 
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
-	/* .mn_mement    = */ { {} },
-	/* .mn_minaddr   = */ (byte_t *)0,
-	/* .mn_maxaddr   = */ (byte_t *)PAGESIZE - 1,
-	/* .mn_flags     = */ MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
-	/*                 */ MNODE_F_KERNPART | MNODE_F_MLOCK |
-	/*                 */ _MNODE_F_MPREPARED_KERNEL,
-	/* .mn_part      = */ NULL, /* Reserved node! */
-	/* .mn_fspath    = */ NULL,
-	/* .mn_fsname    = */ NULL,
-	/* .mn_mman      = */ { &mman_kernel },
-	/* .mn_partoff   = */ 0,
-	/* .mn_link      = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* .mn_writable  = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* ._mn_module   = */ NULL
+	MNODE_INIT_mn_mement({}),
+	MNODE_INIT_mn_minaddr(0),
+	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
+	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+	                    MNODE_F_KERNPART | MNODE_F_MLOCK |
+	                    _MNODE_F_MPREPARED_KERNEL),
+	MNODE_INIT_mn_part(NULL), /* Reserved node! */
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT__mn_module(NULL)
 };
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+
 #else /* CONFIG_USE_NEW_VM */
 PUBLIC ATTR_PERTASK struct vm_datapart
 this_kernel_stackpart_ ASMNAME("this_kernel_stackpart") = {
