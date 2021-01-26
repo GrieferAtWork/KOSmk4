@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_DATAPART_HANDLE_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_DATAPART_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_DATAPART_HANDLE_C
+#define GUARD_KERNEL_SRC_MEMORY_DATAPART_HANDLE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -192,6 +192,7 @@ INTERN void KCALL
 handle_datapart_sync(struct vm_datapart *__restrict self) {
 	vm_datapart_sync(self);
 }
+
 DEFINE_INTERN_ALIAS(handle_datapart_datasync, handle_datapart_sync);
 
 INTERN void KCALL
@@ -298,6 +299,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		return handle_installhop(&data->dof_openfd, hnd);
 	}	break;
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATAPART_STAT: {
 		size_t struct_size;
 		struct hop_datapart_stat info;
@@ -355,7 +357,9 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		data->ds_mindpage = info.ds_mindpage;
 		data->ds_maxdpage = info.ds_maxdpage;
 	}	break;
+#endif /* !CONFIG_USE_NEW_VM */
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATAPART_HASCHANGED: {
 		size_t struct_size;
 		struct hop_datablock_haschanged *data;
@@ -380,6 +384,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		data->dhc_result = has_changed ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE
 		                               : HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED;
 	}	break;
+#endif /* !CONFIG_USE_NEW_VM */
 
 
 	default:
@@ -396,4 +401,4 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_DATAPART_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_DATAPART_HANDLE_C */

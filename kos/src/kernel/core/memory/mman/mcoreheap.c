@@ -639,9 +639,8 @@ mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 }
 
 
-PRIVATE NOBLOCK NONNULL((1)) struct mlockop *
-NOTHROW(FCALL mlockop_coreheap_free_callback)(union mcorepart *__restrict self,
-                                              gfp_t UNUSED(flags)) {
+PRIVATE NOBLOCK NONNULL((1)) struct mpostlockop *
+NOTHROW(FCALL mlockop_coreheap_free_callback)(union mcorepart *__restrict self) {
 	mcoreheap_free_locked(self);
 	return NULL;
 }

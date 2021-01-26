@@ -102,6 +102,9 @@ NOTHROW(FCALL mfutex_destroy_later)(struct mfutex *__restrict self) {
 DECL_END
 
 #define RBTREE_LEFT_LEANING
+#define RBTREE_WANT_TRYINSERT
+#define RBTREE_WANT_RLOCATE
+#define RBTREE_WANT_RREMOVE
 #define RBTREE(name)           mfutex_tree_##name
 #define RBTREE_T               struct mfutex
 #define RBTREE_Tkey            mpart_reladdr_t
@@ -202,6 +205,7 @@ mpart_createfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
 	partrel_offset &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 
 	meta = mpart_getmeta(self);
+again:
 	mpartmeta_ftxlock_read(meta);
 	if unlikely(partrel_offset >= mpart_getsize(self)) {
 		result = MPART_FUTEX_OOB;
@@ -229,12 +233,21 @@ mpart_createfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
 					RETHROW();
 				}
 check_old_futex:
-				old_futex = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
-				if unlikely(old_futex && tryincref(old_futex)) {
-					/* Deal with the case of another, existing futex. */
+				/* Initialize the new futex object. */
+				mfutex_init(result, self, partrel_offset);
+				/* Try to insert the new futex into the tree. */
+				if (!mfutex_tree_tryinsert(&meta->mpm_ftx, result)) {
+					bool refok;
+					old_futex = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
+					assert(old_futex);
+					refok = tryincref(old_futex);
 					mpartmeta_ftxlock_endwrite(meta);
 					kfree(result);
-					return old_futex;
+					if likely(refok)
+						return old_futex;
+					/* Try again (the dead futex should have been
+					 * reaped by `mpartmeta_ftxlock_endwrite()') */
+					goto again;
 				}
 			} else {
 				TRY {
@@ -244,11 +257,11 @@ check_old_futex:
 					kfree(result);
 					RETHROW();
 				}
+				/* Initialize the new futex object. */
+				mfutex_init(result, self, partrel_offset);
+				/* Insert the new futex into the tree. */
+				mfutex_tree_insert(&meta->mpm_ftx, result);
 			}
-			/* Initialize the new futex object. */
-			mfutex_init(result, self, partrel_offset);
-			/* Insert the new futex into the tree. */
-			mfutex_tree_insert(&meta->mpm_ftx, result);
 			mpartmeta_ftxlock_endwrite(meta);
 		}
 	}

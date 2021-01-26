@@ -181,7 +181,7 @@ again:
 				goto return_existing_entry;
 		}
 	} EXCEPT {
-		if (vm_datablock_lock_endread(target_directory))
+		if (inode_lock_endread(target_directory))
 			goto again;
 		RETHROW();
 	}
@@ -471,7 +471,7 @@ again_endwrite_self:
 	return result;
 #ifdef DEFINE_DIRECTORY_CREATFILE
 	return_existing_entry:
-	vm_datablock_lock_endread(target_directory);
+	inode_lock_endread(target_directory);
 open_existing_entry:
 	TRY {
 		result = superblock_opennode(target_directory->i_super,

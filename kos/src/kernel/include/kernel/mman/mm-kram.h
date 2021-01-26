@@ -216,14 +216,17 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 struct mman_unmap_kram_job;
 SLIST_HEAD(mman_unmap_kram_job_slist, mman_unmap_kram_job);
 
+/* Completion callback for an mman-unmap-kram job. */
+typedef NOBLOCK NONNULL((1)) void
+/*NOTHROW*/ (FCALL *mman_unmap_kram_job_done_t)(struct mman_unmap_kram_job *__restrict self);
+
 struct mman_unmap_kram_job {
 	/* [0..1] Callback executed once the job is finished (See the description above).
 	 * NOTE: This callback is guarantied to only be invoked _after_ any lock which
 	 *       may have been held to the kernel mman, or a backing mem-part has already
 	 *       been released, so you're free to trylock() anything you want (so long as
 	 *       you make sure that the call is non-blocking). */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (*mukj_done)(struct mman_unmap_kram_job *__restrict self);
+	mman_unmap_kram_job_done_t mukj_done;
 	byte_t       *mukj_minaddr; /* Lowest address being unmapped.
 	                             * When equal to `(byte_t *)self', then the
 	                             * unmap job is considered to be in-line. */
@@ -281,6 +284,17 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 #define MMAN_UNMAP_KRAM_LOCKED_EX_DONE  ((struct mman_unmap_kram_job *)-1) /* The job was finished (caller must run `mukj_done' after releasing locks) */
 #define MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC ((struct mman_unmap_kram_job *)-2) /* The job will be completed asynchronously*/
 
+/* Do all of the necessary locking and queuing to eventually bring `job' to completion. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) void
+NOTHROW(FCALL mman_unmap_kram_ex)(/*inherit(always)*/ struct mman_unmap_kram_job *__restrict job);
+
+/* Helper function that can be used to unmap anything by re-using `freeme', which must be
+ * a kmalloc-pointer with `kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job)'
+ * in order to represent intermediate storage for  */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
+                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                         void *freeme, gfp_t flags DFL(0));
 
 DECL_END
 #endif /* __CC__ */

@@ -270,7 +270,6 @@ mbuilder_map(struct mbuilder *__restrict self,
 	if unlikely(file_pos & PAGEMASK) {
 		size_t addend;
 		addend = ((size_t)file_pos & PAGEMASK);
-		result = (byte_t *)baseaddr + addend;
 		num_bytes += addend;
 		file_pos &= ~PAGEMASK;
 	}
@@ -360,7 +359,6 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 	if unlikely(file_pos & PAGEMASK) {
 		size_t addend;
 		addend = ((size_t)file_pos & PAGEMASK);
-		result = (byte_t *)baseaddr + addend;
 		num_bytes += addend;
 		file_pos &= ~PAGEMASK;
 	}
@@ -603,7 +601,7 @@ NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
 	assert(fmnode->mbn_part != NULL);
 	assert(fmnode->mbn_file != NULL);
 	assert(fmnode->mbn_filnxt == NULL);
-	mbnode_tree_remove(&self->mb_mappings, fmnode);
+	mbnode_tree_removenode(&self->mb_mappings, fmnode);
 	LIST_REMOVE(fmnode, mbn_nxtuprt);
 	SLIST_REMOVE(&self->mb_files, fmnode, mbn_nxtfile); /* WARNING: O(n) operation! */
 	DBG_memset(&fmnode->mbn_mement, 0xcc, sizeof(fmnode->mbn_mement));

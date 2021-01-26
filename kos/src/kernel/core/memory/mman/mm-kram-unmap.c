@@ -969,49 +969,6 @@ fail:
 }
 
 
-/* Insert `lop' into the lock-operations list of `mman_kernel',
- * and return `true', or don't insert it into the list, acquire
- * a lock to `mman_kernel', and return `false' */
-PRIVATE NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL mman_lockop_insert_or_lock)(struct mlockop *__restrict lop) {
-	bool did_remove;
-	struct mlockop_slist locklist;
-	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, mlo_link);
-	if likely(!mman_lock_tryacquire(&mman_kernel))
-		return true;
-	/* Welp... We've got the lock... -> Try to remove `lop' once again. */
-	locklist.slh_first = SLIST_ATOMIC_CLEAR(&mman_kernel_lockops);
-	did_remove         = true;
-	SLIST_TRYREMOVE(&locklist, lop, mlo_link, {
-		did_remove = false;
-	});
-	if (locklist.slh_first != NULL) {
-		/* Re-queue all removed elements. */
-		struct mlockop *lastop;
-		lastop = SLIST_FIRST(&locklist);
-		while (SLIST_NEXT(lastop, mlo_link))
-			lastop = SLIST_NEXT(lastop, mlo_link);
-		SLIST_ATOMIC_INSERT_R(&mman_kernel_lockops,
-		                      SLIST_FIRST(&locklist),
-		                      lastop, mlo_link);
-	}
-	if (!did_remove) {
-		/* Lock acquired, but `lop' was already executed.
-		 * Act as though we had never acquired the lock in the first place! */
-		mman_lock_release(&mman_kernel);
-		return true;
-	}
-	/* Lock acquired, and `lop' not added to the lock-op list. */
-	return false;
-}
-
-PRIVATE NOBLOCK struct mpostlockop *
-NOTHROW(FCALL mlockop_kram_finish)(struct mlockop *__restrict self) {
-	struct mman_unmap_kram_job *job, *res;
-	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mm);
-	(*job->mukj_done)(job);
-}
-
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL mlockop_kram_cb_post)(struct mpostlockop *__restrict self) {
@@ -1033,7 +990,6 @@ NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self) {
 			return &job->mukj_post_lop_mm;
 		}
 	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
-		struct mlockop *next;
 		/* Must re-queue as pending for the kernel mman. */
 		/* TODO: This must happen in a post-op so we don't end up in an infinite loop! */
 		res->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
@@ -1066,7 +1022,6 @@ NOTHROW(FCALL mpartlockop_kram_cb)(struct mpart_lockop *__restrict self,
 			return &job->mukj_post_lop_mp;
 		}
 	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
-		struct mlockop *next;
 		/* Must re-queue as pending for the kernel mman. */
 		res->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
@@ -1126,10 +1081,10 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
  *                                           in-line with the memory being free'd, the given
  *                                           done-callback is responsible to free `job'
  * @return: * : Insufficient memory (re-queue the returned job for later execution) */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mman_unmap_kram_job *
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct mman_unmap_kram_job *
 NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict job,
                                          struct mpart *locked_part) {
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (*job_done)(struct mman_unmap_kram_job *__restrict self);
+	mman_unmap_kram_job_done_t job_done;
 	byte_t *job_orgaddr, *job_minaddr, *job_maxaddr;
 	gfp_t job_flags;
 	job_done    = job->mukj_done;
@@ -1512,18 +1467,7 @@ NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
 	job->mukj_minaddr = (byte_t *)addr;
 	job->mukj_maxaddr = (byte_t *)addr + num_bytes - 1;
 	job->mukj_flags   = flags;
-	if (mman_lock_tryacquire(&mman_kernel)) {
-		/* Directly try to unmap kernel ram. */
-		job = mman_unmap_kram_locked_ex(job);
-		mman_lock_release(&mman_kernel);
-		assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
-		if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC)
-			goto do_schedule_lockop;
-	} else {
-do_schedule_lockop:
-		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
-		mman_kernel_lockop(&job->mukj_lop_mm);
-	}
+	mman_unmap_kram_ex(job);
 }
 
 /* Same as `mman_unmap_kram()', but may be used to improve efficiency
@@ -1544,9 +1488,8 @@ NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
 	job->mukj_maxaddr = (byte_t *)addr + num_bytes - 1;
 	job->mukj_flags   = flags;
 
-	/* Directly try to unmap kernel ram. */
+	/* Try to unmap kernel ram directly. */
 	job = mman_unmap_kram_locked_ex(job);
-	mman_lock_release(&mman_kernel);
 	assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
 	if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
 		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
@@ -1554,6 +1497,53 @@ NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
 		                    &job->mukj_lop_mm,
 		                    mlo_link);
 	}
+}
+
+/* Do all of the necessary locking and queuing to eventually bring `job' to completion. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) void
+NOTHROW(FCALL mman_unmap_kram_ex)(/*inherit(always)*/ struct mman_unmap_kram_job *__restrict job) {
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		/* Try to unmap kernel ram directly. */
+		job = mman_unmap_kram_locked_ex(job);
+		mman_lock_release(&mman_kernel);
+		assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
+		if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC)
+			goto do_schedule_lockop;
+	} else {
+do_schedule_lockop:
+		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		mman_kernel_lockop(&job->mukj_lop_mm);
+	}
+}
+
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL kfree_for_done)(struct mman_unmap_kram_job *__restrict self) {
+	kfree(self);
+}
+
+
+/* Helper function that can be used to unmap anything by re-using `freeme', which must be
+ * a kmalloc-pointer with `kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job)'
+ * in order to represent intermediate storage for  */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
+                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                         void *freeme, gfp_t flags) {
+	struct mman_unmap_kram_job *job;
+	assert(kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job));
+	if unlikely(!num_bytes) {
+		kfree(freeme);
+		return;
+	}
+
+	job = (struct mman_unmap_kram_job *)freeme;
+	job->mukj_done    = &kfree_for_done;
+	job->mukj_minaddr = (byte_t *)addr;
+	job->mukj_maxaddr = (byte_t *)addr + num_bytes - 1;
+	job->mukj_flags   = flags;
+	mman_unmap_kram_ex(job);
 }
 
 

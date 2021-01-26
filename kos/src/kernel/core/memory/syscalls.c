@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_SYSCALLS_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_SYSCALLS_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_SYSCALLS_C
+#define GUARD_KERNEL_SRC_MEMORY_SYSCALLS_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -46,20 +46,23 @@
 #include <errno.h>
 #include <string.h>
 
+/* TODO: Completely re-write this file for use with the new mman! */
+
 DECL_BEGIN
 
 STATIC_ASSERT(PROT_NONE   == VM_PROT_NONE);
 STATIC_ASSERT(PROT_EXEC   == VM_PROT_EXEC);
 STATIC_ASSERT(PROT_WRITE  == VM_PROT_WRITE);
 STATIC_ASSERT(PROT_READ   == VM_PROT_READ);
-STATIC_ASSERT(PROT_LOOSE  == VM_PROT_LOOSE);
 STATIC_ASSERT(PROT_SHARED == VM_PROT_SHARED);
+#ifdef VM_PROT_LOOSE
+STATIC_ASSERT(PROT_LOOSE  == VM_PROT_LOOSE);
+#endif /* VM_PROT_LOOSE */
 
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
-
 
 LOCAL REF struct vm_datablock *KCALL
 getdatablock_from_handle(unsigned int fd,
@@ -285,10 +288,17 @@ err_bad_length:
 				if (flags & MAP_GROWSUP) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
+#ifdef CONFIG_USE_NEW_VM
+					node_flags |= MAP_GROWSUP;
+#else /* CONFIG_USE_NEW_VM */
 					node_flags |= VM_NODE_FLAG_GROWSUP;
+#endif /* !CONFIG_USE_NEW_VM */
 				} else if (flags & MAP_GROWSDOWN) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
+#ifdef CONFIG_USE_NEW_VM
+					node_flags |= MAP_GROWSDOWN;
+#endif /* CONFIG_USE_NEW_VM */
 				}
 again_mapat:
 				/* XXX: vm_mapat_override(...)? */
@@ -317,7 +327,7 @@ again_mapat:
 						goto again_mapat;
 					}
 					/* Check if the given range overlaps with KERNEL-SPACE */
-					if (!PAGEIDRANGE_ISKERN_PARTIAL(result, num_bytes + guard))
+					if (!ADDRRANGE_ISKERN_PARTIAL(result, num_bytes + guard))
 						goto again_mapat;
 				}
 			}
@@ -362,10 +372,17 @@ again_mapat:
 				if (flags & MAP_GROWSUP) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
+#ifdef CONFIG_USE_NEW_VM
+					node_flags |= MAP_GROWSUP;
+#else /* CONFIG_USE_NEW_VM */
 					node_flags |= VM_NODE_FLAG_GROWSUP;
+#endif /* !CONFIG_USE_NEW_VM */
 				} else if (flags & MAP_GROWSDOWN) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
+#ifdef CONFIG_USE_NEW_VM
+					node_flags |= MAP_GROWSDOWN;
+#endif /* CONFIG_USE_NEW_VM */
 				}
 				result = (byte_t *)vm_map_subrange(THIS_VM,
 				                                   hint,
@@ -455,4 +472,4 @@ DECL_END
 
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_SYSCALLS_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_SYSCALLS_C */

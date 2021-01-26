@@ -77,7 +77,7 @@ typedef ssize_t (FCALL *mman_enum_callback_t)(void *arg, struct mmapinfo *__rest
  * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
  *                       mapping. */
 FUNDEF ssize_t KCALL
-mman_enum(struct vm *__restrict self, mman_enum_callback_t cb, void *arg,
+mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
 #ifdef USERSPACE_END
           UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
           UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)(USERSPACE_END - 1))

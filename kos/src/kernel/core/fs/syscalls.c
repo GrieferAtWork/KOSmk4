@@ -2993,10 +2993,25 @@ DEFINE_SYSCALL3(ssize_t, readlink,
 #endif /* __ARCH_WANT_SYSCALL_READLINK */
 
 
+#ifdef CONFIG_USE_NEW_VM
+typedef void(KCALL *kernel_permman_onexec_t)(void);
+INTDEF kernel_permman_onexec_t __kernel_permman_onexec_start[];
+INTDEF kernel_permman_onexec_t __kernel_permman_onexec_end[];
+
+LOCAL void KCALL run_permman_onexec(void) {
+	kernel_permman_onexec_t *iter;
+	for (iter = __kernel_permman_onexec_start;
+	     iter < __kernel_permman_onexec_end; ++iter)
+		(**iter)();
+	/* Invoke dynamic callbacks. */
+	mman_onexec_callbacks();
+}
+#else /* CONFIG_USE_NEW_VM */
 typedef void(KCALL *kernel_pervm_onexec_t)(void);
 INTDEF kernel_pervm_onexec_t __kernel_pervm_onexec_start[];
 INTDEF kernel_pervm_onexec_t __kernel_pervm_onexec_end[];
-LOCAL void KCALL run_pervm_onexec(void) {
+
+LOCAL void KCALL run_permman_onexec(void) {
 	kernel_pervm_onexec_t *iter;
 	for (iter = __kernel_pervm_onexec_start;
 	     iter < __kernel_pervm_onexec_end; ++iter)
@@ -3004,6 +3019,7 @@ LOCAL void KCALL run_pervm_onexec(void) {
 	/* Invoke dynamic callbacks. */
 	vm_onexec_callbacks();
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 
 
@@ -3102,7 +3118,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
-	run_pervm_onexec();
+	run_permman_onexec();
 #ifndef CONFIG_EVERYONE_IS_ROOT
 	cred_onexec(args->ea_xnode);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */

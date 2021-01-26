@@ -52,8 +52,13 @@ DECL_BEGIN
  * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
  *                       mapping. */
 FUNDEF ssize_t KCALL
-mman_enum(struct vm *__restrict self, mman_enum_callback_t cb, void *arg,
+mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
           UNCHECKED void *enum_minaddr, UNCHECKED void *enum_maxaddr) {
+	(void)self;
+	(void)cb;
+	(void)arg;
+	(void)enum_minaddr;
+	(void)enum_maxaddr;
 	/* TODO */
 	return 0;
 }

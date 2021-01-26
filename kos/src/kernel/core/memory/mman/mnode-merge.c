@@ -17,25 +17,44 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_MERGE_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_MERGE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#ifndef __INTELLISENSE__
-#define DEFINE_mman_read_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_write_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_memset_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_read
-#include "mm-rw.c.inl"
-#define DEFINE_mman_write
-#include "mm-rw.c.inl"
-#define DEFINE_mman_memset
-#include "mm-rw.c.inl"
-#endif /* !__INTELLISENSE__ */
+#include <fs/node.h>
+#include <fs/vfs.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C */
+#include <assert.h>
+
+DECL_BEGIN
+
+/* While holding a lock to `self->mn_mman' and `self->mn_part', try
+ * to merge the given node with its successor/predecessor node, without
+ * releasing any of the locks still held.
+ * @return: * : The new, merged node (which may have a different min-addr
+ *              that the original node `self'). Also note that this node
+ *              may or may not be equal to `self', and that it's min- and
+ *              max-addr fields may be different from those that `self'
+ *              had upon entry, irregardless of `self' being re-returned.
+ *              As a matter of fact `*self' becomes invalid after a call
+ *              to this function! */
+PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
+NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {
+	assert(!self->mn_part || mpart_lock_acquired(self->mn_part));
+	assert(self->mn_mman);
+	assert(mman_lock_acquired(self->mn_mman));
+
+	/* TODO */
+
+	return self;
+}
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_MERGE_C */

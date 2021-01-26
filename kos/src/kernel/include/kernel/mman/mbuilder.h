@@ -29,6 +29,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/__assert.h>
+#include <hybrid/__pointer.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 
@@ -445,6 +446,80 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
+
+
+/* TODO: The PEB API is deprecated, and at some point in the future,
+ *       process startup information will be passed via the main()
+ *       thread's stack! */
+
+/* Allocate a PEB (Process Environment Block) within the given MBuilder,
+ * initializing its contents with the strings from the given argv+envp pair.
+ * This function is called from `vm_exec()' after the remainder of the application,
+ * as well as the dynamic linker have already been loaded into memory.
+ * @param: argc_inject: The number of arguments from `argv_inject' to inject
+ *                      at the beginning of the user-space argc/argv vector.
+ * @param: argv_inject: Vector of arguments to inject at the beginning of
+ *                      the user-space argc/argv vector.
+ * @param: argv:        User-space pointer to a NULL-terminated vector of argument strings
+ * @param: envp:        User-space pointer to a NULL-terminated vector of environment strings
+ * @return: * :         Page index of the PEB (to-be passed to the user-space program) */
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb(struct mbuilder *__restrict self,
+                   size_t argc_inject, KERNEL char const *const *argv_inject,
+                   USER UNCHECKED char const *USER CHECKED const *argv,
+                   USER UNCHECKED char const *USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#define mbuilder_alloc_peb64     mbuilder_alloc_peb
+#define mbuilder_alloc_peb64_p64 mbuilder_alloc_peb
+#define mbuilder_alloc_peb32_p32 mbuilder_alloc_peb32
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb32(struct mbuilder *__restrict self,
+                     size_t argc_inject, KERNEL char const *const *argv_inject,
+                     USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+                     USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb32_p64(struct mbuilder *__restrict self,
+                         size_t argc_inject, KERNEL char const *const *argv_inject,
+                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb64_p32(struct mbuilder *__restrict self,
+                         size_t argc_inject, KERNEL char const *const *argv_inject,
+                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#define mbuilder_alloc_peb32     mbuilder_alloc_peb
+#define mbuilder_alloc_peb64_p64 mbuilder_alloc_peb64
+#define mbuilder_alloc_peb32_p32 mbuilder_alloc_peb
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb64(struct mbuilder *__restrict self,
+                     size_t argc_inject, KERNEL char const *const *argv_inject,
+                     USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+                     USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb64_p32(struct mbuilder *__restrict self,
+                         size_t argc_inject, KERNEL char const *const *argv_inject,
+                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+mbuilder_alloc_peb32_p64(struct mbuilder *__restrict self,
+                         size_t argc_inject, KERNEL char const *const *argv_inject,
+                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+#else
+#error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
+#endif
+#endif /* __ARCH_HAVE_COMPAT */
+
 
 DECL_END
 #endif /* __CC__ */

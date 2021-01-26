@@ -17,25 +17,47 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MBUILDER_PEB_C
+#define GUARD_KERNEL_SRC_MEMORY_MBUILDER_PEB_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#include <kos/exec/bits/peb32.h>
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#include <kos/exec/bits/peb64.h>
+#endif
+#endif /* __ARCH_HAVE_COMPAT */
+
 #ifndef __INTELLISENSE__
-#define DEFINE_mman_read_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_write_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_memset_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_read
-#include "mm-rw.c.inl"
-#define DEFINE_mman_write
-#include "mm-rw.c.inl"
-#define DEFINE_mman_memset
-#include "mm-rw.c.inl"
+#define IN_POINTERSIZE __SIZEOF_POINTER__
+#define OU_POINTERSIZE __SIZEOF_POINTER__
+#include "mbuilder-peb.c.inl"
+
+#ifdef __ARCH_HAVE_COMPAT
+#if __SIZEOF_POINTER__ != 4
+#define IN_POINTERSIZE 4
+#define OU_POINTERSIZE 4
+#include "mbuilder-peb.c.inl"
+#endif /* __SIZEOF_POINTER__ != 4 */
+
+#if __SIZEOF_POINTER__ != 8
+#define IN_POINTERSIZE 8
+#define OU_POINTERSIZE 8
+#include "mbuilder-peb.c.inl"
+#endif /* __SIZEOF_POINTER__ != 8 */
+
+#define IN_POINTERSIZE 4
+#define OU_POINTERSIZE 8
+#include "mbuilder-peb.c.inl"
+
+#define IN_POINTERSIZE 8
+#define OU_POINTERSIZE 4
+#include "mbuilder-peb.c.inl"
+#endif /* __ARCH_HAVE_COMPAT */
+
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MBUILDER_PEB_C */

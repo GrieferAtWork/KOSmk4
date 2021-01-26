@@ -632,13 +632,18 @@ NOTHROW(KCALL fs_filesystems_remove)(struct superblock *__restrict block) {
 
 
 
+#ifdef CONFIG_USE_NEW_VM
+#define INODE_SCOPED_LOCK_FOR(self) ((struct inode *)(self))
+#else /* CONFIG_USE_NEW_VM */
+#define INODE_SCOPED_LOCK_FOR(self) ((struct vm_datablock *)(self))
+#endif /* !CONFIG_USE_NEW_VM */
 
 
 /* INODE INTERFACE */
 PUBLIC NONNULL((1)) bool KCALL
 inode_changed_chmtime(struct inode *__restrict self) {
 	{
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		/* TODO: Update the INode's last-changed timestamp */
 	}
 	return inode_changed(self, INODE_FCHANGED | INODE_FATTRCHANGED);
@@ -652,7 +657,7 @@ inode_loadattr(struct inode *__restrict self)
 	if (ATOMIC_READ(self->i_flags) & INODE_FATTRLOADED)
 		return; /* Already loaded. */
 	/* Must load INode attributes now. */
-	SCOPED_WRITELOCK((struct vm_datablock *)self);
+	SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 	COMPILER_READ_BARRIER();
 	assert(self->i_type);
 	assert(self->i_type->it_attr.a_loadattr);
@@ -814,7 +819,7 @@ inode_loadattr_and_check_deleted(struct inode *__restrict self,
 	if (flags & INODE_FATTRLOADED)
 		return; /* Already loaded. */
 	/* Must load INode attributes now. */
-	SCOPED_WRITELOCK((struct vm_datablock *)self);
+	SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 	COMPILER_READ_BARRIER();
 	assert(self->i_type);
 	assert(self->i_type->it_attr.a_loadattr);
@@ -845,7 +850,7 @@ inode_truncate(struct inode *__restrict self, pos_t new_size)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_TRUNC);
 	inode_loadattr_and_check_deleted(self);
 	{
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		if likely(self->i_filesize != new_size) {
 			if (new_size < self->i_filesize) {
 				/* TODO: Delete/truncate VM data parts */
@@ -896,7 +901,7 @@ inode_chtime(struct inode *__restrict self,
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_WRATTR);
 	inode_loadattr_and_check_deleted(self);
 	{
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		if (new_atime)
 			memcpy(&self->i_fileatime, new_atime, sizeof(struct timespec));
 		if (new_mtime)
@@ -935,7 +940,7 @@ inode_chmod(struct inode *__restrict self,
 	inode_loadattr_and_check_deleted(self);
 	{
 		mode_t new_mode;
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 #ifndef CONFIG_EVERYONE_IS_ROOT
 		if (check_permissions) {
 			/* Permission restrictions:
@@ -1008,7 +1013,7 @@ inode_chown(struct inode *__restrict self,
 	inode_loadattr_and_check_deleted(self);
 	{
 		mode_t new_mode;
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		old_owner = self->i_fileuid;
 		old_group = self->i_filegid;
 		/* Check for special cases: Don't actually change uid/gid */
@@ -1275,7 +1280,7 @@ symlink_node_load(struct symlink_node *__restrict self)
 		if (!self->i_type->it_symlink.sl_readlink)
 			return false; /* Dynamic, symbolic link. */
 		inode_loadattr_and_check_deleted(self);
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		COMPILER_READ_BARRIER();
 		if likely(self->sl_text == NULL) {
 			(*self->i_type->it_symlink.sl_readlink)(self);
@@ -1431,7 +1436,7 @@ continue_reading:
 	}
 	if (!result) {
 		/* End of directory. (Set the flag for that) */
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		ATOMIC_OR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
@@ -1440,7 +1445,7 @@ continue_reading:
 	assertf(!memchr(result->de_name, 0, result->de_namelen),
 	        "%$[hex]", (size_t)result->de_namelen, result->de_name);
 	TRY {
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 #ifndef NDEBUG
 		/* `rwlock_write()' will have thrown an error if it didn't
 		 *  manage to upgrade the associated R/W-lock atomically.
@@ -1560,7 +1565,7 @@ continue_reading:
 	}
 	if (!result) {
 		/* End of directory. (Set the flag for that) */
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		ATOMIC_OR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
@@ -1570,7 +1575,7 @@ continue_reading:
 	        "%$[hex]", (size_t)result->de_namelen, result->de_name);
 	TRY {
 		struct directory_entry **presult;
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 #ifndef NDEBUG
 		/* `rwlock_write()' will have thrown an error if it didn't
 		 *  manage to upgrade the associated R/W-lock atomically.
@@ -2290,7 +2295,7 @@ again:
 					if (!(ATOMIC_READ(dir->i_flags) & INODE_FDIRLOADED)) {
 						if unlikely(!sync_trywrite(dir))
 							goto unlock_directory_and_start_again;
-						FINALLY_ENDWRITE((struct vm_datablock *)dir);
+						FINALLY_ENDWRITE(INODE_SCOPED_LOCK_FOR(dir));
 						if (!(ATOMIC_READ(dir->i_flags) & INODE_FDIRLOADED) &&
 						    directory_readnext(dir) != NULL)
 							THROW(E_FSERROR_DIRECTORY_NOT_EMPTY);
@@ -2348,8 +2353,8 @@ again:
 						}
 					}
 					/* All locks have been upgraded/acquired */
-					FINALLY_ENDWRITE((struct vm_datablock *)self);
-					FINALLY_ENDWRITE((struct vm_datablock *)dir);
+					FINALLY_ENDWRITE(INODE_SCOPED_LOCK_FOR(self));
+					FINALLY_ENDWRITE(INODE_SCOPED_LOCK_FOR(dir));
 					TRY {
 						result = DIRECTORY_REMOVE_STATUS_RMDIR;
 						if (dir->i_filenlink == (nlink_t)1) {
@@ -2415,8 +2420,8 @@ again:
 						goto unlock_directory_and_start_again;
 					}
 					/* All locks have been upgraded/acquired */
-					FINALLY_ENDWRITE((struct vm_datablock *)self);
-					FINALLY_ENDWRITE((struct vm_datablock *)node);
+					FINALLY_ENDWRITE(INODE_SCOPED_LOCK_FOR(self));
+					FINALLY_ENDWRITE(INODE_SCOPED_LOCK_FOR(node));
 					if (node->i_filenlink == (nlink_t)1 && node->i_filesize != 0) {
 						/* Deallocate file data of the node if this is the last link. */
 						if unlikely(!node->i_type->it_file.f_truncate)
@@ -4479,8 +4484,14 @@ superblock_open(struct superblock_type *__restrict type,
 
 
 /* DATA BLOCK INTERFACE IMPLEMENTATION FOR INODES */
+#ifdef CONFIG_USE_NEW_VM
+#define MFILE_OPS_CC FCALL
+#else /* CONFIG_USE_NEW_VM */
+#define MFILE_OPS_CC KCALL
+#endif /* !CONFIG_USE_NEW_VM */
+
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
+NOTHROW(MFILE_OPS_CC inode_destroy)(struct inode *__restrict self) {
 	assertf(!(self->i_flags & (INODE_FCHANGED | INODE_FATTRCHANGED)) ||
 	        self == self->i_super,
 	        "The changed-inode chain should have kept a reference");
@@ -4623,7 +4634,7 @@ db_inode_loadpart(struct inode *__restrict self, datapage_t start,
 		}
 		aio_multihandle_generic_init(&hand);
 		TRY {
-			SCOPED_READLOCK((struct vm_datablock *)self);
+			SCOPED_READLOCK(INODE_SCOPED_LOCK_FOR(self));
 			(*type->it_file.f_pread)(self, buffer, num_bytes, daddr, &hand);
 			aio_multihandle_done(&hand);
 		} EXCEPT {
@@ -4669,7 +4680,7 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 		}
 		aio_multihandle_generic_init(&hand);
 		TRY {
-			SCOPED_WRITELOCK((struct vm_datablock *)self);
+			SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 			(*type->it_file.f_pwrite)(self, buffer, num_bytes, daddr, &hand);
 			aio_multihandle_done(&hand);
 		} EXCEPT {
@@ -4687,17 +4698,17 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL db_inode_changed)(struct inode *__restrict self,
-                                struct mpart *__restrict UNUSED(part)) {
+NOTHROW(MFILE_OPS_CC db_inode_changed)(struct inode *__restrict self,
+                                       struct mpart *__restrict UNUSED(part)) {
 	inode_changed(self, INODE_FCHANGED);
 }
 
 PUBLIC struct vm_datablock_type inode_datablock_type = {
-	/* .dt_destroy  = */ (NOBLOCK void(KCALL *)(struct vm_datablock *__restrict))&inode_destroy,
+	/* .dt_destroy  = */ (NOBLOCK void(MFILE_OPS_CC *)(struct vm_datablock *__restrict))&inode_destroy,
 	/* .dt_initpart = */ NULL,
 	/* .dt_loadpart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,physaddr_t,size_t))&db_inode_loadpart,
 	/* .dt_savepart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,physaddr_t,size_t))&db_inode_savepart,
-	/* .dt_changed  = */ (void(KCALL *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
+	/* .dt_changed  = */ (void(MFILE_OPS_CC *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
 };
 
 

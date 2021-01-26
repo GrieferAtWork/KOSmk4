@@ -181,7 +181,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #ifndef DEFINE_IO_READ
 		if unlikely(!self->i_type->it_file.RW_OPERATOR)
 			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-		SCOPED_WRITELOCK((struct vm_datablock *)self);
+		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		inode_loadattr(self);
 		{
 			pos_t write_end;

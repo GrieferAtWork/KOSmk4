@@ -74,14 +74,17 @@
 #define vm_datapart_maxbyte(...)                      mpart_getmaxaddr(__VA_ARGS__)
 #define vm_datapart_startbyte(...)                    mpart_getminaddr(__VA_ARGS__)
 #define vm_datapart_endbyte(...)                      mpart_getendaddr(__VA_ARGS__)
-#define vm_datapart_read(...)                         mpart_read(__VA_ARGS__)
-#define vm_datapart_write(...)                        mpart_write(__VA_ARGS__)
-#define vm_datapart_read_phys(...)                    mpart_read_p(__VA_ARGS__)
-#define vm_datapart_write_phys(...)                   mpart_write_p(__VA_ARGS__)
-#define vm_datapart_readv(...)                        mpart_readv(__VA_ARGS__)
-#define vm_datapart_writev(...)                       mpart_writev(__VA_ARGS__)
-#define vm_datapart_readv_phys(...)                   mpart_readv_p(__VA_ARGS__)
-#define vm_datapart_writev_phys(...)                  mpart_writev_p(__VA_ARGS__)
+#define vm_datapart_read(self, dst, num_bytes, src_offset)                      mpart_read(self, dst, num_bytes, src_offset)
+#define vm_datapart_write(self, src, num_bytes, split_bytes, dst_offset)        mpart_write(self, src, num_bytes, dst_offset)
+#define vm_datapart_read_phys(self, dst, num_bytes, src_offset)                 mpart_read_p(self, dst, num_bytes, src_offset)
+#define vm_datapart_write_phys(self, src, num_bytes, split_bytes, dst_offset)   mpart_write_p(self, src, num_bytes, dst_offset)
+#define vm_datapart_readv(self, buf, src_offset)                                mpart_readv(self, buf, 0, aio_buffer_size(buf), src_offset)
+#define vm_datapart_writev(self, buf, split_bytes, dst_offset)                  mpart_writev(self, buf, 0, aio_buffer_size(buf), dst_offset)
+#define vm_datapart_readv_phys(self, buf, src_offset)                           mpart_readv_p(self, buf, 0, aio_pbuffer_size(buf), src_offset)
+#define vm_datapart_writev_phys(self, buf, split_bytes, dst_offset)             mpart_writev_p(self, buf, 0, aio_pbuffer_size(buf), dst_offset)
+#define vm_datapart_read_unsafe(self, dst, num_bytes, src_offset)               mpart_read(self, dst, num_bytes, src_offset)
+#define vm_datapart_write_unsafe(self, src, num_bytes, split_bytes, dst_offset) mpart_write(self, src, num_bytes, dst_offset)
+#define vm_datapart_sync(self, ...)                   (mpart_sync(self), 0)
 #define vm_datapart_split(...)                        mpart_split(__VA_ARGS__)
 #define vm_datapart_lockwrite_setcore(...)            mpart_lock_acquire_and_setcore(__VA_ARGS__)
 #define vm_datapart_lockwrite_setcore_unsharecow(...) mpart_lock_acquire_and_setcore_unsharecow(__VA_ARGS__)
@@ -103,26 +106,20 @@
 #define db_parts                                      mf_parts
 #define db_addrshift                                  mf_blockshift
 #define vm_datablock_destroy(...)                     mfile_destroy(__VA_ARGS__)
-#define vm_datablock_anonymize(...)                   mfile_makeanon(__VA_ARGS__)
+#define vm_datablock_anonymize(...)                   (mfile_makeanon(__VA_ARGS__), 1)
 #define vm_datablock_isanonymous(...)                 mfile_isanon(__VA_ARGS__)
 #define vm_datablock_sync(...)                        mfile_sync(__VA_ARGS__)
 #define vm_datablock_locatepart(...)                  mfile_getpart(__VA_ARGS__)
-#define vm_datablock_read(...)                        mfile_read(__VA_ARGS__)
-#define vm_datablock_write(...)                       mfile_write(__VA_ARGS__)
-#define vm_datablock_read_phys(...)                   mfile_read_p(__VA_ARGS__)
-#define vm_datablock_write_phys(...)                  mfile_write_p(__VA_ARGS__)
-#define vm_datablock_readv(...)                       mfile_readv(__VA_ARGS__)
-#define vm_datablock_writev(...)                      mfile_writev(__VA_ARGS__)
-#define vm_datablock_readv_phys(...)                  mfile_readv_p(__VA_ARGS__)
-#define vm_datablock_writev_phys(...)                 mfile_writev_p(__VA_ARGS__)
-#define vm_datablock_vio_read(...)                    mfile_vio_read(__VA_ARGS__)
-#define vm_datablock_vio_write(...)                   mfile_vio_write(__VA_ARGS__)
-#define vm_datablock_vio_read_phys(...)               mfile_vio_read_p(__VA_ARGS__)
-#define vm_datablock_vio_write_phys(...)              mfile_vio_write_p(__VA_ARGS__)
-#define vm_datablock_vio_readv(...)                   mfile_vio_readv(__VA_ARGS__)
-#define vm_datablock_vio_writev(...)                  mfile_vio_writev(__VA_ARGS__)
-#define vm_datablock_vio_readv_phys(...)              mfile_vio_readv_p(__VA_ARGS__)
-#define vm_datablock_vio_writev_phys(...)             mfile_vio_writev_p(__VA_ARGS__)
+#define vm_datablock_read(self, dst, num_bytes, src_offset)         mfile_read(self, dst, num_bytes, src_offset)
+#define vm_datablock_write(self, src, num_bytes, dst_offset)        mfile_write(self, src, num_bytes, dst_offset)
+#define vm_datablock_read_phys(self, dst, num_bytes, src_offset)    mfile_read_p(self, dst, num_bytes, src_offset)
+#define vm_datablock_write_phys(self, src, num_bytes, dst_offset)   mfile_write_p(self, src, num_bytes, dst_offset)
+#define vm_datablock_readv(self, buf, num_bytes, src_offset)        mfile_readv(self, buf, 0, num_bytes, src_offset)
+#define vm_datablock_writev(self, buf, num_bytes, dst_offset)       mfile_writev(self, buf, 0, num_bytes, dst_offset)
+#define vm_datablock_readv_phys(self, buf, num_bytes, src_offset)   mfile_readv_p(self, buf, 0, num_bytes, src_offset)
+#define vm_datablock_writev_phys(self, buf, num_bytes, dst_offset)  mfile_writev_p(self, buf, 0, num_bytes, dst_offset)
+#define vm_datablock_read_unsafe(self, dst, num_bytes, src_offset)  mfile_read(self, dst, num_bytes, src_offset)
+#define vm_datablock_write_unsafe(self, src, num_bytes, dst_offset) mfile_write(self, src, num_bytes, dst_offset)
 #define vm_datablock_haschanged(self)                 mfile_haschanged(self)
 #define vm_datablock_physical                         mfile_phys
 #define vm_datablock_physical_type                    mfile_phys_ops
@@ -254,10 +251,19 @@
 #define dt_loadpart                                   mo_loadpart
 #define dt_savepart                                   mo_savepart
 #define dt_changed                                    mo_changed
+#define vm_datapart_decref_and_merge(self)            decref(self)
 
 #ifdef __CC__
 #include <kos/except.h>
 DECL_BEGIN
+
+__DEFINE_SYNC_MUTEX(struct mpart,
+                    mpart_lock_tryacquire,
+                    mpart_lock_acquire,
+                    mpart_lock_acquire_nx,
+                    mpart_lock_release,
+                    mpart_lock_acquired,
+                    mpart_lock_available)
 
 
 FORCELOCAL WUNUSED NONNULL((1, 4)) bool
@@ -497,14 +503,6 @@ DECL_END
 #define mpart_getminaddr(...)                          vm_datapart_minbyte(__VA_ARGS__)
 #define mpart_getmaxaddr(...)                          vm_datapart_maxbyte(__VA_ARGS__)
 #define mpart_getendaddr(...)                          vm_datapart_endbyte(__VA_ARGS__)
-#define mpart_read(...)                                vm_datapart_read(__VA_ARGS__)
-#define mpart_write(...)                               vm_datapart_write(__VA_ARGS__)
-#define mpart_read_p(...)                              vm_datapart_read_phys(__VA_ARGS__)
-#define mpart_write_p(...)                             vm_datapart_write_phys(__VA_ARGS__)
-#define mpart_readv(...)                               vm_datapart_readv(__VA_ARGS__)
-#define mpart_writev(...)                              vm_datapart_writev(__VA_ARGS__)
-#define mpart_readv_p(...)                             vm_datapart_readv_phys(__VA_ARGS__)
-#define mpart_writev_p(...)                            vm_datapart_writev_phys(__VA_ARGS__)
 #define mpart_split(...)                               vm_datapart_split(__VA_ARGS__)
 #define mpart_lock_acquire_and_setcore(...)            vm_datapart_lockwrite_setcore(__VA_ARGS__)
 #define mpart_lock_acquire_and_setcore_unsharecow(...) vm_datapart_lockwrite_setcore_unsharecow(__VA_ARGS__)
@@ -525,10 +523,6 @@ DECL_END
 #define mfile_write(...)                               vm_datablock_write(__VA_ARGS__)
 #define mfile_read_p(...)                              vm_datablock_read_phys(__VA_ARGS__)
 #define mfile_write_p(...)                             vm_datablock_write_phys(__VA_ARGS__)
-#define mfile_readv(...)                               vm_datablock_readv(__VA_ARGS__)
-#define mfile_writev(...)                              vm_datablock_writev(__VA_ARGS__)
-#define mfile_readv_p(...)                             vm_datablock_readv_phys(__VA_ARGS__)
-#define mfile_writev_p(...)                            vm_datablock_writev_phys(__VA_ARGS__)
 #define mfile_vio_read(...)                            vm_datablock_vio_read(__VA_ARGS__)
 #define mfile_vio_write(...)                           vm_datablock_vio_write(__VA_ARGS__)
 #define mfile_vio_read_p(...)                          vm_datablock_vio_read_phys(__VA_ARGS__)
@@ -543,6 +537,26 @@ DECL_END
 #define mfile_ndef_ops                                 vm_datablock_anonymous_type
 #define mfile_zero                                     vm_datablock_anonymous_zero
 #define mfile_zero_ops                                 vm_datablock_anonymous_zero_type
+#define mfile_lock_write(self)                         sync_write(self)
+#define mfile_lock_write_nx(self)                      sync_write_nx(self)
+#define mfile_lock_trywrite(self)                      sync_trywrite(self)
+#define mfile_lock_endwrite(self)                      sync_endwrite(self)
+#define mfile_lock_endwrite_f(self)                    sync_endwrite(self)
+#define mfile_lock_read(self)                          sync_read(self)
+#define mfile_lock_read_nx(self)                       sync_read_nx(self)
+#define mfile_lock_tryread(self)                       sync_tryread(self)
+#define mfile_lock_endread(self)                       sync_endread(self)
+#define mfile_lock_endread_f(self)                     sync_endread(self)
+#define mfile_lock_end(self)                           sync_end(self)
+#define mfile_lock_end_f(self)                         sync_end(self)
+#define mfile_lock_upgrade(self)                       sync_upgrade(self)
+#define mfile_lock_upgrade_nx(self)                    sync_upgrade_nx(self)
+#define mfile_lock_tryupgrade(self)                    sync_tryupgrade(self)
+#define mfile_lock_downgrade(self)                     sync_downgrade(self)
+#define mfile_lock_reading(self)                       sync_reading(self)
+#define mfile_lock_writing(self)                       sync_writing(self)
+#define mfile_lock_canread(self)                       sync_canread(self)
+#define mfile_lock_canwrite(self)                      sync_canwrite(self)
 #define MNODE_F_NORMAL                                 VM_PROT_NONE
 #define MNODE_F_PEXEC                                  VM_PROT_EXEC
 #define MNODE_F_PWRITE                                 VM_PROT_WRITE

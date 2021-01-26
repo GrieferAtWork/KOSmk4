@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_USERMOD_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_USERMOD_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_USERMOD_C
+#define GUARD_KERNEL_SRC_MEMORY_USERMOD_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -52,11 +52,13 @@
 #include <libdebuginfo/debug_frame.h> /* unwind_fde_scan_df() */
 #include <libunwind/unwind.h>
 
-#include "vm-nodeapi.h"
-
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/debugger.h>
 #endif /* CONFIG_HAVE_DEBUGGER */
+
+#ifndef CONFIG_USE_NEW_VM
+#include "vm/vm-nodeapi.h"
+#endif /* !CONFIG_USE_NEW_VM */
 
 /* TODO: Add support for libdl.so to usermod objects.
  *    -> Because libdl is loaded as a static binary into user-space,
@@ -137,6 +139,7 @@ typedef union {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
+#ifndef CONFIG_USE_NEW_VM
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL usermod_section_unmap_and_free)(struct usermod_section *__restrict self) {
 	/* Must unmap sections data. */
@@ -151,6 +154,7 @@ NOTHROW(KCALL usermod_section_unmap_and_free)(struct usermod_section *__restrict
 	                                                  PAGESIZE));
 	kfree(self);
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 /* Destroy the given usermod section. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -165,12 +169,25 @@ NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) 
 	/* Must unmap sections data.
 	 * NOTE: Must write `us_data' elsewhere, since the first 2 pointers of the
 	 *       section object will be clobbered by `vm_kernel_locked_operation()' */
+#ifdef CONFIG_USE_NEW_VM
+	{
+		byte_t *sect_base;
+		size_t sect_size;
+		sect_base = (byte_t *)self->us_cdata;
+		sect_size = self->us_size;
+		sect_size += (uintptr_t)sect_base & PAGEMASK;
+		sect_base = (byte_t *)((uintptr_t)sect_base & ~PAGEMASK);
+		sect_size = CEIL_ALIGN(sect_size, PAGESIZE);
+		mman_unmap_kram_and_kfree(sect_base, sect_size, self);
+	}
+#else /* CONFIG_USE_NEW_VM */
 	{
 		STATIC_ASSERT(offsetof(struct usermod_section, us_cdata) >=
 		              sizeof(struct vm_kernel_pending_operation));
 		self->us_cdata = self->us_data;
 		vm_kernel_locked_operation(self, &usermod_section_unmap_and_free);
 	}
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 #ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
@@ -513,9 +530,9 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 	struct vm_node *rhs_iter;
 	struct vm_node *next;
 	lhs_iter = self;
-	rhs_iter = self->vn_byaddr.ln_next;
-	if (rhs_iter && (vm_node_getminpageid(rhs_iter) !=
-	                 vm_node_getmaxpageid(lhs_iter) + 1))
+	rhs_iter = mnode_tree_nextnode(self);
+	if (rhs_iter && ((byte_t *)mnode_getmaxaddr(lhs_iter) + 1 !=
+	                 (byte_t *)mnode_getminaddr(rhs_iter)))
 		rhs_iter = NULL;
 	while (lhs_iter && rhs_iter) {
 		if (lhs_iter->vn_prot != self->vn_prot ||
@@ -540,8 +557,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 		       ? VM_NODE_PREV(lhs_iter)
 		       : NULL;
 		/* Verify continuity. */
-		if (next && (vm_node_getmaxpageid(next) + 1 !=
-		             vm_node_getminpageid(lhs_iter)))
+		if (next && ((byte_t *)mnode_getmaxaddr(next) + 1 !=
+		             (byte_t *)mnode_getminaddr(lhs_iter)))
 			next = NULL;
 		lhs_iter = next;
 
@@ -550,8 +567,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 		       ? VM_NODE_NEXT(rhs_iter)
 		       : NULL;
 		/* Verify continuity. */
-		if (next && (vm_node_getminpageid(next) !=
-		             vm_node_getmaxpageid(rhs_iter) + 1))
+		if (next && ((byte_t *)mnode_getmaxaddr(rhs_iter) + 1 !=
+		             (byte_t *)mnode_getminaddr(next)))
 			next = NULL;
 		rhs_iter = next;
 	}
@@ -567,8 +584,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 				break;
 			next = VM_NODE_PREV(lhs_iter);
 			/* Verify continuity. */
-			if (vm_node_getmaxpageid(next) + 1 !=
-			    vm_node_getminpageid(lhs_iter))
+			if ((byte_t *)mnode_getmaxaddr(next) + 1 !=
+			    (byte_t *)mnode_getminaddr(lhs_iter))
 				break;
 			lhs_iter = next;
 		}
@@ -583,8 +600,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 				break;
 			next = VM_NODE_NEXT(rhs_iter);
 			/* Verify continuity. */
-			if (vm_node_getminpageid(next) !=
-			    vm_node_getmaxpageid(rhs_iter) + 1)
+			if ((byte_t *)mnode_getmaxaddr(rhs_iter) + 1 !=
+			    (byte_t *)mnode_getminaddr(next))
 				break;
 			rhs_iter = next;
 		}
@@ -1004,9 +1021,12 @@ PUBLIC REF struct usermod *FCALL
 vm_getusermod_above(struct vm *__restrict self,
                     USER void *addr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_nodetree_minmax_t minmax;
-	pageid_t minpage;
-	pageid_t maxpage;
+#ifdef CONFIG_USE_NEW_VM
+	struct mnode_tree_minmax mima;
+#else /* CONFIG_USE_NEW_VM */
+	vm_nodetree_minmax_t mima;
+#endif /* !CONFIG_USE_NEW_VM */
+	byte_t *minaddr, *maxaddr;
 	REF struct usermod *result;
 	/* Special case: the kernel VM can never house user-space modules */
 	if (self == &vm_kernel)
@@ -1019,11 +1039,11 @@ vm_getusermod_above(struct vm *__restrict self,
 #endif /* !KERNELSPACE_HIGHMEM */
 	}
 
-	minpage = PAGEID_ENCODE(addr);
+	minaddr = (byte_t *)addr;
 #ifdef KERNELSPACE_HIGHMEM
-	maxpage = PAGEID_ENCODE(USERSPACE_END - 1);
+	maxaddr = (byte_t *)USERSPACE_END - 1;
 #else /* KERNELSPACE_HIGHMEM */
-	maxpage = __ARCH_PAGEID_MAX;
+	maxaddr = (byte_t *)-1;
 #endif /* !KERNELSPACE_HIGHMEM */
 
 	result = NULL;
@@ -1039,13 +1059,13 @@ again:
 				/* NOTE: Search for overlapping, rather than located-above,
 				 *       so that we can still check for more libraries between
 				 *       `addr' and the next already-known library. */
-				uintptr_t load_startpage;
-				load_startpage = FLOOR_ALIGN(result->um_loadstart, PAGESIZE);
-				if (load_startpage >= (uintptr_t)addr) {
+				uintptr_t load_startaddr;
+				load_startaddr = FLOOR_ALIGN(result->um_loadstart, PAGESIZE);
+				if (load_startaddr >= (uintptr_t)addr) {
 					/* Found a library to which the given criteria applies. */
 					incref(result);
 					/* Only search for libraries that may be mapped _before_ `result' */
-					maxpage = PAGEID_ENCODE(load_startpage);
+					maxaddr = (byte_t *)load_startaddr - 1;
 					break;
 				}
 			} while ((result = result->um_next) != NULL);
@@ -1060,15 +1080,19 @@ again:
 	}
 
 	/* Find the first mapped memory location above the given address. */
-	minmax.mm_min = minmax.mm_max = NULL;
+#ifdef CONFIG_USE_NEW_VM
+	mnode_tree_minmaxlocate(self->v_tree, minaddr, maxaddr, &mima);
+#else /* CONFIG_USE_NEW_VM */
+	mima.mm_min = mima.mm_max = NULL;
 	vm_nodetree_minmaxlocate(self->v_tree,
-	                         minpage,
-	                         maxpage,
-	                         &minmax);
-	assert((minmax.mm_min != NULL) == (minmax.mm_max != NULL));
-	if (minmax.mm_min) {
+	                         PAGEID_ENCODE(minaddr),
+	                         PAGEID_ENCODE(maxaddr),
+	                         &mima);
+#endif /* !CONFIG_USE_NEW_VM */
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min) {
 		struct vm_node *node;
-		node = minmax.mm_min;
+		node = mima.mm_min;
 		for (;;) {
 			if ((node->vn_prot & VM_PROT_EXEC) &&
 			    node->vn_block && node->vn_part &&
@@ -1080,7 +1104,7 @@ again:
 				REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name. */
 				pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
 				USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
-				minpage          = vm_node_getendpageid(node);
+				minaddr          = (byte_t *)mnode_getendaddr(node);
 				map_inode        = (REF struct inode *)incref(node->vn_block);
 				map_inode_path   = xincref(node->vn_fspath);
 				map_inode_name   = xincref(node->vn_fsname);
@@ -1107,12 +1131,12 @@ again:
 					                                                          new_result);
 					return new_result;
 				}
-				addr = PAGEID_DECODE(minpage);
+				addr = minaddr;
 				goto again;
 			}
-			if (node == minmax.mm_max)
+			if (node == mima.mm_max)
 				break;
-			node = node->vn_byaddr.ln_next;
+			node = mnode_tree_nextnode(node);
 		}
 	}
 	sync_endread(self);
@@ -1546,4 +1570,4 @@ DECL_END
 
 #endif /* CONFIG_HAVE_USERMOD */
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_USERMOD_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_USERMOD_C */

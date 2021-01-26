@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_DATABLOCK_HANDLE_C
+#define GUARD_KERNEL_SRC_MEMORY_DATABLOCK_HANDLE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -172,7 +172,12 @@ handle_datablock_pollconnect(struct vm_datablock *__restrict self,
 	if (self->db_type->dt_handle_pollconnect) {
 		(*self->db_type->dt_handle_pollconnect)(self, what);
 	} else if (what & (POLLOUTMASK | POLLINMASK)) {
+#ifdef CONFIG_USE_NEW_VM
+		if (vm_datablock_isinode(self))
+			rwlock_pollconnect(__inode_lock((struct inode *)self));
+#else /* CONFIG_USE_NEW_VM */
 		rwlock_pollconnect(&self->db_lock);
+#endif /* !CONFIG_USE_NEW_VM */
 	}
 }
 
@@ -184,16 +189,35 @@ handle_datablock_polltest(struct vm_datablock *__restrict self,
 	if (self->db_type->dt_handle_polltest)
 		return (*self->db_type->dt_handle_polltest)(self, what);
 	if (what & POLLOUTMASK) {
+#ifdef CONFIG_USE_NEW_VM
+		if (vm_datablock_isinode(self)) {
+			if (rwlock_canwrite(__inode_lock((struct inode *)self)))
+				return POLLOUTMASK | POLLINMASK;
+		} else {
+			return POLLOUTMASK | POLLINMASK;
+		}
+#else /* CONFIG_USE_NEW_VM */
 		if (rwlock_canwrite(&self->db_lock))
 			return POLLOUTMASK | POLLINMASK;
+#endif /* !CONFIG_USE_NEW_VM */
 	} else if (what & POLLINMASK) {
+#ifdef CONFIG_USE_NEW_VM
+		if (vm_datablock_isinode(self)) {
+			if (rwlock_canread(__inode_lock((struct inode *)self)))
+				return POLLINMASK;
+		} else {
+			return POLLINMASK;
+		}
+#else /* CONFIG_USE_NEW_VM */
 		if (rwlock_canread(&self->db_lock))
 			return POLLINMASK;
+#endif /* !CONFIG_USE_NEW_VM */
 	}
 	return 0;
 }
 
 
+#ifndef CONFIG_USE_NEW_VM
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL datablock_stat_parts)(struct vm_datapart *__restrict self,
                                     struct hop_datablock_stat *__restrict st) {
@@ -278,6 +302,7 @@ do_track_ramblocks:
 		goto again;
 	}
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_datablock_ioctl(struct vm_datablock *__restrict self,
@@ -298,6 +323,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
                      iomode_t mode) {
 	switch (cmd) {
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATABLOCK_STAT: {
 		struct hop_datablock_stat st;
 		struct vm_datapart *parts;
@@ -339,6 +365,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			memcpy(info, &st, sizeof(struct hop_datablock_stat));
 		}
 	}	break;
+#endif /* !CONFIG_USE_NEW_VM */
 
 	case HOP_DATABLOCK_SYNCALL: {
 		datapage_t count;
@@ -349,6 +376,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		}
 	}	break;
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATABLOCK_SYNCPAGES: {
 		struct hop_datablock_syncpages *range;
 		size_t struct_size;
@@ -377,6 +405,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                                                       VM_DATABLOCK_ADDRSHIFT(self)))
 		                   << VM_DATABLOCK_ADDRSHIFT(self);
 	}	break;
+#endif /* !CONFIG_USE_NEW_VM */
 
 	case HOP_DATABLOCK_ANONYMIZE:
 		/* Need write permissions. */
@@ -386,6 +415,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		*(int *)arg = vm_datablock_anonymize(self) ? 1 : 0;
 		break;
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATABLOCK_DEANONYMIZE:
 		require(CAP_DATABLOCK_DEANONYMIZE);
 		validate_writable(arg, sizeof(int));
@@ -394,7 +424,9 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			THROW(E_INVALID_CONTEXT);
 		*(int *)arg = vm_datablock_deanonymize(self) ? 1 : 0;
 		break;
+#endif /* !CONFIG_USE_NEW_VM */
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATABLOCK_OPEN_PART:
 	case HOP_DATABLOCK_OPEN_PART_EXACT: {
 		size_t struct_size;
@@ -441,6 +473,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                              : HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED;
 		COMPILER_WRITE_BARRIER();
 	}	break;
+#endif /* !CONFIG_USE_NEW_VM */
 
 	case HOP_DATABLOCK_OPEN_FUTEX:
 	case HOP_DATABLOCK_OPEN_FUTEX_EXISTING: {
@@ -1259,6 +1292,18 @@ NOTHROW(KCALL vm_datablock_count_part)(struct vm_datapart const *__restrict self
 	size_t result = 0;
 again:
 	++result;
+#ifdef CONFIG_USE_NEW_VM
+	if (self->mp_filent.rb_lhs) {
+		if (self->mp_filent.rb_rhs)
+			result += vm_datablock_count_part(self->mp_filent.rb_rhs);
+		self = self->mp_filent.rb_lhs;
+		goto again;
+	}
+	if (self->mp_filent.rb_rhs) {
+		self = self->mp_filent.rb_rhs;
+		goto again;
+	}
+#else /* CONFIG_USE_NEW_VM */
 	if (self->dp_tree.a_min) {
 		if (self->dp_tree.a_max)
 			result += vm_datablock_count_part(self->dp_tree.a_max);
@@ -1269,6 +1314,7 @@ again:
 		self = self->dp_tree.a_max;
 		goto again;
 	}
+#endif /* !CONFIG_USE_NEW_VM */
 	return result;
 }
 
@@ -1281,10 +1327,10 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 	} else {
 		/* Generic data-block stat */
 		size_t partcount = 0;
-		sync_read(self);
+		mfile_lock_read(self);
 		if (self->db_parts && self->db_parts != VM_DATABLOCK_ANONPARTS)
 			partcount = vm_datablock_count_part(self->db_parts);
-		sync_endread(self);
+		mfile_lock_endread(self);
 		COMPILER_BARRIER();
 		memset(result, 0, sizeof(*result));
 		result->st_blksize = VM_DATABLOCK_PAGESIZE(self);
@@ -1305,4 +1351,4 @@ handle_datablock_mmap(struct vm_datablock *__restrict self,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_DATABLOCK_HANDLE_C */

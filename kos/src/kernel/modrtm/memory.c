@@ -1473,30 +1473,29 @@ again_acquire_region_locks:
 		{
 			struct vm_node *node;
 			size_t node_size_after_addr;
-			pageid_t region_start_page;
+			byte_t *region_start_addr;
 #if !CONFIG_RTM_USERSPACE_ONLY
 			struct vm *effective_vm = myvm;
 			if unlikely(ADDR_ISKERN(region->mr_addrlo))
 				effective_vm = &vm_kernel;
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
-			region_start_page = PAGEID_ENCODE(region->mr_addrlo);
+			region_start_addr = (byte_t *)region->mr_addrlo;
 			if unlikely(!sync_tryread(effective_vm)) {
 				rtm_memory_endwrite_modified_parts(self, i);
 				while (!sync_canread(effective_vm))
 					task_yield();
 				goto again_acquire_region_locks;
 			}
-			node = vm_getnodeofpageid(myvm, region_start_page);
+			node = vm_getnodeofaddress(myvm, region_start_addr);
 			if unlikely(!node || node->vn_part != part) {
 				sync_endread(effective_vm);
 				goto partially_release_locks_and_retry;
 			}
 			/* Make sure that the node has sufficient memory after `region->mr_addrlo'
 			 * to account for at least `region->mr_size' bytes of memory. */
-			node_size_after_addr = vm_node_getendpageid(node);
+			node_size_after_addr = (size_t)vm_node_getendaddr(node);
 			sync_endread(effective_vm);
-			node_size_after_addr -= region_start_page;
-			node_size_after_addr *= PAGESIZE;
+			node_size_after_addr -= (uintptr_t)region_start_addr;
 			node_size_after_addr += PAGESIZE - ((uintptr_t)region->mr_addrlo & PAGEMASK);
 			if unlikely(rtm_memory_region_getsize(region) > node_size_after_addr)
 				goto partially_release_locks_and_retry;

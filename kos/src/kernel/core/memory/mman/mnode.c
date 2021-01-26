@@ -85,7 +85,7 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(struct mpart_postlockop *__restrict self,
-                                                  struct mpart *__restrict part) {
+                                                  struct mpart *__restrict UNUSED(part)) {
 	struct mnode *me;
 	me = (struct mnode *)self;
 	weakdecref(me->mn_mman);
@@ -430,7 +430,13 @@ err_changed_free_hinode:
 DECL_END
 
 #undef RBTREE_LEFT_LEANING
+#define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_WANT_PREV_NEXT_NODE
+#define RBTREE_WANT_RREMOVE
+#define RBTREE_WANT_RLOCATE
+#define RBTREE_WANT_TRYINSERT
+#define RBTREE_MINMAX_T_DEFINED
+#define mnode_tree_minmax_t    struct mnode_tree_minmax
 #define RBTREE(name)           mnode_tree_##name
 #define RBTREE_T               struct mnode
 #define RBTREE_Tkey            void const *

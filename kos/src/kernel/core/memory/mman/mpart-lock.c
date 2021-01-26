@@ -509,7 +509,7 @@ setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
 	size_t i, block_size;
 	uintptr_t dst_offset = 0;
 	uintptr_t src_offset = 0;
-	block_size = (size_t)1 << block_size;
+	block_size = (size_t)1 << block_shift;
 	for (i = 0; i < num_blocks;) {
 		size_t end, num_bytes;
 		if (GETSTATE(i) != MPART_BLOCK_ST_INIT) {

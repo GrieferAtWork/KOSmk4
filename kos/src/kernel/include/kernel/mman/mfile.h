@@ -71,6 +71,14 @@ typedef pos_t mfile_block_t;
  * part that (supposedly) describes the same position. */
 #define MFILE_PARTS_ANONYMOUS ((struct mpart *)-1)
 
+
+#ifdef CONFIG_USE_NEW_VM
+#ifndef __poll_mode_t_defined
+#define __poll_mode_t_defined 1
+typedef unsigned int poll_mode_t; /* Set of `POLL*' */
+#endif /* !poll_mode_t_defined */
+#endif /* CONFIG_USE_NEW_VM */
+
 struct mfile_ops {
 	/* [0..1] Finalize + free the given mem-file. */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *mo_destroy)(struct mfile *__restrict self);
@@ -102,13 +110,37 @@ struct mfile_ops {
 	 * NOTE: Not invoked if a new change part is created as the result
 	 *       of an already-known-as-changed part being split. */
 	NOBLOCK NONNULL((1, 2)) void
-	/*NOTHROW*/ (KCALL *mo_changed)(struct mfile *__restrict self,
+	/*NOTHROW*/ (FCALL *mo_changed)(struct mfile *__restrict self,
 	                                struct mpart *__restrict part);
 #ifndef CONFIG_MFILE_LEGACY_VIO_OPS
 	/* [0..1] VIO file operators. (when non-NULL, then this file is backed by VIO,
 	 *        and the `mo_loadblocks' and `mo_saveblocks' operators are ignored) */
 	struct vio_operators const *mo_vio;
 #endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
+
+#ifdef CONFIG_USE_NEW_VM /* Hacky forward-compatibility... */
+	/* [0..1] Optional operators for when read(2) or write(2) is used with
+	 *        a file descriptor pointing to a vm_datablock of this type.
+	 * These callbacks are used by UVIO datablocks to implement the
+	 * server/client architecture for user-space driven VIO emulation. */
+	WUNUSED NONNULL((1)) size_t
+	(KCALL *dt_handle_read)(struct vm_datablock *__restrict self,
+	                        USER CHECKED void *dst,
+	                        size_t num_bytes, iomode_t mode) THROWS(...);
+	WUNUSED NONNULL((1)) size_t
+	(KCALL *dt_handle_write)(struct vm_datablock *__restrict self,
+	                         USER CHECKED void const *src,
+	                         size_t num_bytes, iomode_t mode) THROWS(...);
+	/* [0..1] Same as above, but used when polling for data being available.
+	 * When not implemented (i.e. when set to `NULL'), poll is implemented for
+	 * the datablock through use of `rwlock_poll(read|write)(&self->db_lock)' */
+	NONNULL((1)) void
+	(KCALL *dt_handle_pollconnect)(struct vm_datablock *__restrict self,
+	                               poll_mode_t what) THROWS(...);
+	WUNUSED NONNULL((1)) poll_mode_t
+	(KCALL *dt_handle_polltest)(struct vm_datablock *__restrict self,
+	                            poll_mode_t what) THROWS(...);
+#endif /* CONFIG_USE_NEW_VM */
 
 	/* TODO: Operator `mo_changed': Called when the backing memory of a part is modified. */
 	/* TODO: Operator `mo_attr_changed': Called when one of the file's attribute fields changed. */

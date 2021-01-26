@@ -436,9 +436,8 @@ SECTIONS {
 #ifdef CONFIG_USE_NEW_VM
 		PROVIDE(mman_kernel = ABSOLUTE(.));
 		PROVIDE(mman_kernel_lockops = ABSOLUTE(mman_kernel + thismman_lockops));
-#else /* CONFIG_USE_NEW_VM */
+#endif /* CONFIG_USE_NEW_VM */
 		PROVIDE(vm_kernel = ABSOLUTE(.));
-#endif /* !CONFIG_USE_NEW_VM */
 		PROVIDE(pagedir_kernel = ABSOLUTE(.));
 		PROVIDE(pagedir_kernel_phys = ABSOLUTE(pagedir_kernel) - KERNEL_CORE_BASE);
 		. += PAGEDIR_SIZE;

@@ -165,6 +165,40 @@ struct mnode {
 	 *          the part that is being mapped), else you have no guaranty that
 	 *          the node won't just be free'd, and you'll end up accessing dead
 	 *          memory! */
+#ifdef __INTELLISENSE__
+	typedef RBTREE_NODE(struct mnode) _rbtree_node_mnode;
+	typedef SLIST_ENTRY(mnode) _slist_entry_mnode;
+	typedef LIST_ENTRY(mnode) _list_entry_mnode;
+	union {
+		_rbtree_node_mnode              mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
+		_slist_entry_mnode             _mn_dead;     /* [lock(ATOMIC)] Internal chain of dead nodes */
+	};
+	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
+	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
+	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
+	/*REF*/ struct mpart               *mn_part;     /* [0..1][const] The bound mem-part.
+	                                                  * When set to NULL, then this node represents a reserved node. */
+	/*REF*/ struct path                *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
+	/*REF*/ struct directory_entry     *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+	union {
+		/*WEAK REF*/ struct mman       *mn_mman;     /* [1..1][const] Associated memory manager.
+		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
+		                                              *       and the node has to be inserted into the associated part's dead-node-list.
+		                                              *       Unless this has happened, this is just a regular, old pointer! */
+		_slist_entry_mnode             _mn_alloc;    /* Internal list of freshly allocated nodes. */
+	};
+	/*PAGEDIR_PAGEALIGNED*/ mpart_reladdr_t
+	                                    mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
+	_list_entry_mnode                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
+	_list_entry_mnode                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Chain of nodes that (may) contain pages that
+	                                                  * are current mapped with write-access enabled. This list is used to speed
+	                                                  * up the clearing of write-access of modified memory mappings when copying
+	                                                  * a memory manager as part of fork(2). For this purpose, this list contains
+	                                                  * all memory nodes that request write-access, and have actually been mapped
+	                                                  * with write-access enabled (which happens lazily upon first access)
+	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
+	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+#else /* __INTELLISENSE__ */
 	union {
 		RBTREE_NODE(struct mnode)       mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 		SLIST_ENTRY(mnode)             _mn_dead;     /* [lock(ATOMIC)] Internal chain of dead nodes */
@@ -193,6 +227,7 @@ struct mnode {
 	                                                  * with write-access enabled (which happens lazily upon first access)
 	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+#endif /* !__INTELLISENSE__ */
 	/* TODO: `struct usermod' and `struct driver' integration right here!
 	 *       For this, add a field [0..1] `union { REF struct usermod *, ... }',
 	 *       For `mman_kernel', it'll always be a `driver', and elsewhere a `usermod'

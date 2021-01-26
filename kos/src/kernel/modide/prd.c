@@ -66,6 +66,7 @@ struct ata_dma_acquire_data {
 	size_t  ad_max;  /* Number of available buffer entries. */
 };
 
+#ifndef CONFIG_USE_NEW_VM
 PRIVATE NOBLOCK void
 NOTHROW(KCALL ata_dma_reset_func)(void *arg) {
 	struct ata_dma_acquire_data *data;
@@ -73,6 +74,7 @@ NOTHROW(KCALL ata_dma_reset_func)(void *arg) {
 	data->ad_buf = data->ad_base;
 	data->ad_siz = data->ad_max;
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL ata_dma_acquire_func)(void *arg, physaddr_t paddr, size_t num_bytes,

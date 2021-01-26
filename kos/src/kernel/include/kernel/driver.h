@@ -419,7 +419,11 @@ INTDEF struct driver_section kernel_section_debug_str;
 INTDEF struct driver_section kernel_section_debug_ranges;
 INTDEF struct driver_section kernel_section_debug_loc;
 INTDEF struct driver_section kernel_section_pertask;
+#ifdef CONFIG_USE_NEW_VM
+INTDEF struct driver_section kernel_section_permman;
+#else /* CONFIG_USE_NEW_VM */
 INTDEF struct driver_section kernel_section_pervm;
+#endif /* !CONFIG_USE_NEW_VM */
 INTDEF struct driver_section kernel_section_percpu;
 INTDEF struct driver_section kernel_section_shstrtab;
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

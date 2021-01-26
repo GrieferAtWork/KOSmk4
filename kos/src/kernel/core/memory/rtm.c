@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_RTM_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_RTM_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_RTM_C
+#define GUARD_KERNEL_SRC_MEMORY_RTM_C 1
 
 #include <kernel/compiler.h>
 
@@ -155,4 +155,4 @@ DEFINE_SYSCALL0(syscall_ulong_t, rtm_test) {
 DECL_END
 #endif /* ARCH_HAVE_RTM */
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_RTM_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_RTM_C */

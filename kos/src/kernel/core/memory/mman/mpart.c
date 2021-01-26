@@ -244,7 +244,13 @@ again_service_lops:
 DECL_END
 
 #undef RBTREE_LEFT_LEANING
+#define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_WANT_PREV_NEXT_NODE
+#define RBTREE_WANT_RREMOVE
+#define RBTREE_WANT_RLOCATE
+#define RBTREE_WANT_TRYINSERT
+#define RBTREE_MINMAX_T_DEFINED
+#define mpart_tree_minmax_t    struct mpart_tree_minmax
 #define RBTREE(name)           mpart_tree_##name
 #define RBTREE_T               struct mpart
 #define RBTREE_Tkey            pos_t

@@ -52,8 +52,13 @@ INTDEF byte_t __kernel_debug_loc_start[];
 INTDEF byte_t __kernel_debug_loc_size[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
+#ifdef CONFIG_USE_NEW_VM
+INTDEF byte_t __kernel_permman_start[];
+INTDEF byte_t __kernel_permman_size[];
+#else /* CONFIG_USE_NEW_VM */
 INTDEF byte_t __kernel_pervm_start[];
 INTDEF byte_t __kernel_pervm_size[];
+#endif /* !CONFIG_USE_NEW_VM */
 INTDEF byte_t __kernel_percpu_start[];
 INTDEF byte_t __kernel_percpu_size[];
 INTDEF byte_t __kernel_sect_data_start[];
@@ -81,7 +86,11 @@ INTERN_SECTION(kernel_section_debug_str, ".debug_str", SHT_PROGBITS, SHF_ALLOC |
 INTERN_SECTION(kernel_section_debug_ranges, ".debug_ranges", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_ranges_start, __kernel_debug_ranges_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_debug_loc, ".debug_loc", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_loc_start, __kernel_debug_loc_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_pertask, ".pertask", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pertask_start, __kernel_pertask_size, 0, 0, 0)
+#ifdef CONFIG_USE_NEW_VM
+INTERN_SECTION(kernel_section_permman, ".permman", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_permman_start, __kernel_permman_size, 0, 0, 0)
+#else /* CONFIG_USE_NEW_VM */
 INTERN_SECTION(kernel_section_pervm, ".pervm", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pervm_start, __kernel_pervm_size, 0, 0, 0)
+#endif /* !CONFIG_USE_NEW_VM */
 INTERN_SECTION(kernel_section_percpu, ".percpu", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_percpu_start, __kernel_percpu_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_data, ".data", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_data_start, __kernel_sect_data_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_bss, ".bss", SHT_NOBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_bss_start, __kernel_sect_bss_size, 0, 0, 0)

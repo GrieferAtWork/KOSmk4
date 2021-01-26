@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_UVIO_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_UVIO_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_UVIO_C
+#define GUARD_KERNEL_SRC_MEMORY_UVIO_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -960,18 +960,8 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
 	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),
 	                                    GFP_NORMAL);
-	result->db_refcnt = 1;
-	rwlock_init(&result->db_lock);
-	result->db_type      = &uvio_datablock_type;
-	result->db_vio       = &uvio_operators;
-	result->db_parts     = VM_DATABLOCK_ANONPARTS;
-	result->db_pageshift = 0;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-	result->db_addrshift = PAGESHIFT;
-	result->db_pagealign = 1;
-	result->db_pagemask  = 0;
-	result->db_pagesize  = PAGESIZE;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
+	mfile_init(result, &uvio_datablock_type, PAGESHIFT);
+	result->db_vio = &uvio_operators;
 	sig_init(&result->uv_reqmore);
 	sig_init(&result->uv_reqdlvr);
 	sig_init(&result->uv_reqdone);
@@ -1036,4 +1026,4 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 DECL_END
 #endif /* LIBVIO_CONFIG_ENABLED */
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_UVIO_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_UVIO_C */

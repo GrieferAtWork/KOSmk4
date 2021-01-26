@@ -1055,7 +1055,7 @@ pop_connections_and_set_exception_pointers2:
 #endif /* NEED_pop_connections_and_set_exception_pointers2 */
 pop_connections_and_throw_segfault:
 	task_popconnections();
-throw_segfault:
+/*throw_segfault:*/
 	if (pc == addr) {
 		/* This can happen when trying to call an invalid function pointer.
 		 * -> Try to unwind this happening. */
