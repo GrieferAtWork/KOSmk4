@@ -106,23 +106,23 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	switch (self->mp_state) {
 
 	case MPART_ST_SWP:
-		if (!(self->mp_flags & MPART_F_NO_FREE))
+		if (!(self->mp_flags & MPART_F_NOFREE))
 			mchunk_freeswp(&self->mp_swp);
 		break;
 
 	case MPART_ST_MEM:
-		if (!(self->mp_flags & MPART_F_NO_FREE))
+		if (!(self->mp_flags & MPART_F_NOFREE))
 			mchunk_freemem(&self->mp_mem);
 		break;
 
 	case MPART_ST_SWP_SC:
-		if (!(self->mp_flags & MPART_F_NO_FREE))
+		if (!(self->mp_flags & MPART_F_NOFREE))
 			mchunkvec_freeswp(self->mp_swp_sc.ms_v, self->mp_swp_sc.ms_c);
 		kfree(self->mp_swp_sc.ms_v);
 		break;
 
 	case MPART_ST_MEM_SC:
-		if (!(self->mp_flags & MPART_F_NO_FREE))
+		if (!(self->mp_flags & MPART_F_NOFREE))
 			mchunkvec_freemem(self->mp_mem_sc.ms_v, self->mp_mem_sc.ms_c);
 		kfree(self->mp_mem_sc.ms_v);
 		break;
@@ -184,94 +184,57 @@ NOTHROW(FCALL mpart_destroy_later)(struct mpart *__restrict self) {
 	decref(file);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
-	/* Check if there are any nodes mapping our part that use LOCK flags.
-	 * For this purpose, both copy-on-write and shared nodes can lock the part. */
-	struct mnode *node;
-	LIST_FOREACH (node, &self->mp_copy, mn_link) {
-		if (node->mn_flags & MNODE_F_MLOCK)
-			return;
-	}
-	LIST_FOREACH (node, &self->mp_share, mn_link) {
-		if (node->mn_flags & MNODE_F_MLOCK)
-			return;
-	}
-	/* Clear the lock-flag for our part, since there are no
-	 * more nodes that could keep our part locked in-core! */
-	ATOMIC_AND(self->mp_flags, ~MPART_F_MLOCK);
-}
-
-
-INTERN NOBLOCK NONNULL((1, 2)) void /* NOTE: "INTERN" because used in other CUs, too! */
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
-                                             struct mpart *__restrict part) {
-	struct mnode *node;
-	node = (struct mnode *)self;
-	LIST_REMOVE(node, mn_link);
-	if ((node->mn_flags & (MNODE_F_MLOCK)) &&
-	    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
-		mpart_maybe_clear_mlock(part);
-	weakdecref(node->mn_mman);
-	mnode_free(node);
-}
-
-
-
+SLIST_HEAD(mpart_postlockop_slist, mpart_postlockop);
 
 /* Reap dead nodes of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mpart_deadnodes_reap)(struct mpart *__restrict self) {
-	struct mpart_lockop *lop, *next;
 	struct mpart_lockop_slist lops;
-	struct mnode_slist deadnodes;
-	bool must_recheck_mlock;
-again:
+	struct mpart_postlockop_slist post;
+	struct mpart_lockop *iter;
 	if (!mpart_lock_tryacquire(self))
 		return;
+	SLIST_INIT(&post);
+again_steal_and_service_lops:
 	lops.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
-
-	/* Unlink all of the deleted nodes. */
-	SLIST_INIT(&deadnodes);
-	must_recheck_mlock = false;
-	for (lop = SLIST_FIRST(&lops); lop; lop = next) {
-		next = SLIST_NEXT(lop, mplo_link);
-		/* Special handling for the destruction of mem-nodes. */
-		if (lop->mplo_func == &mnode_unlink_from_part_lockop) {
-			struct mnode *node;
-			node = (struct mnode *)lop;
-			assert(wasdestroyed(node->mn_mman) || (node->mn_flags & MNODE_F_UNMAPPED));
-			LIST_REMOVE(node, mn_link);
-			if (node->mn_flags & MNODE_F_MLOCK)
-				must_recheck_mlock = true;
-			SLIST_INSERT(&deadnodes, node, _mn_dead);
-		} else {
-			/* Invoke generic lock operations. */
-			(*lop->mplo_func)(lop, self);
-		}
-		lop = next;
+again_service_lops:
+	iter = SLIST_FIRST(&lops);
+	while (iter != NULL) {
+		struct mpart_lockop *next;
+		struct mpart_postlockop *later;
+		next = SLIST_NEXT(iter, mplo_link);
+		/* Invoke the lock operation. */
+		later = (*iter->mplo_func)(iter, self);
+		/* Enqueue operations for later execution. */
+		if (later != NULL)
+			SLIST_INSERT(&post, later, mpplo_link);
+		iter = next;
 	}
-
-	/* If we have to, then clear the MLOCK flag. */
-	if (must_recheck_mlock &&
-	    (self->mp_flags & (MPART_F_MLOCK |
-	                       MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
-		mpart_maybe_clear_mlock(self);
 	mpart_lock_release_f(self);
 
-	/* Free all of the unlinked nodes, and drop the weak references
-	 * they were still holding to their respective (now-destroyed) mmans. */
-	while (!SLIST_EMPTY(&deadnodes)) {
-		struct mnode *node;
-		node = SLIST_FIRST(&deadnodes);
-		SLIST_REMOVE_HEAD(&deadnodes, _mn_dead);
-		weakdecref(node->mn_mman);
-		mnode_free(node);
+	/* Check for more operations. */
+	lops.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
+	if unlikely(!SLIST_EMPTY(&lops)) {
+		if likely(mpart_lock_tryacquire(self))
+			goto again_service_lops;
+		/* re-queue all stolen lops. */
+		iter = SLIST_FIRST(&lops);
+		while (SLIST_NEXT(iter, mplo_link))
+			iter = SLIST_NEXT(iter, mplo_link);
+		SLIST_ATOMIC_INSERT_R(&self->mp_lockops,
+		                      SLIST_FIRST(&lops),
+		                      iter, mplo_link);
+		if unlikely(mpart_lock_tryacquire(self))
+			goto again_steal_and_service_lops;
 	}
 
-	/* Check if more work has shown up. */
-	if (mpart_deadnodes_mustreap(self))
-		goto again;
+	/* Run all enqueued post-operations. */
+	while (!SLIST_EMPTY(&post)) {
+		struct mpart_postlockop *op;
+		op = SLIST_FIRST(&post);
+		SLIST_REMOVE_HEAD(&post, mpplo_link);
+		(*op->mpplo_func)(op, self);
+	}
 }
 
 
@@ -398,7 +361,6 @@ mpart_sync_impl(struct mpart *__restrict self, bool keep_lock) {
 	size_t result = 0;
 	struct mfile *file;
 	size_t start, block_count;
-	unsigned int status;
 	bool has_initializing_parts;
 	assert(!task_wasconnected());
 

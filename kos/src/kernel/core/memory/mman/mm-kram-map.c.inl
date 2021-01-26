@@ -74,13 +74,16 @@ DECL_BEGIN
  *                       If memory has already been mapped at that address, then simply
  *                       return `MAP_INUSE' unconditionally.
  *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
- *                       must be combined with `MAP_POPULATE', and should also
- *                       be combined with `GFP_LOCKED' to prevent the backing
- *                       physical memory from being altered.
+ *                       should be combined with `GFP_LOCKED' to prevent the backing
+ *                       physical memory from being altered (and thus having its
+ *                       physical location altered).
  *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
  *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
  *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
  *   - GFP_MAP_NOASLR:   s.a. `MAP_NOASLR'
+ *   - GFP_MAP_NOSPLIT:  Set the `MNODE_F_NOSPLIT' flag for new nodes
+ *   - GFP_MAP_NOMERGE:  Set the `MNODE_F_NOMERGE' flag for new nodes, and don't try
+ *                       to extend an existing node.
  *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded onto
@@ -93,7 +96,8 @@ DECL_BEGIN
  * @param: hint:          Hint for where the mapping should go. This argument is
  *                        passed onto `mman_findunmapped()', alongside certain bits
  *                        from `flags': `GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR'
- *                        You may pass `NULL' to use `KERNEL_VMHINT_HEAP' instead.
+ *                        You may pass `NULL' to use either `KERNEL_VMHINT_HEAP' or
+ *                        `KERNEL_VMHINT_LHEAP' (based on `GFP_LOCKED') instead.
  *                        When `GFP_MAP_FIXED' is set, this is the (possibly unaligned)
  *                        address of where the mapping should go. If not page-aligned,
  *                        then the sub-page-misalignment will be carried over into the
@@ -177,9 +181,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 	num_bytes = num_pages << PAGESHIFT; /* This enforces page-alignment for `num_bytes'! */
 	inner_flags = flags;
 	inner_flags |= GFP_LOCKED | GFP_PREFLT | GFP_VCBASE | GFP_NOOVER;
-	inner_flags &= ~(GFP_CALLOC | GFP_MAP_32BIT | GFP_MAP_PREPARED |
-	                 GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR |
-	                 GFP_MAP_FIXED);
+	inner_flags &= ~(GFP_CALLOC | GFP_MAP_FLAGS);
 
 again_lock_mman:
 	LOCAL_IFX(TRY) {
@@ -233,7 +235,7 @@ again_lock_mman:
 				}
 			}
 			result = mman_findunmapped(&mman_kernel, hint, num_bytes,
-			                           mapflags_from_gfp(flags),
+			                           mapfindflags_from_gfp(flags),
 			                           min_alignment);
 			if unlikely(result == MAP_FAILED)
 				goto err_nospace_for_mapping;
@@ -244,7 +246,8 @@ again_lock_mman:
 			goto unlock_and_done;
 		}
 
-		{
+		/* Check if we may be able to extend a pre-existing node. */
+		if (!(flags & GFP_MAP_NOMERGE)) {
 			struct mnode *neighbor;
 			neighbor = mnode_tree_locate(mman_kernel.mm_mappings,
 			                             (byte_t *)result - 1);

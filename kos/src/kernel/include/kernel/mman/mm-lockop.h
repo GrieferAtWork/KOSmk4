@@ -32,39 +32,30 @@ DECL_BEGIN
 
 struct mman;
 struct mlockop;
+struct mpostlockop;
 
-#ifndef __gfp_t_defined
-#define __gfp_t_defined 1
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
+typedef NOBLOCK NONNULL((1)) void
+/*NOTHROW*/ (FCALL *mpostlockop_callback_t)(struct mpostlockop *__restrict self);
+
+struct mpostlockop {
+	SLIST_ENTRY(mpostlockop) mplo_link; /* [lock(ATOMIC)] Next post-lock operation. */
+	mpostlockop_callback_t   mplo_func; /* [1..1][const] Callback to invoke. */
+};
 
 
 /* Callback prototype for mman pending locked operations.
- * NOTE: This callback is allowed to assume that `self->mlo_link.sle_next == NULL'
- * @param: flags: A set of `GFP_*' flags that must be used in dynamic allocations.
- *                Callbacks of this type may assume that this set always contains
- *                at least `GFP_ATOMIC', and doesn't contain `GFP_CALLOC'.
- * @return: NULL: Discard this lock operation.
- * @return: * :   A chain of lock operations that should be re-scheduled
- *                to be performed the next time the mman's lock is released.
- *                Note that unlike the initial attempt, this next attempt
- *                may happen at an arbitrary point in the future, and is
- *                not guarantied to actually happen in the near future.
- *                Use this mechanism is you have to schedule a lock operation
- *                that may fail arbitrarily, and will continue to fail if one
- *                were to keep attempting it without going away to do something
- *                else before.
- *                The return value will (eventually) be re-queued as through it
- *                had been passed in a call to `mman_kernel_lockop_many()' */
-typedef NOBLOCK NONNULL((1)) struct mlockop *
-/*NOTHROW*/ (FCALL *mlockop_callback_t)(struct mlockop *__restrict self, gfp_t flags);
+ * @return: NULL: Completed.
+ * @return: * :   A descriptor for an operation to perform
+ *                after the mman-lock has been released. */
+typedef NOBLOCK NONNULL((1)) struct mpostlockop *
+/*NOTHROW*/ (FCALL *mlockop_callback_t)(struct mlockop *__restrict self);
 
 /* Memory-manager locked operation.
  * This struct describes a pending operation that should be executed
  * while holding a lock to the associated memory manager the next time
  * that someone releases its `mm_lock' */
 struct mlockop {
-	SLIST_ENTRY(mlockop) mlo_link; /* [lock(ATOMIC)] Next dead-ram area. */
+	SLIST_ENTRY(mlockop) mlo_link; /* [lock(ATOMIC)] Next lock operation. */
 	mlockop_callback_t   mlo_func; /* [1..1][const] Operation to perform. */
 };
 
@@ -72,6 +63,11 @@ struct mlockop {
 #define __mlockop_slist_defined 1
 SLIST_HEAD(mlockop_slist, mlockop);
 #endif /* !__mlockop_slist_defined */
+
+#ifndef __mpostlockop_slist_defined
+#define __mpostlockop_slist_defined 1
+SLIST_HEAD(mpostlockop_slist, mpostlockop);
+#endif /* !__mpostlockop_slist_defined */
 
 /* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_lockops)' */
 #ifndef __mman_kernel_lockops_defined
@@ -83,20 +79,14 @@ DATDEF struct mlockop_slist mman_kernel_lockops;
  * point in the future. The given `op->mlo_func' is responsible for freeing the
  * backing memory of `op' during its invocation. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op, gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
-
-/* Same as `mman_kernel_lockop()', but `op->mlo_link' may point to another lock
- * op that should also be enqueued, which may point to another, and so on...
- * Additionally, `op' may be `NULL', in which case the call is a no-op */
-FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_kernel_lockop_many)(struct mlockop *op, gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op);
 
 #ifdef __cplusplus
 extern "C++" {
 template<class T> FORCELOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(mman_kernel_lockop)(T *__restrict obj,
-                            NOBLOCK struct mlockop *
-                            /*NOTHROW*/ (FCALL *cb)(T *__restrict self, gfp_t flags)) {
+                            NOBLOCK struct mpostlockop *
+                            /*NOTHROW*/ (FCALL *cb)(T *__restrict self)) {
 	struct mlockop *pend;
 	pend           = (struct mlockop *)obj;
 	pend->mlo_func = (mlockop_callback_t)cb;

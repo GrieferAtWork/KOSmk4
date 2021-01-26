@@ -252,7 +252,6 @@ do_unshare_cow:
 		decref_unlikely(file);
 		if (hirel > avail) {
 			/* Can truncate some trailing blocks. */
-			REF struct mpart *hipart;
 			xdecref(mpart_split(self, hirel));
 			goto again;
 		}

@@ -142,14 +142,14 @@ again_acquire_lock:
 		 * to split nodes not fully contained within the given address range. */
 		node = mnode_tree_locate(self->mm_mappings, addr);
 		if (node && mnode_getminaddr(node) != addr &&
-		    !(node->mn_flags & MNODE_F_NO_SPLIT) && LOCAL_must_modify_node(node)) {
+		    !(node->mn_flags & MNODE_F_NOSPLIT) && LOCAL_must_modify_node(node)) {
 			if (!mnode_split_or_unlock(self, node, addr, NULL))
 				goto again_acquire_lock;
 		}
 		maxaddr = (byte_t *)addr + num_bytes - 1;
 		node = mnode_tree_locate(self->mm_mappings, maxaddr);
 		if (node && mnode_getmaxaddr(node) != maxaddr &&
-		    !(node->mn_flags & MNODE_F_NO_SPLIT) && LOCAL_must_modify_node(node)) {
+		    !(node->mn_flags & MNODE_F_NOSPLIT) && LOCAL_must_modify_node(node)) {
 			if (!mnode_split_or_unlock(self, node, maxaddr + 1, NULL))
 				goto again_acquire_lock;
 		}

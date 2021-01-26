@@ -69,15 +69,15 @@
                                        * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The backing block-state bitset exists in-line. */
-#define MPART_F_NO_FREE        0x0020 /* [const] Don't page_free() backing physical memory or swap. */
-#define MPART_F_NO_SPLIT       0x0040 /* [const] This mem-part cannot be split, and if doing so would be necessary,
-                                       *         then the attempt will instead result in kernel panic. Similarly,
-                                       *         this flag also prevents the part from being merged. */
-#define MPART_F_NO_MERGE       0x0080 /* [const] Don't allow this mem-part to be merged. */
+#define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
+/*efine MPART_F_               0x0040  * ... */
+/*efine MPART_F_               0x0080  * ... */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 /*efine MPART_F_               0x0200  * ... */
-/*efine MPART_F_               0x0400  * ... */
-/*efine MPART_F_               0x0800  * ... */
+#define MPART_F_NOSPLIT        0x0400 /* [const] This mem-part cannot be split, and if doing so would be necessary,
+                                       *         then the attempt will instead result in kernel panic. Similarly,
+                                       *         this flag also prevents the part from being merged. */
+#define MPART_F_NOMERGE        0x0800 /* [const] Don't allow this mem-part to be merged. */
 #define MPART_F_MLOCK_FROZEN   0x1000 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
 #define MPART_F_MLOCK          0x2000 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the part's state
                                        * cannot move away from INCORE). Unless `MPART_F_MLOCK_FROZEN' is set, this flag
@@ -155,17 +155,8 @@ struct mchunkvec {
 };
 
 
-struct mpart_lockop;
+struct mpart_lockop; /* from "mpart-lockop.h" */
 SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
-/* Callback for mem-part lock operations. */
-typedef NOBLOCK NONNULL((1, 2)) void
-/*NOTHROW*/ (FCALL *mpart_lockop_callback_t)(struct mpart_lockop *__restrict self,
-                                             struct mpart *__restrict part);
-struct mpart_lockop {
-	SLIST_ENTRY(mpart_lockop) mplo_link; /* [0..1] Lock operations list entry. */
-	mpart_lockop_callback_t   mplo_func; /* [1..1] Function to invoke in the context of holding
-	                                      *        alock to the associated mem-part. */
-};
 
 #define __ALIGNOF_MPART __ALIGNOF_INT64__
 #if __SIZEOF_POINTER__ == 4
@@ -179,7 +170,7 @@ struct mpart_lockop {
 #if 0 /* Static initializer template: */
 	/* .mp_refcnt    = */ FILLME,
 	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/*                 */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/*                 */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
 	/* .mp_state     = */ MPART_ST_MEM,
 	/* .mp_file      = */ { &mfile_ndef },
@@ -187,9 +178,9 @@ struct mpart_lockop {
 	/* .mp_share     = */ LIST_HEAD_INITIALIZER(FILLME.mp_share),
 	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(FILLME.mp_lockops),
 	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_changed   = */ {},
 	/* .mp_minaddr   = */ (pos_t)0,
 	/* .mp_maxaddr   = */ (pos_t)FILLME - 1,
+	/* .mp_changed   = */ {},
 	/* .mp_filent    = */ { {} },
 	/* .mp_blkst_ptr = */ { NULL },
 	/* .mp_mem       = */ { {
@@ -294,9 +285,9 @@ struct mpart {
 		 * assume that any unchanged block can always be re-constructed at a later point
 		 * in time by making use of the `mo_loadblocks' operator.
 		 *
-		 * Also note that parts with the `MPART_F_NO_FREE' flag set should never be off-
+		 * Also note that parts with the `MPART_F_NOFREE' flag set should never be off-
 		 * loaded into swap: If not only because doing so wouldn't actually free up physical
-		 * memory, doing so might actually cause problems (since `MPART_F_NO_FREE' is set
+		 * memory, doing so might actually cause problems (since `MPART_F_NOFREE' is set
 		 * by special files such as `mfile_phys')
 		 */
 		struct mchunk             mp_swp;       /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
@@ -309,8 +300,8 @@ struct mpart {
 #define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)          \
 	{                                                                     \
 		/* .mp_refcnt      = */ 1,                                        \
-		/* .mp_flags       = */ MPART_F_NO_GLOBAL_REF | MPART_F_NO_FREE | \
-		/*                   */ MPART_F_NO_SPLIT | MPART_F_MLOCK |        \
+		/* .mp_flags       = */ MPART_F_NO_GLOBAL_REF | MPART_F_NOFREE | \
+		/*                   */ MPART_F_NOSPLIT | MPART_F_MLOCK |        \
 		/*                   */ MPART_F_MLOCK_FROZEN,                     \
 		/* .mp_state       = */ MPART_ST_MEM,                             \
 		{ /* .mp_file      = */ file },                                   \
@@ -318,9 +309,9 @@ struct mpart {
 		/* .mp_share       = */ LIST_HEAD_INITIALIZER(~),                 \
 		/* .mp_lockops     = */ SLIST_HEAD_INITIALIZER(~),                \
 		{ /* .mp_allparts  = */ LIST_ENTRY_UNBOUND_INITIALIZER },         \
-		/* .mp_changed     = */ {},                                       \
 		/* .mp_minaddr     = */ 0,                                        \
 		/* .mp_maxaddr     = */ (pos_t)((num_bytes) - 1),                 \
+		/* .mp_changed     = */ {},                                       \
 		{ /* .mp_filent    = */ {} },                                     \
 		{ /* .mp_blkst_ptr = */ __NULLPTR},                               \
 		{ /* .mp_mem       = */ { first_page, page_count } },             \

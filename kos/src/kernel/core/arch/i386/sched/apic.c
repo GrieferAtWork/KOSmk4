@@ -181,7 +181,7 @@ mpart_create_lockram(size_t num_pages) {
 #ifdef CONFIG_USE_NEW_VM
 	result->mp_refcnt = 1;
 	result->mp_flags  = (MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	                     MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	                     MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                     MPART_F_MLOCK_FROZEN | MPART_F_MLOCK);
 	result->mp_file   = incref(&mfile_ndef);
 	LIST_INIT(&result->mp_copy);
@@ -246,8 +246,8 @@ mnode_create_lockram(size_t num_pages) {
 	}
 #ifdef CONFIG_USE_NEW_VM
 	result->mn_flags = MNODE_F_PWRITE | MNODE_F_PREAD |
-	                   MNODE_F_SHARED | MNODE_F_NO_SPLIT |
-	                   MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	                   MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                   MNODE_F_NOMERGE | MNODE_F_KERNPART |
 	                   MNODE_F_MLOCK;
 	result->mn_part         = part; /* Inherit reference */
 	result->mn_fspath       = NULL;
@@ -400,8 +400,8 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	vm_node_setmaxaddr(cpu_node2, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + PAGESIZE - 1);
 #ifdef CONFIG_USE_NEW_VM
 	cpu_node2->mn_flags = MNODE_F_PWRITE | MNODE_F_PREAD |
-	                      MNODE_F_SHARED | MNODE_F_NO_SPLIT |
-	                      MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	                      MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                      MNODE_F_NOMERGE | MNODE_F_KERNPART |
 	                      MNODE_F_MLOCK | MNODE_F_MPREPARED;
 	cpu_node2->mn_mman    = &mman_kernel;
 	cpu_node2->mn_part    = NULL; /* Reservation */

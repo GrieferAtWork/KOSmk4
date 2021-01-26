@@ -72,6 +72,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
                                         gfp_t flags) {
 #ifdef CONFIG_USE_NEW_VM
 	void *result;
+	assert(!(flags & GFP_MAP_FLAGS));
 	if (mapping_target == CORE_PAGE_MALLOC_AUTO) {
 		void *mapping_hint;
 		unsigned int mapping_mode;
@@ -97,6 +98,8 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 		                             num_bytes,
 		                             flags | GFP_MAP_FIXED,
 		                             min_alignment);
+		if (result == MAP_INUSE) /* XXX: Do this better... */
+			result = MAP_FAILED;
 	}
 	return result;
 #else /* CONFIG_USE_NEW_VM */

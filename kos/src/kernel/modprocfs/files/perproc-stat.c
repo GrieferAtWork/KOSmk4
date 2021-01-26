@@ -101,6 +101,48 @@ DECL_BEGIN
 */
 
 
+/* Return the total # of bytes of mapped memory from `self'. */
+PRIVATE NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL mnode_tree_get_total_mapped_bytes)(struct mnode *root,
+                                                 struct mnode *skipme) {
+	size_t result = 0;
+again:
+	if (root != skipme)
+		result += mnode_getsize(root);
+#ifdef CONFIG_USE_NEW_VM
+	if (root->mn_mement.rb_lhs) {
+		if (root->mn_mement.rb_rhs)
+			result += mnode_tree_get_total_mapped_bytes(root->mn_mement.rb_rhs, skipme);
+		root = root->mn_mement.rb_lhs;
+		goto again;
+	}
+	if (root->mn_mement.rb_rhs) {
+		root = root->mn_mement.rb_rhs;
+		goto again;
+	}
+#else /* CONFIG_USE_NEW_VM */
+	if (root->vn_node.a_min) {
+		if (root->vn_node.a_max)
+			result += mnode_tree_get_total_mapped_bytes(root->vn_node.a_max, skipme);
+		root = root->vn_node.a_min;
+		goto again;
+	}
+	if (root->vn_node.a_max) {
+		root = root->vn_node.a_max;
+		goto again;
+	}
+#endif /* !CONFIG_USE_NEW_VM */
+	return result;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman *__restrict self) {
+	if unlikely(!self->mm_mappings)
+		return 0;
+	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,
+	                                         vm_get_kernreserve_node(self));
+}
+
 
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
@@ -276,14 +318,9 @@ nofproc:
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done;
 	if (v) {
-		size_t vsize = 0;
-		struct vm_node *iter;
+		size_t vsize;
 		sync_read(v);
-		for (iter = v->v_byaddr; iter; iter = iter->vn_byaddr.ln_next) {
-			if (iter == &v->v_kernreserve)
-				continue;
-			vsize += vm_node_getsize(iter);
-		}
+		vsize = mman_get_total_mapped_bytes(v);
 		sync_endread(v);
 		if (format_printf(printer, arg, "%" PRIuSIZ " ", vsize) < 0)
 			goto done;

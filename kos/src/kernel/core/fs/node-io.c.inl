@@ -98,28 +98,6 @@ DECL_BEGIN
 #endif
 
 
-#ifndef INODE_PARTIO_DEFINED
-#define INODE_PARTIO_DEFINED 1
-INTDEF NONNULL((1, 2)) void KCALL
-inode_do_load_datapart_pages(struct inode *__restrict self,
-                             struct vm_datapart *__restrict part,
-                             size_t partrelative_pageno,
-                             size_t num_data_pages,
-                             struct aio_multihandle *__restrict aio);
-INTDEF NONNULL((1, 2)) void KCALL
-inode_do_load_datapart_pages_sync(struct inode *__restrict self,
-                                  struct vm_datapart *__restrict part,
-                                  size_t partrelative_pageno,
-                                  size_t num_data_pages);
-INTDEF NONNULL((1, 2)) void KCALL
-inode_do_save_datapart_pages(struct inode *__restrict self,
-                             struct vm_datapart *__restrict part,
-                             size_t partrelative_pageno,
-                             size_t num_data_pages,
-                             struct aio_multihandle *__restrict aio);
-#endif /* !INODE_PARTIO_DEFINED */
-
-
 
 #ifdef DEFINE_IO_READ
 INTERN

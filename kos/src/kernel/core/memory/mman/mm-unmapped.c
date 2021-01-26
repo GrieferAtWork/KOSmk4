@@ -650,7 +650,7 @@ disallow_mmap:
 			 *       range is fully contained within a single, pre-existing node! */
 			if (mnode_getminaddr(mima.mm_min) != result) {
 				/* Must split this node! */
-				if (mima.mm_min->mn_flags & MNODE_F_NO_SPLIT)
+				if (mima.mm_min->mn_flags & MNODE_F_NOSPLIT)
 					goto disallow_mmap; /* Not allowed! */
 				if (!mnode_split_or_unlock(self, mima.mm_min, result, unlock))
 					goto must_retry;
@@ -662,7 +662,7 @@ disallow_mmap:
 			max_mapaddr = (byte_t *)result + num_bytes - 1;
 			if (mnode_getmaxaddr(mima.mm_max) != max_mapaddr) {
 				/* Must split this node! */
-				if (mima.mm_min->mn_flags & MNODE_F_NO_SPLIT)
+				if (mima.mm_min->mn_flags & MNODE_F_NOSPLIT)
 					goto disallow_mmap; /* Not allowed! */
 				if (!mnode_split_or_unlock(self, mima.mm_max, max_mapaddr + 1, unlock))
 					goto must_retry;

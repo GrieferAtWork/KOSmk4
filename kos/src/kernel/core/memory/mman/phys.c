@@ -1115,8 +1115,8 @@ PUBLIC ATTR_PERTASK struct mnode this_trampoline_node = {
 	/* .mn_minaddr  = */ (byte_t *)(0),
 	/* .mn_maxaddr  = */ (byte_t *)(PAGESIZE - 1),
 	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
-	/*                */ MNODE_F_NO_MERGE | MNODE_F_MPREPARED |
+	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	/*                */ MNODE_F_NOMERGE | MNODE_F_MPREPARED |
 	/*                */ MNODE_F_MLOCK,
 	/* .mn_part     = */ NULL,
 	/* .mn_fspath   = */ NULL,

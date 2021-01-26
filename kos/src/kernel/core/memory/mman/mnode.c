@@ -83,9 +83,34 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 
 
-INTDEF NOBLOCK NONNULL((1, 2)) void /* From "mpart.c" */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(struct mpart_postlockop *__restrict self,
+                                                  struct mpart *__restrict part) {
+	struct mnode *me;
+	me = (struct mnode *)self;
+	weakdecref(me->mn_mman);
+	mnode_free(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
 NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
-                                             struct mpart *__restrict part);
+                                             struct mpart *__restrict part) {
+	struct mpart_postlockop *post;
+	struct mnode *me;
+	me = (struct mnode *)self;
+	LIST_REMOVE(me, mn_link);
+	if ((me->mn_flags & (MNODE_F_MLOCK)) &&
+	    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
+		mpart_maybe_clear_mlock(part);
+	/* Do the rest in post so we won't be holding a lock to the mem-part anymore:
+	 * >> weakdecref(me->mn_mman);
+	 * >> mnode_free(me); */
+	post             = (struct mpart_postlockop *)self;
+	post->mpplo_func = &mnode_unlink_from_part_lockop_post;
+	return post;
+}
+
+
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
@@ -294,7 +319,7 @@ mnode_split_or_unlock(struct mman *__restrict self,
 	assert((byte_t *)addr_where_to_split < (byte_t *)mnode_getendaddr(lonode));
 
 	/* Safety check: panic if the specified node isn't allowed to be split. */
-	if unlikely(lonode->mn_flags & MNODE_F_NO_SPLIT) {
+	if unlikely(lonode->mn_flags & MNODE_F_NOSPLIT) {
 		kernel_panic("Not allowed to split node at %p-%p at %p",
 		             mnode_getminaddr(lonode),
 		             mnode_getmaxaddr(lonode),
@@ -325,7 +350,7 @@ reload_lonode_after_mman_lock:
 		if ((lonode == NULL) ||
 		    (lonode->mn_minaddr != mnode_minaddr) ||
 		    (lonode->mn_maxaddr != mnode_maxaddr) ||
-		    (lonode->mn_flags & MNODE_F_NO_SPLIT))
+		    (lonode->mn_flags & MNODE_F_NOSPLIT))
 			goto err_changed_free_hinode;
 	}
 

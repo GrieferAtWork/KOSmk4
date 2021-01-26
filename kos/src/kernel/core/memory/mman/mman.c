@@ -86,7 +86,7 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 	/* .mn_mement   = */ { NULL, NULL, NULL },
 	/* .mn_minaddr  = */ (byte_t *)KS_MINADDR,
 	/* .mn_maxaddr  = */ (byte_t *)KS_MAXADDR,
-	/* .mn_flags    = */ MNODE_F_NO_SPLIT | MNODE_F_NO_MERGE |
+	/* .mn_flags    = */ MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 	/*                */ MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */

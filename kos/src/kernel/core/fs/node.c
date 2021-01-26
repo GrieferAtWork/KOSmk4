@@ -1083,16 +1083,6 @@ inode_do_sync_attr(struct inode *__restrict self) {
 
 
 
-/* @param: partrelative_pageno: In data-pages, the part-relative offset to the first modified data-page.
- * @param: num_data_pages:      In data-pages, the number of continuous, modified data-pages. */
-INTDEF NONNULL((1, 2)) void KCALL
-inode_do_save_datapart_pages(struct inode *__restrict self,
-                             struct vm_datapart *__restrict part,
-                             size_t partrelative_pageno,
-                             size_t num_data_pages,
-                             struct aio_multihandle *__restrict aio);
-
-
 
 
 #define INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED   0 /* Failed to acquire a non-blocking lock to the associated superblock's `s_changed_lock' chain */
@@ -4722,11 +4712,6 @@ DECL_END
 #undef DEFINE_IO_VECTOR
 #undef DEFINE_IO_KERNEL
 
-
-#define DEFINE_IO_READ 1
-#include "node-partio.c.inl"
-#define DEFINE_IO_WRITE 1
-#include "node-partio.c.inl"
 
 /* Define `inode_a(read|write)[v][p]' */
 #define DEFINE_IO_READ 1

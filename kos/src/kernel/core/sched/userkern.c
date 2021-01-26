@@ -189,17 +189,17 @@ PUBLIC struct mpart userkern_segment_part = {
 #ifdef CONFIG_USE_NEW_VM
 	/* .mp_refcnt    = */ 1,
 	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
-	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
+	/*                 */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
 	/* .mp_state     = */ MPART_ST_VIO,
 	/* .mp_file      = */ { &mfile_ndef },
 	/* .mp_copy      = */ LIST_HEAD_INITIALIZER(userkern_segment_part.mp_copy),
 	/* .mp_share     = */ LIST_HEAD_INITIALIZER(userkern_segment_part.mp_share),
 	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(userkern_segment_part.mp_lockops),
 	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_changed   = */ {},
 	/* .mp_minaddr   = */ (pos_t)(0),
 	/* .mp_maxaddr   = */ (pos_t)(KS_MAXADDR - KS_MINADDR),
+	/* .mp_changed   = */ {},
 	/* .mp_filent    = */ { {} },
 	/* .mp_blkst_ptr = */ { NULL },
 	/* .mp_mem       = */ { {} },
@@ -351,7 +351,7 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 #ifdef CONFIG_USE_NEW_VM
 	/* .mp_refcnt    = */ 1,
 	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/* .mp_flags     = */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK,
 	/* .mp_state     = */ MPART_ST_VIO,
 	/* .mp_file      = */ { &mfile_ndef },
@@ -359,9 +359,9 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 	/* .mp_share     = */ LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_share),
 	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_lockops),
 	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_changed   = */ {},
 	/* .mp_minaddr   = */ (pos_t)(0),
 	/* .mp_maxaddr   = */ (pos_t)((((COMPAT_KERNELSPACE_MAXPAGEID - COMPAT_KERNELSPACE_MINPAGEID) + 1) * PAGESIZE) - 1),
+	/* .mp_changed   = */ {},
 	/* .mp_filent    = */ { {} },
 	/* .mp_blkst_ptr = */ { NULL },
 	/* .mp_mem       = */ { {} },

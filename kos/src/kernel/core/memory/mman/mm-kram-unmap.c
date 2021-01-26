@@ -58,10 +58,11 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
-STATIC_ASSERT_MSG(GFP_ATOMIC == 0x0400,
-                  "This is currently hard-coded in "
-                  "<kernel/mman/mm-map.h> and "
-                  "<kernel/mman/mm-lockop.h>");
+STATIC_ASSERT_MSG(sizeof(struct mman_unmap_kram_job) <= PAGESIZE,
+                  "There's really no reason for this to fail, but you should "
+                  "be aware that code below assumes that an unmap-job can be "
+                  "stored in a single page, thus allowing it to be stored in "
+                  "its own unmap-area (s.a. `mman_unmap_kram()')");
 
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
@@ -74,281 +75,6 @@ STATIC_ASSERT_MSG(GFP_ATOMIC == 0x0400,
 PUBLIC WEAK unsigned int mman_kernel_hintinit_inuse = 0;
 #endif /* !CONFIG_NO_SMP */
 
-
-struct mlockop_kram;
-SLIST_HEAD(mlockop_kram_slist, mlockop_kram);
-
-struct mlockop_kram: mlockop {
-	PAGEDIR_PAGEALIGNED size_t lkr_size;  /* Total size (in bytes of the region)  */
-	gfp_t                      lkr_flags; /* Set of `0 | GFP_CALLOC' */
-};
-
-
-
-PRIVATE NOBLOCK struct mlockop *
-NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self, gfp_t flags) {
-	struct mlockop_kram *me;
-	size_t size;
-	me   = (struct mlockop_kram *)self;
-	size = me->lkr_size;
-	assert(!(flags & GFP_CALLOC));
-	assert(me->lkr_flags == 0 || me->lkr_flags == GFP_CALLOC);
-	flags |= me->lkr_flags;
-	if (flags & GFP_CALLOC)
-		memset(me, 0, sizeof(*me)); /* Ensure consistent zero-initialized-ness */
-	/* (try to) do the actual unmapping. */
-	return mman_unmap_kram_locked_ex(self, size, flags);
-}
-
-
-
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mlockop_slist_sorted_insert_byaddr)(struct mlockop_kram_slist *__restrict self,
-                                                  struct mlockop *__restrict op) {
-	struct mlockop **p_next, *next;
-	p_next = (struct mlockop **)SLIST_P_FIRST(self);
-	while ((next = *p_next) != NULL) {
-		assert(next != op);
-		if (next > op)
-			break; /* Insert before this one! */
-		p_next = SLIST_P_NEXT(next, mlo_link);
-	}
-	SLIST_P_INSERT_BEFORE(p_next, op, mlo_link);
-}
-
-
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mlockop_kram_slist_merge_adjacent)(struct mlockop_kram_slist *__restrict self) {
-	struct mlockop_kram *iter, *next;
-	assert(!SLIST_EMPTY(self));
-	iter = SLIST_FIRST(self);
-	for (;;) {
-		next = (struct mlockop_kram *)SLIST_NEXT(iter, mlo_link);
-		if (!next)
-			break;
-		if ((byte_t *)iter + iter->lkr_size == (byte_t *)next) {
-			/* Merge these together! */
-			iter->mlo_link.sle_next = next->mlo_link.sle_next;
-			iter->lkr_size += next->lkr_size;
-			iter->lkr_flags &= next->lkr_flags;
-			if (iter->lkr_flags & GFP_CALLOC)
-				memset(next, 0, sizeof(*next));
-			continue;
-		}
-		/* Continue trying to merge other segments. */
-		iter = next;
-	}
-}
-
-
-
-/* Reap lock operations of `self' */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL _mman_lockops_reap)(gfp_t flags) {
-	struct mlockop_slist more;
-	struct mlockop_slist lops;
-	struct mlockop_kram_slist kram;
-	struct mlockop *iter;
-	assert(flags & GFP_ATOMIC);
-	assert(!(flags & GFP_CALLOC));
-/*again:*/
-	if (!mman_lock_tryacquire(&mman_kernel))
-		return;
-	lops.slh_first = SLIST_ATOMIC_CLEAR(&mman_kernel_lockops);
-again_service_lops:
-	SLIST_INIT(&kram);
-	SLIST_INIT(&more);
-	iter = SLIST_FIRST(&lops);
-	while (iter != NULL) {
-		struct mlockop *lop_more, *next;
-		next = SLIST_NEXT(iter, mlo_link);
-		/* Execute these later... */
-		if (iter->mlo_func == &mlockop_kram_cb) {
-			/* Insert into the kram-list of operations. */
-			mlockop_slist_sorted_insert_byaddr(&kram, iter);
-		} else {
-			/* Invoke the lock operation. */
-			iter->mlo_link.sle_next = NULL;
-			lop_more = (*iter->mlo_func)(iter, flags);
-			if unlikely(lop_more != NULL) {
-				struct mlockop *last;
-				last = lop_more;
-				while (SLIST_NEXT(last, mlo_link) != NULL)
-					last = SLIST_NEXT(last, mlo_link);
-				/* Re-queue future operations. */
-				SLIST_INSERT_R(&more, lop_more, last, mlo_link);
-			}
-		}
-		iter = next;
-	}
-	/* At this point, all remaining elements in `kram' are requests
-	 * for unmapping kernel RAM, which have already been sorted by
-	 * their base address. */
-	if likely(!SLIST_EMPTY(&kram)) {
-		/* Merge adjacent kram operations */
-		mlockop_kram_slist_merge_adjacent(&kram);
-		/* Invoke unmap-kernel-ram lops */
-		do {
-			struct mlockop *lop, *lop_more;
-			lop            = (struct mlockop *)SLIST_FIRST(&kram);
-			kram.slh_first = (struct mlockop_kram *)SLIST_NEXT(lop, mlo_link);
-			/*lop->mlo_link.sle_next = NULL;*/ /* `mlockop_kram_cb()' doesn't care about this... */
-			lop_more = mlockop_kram_cb(lop, flags);
-			if unlikely(lop_more != NULL) {
-				struct mlockop *last;
-				last = lop_more;
-				while (SLIST_NEXT(last, mlo_link) != NULL)
-					last = SLIST_NEXT(last, mlo_link);
-				/* Re-queue future operations. */
-				SLIST_INSERT_R(&more, lop_more, last, mlo_link);
-			}
-		} while (!SLIST_EMPTY(&kram));
-	}
-
-	mman_lock_release_f(&mman_kernel);
-	/* If other lops (aside from `more') were addend, then consume
-	 * them an merge them with `more' before trying to service all
-	 * of them together as one large package!
-	 * Doing this can improve efficiency of unmap-kernel-ram requests! */
-enqueue_more:
-	if (!ATOMIC_CMPXCH(mman_kernel_lockops.slh_first, NULL, more.slh_first)) {
-		lops.slh_first = ATOMIC_XCH(mman_kernel_lockops.slh_first, NULL);
-		if (!SLIST_EMPTY(&more)) {
-			struct mlockop *last;
-			last = SLIST_FIRST(&lops);
-			while (SLIST_NEXT(last, mlo_link) != NULL)
-				last = SLIST_NEXT(last, mlo_link);
-			last->mlo_link.sle_next = more.slh_first;
-		}
-		if (mman_lock_tryacquire(&mman_kernel))
-			goto again_service_lops;
-		/* Enqueue everything together. */
-		more = lops;
-		goto enqueue_more;
-	}
-}
-
-
-
-/* Run `op->mlo_func' in the context of holding a lock to the kernel VM at some
- * point in the future. The given `op->mlo_func' is responsible for freeing the
- * backing memory of `op' during its invocation. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op, gfp_t flags) {
-	/* Atomically insert the new lock operation. */
-	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, op, mlo_link);
-	_mman_lockops_reap(flags);
-}
-
-
-
-/* Same as `mman_kernel_lockop()', but `op->mlo_link' may point to another lock
- * op that should also be enqueued, which may point to another, and so on...
- * Additionally, `op' may be `NULL', in which case the call is a no-op */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_kernel_lockop_many)(struct mlockop *op, gfp_t flags) {
-	struct mlockop *lastop;
-	if unlikely(!op)
-		return;
-	lastop = op;
-	while (SLIST_NEXT(lastop, mlo_link) != NULL)
-		lastop = SLIST_NEXT(lastop, mlo_link);
-	/* Atomically insert all of the new elements. */
-	SLIST_ATOMIC_INSERT_R(&mman_kernel_lockops, op, lastop, mlo_link);
-	_mman_lockops_reap(flags);
-}
-
-
-
-/* Without blocking, unmap a given region of kernel RAM.
- * These functions will attempt to acquire a lock to the kernel mman, and
- * if that fails, will instead inject a pending lock operation into the
- * kernel mman's `mman_kernel_lockops', which will then perform the actual
- * job of unmapping the associated address range as soon as doing so becomes
- * possible.
- * These functions may only be used to unmap nodes mapped with the `MNODE_F_NO_MERGE'
- * flag, as well as read+write permissions. Additionally, if preparing the backing
- * page directory fails, as might happen if the associated node didn't have the
- * `MNODE_F_MPREPARED' flag set, then a warning is written to the system (unless
- * an internal rate-limit check fails), and the unmap operation is re-inserted as
- * a pending lock operation into `mman_kernel_lockops' (meaning that the unmap will
- * be re-attempted repeatedly until it (hopefully) succeeds at some point)
- * @param: flags:   Set of `GFP_*'. When `GFP_CALLOC' is given, allows the memory
- *                  management system to assume that the backing physical memory
- *                  is zero-initialized. If you're not sure if this is the case,
- *                  better pass `false'. If you lie here, calloc() might arbitrarily
- *                  break... */
-PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void
-NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               gfp_t flags) {
-	struct mlockop_kram *lockop;
-	assert(num_bytes != 0);
-	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
-	assert(IS_ALIGNED(num_bytes, PAGESIZE));
-	assert(flags & GFP_ATOMIC);
-	if (mman_lock_tryacquire(&mman_kernel)) {
-		/* Directly try to unmap kernel ram. */
-		lockop = (struct mlockop_kram *)mman_unmap_kram_locked_ex(addr, num_bytes, flags);
-		mman_lock_release(&mman_kernel);
-		if unlikely(lockop != NULL)
-			goto do_schedule_lockop;
-	} else {
-		lockop = (struct mlockop_kram *)addr;
-		lockop->mlo_func  = &mlockop_kram_cb;
-		lockop->lkr_size  = num_bytes;
-		lockop->lkr_flags = flags & GFP_CALLOC;
-do_schedule_lockop:
-		mman_kernel_lockop(lockop);
-	}
-}
-
-
-INTDEF NOBLOCK NONNULL((1, 2)) void /* From "mpart.c" */
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
-                                             struct mpart *__restrict part);
-
-
-PRIVATE NOBLOCK void
-NOTHROW(FCALL mnode_destroy_kram)(struct mnode *__restrict self) {
-	REF struct mpart *part;
-	part = self->mn_part;
-	if unlikely(self->mn_fspath != NULL)
-		decref(self->mn_fspath);
-	if unlikely(self->mn_fsname != NULL)
-		decref(self->mn_fsname);
-
-	/* Try to unlink the node from the copy- or share-chain of the associated part. */
-	if (mpart_lock_tryacquire(part)) {
-		LIST_REMOVE(self, mn_link);
-		if ((self->mn_flags & (MNODE_F_MLOCK)) &&
-		    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
-			ATOMIC_AND(part->mp_flags, ~MPART_F_MLOCK);
-		mpart_lock_release(part);
-		decref_unlikely(part);
-	} else {
-		struct mpart_lockop *lop;
-		/* Must insert the node into the part's list of deleted nodes. */
-		weakincref(&mman_kernel); /* A weak reference here is required by the ABI */
-		DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
-
-		/* Insert into the lock-operations list of `part'
-		 * The act of doing this is what essentially causes
-		 * ownership of our node to be transfered to `part' */
-		lop = (struct mpart_lockop *)self;
-		lop->mplo_func = &mnode_unlink_from_part_lockop;
-		SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, mplo_link);
-
-		/* Try to reap dead nodes. */
-		_mpart_deadnodes_reap(part);
-
-		/* Drop our old reference to the associated part. */
-		decref_likely(part);
-		return;
-	}
-	mnode_free(self);
-}
 
 typedef NOBLOCK void
 /*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
@@ -383,7 +109,7 @@ NOTHROW(FCALL freefun_for_mpart)(struct mpart const *__restrict self) {
 	case MPART_ST_MEM:
 	case MPART_ST_MEM_SC:
 		result = &freefun_phys;
-		if (self->mp_flags & MPART_F_NO_FREE)
+		if (self->mp_flags & MPART_F_NOFREE)
 			result = &freefun_noop;
 		break;
 
@@ -714,8 +440,8 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(flags & GFP_ATOMIC);
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(mpart_lock_acquired(part));
-	assert(!(part->mp_flags & MPART_F_NO_SPLIT));
-	assert(!(node->mn_flags & MNODE_F_NO_SPLIT));
+	assert(!(part->mp_flags & MPART_F_NOSPLIT));
+	assert(!(node->mn_flags & MNODE_F_NOSPLIT));
 	assert(unmap_minaddr >= node->mn_minaddr);
 	assert(unmap_maxaddr <= node->mn_maxaddr);
 	assertf(unmap_minaddr != node->mn_minaddr || unmap_maxaddr != node->mn_maxaddr,
@@ -1191,7 +917,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	/* Initialize the hi-part. */
 	hipart->mp_refcnt = 1;
 	hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT | MPART_F_NO_GLOBAL_REF |
-	                                        MPART_F_CHANGED | MPART_F_NO_FREE |
+	                                        MPART_F_CHANGED | MPART_F_NOFREE |
 	                                        MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
 	/*hipart->mp_state = ...;*/ /* Alraedy initialized above */
 	hipart->mp_file = incref(lopart->mp_file);
@@ -1279,106 +1005,75 @@ NOTHROW(FCALL mman_lockop_insert_or_lock)(struct mlockop *__restrict lop) {
 	return false;
 }
 
+PRIVATE NOBLOCK struct mpostlockop *
+NOTHROW(FCALL mlockop_kram_finish)(struct mlockop *__restrict self) {
+	struct mman_unmap_kram_job *job, *res;
+	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mm);
+	(*job->mukj_done)(job);
+}
 
-struct mpart_lockop_truncate: mpart_lockop {
-	PAGEDIR_PAGEALIGNED size_t mplot_size;  /* Total size (in bytes of the region)  */
-	gfp_t                      mplot_flags; /* Set of `0 | GFP_CALLOC' */
-};
+
+PRIVATE NOBLOCK void
+NOTHROW(FCALL mlockop_kram_cb_post)(struct mpostlockop *__restrict self) {
+	struct mman_unmap_kram_job *job;
+	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mm);
+	(*job->mukj_done)(job);
+}
+
+PRIVATE NOBLOCK struct mpostlockop *
+NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self) {
+	struct mman_unmap_kram_job *job, *res;
+	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mm);
+	res = mman_unmap_kram_locked_ex(job, NULL);
+	if (res == MMAN_UNMAP_KRAM_LOCKED_EX_DONE) {
+		if likely(job->mukj_done != NULL) {
+			/* Set-up a post-lock callback to exec the done-callback.
+			 *  */
+			job->mukj_post_lop_mm.mplo_func = &mlockop_kram_cb_post;
+			return &job->mukj_post_lop_mm;
+		}
+	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
+		struct mlockop *next;
+		/* Must re-queue as pending for the kernel mman. */
+		/* TODO: This must happen in a post-op so we don't end up in an infinite loop! */
+		res->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+		                    &res->mukj_lop_mm,
+		                    mlo_link);
+	}
+	return NULL;
+}
+
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpart_lockop_truncate_cb)(struct mpart_lockop *__restrict self,
-                                        struct mpart *__restrict part) {
-	struct mpart_lockop_truncate *me;
-	struct mnode *node;
-	byte_t *unmap_minaddr, *unmap_maxaddr;
-	gfp_t flags;
-	me            = (struct mpart_lockop_truncate *)self;
-	unmap_minaddr = (byte_t *)me;
-	unmap_maxaddr = (byte_t *)me + me->mplot_size - 1;
-	flags         = me->mplot_flags | GFP_ATOMIC;
-	if (flags & GFP_CALLOC)
-		memset(me, 0, sizeof(*me));
-	if (!mman_lock_tryacquire(&mman_kernel)) {
-		struct mlockop_kram *lop;
-		lop = (struct mlockop_kram *)me;
-		lop->mlo_func  = &mlockop_kram_cb;
-		lop->lkr_size  = (size_t)(unmap_maxaddr - (byte_t *)me) + 1;
-		lop->lkr_flags = flags;
-		if (mman_lockop_insert_or_lock(lop))
-			return;
-		if (flags & GFP_CALLOC)
-			memset(lop, 0, sizeof(*lop));
-	}
+NOTHROW(FCALL mpartlockop_kram_cb_post)(struct mpart_postlockop *__restrict self,
+                                        struct mpart *__restrict UNUSED(part)) {
+	struct mman_unmap_kram_job *job;
+	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mp);
+	(*job->mukj_done)(job);
+}
 
-	/* At this point, we're holding a lock to both the mman, as
-	 * well as (what is supposed to be) the backing mem-part.
-	 *
-	 * As such, start out by validating that this is actually the case. */
-	node = mnode_tree_locate(mman_kernel.mm_mappings, unmap_minaddr);
-	assertf(node != NULL, "Address %p not mapped", unmap_minaddr);
-	assert(mnode_getminaddr(node) >= unmap_minaddr);
-	assert(mnode_getmaxaddr(node) <= unmap_maxaddr);
-	if unlikely(node->mn_flags & MNODE_F_KERNPART) {
-		kernel_panic("Attempted to unmap kernel part at %p-%p (via unmap-kram %p-%p)",
-		             mnode_getminaddr(node), mnode_getmaxaddr(node),
-		             unmap_minaddr, unmap_maxaddr);
+PRIVATE NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
+NOTHROW(FCALL mpartlockop_kram_cb)(struct mpart_lockop *__restrict self,
+                                   struct mpart *__restrict part) {
+	struct mman_unmap_kram_job *job, *res;
+	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mp);
+	res = mman_unmap_kram_locked_ex(job, part);
+	if (res == MMAN_UNMAP_KRAM_LOCKED_EX_DONE) {
+		if likely(job->mukj_done != NULL) {
+			/* Set-up a post-lock callback to exec the done-callback */
+			job->mukj_post_lop_mp.mpplo_func = &mpartlockop_kram_cb_post;
+			return &job->mukj_post_lop_mp;
+		}
+	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
+		struct mlockop *next;
+		/* Must re-queue as pending for the kernel mman. */
+		res->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+		                    &res->mukj_lop_mm,
+		                    mlo_link);
 	}
-	assert(node->mn_mman == &mman_kernel);
-	assert(node->mn_flags & MNODE_F_PREAD);
-	assert(node->mn_flags & MNODE_F_PWRITE);
-	assert(mnode_iskern(node));
-	assert(node->mn_part);
-	assert(node->mn_part->mp_flags & MPART_F_NO_GLOBAL_REF);
-	if (node->mn_flags & MNODE_F_SHARED) {
-		assert(LIST_EMPTY(&node->mn_part->mp_copy));
-		assert(LIST_FIRST(&node->mn_part->mp_share) == node);
-	} else {
-		assert(LIST_EMPTY(&node->mn_part->mp_share));
-		assert(LIST_FIRST(&node->mn_part->mp_copy) == node);
-	}
-	assert(LIST_NEXT(node, mn_link) == NULL);
-	assert(mfile_isanon(node->mn_part->mp_file));
-#ifdef MPART_ST_VIO
-	assert(node->mn_part->mp_state != MPART_ST_VIO);
-#endif /* MPART_ST_VIO */
-
-	if unlikely(node->mn_part != part)
-		goto changed;
-	if unlikely(unmap_minaddr < mnode_getminaddr(node))
-		goto changed;
-	if unlikely(unmap_maxaddr > mnode_getmaxaddr(node))
-		goto changed;
-	if unlikely(unmap_minaddr == mnode_getminaddr(node) &&
-	            unmap_maxaddr == mnode_getmaxaddr(node))
-		goto changed;
-	if unlikely(node->mn_flags & MNODE_F_NO_SPLIT)
-		goto changed;
-	if unlikely(part->mp_flags & MPART_F_NO_SPLIT)
-		goto changed;
-	/* Everything looks in order.
-	 * -> Try to do the actual sub-range unmapping! */
-	if (!mman_unmap_mpart_subregion(node, part,
-	                                unmap_minaddr,
-	                                unmap_maxaddr,
-	                                flags))
-		goto changed; /* Handle allocation errors by re-attempting later. */
-	mman_lock_release(&mman_kernel);
-	return;
-changed:
-	/* Failed to unmap the sub-region.
-	 * Resolve this issue by re-queue a pending lock operation for
-	 * execution within the context of holding a lock to the kernel
-	 * memory manager. */
-	{
-		struct mlockop_kram *lop;
-		lop = (struct mlockop_kram *)me;
-		lop->mlo_func  = &mlockop_kram_cb;
-		lop->lkr_size  = (size_t)(unmap_maxaddr - (byte_t *)me) + 1;
-		lop->lkr_flags = flags;
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, mlo_link);
-	}
-	mman_lock_release_f(&mman_kernel);
-	_mman_lockops_reap();
+	return NULL;
 }
 
 
@@ -1420,24 +1115,35 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
 }
 
 
-/* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
- * @param: flags: Set of `GFP_*'
- * @return: NULL: Successfully unmapped kernel ram.
- * @return: * :   Failed to allocate needed memory.
- *                The returned value is a freshly initialized pending mman-
- *                lock-operation which the caller must enqueue for execution.
- *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
-PUBLIC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) struct mlockop *
-NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                         gfp_t flags) {
-	byte_t *maxaddr;
+/* Try to unmap kernel memory while the caller is holding a lock to the kernel mman.
+ * NOTE: This function can be used to delete any kind of kernel-space memory mapping,
+ *       but special case must be taken when it comes to read-only, or shared copy-on-
+ *       write memory mappings (see the documentation of `struct mman_unmap_kram_job')
+ * @param: locked_part: If non-NULL, a part which may be assumed as locked by the caller.
+ * @return: MMAN_UNMAP_KRAM_LOCKED_EX_DONE:  Success (you must invoke the done-callback)
+ * @return: MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC: Success (memory will be free'd asynchronously)
+ *                                           In this case, so-long as the job isn't allocated
+ *                                           in-line with the memory being free'd, the given
+ *                                           done-callback is responsible to free `job'
+ * @return: * : Insufficient memory (re-queue the returned job for later execution) */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mman_unmap_kram_job *
+NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict job,
+                                         struct mpart *locked_part) {
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (*job_done)(struct mman_unmap_kram_job *__restrict self);
+	byte_t *job_orgaddr, *job_minaddr, *job_maxaddr;
+	gfp_t job_flags;
+	job_done    = job->mukj_done;
+	job_minaddr = job->mukj_minaddr;
+	job_maxaddr = job->mukj_maxaddr;
+	job_flags   = job->mukj_flags;
+	job_orgaddr = job_minaddr;
+	assert(job_maxaddr >= job_minaddr);
+	assert(IS_ALIGNED((uintptr_t)job_minaddr, PAGESIZE));
+	assert(IS_ALIGNED((uintptr_t)job_maxaddr + 1, PAGESIZE));
+	assert(job_flags & GFP_ATOMIC);
 	assert(mman_lock_acquired(&mman_kernel));
-	assert(num_bytes != 0);
-	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
-	assert(IS_ALIGNED(num_bytes, PAGESIZE));
-	assert(flags & GFP_ATOMIC);
-	maxaddr = (byte_t *)addr + num_bytes - 1;
+	if (job_flags & GFP_CALLOC)
+		memset(job, 0, sizeof(*job));
 	for (;;) {
 		struct mnode *node;
 		struct mpart *part;
@@ -1445,33 +1151,37 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
 		byte_t *unmap_maxaddr;
 		size_t unmap_size;
 
-		node = mnode_tree_locate(mman_kernel.mm_mappings, addr);
-		assertf(node != NULL, "Address %p not mapped", addr);
-		assert(mnode_getminaddr(node) >= addr);
-		assert(mnode_getmaxaddr(node) <= addr);
+		node = mnode_tree_locate(mman_kernel.mm_mappings, job_minaddr);
+		assertf(node != NULL, "Address %p not mapped", job_minaddr);
+		assert(mnode_getminaddr(node) >= job_minaddr);
+		assert(mnode_getmaxaddr(node) <= job_minaddr);
 		if unlikely(node->mn_flags & MNODE_F_KERNPART) {
 			kernel_panic("Attempted to unmap kernel part at %p-%p (via unmap-kram %p-%p)",
-			             mnode_getminaddr(node), mnode_getmaxaddr(node), addr, maxaddr);
+			             mnode_getminaddr(node), mnode_getmaxaddr(node),
+			             job_minaddr, job_maxaddr);
 		}
 		assert(node->mn_mman == &mman_kernel);
-		assert(node->mn_flags & MNODE_F_PREAD);
-		assert(node->mn_flags & MNODE_F_PWRITE);
 		assert(mnode_iskern(node));
 		part = node->mn_part;
 		assert(part);
-		assert(part->mp_flags & MPART_F_NO_GLOBAL_REF);
-		if (node->mn_flags & MNODE_F_SHARED) {
-			assert(LIST_EMPTY(&part->mp_share));
-			assert(LIST_FIRST(&part->mp_copy) == node);
-		} else {
-			assert(LIST_EMPTY(&part->mp_copy));
-			assert(LIST_FIRST(&part->mp_share) == node);
-		}
-		assert(LIST_NEXT(node, mn_link) == NULL);
-		assert(mfile_isanon(part->mp_file));
+#ifndef NDEBUG
+		if (job_minaddr == (byte_t *)job) {
+			assert(node->mn_flags & MNODE_F_PREAD);
+			assert(node->mn_flags & MNODE_F_PWRITE);
+			if (node->mn_flags & MNODE_F_SHARED) {
+				assert(LIST_EMPTY(&part->mp_share));
+				assert(LIST_FIRST(&part->mp_copy) == node);
+			} else {
+				assert(LIST_EMPTY(&part->mp_copy));
+				assert(LIST_FIRST(&part->mp_share) == node);
+			}
+			assert(LIST_NEXT(node, mn_link) == NULL);
+			assert(mfile_isanon(part->mp_file));
 #ifdef MPART_ST_VIO
-		assert(part->mp_state != MPART_ST_VIO);
+			assert(part->mp_state != MPART_ST_VIO);
 #endif /* MPART_ST_VIO */
+		}
+#endif /* !NDEBUG */
 
 		/* In order to unmap a sub-segment of a hinted mem-node, the following must be done:
 		 *  - Because hinted mem-nodes cannot be split (only truncated),
@@ -1531,11 +1241,9 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
 		 */
 
 		/* Figure out the actual bounds which we wish to unmap. */
-		unmap_minaddr = (byte_t *)addr;
-		unmap_maxaddr = maxaddr;
-		if (unmap_minaddr > (byte_t *)mnode_getminaddr(node))
-			unmap_minaddr = (byte_t *)mnode_getminaddr(node);
-		if (unmap_maxaddr < (byte_t *)mnode_getmaxaddr(node))
+		unmap_minaddr = job_minaddr;
+		unmap_maxaddr = job_maxaddr;
+		if (unmap_maxaddr > (byte_t *)mnode_getmaxaddr(node))
 			unmap_maxaddr = (byte_t *)mnode_getmaxaddr(node);
 		unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 
@@ -1548,6 +1256,8 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
 		}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
+		/* When dealing with an in-line */
+
 		/* Check for simple case: unmap a node as a whole. */
 		if (unmap_minaddr == mnode_getminaddr(node) &&
 		    unmap_maxaddr == mnode_getmaxaddr(node)) {
@@ -1558,37 +1268,38 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
 			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 
 			/* Just delete the node as a whole! */
-			mnode_destroy_kram(node);
+			node->mn_flags &= ~MNODE_F_MPREPARED; /* Prevent double-unprepare! */
+			mnode_destroy(node);
 			goto continue_nextpart;
 		}
 
 		/* In order to do this unmap, we'll have to split the node.
 		 * Check if we're allowed to do this. */
-		if unlikely((node->mn_flags & MNODE_F_NO_SPLIT) ||
-		            (part->mp_flags & MPART_F_NO_SPLIT)) {
+		if unlikely((node->mn_flags & MNODE_F_NOSPLIT) ||
+		            (part->mp_flags & MPART_F_NOSPLIT)) {
 			/* Not allowed... (keep on re-attempting the unmap in hopes
 			 * that `_mman_lockops_reap()' will join us together with
 			 * another unmap request, which then allows the node as a
 			 * whole to be unmapped). */
-			if (maxaddr > unmap_maxaddr) {
-				/* XXX: We could still try to unmap memory further above */
-			}
 			goto failed;
 		}
 
 		/* We'll need to somehow split the part, meaning that we'll be
 		 * needing to acquire a lock to said part! */
-		if (!mpart_lock_tryacquire(part)) {
-			struct mpart_lockop_truncate *lop;
-			/* Try to do the truncate later... */
-			lop = (struct mpart_lockop_truncate *)unmap_minaddr;
-			lop->mplo_func   = &mpart_lockop_truncate_cb;
-			lop->mplot_size  = unmap_size;
-			lop->mplot_flags = flags & GFP_CALLOC;
-			if (mpart_lockop_insert_or_lock(part, lop))
-				goto continue_nextpart;
-			if (flags & GFP_CALLOC)
-				memset(lop, 0, sizeof(*lop));
+		if (part != locked_part) {
+			if (!mpart_lock_tryacquire(part)) {
+				if (job_orgaddr == (byte_t *)job)
+					job = (struct mman_unmap_kram_job *)job_minaddr;
+				job->mukj_done             = job_done;
+				job->mukj_maxaddr          = job_maxaddr;
+				job->mukj_flags            = job_flags;
+				job->mukj_minaddr          = unmap_minaddr;
+				job->mukj_lop_mp.mplo_func = &mpartlockop_kram_cb;
+				if (mpart_lockop_insert_or_lock(part, &job->mukj_lop_mp))
+					return MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC;
+				if (job_flags & GFP_CALLOC)
+					memset(job, 0, sizeof(*job));
+			}
 		}
 
 		/* At this point, we've got a lock to the part, so try to unmap it! */
@@ -1598,8 +1309,9 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
 			unmap_ok = mman_unmap_mpart_subregion(node, part,
 			                                      unmap_minaddr,
 			                                      unmap_maxaddr,
-			                                      flags);
-			mpart_lock_release(part);
+			                                      job_flags | GFP_ATOMIC);
+			if (part != locked_part)
+				mpart_lock_release(part);
 			decref_unlikely(part);
 			if (!unmap_ok)
 				goto failed;
@@ -1607,35 +1319,243 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
 
 		/* Continue after the successfully unmapped address range. */
 continue_nextpart:
-		addr = unmap_maxaddr + 1;
-		if (addr > maxaddr)
+		job_minaddr = unmap_maxaddr + 1;
+		if (job_minaddr > job_maxaddr)
 			break;
 	}
-	return NULL;
-	{
-		struct mlockop_kram *mlo;
+	if (job_orgaddr == (byte_t *)job)
+		return MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC;
+	return MMAN_UNMAP_KRAM_LOCKED_EX_DONE;
 failed:
-		mlo = (struct mlockop_kram *)addr;
-		mlo->mlo_func          = &mlockop_kram_cb;
-		mlo->mlo_link.sle_next = NULL; /* Only a single element. */
-		mlo->lkr_size          = (size_t)(maxaddr - (byte_t *)addr) + 1;
-		mlo->lkr_flags         = flags & GFP_CALLOC;
-		return mlo;
-	}
-
+	/* Re-construct at a higher address. */
+	if (job_orgaddr == (byte_t *)job)
+		job = (struct mman_unmap_kram_job *)job_minaddr;
+	job->mukj_done    = job_done;
+	job->mukj_minaddr = job_minaddr;
+	job->mukj_maxaddr = job_maxaddr;
+	job->mukj_flags   = job_flags;
+	return job;
 }
 
-/* Same as `mman_unmap_kram_locked_ex()', but automatically enqueue a
- * possibly returned mlockop object into the kernel mman. */
+
+
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL krulist_sorted_insert_byaddr)(struct mman_unmap_kram_job_slist *__restrict self,
+                                            struct mman_unmap_kram_job *__restrict op) {
+	struct mman_unmap_kram_job **p_next, *next;
+	p_next = SLIST_P_FIRST(self);
+	while ((next = *p_next) != NULL) {
+		assert(next != op);
+		if (next > op)
+			break; /* Insert before this one! */
+		p_next = SLIST_P_NEXT(next, mukj_link);
+	}
+	SLIST_P_INSERT_BEFORE(p_next, op, mukj_link);
+}
+
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL krulist_merge_adjacent)(struct mman_unmap_kram_job_slist *__restrict self) {
+	struct mman_unmap_kram_job *iter, *next;
+	assert(!SLIST_EMPTY(self));
+	iter = SLIST_FIRST(self);
+	for (;;) {
+		assert(iter->mukj_minaddr == (byte_t *)iter);
+		next = SLIST_NEXT(iter, mukj_link);
+		if (!next)
+			break;
+		if (iter->mukj_maxaddr + 1 == (byte_t *)next &&
+		    (iter->mukj_done == NULL || next->mukj_done == NULL)) {
+			if (next->mukj_done != NULL)
+				iter->mukj_done = next->mukj_done;
+			/* Merge these together! */
+			iter->mukj_link.sle_next = next->mukj_link.sle_next;
+			iter->mukj_maxaddr       = next->mukj_maxaddr;
+			iter->mukj_flags         = next->mukj_flags;
+			if (iter->mukj_flags & GFP_CALLOC)
+				memset(next, 0, sizeof(*next));
+			continue;
+		}
+		/* Continue trying to merge other segments. */
+		iter = next;
+	}
+}
+
+
+
+/* Reap lock operations of `mman_kernel' */
+PUBLIC NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void) {
+	struct mman_unmap_kram_job_slist krlist;
+	struct mlockop_slist lops;
+	struct mpostlockop_slist post;
+	struct mlockop *iter;
+/*again:*/
+	if (!mman_lock_tryacquire(&mman_kernel))
+		return;
+	SLIST_INIT(&post);
+again_steal_and_service_lops:
+	lops.slh_first = SLIST_ATOMIC_CLEAR(&mman_kernel_lockops);
+again_service_lops:
+	SLIST_INIT(&krlist);
+	iter = SLIST_FIRST(&lops);
+	while (iter != NULL) {
+		struct mlockop *next;
+		struct mpostlockop *later;
+		next = SLIST_NEXT(iter, mlo_link);
+		/* Special handling for unmap-kram jobs with inline-memory.
+		 * For efficiency, these get merged with each other. */
+		if (iter->mlo_func == &mlockop_kram_cb) {
+			struct mman_unmap_kram_job *job;
+			job = container_of(iter, struct mman_unmap_kram_job, mukj_lop_mm);
+			if (job->mukj_minaddr == (byte_t *)job) {
+				/* Insert into the kram-list of operations. */
+				krulist_sorted_insert_byaddr(&krlist, job);
+				goto continue_with_next;
+			}
+		}
+		/* Invoke the lock operation. */
+		later = (*iter->mlo_func)(iter);
+		/* Enqueue operations for later execution. */
+		if (later != NULL)
+			SLIST_INSERT(&post, later, mplo_link);
+continue_with_next:
+		iter = next;
+	}
+	/* At this point, all remaining elements in `krlist' are requests
+	 * for unmapping kernel RAM, which have already been sorted by
+	 * their base address. */
+	if (!SLIST_EMPTY(&krlist)) {
+		/* Merge adjacent krlist operations */
+		krulist_merge_adjacent(&krlist);
+		/* Invoke unmap-kernel-ram lops */
+		do {
+			struct mman_unmap_kram_job *job;
+			struct mpostlockop *later;
+			job = SLIST_FIRST(&krlist);
+			SLIST_REMOVE_HEAD(&krlist, mukj_link);
+			later = mlockop_kram_cb(&job->mukj_lop_mm);
+			if (later != NULL)
+				SLIST_INSERT(&post, later, mplo_link);
+		} while (!SLIST_EMPTY(&krlist));
+	}
+
+	mman_lock_release_f(&mman_kernel);
+
+	/* Check for more operations. */
+	lops.slh_first = SLIST_ATOMIC_CLEAR(&mman_kernel_lockops);
+	if unlikely(!SLIST_EMPTY(&lops)) {
+		if likely(mman_lock_tryacquire(&mman_kernel))
+			goto again_service_lops;
+		/* re-queue all stolen lops. */
+		iter = SLIST_FIRST(&lops);
+		while (SLIST_NEXT(iter, mlo_link))
+			iter = SLIST_NEXT(iter, mlo_link);
+		SLIST_ATOMIC_INSERT_R(&mman_kernel_lockops,
+		                      SLIST_FIRST(&lops),
+		                      iter, mlo_link);
+		if unlikely(mman_lock_tryacquire(&mman_kernel))
+			goto again_steal_and_service_lops;
+	}
+
+	/* Run all enqueued post-operations. */
+	while (!SLIST_EMPTY(&post)) {
+		struct mpostlockop *op;
+		op = SLIST_FIRST(&post);
+		SLIST_REMOVE_HEAD(&post, mplo_link);
+		(*op->mplo_func)(op);
+	}
+}
+
+
+
+/* Run `op->mlo_func' in the context of holding a lock to the kernel VM at some
+ * point in the future. The given `op->mlo_func' is responsible for freeing the
+ * backing memory of `op' during its invocation. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op) {
+	/* Atomically insert the new lock operation. */
+	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, op, mlo_link);
+	_mman_lockops_reap();
+}
+
+
+
+
+/* Without blocking, unmap a given region of kernel RAM.
+ * NOTE: The caller must ensure that the given the address range can
+ *       be written to without any chance of that write blocking, or
+ *       resulting in an exception. (i.e. don't use this one to unmap
+ *       file mappings or the like...)
+ *       If your intend is to unmap mappings that don't fulfil this
+ *       requirement, the you should read the description of `struct
+*        mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
+ * @param: flags:   Set of `0 | GFP_CALLOC'. When `GFP_CALLOC' is given, allows
+ *                  the memory management system to assume that the backing
+ *                  physical memory is zero-initialized. If you're not sure
+ *                  if this is the case, better pass `0'. If you lie here,
+ *                  calloc() might arbitrarily break... */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               gfp_t flags) {
+	struct mman_unmap_kram_job *job;
+	if unlikely(!num_bytes)
+		return;
+	assert(!(flags & ~(GFP_CALLOC)));
+	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	job = (struct mman_unmap_kram_job *)addr;
+	job->mukj_done    = NULL;
+	job->mukj_minaddr = (byte_t *)addr;
+	job->mukj_maxaddr = (byte_t *)addr + num_bytes - 1;
+	job->mukj_flags   = flags;
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		/* Directly try to unmap kernel ram. */
+		job = mman_unmap_kram_locked_ex(job);
+		mman_lock_release(&mman_kernel);
+		assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
+		if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC)
+			goto do_schedule_lockop;
+	} else {
+do_schedule_lockop:
+		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		mman_kernel_lockop(&job->mukj_lop_mm);
+	}
+}
+
+/* Same as `mman_unmap_kram()', but may be used to improve efficiency
+ * when the caller is already holding a lock to `mman_kernel' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                       PAGEDIR_PAGEALIGNED size_t num_bytes,
                                       gfp_t flags) {
-	struct mlockop *lop;
-	lop = mman_unmap_kram_locked_ex(addr, num_bytes, flags);
-	if (lop != NULL)
-		mman_kernel_lockop(lop);
+	struct mman_unmap_kram_job *job;
+	if unlikely(!num_bytes)
+		return;
+	assert(!(flags & ~(GFP_CALLOC)));
+	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	job = (struct mman_unmap_kram_job *)addr;
+	job->mukj_done    = NULL;
+	job->mukj_minaddr = (byte_t *)addr;
+	job->mukj_maxaddr = (byte_t *)addr + num_bytes - 1;
+	job->mukj_flags   = flags;
+
+	/* Directly try to unmap kernel ram. */
+	job = mman_unmap_kram_locked_ex(job);
+	mman_lock_release(&mman_kernel);
+	assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
+	if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
+		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+		                    &job->mukj_lop_mm,
+		                    mlo_link);
+	}
 }
+
 
 
 DECL_END

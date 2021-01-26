@@ -38,21 +38,59 @@ DECL_BEGIN
  * to also share identical numerical values. */
 
 
+
+/*
+ * (intended, but not assumed) flags equivalences:
+ *
+ *                                 INTENDED                  UNINTENDED
+ * GFP_NORMAL       0x00000000
+ * GFP_LOCKED       0x00000001                               [MAP_SHARED]
+ * GFP_PREFLT       0x00000002                               [MAP_PRIVATE]
+ * GFP_CALLOC       0x00000004
+ * GFP_NOCLRC       0x00000008
+ * GFP_MAP_FIXED    0x00000010    [MAP_FIXED]
+ * GFP_NOMMAP       0x00000020    [GFP_NOTRIM]               [MAP_ANON,MNODE_F_SHARED]
+ * GFP_MAP_32BIT    0x00000040    [MAP_32BIT]                [MNODE_F_UNMAPPED]
+ * GFP_MAP_PREPARED 0x00000080    [MAP_PREPARED,MNODE_F_MPREPARED]
+ * GFP_MAP_BELOW    0x00000100    [MAP_GROWSDOWN]            [MNODE_F_COREPART]
+ * GFP_MAP_ABOVE    0x00000200    [MAP_GROWSUP]              [MNODE_F_KERNPART]
+ * -                0x00000400
+ * GFP_ATOMIC       0x00000800    [O_NONBLOCK]
+ * GFP_NOOVER       0x00001000
+ * GFP_NOSWAP       0x00002000                               [MAP_LOCKED]
+ * GFP_VCBASE       0x00004000                               [MAP_NORESERVE]
+ * GFP_NOMOVE       0x00008000    [MBNODE_F_POPULATE,MAP_POPULATE]               *GFP_NOMOVE overlap is not intended
+ * -                0x00010000    [MBNODE_F_NONBLOCK,MAP_NONBLOCK]               *GFP_ATOMIC overlap would be nice, but not possible due to O_NONBLOCK
+ * -                0x00020000                               [MAP_STACK]
+ * GFP_MAP_NOSPLIT  0x00040000    [MAP_NOSPLIT,MNODE_F_NOSPLIT]
+ * GFP_MAP_NOMERGE  0x00080000    [MAP_NOMERGE,MNODE_F_NOMERGE]
+ * -                0x00100000                               [MAP_FIXED_NOREPLACE]
+ * -                0x04000000                               [MAP_UNINITIALIZED]
+ * GFP_MAP_NOASLR   0x40000000    [MAP_NOASLR]
+ *
+ */
+
+
 /* >> uintptr_t mnodeflags_from_mapflags(unsigned int prot);
  * Convert `MAP_*' to `MNODE_F_*':
  *   - 0            -> MNODE_F_NORMAL
  *   - MAP_PREPARED -> MNODE_F_MPREPARED
  *   - MAP_LOCKED   -> MNODE_F_MLOCK
- */
+ *   - MAP_NOSPLIT  -> MNODE_F_NOSPLIT
+ *   - MAP_NOMERGE  -> MNODE_F_NOMERGE */
 #if (0 == MNODE_F_NORMAL &&               \
      MAP_PREPARED == MNODE_F_MPREPARED && \
-     MAP_LOCKED == MNODE_F_MLOCK)
+     MAP_LOCKED == MNODE_F_MLOCK &&       \
+     MAP_NOSPLIT == MNODE_F_NOSPLIT &&    \
+     MAP_NOMERGE == MNODE_F_NOMERGE)
 #define mnodeflags_from_mapflags(mapflags) \
-	((mapflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK))
+	((mapflags) & (MAP_PREPARED | MAP_LOCKED | MAP_NOSPLIT | MAP_NOMERGE))
 #else /* ... */
 #define mnodeflags_from_mapflags(mapflags)                 \
 	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
-	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0))
+	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0) |       \
+	 (((mapflags)&MAP_NOSPLIT) ? MNODE_F_NOSPLIT : 0) |    \
+	 (((mapflags)&MAP_NOMERGE) ? MNODE_F_NOMERGE : 0))
 #endif /* !... */
 
 /* >> uintptr_t mbnodeflags_from_mapflags(unsigned int prot);
@@ -62,29 +100,38 @@ DECL_BEGIN
  *   - MAP_LOCKED   -> MNODE_F_MLOCK
  *   - MAP_POPULATE -> MBNODE_F_POPULATE
  *   - MAP_NONBLOCK -> MBNODE_F_NONBLOCK
- */
+ *   - MAP_NOSPLIT  -> MNODE_F_NOSPLIT
+ *   - MAP_NOMERGE  -> MNODE_F_NOMERGE */
 #if (0 == MNODE_F_NORMAL &&               \
      MAP_PREPARED == MNODE_F_MPREPARED && \
      MAP_LOCKED == MNODE_F_MLOCK &&       \
      MAP_POPULATE == MBNODE_F_POPULATE && \
-     MAP_NONBLOCK == MBNODE_F_NONBLOCK)
-#define mbnodeflags_from_mapflags(mapflags)            \
-	((mapflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK | \
-	               MBNODE_F_POPULATE | MBNODE_F_NONBLOCK))
-#define mapflags_from_mbnodeflags(mbnodeflags)    \
-	((mbnodeflags) & (MAP_PREPARED | MAP_LOCKED | \
-	                  MAP_POPULATE | MAP_NONBLOCK))
+     MAP_NONBLOCK == MBNODE_F_NONBLOCK && \
+     MAP_NOSPLIT == MNODE_F_NOSPLIT &&    \
+     MAP_NOMERGE == MNODE_F_NOMERGE)
+#define mbnodeflags_from_mapflags(mapflags)      \
+	((mapflags) & (MAP_PREPARED | MAP_LOCKED |   \
+	               MAP_POPULATE | MAP_NONBLOCK | \
+	               MAP_NOSPLIT | MAP_NOMERGE))
+#define mapflags_from_mbnodeflags(mbnodeflags)                \
+	((mbnodeflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK |     \
+	                  MBNODE_F_POPULATE | MBNODE_F_NONBLOCK | \
+	                  MNODE_F_NOSPLIT | MNODE_F_NOMERGE))
 #else /* ... */
 #define mbnodeflags_from_mapflags(mapflags)                \
 	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
 	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0) |       \
 	 (((mapflags)&MAP_POPULATE) ? MBNODE_F_POPULATE : 0) | \
-	 (((mapflags)&MAP_NONBLOCK) ? MBNODE_F_NONBLOCK : 0))
+	 (((mapflags)&MAP_NONBLOCK) ? MBNODE_F_NONBLOCK : 0) | \
+	 (((mapflags)&MAP_NOSPLIT) ? MNODE_F_NOSPLIT : 0) |    \
+	 (((mapflags)&MAP_NOMERGE) ? MNODE_F_NOMERGE : 0))
 #define mapflags_from_mbnodeflags(mbnodeflags)                \
 	((((mbnodeflags)&MNODE_F_MPREPARED) ? MAP_PREPARED : 0) | \
 	 (((mbnodeflags)&MNODE_F_MLOCK) ? MAP_LOCKED : 0) |       \
 	 (((mbnodeflags)&MBNODE_F_POPULATE) ? MAP_POPULATE : 0) | \
-	 (((mbnodeflags)&MBNODE_F_NONBLOCK) ? MAP_NONBLOCK : 0))
+	 (((mbnodeflags)&MBNODE_F_NONBLOCK) ? MAP_NONBLOCK : 0) | \
+	 (((mbnodeflags)&MNODE_F_NOSPLIT) ? MAP_NOSPLIT : 0) |    \
+	 (((mbnodeflags)&MNODE_F_NOMERGE) ? MAP_NOMERGE : 0))
 #endif /* !... */
 
 
@@ -147,48 +194,55 @@ DECL_BEGIN
 	((((before) & ~(after)) & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) != 0)
 
 
-/* >> unsigned int mapflags_from_gfp(gfp_t gfp);
+/* >> unsigned int mapfindflags_from_gfp(gfp_t gfp);
  * Convert `GFP_*' to `MAP_*':
- *    GFP_MAP_32BIT  -> MAP_32BIT
  *    GFP_MAP_BELOW  -> MAP_GROWSDOWN
  *    GFP_MAP_ABOVE  -> MAP_GROWSUP
- *    GFP_MAP_NOASLR -> MAP_NOASLR */
-#if (GFP_MAP_32BIT == __MAP_32BIT && GFP_MAP_BELOW == __MAP_GROWSDOWN && \
-     GFP_MAP_ABOVE == __MAP_GROWSUP && GFP_MAP_NOASLR == __MAP_NOASLR)
-#define mapflags_from_gfp(gfp) \
-	((gfp) & (GFP_MAP_32BIT | GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR))
+ *    GFP_MAP_NOASLR -> MAP_NOASLR
+ * NOTE: Intended to construct flags for `mman_findunmapped()' from `gfp'! */
+#if (GFP_MAP_BELOW == MAP_GROWSDOWN && \
+     GFP_MAP_ABOVE == MAP_GROWSUP &&   \
+     GFP_MAP_NOASLR == MAP_NOASLR)
+#define mapfindflags_from_gfp(gfp) \
+	((gfp) & (GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR))
 #define gfp_from_mapflags(gfp) \
-	((gfp) & (__MAP_32BIT | __MAP_GROWSDOWN | __MAP_GROWSUP | __MAP_NOASLR))
+	((gfp) & (MAP_GROWSDOWN | MAP_GROWSUP | MAP_NOASLR))
 #else /* ... */
-#define mapflags_from_gfp(gfp)                       \
-	((((gfp)&GFP_MAP_32BIT) ? __MAP_32BIT : 0) |     \
-	 (((gfp)&GFP_MAP_BELOW) ? __MAP_GROWSDOWN : 0) | \
-	 (((gfp)&GFP_MAP_ABOVE) ? __MAP_GROWSUP : 0) |   \
-	 (((gfp)&GFP_MAP_NOASLR) ? __MAP_NOASLR : 0))
-#define gfp_from_mapflags(gfp)                       \
-	((((gfp)&__MAP_32BIT) ? GFP_MAP_32BIT : 0) |     \
-	 (((gfp)&__MAP_GROWSDOWN) ? GFP_MAP_BELOW : 0) | \
-	 (((gfp)&__MAP_GROWSUP) ? GFP_MAP_ABOVE : 0) |   \
-	 (((gfp)&__MAP_NOASLR) ? GFP_MAP_NOASLR : 0))
+#define mapfindflags_from_gfp(gfp)                 \
+	((((gfp)&GFP_MAP_BELOW) ? MAP_GROWSDOWN : 0) | \
+	 (((gfp)&GFP_MAP_ABOVE) ? MAP_GROWSUP : 0) |   \
+	 (((gfp)&GFP_MAP_NOASLR) ? MAP_NOASLR : 0))
+#define gfp_from_mapflags(gfp)                     \
+	((((gfp)&MAP_GROWSDOWN) ? GFP_MAP_BELOW : 0) | \
+	 (((gfp)&MAP_GROWSUP) ? GFP_MAP_ABOVE : 0) |   \
+	 (((gfp)&MAP_NOASLR) ? GFP_MAP_NOASLR : 0))
 #endif /* !... */
 
 
 /* >> unsigned int mnodeflags_from_gfp(gfp_t gfp);
  * Convert `GFP_*' to `MNODE_F_*':
  *    GFP_MAP_PREPARED -> MNODE_F_MPREPARED
- *    GFP_LOCKED       -> MNODE_F_MLOCK */
+ *    GFP_LOCKED       -> MNODE_F_MLOCK
+ *    GFP_MAP_NOSPLIT  -> MNODE_F_NOSPLIT
+ *    GFP_MAP_NOMERGE  -> MNODE_F_NOMERGE */
 #if (GFP_MAP_PREPARED == MNODE_F_MPREPARED && \
-     GFP_LOCKED == MNODE_F_MLOCK)
+     GFP_LOCKED == MNODE_F_MLOCK &&           \
+     GFP_MAP_NOSPLIT == MNODE_F_NOSPLIT &&    \
+     GFP_MAP_NOMERGE == MNODE_F_NOMERGE)
 #define mnodeflags_from_gfp(gfp) \
-	((gfp) & (GFP_MAP_PREPARED | GFP_LOCKED))
-#elif (GFP_MAP_PREPARED == MNODE_F_MPREPARED)
-#define mnodeflags_from_gfp(gfp)    \
-	(((gfp) & (GFP_MAP_PREPARED)) | \
+	((gfp) & (GFP_MAP_PREPARED | GFP_LOCKED | GFP_MAP_NOSPLIT | GFP_MAP_NOMERGE))
+#elif (GFP_MAP_PREPARED == MNODE_F_MPREPARED && \
+       GFP_MAP_NOSPLIT == MNODE_F_NOSPLIT &&    \
+       GFP_MAP_NOMERGE == MNODE_F_NOMERGE)
+#define mnodeflags_from_gfp(gfp)                                        \
+	(((gfp) & (GFP_MAP_PREPARED | GFP_MAP_NOSPLIT | GFP_MAP_NOMERGE)) | \
 	 (((gfp)&GFP_LOCKED) ? MNODE_F_MLOCK : 0))
 #else /* ... */
 #define mnodeflags_from_gfp(gfp)                          \
 	((((gfp)&GFP_MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
-	 (((gfp)&GFP_LOCKED) ? MNODE_F_MLOCK : 0))
+	 (((gfp)&GFP_LOCKED) ? MNODE_F_MLOCK : 0) |           \
+	 (((gfp)&GFP_MAP_NOSPLIT) ? MNODE_F_NOSPLIT : 0) |    \
+	 (((gfp)&GFP_MAP_NOMERGE) ? MNODE_F_NOMERGE : 0))
 #endif /* !... */
 
 

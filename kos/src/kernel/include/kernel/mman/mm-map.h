@@ -123,7 +123,15 @@
 /* Kernel-only mmap flag: Set the `MNODE_F_MPREPARED' node flag,
  * and ensure that the backing page directory address range is kept
  * prepared for the duration of the node's lifetime. */
-#define MAP_PREPARED 0x0800
+#define MAP_PREPARED 0x00000080
+
+/* Set the `MNODE_F_NOSPLIT' flag for newly created nodes. */
+#define MAP_NOSPLIT 0x00040000
+
+/* Set the `MNODE_F_NOMERGE' flag for newly created nodes,
+ * and don't try to extend a pre-existing node in order to
+ * perform the requested mapping. */
+#define MAP_NOMERGE 0x00080000
 
 #ifdef __CC__
 DECL_BEGIN
@@ -232,7 +240,7 @@ mman_map_res(struct mman *__restrict self,
                                          * Instead, only unmap whole nodes, or nothing at all. When set, all nodes
                                          * that overlap with the given address address range will be unmapped.
                                          * NOTE: When this flag isn't given, and an attempt is made to unmap
-                                         *       node with the `MNODE_F_NO_SPLIT' flag set, then the node won't
+                                         *       node with the `MNODE_F_NOSPLIT' flag set, then the node won't
                                          *       be split, but the affected address range is expanded to include
                                          *       that node in its entirety, the same way this would also be done
                                          *       had the `MMAN_UNMAP_NOSPLIT' been given. */

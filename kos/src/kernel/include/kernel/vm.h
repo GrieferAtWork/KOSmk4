@@ -51,9 +51,9 @@
 #define VM_DATAPART_FLAG_NORMAL                       MPART_F_NORMAL
 #define VM_DATAPART_FLAG_LOCKED                       MPART_F_MLOCK
 #define VM_DATAPART_FLAG_CHANGED                      MPART_F_CHANGED
-#define VM_DATAPART_FLAG_KEEPRAM                      MPART_F_NO_FREE
+#define VM_DATAPART_FLAG_KEEPRAM                      MPART_F_NOFREE
 #define VM_DATAPART_FLAG_COREPRT                      MPART_F_COREPART
-#define VM_DATAPART_FLAG_KERNPRT                      MPART_F_NO_SPLIT
+#define VM_DATAPART_FLAG_KERNPRT                      MPART_F_NOSPLIT
 #define VM_DATAPART_STATE_ABSENT                      MPART_ST_VOID
 #define VM_DATAPART_STATE_INCORE                      MPART_ST_MEM
 #define VM_DATAPART_STATE_INSWAP                      MPART_ST_SWP
@@ -139,7 +139,7 @@
 #define VM_NODE_FLAG_NORMAL                           MNODE_F_NORMAL
 #define VM_NODE_FLAG_PREPARED                         MNODE_F_MPREPARED
 #define VM_NODE_FLAG_HINTED                           MNODE_F_MHINT
-#define VM_NODE_FLAG_NOMERGE                          MNODE_F_NO_MERGE
+#define VM_NODE_FLAG_NOMERGE                          MNODE_F_NOMERGE
 #define VM_NODE_FLAG_COREPRT                          MNODE_F_COREPART
 #define VM_NODE_FLAG_KERNPRT                          MNODE_F_KERNPART
 #define vn_prot                                       mn_flags
@@ -408,6 +408,7 @@ DECL_END
 #define vm_kernel_pending_operations    mman_kernel_lockops.slh_first
 #define VM_KERNEL_PENDING_CB_RETURN_T   struct mlockop *
 #define VM_KERNEL_PENDING_CB_RETURN     return __NULLPTR
+#define VM_KERNEL_PENDING_CB_CC         FCALL
 #define vm_kernel_locked_operation(...) mman_kernel_lockop(__VA_ARGS__)
 #define vm_onexec_callbacks             mman_onexec_callbacks
 #define vm_oninit_callbacks             mman_oninit_callbacks
@@ -429,8 +430,8 @@ DECL_END
 #define vm_isused(self, addr, num_bytes)                       (mnode_tree_rlocate((self)->mm_mappings, addr, (byte_t *)(addr) + (num_bytes)-1) != __NULLPTR)
 #define vm_node_insert(self)                                   mnode_tree_insert(&(self)->mn_mman->mm_mappings, self)
 #define vm_node_remove(self, addr)                             COMPILER_UNUSED(mnode_tree_remove(&(self)->mm_mappings, addr))
-#define vm_unmap_kernel_ram(addr, um_bytes, is_zero)           mman_unmap_kram(addr, um_bytes, (is_zero) ? (GFP_ATOMIC | GFP_CALLOC) : GFP_ATOMIC)
-#define vm_unmap_kernel_mapping_locked(addr, num_bytes)        mman_unmap_kram_locked(addr, um_bytes)
+#define vm_unmap_kernel_ram(addr, num_bytes, is_zero)          mman_unmap_kram(addr, num_bytes, (is_zero) ? (GFP_ATOMIC | GFP_CALLOC) : GFP_ATOMIC)
+#define vm_unmap_kernel_mapping_locked(addr, num_bytes)        mman_unmap_kram_locked(addr, num_bytes)
 #define vm_get_kernreserve_node(self)                          (&FORMMAN(self, thismman_kernel_reservation))
 #define vm_datapart_do_allocram(self)                          mpart_ll_allocmem(self, mpart_getsize(self) / PAGESIZE)
 #define vm_datapart_do_ccfreeram(self)                         mpart_ll_ccfreemem(self)
@@ -474,7 +475,7 @@ DECL_END
 #define MPART_F_NORMAL                                 VM_DATAPART_FLAG_NORMAL
 #define MPART_F_MLOCK                                  VM_DATAPART_FLAG_LOCKED
 #define MPART_F_CHANGED                                VM_DATAPART_FLAG_CHANGED
-#define MPART_F_NO_FREE                                VM_DATAPART_FLAG_KEEPRAM
+#define MPART_F_NOFREE                                 VM_DATAPART_FLAG_KEEPRAM
 #define MPART_F_COREPART                               VM_DATAPART_FLAG_COREPRT
 #define mp_refcnt                                      dp_refcnt
 #define mp_file                                        dp_block
@@ -484,6 +485,9 @@ DECL_END
 #define mp_blkst_ptr                                   dp_pprop_p
 #define mp_meta                                        dp_futex
 #define mp_mem                                         dp_ramdata.rd_block0
+#define mp_mem_sc                                      dp_ramdata
+#define ms_c                                           rd_blockc
+#define ms_v                                           rd_blockv
 #define mrf_file                                       rf_block
 #define mc_start                                       rb_start
 #define mc_size                                        rb_size
@@ -3368,6 +3372,7 @@ vm_enum(struct vm *__restrict self, vm_enum_callback_t cb, void *arg,
 
 #define VM_KERNEL_PENDING_CB_RETURN_T void
 #define VM_KERNEL_PENDING_CB_RETURN   return
+#define VM_KERNEL_PENDING_CB_CC       KCALL
 
 struct vm_kernel_pending_operation;
 typedef NOBLOCK void /*NOTHROW*/ (KCALL *vm_kernel_pending_cb_t)(struct vm_kernel_pending_operation *__restrict self);

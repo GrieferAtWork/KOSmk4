@@ -120,7 +120,6 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 	REF struct vm *threadvm;
 	UNCHECKED void *minaddr;
 	UNCHECKED void *maxaddr;
-	pageid_t minpage, maxpage;
 	/* Try to parse the min/max address range from `name' */
 	if unlikely(!parse_mapfiles_filename(name, namelen, mode,
 	                                     &minaddr, &maxaddr))
@@ -130,8 +129,6 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 		goto err;
 	if (!IS_ALIGNED((uintptr_t)maxaddr + 1, PAGESIZE))
 		goto err;
-	minpage = PAGEID_ENCODE(minaddr);
-	maxpage = PAGEID_ENCODE(maxaddr);
 	/* Lookup the associated thread. */
 	pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_MAPFILES_PIDMASK);
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
@@ -153,27 +150,39 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 		 * this area could be merged, but that isn't really necessary,
 		 * and not doing so doesn't introduce any glaring inconsistencies. */
 		vm_treelock_read(threadvm);
+#ifdef CONFIG_USE_NEW_VM
+		{
+			struct mnode_tree_minmax mima;
+			mnode_tree_minmaxlocate(threadvm->mm_mappings,
+			                        (void *)0, (void *)-1,
+			                        &mima);
+			node = mima.mm_min;
+		}
+#else /* CONFIG_USE_NEW_VM */
 		node = threadvm->v_byaddr;
+#endif /* !CONFIG_USE_NEW_VM */
 		for (;;) {
 			if unlikely(!node) {
 unlock_threadvm_and_goto_err:
 				vm_treelock_endread(threadvm);
 				goto err;
 			}
-			if (node->vn_node.a_vmin >= minpage)
+			if (mnode_getminaddr(node) >= minaddr)
 				break;
 			++nodeid;
-			node = node->vn_byaddr.ln_next;
+			node = mnode_tree_nextnode(node);
 		}
-		if (node->vn_node.a_vmin != minpage)
+		if (mnode_getminaddr(node) != minaddr)
 			goto unlock_threadvm_and_goto_err;
-		/* Make sure that there is another node that ends at `maxpage' */
-		while (node->vn_node.a_vmax != maxpage) {
+		/* Make sure that there is another node that ends at `maxaddr' */
+		while (mnode_getmaxaddr(node) != maxaddr) {
 			struct vm_node *succ;
-			if (node->vn_node.a_vmax > maxpage)
-				goto unlock_threadvm_and_goto_err; /* `maxpage' is too large */
-			succ = node->vn_byaddr.ln_next;
-			if (succ->vn_node.a_vmin != node->vn_node.a_vmax + 1)
+			if (mnode_getmaxaddr(node) > maxaddr)
+				goto unlock_threadvm_and_goto_err; /* `maxaddr' is too large */
+			succ = mnode_tree_nextnode(node);
+			if (!succ)
+				goto unlock_threadvm_and_goto_err; /* Non-consecutive */
+			if ((byte_t *)mnode_getminaddr(succ) != (byte_t *)mnode_getmaxaddr(node) + 1)
 				goto unlock_threadvm_and_goto_err; /* Non-consecutive */
 			node = succ;
 		}
@@ -311,7 +320,17 @@ ProcFS_PerProc_MapFiles_Entry_Readlink(struct symlink_node *__restrict self,
 		FINALLY_DECREF_UNLIKELY(threadvm);
 		/* find the `nth'th `struct vm_node' within `threadvm' */
 		vm_treelock_read(threadvm);
+#ifdef CONFIG_USE_NEW_VM
+		{
+			struct mnode_tree_minmax mima;
+			mnode_tree_minmaxlocate(threadvm->mm_mappings,
+			                        (void *)0, (void *)-1,
+			                        &mima);
+			node = mima.mm_min;
+		}
+#else /* CONFIG_USE_NEW_VM */
 		node = threadvm->v_byaddr;
+#endif /* !CONFIG_USE_NEW_VM */
 		for (;;) {
 			if unlikely(!node) {
 unlock_threadvm_and_goto_err:
@@ -320,7 +339,7 @@ unlock_threadvm_and_goto_err:
 			}
 			if (!nth)
 				break;
-			node = node->vn_byaddr.ln_next;
+			node = mnode_tree_nextnode(node);
 			--nth;
 		}
 		/* Found the node!

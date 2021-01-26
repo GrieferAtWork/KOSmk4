@@ -292,12 +292,9 @@ again_next_slab_page_tryhard:
 		}
 gotaddr:
 		/* Make use of the KRAM mapping system to map more slab memory. */
+		assert(!(flags & GFP_MAP_FLAGS));
 		result = (struct slab *)mman_map_kram_nx(next_slab_addr, PAGESIZE,
-		                                         GFP_MAP_FIXED | (flags & ~(GFP_MAP_32BIT |
-		                                                                    GFP_MAP_PREPARED |
-		                                                                    GFP_MAP_BELOW |
-		                                                                    GFP_MAP_ABOVE |
-		                                                                    GFP_MAP_NOASLR)));
+		                                         GFP_MAP_FIXED | flags);
 		if unlikely(result == MAP_INUSE)
 			goto again_lock_vm; /* Race condition: our picked address got used in the meantime... */
 		if unlikely(result == MAP_FAILED)

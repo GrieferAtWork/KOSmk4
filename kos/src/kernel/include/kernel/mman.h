@@ -161,8 +161,7 @@ typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 
 /* Reap lock operations of `mman_kernel' */
-FUNDEF NOBLOCK void
-NOTHROW(FCALL _mman_lockops_reap)(gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+FUNDEF NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void);
 #define mman_lockops_mustreap(self) \
 	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__

@@ -85,7 +85,7 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
 
 PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 	/* .mp_refcnt    = */ 1,
-	/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |
+	/* .mp_flags     = */ MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	/*                 */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
 	/*                 */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED,
 	/* .mp_state     = */ MPART_ST_MEM,
@@ -94,9 +94,9 @@ PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 	/* .mp_share     = */ { &this_kernel_stacknode_ },
 	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_lockops),
 	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_changed   = */ {},
 	/* .mp_minaddr   = */ (pos_t)0,
 	/* .mp_maxaddr   = */ (pos_t)KERNEL_STACKSIZE - 1,
+	/* .mp_changed   = */ {},
 	/* .mp_filent    = */ { {} },
 	/* .mp_blkst_ptr = */ { NULL },
 	/* .mp_mem       = */ { {
@@ -111,8 +111,8 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 	/* .mn_minaddr   = */ (byte_t *)0,
 	/* .mn_maxaddr   = */ (byte_t *)KERNEL_STACKSIZE - 1,
 	/* .mn_flags     = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                 */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
-	/*                 */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	/*                 */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	/*                 */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
 	/*                 */ MNODE_F_MLOCK | _MNODE_F_MPREPARED_KERNEL,
 	/* .mn_part      = */ &this_kernel_stackpart_,
 	/* .mn_fspath    = */ NULL,
@@ -129,7 +129,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
 	/* .mn_mement    = */ { {} },
 	/* .mn_minaddr   = */ (byte_t *)0,
 	/* .mn_maxaddr   = */ (byte_t *)PAGESIZE - 1,
-	/* .mn_flags     = */ MNODE_F_NO_SPLIT | MNODE_F_NO_MERGE |
+	/* .mn_flags     = */ MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	/*                 */ MNODE_F_KERNPART | MNODE_F_MLOCK |
 	/*                 */ _MNODE_F_MPREPARED_KERNEL,
 	/* .mn_part      = */ NULL, /* Reserved node! */
@@ -505,8 +505,8 @@ DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kern
 DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
 
 /* Called with a lock to the kernel VM's treelock held. */
-PRIVATE NOBLOCK void
-NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
+PRIVATE NOBLOCK VM_KERNEL_PENDING_CB_RETURN_T
+NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict self) {
 #ifndef CONFIG_USE_NEW_VM
 	struct vm_node *node;
 #endif /* !CONFIG_USE_NEW_VM */
@@ -632,6 +632,7 @@ do_free_self:
 		decref(myvm);
 	}
 #endif /* !CONFIG_USE_NEW_VM */
+	VM_KERNEL_PENDING_CB_RETURN;
 }
 
 

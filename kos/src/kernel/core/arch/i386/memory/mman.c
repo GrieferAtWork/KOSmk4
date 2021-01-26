@@ -177,18 +177,18 @@ INTDEF struct mnode x86_vmnode_transition_reserve;
 	{                                                                   \
 		/* .mp_refcnt    = */ 2, /* 2 == 1(myself) + 1(node) */         \
 		/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED | \
-		/* .mp_flags     = */ MPART_F_NO_SPLIT | MPART_F_NO_MERGE |     \
+		/* .mp_flags     = */ MPART_F_NOSPLIT | MPART_F_NOMERGE |       \
 		/* .mp_flags     = */ MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |    \
-		/* .mp_flags     = */ MPART_F_NO_FREE,                          \
+		/* .mp_flags     = */ MPART_F_NOFREE,                           \
 		/* .mp_state     = */ MPART_ST_MEM,                             \
 		/* .mp_file      = */ { &mfile_ndef },                          \
 		/* .mp_copy      = */ LIST_HEAD_INITIALIZER(self.mp_copy),      \
 		/* .mp_share     = */ { node },                                 \
 		/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(self.mp_lockops),  \
 		/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },       \
-		/* .mp_changed   = */ {},                                       \
 		/* .mp_minaddr   = */ (pos_t)0,                                 \
-		/* .mp_maxaddr   = */ (pos_t)(num_bytes) - 1,                   \
+		/* .mp_maxaddr   = */ (pos_t)(num_bytes)-1,                     \
+		/* .mp_changed   = */ {},                                       \
 		/* .mp_filent    = */ { {} },                                   \
 		/* .mp_blkst_ptr = */ { NULL },                                 \
 		/* .mp_mem       = */ { {                                       \
@@ -256,8 +256,8 @@ INTERN struct mpart x86_kernel_vm_parts[6] = {
 		/* .mn_mement   = */ { {} },                                       \
 		/* .mn_minaddr  = */ (byte_t *)(minaddr),                          \
 		/* .mn_maxaddr  = */ (byte_t *)(maxaddr),                          \
-		/* .mn_flags    = */ (prot) | MNODE_F_SHARED | MNODE_F_NO_SPLIT |  \
-		/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |         \
+		/* .mn_flags    = */ (prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT |   \
+		/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |          \
 		/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,    \
 		/* .mn_part     = */ NULL,                                         \
 		/* .mn_fspath   = */ NULL,                                         \
@@ -268,22 +268,22 @@ INTERN struct mpart x86_kernel_vm_parts[6] = {
 		/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,               \
 		/* ._mn_module  = */ NULL                                          \
 	}
-#define INIT_MNODE(self, minaddr, maxaddr, minpage, maxpage, prot, part)   \
-	{                                                                      \
-		/* .mn_mement   = */ { {} },                                       \
-		/* .mn_minaddr  = */ (byte_t *)(minaddr),                          \
-		/* .mn_maxaddr  = */ (byte_t *)(maxaddr),                          \
-		/* .mn_flags    = */ (prot) | MNODE_F_SHARED | MNODE_F_NO_SPLIT |  \
-		/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |         \
-		/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,    \
-		/* .mn_part     = */ &(part),                                      \
-		/* .mn_fspath   = */ NULL,                                         \
-		/* .mn_fsname   = */ NULL,                                         \
-		/* .mn_mman     = */ { &mman_kernel },                             \
-		/* .mn_partoff  = */ 0,                                            \
-		/* .mn_link     = */ { NULL, &(part).mp_share.lh_first },          \
-		/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,               \
-		/* ._mn_module  = */ NULL                                          \
+#define INIT_MNODE(self, minaddr, maxaddr, minpage, maxpage, prot, part) \
+	{                                                                    \
+		/* .mn_mement   = */ { {} },                                     \
+		/* .mn_minaddr  = */ (byte_t *)(minaddr),                        \
+		/* .mn_maxaddr  = */ (byte_t *)(maxaddr),                        \
+		/* .mn_flags    = */ (prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
+		/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |        \
+		/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,  \
+		/* .mn_part     = */ &(part),                                    \
+		/* .mn_fspath   = */ NULL,                                       \
+		/* .mn_fsname   = */ NULL,                                       \
+		/* .mn_mman     = */ { &mman_kernel },                           \
+		/* .mn_partoff  = */ 0,                                          \
+		/* .mn_link     = */ { NULL, &(part).mp_share.lh_first },        \
+		/* .mn_writable = */ LIST_ENTRY_UNBOUND_INITIALIZER,             \
+		/* ._mn_module  = */ NULL                                        \
 	}
 #else /* CONFIG_USE_NEW_VM */
 #define INIT_MNODE_RESERVE(self, minaddr, maxaddr, minpage, maxpage, prot)                      \

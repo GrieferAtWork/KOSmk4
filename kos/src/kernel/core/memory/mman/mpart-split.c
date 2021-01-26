@@ -434,7 +434,7 @@ NOTHROW(FCALL mpart_get_swp_offset_after_split)(struct mpart const *__restrict s
 	lo_blocks      = partrel_offset >> self->mp_file->mf_blockshift;
 	changed_blocks = mpart_count_changed_blocks_before(self, lo_blocks);
 	byte_offset    = changed_blocks << self->mp_file->mf_blockshift;
-	return changed_blocks << self->mp_file->mf_blockshift;
+	return byte_offset;
 }
 
 
@@ -453,8 +453,8 @@ mpart_split_data_alloc_mnodes(struct mpart_split_data *__restrict self) {
 	needed = mpart_count_needed_nodes_for_hipart(self);
 
 	/* Hint that we usually only get here once, with everything set to NULL/0 */
-	__builtin_expect(self->msd_hinodec, 0);
-	__builtin_expect(SLIST_EMPTY(&self->msd_hinodes), 1);
+	(void)__builtin_expect(self->msd_hinodec, 0);
+	(void)__builtin_expect(SLIST_EMPTY(&self->msd_hinodes), 1);
 
 	/* Keep on allocating nodes until we've got enough! */
 	while (needed > self->msd_hinodec) {
@@ -769,7 +769,7 @@ release_and_return_null:
 		assertf(data.msd_offset != 0, "Invalid split-offset: 0");
 		assertf(mfile_addr_aligned(file, data.msd_offset),
 		        "Badly aligned offset %#" PRIxSIZ, data.msd_offset);
-		assertf(!(self->mp_flags & MPART_F_NO_SPLIT),
+		assertf(!(self->mp_flags & MPART_F_NOSPLIT),
 		        "You're not allowed to split this part!");
 	
 		/* Step #1: Acquire references to all affected mmans. This way,
@@ -798,8 +798,8 @@ relock_with_data:
 			file = self->mp_file;
 			assertf(mfile_addr_aligned(file, data.msd_offset),
 			        "Internal error: file alignment changed");
-			assertf(!(self->mp_flags & MPART_F_NO_SPLIT),
-			        "Internal error: MPART_F_NO_SPLIT flag was modified");
+			assertf(!(self->mp_flags & MPART_F_NOSPLIT),
+			        "Internal error: MPART_F_NOSPLIT flag was modified");
 			mpart_foreach_mmans_incref(self);
 			if (!mpart_lock_all_mmans_or_unlock_and_decref(self))
 				goto relock_with_data;
@@ -842,7 +842,7 @@ relock_with_data:
 	/* Fill in flags for the new pat. */
 	hipart->mp_flags = (lopart->mp_flags & (MPART_F_NO_GLOBAL_REF |
 	                                        MPART_F_CHANGED |
-	                                        MPART_F_NO_FREE |
+	                                        MPART_F_NOFREE |
 	                                        MPART_F_BLKST_INL)) |
 	                   (MPART_F_LOCKBIT);
 
@@ -883,7 +883,7 @@ relock_with_data:
 				struct mnode *hinode;
 				size_t noderel_offset;
 				/* This one must be split! */
-				assertf(!(lonode->mn_flags & MNODE_F_NO_SPLIT),
+				assertf(!(lonode->mn_flags & MNODE_F_NOSPLIT),
 				        "Not allowed to split this node (at %p...%p)",
 				        mnode_getminaddr(lonode),
 				        mnode_getmaxaddr(lonode));

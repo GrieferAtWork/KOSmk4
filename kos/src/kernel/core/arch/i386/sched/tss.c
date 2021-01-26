@@ -62,8 +62,8 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ = {
 	/* .mn_minaddr  = */ __bootcpu_x86_iob_start,
 	/* .mn_maxaddr  = */ __bootcpu_x86_iob_start + PAGESIZE - 1,
 	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
-	/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
 	/*                */ MNODE_F_MPREPARED | MNODE_F_MLOCK,
 	/* .mn_part     = */ NULL, /* Reserved node */
 	/* .mn_fspath   = */ NULL,
@@ -82,8 +82,8 @@ INTDEF struct mpart __bootcpu_x86_dfstack_part;
 PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
 	/* .mp_refcnt    = */ 2, /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode.mn_part' */
 	/* .mp_flags     = */ MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
-	/* .mp_flags     = */ MPART_F_NO_FREE | MPART_F_NO_SPLIT |
-	/*                 */ MPART_F_NO_MERGE | MPART_F_MLOCK_FROZEN |
+	/* .mp_flags     = */ MPART_F_NOFREE | MPART_F_NOSPLIT |
+	/*                 */ MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN |
 	/*                 */ MPART_F_MLOCK,
 	/* .mp_state     = */ MPART_ST_MEM,
 	/* .mp_file      = */ { &mfile_ndef },
@@ -91,9 +91,9 @@ PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
 	/* .mp_share     = */ { &__bootcpu_x86_dfstack_node },
 	/* .mp_lockops   = */ SLIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_lockops),
 	/* .mp_allparts  = */ { LIST_ENTRY_UNBOUND_INITIALIZER },
-	/* .mp_changed   = */ {},
 	/* .mp_minaddr   = */ (pos_t)0,
 	/* .mp_maxaddr   = */ (pos_t)KERNEL_DF_STACKSIZE - 1,
+	/* .mp_changed   = */ {},
 	/* .mp_filent    = */ { {} },
 	/* .mp_blkst_ptr = */ { NULL },
 	/* .mp_mem       = */ { {
@@ -108,8 +108,8 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ = {
 	/* .mn_minaddr  = */ __bootcpu_x86_df_stack,
 	/* .mn_maxaddr  = */ __bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE - 1,
 	/* .mn_flags    = */ MNODE_F_PWRITE | MNODE_F_PREAD |
-	/*                */ MNODE_F_SHARED | MNODE_F_NO_SPLIT |
-	/*                */ MNODE_F_NO_MERGE | MNODE_F_KERNPART |
+	/*                */ MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	/*                */ MNODE_F_NOMERGE | MNODE_F_KERNPART |
 	/*                */ _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK,
 	/* .mn_part     = */ &__bootcpu_x86_dfstack_part,
 	/* .mn_fspath   = */ NULL,

@@ -739,6 +739,24 @@ PUBLIC NONNULL((1, 3)) ssize_t KCALL
 task_enum_vm_nb(task_enum_cb_t cb, void *arg,
                 struct vm *__restrict v)
 		THROWS(E_WOULDBLOCK) {
+#ifdef CONFIG_USE_NEW_VM
+	struct task *thread;
+	ssize_t temp, result = 0;
+	pflag_t was;
+	was = PREEMPTION_PUSHOFF();
+	mman_threadslock_acquire_nopr(v);
+	LIST_FOREACH (thread, &v->v_tasks, t_mman_tasks) {
+		/* Enumerate the thread. */
+		CB_THREAD(thread);
+	}
+	mman_threadslock_release_nopr(v);
+	PREEMPTION_POP(was);
+	return result;
+err:
+	mman_threadslock_release_nopr(v);
+	PREEMPTION_POP(was);
+	return temp;
+#else /* CONFIG_USE_NEW_VM */
 	struct task *thread;
 	ssize_t temp, result = 0;
 	IF_NOT_DEBUGGER_ACTIVE(vm_tasklock_read(v));
@@ -751,6 +769,7 @@ task_enum_vm_nb(task_enum_cb_t cb, void *arg,
 err:
 	IF_NOT_DEBUGGER_ACTIVE(vm_tasklock_endread(v));
 	return temp;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 

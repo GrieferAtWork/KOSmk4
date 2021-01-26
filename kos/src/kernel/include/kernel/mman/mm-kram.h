@@ -22,6 +22,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/mman/mm-lockop.h>
+#include <kernel/mman/mpart-lockop.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -43,18 +45,25 @@ typedef unsigned int gfp_t;
 /* Additional GFP_* flags for `mman_map_kram()'                   */
 /************************************************************************/
 
-
 #define GFP_MAP_FIXED        0x0010 /* Map new kernel ram at exactly the given address.
                                      * If the given address is already in-use, fail by
                                      * unconditionally returning `MAP_FAILED' */
 #define GFP_MAP_32BIT        0x0040 /* The backing _physical_ memory will use 32-bit addresses.
                                      * This differs from the normal meaning of the `MAP_32BIT' flag!!! */
-#define GFP_MAP_PREPARED     0x0800 /* Set the `MNODE_F_MPREPARED' node flag, and ensure that
+#define GFP_MAP_PREPARED     0x0080 /* Set the `MNODE_F_MPREPARED' node flag, and ensure that
                                      * the backing page directory address range is kept prepared
                                      * for the duration of the node's lifetime. */
 #define GFP_MAP_BELOW        0x0100 /* [valid_if(!GFP_MAP_FIXED)] s.a. `MAP_GROWSDOWN' */
 #define GFP_MAP_ABOVE        0x0200 /* [valid_if(!GFP_MAP_FIXED)] s.a. `MAP_GROWSUP' */
+#define GFP_MAP_NOSPLIT  0x00040000 /* Set the `MNODE_F_NOSPLIT' flag for new nodes */
+#define GFP_MAP_NOMERGE  0x00080000 /* Set the `MNODE_F_NOMERGE' flag for new nodes, and don't try to extend an existing node. */
 #define GFP_MAP_NOASLR   0x40000000 /* [valid_if(!GFP_MAP_FIXED)] s.a. `MAP_NOASLR' */
+
+/* Set of all of the GFP_* flags which control mapping behavior */
+#define GFP_MAP_FLAGS                                   \
+	(GFP_MAP_FIXED | GFP_MAP_32BIT | GFP_MAP_PREPARED | \
+	 GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR |   \
+	 GFP_MAP_NOSPLIT | GFP_MAP_NOMERGE)
 
 
 
@@ -80,6 +89,9 @@ typedef unsigned int gfp_t;
  *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
  *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
  *   - GFP_MAP_NOASLR:   s.a. `MAP_NOASLR'
+ *   - GFP_MAP_NOSPLIT:  Set the `MNODE_F_NOSPLIT' flag for new nodes
+ *   - GFP_MAP_NOMERGE:  Set the `MNODE_F_NOMERGE' flag for new nodes, and don't try
+ *                       to extend an existing node.
  *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded onto
@@ -128,48 +140,147 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 #endif /* !MAP_FAILED */
 
 
+/*
+ * Unmapping kernel ram without blocking is quite the complicated task,
+ * but it is not impossible. We must differentiate between 2 different
+ * kind of mappings which the caller wants us to delete:
+ *  - Writable mappings    (w/o file write-back) (`mukj_done' should be [0..1])
+ *  - Read-only mappings                         (`mukj_done' should be [1..1])
+ *
+ * In the case of writable mappings, the solution is fairly simple, since
+ * all that really needs to be done is (ab-)use a small portion of the
+ * region being free'd as a `struct mlockop' that is enqueued for running
+ * when a lock to the kernel mman becomes available.
+ *
+ * Once that lock is available, iteratively go through all nodes of the
+ * region (splitting the region at the front if necessary, and asserting
+ * that any partial nodes don't have the MNODE_F_NOSPLIT flag set). For
+ * every node encountered in this manner, try to acquire a lock to the
+ * associated mem-part. If this lock cannot be acquired, re-purpose the
+ * region being freed as a `struct mpart_lockop' that is executed once
+ * that lock becomes available. If this was done, the mpart_lockop will
+ * try to acquire a lock to the kernel mman. On success, continue as if
+ * the original mman->part locking order attempt was successful. Else,
+ * re-purpose the `struct mpart_lockop' as yet another `struct mlockop',
+ * and enqueue that one back onto the kernel mman lock-job queue, thus
+ * letting the request bounce back and forth without ever blocking, until
+ * both locks can be acquired at the same time.
+ *
+ * Once both locks are held, do the actual unmap. For this purpose, when
+ * needing to split the node, special handling is also done to deal with
+ * `MNODE_F_MHINT' nodes to prevent possible race conditions with other
+ * CPUs/threads accessing memory below or above the region that is being
+ * unmapped. Namely, forcably pre-initializing all pages affected by this,
+ * and waiting for `mman_kernel_hintinit_inuse' to become zero.
+ *
+ * If the unmap itself (or the attempt to partially split a leading/trailing
+ * node/part) fails (due to lack of memory during a split or pagedir_prepare),
+ * then the unmap operation is enqueued as a `struct mlockop' in such a way
+ * that it will _not_ be (re-)attempted immediately once the caller (which is
+ * usually `_mman_lockops_reap()') releases their lock to the kernel mman.
+ * The idea here is to hope that more memory will be available once the kernel
+ * mman is unlocked the next time around.
+ *
+ * If the remainder of the requested unmap-area is now gone, then we're
+ * done. Otherwise, if the current locking order is mman->part (that is:
+ * the current request originates from a `struct mpart_lockop'), release
+ * the part lock. Then, continue searching for the next node to unmap.
+ *
+ * When unmapping a read-only mapping, things are a bit more complicated,
+ * since it's not possible to (ab-)use the region being free'd as a lock-
+ * job descriptor (either a `struct mlockop' or `struct mpart_lockop').
+ * In this case, unmapping is only possible if the caller sacrifices yet
+ * another dynamically allocated (and most importantly: writable) region
+ * of memory: a `struct mman_unmap_kram_job'.
+ *
+ * In this case, instead of always re-using the actual region that is being
+ * unmapped as temporary storage for storing lock jobs, the caller provide
+ * a single, common storage that is continuously re-purposed for use as
+ * all of the different lock-jobs which may be needed until the region has
+ * been fully unmapped. Once this has been achieved, the unmap kram job is
+ * enqueued to have its `mukj_done' callback be run once the caller (which
+ * is usually `_mman_lockops_reap()') has released their lock on the kernel
+ * mman. This callback should then do the necessary work to either free, or
+ * re-purpose the `struct mman_unmap_kram_job' that it is contained inside
+ * of.
+ *
+ * For convenience, the internal implementation uses `struct mman_unmap_kram_job'
+ * in all cases, but will check if the `struct mman_unmap_kram_job' is contained
+ * inside of the address range that it is trying to unmap. If this is the case,
+ * then `mukj_done' will never be executed (is considered [valid_if(false)]), and
+ * the `struct mman_unmap_kram_job' itself will move up in memory as nodes are
+ * successfully deleted, such that `job->mukj_minaddr == (void *)job' will continue
+ * to be the case, where `job->mukj_minaddr' is the starting address of the range
+ * that is still left to-be free'd
+ */
+struct mman_unmap_kram_job;
+SLIST_HEAD(mman_unmap_kram_job_slist, mman_unmap_kram_job);
+
+struct mman_unmap_kram_job {
+	/* [0..1] Callback executed once the job is finished (See the description above).
+	 * NOTE: This callback is guarantied to only be invoked _after_ any lock which
+	 *       may have been held to the kernel mman, or a backing mem-part has already
+	 *       been released, so you're free to trylock() anything you want (so long as
+	 *       you make sure that the call is non-blocking). */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (*mukj_done)(struct mman_unmap_kram_job *__restrict self);
+	byte_t       *mukj_minaddr; /* Lowest address being unmapped.
+	                             * When equal to `(byte_t *)self', then the
+	                             * unmap job is considered to be in-line. */
+	byte_t       *mukj_maxaddr; /* Greatest address being unmapped. */
+	gfp_t         mukj_flags;   /* Set of `0 | GFP_CALLOC' */
+	union {
+		struct mlockop                   mukj_lop_mm;      /* MMan lockop */
+		struct mpart_lockop              mukj_lop_mp;      /* MPart lockop */
+		struct mpostlockop               mukj_post_lop_mm; /* MMan post-lockop */
+		struct mpart_postlockop          mukj_post_lop_mp; /* MPart post-lockop */
+		SLIST_ENTRY(mman_unmap_kram_job) mukj_link;        /* List link (used internally) */
+	};
+};
+
+
 /* Without blocking, unmap a given region of kernel RAM.
- * These functions will attempt to acquire a lock to the kernel mman, and
- * if that fails, will instead inject a pending lock operation into the
- * kernel mman's `mman_kernel_lockops', which will then perform the actual
- * job of unmapping the associated address range as soon as doing so becomes
- * possible.
- * These functions may only be used to unmap nodes mapped with the `MNODE_F_NO_MERGE'
- * flag, as well as read+write permissions. Additionally, if preparing the backing
- * page directory fails, as might happen if the associated node didn't have the
- * `MNODE_F_MPREPARED' flag set, then a warning is written to the system (unless
- * an internal rate-limit check fails), and the unmap operation is re-inserted as
- * a pending lock operation into `mman_kernel_lockops' (meaning that the unmap will
- * be re-attempted repeatedly until it (hopefully) succeeds at some point)
- * @param: flags:   Set of `GFP_*'. When `GFP_CALLOC' is given, allows the memory
- *                  management system to assume that the backing physical memory
- *                  is zero-initialized. If you're not sure if this is the case,
- *                  better pass `false'. If you lie here, calloc() might arbitrarily
- *                  break...
- *                  Must always contain at least `GFP_ATOMIC' */
+ * NOTE: The caller must ensure that the given the address range can
+ *       be written to without any chance of that write blocking, or
+ *       resulting in an exception. (i.e. don't use this one to unmap
+ *       file mappings or the like...)
+ *       If your intend is to unmap mappings that don't fulfil this
+ *       requirement, the you should read the description of `struct
+*        mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
+ * @param: flags:   Set of `0 | GFP_CALLOC'. When `GFP_CALLOC' is given, allows
+ *                  the memory management system to assume that the backing
+ *                  physical memory is zero-initialized. If you're not sure
+ *                  if this is the case, better pass `0'. If you lie here,
+ *                  calloc() might arbitrarily break... */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+                               gfp_t flags DFL(0));
 
-/* Try to unmap kernel raw while the caller is holding a lock to the kernel mman.
- * @param: flags: Set of `GFP_*' (Must always contain at least `GFP_ATOMIC')
- * @return: NULL: Successfully unmapped kernel ram.
- * @return: * :   Failed to allocate needed memory.
- *                The returned value is a freshly initialized pending mman-
- *                lock-operation which the caller must enqueue for execution.
- *                (s.a. `mman_kernel_lockop()' and `mlockop_callback_t') */
-FUNDEF WUNUSED NOBLOCK struct mlockop *
-NOTHROW(FCALL mman_unmap_kram_locked_ex)(PAGEDIR_PAGEALIGNED void *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                         gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
-
-/* Same as `mman_unmap_kram_locked_ex()', but automatically enqueue a
- * possibly returned mlockop object into the kernel mman. */
+/* Same as `mman_unmap_kram()', but may be used to improve efficiency
+ * when the caller is already holding a lock to `mman_kernel' */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                       PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t flags DFL(0x0400 /*GFP_ATOMIC*/));
+                                      gfp_t flags DFL(0));
+
+/* Try to unmap kernel memory while the caller is holding a lock to the kernel mman.
+ * NOTE: This function can be used to delete any kind of kernel-space memory mapping,
+ *       but special case must be taken when it comes to read-only, or shared copy-on-
+ *       write memory mappings (see the documentation of `struct mman_unmap_kram_job')
+ * @param: locked_part: If non-NULL, a part which may be assumed as locked by the caller.
+ * @return: MMAN_UNMAP_KRAM_LOCKED_EX_DONE:  Success (you must invoke the done-callback)
+ * @return: MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC: Success (memory will be free'd asynchronously)
+ *                                           In this case, so-long as the job isn't allocated
+ *                                           in-line with the memory being free'd, the given
+ *                                           done-callback is responsible to free `job'
+ * @return: * : Insufficient memory (re-queue the returned job for later execution) */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mman_unmap_kram_job *
+NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict job,
+                                         struct mpart *locked_part DFL(__NULLPTR));
+#define MMAN_UNMAP_KRAM_LOCKED_EX_DONE  ((struct mman_unmap_kram_job *)-1) /* The job was finished (caller must run `mukj_done' after releasing locks) */
+#define MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC ((struct mman_unmap_kram_job *)-2) /* The job will be completed asynchronously*/
+
 
 DECL_END
 #endif /* __CC__ */
