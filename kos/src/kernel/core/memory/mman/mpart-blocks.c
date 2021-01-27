@@ -143,7 +143,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 	/* Check the state of blocks that overlap with the result range. */
 	if unlikely(!mpart_hasblockstate(self)) {
 		/* Simple (but rather unlikely) case: All blocks are known to be CHNG */
-	} else {
+	} else if likely(result->mppl_size != 0) {
 		struct mfile *file = self->mp_file;
 		size_t i, min, max, block_mask;
 		unsigned int st;
@@ -164,6 +164,8 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 			st = mpart_getblockstate(self, max);
 			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT)
 				goto err_not_loaded;
+			if (min >= max)
+				goto done; /* Prevent underflow when `max == 0' */
 			--max;
 		}
 		/* Iterate over whole blocks within the result range,
@@ -177,6 +179,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 				goto err_not_loaded;
 		}
 	}
+done:
 	return MPART_MEMADDR_SUCCESS;
 err_not_loaded:
 	return MPART_MEMADDR_NOT_LOADED;
@@ -222,7 +225,7 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 	/* Check the state of blocks that overlap with the result range. */
 	if unlikely(!mpart_hasblockstate(self)) {
 		/* Simple (but rather unlikely) case: All blocks are already known to be CHNG */
-	} else {
+	} else if likely(num_bytes != 0) {
 		struct mfile *file = self->mp_file;
 		size_t i, min, max, block_mask;
 		unsigned int st;
@@ -267,6 +270,8 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 				mpart_setblockstate(self, max, MPART_BLOCK_ST_CHNG);
 				did_change = true;
 			}
+			if (min >= max)
+				goto after_intermediate_blocks; /* Prevent underflow when `max == 0' */
 			--max;
 		}
 
@@ -285,6 +290,7 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 				did_change = true;
 			}
 		}
+after_intermediate_blocks:
 
 		/* If we did manage to set at least 1 block to changed that
 		 * wasn't set as such before, then we must mark this mem-part

@@ -583,14 +583,6 @@ mfault_or_unlock(struct mfault *__restrict self)
 	assert(self->mfl_size != 0);
 	assert(!wasdestroyed(self->mfl_part));
 	assert(!wasdestroyed(self->mfl_mman));
-	printk(KERN_DEBUG "HERE: %p", self->mfl_addr);
-	{
-		u32 word;
-		if (memcpy_nopf(&word, (void *)0xbf113368, 4) == 0)
-			printk(KERN_DEBUG " (0xbf113368=%p)", word);
-	}
-	printk(KERN_DEBUG "\n");
-
 	node = self->mfl_node;
 	part = self->mfl_part;
 
