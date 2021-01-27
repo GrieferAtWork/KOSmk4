@@ -1101,7 +1101,7 @@ __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-nexttowardl(*) = nextafterl;
+[[std]] nexttowardl(*) = nextafterl;
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbnl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnl", "__scalblnl")]]
