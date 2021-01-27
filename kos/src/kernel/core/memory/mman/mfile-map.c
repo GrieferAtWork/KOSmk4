@@ -381,22 +381,24 @@ mfile_map_fill_holes(struct mfile_map *__restrict self,
 continue_with_pnode:
 	for (;;) {
 		uintptr_t gap_min_offset;
-		uintptr_t gap_max_offset;
+		uintptr_t gap_end_offset;
 		next = *p_node;
 		/* Figure out the bounds of a (potential) gap. */
 		gap_min_offset = 0;
-		gap_max_offset = self->mfm_size - 1;
+		gap_end_offset = self->mfm_size - 1;
 		if (prev != NULL)
 			gap_min_offset = (uintptr_t)prev->mn_maxaddr + 1;
 		if (next != NULL)
-			gap_max_offset = (uintptr_t)next->mn_minaddr - 1;
-		if (gap_min_offset <= gap_max_offset) {
+			gap_end_offset = (uintptr_t)next->mn_minaddr;
+		if (gap_min_offset < gap_end_offset) {
 			struct mfile *file = self->mfm_file;
 			struct mnode *new_node;
 			REF struct mpart *part;
 			pos_t gap_min_addr, gap_max_addr;
 			pos_t block_aligned_gap_addr;
 			size_t block_aligned_gap_size, gap_size;
+			uintptr_t gap_max_offset;
+			gap_max_offset = gap_end_offset - 1;
 
 			/* Part lookup is a blocking operation, so we must unlock everything first. */
 			if (result) {
@@ -437,8 +439,10 @@ continue_with_pnode:
 					struct mnode *removed_nodes_hi;
 					if (p_duplicate_node == p_node)
 						duplicate_node_is_after_gap = true;
-					if (duplicate_node->mn_part != part)
+					if (duplicate_node->mn_part != part) {
+						p_duplicate_node = SLIST_P_NEXT(duplicate_node, _mn_alloc);
 						continue;
+					}
 					decref_nokill(part); /* The reference returned by `mfile_getpart()' */
 
 					/* Found a duplicate of the part!

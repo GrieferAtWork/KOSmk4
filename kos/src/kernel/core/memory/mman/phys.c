@@ -341,10 +341,12 @@ NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64 value) {
 			_page_bytes  = PAGESIZE - (uintptr_t)((addr)&PAGEMASK);                  \
 			(buf)        = (typeof(buf))(trampoline + (uintptr_t)((addr)&PAGEMASK)); \
 			(buf_Twords) = _page_bytes / sizeofT;                                    \
+			if ((buf_Twords) > (num_Twords))                                         \
+				(buf_Twords) = (num_Twords);                                         \
 			__VA_ARGS__;                                                             \
-			(num_Twords) -= (buf_Twords);                                            \
-			if (!(num_Twords))                                                       \
+			if ((buf_Twords) >= (num_Twords))                                        \
 				break;                                                               \
+			(num_Twords) -= (buf_Twords);                                            \
 			(addr) += _page_bytes;                                                   \
 			phys_loadpage(addr);                                                     \
 		}                                                                            \

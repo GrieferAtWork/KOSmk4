@@ -211,11 +211,12 @@ struct mfile {
 #define __mfile_cinit_vio(self) /* nothing */
 #endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
 
-#define mfile_init_blockshift(self, block_shift)                               \
-	((self)->mf_blockshift = (block_shift),                                    \
-	 (self)->mf_part_amask = (size_t)1 << (((self)->mf_blockshift) > PAGESHIFT \
-	                                       ? ((self)->mf_blockshift)           \
-	                                       : PAGESHIFT))
+#define mfile_init_blockshift(self, block_shift)                                \
+	((self)->mf_blockshift = (block_shift),                                     \
+	 (self)->mf_part_amask = ((size_t)1 << (((self)->mf_blockshift) > PAGESHIFT \
+	                                        ? ((self)->mf_blockshift)           \
+	                                        : PAGESHIFT)) -                     \
+	                         1)
 #define mfile_init(self, ops, block_shift) \
 	((self)->mf_refcnt = 1,                \
 	 (self)->mf_ops    = (ops),            \
@@ -511,8 +512,9 @@ mfile_map_init(struct mfile_map *__restrict self,
 #else /* __INTELLISENSE__ */
 #define mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags) \
 	((self)->mfm_file = (file), (self)->mfm_addr = (addr),                   \
-	 (self)->mfm_prot = (prot), (self)->mfm_flags = (flags),                 \
-	 SLIST_INIT(&(self)->mfm_flist), _mfile_map_init_and_acquire(self))
+	 (self)->mfm_size = (num_bytes), (self)->mfm_prot = (prot),              \
+	 (self)->mfm_flags = (flags), SLIST_INIT(&(self)->mfm_flist),            \
+	 _mfile_map_init_and_acquire(self))
 #define mfile_map_init(self, file, addr, num_bytes, prot, flags)           \
 	(mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags), \
 	 mfile_map_release(self))

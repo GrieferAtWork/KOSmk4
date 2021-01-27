@@ -91,9 +91,9 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
-	assert(!LIST_EMPTY(&self->mp_copy));
-	assert(!LIST_EMPTY(&self->mp_share));
-	assert(!(self->mp_flags & MPART_F_NO_GLOBAL_REF));
+	assert(LIST_EMPTY(&self->mp_copy));
+	assert(LIST_EMPTY(&self->mp_share));
+	assert(self->mp_flags & MPART_F_NO_GLOBAL_REF);
 	/* Make sure that we've served _all_ dead nodes that may have still been there. */
 	while (!SLIST_EMPTY(&self->mp_lockops)) {
 		struct mpart_lockop *lop;

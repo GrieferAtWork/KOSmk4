@@ -35,6 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/slab.h>
@@ -44,7 +45,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
+#include <stddef.h>
 #include <string.h>
+
+#ifdef CONFIG_USE_NEW_VM
+#include <kernel/mman/mcoreheap.h>
+#endif /* CONFIG_USE_NEW_VM */
 
 #include "corebase.h"
 
@@ -84,10 +90,134 @@ PRIVATE ATTR_COLDTEXT PAGEDIR_PAGEALIGNED void *
 NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     gfp_t flags) {
 #ifdef CONFIG_USE_NEW_VM
-	return mman_map_kram(NULL, num_bytes,
-	                     GFP_LOCKED | GFP_PREFLT |
-	                     GFP_VCBASE | GFP_NOCLRC |
-	                     GFP_NOSWAP | flags);
+#if 1
+	void *result;
+	struct mnode *node;
+	struct mpart *part;
+	union mcorepart *cp;
+	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
+	if (flags & GFP_ATOMIC) {
+		if (!mman_lock_tryacquire(&mman_kernel))
+			goto err;
+	} else {
+		if (!mman_lock_acquire_nx(&mman_kernel))
+			goto err;
+	}
+	/* Find a suitable free location.
+	 * NOTE: To aid in debugging, unconditionally disable ASLR
+	 *       for memory allocated from the poison-heap! */
+	result = mman_findunmapped(&mman_kernel, NULL,
+	                           num_bytes, MAP_NOASLR);
+	if unlikely(result == MAP_FAILED)
+		goto err_unlock;
+	cp = mcoreheap_alloc_locked_nx();
+	if unlikely(!cp)
+		goto err_unlock;
+	node = &cp->mcp_node;
+	cp = mcoreheap_alloc_locked_nx();
+	if unlikely(!cp)
+		goto err_unlock_node;
+	part = &cp->mcp_part;
+	part->mp_mem.mc_size  = num_bytes / PAGESIZE;
+	part->mp_mem.mc_start = page_malloc(part->mp_mem.mc_size);
+	if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID)
+		goto err_unlock_node_part;
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if unlikely(!pagedir_prepare_map(result, num_bytes)) {
+		page_ccfree(part->mp_mem.mc_start, part->mp_mem.mc_size);
+		goto err_unlock_node_part;
+	}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_map(result, num_bytes, physpage2addr(part->mp_mem.mc_start),
+	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	pagedir_sync(result, num_bytes);
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_map(result, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+	/* Now just put everything together for the node/part, and
+	 * follow this up by loading them into the kernel mman. */
+	node->mn_minaddr = (byte_t *)result;
+	node->mn_maxaddr = (byte_t *)result + num_bytes - 1;
+
+	/* Poison-heap mappings should never go away, so set the `MNODE_F_KERNPART'
+	 * to cause all of the normal methods of unmapping memory to instead fault. */
+	node->mn_flags        = MNODE_F_PWRITE | MNODE_F_PREAD | MNODE_F_SHARED |
+	                        MNODE_F_COREPART | MNODE_F_KERNPART |
+	                        MNODE_F_NOSPLIT | MNODE_F_NOMERGE;
+	node->mn_part         = part;
+	node->mn_fspath       = NULL;
+	node->mn_fsname       = NULL;
+	node->mn_mman         = &mman_kernel;
+	node->mn_partoff      = 0;
+	node->mn_link.le_prev = &part->mp_share.lh_first;
+	node->mn_link.le_next = NULL;
+	LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
+	node->_mn_module = NULL;
+
+	part->mp_refcnt = 1;
+	part->mp_flags  = MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	                  MPART_F_NOFREE | MPART_F_COREPART |
+	                  MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	                  MPART_F_MLOCK_FROZEN | MPART_F_MLOCK;
+	part->mp_state  = MPART_ST_MEM;
+	part->mp_file   = &mfile_ndef;
+	ATOMIC_INC(mfile_ndef.mf_refcnt);
+	part->mp_copy.lh_first     = NULL;
+	part->mp_share.lh_first    = node;
+	part->mp_lockops.slh_first = NULL;
+	/* Technically, we should insert the part into the global list
+	 * of all parts. However, in practice that would be a bad idea
+	 * since parts aren't required to be apart of the global list,
+	 * and not adding a part to said list reduces its connectivity
+	 * to other kernel sub-systems (thus reducing the chances of
+	 * fault recursion) */
+	LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+	part->mp_minaddr          = (pos_t)(0);
+	part->mp_maxaddr          = (pos_t)(num_bytes - 1);
+	part->mp_changed.sle_next = NULL; /* Technically shouldn't needed... */
+	part->mp_filent.rb_lhs    = NULL; /* Technically shouldn't needed... */
+	part->mp_filent.rb_rhs    = NULL; /* Technically shouldn't needed... */
+	part->mp_filent.rb_par    = NULL; /* Technically shouldn't needed... */
+	part->mp_blkst_ptr        = NULL;
+	part->mp_meta             = NULL;
+
+	/* Insert the new node into the kernel and release our lock to it. */
+	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	mman_lock_release(&mman_kernel);
+
+	/* Initialize resulting memory.
+	 * Note that technically, we could use `page_iszero()' to skip pages
+	 * that had already been zero-initialized, but that would introduce
+	 * additional dependencies, as well as the assumption that the page-
+	 * is-zero database doesn't contain incorrect information (which it
+	 * might if the kernel panic'd as the result of calloc-memory not
+	 * actually being zero-initialized due to an error in said database) */
+	if (flags & GFP_CALLOC)
+		memset(result, 0, num_bytes);
+
+	return result;
+err_unlock_node_part:
+	mcoreheap_free_locked(container_of(part, union mcorepart, mcp_part));
+err_unlock_node:
+	mcoreheap_free_locked(container_of(node, union mcorepart, mcp_node));
+err_unlock:
+	mman_lock_release(&mman_kernel);
+err:
+	return NULL;
+#else
+	/* TODO: Can't use `mman_map_kram_nx()' because that one may allocate
+	 *       physical memory via a chunk-vector (which recursively calls
+	 *       kmalloc_nx(), which we're not able to deal with) */
+	void *result;
+	result = mman_map_kram_nx(NULL, num_bytes,
+	                          GFP_LOCKED | GFP_PREFLT |
+	                          GFP_VCBASE | GFP_NOCLRC |
+	                          GFP_NOSWAP | flags);
+	if (result == MAP_FAILED)
+		result = NULL;
+	return result;
+#endif
 #else /* CONFIG_USE_NEW_VM */
 	PAGEDIR_PAGEALIGNED void *mapping_target;
 	struct vm_corepair_ptr corepair;

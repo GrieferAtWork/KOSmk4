@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include <libc/string.h>
 
@@ -296,8 +297,13 @@ mman_map_res(struct mman *__restrict self,
 		/* Check the upper bound. */
 		if (file_size > 0) {
 			size_t max_file_size;
-			if (OVERFLOW_USUB((file_map_maxaddr + 1), file_pos, &max_file_size))
+			if (file_pos >= file_map_maxaddr)
 				max_file_size = 0;
+			else {
+				if (OVERFLOW_USUB(file_map_maxaddr, file_pos, &max_file_size) ||
+				    OVERFLOW_UADD(max_file_size, 1, &max_file_size))
+					max_file_size = SIZE_MAX;
+			}
 			/* Check if the requested size exceeds the allowed size. */
 			if (file_size > max_file_size) {
 				struct mnode *node;
@@ -319,7 +325,7 @@ mman_map_res(struct mman *__restrict self,
 		if unlikely(file_size <= 0) {
 			SLIST_INIT(&map.mmwu_map.mfm_nodes);
 			SLIST_INIT(&map.mmwu_map.mfm_flist);
-			goto do_insert_mappings;
+			goto do_insert_without_file;
 #define NEED_do_insert_mappings
 		}
 #endif /* DEFINE_mman_map_subrange */
@@ -329,6 +335,11 @@ mman_map_res(struct mman *__restrict self,
 		mfile_map_init_and_acquire(&map.mmwu_map, file, file_pos,
 		                           file_size, prot, flags);
 #endif /* HAVE_FILE */
+
+#ifdef NEED_do_insert_mappings
+#undef NEED_do_insert_mappings
+do_insert_without_file:
+#endif /* NEED_do_insert_mappings */
 
 #ifdef DEFINE_mman_map_res
 		/* Create+initialize the reserved memory node that's supposed to get mapped. */
@@ -406,7 +417,6 @@ again_lock_mfile_map:
 				mman_lock_release(self);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
-
 		} EXCEPT {
 #ifdef HAVE_FILE
 			mfile_map_fini(&map.mmwu_map);
@@ -417,11 +427,6 @@ again_lock_mfile_map:
 			RETHROW();
 		}
 		/* === Point of no return === */
-
-#ifdef NEED_do_insert_mappings
-#undef NEED_do_insert_mappings
-do_insert_mappings:
-#endif /* NEED_do_insert_mappings */
 
 		/* Get rid of existing mappings. */
 		SLIST_INIT(&old_mappings);
@@ -504,7 +509,7 @@ do_insert_mappings:
 
 #ifdef DEFINE_mman_map_res
 		res_node->mn_minaddr = (byte_t *)result;
-		res_node->mn_maxaddr = (byte_t *)result + num_bytes;
+		res_node->mn_maxaddr = (byte_t *)result + num_bytes - 1;
 		mnode_tree_insert(&self->mm_mappings, res_node);
 #endif /* DEFINE_mman_map_res */
 	}

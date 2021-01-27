@@ -174,7 +174,7 @@ again:
 	                                   peb_total_size,
 	                                   PROT_READ | PROT_WRITE | PROT_SHARED,
 	                                   HINT_GETMODE(KERNEL_VMHINT_TEMPORARY) |
-                                       MAP_PREPARED | MAP_NOMERGE | MAP_NOSPLIT,
+	                                   MAP_PREPARED | MAP_NOMERGE | MAP_NOSPLIT,
 	                                   &mfile_zero,
 	                                   NULL,
 	                                   NULL,

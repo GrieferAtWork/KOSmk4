@@ -653,7 +653,10 @@ mfault_or_unlock(struct mfault *__restrict self)
 				kfree(self->mfl_pcopy[0]);
 				kfree(self->mfl_pcopy[1]);
 			}
-			goto done_mark_changed;
+done_mark_changed:
+			/* Mark the accessed address range as changed */
+			mpart_changed(part, acc_offs, acc_size);
+			goto done;
 		}
 	
 		/* Make sure that the accessed part is loaded. */
@@ -876,13 +879,22 @@ pcopy_free_unused_block_status:
 			 * still copy over the contents of the old part into the new one! */
 			mpart_copyram(copy, part, acc_offs, acc_size / PAGESIZE);
 
+			/* With memory copied, we no longer need our lock to `part'
+			 * But note that we've set `copy->mp_flags & MPART_F_LOCKBIT'
+			 * above, and it is _that_ lock which we'll eventually let our
+			 * caller inherit! */
+			mpart_lock_release(part);
+
 			/* Set-up the copy <--> node link */
 			copy->mp_copy.lh_first = node;
 			node->mn_part          = copy; /* A reference to the original `part' is inherited here.
 			                                * That reference is destroyed further below! */
 			node->mn_partoff       = 0;    /* The newly created node is a perfect fit for the accessed range! */
+			self->mfl_offs         = 0;    /* *ditto* */
 			node->mn_link.le_prev  = &copy->mp_copy.lh_first;
 			node->mn_link.le_next  = NULL;
+			/*noderel_offset = 0;*/ /* Would be unused... */
+			/*acc_offs       = 0;*/ /* Would be unused... */
 
 			/* Insert the new (copy)-part into the global list of all parts. */
 			COMPILER_WRITE_BARRIER();
@@ -896,7 +908,7 @@ pcopy_free_unused_block_status:
 		{
 			byte_t *old_minaddr;
 			old_minaddr    = node->mn_minaddr;
-			node           = mnode_merge(node);
+			node           = mnode_merge(node); /* TODO: Implement this one (currently a stub) */
 			self->mfl_node = node;
 			assert(old_minaddr <= node->mn_minaddr);
 			if (old_minaddr < node->mn_minaddr)
@@ -906,9 +918,6 @@ pcopy_free_unused_block_status:
 		mpart_setcore_data_init(&self->mfl_scdat);
 		RETHROW();
 	}
-done_mark_changed:
-	/* Mark the accessed address range as changed */
-	mpart_changed(part, acc_offs, acc_size);
 done:
 	DBG_inval(self->mfl_scdat);
 	DBG_inval(self->mfl_ucdat);

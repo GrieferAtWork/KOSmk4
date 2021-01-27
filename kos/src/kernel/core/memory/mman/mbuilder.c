@@ -286,9 +286,9 @@ mbuilder_map(struct mbuilder *__restrict self,
 	fm.mfm_size  = num_bytes;
 	fm.mfm_prot  = prot;
 	fm.mfm_flags = flags;
-	STEAL_FREE_NODE_LIST(fm.mfm_nodes, self->_mb_fnodes);
+	STEAL_FREE_NODE_LIST(fm.mfm_flist, self->_mb_fnodes);
 	_mfile_map_init(&fm);
-	STEAL_FREE_NODE_LIST(self->_mb_fnodes, fm.mfm_nodes);
+	STEAL_FREE_NODE_LIST(self->_mb_fnodes, fm.mfm_flist);
 
 	/* Convert the node list into a `struct mbnode' */
 	fmnode = (struct mbnode *)SLIST_FIRST(&fm.mfm_nodes);
@@ -417,9 +417,9 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 			fm.mfm_size  = num_bytes;
 			fm.mfm_prot  = prot;
 			fm.mfm_flags = flags;
-			STEAL_FREE_NODE_LIST(fm.mfm_nodes, self->_mb_fnodes);
+			STEAL_FREE_NODE_LIST(fm.mfm_flist, self->_mb_fnodes);
 			_mfile_map_init(&fm);
-			STEAL_FREE_NODE_LIST(self->_mb_fnodes, fm.mfm_nodes);
+			STEAL_FREE_NODE_LIST(self->_mb_fnodes, fm.mfm_flist);
 
 			/* Convert the node list into a `struct mbnode' */
 			fmnode = (struct mbnode *)SLIST_FIRST(&fm.mfm_nodes);

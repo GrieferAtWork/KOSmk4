@@ -112,11 +112,12 @@ do_load_whole_pages_readonly:
 						}
 					}
 					/* Load as continuous, read-only memory. */
-					addr_offset = i * PAGESIZE;
+					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset,
 					                  perm & ~PAGEDIR_MAP_FWRITE);
+					i = endpage;
 				} else if (st == MPART_BLOCK_ST_CHNG) {
 					size_t addr_offset, endpage;
 					if (!(perm & PAGEDIR_MAP_FWRITE))
@@ -126,11 +127,12 @@ do_load_whole_pages_readonly:
 					       getstate(endpage) == MPART_BLOCK_ST_CHNG)
 						++endpage;
 					/* Load as continuous, read/write memory. */
-					addr_offset = i * PAGESIZE;
+					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset, perm);
 					result |= PAGEDIR_MAP_FWRITE;
+					i = endpage;
 				} else {
 					++i;
 				}
@@ -165,11 +167,12 @@ do_load_small_pages_readonly:
 						}
 					}
 					/* Load as continuous, read-only memory. */
-					addr_offset = i * PAGESIZE;
+					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset,
 					                  perm & ~PAGEDIR_MAP_FWRITE);
+					i = endpage;
 				} else if (st == MPART_BLOCK_ST_CHNG) {
 					size_t addr_offset, endpage;
 					if (!(perm & PAGEDIR_MAP_FWRITE))
@@ -183,11 +186,12 @@ do_load_small_pages_readonly:
 						++endpage;
 					}
 					/* Load as continuous, read/write memory. */
-					addr_offset = i * PAGESIZE;
+					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset, perm);
 					result |= PAGEDIR_MAP_FWRITE;
+					i = endpage;
 				} else {
 					++i;
 				}
@@ -219,11 +223,12 @@ do_load_large_pages_readonly:
 						}
 					}
 					/* Load as continuous, read-only memory. */
-					addr_offset = i * PAGESIZE;
+					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset,
 					                  perm & ~PAGEDIR_MAP_FWRITE);
+					i = endpage;
 				} else if (st == MPART_BLOCK_ST_CHNG) {
 					size_t addr_offset, endpage;
 					if (!(perm & PAGEDIR_MAP_FWRITE))
@@ -233,11 +238,12 @@ do_load_large_pages_readonly:
 					       getstate(endpage >> block_to_page_shift) == MPART_BLOCK_ST_CHNG)
 						++endpage;
 					/* Load as continuous, read/write memory. */
-					addr_offset = i * PAGESIZE;
+					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset, perm);
 					result |= PAGEDIR_MAP_FWRITE;
+					i = endpage;
 				} else {
 					++i;
 				}

@@ -850,7 +850,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		} EXCEPT {
 			/* Set block states back to NDEF */
 			for (i = start; i < end; ++i)
-				mpart_setblockstate(self, end, MPART_BLOCK_ST_NDEF);
+				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
 			mpart_deadnodes_reap(self);
@@ -859,7 +859,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		}
 		/* Set loaded states back to LOAD */
 		for (i = start; i < end; ++i)
-			mpart_setblockstate(self, end, MPART_BLOCK_ST_LOAD);
+			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		decref_unlikely(self);

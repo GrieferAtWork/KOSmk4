@@ -324,7 +324,7 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode *__restrict fmnode) {
 	mm_base = fmnode->mbn_minaddr;
 	fm_base = fmnode->mbn_filpos;
 	iter    = fmnode;
-	for (;;) {
+	do {
 		pos_t iter_fm_minaddr, iter_fm_maxaddr;
 		struct mpart *part;
 
@@ -343,8 +343,7 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode *__restrict fmnode) {
 			 * must be resolved by re-flowing this file mapping. */
 			return false;
 		}
-		iter = iter->mbn_filnxt;
-	}
+	} while ((iter = iter->mbn_filnxt) != NULL);
 	return true;
 }
 

@@ -77,7 +77,7 @@ again:
 	root->_mn_module = NULL;
 	if (root->mn_mement.rb_lhs) {
 		if (root->mn_mement.rb_rhs)
-			mnode_tree_foreach_set_unmapped(root->mn_mement.rb_rhs);
+			mnode_tree_init_mman_and_module(root->mn_mement.rb_rhs, mm);
 		root = root->mn_mement.rb_lhs;
 		goto again;
 	}
@@ -129,10 +129,11 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	/* Step #4: Go over all file mappings and fill in the fields:
 	 *    - _mbn_partoff
 	 *    - _mbn_link */
-	SLIST_FOREACH (fmnode, &self->mb_files, mbn_nxtfile) {
+	for (fmnode = SLIST_FIRST(&self->mb_files); fmnode;) {
 		pos_t fm_base;   /* File-map-base */
 		byte_t *mm_base; /* Memory-map-base */
-		struct mbnode *iter;
+		struct mbnode *iter, *fmnext;
+		fmnext  = SLIST_NEXT(fmnode, mbn_nxtfile);
 		mm_base = fmnode->mbn_minaddr;
 		fm_base = fmnode->mbn_filpos;
 		iter    = fmnode;
@@ -150,6 +151,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 			link_list = (iter->mbn_flags & MNODE_F_SHARED) ? &part->mp_share : &part->mp_copy;
 			LIST_INSERT_HEAD(link_list, (struct mnode *)iter, mn_link);
 		} while ((iter = iter->mbn_filnxt) != NULL);
+		fmnode = fmnext;
 	}
 	SLIST_INIT(&self->mb_files);
 
@@ -171,8 +173,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	 *          link field wasn't already overwritten by any of the above! */
 	for (i = 0; i < MBNODE_PARTSET_NUMBUCKETS; ++i) {
 		struct mbnode *iter;
-		iter = LIST_FIRST(&self->mb_uparts.mbps_set[i]);
-		while (iter) {
+		for (iter = LIST_FIRST(&self->mb_uparts.mbps_set[i]); iter;) {
 			struct mbnode *next;
 			next = LIST_NEXT(iter, mbn_nxtuprt);
 
@@ -180,7 +181,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 			mpart_lock_release(iter->mbn_part);
 
 			/* Initialize the writable-link as unbound. */
-			LIST_ENTRY_UNBOUND_INIT(&next->_mbn_writable);
+			LIST_ENTRY_UNBOUND_INIT(&iter->_mbn_writable);
 			iter = next;
 		}
 	}

@@ -47,8 +47,10 @@ NOTHROW(KCALL kernel_initialize_selftest)(void) {
 		PSELFTEST const *iter;
 		printk(FREESTR(KERN_INFO "[boot] Running self-tests\n"));
 		for (iter = __kernel_selftest_start;
-			 iter < __kernel_selftest_end; ++iter)
+			 iter < __kernel_selftest_end; ++iter) {
 			(**iter)();
+		}
+		printk(FREESTR(KERN_INFO "[boot] All self-tests OK\n"));
 	}
 }
 
