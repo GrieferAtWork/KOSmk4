@@ -477,7 +477,7 @@ again_lock_mfile_map:
 			 * However, by unconditionally doing it here, we can
 			 * speed up the initial memory access whenever memory
 			 * had already been loaded in some other way, too! */
-			map_prot = mnode_getperm(node);
+			map_prot = mnode_getperm_force(node);
 			if (map_prot & PAGEDIR_MAP_FWRITE) {
 				/* Delete write-permissions if necessary. */
 				if ((prot & PROT_SHARED)

@@ -425,6 +425,53 @@ err_changed_free_hinode:
 }
 
 
+/* Load the bounding set of page directory permissions with which
+ * a given mem-nodes should have its backing memory be mapped.
+ * NOTE: The caller must ensure that `self->mn_part' is non-NULL,
+ *       and that they are holding a lock to said part!
+ *
+ * Write permissions which may have been requested by the node
+ * are automatically removed for the purpose of copy-on-write:
+ * >> result = mnode_getperm_force(self);
+ * >> if (result & PAGEDIR_MAP_FWRITE) {
+ * >>     struct mpart *part = self->mn_part;
+ * >>     if (self->mn_flags & MNODE_F_SHARED) {
+ * >>         if (!LIST_EMPTY(&part->mp_copy))
+ * >>             result &= ~PAGEDIR_MAP_FWRITE;
+ * >>     } else {
+ * >>         if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
+ * >>             LIST_NEXT(self, mn_link) != NULL || !mfile_isanon(part->mp_file))
+ * >>             result &= ~PAGEDIR_MAP_FWRITE;
+ * >>     }
+ * >> } */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
+NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
+	u16 result;
+	result = mnode_getperm_force_nouser(self);
+	if (result & PAGEDIR_MAP_FWRITE) {
+		struct mpart *part = self->mn_part;
+		if (self->mn_flags & MNODE_F_SHARED) {
+			/* Disallow write to a shared mapping if there are other copy-on-write nodes.
+			 * This way, copy-on-write nodes can be unshared lazily once the first write
+			 * happens. */
+			if (!LIST_EMPTY(&part->mp_copy))
+				result &= ~PAGEDIR_MAP_FWRITE;
+		} else {
+			/* Disallow write if there are any other memory mappings of the backing part,
+			 * or if the part belongs to a non-anonymous file (in which case someone may
+			 * open(2)+write(2) the file, meaning that modifications made to the backing
+			 * storage by our node mapping musn't be persistent) */
+			if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
+			    LIST_NEXT(self, mn_link) != NULL || !mfile_isanon(part->mp_file))
+				result &= ~PAGEDIR_MAP_FWRITE;
+		}
+	}
+	return result;
+}
+
+
+
+
 /* Mem-node tree API. All of these functions require that the caller
  * be holding a lock to the associated mman. */
 DECL_END

@@ -1012,17 +1012,18 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	/* Re-map the freshly faulted memory. */
 	{
 		u16 perm;
+		perm = mnode_getperm(mf.mfl_node);
 		if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-			                  mf.mfl_offs, mnode_getperm(mf.mfl_node));
+			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
+			                  mf.mfl_size, mf.mfl_offs, perm);
 		} else {
 			if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-			                  mf.mfl_offs, mnode_getperm(mf.mfl_node));
+			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
+			                  mf.mfl_size, mf.mfl_offs, perm);
 			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
 		}
 		mpart_lock_release(mf.mfl_part);

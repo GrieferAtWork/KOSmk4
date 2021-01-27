@@ -32,9 +32,9 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>
-#include <kernel/vm/phys.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
@@ -959,9 +959,9 @@ NOTHROW(FCALL mpart_copyram)(struct mpart *__restrict dst,
 	if (src->mp_state == MPART_ST_MEM) {
 		if (dst->mp_state == MPART_ST_MEM) {
 			/* SINGLE --> SINGLE */
-			vm_copypagesinphys(physpage2addr(dst->mp_mem.mc_start),
-			                   physpage2addr(src->mp_mem.mc_start) + src_offset,
-			                   num_pages);
+			copypagesinphys(physpage2addr(dst->mp_mem.mc_start),
+			                physpage2addr(src->mp_mem.mc_start) + src_offset,
+			                num_pages);
 		} else {
 			/* SINGLE --> MULTIPLE */
 			size_t i;
@@ -975,9 +975,9 @@ NOTHROW(FCALL mpart_copyram)(struct mpart *__restrict dst,
 				count = dst_chunks[i].mc_size;
 				if (count > num_pages)
 					count = num_pages;
-				vm_copypagesinphys(physpage2addr(dst_chunks[i].mc_start),
-				                   physpage2addr(src_page) + src_offset,
-				                   count);
+				copypagesinphys(physpage2addr(dst_chunks[i].mc_start),
+				                physpage2addr(src_page) + src_offset,
+				                count);
 				if (count >= num_pages)
 					break;
 				num_pages -= count;
@@ -1004,9 +1004,9 @@ NOTHROW(FCALL mpart_copyram)(struct mpart *__restrict dst,
 			}
 			if (count > num_pages)
 				count = num_pages;
-			vm_copypagesinphys(physpage2addr(dst_page),
-			                   physpage2addr(src_chunks[i].mc_start) + src_offset,
-			                   count);
+			copypagesinphys(physpage2addr(dst_page),
+			                physpage2addr(src_chunks[i].mc_start) + src_offset,
+			                count);
 			if (count >= num_pages)
 				break;
 			src_offset = 0;
@@ -1049,9 +1049,9 @@ next_src_chunk:
 					count = src_chunk.mc_size;
 				if (count > num_pages)
 					count = num_pages;
-				vm_copypagesinphys(physpage2addr(b.mc_start),
-				                   physpage2addr(src_chunk.mc_start),
-				                   count);
+				copypagesinphys(physpage2addr(b.mc_start),
+				                physpage2addr(src_chunk.mc_start),
+				                count);
 				if (count >= num_pages)
 					return;
 				num_pages -= count;

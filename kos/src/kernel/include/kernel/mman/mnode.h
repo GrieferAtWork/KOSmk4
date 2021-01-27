@@ -292,22 +292,47 @@ struct mnode {
 
 
 /* Load the bounding set of page directory permissions with which
- * a given mem-nodes should have its backing memory be mapped. */
+ * a given mem-nodes should have its backing memory be mapped.
+ * NOTE: The caller must ensure that `self->mn_part' is non-NULL,
+ *       and that they are holding a lock to said part!
+ *
+ * Write permissions which may have been requested by the node
+ * are automatically removed for the purpose of copy-on-write:
+ * >> result = mnode_getperm_force(self);
+ * >> if (result & PAGEDIR_MAP_FWRITE) {
+ * >>     struct mpart *part = self->mn_part;
+ * >>     if (self->mn_flags & MNODE_F_SHARED) {
+ * >>         if (!LIST_EMPTY(&part->mp_copy))
+ * >>             result &= ~PAGEDIR_MAP_FWRITE;
+ * >>     } else {
+ * >>         if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
+ * >>             LIST_NEXT(self, mn_link) != NULL || !mfile_isanon(part->mp_file))
+ * >>             result &= ~PAGEDIR_MAP_FWRITE;
+ * >>     }
+ * >> } */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
+NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self);
+#define mnode_getperm(self) \
+	(mnode_getperm_nouser(self) | (mnode_isuser(self) ? PAGEDIR_MAP_FUSER : 0))
+
+/* Return mem-node paging permissions, irregardless of copy-on-write
+ * semantics. - That is: allow write whenever the node requests write,
+ * no matter who else might also be using the underlying mem-part. */
 #if (PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC && \
      PAGEDIR_MAP_FREAD == MNODE_F_PREAD && \
      PAGEDIR_MAP_FWRITE == MNODE_F_PWRITE)
-#define mnode_getperm(self)                                                  \
+#define mnode_getperm_force(self)                                            \
 	(((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE)) | \
 	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
-#define mnode_getperm_kernel(self) \
+#define mnode_getperm_force_nouser(self) \
 	((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE))
 #else /* ... */
-#define mnode_getperm(self)                                           \
+#define mnode_getperm_force(self)                                     \
 	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_MAP_FEXEC : 0) |   \
 	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_MAP_FREAD : 0) |   \
 	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_MAP_FWRITE : 0) | \
 	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
-#define mnode_getperm_kernel(self)                                  \
+#define mnode_getperm_force_nouser(self)                            \
 	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_MAP_FEXEC : 0) | \
 	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_MAP_FREAD : 0) | \
 	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_MAP_FWRITE : 0))
@@ -319,8 +344,8 @@ struct mnode {
 #define mnode_getendaddr(self) ((void *)((self)->mn_maxaddr + 1))
 #define mnode_getaddr(self)    ((void *)(self)->mn_minaddr)
 #define mnode_getsize(self)    ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr) + 1)
-#define mnode_iskern(self)     ADDR_ISKERN((self)->mn_minaddr)
-#define mnode_isuser(self)     ADDR_ISUSER((self)->mn_minaddr)
+#define mnode_iskern(self)     ADDRRANGE_ISKERN((self)->mn_minaddr, (self)->mn_maxaddr + 1)
+#define mnode_isuser(self)     ADDRRANGE_ISUSER((self)->mn_minaddr, (self)->mn_maxaddr + 1)
 /* Return the part-relative min-/max-address that is being mapped. */
 #define mnode_getmapaddr(self)    ((mpart_reladdr_t)((self)->mn_partoff))
 #define mnode_getmapminaddr(self) ((mpart_reladdr_t)((self)->mn_partoff))

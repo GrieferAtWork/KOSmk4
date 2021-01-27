@@ -127,8 +127,8 @@ again:
 		/* (re-)map the faulted address range. */
 		{
 			u16 perm;
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-			                  mf.mfl_offs, mnode_getperm(mf.mfl_node));
+			perm = mnode_getperm(mf.mfl_node);
+			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size, mf.mfl_offs, perm);
 			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
@@ -279,8 +279,9 @@ again:
 		/* (re-)map the faulted address range. */
 		{
 			u16 perm;
+			perm = mnode_getperm(mf.mfl_node);
 			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-			                  mf.mfl_offs, mnode_getperm(mf.mfl_node));
+			                  mf.mfl_offs, perm);
 			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
@@ -470,6 +471,34 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 }
 
 
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL copybits)(mpart_blkst_word_t *dst_bitset,
+                        mpart_blkst_word_t const *src_bitset,
+                        size_t dst_index, size_t src_index,
+                        size_t num_bits) {
+#define BITSET_INDEX(index) ((index) / BITSOF(mpart_blkst_word_t))
+#define BITSET_SHIFT(index) ((index) % BITSOF(mpart_blkst_word_t))
+#define GETBIT(index)       ((src_bitset[BITSET_INDEX(index)] >> BITSET_SHIFT(index)) & 1)
+#define SETBIT_OFF(index)   ((dst_bitset[BITSET_INDEX(index)] &= ~((mpart_blkst_word_t)1 << BITSET_SHIFT(index))))
+#define SETBIT_ON(index)    ((dst_bitset[BITSET_INDEX(index)] |= ((mpart_blkst_word_t)1 << BITSET_SHIFT(index))))
+	while (num_bits) {
+		--num_bits;
+		if (GETBIT(src_index)) {
+			SETBIT_ON(dst_index);
+		} else {
+			SETBIT_OFF(dst_index);
+		}
+		++dst_index;
+		++src_index;
+	}
+#undef SETBIT_ON
+#undef SETBIT_OFF
+#undef GETBIT
+#undef BITSET_SHIFT
+#undef BITSET_INDEX
+}
+
+
 
 
 /* (Try to) acquire locks, and load/split/unshare/... backing memory,
@@ -499,8 +528,9 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
  * >>         RETHROW();
  * >>     }
  * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
- * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
- * >>                       mf.mfl_offs, mnode_getperm(mf.mfl_node));
+ * >>     perm = mnode_getperm(mf.mfl_node);
+ * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
+ * >>                       mf.mfl_size, mf.mfl_offs, perm);
  * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
@@ -808,6 +838,7 @@ done_mark_changed:
 		 */
 		{
 			struct mpart *copy;
+			size_t block_offset;
 			size_t block_count;
 			copy = self->mfl_ucdat.ucd_copy;
 			assert(copy);
@@ -828,15 +859,19 @@ done_mark_changed:
 			DBG_inval(copy->mp_filent);
 
 			/* We need to copy the block-status bitset. */
-			block_count = acc_size >> copy->mp_file->mf_blockshift;
+			block_offset = acc_offs >> copy->mp_file->mf_blockshift;
+			block_count  = acc_size >> copy->mp_file->mf_blockshift;
 			if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 				/* A single word is enough! */
 				mpart_blkst_word_t word;
-				word = part->mp_blkst_inl;
-				if (!(part->mp_flags & MPART_F_BLKST_INL)) {
+				if (part->mp_flags & MPART_F_BLKST_INL) {
+					word = part->mp_blkst_inl >> (block_offset * MPART_BLOCK_STBITS);
+				} else if (part->mp_blkst_ptr == NULL) {
 					word = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
-					if (part->mp_blkst_ptr != NULL)
-						word = part->mp_blkst_ptr[0];
+				} else {
+					copybits(&word, part->mp_blkst_ptr, 0,
+					         block_offset* MPART_BLOCK_STBITS,
+					         block_count * MPART_BLOCK_STBITS);
 				}
 				copy->mp_blkst_inl = word;
 				copy->mp_flags |= MPART_F_BLKST_INL;
@@ -854,11 +889,11 @@ pcopy_free_unused_block_status:
 				        MPART_BLKST_BLOCKS_PER_WORD) >= block_count);
 				assert(block_count <= mpart_getblockcount(part, part->mp_file));
 				/* Copy over block-status bitset data. */
-				copy->mp_blkst_ptr = (mpart_blkst_word_t *)memcpy(self->mfl_ucdat.ucd_ucmem.scd_bitset,
-				                                                  part->mp_blkst_ptr,
-				                                                  block_count / MPART_BLKST_BLOCKS_PER_WORD,
-				                                                  sizeof(mpart_blkst_word_t));
+				copy->mp_blkst_ptr = self->mfl_ucdat.ucd_ucmem.scd_bitset;
 				DBG_inval(self->mfl_ucdat.ucd_ucmem.scd_bitset);
+				copybits(copy->mp_blkst_ptr, part->mp_blkst_ptr, 0,
+				         block_offset * MPART_BLOCK_STBITS,
+				         block_count * MPART_BLOCK_STBITS);
 			}
 
 			/* Fill in information on the backing storage. */
@@ -910,8 +945,8 @@ pcopy_free_unused_block_status:
 			old_minaddr    = node->mn_minaddr;
 			node           = mnode_merge(node); /* TODO: Implement this one (currently a stub) */
 			self->mfl_node = node;
-			assert(old_minaddr <= node->mn_minaddr);
-			if (old_minaddr < node->mn_minaddr)
+			assert(old_minaddr >= node->mn_minaddr);
+			if (old_minaddr > node->mn_minaddr)
 				self->mfl_offs += (size_t)(old_minaddr - node->mn_minaddr);
 		} /* Scope... */
 	} EXCEPT {

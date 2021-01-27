@@ -243,8 +243,9 @@ struct mfault {
  * >>         RETHROW();
  * >>     }
  * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
- * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
- * >>                       mf.mfl_offs, mnode_getperm(mf.mfl_node));
+ * >>     perm = mnode_getperm(mf.mfl_node);
+ * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
+ * >>                       mf.mfl_size, mf.mfl_offs, perm);
  * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
