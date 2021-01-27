@@ -63,7 +63,7 @@ NOTHROW(FCALL mnode_free)(struct mnode *__restrict self) {
 
 
 
-PRIVATE NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 	/* Check if there are any nodes mapping our part that use LOCK flags.
 	 * For this purpose, both copy-on-write and shared nodes can lock the part. */
@@ -92,7 +92,7 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(struct mpart_postlockop *__res
 	mnode_free(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
+INTERN NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
 NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
                                              struct mpart *__restrict part) {
 	struct mpart_postlockop *post;
