@@ -118,6 +118,12 @@ PRIVATE PAGEDIR_PAGEALIGNED uintptr_t KCALL
 select_random_integer_with_bias(uintptr_t minval,
                                 uintptr_t maxval,
                                 uintptr_t bias) {
+#if 1
+	assert(minval <= bias);
+	assert(bias <= maxval);
+	/* TODO: The below code doesn't work (returns numbers outside the min/max-range)... */
+	return bias;
+#else
 	uintptr_t rand_count;
 	assert(minval <= bias);
 	assert(bias <= maxval);
@@ -150,6 +156,7 @@ select_random_integer_with_bias(uintptr_t minval,
 		return minval + offset;
 	}
 	return bias;
+#endif
 }
 
 
@@ -333,14 +340,9 @@ do_set_automatic_userspace_hint:
 	                        &mima);
 	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
 	if (mima.mm_min == NULL) {
-		uintptr_t retindex;
+		void *alloc_maxaddr;
 		unsigned int alignshift;
 select_from_avail_range:
-		/* The hinted address range it available! */
-		if (flags & MAP_NOASLR) {
-			result = avail_minaddr;
-			goto done_dynamic;
-		}
 		alignshift = PAGESHIFT;
 		if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
 			alignshift = CTZ(min_alignment);
@@ -356,9 +358,11 @@ select_from_avail_range:
 				avail_minaddr = (byte_t *)mnode_getmaxaddr(mima.mm_max) + 1;
 				if (avail_minaddr < allow_minaddr)
 					avail_minaddr = allow_minaddr;
-				if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
-					avail_minaddr = (void *)CEIL_ALIGN((uintptr_t)avail_minaddr, min_alignment);
+			} else {
+				avail_minaddr = allow_minaddr;
 			}
+			if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
+				avail_minaddr = (void *)CEIL_ALIGN((uintptr_t)avail_minaddr, min_alignment);
 		}
 		if (avail_maxaddr < allow_maxaddr) {
 			mnode_tree_minmaxlocate(self->mm_mappings,
@@ -368,27 +372,38 @@ select_from_avail_range:
 				avail_maxaddr = (byte_t *)mnode_getminaddr(mima.mm_min) - 1;
 				if (avail_maxaddr > allow_maxaddr)
 					avail_maxaddr = allow_maxaddr;
-				if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
-					avail_maxaddr = (void *)(FLOOR_ALIGN((uintptr_t)avail_maxaddr + 1, min_alignment) - 1);
+			} else {
+				avail_maxaddr = allow_maxaddr;
 			}
+			if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
+				avail_maxaddr = (void *)(FLOOR_ALIGN((uintptr_t)avail_maxaddr + 1, min_alignment) - 1);
 		}
 		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
-		avail_maxaddr = (byte_t *)avail_maxaddr - num_bytes;
+		/* Figure out the max address which we're allowed to return. */
+		alloc_maxaddr = ((byte_t *)avail_maxaddr + 1) - num_bytes;
 		if (addr < avail_minaddr)
 			addr = avail_minaddr;
-		if (addr > (byte_t *)avail_maxaddr /*+ 1*/)
-			addr = (byte_t *)avail_maxaddr + 1;
+		if (addr > alloc_maxaddr)
+			addr = alloc_maxaddr;
 		if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
-			avail_maxaddr = addr;
+			alloc_maxaddr = addr;
 		} else if (MMAN_GETUNMAPPED_ISABOVE(flags)) {
 			avail_minaddr = addr;
 		}
-		retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
-		                                           (uintptr_t)avail_maxaddr >> alignshift,
-		                                           (uintptr_t)addr >> alignshift);
-		result   = (void *)(retindex << alignshift);
+		assertf(addr >= avail_minaddr, "%p >= %p", addr, avail_minaddr);
+		assertf(addr <= alloc_maxaddr, "%p <= %p", addr, alloc_maxaddr);
+		if (flags & MAP_NOASLR) {
+			/* Always use the given bias if ASLR is disabled. */
+			result = addr;
+		} else {
+			uintptr_t retindex;
+			retindex = select_random_integer_with_bias((uintptr_t)avail_minaddr >> alignshift,
+			                                           (uintptr_t)alloc_maxaddr >> alignshift,
+			                                           (uintptr_t)addr >> alignshift);
+			result   = (void *)(retindex << alignshift);
+		}
 		assertf(result >= avail_minaddr, "%p >= %p", result, avail_minaddr);
-		assertf(result <= avail_maxaddr, "%p <= %p", result, avail_maxaddr);
+		assertf(result <= alloc_maxaddr, "%p <= %p", result, alloc_maxaddr);
 	} else {
 		struct mnode *prev, *next;
 		bool want_below, want_above;
@@ -555,7 +570,6 @@ select_from_hi_range:
 		goto err_no_space;
 	}
 
-done_dynamic:
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 	/* Have the return value point past the leading guard-page.
 	 * We've originally (tried) to allocate +1 page of additional
@@ -567,6 +581,7 @@ done_dynamic:
 #endif /* !NDEBUG */
 	}
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
+
 	/* Sanity check: assert that the found region really is unused. */
 	assertf(!mnode_tree_rlocate(self->mm_mappings,
 	                            (byte_t *)result,

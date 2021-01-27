@@ -520,7 +520,7 @@ again:
 			                               (self->mp_minaddr >> file->mf_blockshift) + start,
 			                               loc.mppl_addr, end - start);
 		} EXCEPT {
-			/* The write-back failed. - As such we must re-store the ST_CHNG status
+			/* The write-back failed. - As such we must restore the ST_CHNG status
 			 * of all of the pages we've altered to INIT, as well as broadcast the
 			 * init-done signal of the associated file. */
 			for (i = start; i < end; ++i)

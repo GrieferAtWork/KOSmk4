@@ -363,7 +363,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		st = mpart_getblockstate(self, max + 1);
 		if (st != MPART_BLOCK_ST_NDEF)
 			break; /* Can't load this one for whatever reason... */
-		mpart_setblockstate(self, min + 1, MPART_BLOCK_ST_INIT);
+		mpart_setblockstate(self, max + 1, MPART_BLOCK_ST_INIT);
 		++max;
 	}
 
@@ -599,7 +599,7 @@ again_read_st:
 
 		if (st == MPART_BLOCK_ST_NDEF) {
 			auto mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
-			if (mo_loadblocks != NULL) {
+			if likely(mo_loadblocks != NULL) {
 				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW! */
 				(*mo_loadblocks)(self->mp_file,
 				                 (mfile_block_t)((mpart_getminaddr(self) >>

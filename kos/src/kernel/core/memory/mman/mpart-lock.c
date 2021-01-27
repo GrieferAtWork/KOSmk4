@@ -46,6 +46,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -423,7 +424,7 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 	mpart_blkst_word_t *new_bitset;
 	/* Must actually allocate the block-status bitset! */
 	avl_size = kmalloc_usable_size(data->scd_bitset);
-	req_size = CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD);
+	req_size = CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
 	if likely(req_size > avl_size) {
 		/* Must allocate a larger bitset. */
 		new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->scd_bitset, req_size,
@@ -571,7 +572,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			/* All blocks are undefined by default! */
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
 			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
-		} else {
+		} else if (self->mp_blkst_ptr == NULL) {
 			/* Must actually allocate the block-status bitset! */
 			if (!setcore_ex_makebitset_or_unlock(self, unlock, data, num_blocks, GFP_CALLOC))
 				goto nope;
@@ -581,6 +582,17 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			ATOMIC_AND(self->mp_flags, ~MPART_F_BLKST_INL);
 			DBG_inval(data->scd_bitset);
 		}
+#ifndef NDEBUG
+		else {
+			assertf(kmalloc_usable_size(self->mp_blkst_ptr) >=
+			        CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD) *
+			        sizeof(mpart_blkst_word_t),
+			        "Allocated bitset at %p is too small (%" PRIuSIZ " < %" PRIuSIZ ")",
+			        kmalloc_usable_size(self->mp_blkst_ptr),
+			        CEILDIV(num_blocks, MPART_BLKST_BLOCKS_PER_WORD) *
+			        sizeof(mpart_blkst_word_t));
+		}
+#endif /* !NDEBUG */
 		break;
 
 	case MPART_ST_SWP:

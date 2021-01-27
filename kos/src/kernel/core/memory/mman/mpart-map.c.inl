@@ -83,10 +83,11 @@ NOTHROW(FCALL mpart_mmap_impl)(mpart_blkst_word_t const *bitset, unsigned int sh
 			(retval)           = MPART_BLOCK_COMMON(retval, _temp);     \
 		}                                                               \
 	}	__WHILE0
+	baseaddr += baseaddr_offset;
 	if (bitset == NULL) {
 		/* All blocks are implicitly marked CHNG, so we can map with full permissions! */
 		result = perm;
-		LOCAL_pagedir_map(addr, chunk_size, baseaddr + baseaddr_offset, perm);
+		LOCAL_pagedir_map(addr, chunk_size, baseaddr, perm);
 	} else {
 		size_t page_start, page_end;
 		page_start = baseaddr_offset >> PAGESHIFT;

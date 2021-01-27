@@ -4533,6 +4533,8 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 		                               driver_dentry,
 		                               flags);
 	} EXCEPT {
+		/* TODO: With the new mman, we can use `mman_unmap_kram_locked_ex()'
+		 *       to get the guaranty that unmapping won't fail here! */
 		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
 		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 		RETHROW();
