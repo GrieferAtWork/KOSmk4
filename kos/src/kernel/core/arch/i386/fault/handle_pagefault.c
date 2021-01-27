@@ -421,6 +421,11 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Load the address of the faulting page. */
 	mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
 
+#if 1
+	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "]\n",
+	       (uintptr_t)addr, mf.mfl_addr, pc, icpustate_getsp(state), ecode);
+#endif
+
 	/* Check if a hint was defined for this page. */
 	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT |
 	              X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&

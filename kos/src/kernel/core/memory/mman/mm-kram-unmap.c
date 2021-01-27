@@ -1454,14 +1454,13 @@ NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op) {
  *                  calloc() might arbitrarily break... */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               gfp_t flags) {
+                               size_t num_bytes, gfp_t flags) {
 	struct mman_unmap_kram_job *job;
 	if unlikely(!num_bytes)
 		return;
 	assert(!(flags & ~(GFP_CALLOC)));
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
-	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 	job = (struct mman_unmap_kram_job *)addr;
 	job->mukj_done    = NULL;
 	job->mukj_minaddr = (byte_t *)addr;
@@ -1474,14 +1473,13 @@ NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
  * when the caller is already holding a lock to `mman_kernel' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t flags) {
+                                      size_t num_bytes, gfp_t flags) {
 	struct mman_unmap_kram_job *job;
 	if unlikely(!num_bytes)
 		return;
 	assert(!(flags & ~(GFP_CALLOC)));
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
-	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 	job = (struct mman_unmap_kram_job *)addr;
 	job->mukj_done    = NULL;
 	job->mukj_minaddr = (byte_t *)addr;

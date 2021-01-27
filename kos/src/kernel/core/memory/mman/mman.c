@@ -227,11 +227,13 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_new(void) THROWS(E_BADALLOC, ...) {
 	REF struct mman *result;
 	result = _mman_alloc();
-	result->mm_pagedir_p = (pagedir_phys_t)pagedir_translate(&result->mm_pagedir);
 
 	/* Copy the PER-VM initialization template. */
 	memcpy((byte_t *)result + PAGEDIR_SIZE, __kernel_permman_start,
-		    (size_t)__kernel_permman_size);
+	       (size_t)__kernel_permman_size);
+
+	/* Fill in mm-specific fields. */
+	result->mm_pagedir_p  = (pagedir_phys_t)pagedir_translate(&result->mm_pagedir);
 	result->mm_refcnt     = 1;
 	result->mm_weakrefcnt = 1;
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
@@ -308,6 +310,7 @@ again:
 		/* No-op (but must check explicitly to prevent dead-
 		 * lock from acquiring `newmman->mm_threadslock' twice) */
 		PREEMPTION_POP(was);
+		decref_nokill(newmman);
 		return;
 	}
 

@@ -257,15 +257,13 @@ struct mman_unmap_kram_job {
  *                  calloc() might arbitrarily break... */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               gfp_t flags DFL(0));
+                               size_t num_bytes, gfp_t flags DFL(0));
 
 /* Same as `mman_unmap_kram()', but may be used to improve efficiency
  * when the caller is already holding a lock to `mman_kernel' */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                      gfp_t flags DFL(0));
+                                      size_t num_bytes, gfp_t flags DFL(0));
 
 /* Try to unmap kernel memory while the caller is holding a lock to the kernel mman.
  * NOTE: This function can be used to delete any kind of kernel-space memory mapping,

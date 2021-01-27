@@ -477,19 +477,7 @@ again_lock_mfile_map:
 			 * However, by unconditionally doing it here, we can
 			 * speed up the initial memory access whenever memory
 			 * had already been loaded in some other way, too! */
-			map_prot = mnode_getperm_force(node);
-			if (map_prot & PAGEDIR_MAP_FWRITE) {
-				/* Delete write-permissions if necessary. */
-				if ((prot & PROT_SHARED)
-				    /* Mustn't allow write to SHARED mappings if there are copy-on-write
-				     * mappings that have to be unshared first. */
-				    ? (!LIST_EMPTY(&part->mp_copy))
-				    /* Mustn't allow write to COPY-ON-WRITE mappings, unless we're the
-				     * only ones that could feasibly even access this node. */
-				    : (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != node ||
-				       LIST_NEXT(node, mn_link) != NULL || !mfile_isanon(part->mp_file)))
-					map_prot &= ~PAGEDIR_MAP_FWRITE; /* Must do lazy unshare! */
-			}
+			map_prot = mnode_getperm(node);
 			map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
 			                        mnode_getaddr(node),
 			                        mnode_getsize(node),

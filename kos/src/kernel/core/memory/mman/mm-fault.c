@@ -47,6 +47,11 @@
 #include <stddef.h>
 #include <string.h>
 
+/*TODO:REMOVE_ME*/
+#include <kernel/printk.h>
+#include <kernel/mman/nopf.h>
+/*TODO:REMOVE_ME*/
+
 DECL_BEGIN
 
 #ifdef NDEBUG
@@ -578,6 +583,14 @@ mfault_or_unlock(struct mfault *__restrict self)
 	assert(self->mfl_size != 0);
 	assert(!wasdestroyed(self->mfl_part));
 	assert(!wasdestroyed(self->mfl_mman));
+	printk(KERN_DEBUG "HERE: %p", self->mfl_addr);
+	{
+		u32 word;
+		if (memcpy_nopf(&word, (void *)0xbf113368, 4) == 0)
+			printk(KERN_DEBUG " (0xbf113368=%p)", word);
+	}
+	printk(KERN_DEBUG "\n");
+
 	node = self->mfl_node;
 	part = self->mfl_part;
 
@@ -688,11 +701,11 @@ done_mark_changed:
 			mpart_changed(part, acc_offs, acc_size);
 			goto done;
 		}
-	
+
 		/* Make sure that the accessed part is loaded. */
 		if (!mpart_loadsome_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 			goto nope_reinit_scmem;
-	
+
 		/* Deal with writes to copy-on-write mappings that aren't reachable from the
 		 * outside word. This is the normal case for mmap(MAN_ANON) memory, unless
 		 * the associated process has called fork(2), at which point there would be
