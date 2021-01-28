@@ -241,7 +241,7 @@ done_tmpfs:
 		 * Instead, fork()+exec(), then keep on doing so
 		 * whenever busybox dies (such as when the user
 		 * presses CTRL+D do trigger an end-of-input event) */
-		cpid = Fork(); /* TODO: Change back to VFork() Only set to Fork() to easily debug mman_fork() */
+		cpid = VFork();
 		if (cpid == 0) {
 			/* Become the foreground process of /dev/console */
 			console_set_fgproc();
