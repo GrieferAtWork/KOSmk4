@@ -293,6 +293,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Support for fat12, fat16 and fat32
 		- Support for writing to files
 		- Support for creating/renaming/removing files and directories
+		- Support for symbolic links (using cygwin's old symlink format)
 	- apic/lapic
 	- acpi (detected, but tables aren't actually being parsed)
 	- iso9660
