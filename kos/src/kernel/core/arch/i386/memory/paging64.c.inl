@@ -2087,7 +2087,7 @@ NOTHROW(FCALL p64_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
 INTERN NOBLOCK void
-NOTHROW(FCALL p64_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p64_pagedir_denywriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec4, vec3, vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	vec4 = P64_PDIR_VEC3INDEX(addr);
@@ -2098,8 +2098,8 @@ NOTHROW(FCALL p64_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p64_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p64_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                     PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	for (i = 0; i < num_bytes; i += 4096) {
@@ -2422,8 +2422,8 @@ DEFINE_PUBLIC_ALIAS(pagedir_push_mapone, p64_pagedir_push_mapone);
 DEFINE_PUBLIC_ALIAS(pagedir_pop_mapone, p64_pagedir_pop_mapone);
 DEFINE_PUBLIC_ALIAS(pagedir_unmapone, p64_pagedir_unmapone);
 DEFINE_PUBLIC_ALIAS(pagedir_unmap, p64_pagedir_unmap);
-DEFINE_PUBLIC_ALIAS(pagedir_unwriteone, p64_pagedir_unwriteone);
-DEFINE_PUBLIC_ALIAS(pagedir_unwrite, p64_pagedir_unwrite);
+DEFINE_PUBLIC_ALIAS(pagedir_denywriteone, p64_pagedir_denywriteone);
+DEFINE_PUBLIC_ALIAS(pagedir_denywrite, p64_pagedir_denywrite);
 DEFINE_PUBLIC_ALIAS(pagedir_ismapped, p64_pagedir_ismapped);
 DEFINE_PUBLIC_ALIAS(pagedir_iswritable, p64_pagedir_iswritable);
 DEFINE_PUBLIC_ALIAS(pagedir_isuseraccessible, p64_pagedir_isuseraccessible);

@@ -40,9 +40,9 @@
 #undef ARCH_PAGEDIR_HAVE_CHANGED
 #define ARCH_PAGEDIR_HAVE_CHANGED 1
 
-/* x86 implements the `pagedir_unwrite' API (delete low-level write permissions). */
-#undef ARCH_PAGEDIR_HAVE_UNWRITE
-#define ARCH_PAGEDIR_HAVE_UNWRITE 1
+/* x86 implements the `pagedir_denywrite' API (delete low-level write permissions). */
+#undef ARCH_PAGEDIR_HAVE_DENYWRITE
+#define ARCH_PAGEDIR_HAVE_DENYWRITE 1
 
 #if defined(CONFIG_NO_PAGING_PAE) && defined(CONFIG_NO_PAGING_P32)
 #error "You can't disable PAE and P32 paging! - I need at least either to work properly!"

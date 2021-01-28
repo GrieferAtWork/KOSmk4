@@ -931,7 +931,7 @@ NOTHROW(FCALL p32_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_denywriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -940,8 +940,8 @@ NOTHROW(FCALL p32_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                     PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	for (i = 0; i < num_bytes; i += 4096) {

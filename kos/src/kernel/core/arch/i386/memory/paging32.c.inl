@@ -69,8 +69,8 @@
 	callback(pagedir_pop_mapone);             \
 	callback(pagedir_unmapone);               \
 	callback(pagedir_unmap);                  \
-	callback(pagedir_unwriteone);             \
-	callback(pagedir_unwrite);                \
+	callback(pagedir_denywriteone);           \
+	callback(pagedir_denywrite);              \
 	callback(pagedir_unmap_userspace);        \
 	callback(pagedir_unmap_userspace_nosync); \
 	callback(pagedir_translate);              \

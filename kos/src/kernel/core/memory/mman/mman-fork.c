@@ -465,8 +465,11 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 			}
 			goto done;
 		}
-		/* TODO: Rename `pagedir_unwrite' to `pagedir_denywrite' */
-		pagedir_unwrite(addr, size);
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
+		pagedir_denywrite(addr, size);
+#else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
+		pagedir_unmap(addr, size);
+#endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 		pagedir_unprepare_map(addr, size);
 		if (!next)
 			break;

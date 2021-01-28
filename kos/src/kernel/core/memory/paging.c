@@ -85,16 +85,16 @@ NOTHROW(KCALL pagedir_unmapone_p)(pagedir_phys_t self,
 	PAGEDIR_P_ENDUSE(self);
 }
 
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_unwriteone_p") void
-NOTHROW(KCALL pagedir_unwriteone_p)(pagedir_phys_t self,
-                                    PAGEDIR_PAGEALIGNED VIRT void *addr) {
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
+PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_denywriteone_p") void
+NOTHROW(KCALL pagedir_denywriteone_p)(pagedir_phys_t self,
+                                      PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	PAGEDIR_P_BEGINUSE(self) {
-		pagedir_unwriteone(addr);
+		pagedir_denywriteone(addr);
 	}
 	PAGEDIR_P_ENDUSE(self);
 }
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 
 PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_map_p") bool
 NOTHROW(KCALL pagedir_prepare_map_p)(pagedir_phys_t self,
@@ -163,17 +163,17 @@ NOTHROW(KCALL pagedir_unmap_p)(pagedir_phys_t self,
 	PAGEDIR_P_ENDUSE(self);
 }
 
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_unwrite_p") void
-NOTHROW(KCALL pagedir_unwrite_p)(pagedir_phys_t self,
-                                 PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
+PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_denywrite_p") void
+NOTHROW(KCALL pagedir_denywrite_p)(pagedir_phys_t self,
+                                   PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	PAGEDIR_P_BEGINUSE(self) {
-		pagedir_unwrite(addr, num_bytes);
+		pagedir_denywrite(addr, num_bytes);
 	}
 	PAGEDIR_P_ENDUSE(self);
 }
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 
 PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_ismapped_p") bool
 NOTHROW(KCALL pagedir_ismapped_p)(pagedir_phys_t self,

@@ -253,14 +253,14 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 
 	if (self->mn_flags & MNODE_F_MPREPARED) {
 		/* Delete write permissions. */
-		pagedir_unwrite_p(pdir, addr, size);
+		pagedir_denywrite_p(pdir, addr, size);
 	} else {
 		/* Prepare the page directory */
 		if unlikely(!pagedir_prepare_map_p(pdir, addr, size))
 			return MNODE_CLEAR_WRITE_BADALLOC;
 
 		/* Delete write permissions. */
-		pagedir_unwrite_p(pdir, addr, size);
+		pagedir_denywrite_p(pdir, addr, size);
 
 		/* Unprepare the page directory. */
 		pagedir_unprepare_map_p(pdir, addr, size);
@@ -293,7 +293,7 @@ NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self) {
 		return MNODE_CLEAR_WRITE_BADALLOC;
 
 	/* Delete write permissions. */
-	pagedir_unwrite(addr, size);
+	pagedir_denywrite(addr, size);
 
 	/* Unprepare the page directory. */
 	pagedir_unprepare_map(addr, size);

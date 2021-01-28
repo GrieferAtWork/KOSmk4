@@ -514,35 +514,35 @@ NOTHROW(FCALL pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNWRITE
 FUNDEF NOBLOCK void
-NOTHROW(FCALL pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
+NOTHROW(FCALL pagedir_denywriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
 FUNDEF NOBLOCK void
-NOTHROW(FCALL __os_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                    PAGEDIR_PAGEALIGNED size_t num_bytes)
-		ASMNAME("pagedir_unwrite");
+NOTHROW(FCALL __os_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                      PAGEDIR_PAGEALIGNED size_t num_bytes)
+		ASMNAME("pagedir_denywrite");
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(FCALL pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
 		if (num_bytes <= PAGESIZE) {
-			pagedir_unwriteone(addr);
+			pagedir_denywriteone(addr);
 			return;
 		}
 	}
-	__os_pagedir_unwrite(addr, num_bytes);
+	__os_pagedir_denywrite(addr, num_bytes);
 }
 #else /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
 FUNDEF NOBLOCK void
-NOTHROW(FCALL pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes);
+NOTHROW(FCALL pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t num_bytes);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_UNWRITE */
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 
 
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNC
@@ -632,9 +632,9 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unprepare_mapone_p)(pagedir_phys_t sel
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_mapone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED PHYS physaddr_t phys, u16 perm);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr);
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
-FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unwriteone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr);
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
+FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_denywriteone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr);
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_ismapped_p)(pagedir_phys_t self, VIRT void const *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_iswritable_p)(pagedir_phys_t self, VIRT void *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuseraccessible_p)(pagedir_phys_t self, VIRT void const *addr);
@@ -677,13 +677,13 @@ NOTHROW(KCALL __os_pagedir_unmap_p)(pagedir_phys_t self,
                                     PAGEDIR_PAGEALIGNED VIRT void *addr,
                                     PAGEDIR_PAGEALIGNED size_t num_bytes)
 		ASMNAME("pagedir_unmap_p");
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 FUNDEF NOBLOCK void
-NOTHROW(KCALL __os_pagedir_unwrite_p)(pagedir_phys_t self,
-                                      PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                      PAGEDIR_PAGEALIGNED size_t num_bytes)
-		ASMNAME("pagedir_unwrite_p");
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+NOTHROW(KCALL __os_pagedir_denywrite_p)(pagedir_phys_t self,
+                                        PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                        PAGEDIR_PAGEALIGNED size_t num_bytes)
+		ASMNAME("pagedir_denywrite_p");
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL pagedir_prepare_map_p)(pagedir_phys_t self,
                                      PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -767,22 +767,22 @@ NOTHROW(KCALL pagedir_unmap_p)(pagedir_phys_t self,
 	}
 	__os_pagedir_unmap_p(self, addr, num_bytes);
 }
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL pagedir_unwrite_p)(pagedir_phys_t self,
-                                 PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(KCALL pagedir_denywrite_p)(pagedir_phys_t self,
+                                   PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
 		if (num_bytes <= PAGESIZE) {
-			pagedir_unwriteone_p(self, addr);
+			pagedir_denywriteone_p(self, addr);
 			return;
 		}
 	}
-	__os_pagedir_unwrite_p(self, addr, num_bytes);
+	__os_pagedir_denywrite_p(self, addr, num_bytes);
 }
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 #else /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
 FUNDEF NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL pagedir_prepare_map_p)(pagedir_phys_t self,
@@ -811,12 +811,12 @@ FUNDEF NOBLOCK void
 NOTHROW(KCALL pagedir_unmap_p)(pagedir_phys_t self,
                                PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes);
-#ifdef ARCH_PAGEDIR_HAVE_UNWRITE
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 FUNDEF NOBLOCK void
-NOTHROW(KCALL pagedir_unwrite_p)(pagedir_phys_t self,
-                                 PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                 PAGEDIR_PAGEALIGNED size_t num_bytes);
-#endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
+NOTHROW(KCALL pagedir_denywrite_p)(pagedir_phys_t self,
+                                   PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes);
+#endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 
 #endif /* __CC__ */

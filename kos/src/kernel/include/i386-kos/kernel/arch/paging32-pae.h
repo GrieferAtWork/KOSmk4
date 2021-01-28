@@ -403,10 +403,10 @@ NOTHROW(FCALL pae_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
 INTDEF NOBLOCK void
-NOTHROW(FCALL pae_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
+NOTHROW(FCALL pae_pagedir_denywriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK void
-NOTHROW(FCALL pae_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                   PAGEDIR_PAGEALIGNED size_t num_bytes);
+NOTHROW(FCALL pae_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                     PAGEDIR_PAGEALIGNED size_t num_bytes);
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it

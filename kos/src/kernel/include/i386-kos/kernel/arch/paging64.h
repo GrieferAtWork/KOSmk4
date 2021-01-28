@@ -454,9 +454,9 @@ typedef struct p64_pdir pagedir_t;
 #undef ARCH_PAGEDIR_HAVE_CHANGED
 #define ARCH_PAGEDIR_HAVE_CHANGED 1
 
-/* x86 implements the `pagedir_unwrite' API (delete low-level write permissions). */
-#undef ARCH_PAGEDIR_HAVE_UNWRITE
-#define ARCH_PAGEDIR_HAVE_UNWRITE 1
+/* x86 implements the `pagedir_denywrite' API (delete low-level write permissions). */
+#undef ARCH_PAGEDIR_HAVE_DENYWRITE
+#define ARCH_PAGEDIR_HAVE_DENYWRITE 1
 
 /* x86 uses a 32-/64-bit pointer for `cr3', meaning that physical memory
  * which may exist outside of the address space also addressable without
