@@ -177,11 +177,9 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	part->mp_minaddr          = (pos_t)(0);
 	part->mp_maxaddr          = (pos_t)(num_bytes - 1);
 	part->mp_changed.sle_next = NULL; /* Technically shouldn't needed... */
-	part->mp_filent.rb_lhs    = NULL; /* Technically shouldn't needed... */
-	part->mp_filent.rb_rhs    = NULL; /* Technically shouldn't needed... */
-	part->mp_filent.rb_par    = NULL; /* Technically shouldn't needed... */
-	part->mp_blkst_ptr        = NULL;
-	part->mp_meta             = NULL;
+	_mpart_init_asanon(part);
+	part->mp_blkst_ptr = NULL;
+	part->mp_meta      = NULL;
 
 	/* Insert the new node into the kernel and release our lock to it. */
 	mnode_tree_insert(&mman_kernel.mm_mappings, node);

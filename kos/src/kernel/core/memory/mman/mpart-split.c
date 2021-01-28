@@ -817,7 +817,7 @@ relock_with_data:
 		/* Step #5: If the associated file isn't anonymous, then we must
 		 *          also acquire a lock to it, so that we can insert the
 		 *          new part we'll be creating into it. */
-		if (!mfile_isanon(file)) {
+		if (!mpart_isanon(self)) {
 			if (!mfile_lock_trywrite(file)) {
 				incref(file);
 				unlockall(self);
@@ -826,6 +826,7 @@ relock_with_data:
 					task_yield();
 				goto again;
 			}
+			assert(!mfile_isanon(file));
 		}
 	} EXCEPT {
 		mpart_split_data_fini(&data);
@@ -1140,7 +1141,8 @@ maybe_free_unused_hibitset:
 	 * mem-file. */
 	DBG_memset(&hipart->mp_changed, 0xcc, sizeof(hipart->mp_changed));
 	if ((hipart->mp_flags & MPART_F_CHANGED) &&
-	    file->mf_ops->mo_saveblocks != NULL && !mfile_isanon(file)) {
+	    file->mf_ops->mo_saveblocks != NULL && !mpart_isanon(self)) {
+		assert(!mfile_isanon(file));
 		if (mpart_really_changed(hipart)) {
 			/* Must add the new `hipart' to the file's list of changed parts. */
 			SLIST_ATOMIC_INSERT(&file->mf_changed, hipart, mp_changed);
@@ -1240,7 +1242,7 @@ maybe_free_unused_hibitset:
 	}
 
 	/* Update the part-tree of the associated file. */
-	if (!mfile_isanon(file)) {
+	if (!mpart_isanon(self)) {
 		mpart_tree_removenode(&file->mf_parts, self);
 		lopart->mp_maxaddr = hipart->mp_minaddr - 1;
 		mpart_tree_insert(&file->mf_parts, lopart);
@@ -1248,7 +1250,7 @@ maybe_free_unused_hibitset:
 		mfile_lock_endwrite(file);
 	} else {
 		lopart->mp_maxaddr = hipart->mp_minaddr - 1;
-		DBG_memset(&hipart->mp_filent, 0xcc, sizeof(hipart->mp_filent));
+		_mpart_init_asanon(hipart);
 	}
 
 	/* Release locks. */

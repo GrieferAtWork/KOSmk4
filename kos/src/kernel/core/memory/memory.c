@@ -286,7 +286,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 			mask <<= missalignment * PMEMZONE_BITSPERPAGE;
 			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
-			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
+			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "oldval        = %" PRIXPTR "\n"
 			        "masked_oldval = %" PRIXPTR "\n"
 			        "mask          = %" PRIXPTR,

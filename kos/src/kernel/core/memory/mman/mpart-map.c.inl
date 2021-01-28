@@ -83,7 +83,6 @@ NOTHROW(FCALL mpart_mmap_impl)(mpart_blkst_word_t const *bitset, unsigned int sh
 			(retval)           = MPART_BLOCK_COMMON(retval, _temp);     \
 		}                                                               \
 	}	__WHILE0
-	baseaddr += baseaddr_offset;
 	if (bitset == NULL) {
 		/* All blocks are implicitly marked CHNG, so we can map with full permissions! */
 		result = perm;
@@ -314,47 +313,41 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
 	case MPART_ST_MEM: {
 		/* Simplest case: we can just directly map the proper sub-range! */
 		physaddr_t baseaddr;
-		baseaddr = physpage2addr(self->mp_mem.mc_start);
+		baseaddr = physpage2addr(self->mp_mem.mc_start) + offset;
 		result = LOCAL_mpart_mmap_p_impl(bitset, shift, baseaddr,
 		                                 addr, size, offset, perm);
 	}	break;
 
 	case MPART_ST_MEM_SC: {
-		mpart_reladdr_t chunk_start;
-		mpart_reladdr_t end_offset;
 		size_t i;
-		if unlikely(!size)
-			break;
-		chunk_start = 0;
-		end_offset  = offset + size;
-		result      = 0;
+		struct mchunk *vec;
+		mpart_reladdr_t chunk_offset;
+		chunk_offset = offset;
+		result       = 0;
+		vec          = self->mp_mem_sc.ms_v;
 		for (i = 0;; ++i) {
-			physaddr_t baseaddr;
-			mpart_reladdr_t chunk_end;
 			size_t chunk_size;
 			assert(i < self->mp_mem_sc.ms_c);
-			chunk_size = self->mp_mem_sc.ms_v[i].mc_size * PAGESIZE;
-			chunk_end  = chunk_start + chunk_size;
-			if (chunk_end < offset) {
-				/* Not interested in this chunk! */
-			} else {
-				/* Limit how much of this chunk will actually be mapped. */
-				if (chunk_end > end_offset)
-					chunk_size = end_offset - chunk_start;
-				assert(chunk_start < end_offset);
-				baseaddr = physpage2addr(self->mp_mem_sc.ms_v[i].mc_start);
-				/* Map the requested sub-range in relation to this chunk.
-				 * NOTE: We must subtract `chunk_start' form the chunk's
-				 *       base-address, since `LOCAL_mpart_mmap_p_impl'
-				 *       assumes that the memory it's mapping is actually
-				 *       linear, which we fake by only mapping the portion
-				 *       that should actually be mapped. */
-				result |= LOCAL_mpart_mmap_p_impl(bitset, shift, baseaddr - chunk_start,
-				                                  addr, chunk_size, offset, perm);
-				if (chunk_end >= end_offset)
-					break;
+			chunk_size = (size_t)vec[i].mc_size << PAGESHIFT;
+			if (chunk_offset >= chunk_size) {
+				/* Uninteresting chunk... */
+				chunk_offset -= chunk_size;
+				continue;
 			}
-			chunk_start = chunk_end;
+			chunk_size -= chunk_offset;
+			if (chunk_size > size)
+				chunk_size = size;
+			/* Map (the requested sub-range of) this chunk */
+			assert(vec[i].mc_start != PHYSPAGE_INVALID);
+			result |= LOCAL_mpart_mmap_p_impl(bitset, shift,
+			                                  physpage2addr(vec[i].mc_start) + chunk_offset,
+			                                  addr, chunk_size, offset, perm);
+			if (chunk_size >= size)
+				break;
+			offset += chunk_size;
+			addr = (byte_t *)addr + chunk_size;
+			size -= chunk_size;
+			chunk_offset = 0;
 		}
 	}	break;
 

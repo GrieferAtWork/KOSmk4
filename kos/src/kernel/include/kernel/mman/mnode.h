@@ -306,7 +306,7 @@ struct mnode {
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     } else {
  * >>         if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
- * >>             LIST_NEXT(self, mn_link) != NULL || !mfile_isanon(part->mp_file))
+ * >>             LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     }
  * >> } */
@@ -372,7 +372,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
  * >>                 mnode_clear_write(node);
  * >>             }
  * >>         } else if (LIST_NEXT(part->mp_copy, mn_link) != NULL &&
- * >>                    mfile_isanon(file)) {
+ * >>                    mpart_isanon(part)) {
  * >>             // This is what would happen during a fork()
  * >>             mnode_clear_write(part->mp_copy);
  * >>         }

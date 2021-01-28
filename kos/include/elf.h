@@ -29,7 +29,6 @@
 #ifndef _ELF_H
 #define _ELF_H 1
 
-/* Standard ELF types. */
 #include "__stdinc.h"
 #ifdef __KOS_SYSTEM_HEADERS__
 #include "features.h"
@@ -51,16 +50,16 @@
 #include <bits/elf.h>
 #endif /* __USE_KOS */
 
-__DECL_BEGIN
-
 /* The contents of this file were originally based on GLibc /usr/include/elf.h
  * Note however that heavy additions were made and more documentation was added,
- * meaning that the original should be retrieved from glibc instead.
+ * meaning that the original should be retrieved from GLibc instead.
  * Additional sources:
  *  - https://docs.oracle.com/cd/E19253-01/817-1984/chapter6-14428/index.html
  *  - GNU Binutils (internal headers)
- *  - Misc. results from research across the internet.
+ *  - Misc. results from research across the Internet.
  */
+
+__DECL_BEGIN
 
 #define __PRIVATE_ELF_NAMEIMPL_ARG_PLACEHOLDER__EN(x) ,
 #define __PRIVATE_ELF_NAMEIMPL_TAKE_SECOND_ARG_IMPL(x, val, ...) val
@@ -97,6 +96,7 @@ __DECL_BEGIN
 #define __SIZEOF_ELF64_VERSYM__   __SIZEOF_ELF64_HALF__
 
 #ifdef __CC__
+/* Standard ELF types. */
 #ifndef _ELF_TYPES_DEFINED
 #define _ELF_TYPES_DEFINED 1
 /* Type for a 16-bit quantity. */
@@ -4128,7 +4128,7 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_METAG_NONE      3 /* No reloc */
 #define R_METAG_RELBRANCH 4
 #define R_METAG_GETSETOFF 5
-/* Backward compatability */
+/* Backward compatibility */
 #define R_METAG_REG32OP1 6
 #define R_METAG_REG32OP2 7
 #define R_METAG_REG32OP3 8

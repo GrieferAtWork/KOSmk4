@@ -360,9 +360,9 @@ do_realloc_in_extend_after_unlock:
 	vec[0]                     = chunk;
 	done                       = chunk.mc_size;
 extend_vector:
+	assert(done < total_pages);
 	for (;;) {
 		size_t missing_pages, avail;
-		assert(done < total_pages);
 		missing_pages = total_pages - done;
 		/* Make sure that there is sufficient space for one additional chunk. */
 		avail = kmalloc_usable_size(data->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
@@ -387,6 +387,10 @@ extend_vector:
 			goto err_badalloc; /* Insufficient physical memory. */
 		data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
 		++data->scd_copy_mem_sc.ms_c;
+		done += chunk.mc_size;
+		assert(done <= total_pages);
+		if (done >= total_pages)
+			break;
 	}
 
 	/* Try to truncate unused memory. */
@@ -1481,7 +1485,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	copy->mp_minaddr = self->mp_minaddr + bounds.ucb_mapmin;
 	copy->mp_maxaddr = self->mp_minaddr + bounds.ucb_mapmax;
 	assert(copy->mp_maxaddr <= self->mp_maxaddr);
-	DBG_inval(copy->mp_filent);
+	_mpart_init_asanon(copy);
 
 	/* We need to copy the block-status bitset. */
 	block_count = bounds.ucb_mapsize >> copy->mp_file->mf_blockshift;
@@ -1848,11 +1852,11 @@ again:
  * But also note that copy-on-write mappings usually prevent each other from gaining
  * write access, simply by co-existing. Furthermore, copy-on-write mappings can't
  * gain write-access to underlying mem-parts if those parts might be accessed from
- * the outside world (which is the case when `!mfile_isanon(self->mp_file)').
+ * the outside world (which is the case when `!mpart_isanon(self)').
  *
  * In other words: The only case where there may still be a node associated with
  * `self' that has write-access, applies when:
- *   >> mfile_isanon(self->mp_file) &&               // Backing file isn't anonymous
+ *   >> mpart_isanon(self) &&                        // Mem-part is anonymous
  *   >> LIST_EMPTY(&self->mp_share) &&               // No secondary shared mappings
  *   >> !LIST_EMPTY(&self->mp_copy) &&               // There is a copy-on-write mapping
  *   >> (LIST_NEXT(LIST_FIRST(&self->mp_copy), mn_link) == NULL) // There is exactly 1 copy-on-write mapping

@@ -529,13 +529,16 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 	struct vm_node *lhs_iter;
 	struct vm_node *rhs_iter;
 	struct vm_node *next;
+	if (!self->mn_fspath && !self->mn_fsname)
+		return NULL;
 	lhs_iter = self;
 	rhs_iter = mnode_tree_nextnode(self);
 	if (rhs_iter && ((byte_t *)mnode_getmaxaddr(lhs_iter) + 1 !=
 	                 (byte_t *)mnode_getminaddr(rhs_iter)))
 		rhs_iter = NULL;
 	while (lhs_iter && rhs_iter) {
-		if (lhs_iter->vn_prot != self->vn_prot ||
+		if (lhs_iter->mn_fsname != self->mn_fsname ||
+		    lhs_iter->mn_fspath != self->mn_fspath ||
 		    !lhs_iter->vn_part || !lhs_iter->vn_block) {
 			lhs_iter = NULL;
 			break;
@@ -543,7 +546,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 		/* Check if `lhs_iter' might be what we're looking for. */
 		if (vm_datablock_isusermod(lhs_iter->vn_block))
 			return lhs_iter;
-		if (rhs_iter->vn_prot != self->vn_prot ||
+		if (rhs_iter->mn_fsname != self->mn_fsname ||
+		    rhs_iter->mn_fspath != self->mn_fspath ||
 		    !rhs_iter->vn_part || !rhs_iter->vn_block) {
 			rhs_iter = NULL;
 			break;
@@ -575,7 +579,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 	/* Walk the remainder. */
 	if (lhs_iter) {
 		for (;;) {
-			if (lhs_iter->vn_prot != self->vn_prot ||
+			if (lhs_iter->mn_fsname != self->mn_fsname ||
+			    lhs_iter->mn_fspath != self->mn_fspath ||
 			    !lhs_iter->vn_part || !lhs_iter->vn_block)
 				break;
 			if (vm_datablock_isusermod(lhs_iter->vn_block))
@@ -591,7 +596,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 		}
 	} else if (rhs_iter) {
 		for (;;) {
-			if (rhs_iter->vn_prot != self->vn_prot ||
+			if (rhs_iter->mn_fsname != self->mn_fsname ||
+			    rhs_iter->mn_fspath != self->mn_fspath ||
 			    !rhs_iter->vn_part || !rhs_iter->vn_block)
 				break;
 			if (vm_datablock_isusermod(rhs_iter->vn_block))

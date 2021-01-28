@@ -294,33 +294,41 @@ struct mpart {
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file max address of this part. */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
+#ifdef __WANT_MPART__mp_oob
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_changed(...) { __VA_ARGS__ }
+#endif /* __WANT_MPART_INIT */
+	union {
+		SLIST_ENTRY(REF mpart)    mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
+		                                         *                         !mpart_isanon(self) && MPART_F_CHANGED)]
+		                                         * Per-file chain of mem-parts that have changed.
+		                                         * When the associated file supports the `mo_saveblocks', then
+		                                         * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
+		                                         * into its file's `mf_changed' list.
+		                                         * Also note that changed mem-parts are kept alive by the associated
+		                                         * file, since this list contains references, rather than weak pointers. */
+		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
+	};
+#else /* __WANT_MPART__mp_oob */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_changed(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
 	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
-	                                             *                         !mfile_isanon(mp_file) && MPART_F_CHANGED)]
+	                                             *                         !mpart_isanon(self) && MPART_F_CHANGED)]
 	                                             * Per-file chain of mem-parts that have changed.
 	                                             * When the associated file supports the `mo_saveblocks', then
 	                                             * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
 	                                             * into its file's `mf_changed' list.
 	                                             * Also note that changed mem-parts are kept alive by the associated
 	                                             * file, since this list contains references, rather than weak pointers. */
-#ifdef __WANT_MPART__mp_oob
-#ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_filent(...) { __VA_ARGS__ }
-#endif /* __WANT_MPART_INIT */
-	union {
-		RBTREE_NODE(struct mpart) mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
-		                                         * Entry with the associated file's tree. */
-		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
-	};
-#else /* __WANT_MPART__mp_oob */
+#endif /* !__WANT_MPART__mp_oob */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_filent(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
-	RBTREE_NODE(struct mpart)     mp_filent;    /* [lock(:mfile::mf_lock)][valid_if(!mfile_isanon(mp_file))]
+	RBTREE_NODE(struct mpart)     mp_filent;    /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock),
+	                                             *       WRITE(MPART_F_LOCKBIT && mp_file->mf_lock))]
+	                                             * [valid_if(!mpart_isanon(self))]
 	                                             * Entry with the associated file's tree. */
-#endif /* !__WANT_MPART__mp_oob */
 	union {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_blkst_ptr(mp_blkst_ptr) { mp_blkst_ptr }
@@ -388,6 +396,7 @@ struct mpart {
 
 
 #ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_filent_asanon() MPART_INIT_mp_filent({  })
 #define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)     \
 	{                                                                \
 		MPART_INIT_mp_refcnt(1),                                     \
@@ -403,7 +412,7 @@ struct mpart {
 		MPART_INIT_mp_minaddr(0),                                    \
 		MPART_INIT_mp_maxaddr((num_bytes)-1),                        \
 		MPART_INIT_mp_changed({}),                                   \
-		MPART_INIT_mp_filent({}),                                    \
+		MPART_INIT_mp_filent_asanon(),                               \
 		MPART_INIT_mp_blkst_ptr(__NULLPTR),                          \
 		MPART_INIT_mp_mem(first_page, page_count),                   \
 		MPART_INIT_mp_meta(__NULLPTR)                                \
@@ -422,6 +431,31 @@ struct mpart {
 #define mpart_getmaxblock(self, file)   (mfile_block_t)(mpart_getmaxaddr(self) >> (file)->mf_blockshift) /* WARNING: This one requires a lock! */
 #define mpart_getendblock(self, file)   (mfile_block_t)(mpart_getendaddr(self) >> (file)->mf_blockshift) /* WARNING: This one requires a lock! */
 #define mpart_getblockcount(self, file) (size_t)(mpart_getsize(self) >> (file)->mf_blockshift)           /* WARNING: This one requires a lock! */
+
+
+/* Check if `self' is anonymous (that is: `self !in self->mp_file->mf_parts')
+ * Note that as long as you're holding a lock to `self', you may make the assumption:
+ *    `(!wasdestroyed(self) && !mpart_isanon(self)) -> !mfile_isanon(self->mp_file)'
+ * Even when you're not actually holding a lock to the associated file. */
+#define mpart_isanon(self) ((self)->mp_filent.rb_par == (struct mpart *)-1)
+
+/* Fill in `self->mp_filent' such that `self' is marked as an anonymous mem-part. */
+#ifdef NDEBUG
+#define _mpart_init_asanon(self) (void)((self)->mp_filent.rb_par = (struct mpart *)-1)
+#elif __SIZEOF_POINTER__ == 4
+#define _mpart_init_asanon(self)                                              \
+	(void)((self)->mp_filent.rb_par = (struct mpart *)-1,                     \
+	       (self)->mp_filent.rb_lhs = (struct mpart *)__UINT32_C(0xcccccccc), \
+	       (self)->mp_filent.rb_rhs = (struct mpart *)__UINT32_C(0xcccccccc))
+#elif __SIZEOF_POINTER__ == 8
+#define _mpart_init_asanon(self)                                                      \
+	(void)((self)->mp_filent.rb_par = (struct mpart *)-1,                             \
+	       (self)->mp_filent.rb_lhs = (struct mpart *)__UINT64_C(0xcccccccccccccccc), \
+	       (self)->mp_filent.rb_rhs = (struct mpart *)__UINT64_C(0xcccccccccccccccc))
+#else /* __SIZEOF_POINTER__ == ... */
+#define _mpart_init_asanon(self) (void)((self)->mp_filent.rb_par = (struct mpart *)-1)
+#endif /* __SIZEOF_POINTER__ != ... */
+
 
 /* Reference counting control for `struct mpart' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_free)(struct mpart *__restrict self);
@@ -718,18 +752,18 @@ mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
  * are still being held, and that all shared mappings of the given mem-part are
  * no longer mapped with write permissions:
- * >> LIST_FOREACH(node, &self->mp_share, mn_link) {
+ * >> LIST_FOREACH (node, &self->mp_share, mn_link) {
  * >>     mnode_clear_write(node);
  * >> }
  * Note that copy-on-write (i.e. `&self->mp_copy') nodes don't need to be updated.
  * But also note that copy-on-write mappings usually prevent each other from gaining
  * write access, simply by co-existing. Furthermore, copy-on-write mappings can't
  * gain write-access to underlying mem-parts if those parts might be accessed from
- * the outside world (which is the case when `!mfile_isanon(self->mp_file)').
+ * the outside world (which is the case when `!mpart_isanon(self)').
  *
  * In other words: The only case where there may still be a node associated with
  * `self' that has write-access, applies when:
- *   >> mfile_isanon(self->mp_file) &&               // Backing file isn't anonymous
+ *   >> mpart_isanon(self) &&                        // Mem-part is anonymous
  *   >> LIST_EMPTY(&self->mp_share) &&               // No secondary shared mappings
  *   >> !LIST_EMPTY(&self->mp_copy) &&               // There is a copy-on-write mapping
  *   >> (LIST_NEXT(LIST_FIRST(&self->mp_copy), mn_link) == NULL) // There is exactly 1 copy-on-write mapping

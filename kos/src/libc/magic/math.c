@@ -1314,7 +1314,7 @@ double exp10(double x); /* TODO */
 
 @@Another name occasionally used
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__pow10")]]
-[[requires($has_function(pow))]]
+[[requires_function(pow)]]
 double pow10(double x) {
 	return pow(10.0, x);
 }

@@ -1077,8 +1077,10 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
 	}
 again:
 	/* Gracefully fail if the given range is already mapped. */
-	if (_RBTREE_OVERLAPPING(root, node))
+	if (_RBTREE_OVERLAPPING(root, node)) {
+		_RBTREE_VALIDATE(*proot);
 		return 0;
+	}
 	if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
 		RBTREE_T *nextnode;
 		nextnode = RBTREE_GETLHS(root);

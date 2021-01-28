@@ -703,7 +703,7 @@ done_mark_changed:
 		 * the associated process has called fork(2), at which point there would be
 		 * more than 1 mapping for the mem-part, and this part would fail! */
 		if (LIST_EMPTY(&part->mp_share) && LIST_FIRST(&part->mp_copy) == node &&
-		    LIST_NEXT(node, mn_link) == NULL && mfile_isanon(part->mp_file)) {
+		    LIST_NEXT(node, mn_link) == NULL && mpart_isanon(part)) {
 			/* Backing file is anonymous, there are no SHARED-mappings,
 			 * and we're the only copy-on-write mapping in existence.
 			 *
@@ -861,7 +861,7 @@ done_mark_changed:
 			DBG_inval(copy->mp_changed);
 			copy->mp_minaddr = part->mp_minaddr + acc_offs;
 			copy->mp_maxaddr = copy->mp_minaddr + acc_size - 1;
-			DBG_inval(copy->mp_filent);
+			_mpart_init_asanon(copy);
 
 			/* We need to copy the block-status bitset. */
 			block_offset = acc_offs >> copy->mp_file->mf_blockshift;
@@ -918,6 +918,9 @@ pcopy_free_unused_block_status:
 			/* With that, the new mem-part has been initialized, however we must
 			 * still copy over the contents of the old part into the new one! */
 			mpart_copyram(copy, part, acc_offs, acc_size / PAGESIZE);
+
+			/* Remove `node' from the link-list of the original mem-part. */
+			LIST_REMOVE(node, mn_link);
 
 			/* With memory copied, we no longer need our lock to `part'
 			 * But note that we've set `copy->mp_flags & MPART_F_LOCKBIT'

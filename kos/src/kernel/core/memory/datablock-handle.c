@@ -1293,6 +1293,7 @@ NOTHROW(KCALL vm_datablock_count_part)(struct vm_datapart const *__restrict self
 again:
 	++result;
 #ifdef CONFIG_USE_NEW_VM
+	assert(!mpart_isanon(self));
 	if (self->mp_filent.rb_lhs) {
 		if (self->mp_filent.rb_rhs)
 			result += vm_datablock_count_part(self->mp_filent.rb_rhs);

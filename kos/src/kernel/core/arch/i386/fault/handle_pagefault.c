@@ -376,7 +376,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void *pc) 
 #ifdef CONFIG_USE_NEW_VM
 #ifndef CONFIG_NO_SMP
 #define mman_kernel_hintinit_inuse_inc() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
-#define mman_kernel_hintinit_inuse_dec() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
+#define mman_kernel_hintinit_inuse_dec() OATOMIC_DEC(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
 #else /* !CONFIG_NO_SMP */
 #define mman_kernel_hintinit_inuse_inc() (void)0
 #define mman_kernel_hintinit_inuse_dec() (void)0

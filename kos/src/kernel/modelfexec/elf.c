@@ -202,7 +202,7 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 	part->mp_minaddr      = (pos_t)(0);
 	part->mp_maxaddr      = (pos_t)(PAGESIZE - 1);
-	DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+	_mpart_init_asanon(part);
 	part->mp_blkst_ptr    = NULL;
 	part->mp_mem.mc_start = overlap_page;
 	part->mp_mem.mc_size  = 1;

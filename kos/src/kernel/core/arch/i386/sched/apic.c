@@ -191,7 +191,7 @@ mpart_create_lockram(size_t num_pages) {
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	result->mp_minaddr = (pos_t)0;
 	result->mp_maxaddr = (pos_t)((num_pages * PAGESIZE) - 1);
-	DBG_memset(&result->mp_filent, 0xcc, sizeof(result->mp_filent));
+	_mpart_init_asanon(result);
 	result->mp_blkst_ptr = NULL;
 	result->mp_meta      = NULL;
 

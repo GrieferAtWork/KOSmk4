@@ -295,7 +295,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfile_destroy)(struct mfile *__re
 DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 
 
-
+/* Check if the given mem-file has been marked as anonymous.
+ * When this is the case, then accessed mem-parts of the file
+ * as always unique and never the same during repeated calls. */
 #define mfile_isanon(self) ((self)->mf_parts == MFILE_PARTS_ANONYMOUS)
 
 /* Floor- or ceil-align a given `addr' such that it may describe the start/end of a mem-part. */

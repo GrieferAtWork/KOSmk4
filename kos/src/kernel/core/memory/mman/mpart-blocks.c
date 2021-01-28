@@ -93,8 +93,17 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
 		for (i = min; i <= max; ++i) {
 			unsigned int st;
 			st = mpart_getblockstate(self, i);
-			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT)
-				goto err_not_loaded;
+			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT) {
+				size_t loadend, loadsiz;
+				if (i == min)
+					goto err_not_loaded;
+				loadend = i << file->mf_blockshift;
+				assert(loadend > partrel_offset);
+				loadsiz = loadend - partrel_offset;
+				assert(loadsiz < result->mppl_size);
+				result->mppl_size = loadsiz;
+				break;
+			}
 		}
 	}
 	return MPART_MEMADDR_SUCCESS;
@@ -297,7 +306,7 @@ after_intermediate_blocks:
 		 * as having changed, and possibly add it to the associated
 		 * file's list of changed parts. */
 		if (did_change && file->mf_ops->mo_saveblocks != NULL &&
-		    !mfile_isanon(file) && (self->mp_flags & MPART_F_CHANGED) == 0) {
+		    !mpart_isanon(self) && (self->mp_flags & MPART_F_CHANGED) == 0) {
 
 			/* Mark the part as changed. */
 			ATOMIC_OR(self->mp_flags, MPART_F_CHANGED);
@@ -492,7 +501,7 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 	 * as having changed, and possibly add it to the associated
 	 * file's list of changed parts. */
 	if (did_change && file->mf_ops->mo_saveblocks != NULL &&
-	    !mfile_isanon(file) && (self->mp_flags & MPART_F_CHANGED) == 0) {
+	    !mpart_isanon(self) && (self->mp_flags & MPART_F_CHANGED) == 0) {
 
 		/* Mark the part as changed. */
 		ATOMIC_OR(self->mp_flags, MPART_F_CHANGED);

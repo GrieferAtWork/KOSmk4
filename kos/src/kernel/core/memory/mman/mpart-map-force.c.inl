@@ -75,6 +75,7 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
 		/* Simplest case: we can just directly map the proper sub-range! */
 		physaddr_t baseaddr;
 		assert((offset + size) <= self->mp_mem.mc_size * PAGESIZE);
+		assert(self->mp_mem.mc_start != PHYSPAGE_INVALID);
 		baseaddr = physpage2addr(self->mp_mem.mc_start);
 		LOCAL_pagedir_map(addr, size, baseaddr + offset);
 	}	break;
@@ -96,6 +97,7 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
 			if (chunk_size > size)
 				chunk_size = size;
 			/* Map (the requested sub-range of) this chunk */
+			assert(vec[i].mc_start != PHYSPAGE_INVALID);
 			LOCAL_pagedir_map(addr, chunk_size,
 			                  physpage2addr(vec[i].mc_start) +
 			                  offset);

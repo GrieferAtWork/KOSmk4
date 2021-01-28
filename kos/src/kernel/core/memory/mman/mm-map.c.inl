@@ -104,7 +104,7 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 			part->mp_minaddr = (pos_t)0;
 			part->mp_maxaddr = (pos_t)num_bytes - 1;
-			DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+			_mpart_init_asanon(part);
 			part->mp_meta = NULL;
 			if (flags & MAP_POPULATE) {
 				/* Pre-populate + pre-initialize RAM-data for this part. */

@@ -28,6 +28,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/printk.h>
 #include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/mman/mm-sync.h>
@@ -266,6 +267,8 @@ NOTHROW(FCALL mpart_truncate_trailing)(struct mpart *__restrict self,
                                        freefun_t freefun, gfp_t flags,
                                        uintptr_t node_flags) {
 	physpagecnt_t part_pages;
+	printk(KERN_TRACE "[mm] mpart_truncate_trailing(%p, %Iu, %p, %#x, %#Ix)\n",
+	       self, part_size, freefun, flags, node_flags);
 	assert(self->mp_maxaddr > self->mp_minaddr + part_size - 1);
 	self->mp_maxaddr = self->mp_minaddr + part_size - 1;
 	if (!(self->mp_flags & MPART_F_BLKST_INL) && self->mp_blkst_ptr != NULL) {
@@ -319,6 +322,10 @@ NOTHROW(FCALL mpart_truncate_leading)(struct mpart *__restrict self,
                                       freefun_t freefun, gfp_t flags) {
 	size_t remove_blocks;
 	physpagecnt_t remove_pages;
+	printk(KERN_TRACE "[mm] mpart_truncate_leading(%p, %iu, %p, %#x)\n",
+	       self, remove_size, freefun, flags);
+	assert(remove_size != 0);
+	assert(mpart_getsize(self) > remove_size);
 	remove_pages  = remove_size >> PAGESHIFT;
 	remove_blocks = remove_size >> self->mp_file->mf_blockshift;
 	COMPILER_WRITE_BARRIER();
@@ -436,8 +443,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	size_t losize, hisize, hioffset;
 	size_t unmap_size;
 	freefun_t freefun;
-
-	assert(flags & GFP_ATOMIC);
+	printk(KERN_TRACE "[mm] mman_unmap_mpart_subregion(%p(%p-%p),%p,%p,%p,%#x)\n",
+	       node, mnode_getminaddr(node), mnode_getmaxaddr(node), part,
+	       unmap_minaddr, unmap_maxaddr, flags);
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(mpart_lock_acquired(part));
 	assert(!(part->mp_flags & MPART_F_NOSPLIT));
@@ -446,14 +454,27 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(unmap_maxaddr <= node->mn_maxaddr);
 	assertf(unmap_minaddr != node->mn_minaddr || unmap_maxaddr != node->mn_maxaddr,
 	        "This case should be handled by the caller");
+
+	/* TODO: None of the following should be a requirement!
+	 *       However, right now the below codes assumes all of this stuff.
+	 * The only solution here is having a proper mpart-split function which
+	 * we can use to do all of the necessary unsharing, etc... when deleting
+	 * a kernel ram sub-region that was backed by a part that's also mapped
+	 * somewhere else... */
+	assert(mpart_isanon(part));
+	assert(node->mn_flags & MNODE_F_SHARED
+	       ? part->mp_share.lh_first == node
+	       : part->mp_copy.lh_first == node);
+	assert(node->mn_link.le_next == NULL);
+
 	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 	freefun    = freefun_for_mpart(part);
 
 	/* Set-up malloc-flags for all of the (potential) calls below. */
-	flags = GFP_LOCKED | GFP_PREFLT | (flags & ~GFP_CALLOC);
+	flags = GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC | (flags & ~GFP_CALLOC);
 
 	/* Check for simple case: Truncate the node/part at the back. */
-	if (unmap_minaddr == node->mn_minaddr) {
+	if (unmap_maxaddr == node->mn_maxaddr) {
 		size_t part_size;
 
 		/* Truncate at the back. */
@@ -467,6 +488,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		part_size        = node->mn_partoff + (size_t)(unmap_minaddr - node->mn_minaddr);
 		mpart_truncate_trailing(part, part_size, freefun, flags, node->mn_flags);
 		COMPILER_WRITE_BARRIER();
+
 		/* Re-insert the (now truncated) node into the kernel mman. */
 		mnode_tree_insert(&mman_kernel.mm_mappings, node);
 		return true;
@@ -528,7 +550,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 		/* We can truncate the node at the front. */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
-		remove_size = (size_t)((unmap_maxaddr + 1) - node->mn_minaddr);
+		remove_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
 		mpart_truncate_leading(part, remove_size, freefun, flags);
 
@@ -542,6 +564,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	 *
 	 * Note that for this purpose, we may even use `mcoreheap_alloc_locked_nx()'
 	 * in order to dynamically allocate the required additional data structures! */
+	printk(KERN_TRACE "[mm] mman_unmap_mpart_subregion(): Cut a hole %p-%p into %p-%p\n",
+	       unmap_minaddr, unmap_maxaddr, mnode_getminaddr(node), mnode_getmaxaddr(node));
+
 	lonode = node;
 	lopart = part;
 
@@ -799,8 +824,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		/* === Point of no return */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 		(*freefun)(lopart->mp_mem.mc_start + losize_pages,
-		           lopart->mp_mem.mc_size - losize_pages,
-		           flags);
+		           hioffset_pages - losize_pages, flags);
 		lopart->mp_mem.mc_size = losize_pages;
 	}	break;
 
@@ -896,7 +920,6 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	hinode->mn_minaddr = unmap_maxaddr + 1;
 	hinode->mn_maxaddr = lonode->mn_maxaddr;
 	lonode->mn_maxaddr = unmap_minaddr - 1;
-	lopart->mp_maxaddr = lopart->mp_minaddr;
 	hinode->mn_flags  |= lonode->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE |
 	                                         MNODE_F_PREAD | MNODE_F_SHARED |
 	                                         MNODE_F_MPREPARED | MNODE_F_MLOCK);
@@ -919,7 +942,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT | MPART_F_NO_GLOBAL_REF |
 	                                        MPART_F_CHANGED | MPART_F_NOFREE |
 	                                        MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
-	/*hipart->mp_state = ...;*/ /* Alraedy initialized above */
+	/*hipart->mp_state = ...;*/ /* Already initialized above */
 	hipart->mp_file = incref(lopart->mp_file);
 	LIST_INIT(&hipart->mp_copy);
 	LIST_INIT(&hipart->mp_share);
@@ -933,9 +956,10 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	SLIST_INIT(&hipart->mp_lockops);
 	/*LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);*/ /* Initialized below */
 	DBG_memset(&hipart->mp_changed, 0xcc, sizeof(hipart->mp_changed));
-	hipart->mp_minaddr = 0;
-	hipart->mp_maxaddr = (pos_t)(hisize - 1);
-	DBG_memset(&hipart->mp_filent, 0xcc, sizeof(hipart->mp_filent));
+	hipart->mp_maxaddr = lopart->mp_maxaddr;
+	lopart->mp_maxaddr = lopart->mp_minaddr + (losize - 1);
+	hipart->mp_minaddr = hipart->mp_maxaddr - (hisize - 1);
+	_mpart_init_asanon(hipart);
 	/*hipart->mp_blkst_ptr = ...;*/ /* Initialized above */
 	/*hipart->mp_mem       = ...;*/ /* Initialized above */
 	hipart->mp_meta = NULL;
@@ -1095,7 +1119,6 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 	assert(job_maxaddr >= job_minaddr);
 	assert(IS_ALIGNED((uintptr_t)job_minaddr, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)job_maxaddr + 1, PAGESIZE));
-	assert(job_flags & GFP_ATOMIC);
 	assert(mman_lock_acquired(&mman_kernel));
 	if (job_flags & GFP_CALLOC)
 		memset(job, 0, sizeof(*job));
@@ -1108,8 +1131,8 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 
 		node = mnode_tree_locate(mman_kernel.mm_mappings, job_minaddr);
 		assertf(node != NULL, "Address %p not mapped", job_minaddr);
-		assert(mnode_getminaddr(node) >= job_minaddr);
-		assert(mnode_getmaxaddr(node) <= job_minaddr);
+		assert(mnode_getminaddr(node) <= job_minaddr);
+		assert(mnode_getmaxaddr(node) >= job_minaddr);
 		if unlikely(node->mn_flags & MNODE_F_KERNPART) {
 			kernel_panic("Attempted to unmap kernel part at %p-%p (via unmap-kram %p-%p)",
 			             mnode_getminaddr(node), mnode_getmaxaddr(node),
@@ -1124,14 +1147,14 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			assert(node->mn_flags & MNODE_F_PREAD);
 			assert(node->mn_flags & MNODE_F_PWRITE);
 			if (node->mn_flags & MNODE_F_SHARED) {
-				assert(LIST_EMPTY(&part->mp_share));
-				assert(LIST_FIRST(&part->mp_copy) == node);
-			} else {
 				assert(LIST_EMPTY(&part->mp_copy));
 				assert(LIST_FIRST(&part->mp_share) == node);
+			} else {
+				assert(LIST_EMPTY(&part->mp_share));
+				assert(LIST_FIRST(&part->mp_copy) == node);
 			}
 			assert(LIST_NEXT(node, mn_link) == NULL);
-			assert(mfile_isanon(part->mp_file));
+			assert(mpart_isanon(part));
 #ifdef MPART_ST_VIO
 			assert(part->mp_state != MPART_ST_VIO);
 #endif /* MPART_ST_VIO */
@@ -1366,7 +1389,7 @@ again_service_lops:
 			struct mman_unmap_kram_job *job;
 			job = container_of(iter, struct mman_unmap_kram_job, mukj_lop_mm);
 			if (job->mukj_minaddr == (byte_t *)job) {
-				/* Insert into the kram-list of operations. */
+				/* Insert into the kram-operations list. */
 				krulist_sorted_insert_byaddr(&krlist, job);
 				goto continue_with_next;
 			}

@@ -27,6 +27,8 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 
+#include <assert.h>
+
 DECL_BEGIN
 
 /* Try to merge the given part with other, neighboring parts from
@@ -41,9 +43,7 @@ NOTHROW(FCALL mpart_merge)(struct mpart *__restrict self) {
 again:
 	if (!mpart_lock_tryacquire(self))
 		goto done;
-	file = self->mp_file;
-	if (mfile_isanon(file)) {
-do_merge_anon:
+	if (mpart_isanon(self)) {
 		/* Try to merge anonymous parts by looking at the nodes mapping it. */
 		if (LIST_EMPTY(&self->mp_copy) && LIST_EMPTY(&self->mp_share)) {
 			/* Nothing is mapping our part, so we've go no frame of reference... */
@@ -55,12 +55,11 @@ do_merge_anon:
 		goto done_unlock;
 	}
 	
+	file = self->mp_file;
 	if (mfile_lock_trywrite(file)) {
 		struct mpart *next;
-		if unlikely(mfile_isanon(file)) {
-			mfile_lock_endwrite(file);
-			goto do_merge_anon;
-		}
+		assert(!mfile_isanon(file));
+
 		/* Check for a neighboring, preceding part. */
 		next = mpart_tree_prevnode(self);
 		if (next && next->mp_maxaddr == self->mp_minaddr - 1) {

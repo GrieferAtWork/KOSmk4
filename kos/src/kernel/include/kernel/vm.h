@@ -436,7 +436,7 @@ DECL_END
 #define vm_isused(self, addr, num_bytes)                       (mnode_tree_rlocate((self)->mm_mappings, addr, (byte_t *)(addr) + (num_bytes)-1) != __NULLPTR)
 #define vm_node_insert(self)                                   mnode_tree_insert(&(self)->mn_mman->mm_mappings, self)
 #define vm_node_remove(self, addr)                             COMPILER_UNUSED(mnode_tree_remove(&(self)->mm_mappings, addr))
-#define vm_unmap_kernel_ram(addr, num_bytes, is_zero)          mman_unmap_kram(addr, num_bytes, (is_zero) ? (GFP_ATOMIC | GFP_CALLOC) : GFP_ATOMIC)
+#define vm_unmap_kernel_ram(addr, num_bytes, is_zero)          mman_unmap_kram(addr, num_bytes, (is_zero) ? GFP_CALLOC : 0)
 #define vm_unmap_kernel_mapping_locked(addr, num_bytes)        mman_unmap_kram_locked(addr, num_bytes)
 #define vm_get_kernreserve_node(self)                          (&FORMMAN(self, thismman_kernel_reservation))
 #define vm_datapart_do_allocram(self)                          mpart_ll_allocmem(self, mpart_getsize(self) / PAGESIZE)

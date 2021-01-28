@@ -151,7 +151,7 @@ struct mfault {
 	 * >>     } else if (LIST_EMPTY(&mfl_part->mp_share) &&
 	 * >>                LIST_FIRST(&mfl_part->mp_copy) == mfl_node &&
 	 * >>                LIST_NEXT(mfl_node, mn_link) == NULL &&
-	 * >>                mfile_isanon(mfl_part->mp_file)) {
+	 * >>                mpart_isanon(mfl_part)) {
 	 * >>         // Accessed mfl_node is the only copy-on-write mfl_node in existance
 	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
 	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));

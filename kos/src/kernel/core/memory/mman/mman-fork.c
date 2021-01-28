@@ -475,14 +475,14 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 	assertf(ft.ftd_oldmm != &mman_kernel, "You can't fork the kernel...");
 	ft.ftd_newmm = mman_new();
 
-	/* REMINDER: When not able to acquire a lock, you must call `task_serve()' after
+	/* REMINDER: When not able to acquire a lock, we must call `task_serve()' after
 	 *           releasing all other already-acquired locks. This is necessary to
-	 *           ensure that another thread within our current mman calling exec().
-	 * Otherwise, we might get a situation where a process w/ 2 threads, where one
+	 *           deal with another thread within our current mman calling exec().
+	 * Otherwise, we might get a situation with a process w/ 2 threads, where one
 	 * thread calls exec() while another calls fork(), which could then result in
 	 * both to exec(), as well as the fork() succeeding, but the fork() succeeding
-	 * in the context of the process being exec'd by the first thread (which would
-	 * be no good) */
+	 * in the context of the program being exec'd by the first thread (which would
+	 * be no good), rather than the program that contained the fork() call. */
 
 	SLIST_INIT(&ft.ftd_freelist);
 	ft.ftd_didulock = false;

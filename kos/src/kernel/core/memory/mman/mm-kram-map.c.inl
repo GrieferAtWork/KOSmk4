@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "mm-kram-map.c"
-#define DEFINE_mman_map_kram
-//#define DEFINE_mman_map_kram_nx
+//#define DEFINE_mman_map_kram
+#define DEFINE_mman_map_kram_nx
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/heap.h>
@@ -321,21 +321,22 @@ again_lock_mman:
 #if __SIZEOF_PHYSADDR_T__ > 4
 #define MY_PAGE_MALLOC(max_pages, res_pages)                                   \
 			((flags & GFP_MAP_32BIT)                                           \
-			 ? page_malloc_part(1, max_pages, res_pages)                       \
-			 : page_malloc_part_between(physaddr2page(__UINT32_C(0x00000000)), \
+			 ? page_malloc_part_between(physaddr2page(__UINT32_C(0x00000000)), \
 			                            physaddr2page(__UINT32_C(0xffffffff)), \
-			                            1, max_pages, res_pages))
+			                            1, max_pages, res_pages)               \
+			 : page_malloc_part(1, max_pages, res_pages))
 #else /* __SIZEOF_PHYSADDR_T__ > 4 */
 #define MY_PAGE_MALLOC(max_pages, res_pages) \
 			page_malloc_part(1, max_pages, res_pages)
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
-			part->mp_state        = MPART_ST_MEM;
 			part->mp_mem.mc_start = MY_PAGE_MALLOC(num_pages, &part->mp_mem.mc_size);
 			if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID)
 				goto err_nophys_for_backing;
 			assert(part->mp_mem.mc_size != 0);
 			assert(part->mp_mem.mc_size <= num_pages);
-			if unlikely(part->mp_mem.mc_size < num_pages) {
+			if likely(part->mp_mem.mc_size >= num_pages) {
+				part->mp_state = MPART_ST_MEM;
+			} else {
 				bool did_unlock = false;
 				size_t missing;
 				struct mchunkvec vec;
@@ -442,7 +443,6 @@ do_prefault:
 
 			/* Pre-initialize backing physical memory */
 			if (flags & GFP_CALLOC) {
-				part->mp_file = &mfile_zero;
 				if (part->mp_state == MPART_ST_MEM) {
 					bzero_pages(result,
 					            part->mp_mem.mc_start,
@@ -458,10 +458,11 @@ do_prefault:
 						vbase += chunk.mc_size * PAGESIZE;
 					}
 				}
+				part->mp_file = &mfile_zero;
 			} else {
 #ifdef CONFIG_DEBUG_HEAP
-				part->mp_file = &mfile_dbgheap;
 				memsetl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes / 4);
+				part->mp_file = &mfile_dbgheap;
 #else  /* CONFIG_DEBUG_HEAP */
 				part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_DEBUG_HEAP */
@@ -504,7 +505,7 @@ do_prefault:
 #ifdef CONFIG_DEBUG_HEAP
 				part->mp_file = &mfile_dbgheap;
 #else  /* CONFIG_DEBUG_HEAP */
-			part->mp_file = &mfile_ndef;
+				part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_DEBUG_HEAP */
 			}
 			/* To ensure atomic initialization without prefaulting, we must
@@ -550,7 +551,7 @@ do_prefault:
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 		part->mp_minaddr = (pos_t)(0);
 		part->mp_maxaddr = (pos_t)(num_bytes - 1);
-		DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+		_mpart_init_asanon(part);
 		/*part->mp_blkst_ptr = ...;*/ /* Already initialized */
 		/*part->mp_mem       = ...;*/ /* Already initialized */
 		part->mp_meta = NULL;

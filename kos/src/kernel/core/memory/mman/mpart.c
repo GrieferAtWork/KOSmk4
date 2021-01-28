@@ -145,7 +145,7 @@ NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self) {
 	mpart_fini(self);
 	file = self->mp_file;
 	assert(file);
-	if (file->mf_parts == MFILE_PARTS_ANONYMOUS) {
+	if (mpart_isanon(self)) {
 		/* No need to unlink from the file. - The file's tree was deleted! */
 remove_node_from_globals:
 		if (LIST_ISBOUND(self, mp_allparts)) {
@@ -161,8 +161,10 @@ remove_node_from_globals:
 		}
 	} else if (mfile_lock_trywrite(file)) {
 		/* Immediately remove the part from the associated file's tree. */
-		if (file->mf_parts != MFILE_PARTS_ANONYMOUS)
+		if likely(!mpart_isanon(self)) {
+			assert(!mfile_isanon(file));
 			mpart_tree_removenode(&file->mf_parts, self);
+		}
 		mfile_lock_endwrite(file);
 		DBG_memset(&self->mp_filent, 0xcc, sizeof(self->mp_filent));
 		goto remove_node_from_globals;

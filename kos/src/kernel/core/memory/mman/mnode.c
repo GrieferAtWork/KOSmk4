@@ -177,7 +177,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
  * >>                 mnode_clear_write(node);
  * >>             }
  * >>         } else if (LIST_NEXT(part->mp_copy, mn_link) != NULL &&
- * >>                    mfile_isanon(file)) {
+ * >>                    mpart_isanon(part)) {
  * >>             // This is what would happen during a fork()
  * >>             mnode_clear_write(part->mp_copy);
  * >>         }
@@ -440,7 +440,7 @@ err_changed_free_hinode:
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     } else {
  * >>         if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
- * >>             LIST_NEXT(self, mn_link) != NULL || !mfile_isanon(part->mp_file))
+ * >>             LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     }
  * >> } */
@@ -458,11 +458,11 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
 				result &= ~PAGEDIR_MAP_FWRITE;
 		} else {
 			/* Disallow write if there are any other memory mappings of the backing part,
-			 * or if the part belongs to a non-anonymous file (in which case someone may
-			 * open(2)+write(2) the file, meaning that modifications made to the backing
-			 * storage by our node mapping musn't be persistent) */
+			 * or if the part isn't anonymous (in which case someone may open(2)+read(2)
+			 * from backing file, which musn't include any modifications made by this
+			 * mapping) */
 			if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
-			    LIST_NEXT(self, mn_link) != NULL || !mfile_isanon(part->mp_file))
+			    LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
 				result &= ~PAGEDIR_MAP_FWRITE;
 		}
 	}
