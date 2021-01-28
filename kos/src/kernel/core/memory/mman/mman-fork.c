@@ -30,6 +30,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/printk.h> /* TODO: REMOVE_ME */
 #include <kernel/paging.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -432,11 +433,10 @@ NOTHROW(FCALL mnode_slist_freeall)(struct mnode_slist *__restrict self) {
 
 
 
-PRIVATE NOBLOCK NONNULL((1)) void FCALL
-forktree_clearwrite_or_unlock_and_throw(struct forktree_data *__restrict self)
-		THROWS(E_BADALLOC) {
+/* Delete write-attempt from all writable user-space mem-nodes. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 	struct mnode *iter;
-	struct mman *mm = self->ftd_oldmm;
 	if (LIST_EMPTY(&mm->mm_writable))
 		return;
 	iter = LIST_FIRST(&mm->mm_writable);
@@ -445,6 +445,8 @@ forktree_clearwrite_or_unlock_and_throw(struct forktree_data *__restrict self)
 		struct mnode *next;
 		void *addr;
 		size_t size;
+		printk(KERN_TRACE "[mm] fork: delete write-access to %p-%p\n",
+		       mnode_getminaddr(iter), mnode_getmaxaddr(iter));
 		next = LIST_NEXT(iter, mn_writable);
 		LIST_ENTRY_UNBOUND_INIT(&iter->mn_writable);
 		addr = mnode_getaddr(iter);
@@ -453,9 +455,15 @@ forktree_clearwrite_or_unlock_and_throw(struct forktree_data *__restrict self)
 		 * then simply throw an exception, which our caller will then handle for us.
 		 * But also note that we must first unlock the old and new mman */
 		if (!pagedir_prepare_map(addr, size)) {
-			mman_lock_release(self->ftd_newmm);
-			mman_lock_release(mm);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+			/* Kill the ant with a shotgun, and just unmap everything. */
+			pagedir_unmap_userspace();
+			iter = next;
+			while (iter) {
+				next = LIST_NEXT(iter, mn_writable);
+				LIST_ENTRY_UNBOUND_INIT(&iter->mn_writable);
+				iter = next;
+			}
+			goto done;
 		}
 		pagedir_unwrite(addr, size);
 		pagedir_unprepare_map(addr, size);
@@ -463,6 +471,17 @@ forktree_clearwrite_or_unlock_and_throw(struct forktree_data *__restrict self)
 			break;
 		iter = next;
 	}
+	/* After clearing all of those write-permissions, we must sync the
+	 * current (i.e. copied) mman to ensure that no-one is writing to
+	 * any of the (now shared) pages.
+	 * Following this call, any further modifications made to the memory
+	 * of the old mman will be unshared from the new mman (i.e. will no
+	 * longer appear in both page directories) */
+done:
+#if 1 /* !!!FIXME!!! (high priority): It seems as though `pagedir_unwrite()' doesn't work? */
+	pagedir_unmap_userspace();
+#endif
+	mman_syncall();
 }
 
 
@@ -535,7 +554,7 @@ again:
 		 * delete write permissions for all writable nodes of the old mman, so
 		 * that we can ensure that anything written to by either the old, or the
 		 * new mman will be handled via copy-on-write going forward. */
-		forktree_clearwrite_or_unlock_and_throw(&ft);
+		forktree_clearwrite(ft.ftd_oldmm);
 
 		/* Release our lock to the old mman. */
 		mman_lock_release(ft.ftd_oldmm);

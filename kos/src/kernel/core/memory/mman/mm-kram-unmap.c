@@ -28,7 +28,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/printk.h>
+#include <kernel/printk.h> /* TODO: REMOVE_ME */
 #include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/mman/mm-sync.h>
