@@ -120,7 +120,7 @@ again:
 				goto again;
 
 			/* Prepare our page directory of mapping memory. */
-			if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
+			if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
@@ -134,7 +134,7 @@ again:
 			u16 perm;
 			perm = mnode_getperm(mf.mfl_node);
 			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size, mf.mfl_offs, perm);
-			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
 			if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
@@ -271,7 +271,7 @@ again:
 				goto again;
 
 			/* Prepare our page directory of mapping memory. */
-			if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
+			if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
@@ -287,7 +287,7 @@ again:
 			perm = mnode_getperm(mf.mfl_node);
 			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
 			                  mf.mfl_offs, perm);
-			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
 			if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
@@ -532,11 +532,11 @@ NOTHROW(FCALL copybits)(mpart_blkst_word_t *dst_bitset,
  * >>         mfault_fini(&mf);
  * >>         RETHROW();
  * >>     }
- * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
+ * >>     if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) { ... }
  * >>     perm = mnode_getperm(mf.mfl_node);
  * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
  * >>                       mf.mfl_size, mf.mfl_offs, perm);
- * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+ * >>     pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
  * >>     if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))

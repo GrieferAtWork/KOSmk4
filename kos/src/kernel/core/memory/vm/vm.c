@@ -640,7 +640,7 @@ NOTHROW(KCALL pprop_memcpy)(uintptr_t *__restrict dst_base,
  *       in use. - This function is merely a thin wrapper around `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `pagedir_prepare_map'
+ *       has been prepared in a prior call to `pagedir_prepare'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -2267,11 +2267,11 @@ again_lock_datapart:
 					continue;
 				/* Make sure that the associated page mapping has been prepared. */
 				if unlikely(!(v == myvm || vm_node_iskernelspace(node)
-				              ? pagedir_prepare_map(vm_node_getaddr(node),
-				                                    vm_node_getsize(node))
-				              : pagedir_prepare_map_p(v->v_pdir_phys,
-				                                      vm_node_getaddr(node),
-				                                      vm_node_getsize(node)))) {
+				              ? pagedir_prepare(vm_node_getaddr(node),
+				                                 vm_node_getsize(node))
+				              : pagedir_prepare_p(v->v_pdir_phys,
+				                                   vm_node_getaddr(node),
+				                                   vm_node_getsize(node)))) {
 					vm_set_lockendwrite_all(&vms);
 					sync_endread(self);
 					/*vm_set_clear(&vms); // Done by the EXCEPT below */
@@ -2968,12 +2968,12 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 				if (self->vn_vm == THIS_VM)
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				{
-					pagedir_unprepare_map_p(self->vn_vm->v_pdir_phys,
-					                        vm_node_getaddr(self),
-					                        vm_node_getsize(self));
+					pagedir_unprepare_p(self->vn_vm->v_pdir_phys,
+					                    vm_node_getaddr(self),
+					                    vm_node_getsize(self));
 				} else {
-					pagedir_unprepare_map(vm_node_getaddr(self),
-					                      vm_node_getsize(self));
+					pagedir_unprepare(vm_node_getaddr(self),
+					                  vm_node_getsize(self));
 				}
 			}
 		}
@@ -3062,7 +3062,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 	log_updating_access_rights(self);
 	if (self->vn_vm == THIS_VM) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!pagedir_prepare_map(addr, size)) {
+			if (!pagedir_prepare(addr, size)) {
 				sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
 			}
@@ -3075,11 +3075,11 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		pagedir_unmap(addr, size);
 #endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			pagedir_unprepare_map(addr, size);
+			pagedir_unprepare(addr, size);
 	} else {
 		pagedir_phys_t pdir = self->vn_vm->v_pdir_phys;
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!pagedir_prepare_map_p(pdir, addr, size)) {
+			if (!pagedir_prepare_p(pdir, addr, size)) {
 				sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
 			}
@@ -3092,7 +3092,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		pagedir_unmap_p(pdir, addr, size);
 #endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			pagedir_unprepare_map_p(pdir, addr, size);
+			pagedir_unprepare_p(pdir, addr, size);
 	}
 	vm_sync(self->vn_vm, addr, size);
 	sync_endwrite(self->vn_vm);
@@ -3119,7 +3119,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 	log_updating_access_rights(self);
 	if (self->vn_vm == THIS_VM) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!pagedir_prepare_map(addr, size)) {
+			if (!pagedir_prepare(addr, size)) {
 				if (self->vn_vm != locked_vm)
 					sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
@@ -3133,11 +3133,11 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		pagedir_unmap(addr, size);
 #endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			pagedir_unprepare_map(addr, size);
+			pagedir_unprepare(addr, size);
 	} else {
 		pagedir_phys_t pdir = self->vn_vm->v_pdir_phys;
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!pagedir_prepare_map_p(pdir, addr, size)) {
+			if (!pagedir_prepare_p(pdir, addr, size)) {
 				if (self->vn_vm != locked_vm)
 					sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
@@ -3151,7 +3151,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		pagedir_unmap_p(pdir, addr, size);
 #endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			pagedir_unprepare_map_p(pdir, addr, size);
+			pagedir_unprepare_p(pdir, addr, size);
 	}
 	vm_sync(self->vn_vm, addr, size);
 	if (self->vn_vm != locked_vm)

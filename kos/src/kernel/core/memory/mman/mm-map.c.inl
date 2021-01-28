@@ -409,7 +409,7 @@ again_lock_mfile_map:
 				goto again_lock_mfile_map; /* Locks were released -> Try again */
 
 			/* Make sure that the target address range is prepared within the page directory. */
-			if (!pagedir_prepare_map_p(self->mm_pagedir_p, result, num_bytes)) {
+			if (!pagedir_prepare_p(self->mm_pagedir_p, result, num_bytes)) {
 				/* Failed to prepare the backing page directory... :( */
 #ifdef HAVE_FILE
 				mfile_map_release(&map.mmwu_map);
@@ -546,7 +546,7 @@ again_lock_mfile_map:
 	/* If we're not supposed to keep the mappings prepared, then
 	 * clear unprepare them now. */
 	if (!(flags & MAP_PREPARED))
-		pagedir_unprepare_map_p(self->mm_pagedir_p, result, num_bytes);
+		pagedir_unprepare_p(self->mm_pagedir_p, result, num_bytes);
 
 	/* If some other mapping was there before, then we must invalidate
 	 * the page directory cache so-as to prevent any stale entires.

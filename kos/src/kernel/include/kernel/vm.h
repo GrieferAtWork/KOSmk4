@@ -1213,7 +1213,7 @@ NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
  *       in use. - This function is merely a thin wrapper around `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `pagedir_prepare_map'
+ *       has been prepared in a prior call to `pagedir_prepare'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -2146,12 +2146,12 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 #define VM_NODE_FLAG_PARTITIONED  0x0002 /* Set if the node has been split when the associated data part was split.
                                           * This flag affects how the page directory is un-prepared when the node
                                           * gets unmapped. When set, associated memory must be unmapped as:
-                                          * >> pagedir_prepare_map(vm_node_getaddr(self), vm_node_getsize(self)); // NOTE: This may cause an error!
+                                          * >> pagedir_prepare(vm_node_getaddr(self), vm_node_getsize(self)); // NOTE: This may cause an error!
                                           * >> pagedir_unmap(vm_node_getaddr(self), vm_node_getsize(self));
-                                          * >> pagedir_unprepare_map(vm_node_getaddr(self), vm_node_getsize(self));
+                                          * >> pagedir_unprepare(vm_node_getaddr(self), vm_node_getsize(self));
                                           * When not set, associated memory can simply be unmapped as:
                                           * >> pagedir_unmap(vm_node_getaddr(self), vm_node_getsize(self));
-                                          * >> pagedir_unprepare_map(vm_node_getaddr(self), vm_node_getsize(self)); */
+                                          * >> pagedir_unprepare(vm_node_getaddr(self), vm_node_getsize(self)); */
 #define VM_NODE_FLAG_GROWSUP      0x0004 /* When guarding, the node grows up rather than down. */
 #define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized pages apart of this node hint towards it.
                                           * This flag is set for memory mapping that can be initialized atomically.

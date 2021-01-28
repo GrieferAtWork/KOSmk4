@@ -449,7 +449,7 @@ vm_mapat(struct vm *__restrict self,
 	             parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(addr, num_bytes)) {
+		if (!pagedir_prepare(addr, num_bytes)) {
 			sync_endwrite(self);
 			partnode_pair_vector_fini_and_unlock_parts(&parts);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -557,7 +557,7 @@ vm_mapresat(struct vm *__restrict self,
 	}
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(addr, num_bytes)) {
+		if (!pagedir_prepare(addr, num_bytes)) {
 			sync_endwrite(self);
 			kfree(node);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -638,7 +638,7 @@ again:
 	             parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(result, num_bytes)) {
+		if (!pagedir_prepare(result, num_bytes)) {
 			sync_endwrite(self);
 			partnode_pair_vector_fini_and_unlock_parts(&parts);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -787,7 +787,7 @@ again_lock_vm:
 	node->vn_node.a_vmax = node->vn_node.a_vmin + (num_bytes / PAGESIZE) - 1;
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(result, num_bytes)) {
+		if (!pagedir_prepare(result, num_bytes)) {
 			sync_endwrite(self);
 			kfree(node);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);

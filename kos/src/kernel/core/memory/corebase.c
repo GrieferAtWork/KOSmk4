@@ -410,7 +410,7 @@ again_tryhard_mapping_target:
 		}
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		/* Map the page into our current page directory. */
-		if (!pagedir_prepare_mapone(mapping_target)) {
+		if (!pagedir_prepareone(mapping_target)) {
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
 			page_ccfree(mapping_backend, 1);

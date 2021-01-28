@@ -183,18 +183,18 @@ again_acquire_lock:
 		 LOCAL_must_modify_node(node))
 #endif /* !DEFINE_mman_protect */
 		if (LOCAL_must_prepare_node(node)) {
-			if unlikely(!pagedir_prepare_map_p(self->mm_pagedir_p,
-			                                   mnode_getaddr(node),
-			                                   mnode_getsize(node))) {
+			if unlikely(!pagedir_prepare_p(self->mm_pagedir_p,
+			                                mnode_getaddr(node),
+			                                mnode_getsize(node))) {
 				struct mnode *iter;
 				/* Undo everything... */
 				for (iter = mima.mm_min; iter != node;
 				     iter = mnode_tree_nextnode(iter)) {
 					assert(iter);
 					if (LOCAL_must_prepare_node(iter)) {
-						pagedir_unprepare_map_p(self->mm_pagedir_p,
-						                        mnode_getaddr(iter),
-						                        mnode_getsize(iter));
+						pagedir_unprepare_p(self->mm_pagedir_p,
+						                    mnode_getaddr(iter),
+						                    mnode_getsize(iter));
 					}
 				}
 				mman_lock_release(self);
@@ -249,7 +249,7 @@ again_acquire_lock:
 			node_addr = mnode_getaddr(node);
 			node_size = mnode_getsize(node);
 			pagedir_unmap_p(self->mm_pagedir_p, node_addr, node_size);
-			pagedir_unprepare_map_p(self->mm_pagedir_p, node_addr, node_size);
+			pagedir_unprepare_p(self->mm_pagedir_p, node_addr, node_size);
 			mman_sync_p(self, node_addr, node_size);
 		}
 #elif defined(DEFINE_mman_protect)
@@ -281,8 +281,8 @@ again_acquire_lock:
 
 					/* Undo the prepare that was originally done above. */
 					if (!(node->mn_flags & MNODE_F_MPREPARED)) {
-						pagedir_unprepare_map_p(self->mm_pagedir_p,
-						                        node_addr, node_size);
+						pagedir_unprepare_p(self->mm_pagedir_p,
+						                    node_addr, node_size);
 					}
 
 					/* Sync the affected address range within the given mman. */

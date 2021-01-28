@@ -308,7 +308,7 @@ NOTHROW(KCALL x86_initialize_iobm)(void) {
 #endif /* !__x86_64__ */
 	/* Prepare the IOB region for lazy memory mappings. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(__x86_iob_empty_base, 2 * PAGESIZE))
+	if (!pagedir_prepare(__x86_iob_empty_base, 2 * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare _bootcpu.tss.iob"));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	/* Unmap the initial IOB of the boot CPU. */

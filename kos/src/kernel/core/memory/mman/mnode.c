@@ -122,7 +122,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 		REF struct mman *mm = self->mn_mman;
 		if (tryincref(mm)) {
 			pagedir_phys_t pd = self->mn_mman->mm_pagedir_p;
-			pagedir_unprepare_map_p(pd, mnode_getaddr(self), mnode_getsize(self));
+			pagedir_unprepare_p(pd, mnode_getaddr(self), mnode_getsize(self));
 			decref_unlikely(mm);
 		}
 	}
@@ -256,14 +256,14 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 		pagedir_denywrite_p(pdir, addr, size);
 	} else {
 		/* Prepare the page directory */
-		if unlikely(!pagedir_prepare_map_p(pdir, addr, size))
+		if unlikely(!pagedir_prepare_p(pdir, addr, size))
 			return MNODE_CLEAR_WRITE_BADALLOC;
 
 		/* Delete write permissions. */
 		pagedir_denywrite_p(pdir, addr, size);
 
 		/* Unprepare the page directory. */
-		pagedir_unprepare_map_p(pdir, addr, size);
+		pagedir_unprepare_p(pdir, addr, size);
 	}
 
 	/* Unlink from the list of writable nodes. */
@@ -289,14 +289,14 @@ NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self) {
 	size = mnode_getsize(self);
 
 	/* Prepare the page directory */
-	if unlikely(!pagedir_prepare_map(addr, size))
+	if unlikely(!pagedir_prepare(addr, size))
 		return MNODE_CLEAR_WRITE_BADALLOC;
 
 	/* Delete write permissions. */
 	pagedir_denywrite(addr, size);
 
 	/* Unprepare the page directory. */
-	pagedir_unprepare_map(addr, size);
+	pagedir_unprepare(addr, size);
 
 	/* Unlink from the list of writable nodes. */
 	LIST_UNBIND(self, mn_writable);

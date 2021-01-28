@@ -124,7 +124,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID)
 		goto err_unlock_node_part;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if unlikely(!pagedir_prepare_map(result, num_bytes)) {
+	if unlikely(!pagedir_prepare(result, num_bytes)) {
 		page_ccfree(part->mp_mem.mc_start, part->mp_mem.mc_size);
 		goto err_unlock_node_part;
 	}
@@ -133,7 +133,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 	pagedir_sync(result, num_bytes);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(result, num_bytes);
+	pagedir_unprepare(result, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Now just put everything together for the node/part, and
@@ -269,7 +269,7 @@ err:
 	/* Map the node to the kernel page directory & do initialization. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* Prepare to map all of the new blocks. */
-	if unlikely(!pagedir_prepare_map(mapping_target, num_bytes))
+	if unlikely(!pagedir_prepare(mapping_target, num_bytes))
 		goto err_corepair_content;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_map(mapping_target, num_bytes,

@@ -55,11 +55,10 @@
 #define FOREACH_PAGING_FUNCTION(callback)     \
 	callback(pagedir_init);                   \
 	callback(pagedir_fini);                   \
-	callback(pagedir_prepare_mapone);         \
-	callback(pagedir_prepare_map);            \
-	callback(pagedir_prepare_map_keep);       \
-	callback(pagedir_unprepare_mapone);       \
-	callback(pagedir_unprepare_map);          \
+	callback(pagedir_prepareone);             \
+	callback(pagedir_prepare);                \
+	callback(pagedir_unprepareone);           \
+	callback(pagedir_unprepare);              \
 	callback(pagedir_maphintone);             \
 	callback(pagedir_maphint);                \
 	callback(pagedir_gethint);                \

@@ -492,13 +492,13 @@ again_tryhard_mapping_target:
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Prepare to map all of the new blocks. */
 			for (i = 0; i < blockc; ++i) {
-				if unlikely(!pagedir_prepare_map((byte_t *)mapping_target + mapping_offset,
-				                                 blocks[i].rb_size * PAGESIZE)) {
+				if unlikely(!pagedir_prepare((byte_t *)mapping_target + mapping_offset,
+				                              blocks[i].rb_size * PAGESIZE)) {
 					/* Failed to map a part of the resulting data block. */
 					while (i--) {
 						mapping_offset -= blocks[i].rb_size * PAGESIZE;
-						pagedir_unprepare_map((byte_t *)mapping_target + mapping_offset,
-						                      blocks[i].rb_size * PAGESIZE);
+						pagedir_unprepare((byte_t *)mapping_target + mapping_offset,
+						                  blocks[i].rb_size * PAGESIZE);
 					}
 					IFELSE_NX(goto err_corepair_content,
 					          THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE));

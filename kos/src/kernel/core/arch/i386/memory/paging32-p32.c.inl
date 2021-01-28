@@ -468,18 +468,14 @@ again_try_exchange_e2_word:
 
 /* Prepare the page directory for a future map() operation.
  * The full cycle of a single mapping then looks like this:
- * >> p32_pagedir_prepare_map(...);
+ * >> p32_pagedir_prepare(...);
  * >> p32_pagedir_map(...);
  * >> p32_pagedir_unmap(...);
- * >> p32_pagedir_unprepare_map(...);
- * NOTE: `p32_pagedir_prepare_map_keep()' is the same as `p32_pagedir_prepare_map()', but
- *        will not undo already successfully made preparations after a later one fails.
- *        This will include the undoing of redundant preparations of the given range that
- *        were made in prior calls.
+ * >> p32_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	bool result;
 	unsigned int vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
@@ -493,7 +489,7 @@ NOTHROW(FCALL p32_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_unprepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
@@ -505,8 +501,8 @@ NOTHROW(FCALL p32_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr)
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_prepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_end;
 	unsigned int vec2;
@@ -518,7 +514,7 @@ NOTHROW(FCALL p32_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
-		return p32_pagedir_prepare_mapone(addr);
+		return p32_pagedir_prepareone(addr);
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
@@ -559,58 +555,9 @@ err_0:
 	return false;
 }
 
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
-	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
-		return true;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
-		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
-	if (!num_bytes)
-		return true;
-	if (num_bytes == 4096)
-		return p32_pagedir_prepare_mapone(addr);
-	vec2_min = P32_PDIR_VEC2INDEX(addr);
-	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
-	vec1_min = P32_PDIR_VEC1INDEX(addr);
-	/* Prepare within the same 4MiB region. */
-	if likely(vec2_min == vec2_max) {
-		bool result;
-		result = p32_pagedir_prepare_impl_widen(vec2_min,
-		                                        vec1_min,
-		                                        num_bytes / 4096);
-		PG_TRACE_PREPARE_IF(result, addr, num_bytes);
-		return result;
-	}
-	vec1_end = P32_PDIR_VEC1INDEX((byte_t *)addr + num_bytes);
-	/* Prepare the partial range of the first 4MiB region. */
-	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, 1024 - vec1_min))
-		goto err;
-	/* Prepare the partial range of the last 4MiB region. */
-	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_max, 0, vec1_end))
-		goto err;
-	if unlikely(vec2_min + 1 < vec2_max) {
-		unsigned int vec2;
-		/* Now _fully_ prepare all of the intermediate 4MiB regions. */
-		for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-			if unlikely(!p32_pagedir_prepare_impl_widen(vec2, 0, 1024))
-				goto err;
-		}
-	}
-	PG_TRACE_PREPARE(addr, num_bytes);
-	return true;
-err:
-	return false;
-}
-
-
-
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                     PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_end;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
@@ -621,7 +568,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (!num_bytes)
 		return;
 	if (num_bytes == 4096) {
-		p32_pagedir_unprepare_mapone(addr);
+		p32_pagedir_unprepareone(addr);
 		return;
 	}
 	PG_TRACE_UNPREPARE(addr, num_bytes);

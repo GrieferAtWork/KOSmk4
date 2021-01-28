@@ -451,10 +451,10 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 		LIST_ENTRY_UNBOUND_INIT(&iter->mn_writable);
 		addr = mnode_getaddr(iter);
 		size = mnode_getsize(iter);
-		/* Need to prepare the pagedir for the unwrite first. If this call fails,
+		/* Need to prepare the pagedir for the deny-write first. If this call fails,
 		 * then simply throw an exception, which our caller will then handle for us.
 		 * But also note that we must first unlock the old and new mman */
-		if (!pagedir_prepare_map(addr, size)) {
+		if (!pagedir_prepare(addr, size)) {
 			/* Kill the ant with a shotgun, and just unmap everything. */
 			pagedir_unmap_userspace();
 			iter = next;
@@ -470,7 +470,7 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 #else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
 		pagedir_unmap(addr, size);
 #endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
-		pagedir_unprepare_map(addr, size);
+		pagedir_unprepare(addr, size);
 		if (!next)
 			break;
 		iter = next;

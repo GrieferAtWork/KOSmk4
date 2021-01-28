@@ -1653,7 +1653,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 					                      PAGESIZE,
 					                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
 					if (tempaddr != VM_GETFREE_ERROR) {
-						if (pagedir_prepare_map(tempaddr, 2 * PAGESIZE)) {
+						if (pagedir_prepare(tempaddr, 2 * PAGESIZE)) {
 							pagedir_map(tempaddr, 2 * PAGESIZE, pc_phys & ~PAGEMASK,
 							            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 							pagedir_sync(tempaddr, 2 * PAGESIZE);
@@ -1661,7 +1661,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 							                        ((uintptr_t)pc & PAGEMASK),
 							                        pc);
 							pagedir_unmap(tempaddr, 2 * PAGESIZE);
-							pagedir_unprepare_map(tempaddr, 2 * PAGESIZE);
+							pagedir_unprepare(tempaddr, 2 * PAGESIZE);
 						}
 					}
 				}

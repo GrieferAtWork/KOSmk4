@@ -110,7 +110,7 @@ NOTHROW(KCALL vm_do_pdir_unmap)(PAGEDIR_PAGEALIGNED void *addr,
 	 *       If we were to free any descriptor pages before then, the pages may
 	 *       be allocated again, and become corrupt while other cores are still
 	 *       believing them to contain paging data. */
-	pagedir_unprepare_map(addr, num_bytes);
+	pagedir_unprepare(addr, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 }
 

@@ -1022,14 +1022,14 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
 			                  mf.mfl_size, mf.mfl_offs, perm);
 		} else {
-			if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) {
+			if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
 			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
 			                  mf.mfl_size, mf.mfl_offs, perm);
-			pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 		}
 		mpart_lock_release(mf.mfl_part);
 		/* If write-access was granted, add the node to the list of writable nodes. */
@@ -1871,7 +1871,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					pagedir_prot |= PAGEDIR_MAP_FUSER;
 				/* If the node isn't prepared, make sure that we can map memory. */
 				if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-					if unlikely(!pagedir_prepare_mapone(pageaddr)) {
+					if unlikely(!pagedir_prepareone(pageaddr)) {
 						sync_endwrite(effective_vm);
 						sync_endread(part);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);

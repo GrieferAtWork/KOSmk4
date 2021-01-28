@@ -324,29 +324,22 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 
 /* Prepare the page directory for a future map() operation.
  * The full cycle of a single mapping then looks like this:
- * >> pae_pagedir_prepare_map(...);
+ * >> pae_pagedir_prepare(...);
  * >> pae_pagedir_map(...);
  * >> pae_pagedir_unmap(...);
- * >> pae_pagedir_unprepare_map(...);
- * NOTE: `pae_pagedir_prepare_map_keep()' is the same as `pae_pagedir_prepare_map()', but
- *        will not undo already successfully made preparations after a later one fails.
- *        This will include the undoing of redundant preparations of the given range that
- *        were made in prior calls.
+ * >> pae_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
 INTDEF NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
+NOTHROW(FCALL pae_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED size_t num_bytes);
-INTDEF NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes);
+NOTHROW(FCALL pae_pagedir_prepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes);
 INTDEF NOBLOCK void
-NOTHROW(FCALL pae_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
+NOTHROW(FCALL pae_pagedir_unprepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK void
-NOTHROW(FCALL pae_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes);
+NOTHROW(FCALL pae_pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                     PAGEDIR_PAGEALIGNED size_t num_bytes);
 
 
 /* Set a mapping hint for pages apart of the given virtual memory range.

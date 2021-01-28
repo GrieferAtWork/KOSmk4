@@ -700,7 +700,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	vm_node_setmaxaddr(&kernel_meminfo_mnode, dest + num_bytes - 1);
 	vm_node_insert(&kernel_meminfo_mnode);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if unlikely(!pagedir_prepare_map(dest, num_bytes)) {
+	if unlikely(!pagedir_prepare(dest, num_bytes)) {
 		kernel_panic(FREESTR("Failed to prepare VM for relocated memory "
 		                     "information at %p-%p\n"),
 		       dest, dest + num_bytes - 1);
@@ -714,7 +714,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	            physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start),
 	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(dest, num_bytes);
+	pagedir_unprepare(dest, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	/* Now apply relocations. */
 #define REL(x) ((x) = (__typeof__(x))((byte_t *)(x) + relocation_offset))

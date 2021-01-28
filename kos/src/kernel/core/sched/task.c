@@ -529,7 +529,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(addr);
+	pagedir_unprepareone(addr);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	mnode_tree_removenode(&mman_kernel.mm_mappings, &FORTASK(self, this_kernel_stackguard_));
@@ -540,7 +540,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	pagedir_unmap(addr, size);
 	vm_supersync(addr, size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(addr, size);
+	pagedir_unprepare(addr, size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 #else /* CONFIG_USE_NEW_VM */
 	/* Unlink + unmap the trampoline node. */
@@ -554,7 +554,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	pagedir_unmapone(addr);
 	vm_supersyncone(addr);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(addr);
+	pagedir_unprepareone(addr);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Unlink + unmap the stack node. */
@@ -577,7 +577,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	pagedir_unmap(addr, size);
 	vm_supersync(addr, size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(addr, size);
+	pagedir_unprepare(addr, size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 #endif /* !CONFIG_USE_NEW_VM */
 
@@ -742,7 +742,7 @@ again_lock_vm:
 			}
 #endif /* !CONFIG_USE_NEW_VM */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!pagedir_prepare_map(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
+			if unlikely(!pagedir_prepare(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
 				vm_kernel_treelock_endwrite();
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
@@ -767,7 +767,7 @@ again_lock_vm:
 			FORTASK(result, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(trampoline_addr);
 #endif /* !CONFIG_USE_NEW_VM */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!pagedir_prepare_mapone(trampoline_addr))
+			if unlikely(!pagedir_prepareone(trampoline_addr))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load nodes into the kernel VM. */

@@ -407,10 +407,10 @@ again_scan_nodes:
 				/* Must re-prepare the address range before we
 				 * can safely load new physical memory targets. */
 				if unlikely(!(node->vn_vm == v || node->vn_vm == &vm_kernel
-				              ? pagedir_prepare_map(vm_node_getaddr(node), vm_node_getsize(node))
-				              : pagedir_prepare_map_p(node->vn_vm->v_pdir_phys,
-				                                      vm_node_getaddr(node),
-				                                      vm_node_getsize(node)))) {
+				              ? pagedir_prepare(vm_node_getaddr(node), vm_node_getsize(node))
+				              : pagedir_prepare_p(node->vn_vm->v_pdir_phys,
+				                                   vm_node_getaddr(node),
+				                                   vm_node_getsize(node)))) {
 					vm_set_lockendwrite_all(&vms);
 #ifdef EXLOCK_NX
 					goto err_vms_copy_ramdata_ppp;

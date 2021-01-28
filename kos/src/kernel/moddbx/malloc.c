@@ -184,14 +184,14 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 
 	/* Prepare the address range for mappings. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(new_heap, min_size))
+	if (!pagedir_prepare(new_heap, min_size))
 		return false;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Allocate the backing physical memory. */
 	if (!allocate_physical_memory(new_heap, min_size)) {
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map(new_heap, min_size);
+		pagedir_unprepare(new_heap, min_size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		return false;
 	}

@@ -262,7 +262,7 @@ string_size_changed:
 		/* Lock the kernel VM, so we can steal the PEB node. */
 		sync_write(&mman_kernel);
 		/* Ensure that the page directory is prepared to erase the temporary PEB mapping. */
-		if unlikely(!pagedir_prepare_map(peb_temp_base, peb_total_size)) {
+		if unlikely(!pagedir_prepare(peb_temp_base, peb_total_size)) {
 			sync_endwrite(&mman_kernel);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 		}
@@ -281,7 +281,7 @@ string_size_changed:
 	pagedir_unmap(peb_temp_base, peb_total_size);
 	pagedir_sync(peb_temp_base, peb_total_size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(peb_temp_base, peb_total_size);
+	pagedir_unprepare(peb_temp_base, peb_total_size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	sync_endwrite(&mman_kernel);
 

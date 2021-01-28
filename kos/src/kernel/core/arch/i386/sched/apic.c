@@ -349,7 +349,7 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 			}
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Make sure that the NODE2 portion of the CPU descriptor is always prepared. */
-			if (!pagedir_prepare_map(cpu_baseaddr + (size_t)__x86_cpu_part1_bytes, 2 * PAGESIZE))
+			if (!pagedir_prepare(cpu_baseaddr + (size_t)__x86_cpu_part1_bytes, 2 * PAGESIZE))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		} EXCEPT {
@@ -461,12 +461,12 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	cpu_node3 = vm_node_remove(&vm_kernel, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE);
 	cpu_node1 = vm_node_remove(&vm_kernel, cpu_baseaddr);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE))
+	if (!pagedir_prepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare pagedir for unmapping CPU descriptor"));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_unmap(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
+	pagedir_unprepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	sync_endwrite(&vm_kernel);
 	assert(cpu_node1);
@@ -509,21 +509,21 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	pagedir_sync(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
 	             vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
-	                      vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
+	pagedir_unprepare(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
+	                  vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_unmap(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
 	              vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
 	pagedir_sync(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
 	             vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
-	                      vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
+	pagedir_unprepare(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
+	                  vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_unmapone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
 	pagedir_syncone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
+	pagedir_unprepareone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */
@@ -589,7 +589,7 @@ i386_allocate_secondary_cores(void) {
 			vm_node_setminaddr(&FORCPU(altcore, thiscpu_x86_dfstacknode_), addr);
 			vm_node_setmaxaddr(&FORCPU(altcore, thiscpu_x86_dfstacknode_), addr + KERNEL_DF_STACKSIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if (!pagedir_prepare_map(addr, CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE)))
+			if (!pagedir_prepare(addr, CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's #DF stack"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			vm_datapart_map_ram(&FORCPU(altcore, thiscpu_x86_dfstackpart_),
@@ -655,7 +655,7 @@ i386_allocate_secondary_cores(void) {
 			vm_node_setmaxaddr(&FORTASK(altidle, this_kernel_stacknode_), addr + KERNEL_IDLE_STACKSIZE - 1);
 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if (!pagedir_prepare_map(addr, CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE)))
+			if (!pagedir_prepare(addr, CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's IDLE stack"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			vm_datapart_map_ram(&FORTASK(altidle, this_kernel_stackpart_),
@@ -677,7 +677,7 @@ i386_allocate_secondary_cores(void) {
 			vm_node_setminaddr(&FORTASK(altidle, this_trampoline_node), addr);
 			vm_node_setmaxaddr(&FORTASK(altidle, this_trampoline_node), addr + PAGESIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!pagedir_prepare_mapone(addr))
+			if unlikely(!pagedir_prepareone(addr))
 				kernel_panic(FREESTR("Failed to prepare CPU #%u's IDLE trampoline"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			vm_node_insert(&FORTASK(altidle, this_trampoline_node));

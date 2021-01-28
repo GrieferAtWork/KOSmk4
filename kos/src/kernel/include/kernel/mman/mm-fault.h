@@ -242,11 +242,11 @@ struct mfault {
  * >>         mfault_fini(&mf);
  * >>         RETHROW();
  * >>     }
- * >>     if (!pagedir_prepare_map(mf.mfl_addr, mf.mfl_size)) { ... }
+ * >>     if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) { ... }
  * >>     perm = mnode_getperm(mf.mfl_node);
  * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
  * >>                       mf.mfl_size, mf.mfl_offs, perm);
- * >>     pagedir_unprepare_map(mf.mfl_addr, mf.mfl_size);
+ * >>     pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
  * >>     if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))

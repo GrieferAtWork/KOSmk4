@@ -212,7 +212,7 @@ NOTHROW(FCALL unmap_and_unprepare_and_sync_memory)(void *addr, size_t num_bytes)
 	pagedir_unmap(addr, num_bytes);
 	mman_supersync(addr, num_bytes);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(addr, num_bytes);
+	pagedir_unprepare(addr, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 #if !defined(NDEBUG) && !defined(CONFIG_NO_SMP)
@@ -1228,7 +1228,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		/* Make sure that the (accessed) address range has been prepared. */
 		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
-			if (!pagedir_prepare_map(unmap_minaddr, unmap_size))
+			if (!pagedir_prepare(unmap_minaddr, unmap_size))
 				goto failed;
 			ATOMIC_OR(node->mn_flags, MNODE_F_MPREPARED);
 		}

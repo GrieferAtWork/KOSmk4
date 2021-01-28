@@ -1332,8 +1332,8 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(FCALL vga_map)(void) {
 	 * at that point we'd still have access to the physical identity map, so we
 	 * should instead also support its use instead of only hacking around to
 	 * place a temporary mapping of the VGA display just before the kernel. */
-	vga_oldmapping_did_prepare = pagedir_prepare_map((void *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK),
-	                                                 VGA_VRAM_SIZE);
+	vga_oldmapping_did_prepare = pagedir_prepare((void *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK),
+	                                             VGA_VRAM_SIZE);
 	if (!vga_oldmapping_did_prepare) {
 		printk(DBGSTR(KERN_CRIT "[dbg] Failed to find suitable location to map "
 		                        "VGA video memory. - This shouldn't happen\n"));

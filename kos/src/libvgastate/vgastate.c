@@ -420,7 +420,7 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 		physaddr_t phys;
 		self->vv_biosbase = (byte_t *)KERNEL_CORE_BASE;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		if (!pagedir_prepare_map(self->vv_biosbase, VGA_VM86_BIOS_SIZE))
+		if (!pagedir_prepare(self->vv_biosbase, VGA_VM86_BIOS_SIZE))
 			return VGA_STATE_ERROR_NOMEM;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		for (i = 0, virt = self->vv_biosbase, phys = 0;

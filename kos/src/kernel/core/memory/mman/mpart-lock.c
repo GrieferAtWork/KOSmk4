@@ -1331,9 +1331,9 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
 			continue; /* Skip dead nodes. */
 		if (start_node->mn_flags & (MNODE_F_MPREPARED | MNODE_F_UNMAPPED))
 			continue; /* Skip nodes already prepared, or ones that were unmapped. */
-		pagedir_unprepare_map_p(start_node->mn_mman->mm_pagedir_p,
-		                        mnode_getaddr(start_node),
-		                        mnode_getsize(start_node));
+		pagedir_unprepare_p(start_node->mn_mman->mm_pagedir_p,
+		                    mnode_getaddr(start_node),
+		                    mnode_getsize(start_node));
 	}
 }
 
@@ -1352,9 +1352,9 @@ try_prepare_mmans_or_throw(struct mpart *__restrict self,
 			continue; /* Skip nodes that were unmapped. */
 		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 			/* Prepare the page directory. */
-			if unlikely(!pagedir_prepare_map_p(node->mn_mman->mm_pagedir_p,
-			                                   mnode_getaddr(node),
-			                                   mnode_getsize(node)))
+			if unlikely(!pagedir_prepare_p(node->mn_mman->mm_pagedir_p,
+			                                mnode_getaddr(node),
+			                                mnode_getsize(node)))
 				goto err_badalloc;
 		}
 		result = true;
@@ -1585,7 +1585,7 @@ free_unused_block_status:
 
 			if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 				/* With the new mapping in place, unprepare the page directory. */
-				pagedir_unprepare_map_p(mm->mm_pagedir_p, addr, size);
+				pagedir_unprepare_p(mm->mm_pagedir_p, addr, size);
 			}
 
 			/* Sync memory within the affected area. After all: The backing

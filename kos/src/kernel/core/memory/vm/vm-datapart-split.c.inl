@@ -1072,7 +1072,7 @@ done_futex:
 				high->vn_prot        = iter->vn_prot;
 				/* Unset the prepared flag for the node: because the node got split, it is no
 				 * longer prepared in its entirety, meaning that when being modified, it must
-				 * be prepared once again (see documentation of `pagedir_prepare_mapone()',
+				 * be prepared once again (see documentation of `pagedir_prepareone()',
 				 * specifically the part about having to re-prepare a sub-region before unmap()
 				 * following a map() operation, when only a part of that original region must
 				 * be unmapped, as opposed to it in its entirety) */

@@ -416,8 +416,8 @@ did_alloc_ramdata_in_new_part:
 			/* If the node isn't prepared, make sure that we can map memory. */
 			if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
 				if unlikely(!(self == THIS_VM || self == &vm_kernel
-				              ? pagedir_prepare_map(pageaddr, part_num_vpages * PAGESIZE)
-				              : pagedir_prepare_map_p(self->v_pdir_phys, pageaddr, part_num_vpages * PAGESIZE))) {
+				              ? pagedir_prepare(pageaddr, part_num_vpages * PAGESIZE)
+				              : pagedir_prepare_p(self->v_pdir_phys, pageaddr, part_num_vpages * PAGESIZE))) {
 					sync_endwrite(self);
 					sync_endwrite(part);
 					free_partilly_initialized_datapart(new_part);
@@ -835,7 +835,7 @@ again_acquire_part_lock:
 				pagedir_prot |= PAGEDIR_MAP_FUSER;
 			/* If the node isn't prepared, make sure that we can map memory. */
 			if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-				if unlikely(!pagedir_prepare_mapone(addr)) {
+				if unlikely(!pagedir_prepareone(addr)) {
 					sync_endwrite(self);
 					sync_endread(part);
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);

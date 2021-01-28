@@ -474,7 +474,7 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 	        mnode_getsize(node), mpart_getsize(part));
 	addr = mnode_getaddr(node);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
+	if (!pagedir_prepare(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
 		             vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	}
@@ -521,13 +521,13 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 
 	/* Unmap everything before the kernel. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_map((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE))
+	if (pagedir_prepare((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE))
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmap((void *)KERNEL_CORE_BASE,
 		              (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
+		pagedir_unprepare((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 	assert(mnode_getminaddr(&kernel_meminfo_mnode) != (byte_t *)0);
@@ -560,7 +560,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * The contents of this section are mainly required for SMP initialization,
 	 * though can also be used for other things that require being placed at a
 	 * known physical memory location. */
-	if (!pagedir_prepare_map(__kernel_pdata_start - KERNEL_CORE_BASE, (size_t)__kernel_pdata_size))
+	if (!pagedir_prepare(__kernel_pdata_start - KERNEL_CORE_BASE, (size_t)__kernel_pdata_size))
 		kernel_panic(FREESTR("Failed to prepare kernel VM for mapping .pdata\n"));
 	simple_insert_and_activate(&x86_pdata_mnode, PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #ifndef NDEBUG
@@ -618,9 +618,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 #endif /* !__x86_64__ */
 			num_bytes = (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if (pagedir_prepare_map(pagedata_prev_end, num_bytes)) {
+			if (pagedir_prepare(pagedata_prev_end, num_bytes)) {
 				pagedir_unmap(pagedata_prev_end, num_bytes);
-				pagedir_unprepare_map(pagedata_prev_end, num_bytes);
+				pagedir_unprepare(pagedata_prev_end, num_bytes);
 			}
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			pagedir_unmap(pagedata_prev_end, num_bytes);
@@ -684,30 +684,30 @@ NOTHROW(KCALL x86_initialize_mman_kernel_rdonly)(void) {
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	/* Get rid of the page guarding the end of the boot-task stack. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_mapone(__kernel_boottask_stack_guard))
+	if (pagedir_prepareone(__kernel_boottask_stack_guard))
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmapone(__kernel_boottask_stack_guard);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map(__kernel_boottask_stack_guard);
+		pagedir_unprepare(__kernel_boottask_stack_guard);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_mapone(__kernel_asyncwork_stack_guard))
+	if (pagedir_prepareone(__kernel_asyncwork_stack_guard))
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmapone(__kernel_asyncwork_stack_guard);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map(__kernel_asyncwork_stack_guard);
+		pagedir_unprepare(__kernel_asyncwork_stack_guard);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_mapone(__kernel_bootidle_stack_guard))
+	if (pagedir_prepareone(__kernel_bootidle_stack_guard))
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmapone(__kernel_bootidle_stack_guard);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map(__kernel_bootidle_stack_guard);
+		pagedir_unprepare(__kernel_bootidle_stack_guard);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
@@ -738,12 +738,12 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 	 * NOTE: Make sure not to unmap the first couple of pages which
 	 *       are now used by the relocated BRK data. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_map(__kernel_free_start, (size_t)__kernel_free_size))
+	if (pagedir_prepare(__kernel_free_start, (size_t)__kernel_free_size))
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmap(__kernel_free_start, (size_t)__kernel_free_size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map(__kernel_free_start, (size_t)__kernel_free_size);
+		pagedir_unprepare(__kernel_free_start, (size_t)__kernel_free_size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 

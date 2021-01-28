@@ -237,7 +237,7 @@ again_lock_vm:
 				vm_node_setminaddr(&FORTASK(result, this_kernel_stacknode_), stack_addr);
 				vm_node_setmaxaddr(&FORTASK(result, this_kernel_stacknode_), stack_addr + KERNEL_STACKSIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if unlikely(!pagedir_prepare_map(stack_addr, KERNEL_STACKSIZE)) {
+				if unlikely(!pagedir_prepare(stack_addr, KERNEL_STACKSIZE)) {
 					sync_endwrite(&vm_kernel.v_treelock);
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, KERNEL_STACKSIZE);
 				}
@@ -257,7 +257,7 @@ again_lock_vm:
 				vm_node_setminaddr(&FORTASK(result, this_trampoline_node), trampoline_addr);
 				vm_node_setmaxaddr(&FORTASK(result, this_trampoline_node), trampoline_addr + PAGESIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if unlikely(!pagedir_prepare_mapone(trampoline_addr))
+				if unlikely(!pagedir_prepareone(trampoline_addr))
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				/* Load nodes into the kernel VM. */
@@ -272,7 +272,7 @@ again_lock_vm:
 				                    stack_addr,
 				                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				pagedir_unprepare_map(stack_addr, KERNEL_STACKSIZE);
+				pagedir_unprepare(stack_addr, KERNEL_STACKSIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				sync_endwrite(&vm_kernel.v_treelock);
 			} EXCEPT {

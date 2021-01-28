@@ -437,7 +437,7 @@ do_prefault:
 			                 PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!(flags & GFP_MAP_PREPARED))
-				pagedir_unprepare_map(result, num_bytes);
+				pagedir_unprepare(result, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			pagedir_sync(result, num_bytes);
 
@@ -515,7 +515,7 @@ do_prefault:
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 #ifdef ARCH_PAGEDIR_NEED_UNPREPARE_AFTER_MAPHINT
 			if (!(flags & GFP_MAP_PREPARED))
-				pagedir_unprepare_map(result, num_bytes);
+				pagedir_unprepare(result, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_UNPREPARE_AFTER_MAPHINT */
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		}

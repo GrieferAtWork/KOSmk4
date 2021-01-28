@@ -421,7 +421,7 @@ again_next_slab_page_tryhard:
 			}
 			/* Now to map the new page. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!pagedir_prepare_mapone(next_slab_addr)) {
+			if unlikely(!pagedir_prepareone(next_slab_addr)) {
 				vm_kernel_treelock_endwrite();
 				goto err_corepair_content;
 			}

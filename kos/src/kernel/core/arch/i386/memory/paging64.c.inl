@@ -1619,18 +1619,14 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
 
 /* Prepare the page directory for a future map() operation.
  * The full cycle of a single mapping then looks like this:
- * >> p64_pagedir_prepare_map(...);
+ * >> p64_pagedir_prepare(...);
  * >> p64_pagedir_map(...);
  * >> p64_pagedir_unmap(...);
- * >> p64_pagedir_unprepare_map(...);
- * NOTE: `p64_pagedir_prepare_map_keep()' is the same as `p64_pagedir_prepare_map()', but
- *        will not undo already successfully made preparations after a later one fails.
- *        This will include the undoing of redundant preparations of the given range that
- *        were made in prior calls.
+ * >> p64_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p64_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p64_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	bool result;
 	unsigned int vec4, vec3, vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
@@ -1645,7 +1641,7 @@ NOTHROW(FCALL p64_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p64_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p64_pagedir_unprepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec4, vec3, vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	PG_TRACE_UNPREPARE(addr, PAGESIZE);
@@ -1657,8 +1653,8 @@ NOTHROW(FCALL p64_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr)
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p64_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p64_pagedir_prepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	bool result;
 	unsigned int vec4_min, vec4_max;
 	unsigned int vec3_min, vec3_max;
@@ -1668,7 +1664,7 @@ NOTHROW(FCALL p64_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
-		return p64_pagedir_prepare_mapone(addr);
+		return p64_pagedir_prepareone(addr);
 	vec4_min = P64_PDIR_VEC4INDEX(addr);
 	vec4_max = P64_PDIR_VEC4INDEX((byte_t *)addr + num_bytes - 1);
 	vec3_min = P64_PDIR_VEC3INDEX(addr);
@@ -1686,39 +1682,9 @@ NOTHROW(FCALL p64_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	return result;
 }
 
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p64_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	bool result;
-	unsigned int vec4_min, vec4_max;
-	unsigned int vec3_min, vec3_max;
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_max;
-	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
-	if (!num_bytes)
-		return true;
-	if (num_bytes == 4096)
-		return p64_pagedir_prepare_mapone(addr);
-	vec4_min = P64_PDIR_VEC4INDEX(addr);
-	vec4_max = P64_PDIR_VEC4INDEX((byte_t *)addr + num_bytes - 1);
-	vec3_min = P64_PDIR_VEC3INDEX(addr);
-	vec3_max = P64_PDIR_VEC3INDEX((byte_t *)addr + num_bytes - 1);
-	vec2_min = P64_PDIR_VEC2INDEX(addr);
-	vec2_max = P64_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
-	vec1_min = P64_PDIR_VEC1INDEX(addr);
-	vec1_max = P64_PDIR_VEC1INDEX((byte_t *)addr + num_bytes - 1);
-	result = p64_pagedir_prepare_impl_widen_v4_keep(vec4_min, vec4_max,
-	                                                vec3_min, vec3_max,
-	                                                vec2_min, vec2_max,
-	                                                vec1_min, vec1_max);
-	PG_TRACE_PREPARE_IF(result, addr, num_bytes);
-	assert_prepared_if(result, addr, num_bytes);
-	return result;
-}
-
 INTERN NOBLOCK void
-NOTHROW(FCALL p64_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p64_pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                     PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	unsigned int vec4_min, vec4_max;
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
@@ -1727,7 +1693,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (!num_bytes)
 		return;
 	if (num_bytes == 4096) {
-		p64_pagedir_unprepare_mapone(addr);
+		p64_pagedir_unprepareone(addr);
 		return;
 	}
 	PG_TRACE_UNPREPARE(addr, num_bytes);
@@ -2408,11 +2374,10 @@ DEFINE_PUBLIC_ALIAS(pagedir_fini, p64_pagedir_fini);
 DEFINE_PUBLIC_ALIAS(pagedir_unmap_userspace, p64_pagedir_unmap_userspace);
 DEFINE_PUBLIC_ALIAS(pagedir_unmap_userspace_nosync, p64_pagedir_unmap_userspace_nosync);
 DEFINE_PUBLIC_ALIAS(pagedir_translate, p64_pagedir_translate);
-DEFINE_PUBLIC_ALIAS(pagedir_prepare_mapone, p64_pagedir_prepare_mapone);
-DEFINE_PUBLIC_ALIAS(pagedir_unprepare_mapone, p64_pagedir_unprepare_mapone);
-DEFINE_PUBLIC_ALIAS(pagedir_prepare_map, p64_pagedir_prepare_map);
-DEFINE_PUBLIC_ALIAS(pagedir_prepare_map_keep, p64_pagedir_prepare_map_keep);
-DEFINE_PUBLIC_ALIAS(pagedir_unprepare_map, p64_pagedir_unprepare_map);
+DEFINE_PUBLIC_ALIAS(pagedir_prepareone, p64_pagedir_prepareone);
+DEFINE_PUBLIC_ALIAS(pagedir_unprepareone, p64_pagedir_unprepareone);
+DEFINE_PUBLIC_ALIAS(pagedir_prepare, p64_pagedir_prepare);
+DEFINE_PUBLIC_ALIAS(pagedir_unprepare, p64_pagedir_unprepare);
 DEFINE_PUBLIC_ALIAS(pagedir_maphintone, p64_pagedir_maphintone);
 DEFINE_PUBLIC_ALIAS(pagedir_maphint, p64_pagedir_maphint);
 DEFINE_PUBLIC_ALIAS(pagedir_gethint, p64_pagedir_gethint);

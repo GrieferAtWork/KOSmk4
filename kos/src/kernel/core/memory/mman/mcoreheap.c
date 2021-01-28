@@ -347,7 +347,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 		goto fail;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* If necessary, make sure that the new page is prepared! */
-	if (!pagedir_prepare_mapone(node->mn_minaddr - PAGESIZE)) {
+	if (!pagedir_prepareone(node->mn_minaddr - PAGESIZE)) {
 		page_ccfree(part->mp_mem.mc_start - 1, 1);
 		goto fail;
 	}
@@ -357,7 +357,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 	pagedir_mapone(node->mn_minaddr - PAGESIZE, physpage2addr(ppage),
 	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(node->mn_minaddr - PAGESIZE);
+	pagedir_unprepareone(node->mn_minaddr - PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Update the node/part */
@@ -382,7 +382,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 		goto fail;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* If necessary, make sure that the new page is prepared! */
-	if (!pagedir_prepare_mapone(node->mn_maxaddr + 1)) {
+	if (!pagedir_prepareone(node->mn_maxaddr + 1)) {
 		page_ccfree(part->mp_mem.mc_start - 1, 1);
 		goto fail;
 	}
@@ -392,7 +392,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 	pagedir_mapone(node->mn_maxaddr + 1, physpage2addr(ppage),
 	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(node->mn_maxaddr + 1);
+	pagedir_unprepareone(node->mn_maxaddr + 1);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Update the node/part */
@@ -528,7 +528,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 
 	/* Make sure that the backing page directory is prepared. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(node->mn_minaddr, PAGESIZE)) {
+	if (!pagedir_prepare(node->mn_minaddr, PAGESIZE)) {
 		page_ccfree(part->mp_mem.mc_start, 1);
 		printk(KERN_CRIT "[mcore] low-level OOM: Unable to prepare page directory\n");
 		return false;
@@ -575,7 +575,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	               physpage2addr(part->mp_mem.mc_start),
 	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(node->mn_minaddr, PAGESIZE);
+	pagedir_unprepare(node->mn_minaddr, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* With everything mapped, register the new page for use. */
