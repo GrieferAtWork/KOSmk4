@@ -514,9 +514,9 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pagedir_syncall_user)(void) {
 	__register u64 temp;
-	__asm__("movq %%cr3, %0\n\t"
-	        "movq %0, %%cr3"
-	        : "=&r" (temp));
+	__asm__ __volatile__("movq %%cr3, %0\n\t"
+	                     "movq %0, %%cr3"
+	                     : "=&r" (temp));
 }
 
 /* Same as `pagedir_syncall_user()', but also

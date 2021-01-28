@@ -465,22 +465,20 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 			}
 			goto done;
 		}
+		/* TODO: Rename `pagedir_unwrite' to `pagedir_denywrite' */
 		pagedir_unwrite(addr, size);
 		pagedir_unprepare_map(addr, size);
 		if (!next)
 			break;
 		iter = next;
 	}
+done:
 	/* After clearing all of those write-permissions, we must sync the
 	 * current (i.e. copied) mman to ensure that no-one is writing to
 	 * any of the (now shared) pages.
 	 * Following this call, any further modifications made to the memory
 	 * of the old mman will be unshared from the new mman (i.e. will no
 	 * longer appear in both page directories) */
-done:
-#if 1 /* !!!FIXME!!! (high priority): It seems as though `pagedir_unwrite()' doesn't work? */
-	pagedir_unmap_userspace();
-#endif
 	mman_syncall();
 }
 

@@ -271,9 +271,9 @@ typedef pae_pagedir_pushval_t pagedir_pushval_t;
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pagedir_syncall_user)(void) {
 	__register u32 temp;
-	__asm__("movl %%cr3, %0\n\t"
-	        "movl %0, %%cr3"
-	        : "=&r" (temp));
+	__asm__ __volatile__("movl %%cr3, %0\n\t"
+	                     "movl %0, %%cr3"
+	                     : "=&r" (temp));
 }
 
 /* Same as `pagedir_syncall_user()', but also
