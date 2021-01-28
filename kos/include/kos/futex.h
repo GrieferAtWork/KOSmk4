@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f8e0289 */
+/* HASH CRC-32:0xb297822 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1428,7 +1428,7 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
  *   - ...
  * Futex spinning improves performance by bypassing expensive blocking operations
  * when associated locks are often only held for a couple of moments at a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferrably `futex_waitwhile()'), which
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
@@ -1449,7 +1449,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW,futex_getspin,(void),())
  *   - ...
  * Futex spinning improves performance by bypassing expensive blocking operations
  * when associated locks are often only held for a couple of moments at a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferrably `futex_waitwhile()'), which
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();

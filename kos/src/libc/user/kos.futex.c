@@ -1184,7 +1184,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futex_timedwaitwhile_allbits64]]]*/
 
-/*[[[head:libc_futex_getspin,hash:CRC-32=0xe8b5ffe]]]*/
+/*[[[head:libc_futex_getspin,hash:CRC-32=0x2bf8a4a8]]]*/
 /* Get/Set the number of times to spin the following futex operations without
  * entering kernel-space, setting waiter-bits, and entering sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
@@ -1192,7 +1192,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
  *   - ...
  * Futex spinning improves performance by bypassing expensive blocking operations
  * when associated locks are often only held for a couple of moments at a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferrably `futex_waitwhile()'), which
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
@@ -1217,7 +1217,7 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
 }
 /*[[[end:libc_futex_getspin]]]*/
 
-/*[[[head:libc_futex_setspin,hash:CRC-32=0x2c0e5724]]]*/
+/*[[[head:libc_futex_setspin,hash:CRC-32=0x5a639f7]]]*/
 /* Get/Set the number of times to spin the following futex operations without
  * entering kernel-space, setting waiter-bits, and entering sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
@@ -1225,7 +1225,7 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
  *   - ...
  * Futex spinning improves performance by bypassing expensive blocking operations
  * when associated locks are often only held for a couple of moments at a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferrably `futex_waitwhile()'), which
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();

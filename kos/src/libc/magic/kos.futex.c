@@ -979,7 +979,7 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
 @@  - ...
 @@Futex spinning improves performance by bypassing expensive blocking operations
 @@when associated locks are often only held for a couple of moments at a time.
-@@Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferrably `futex_waitwhile()'), which
+@@Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
 @@is wrapped like this:
 @@>> unsigned int spins;
 @@>> spins = futex_getspin();

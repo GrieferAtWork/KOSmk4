@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x511b030e */
+/* HASH CRC-32:0xe330a7fb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -348,7 +348,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_futex_timedwaitwhile_allbits64
  *   - ...
  * Futex spinning improves performance by bypassing expensive blocking operations
  * when associated locks are often only held for a couple of moments at a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferrably `futex_waitwhile()'), which
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();

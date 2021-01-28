@@ -465,9 +465,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 		kernel_panic(FREESTR("Failed to prepare pagedir for unmapping CPU descriptor"));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_unmap(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_kernelunprepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
 	sync_endwrite(&vm_kernel);
 	assert(cpu_node1);
 	assert(cpu_node2);
@@ -508,23 +506,17 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	              vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
 	pagedir_sync(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
 	             vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
-	                  vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_kernelunprepare(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
+	                        vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
 	pagedir_unmap(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
 	              vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
 	pagedir_sync(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
 	             vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
-	                  vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_kernelunprepare(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
+	                        vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
 	pagedir_unmapone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
 	pagedir_syncone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepareone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_kernelunprepareone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
 
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */
 	while (!mman_lock_tryacquire(&mman_kernel))

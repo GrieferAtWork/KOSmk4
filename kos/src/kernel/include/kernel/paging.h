@@ -102,6 +102,24 @@ typedef uintptr_t pagedir_pushval_t;
 #endif /* __CC__ */
 #endif /* !__pagedir_pushval_t_defined */
 
+/* Helper macros to generate the most efficient code to specifically
+ * prepare/unprepare memory regions within the kernel page directory.
+ *
+ * But note that you can always just use the normal prepare/unprepare
+ * functions even for kernel addresses, only that these right here may
+ * be more efficient in certain configurations. */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+#define pagedir_kernelprepareone(addr)           pagedir_prepareone(addr)
+#define pagedir_kernelunprepareone(addr)         pagedir_unprepareone(addr)
+#define pagedir_kernelprepare(addr, num_bytes)   pagedir_prepare(addr, num_bytes)
+#define pagedir_kernelunprepare(addr, num_bytes) pagedir_unprepare(addr, num_bytes)
+#else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#define pagedir_kernelprepareone(addr)           1
+#define pagedir_kernelunprepareone(addr)         (void)0
+#define pagedir_kernelprepare(addr, num_bytes)   1
+#define pagedir_kernelunprepare(addr, num_bytes) (void)0
+#endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 
 #ifdef __CC__
 

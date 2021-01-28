@@ -103,12 +103,12 @@ DECL_BEGIN
 
 
 
-struct forktree_data {
-	struct mnode      *ftd_newtree;  /* [0..n] New tree of nodes (not a valid R/B-tree until everything has been forked) */
-	struct mman       *ftd_oldmm;    /* [1..1] The old (to-be fork(2)'d) mman. */
-	struct mman       *ftd_newmm;    /* [1..1] The new (target) mman */
-	struct mnode_slist ftd_freelist; /* [0..n] List of free mem-nodes */
-	bool               ftd_didulock; /* Set to true if `ftd_newmm' was ever unlocked. */
+struct forktree {
+	struct mnode      *ft_newtree;  /* [0..n] New tree of nodes (not a valid R/B-tree until everything has been forked) */
+	struct mman       *ft_oldmm;    /* [1..1] The old (to-be fork(2)'d) mman. */
+	struct mman       *ft_newmm;    /* [1..1] The new (target) mman */
+	struct mnode_slist ft_freelist; /* [0..n] List of free mem-nodes */
+	bool               ft_didulock; /* Set to true if `ft_newmm' was ever unlocked. */
 };
 
 
@@ -118,9 +118,9 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict sel
 INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
 
-/* Destroy the given `node', but (try to) re-use it by adding it to `ftd_freelist' */
+/* Destroy the given `node', but (try to) re-use it by adding it to `ft_freelist' */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL forktree_mnode_destroy)(struct forktree_data *__restrict self,
+NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
                                       struct mnode *__restrict node) {
 	REF struct mpart *part;
 	assert(!(node->mn_flags & MNODE_F_COREPART));
@@ -162,19 +162,19 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree_data *__restrict self,
 	}
 
 	/* Insert into the free-list to allow for fast object-reuse. */
-	SLIST_INSERT(&self->ftd_freelist, node, _mn_alloc);
+	SLIST_INSERT(&self->ft_freelist, node, _mn_alloc);
 }
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL forktree_insert_into_newmm)(struct forktree_data *__restrict self,
+NOTHROW(FCALL forktree_insert_into_newmm)(struct forktree *__restrict self,
                                           struct mnode *__restrict root) {
 	struct mnode *lhs, *rhs;
 	struct mman *newmm;
 again:
 	lhs   = root->mn_mement.rb_lhs;
 	rhs   = root->mn_mement.rb_rhs;
-	newmm = self->ftd_newmm;
+	newmm = self->ft_newmm;
 	for (;;) {
 		struct mnode *oldnode;
 		oldnode = mnode_tree_rremove(&newmm->mm_mappings,
@@ -202,19 +202,19 @@ again:
 	}
 }
 
-/* Ensure that `self->ftd_newmm->mm_mappings' is a valid tree of mem-nodes
- * by inserting all nodes from the incomplete tree `ftd_newtree' into the
+/* Ensure that `self->ft_newmm->mm_mappings' is a valid tree of mem-nodes
+ * by inserting all nodes from the incomplete tree `ft_newtree' into the
  * actual mappings tree of that mman. Where an overlap is found, the existing
- * node is removed from `self->ftd_newmm' will be destroyed. */
+ * node is removed from `self->ft_newmm' will be destroyed. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL forktree_unlock_newmm)(struct forktree_data *__restrict self) {
+NOTHROW(FCALL forktree_unlock_newmm)(struct forktree *__restrict self) {
 	struct mman *newmm;
-	newmm = self->ftd_newmm;
+	newmm = self->ft_newmm;
 
 	/* Like the description says. But make sure not to free the kernel-reserve node! */
-	if (self->ftd_newtree != NULL)
-		forktree_insert_into_newmm(self, self->ftd_newtree);
-	DBG_memset(&self->ftd_newtree, 0xcc, sizeof(self->ftd_newtree));
+	if (self->ft_newtree != NULL)
+		forktree_insert_into_newmm(self, self->ft_newtree);
+	DBG_memset(&self->ft_newtree, 0xcc, sizeof(self->ft_newtree));
 
 	/* Make sure that `thismman_kernel_reservation' is apart of the tree. */
 	{
@@ -235,17 +235,17 @@ NOTHROW(FCALL forktree_unlock_newmm)(struct forktree_data *__restrict self) {
 
 /* Helper functions to replicate a tree of memory mappings for the purpose
  * of forking a memory manager:
- *  - While holding a lock to both `ftd_newmm', as well as `ftd_oldmm',
- *    try to fork the given `oldtree' of mem-nodes into a copy that will be
- *    stored in `*p_newtree'.
+ *  - While holding a lock to both `ft_newmm', as well as `ft_oldmm',
+ *    try to fork the given `oldtree' of mem-nodes into a copy that will
+ *    be stored in `*p_newtree'.
  *  - When `oldtree' is `NULL', simply set `*p_newtree' to `NULL'.
- *  - Otherwise, use `mnode_tree_rremove()' on `ftd_newmm->mm_mappings'
+ *  - Otherwise, use `mnode_tree_rremove()' on `ft_newmm->mm_mappings'
  *    to try to remove a mem-node already duplicated during a prior call, in
  *    which case check that attributes (flags, min/max-addr, part, partoff,
  *    fsname, fspath) are still up to date. If so, then simply set `*p_newtree'
  *    to that previously duplicated node, and continue replicating the child-
  *    nodes of `oldtree'
- *  - Otherwise, a new mem-node will be allocated (preferrably via `ftd_freelist')
+ *  - Otherwise, a new mem-node will be allocated (preferably via `ft_freelist')
  *    and initialized to replicate `oldtree' (for this purpose, a lock to the
  *    backing part of `oldtree' will also be acquired, so that the new mem-node
  *    can be added to the part's list of copy- or share-nodes).
@@ -253,16 +253,16 @@ NOTHROW(FCALL forktree_unlock_newmm)(struct forktree_data *__restrict self) {
  *    >> forktree_or_unlock(self, &(*p_newtree)->mn_mement.rb_lhs, oldtree->mn_mement.rb_lhs);
  *    >> forktree_or_unlock(self, &(*p_newtree)->mn_mement.rb_rhs, oldtree->mn_mement.rb_rhs);
  * @return: true:  Success
- * @return: false: Failure: A mem-node could not be allocated atomically, or a lock
- *                 to a mem-part could not be acquired immediately), a lock to `ftd_oldmm'
- *                 and `ftd_newmm' is released (the later by using `forktree_unlock_newmm',
- *                 which will merge all nodes from `self->ftd_newtree' into `ftd_newmm's
+ * @return: false: Failure: A mem-node could not be allocated atomically, or a lock to
+ *                 a mem-part could not be acquired immediately. - A lock to `ft_oldmm'
+ *                 and `ft_newmm' is released (the later by using `forktree_unlock_newmm',
+ *                 which will merge all nodes from `self->ft_newtree' into `ft_newmm's
  *                 tree of mappings), and:
- *                   - A new mem-node is allocated w/ blocking, and added to `freelist'
+ *                   - A new mem-node is allocated w/ blocking, and added to `ft_freelist'
  *                   - Keep on yielding until the locked part becomes available
  *                 -> The caller must then re-acquire locks and try again */
 PRIVATE NONNULL((1, 2)) bool FCALL
-forktree_or_unlock(struct forktree_data *__restrict self,
+forktree_or_unlock(struct forktree *__restrict self,
                    struct mnode **__restrict p_newtree,
                    struct mnode *newtree_parent,
                    struct mnode *oldtree) {
@@ -276,7 +276,7 @@ forktree_or_unlock(struct forktree_data *__restrict self,
 
 again:
 	/* Check if there is a pre-existing node at this address. */
-	newtree = mnode_tree_rremove(&self->ftd_newmm->mm_mappings,
+	newtree = mnode_tree_rremove(&self->ft_newmm->mm_mappings,
 	                             oldtree->mn_minaddr,
 	                             oldtree->mn_maxaddr);
 	if (newtree) {
@@ -294,19 +294,19 @@ again:
 			newtree->mn_flags |= oldtree->mn_flags & MNODE_F__RBRED;
 			goto continue_after_fork_newtree; /* Can re-use this node! */
 		}
-		assert(newtree != &FORMMAN(self->ftd_newmm, thismman_kernel_reservation));
+		assert(newtree != &FORMMAN(self->ft_newmm, thismman_kernel_reservation));
 		/* Different nodes -> Delete the pre-existing, overlapping node. */
 		forktree_mnode_destroy(self, newtree);
 		goto again;
 	}
-	assertf(oldtree != &FORMMAN(self->ftd_oldmm, thismman_kernel_reservation),
+	assertf(oldtree != &FORMMAN(self->ft_oldmm, thismman_kernel_reservation),
 	        "This should have been handled by the `mnode_tree_rremove()' above!");
 
 	/* Must actually create a new copy of `oldtree'. For this purpose,
 	 * start by trying to allocate a new node from the free-list. */
-	newtree = SLIST_FIRST(&self->ftd_freelist);
+	newtree = SLIST_FIRST(&self->ft_freelist);
 	if (newtree) {
-		SLIST_REMOVE_HEAD(&self->ftd_freelist, _mn_alloc);
+		SLIST_REMOVE_HEAD(&self->ft_freelist, _mn_alloc);
 	} else {
 		/* Must use kmalloc_nx+GFP_LOCKED */
 		newtree = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
@@ -314,13 +314,13 @@ again:
 		                                     GFP_PREFLT);
 		if (!newtree) {
 			/* Must blocking-allocate a new mem-part. */
-			mman_lock_release(self->ftd_oldmm);
+			mman_lock_release(self->ft_oldmm);
 			forktree_unlock_newmm(self);
 			newtree = (struct mnode *)kmalloc(sizeof(struct mnode),
 			                                  GFP_LOCKED | GFP_PREFLT);
 			/* Add to the free list so we've got the node
 			 * pre-allocated the next time around! */
-			SLIST_INSERT(&self->ftd_freelist, newtree, _mn_alloc);
+			SLIST_INSERT(&self->ft_freelist, newtree, _mn_alloc);
 			return false;
 		}
 	}
@@ -333,7 +333,7 @@ again:
 	newtree->mn_part     = part;               /* incref'd below... */
 	newtree->mn_fspath   = oldtree->mn_fspath; /* incref'd below... */
 	newtree->mn_fsname   = oldtree->mn_fsname; /* incref'd below... */
-	newtree->mn_mman     = self->ftd_newmm;
+	newtree->mn_mman     = self->ft_newmm;
 	newtree->mn_partoff  = oldtree->mn_partoff;
 	LIST_ENTRY_UNBOUND_INIT(&newtree->mn_writable);
 	newtree->_mn_module = NULL;
@@ -344,7 +344,7 @@ again:
 
 		/* Acquire a lock to `part' */
 		if (!mpart_lock_tryacquire(part)) {
-			mman_lock_release(self->ftd_oldmm);
+			mman_lock_release(self->ft_oldmm);
 			forktree_unlock_newmm(self);
 			FINALLY_DECREF_UNLIKELY(part); /* The reference from `newtree->mn_part' */
 			/* Must blocking-wait for the part to become available. */
@@ -398,7 +398,7 @@ continue_after_fork_newtree:
 
 /* Destroy all nodes from a given R/B-tree of mem-nodes. */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL forktree_freeall)(struct forktree_data *__restrict self,
+NOTHROW(FCALL forktree_freeall)(struct forktree *__restrict self,
                                 struct mnode *__restrict root) {
 	struct mnode *lhs, *rhs;
 again:
@@ -490,10 +490,10 @@ done:
  * NOTE: mman_fork() will fork the current mman. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_fork(void) THROWS(E_BADALLOC, ...) {
-	struct forktree_data ft;
-	ft.ftd_oldmm = THIS_MMAN;
-	assertf(ft.ftd_oldmm != &mman_kernel, "You can't fork the kernel...");
-	ft.ftd_newmm = mman_new();
+	struct forktree ft;
+	ft.ft_oldmm = THIS_MMAN;
+	assertf(ft.ft_oldmm != &mman_kernel, "You can't fork the kernel...");
+	ft.ft_newmm = mman_new();
 
 	/* REMINDER: When not able to acquire a lock, we must call `task_serve()' after
 	 *           releasing all other already-acquired locks. This is necessary to
@@ -504,8 +504,8 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 	 * in the context of the program being exec'd by the first thread (which would
 	 * be no good), rather than the program that contained the fork() call. */
 
-	SLIST_INIT(&ft.ftd_freelist);
-	ft.ftd_didulock = false;
+	SLIST_INIT(&ft.ft_freelist);
+	ft.ft_didulock = false;
 	TRY {
 		/* Because everything relating to low-level page directories can be made
 		 * to happen lazily, forking a memory manager is as simply as replicating
@@ -516,36 +516,41 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 
 again:
 		/* Try to acquire locks to both the old (to-be copied) and new mman. */
-		mman_lock_acquire(ft.ftd_oldmm);
+		mman_lock_acquire(ft.ft_oldmm);
 
 #ifndef __OPTIMIZE_SIZE__
 		/* TODO: The first time we get here, try to count exactly how many mem-nodes
 		 *       we'll be needing to do the fork, and pre-allocate exactly that many
 		 *       to begin with (that way, we won't need to allocate so much while
-		 *       holding all too many locks) */
+		 *       holding all too many locks)
+		 * XXX: That's a bad idea because it would slow down what's currently the
+		 *      fastest path to get through mman_fork() (that path being that all
+		 *      calls to kmalloc_nx() succeed).
+		 *      A better idea would be to count the total # of missing nodes after
+		 *      kmalloc_nx() fails for the first time! */
 #endif /* !__OPTIMIZE_SIZE__ */
 
-		if unlikely(!mman_lock_tryacquire(ft.ftd_newmm)) {
-			/* Super unlikely, but can happen because `ft.ftd_newmm' becomes globally
+		if unlikely(!mman_lock_tryacquire(ft.ft_newmm)) {
+			/* Super unlikely, but can happen because `ft.ft_newmm' becomes globally
 			 * visible even before we're done here, starting with the first
 			 * replicated mem-part via `SOME_GLOBAL_PART->[mp_copy|mp_share]->[...]->mn_mman'
 			 *
 			 * As such, it is possible that someone else (e.g. someone calling
 			 * mpart_split()) has acquired a lock to the mman. - So just wait
 			 * for them to release said lock! */
-			mman_lock_release(ft.ftd_oldmm);
+			mman_lock_release(ft.ft_oldmm);
 			do {
 				task_serve();
 				task_yield();
-			} while (!mman_lock_available(ft.ftd_newmm));
+			} while (!mman_lock_available(ft.ft_newmm));
 			goto again;
 		}
 
 		/* We're now holding a lock to both the old, as well as the new mman.
 		 * That's everything we need to start forking the tree of mappings. */
-		ft.ftd_newtree = NULL;
-		if (!forktree_or_unlock(&ft, &ft.ftd_newtree, NULL,
-		                        ft.ftd_oldmm->mm_mappings)) {
+		ft.ft_newtree = NULL;
+		if (!forktree_or_unlock(&ft, &ft.ft_newtree, NULL,
+		                        ft.ft_oldmm->mm_mappings)) {
 			/* Try again... */
 			task_serve();
 			goto again;
@@ -555,50 +560,50 @@ again:
 		 * delete write permissions for all writable nodes of the old mman, so
 		 * that we can ensure that anything written to by either the old, or the
 		 * new mman will be handled via copy-on-write going forward. */
-		forktree_clearwrite(ft.ftd_oldmm);
+		forktree_clearwrite(ft.ft_oldmm);
 
 		/* Release our lock to the old mman. */
-		mman_lock_release(ft.ftd_oldmm);
+		mman_lock_release(ft.ft_oldmm);
 
-		if (ft.ftd_didulock) {
-			/* Write-back the tree of mappings into `ft.ftd_newmm'.
+		if (ft.ft_didulock) {
+			/* Write-back the tree of mappings into `ft.ft_newmm'.
 			 * For this purpose, make sure that there aren't any left-over
 			 * nodes from any previous fork-attempts... */
-			if unlikely(ft.ftd_newmm->mm_mappings != NULL)
-				forktree_freeall(&ft, ft.ftd_newmm->mm_mappings);
+			if unlikely(ft.ft_newmm->mm_mappings != NULL)
+				forktree_freeall(&ft, ft.ft_newmm->mm_mappings);
 
 			/* Because we had to release our lock from the new mman at
 			 * one point, there is a chance that someone else added a
 			 * mapping to our page directory.
 			 * To make sure that this didn't happen, clear the page
 			 * directory once again at this point. */
-			pagedir_unmap_userspace_p(ft.ftd_newmm->mm_pagedir_p);
+			pagedir_unmap_userspace_p(ft.ft_newmm->mm_pagedir_p);
 #ifndef CONFIG_NO_SMP
-			pagedir_syncall_smp_p(ft.ftd_newmm->mm_pagedir_p);
+			pagedir_syncall_smp_p(ft.ft_newmm->mm_pagedir_p);
 #endif /* !CONFIG_NO_SMP */
 		} else {
-			assert(ft.ftd_newmm->mm_mappings == NULL);
+			assert(ft.ft_newmm->mm_mappings == NULL);
 		}
 
-		/* Because `ft.ftd_newtree' is a mirror copy of the tree of mappings
+		/* Because `ft.ft_newtree' is a mirror copy of the tree of mappings
 		 * from the old mman, we can simply assign it as-is as a valid R/B-tree
 		 * of mem-nodes to-be used by the new mman. */
-		ft.ftd_newmm->mm_mappings = ft.ftd_newtree;
+		ft.ft_newmm->mm_mappings = ft.ft_newtree;
 
 		/* Release our lock to the new mman. */
-		mman_lock_release(ft.ftd_newmm);
+		mman_lock_release(ft.ft_newmm);
 
-		/* NOTE: No further initialization of the underlying page directory of `ft.ftd_newmm'
+		/* NOTE: No further initialization of the underlying page directory of `ft.ft_newmm'
 		 *       is needed, since everything will happen lazily on first access. This
 		 *       way, we don't even have to create a single mapping with the new mman's
 		 *       page directory! */
 	} EXCEPT {
-		mnode_slist_freeall(&ft.ftd_freelist);
-		decref_likely(ft.ftd_newmm);
+		mnode_slist_freeall(&ft.ft_freelist);
+		decref_likely(ft.ft_newmm);
 		RETHROW();
 	}
-	mnode_slist_freeall(&ft.ftd_freelist);
-	return ft.ftd_newmm;
+	mnode_slist_freeall(&ft.ft_freelist);
+	return ft.ft_newmm;
 }
 
 
