@@ -334,7 +334,7 @@ DECL_BEGIN
  *       that still make use of the `MPART_BLOCK_ST_CHNG' state!
  * @param: at:  One of `MPART_BLOCK_ST_*'
  * @return: * : *ditto* */
-PUBLIC NOBLOCK NONNULL((1)) unsigned int
+PUBLIC NOBLOCK ATTR_PURE NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
                                    size_t partrel_block_index) {
 	mpart_blkst_word_t word;

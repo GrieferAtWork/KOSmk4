@@ -1622,7 +1622,7 @@ done:
 }
 
 
-PRIVATE bool KCALL
+PRIVATE ATTR_PURE bool KCALL
 extract_bool(USER CHECKED void const *optval,
              socklen_t optlen) {
 	socklen_t i;

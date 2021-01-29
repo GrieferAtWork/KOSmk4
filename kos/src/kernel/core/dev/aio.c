@@ -53,7 +53,7 @@ PUBLIC struct aio_handle_type aio_noop_type = {
 	/* .ht_retsize  = */ NULL
 };
 
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL aio_noop_retval_retsize)(struct aio_handle *__restrict self) {
 	return (size_t)(uintptr_t)self->ah_data[0];
 }

@@ -294,7 +294,7 @@ FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time);
 
 /* Do the inverse of `reltimespec_to_relktime' */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec
+FUNDEF NOBLOCK WUNUSED ATTR_CONST struct timespec
 NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t);
 
 

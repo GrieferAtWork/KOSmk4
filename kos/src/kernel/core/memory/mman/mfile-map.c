@@ -355,10 +355,10 @@ again:
 /* Check if the nodes from the given list are complete (that is: don't
  * contain any holes), as well as map a total of `num_bytes', as well
  * as that the first node has its min-addr set to `0' */
-PRIVATE NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL mnode_slist_is_complete_range)(struct mnode_slist *__restrict self,
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL mnode_slist_is_complete_range)(struct mnode_slist const *__restrict self,
                                              size_t num_bytes) {
-	struct mnode *node;
+	struct mnode const *node;
 	byte_t *expected_minaddr;
 	expected_minaddr = (byte_t *)0;
 	SLIST_FOREACH(node, self, _mn_alloc) {

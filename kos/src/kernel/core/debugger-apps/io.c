@@ -261,7 +261,7 @@ DBG_COMMAND(mp,
 }
 
 
-PRIVATE NOBLOCK ATTR_DBGTEXT bool
+PRIVATE NOBLOCK ATTR_DBGTEXT ATTR_PURE bool
 NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
 	if (!ADDR_ISKERN(pc))

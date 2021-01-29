@@ -59,6 +59,7 @@ mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
 	(void)arg;
 	(void)enum_minaddr;
 	(void)enum_maxaddr;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }

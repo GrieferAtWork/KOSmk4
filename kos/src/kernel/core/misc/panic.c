@@ -168,7 +168,7 @@ NOTHROW(KCALL handle_error_during_panic_info)(void) {
 }
 
 
-PRIVATE ATTR_COLDTEXT NOBLOCK bool
+PRIVATE NOBLOCK ATTR_COLDTEXT ATTR_PURE bool
 NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
 	if (pc < (void *)KERNELSPACE_BASE)

@@ -41,6 +41,7 @@
 #include <kos/except.h>
 DECL_BEGIN
 
+#ifdef TRY
 FORCELOCAL WUNUSED NONNULL((1, 4)) bool
 vmb_mapat(struct vmb *__restrict self,
           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
@@ -65,6 +66,8 @@ vmb_mapat(struct vmb *__restrict self,
 	}
 	return true;
 }
+#endif /* TRY */
+
 DECL_END
 #endif /* __CC__ */
 

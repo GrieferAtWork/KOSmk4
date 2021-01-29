@@ -102,9 +102,9 @@ DECL_BEGIN
 
 
 /* Return the total # of bytes of mapped memory from `self'. */
-PRIVATE NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(FCALL mnode_tree_get_total_mapped_bytes)(struct mnode *root,
-                                                 struct mnode *skipme) {
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) size_t
+NOTHROW(FCALL mnode_tree_get_total_mapped_bytes)(struct mnode const *root,
+                                                 struct mnode const *skipme) {
 	size_t result = 0;
 again:
 	if (root != skipme)
@@ -135,8 +135,8 @@ again:
 	return result;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman *__restrict self) {
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) size_t
+NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman const *__restrict self) {
 	if unlikely(!self->mm_mappings)
 		return 0;
 	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,

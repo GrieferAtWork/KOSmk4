@@ -740,7 +740,7 @@ overflow:
 }
 
 /* Do the inverse of `reltimespec_to_relktime' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
+PUBLIC NOBLOCK WUNUSED ATTR_CONST struct timespec
 NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t) {
 	struct timespec result;
 	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);

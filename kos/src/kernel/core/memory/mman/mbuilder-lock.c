@@ -129,9 +129,9 @@ NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder *__restrict self,
 
 /* Find the mb-node currently registered as part of the `mb_uparts'
  * set, as the owner of the lock that is being held on `part' */
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct mbnode *
-NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder *__restrict self,
-                                            struct mpart *__restrict part) {
+PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) struct mbnode *
+NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder const *__restrict self,
+                                            struct mpart const *__restrict part) {
 	struct mbnode *iter;
 	LIST_FOREACH(iter, mbnode_partset_listof(&self->mb_uparts, part), mbn_nxtuprt) {
 		if (iter->mbn_part == part)
@@ -179,7 +179,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict s
 	fm->mfmfr_fsname        = fmnode->mbn_fsname;
 	DBG_memset(&self->_mb_fnodes, 0xcc, sizeof(self->_mb_fnodes));
 
-	for (;;) {
+	for (iter = fmnode;;) {
 		struct mbnode *next;
 		mbnode_tree_removenode(&self->mb_mappings, iter);
 		DBG_memset(&iter->mbn_mement, 0xcc, sizeof(iter->mbn_mement));
@@ -316,11 +316,11 @@ NOTHROW(FCALL mb_unlock_all_parts_info_unlock)(struct unlockinfo *__restrict sel
  * the given `fmnode' mapping is continuous (that is: the address
  * ranges described by mapped nodes are entirely contained within
  * those ranges for which an attempt at mapping is made) */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL mbnode_is_continuous)(struct mbnode *__restrict fmnode) {
+PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
 	pos_t fm_base;   /* File-map-base */
 	byte_t *mm_base; /* Memory-map-base */
-	struct mbnode *iter;
+	struct mbnode const *iter;
 	mm_base = fmnode->mbn_minaddr;
 	fm_base = fmnode->mbn_filpos;
 	iter    = fmnode;

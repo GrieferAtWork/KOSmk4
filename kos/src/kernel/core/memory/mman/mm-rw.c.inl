@@ -112,6 +112,8 @@ mman_memset(struct mman *__restrict self,
 #endif /* !LOCAL_IS_NOPF */
 
 	/* TODO */
+	COMPILER_IMPURE();
+
 #ifdef LOCAL_IS_NOPF
 	return num_bytes;
 #else /* LOCAL_IS_NOPF */

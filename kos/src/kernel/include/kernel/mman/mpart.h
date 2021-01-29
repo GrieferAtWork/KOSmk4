@@ -595,17 +595,17 @@ NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
  ************************************************************************/
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
-FUNDEF NONNULL((1)) __BOOL FCALL
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock);
 
 /* Ensure that `self->mp_meta->mpm_dmalocks == 0' */
-FUNDEF NONNULL((1)) __BOOL FCALL
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
                       struct unlockinfo *unlock);
 
 /* Ensure that `self->mp_meta != NULL' */
-FUNDEF NONNULL((1)) __BOOL FCALL
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_hasmeta_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock);
 
@@ -627,7 +627,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict self);
 
 /* Ensure that `MPART_ST_INCORE(self->mp_state)' */
-FUNDEF NONNULL((1, 3)) __BOOL FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,
                         struct mpart_setcore_data *__restrict data);
@@ -638,7 +638,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
  *   - ... the given address range is in-bounds!
  *   - ... MPART_ST_INCORE(self->mp_state)
  * If they don't, then this function will cause an assertion failure! */
-FUNDEF NONNULL((1)) bool FCALL
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_loadsome_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock,
                          mpart_reladdr_t partrel_offset,
@@ -781,7 +781,7 @@ mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
  *          If this cannot be guarantied, then these functions mustn't be called!
  * @param: at:  One of `MPART_BLOCK_ST_*'
  * @return: * : *ditto* */
-FUNDEF NOBLOCK NONNULL((1)) unsigned int
+FUNDEF NOBLOCK ATTR_PURE NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
                                    size_t partrel_block_index);
 FUNDEF NOBLOCK NONNULL((1)) void

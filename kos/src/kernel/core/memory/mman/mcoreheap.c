@@ -134,8 +134,8 @@ PUBLIC size_t mcoreheap_freecount = MCOREPAGE_PARTCOUNT;
 #define LAST_BITSET_WORD_ALLUSED (((uintptr_t)1 << LAST_BITSET_WORD_PARTS) - 1)
 
 /* Check if the given mcorepage is fully in-use. */
-LOCAL NOBLOCK WUNUSED bool
-NOTHROW(FCALL mcorepage_allused)(struct mcorepage *__restrict self) {
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL mcorepage_allused)(struct mcorepage const *__restrict self) {
 #if LAST_BITSET_WORD_PARTS == 0
 #if MCOREPAGE_BITSET_LENGTH == 1
 	return self->mcp_used[0] == (uintptr_t)-1;
@@ -163,8 +163,8 @@ NOTHROW(FCALL mcorepage_allused)(struct mcorepage *__restrict self) {
 }
 
 /* Check if the given mcorepage is fully free. */
-LOCAL NOBLOCK WUNUSED bool
-NOTHROW(FCALL mcorepage_allfree)(struct mcorepage *__restrict self) {
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL mcorepage_allfree)(struct mcorepage const *__restrict self) {
 #if LAST_BITSET_WORD_PARTS == 0
 #if MCOREPAGE_BITSET_LENGTH == 1
 	return self->mcp_used[0] == 0;
@@ -192,7 +192,7 @@ NOTHROW(FCALL mcorepage_allfree)(struct mcorepage *__restrict self) {
 }
 
 /* Find and return a free (unused) part index. */
-LOCAL NOBLOCK WUNUSED unsigned int
+LOCAL NOBLOCK WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL mcorepage_findfree)(struct mcorepage *__restrict self) {
 	unsigned int word_index;
 	uintptr_t word;

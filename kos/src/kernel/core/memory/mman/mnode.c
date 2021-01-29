@@ -315,6 +315,7 @@ mnode_split_or_unlock(struct mman *__restrict self,
 	bool result = true;
 	struct mnode *hinode;
 	struct mpart *part;
+	byte_t const *lonode_minaddr, *lonode_maxaddr;
 	assert((byte_t *)addr_where_to_split >= (byte_t *)mnode_getaddr(lonode));
 	assert((byte_t *)addr_where_to_split < (byte_t *)mnode_getendaddr(lonode));
 
@@ -331,9 +332,8 @@ mnode_split_or_unlock(struct mman *__restrict self,
 	                                    GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
 	if (!hinode) {
 		/* Must do the thing without blocking. */
-		byte_t const *mnode_minaddr, *mnode_maxaddr;
-		mnode_minaddr = lonode->mn_minaddr;
-		mnode_maxaddr = lonode->mn_maxaddr;
+		lonode_minaddr = lonode->mn_minaddr;
+		lonode_maxaddr = lonode->mn_maxaddr;
 		mman_lock_release(self);
 		unlockinfo_xunlock(unlock);
 		result = false;
@@ -346,10 +346,10 @@ mnode_split_or_unlock(struct mman *__restrict self,
 		}
 		/* Check if anything changed in the mean time. */
 reload_lonode_after_mman_lock:
-		lonode = mnode_tree_locate(self->mm_mappings, mnode_minaddr);
+		lonode = mnode_tree_locate(self->mm_mappings, lonode_minaddr);
 		if ((lonode == NULL) ||
-		    (lonode->mn_minaddr != mnode_minaddr) ||
-		    (lonode->mn_maxaddr != mnode_maxaddr) ||
+		    (lonode->mn_minaddr != lonode_minaddr) ||
+		    (lonode->mn_maxaddr != lonode_maxaddr) ||
 		    (lonode->mn_flags & MNODE_F_NOSPLIT))
 			goto err_changed_free_hinode;
 	}
@@ -377,6 +377,8 @@ reload_lonode_after_mman_lock:
 	if (!mpart_lock_tryacquire(part)) {
 		/* Must blocking-wait for the part to become available. */
 		incref(part);
+		lonode_minaddr = lonode->mn_minaddr;
+		lonode_maxaddr = lonode->mn_maxaddr;
 		mman_lock_release(self);
 		if (result) {
 			unlockinfo_xunlock(unlock);

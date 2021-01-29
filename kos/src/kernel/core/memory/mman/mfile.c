@@ -117,8 +117,6 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	assertf(self->mf_parts == NULL ||
 	        self->mf_parts == MFILE_PARTS_ANONYMOUS,
 	        "Any remaining part should have kept us alive!\n"
-	        "Also: You mustn't decref() an mfile before dropping all "
-	        /* */ "local references to contained mparts!\n"
 	        "self->db_parts = %p\n",
 	        self->mf_parts);
 	sig_broadcast_for_fini(&self->mf_initdone);

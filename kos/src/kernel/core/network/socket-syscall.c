@@ -1356,7 +1356,7 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
                 size_t, vlen, syscall_ulong_t, msg_flags,
                 USER UNCHECKED struct timespec32 const *, timeout) {
 	size_t result;
-	ktime_t abs_timeout;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
 		abs_timeout = ktime_from_user(timeout);
@@ -1385,7 +1385,7 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
 #endif /* !__ARCH_WANT_SYSCALL_RECVMMSG64 */
 {
 	size_t result;
-	ktime_t abs_timeout;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
 		abs_timeout = ktime_from_user(timeout);
@@ -1541,7 +1541,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
                        size_t, vlen, syscall_ulong_t, msg_flags,
                        USER UNCHECKED struct compat_timespec32 const *, timeout) {
 	ssize_t result;
-	ktime_t abs_timeout;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
 		abs_timeout = ktime_from_user(timeout);
@@ -1568,7 +1568,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RECVMMSG64 */
 {
 	ssize_t result;
-	ktime_t abs_timeout;
+	ktime_t abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
 		abs_timeout = ktime_from_user(timeout);

@@ -171,10 +171,10 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 /************************************************************************/
 
 /* Check if `part' is already referenced by `self' */
-PRIVATE NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(FCALL mbuilder_uparts_contains)(struct mbuilder *__restrict self,
-                                        struct mpart *__restrict part) {
-	struct mbnode *node;
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) bool
+NOTHROW(FCALL mbuilder_uparts_contains)(struct mbuilder const *__restrict self,
+                                        struct mpart const *__restrict part) {
+	struct mbnode const *node;
 	struct mbnode_list list;
 	list = *mbnode_partset_listof(&self->mb_uparts, part);
 	LIST_FOREACH (node, &list, mbn_nxtuprt) {

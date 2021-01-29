@@ -88,7 +88,7 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 /************************************************************************/
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock) {
 	if unlikely(mpart_hasblocksstate_init(self)) {
@@ -128,7 +128,7 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 }
 
 /* Ensure that `self->mp_dmalocks == 0' */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
                       struct unlockinfo *unlock) {
 	struct mpartmeta *meta;
@@ -153,7 +153,7 @@ mpart_nodma_or_unlock(struct mpart *__restrict self,
 }
 
 /* Ensure that `self->mp_meta != NULL' */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_hasmeta_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock) {
 	if (self->mp_meta == NULL) {
@@ -215,13 +215,13 @@ NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict sel
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-PRIVATE NONNULL((1, 3)) bool FCALL
+PRIVATE WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
                                    struct unlockinfo *unlock,
                                    struct mpart_setcore_data *__restrict data,
                                    size_t total_pages) {
 	struct mchunk chunk, *vec;
-	size_t done;
+	size_t done, missing_pages;
 	if unlikely(data->scd_copy_state != MPART_ST_VOID) {
 		/* Re-use already-allocated buffers. */
 		assert(data->scd_copy_state == MPART_ST_MEM ||
@@ -330,7 +330,7 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 			vec[0]                     = chunk;
 			done                       = chunk.mc_size;
 			for (;;) {
-				size_t missing_pages, avail;
+				size_t avail;
 				assert(done < total_pages);
 				missing_pages = total_pages - done;
 				/* Make sure that there is sufficient space for one additional chunk. */
@@ -380,7 +380,7 @@ do_realloc_in_extend_after_unlock:
 extend_vector:
 	assert(done < total_pages);
 	for (;;) {
-		size_t missing_pages, avail;
+		size_t avail;
 		missing_pages = total_pages - done;
 		/* Make sure that there is sufficient space for one additional chunk. */
 		avail = kmalloc_usable_size(data->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
@@ -429,14 +429,14 @@ err_badalloc_after_unlock:
 
 
 
-#define bitset_getstate(base, partrel_block_index)                              \
+#define bitset_getstate(base, partrel_block_index)                                    \
 	(((base)[(partrel_block_index) / MPART_BLKST_BLOCKS_PER_WORD] >>                  \
 	  (((partrel_block_index) % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS)) & \
 	 (((mpart_blkst_word_t)1 << MPART_BLOCK_STBITS) - 1))
 #define setcore_ex_bitset_getstate(self, partrel_block_index) \
 	bitset_getstate((self)->scd_bitset, partrel_block_index)
 
-PRIVATE NONNULL((1, 3)) bool FCALL
+PRIVATE WUNUSED NONNULL((1, 3)) bool FCALL
 setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
                                 struct unlockinfo *unlock,
                                 struct mpart_setcore_data *__restrict data,
@@ -560,7 +560,7 @@ setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
 
 
 /* Ensure that `MPART_ST_INCORE(self->mp_state)' */
-PUBLIC NONNULL((1, 3)) bool FCALL
+PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,
                         struct mpart_setcore_data *__restrict data) {
@@ -809,7 +809,7 @@ nope:
  *   - ... the given address range is in-bounds!
  *   - ... MPART_ST_INCORE(self->mp_state)
  * If they don't, then this function will cause an assertion failure! */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_loadsome_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock,
                          mpart_reladdr_t partrel_offset,
@@ -938,7 +938,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 
 /* Same as `mpart_loadall_or_unlock()', but only ensure no INIT-blocks when
  * the file used by `self' describes zero-initialized, anonymous memory. */
-PRIVATE NONNULL((1)) bool FCALL
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
 mpart_maybe_loadall_or_unlock(struct mpart *__restrict self,
                               struct unlockinfo *unlock) {
 	/* Check for special case: Without a block-state-bitset,
@@ -1098,7 +1098,7 @@ struct unsharecow_bounds {
 
 
 /* Calculate the max-size needed to represent `part'. */
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restrict self,
                                               struct mpart *__restrict part) {
 	struct mnode *node;
@@ -1130,7 +1130,7 @@ NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restri
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-INTERN NONNULL((1, 3)) bool FCALL
+INTERN WUNUSED NONNULL((1, 3)) bool FCALL
 unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
                               struct unlockinfo *unlock,
                               struct mpart_unsharecow_data *__restrict data) {
@@ -1167,7 +1167,7 @@ done:
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-INTERN NONNULL((1, 3)) bool FCALL
+INTERN WUNUSED NONNULL((1, 3)) bool FCALL
 unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
                                 struct unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
@@ -1211,7 +1211,7 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
  * Throws an exception on error.
  * @return: true:  Success
  * @return: false: Success, but the lock to `self' was lost */
-INTERN NONNULL((1, 3)) bool FCALL
+INTERN WUNUSED NONNULL((1, 3)) bool FCALL
 unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
                                 struct unlockinfo *unlock,
                                 struct mpart_unsharecow_data *__restrict data,
@@ -1229,7 +1229,7 @@ unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
 
 /* Incref all of the mmans of copy-on-write nodes.
  * Dead mmans are silently ignored (returns `false' if all mmans are dead) */
-PRIVATE NONNULL((1)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL unsharecow_incref_mmans)(struct mpart *__restrict part) {
 	bool result = false;
 	struct mnode *node;
@@ -1242,7 +1242,7 @@ NOTHROW(FCALL unsharecow_incref_mmans)(struct mpart *__restrict part) {
 
 /* Decref all of the mmans of copy-on-write nodes.
  * mmans that were already dead are silently ignored. */
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_decref_mmans)(struct mpart *__restrict part) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
@@ -1251,7 +1251,7 @@ NOTHROW(FCALL unsharecow_decref_mmans)(struct mpart *__restrict part) {
 	}
 }
 
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_decref_mmans_fast)(struct mpart *__restrict part) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
@@ -1259,10 +1259,10 @@ NOTHROW(FCALL unsharecow_decref_mmans_fast)(struct mpart *__restrict part) {
 	}
 }
 
-PRIVATE NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL mnode_list_contains_mman_until)(struct mnode *start_node,
-                                              struct mnode *stop_node,
-                                              struct mman *__restrict mm) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL mnode_list_contains_mman_until)(struct mnode const *start_node,
+                                              struct mnode const *stop_node,
+                                              struct mman const *__restrict mm) {
 	while (start_node != stop_node) {
 		if (start_node->mn_mman == mm)
 			return true;
@@ -1271,7 +1271,7 @@ NOTHROW(FCALL mnode_list_contains_mman_until)(struct mnode *start_node,
 	return false;
 }
 
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_unlock_unique_mmans_until)(struct mpart *__restrict part,
                                                     struct mnode *stop_node) {
 	struct mnode *node;
@@ -1291,7 +1291,7 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_until)(struct mpart *__restrict par
 #define unsharecow_unlock_unique_mmans(part) \
 	unsharecow_unlock_unique_mmans_until(part, NULL)
 
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
@@ -1306,7 +1306,7 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part
 }
 
 /* Acquire locks to all of the memory-managers in use by copy-on-write nodes of `part' */
-PRIVATE NONNULL((1)) bool FCALL
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
 unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
                                        struct unlockinfo *unlock) {
 	struct mnode *node;
@@ -1341,7 +1341,7 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 	return true;
 }
 
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
                                      struct mnode *stop_node) {
 	for (; start_node != stop_node; start_node = LIST_NEXT(start_node, mn_link)) {
@@ -1358,7 +1358,7 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
 /* Prepare the backing memory of all page directories with copy-on-write mappings,
  * such that those regions may atomically be replaced with different bindings.
  * If this cannot be done, release all locks and throw an exception. */
-PRIVATE NONNULL((1)) bool FCALL
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
 try_prepare_mmans_or_throw(struct mpart *__restrict self,
                            struct unlockinfo *unlock) {
 	struct mnode *node;
@@ -1401,7 +1401,7 @@ err_badalloc:
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that no alive copy-nodes still exist! */
-PUBLIC NONNULL((1, 3)) bool FCALL
+PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data) {
@@ -1656,7 +1656,7 @@ nope:
 /* Ensure that:
  * >> LIST_FOREACH(node, &self->mp_copy, mn_link)
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_unwrite_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock) {
 	struct mnode *node;
@@ -1772,7 +1772,7 @@ again:
 /* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
  * If the given address range ends up not fully contained within the
  * bounds of `self', then no lock is acquired, and `false' is returned. */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
                                         mpart_reladdr_t partrel_offset,
                                         size_t num_bytes)

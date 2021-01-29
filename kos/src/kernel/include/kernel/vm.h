@@ -266,6 +266,7 @@ __DEFINE_SYNC_MUTEX(struct mpart,
                     mpart_lock_available)
 
 
+#ifdef TRY
 FORCELOCAL WUNUSED NONNULL((1, 4)) bool
 vm_mapat(struct vm *__restrict self,
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
@@ -335,6 +336,7 @@ vm_mapresat(struct vm *__restrict self,
 	}
 	return true;
 }
+#endif /* TRY */
 
 
 DECL_END

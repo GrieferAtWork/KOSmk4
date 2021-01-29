@@ -556,7 +556,7 @@
 	struct {                                           \
 		struct type *slh_first; /* [0..1] List head */ \
 	}
-#define __HYBRID_SLIStype_HEAD_2(name, type)           \
+#define __HYBRID_SLIST_HEAD_2(name, type)              \
 	struct name {                                      \
 		struct type *slh_first; /* [0..1] List head */ \
 	}
