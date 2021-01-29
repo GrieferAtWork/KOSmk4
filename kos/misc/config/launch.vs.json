@@ -35,8 +35,8 @@
 			"launchCompleteCommand": "None",
 			"miDebuggerServerAddress": "localhost:1234",
 			"customLaunchSetupCommands": [
-				{ "text": "cd E:\\c\\kls\\kos", "ignoreFailures": false },
-				{ "text": "set sysroot E:\\c\\kls\\kos\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
 				{ "text": "set architecture ${env.GDBARCH}", "ignoreFailures": false },
 				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false },
 				{ "text": "file bin/${env.TARGET}-kos-${env.CONFIG}/os/kernel.bin", "ignoreFailures": true }
