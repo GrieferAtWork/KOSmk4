@@ -774,8 +774,9 @@ done_mark_changed:
 				lonode->mn_partoff = node->mn_partoff;
 				assert(!(lonode->mn_flags & MNODE_F_SHARED));
 				LIST_INSERT_HEAD(&part->mp_copy, lonode, mn_link);
-				lonode->mn_fspath = xincref(node->mn_fspath);
-				lonode->mn_fsname = xincref(node->mn_fsname);
+				lonode->mn_fspath  = xincref(node->mn_fspath);
+				lonode->mn_fsname  = xincref(node->mn_fsname);
+				lonode->_mn_module = NULL; /* XXX: Inherit from `node'? */
 
 				node->mn_minaddr = (byte_t *)self->mfl_addr;
 				/*node->mn_partoff += mnode_getsize(lonode);*/ /* Not really necessary (always gets overwritten below) */
@@ -790,6 +791,7 @@ done_mark_changed:
 
 				/* If the original node had been marked as containing writable
 				 * mappings, then we must also mark the new node as such! */
+				LIST_ENTRY_UNBOUND_INIT(&lonode->mn_writable);
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, lonode, mn_writable);
 			}
@@ -808,9 +810,10 @@ done_mark_changed:
 				hinode->mn_partoff = node->mn_partoff + ((uintptr_t)endaddr - (uintptr_t)node->mn_minaddr);
 				assert(!(hinode->mn_flags & MNODE_F_SHARED));
 				LIST_INSERT_HEAD(&part->mp_copy, hinode, mn_link);
-				hinode->mn_fspath = xincref(node->mn_fspath);
-				hinode->mn_fsname = xincref(node->mn_fsname);
-				node->mn_maxaddr  = (byte_t *)endaddr - 1;
+				hinode->mn_fspath  = xincref(node->mn_fspath);
+				hinode->mn_fsname  = xincref(node->mn_fsname);
+				hinode->_mn_module = NULL; /* XXX: Inherit from `node'? */
+				node->mn_maxaddr   = (byte_t *)endaddr - 1;
 
 				/* Consume the first p-copy node. */
 				self->mfl_pcopy[0] = self->mfl_pcopy[1];
@@ -822,6 +825,7 @@ done_mark_changed:
 
 				/* If the original node had been marked as containing writable
 				 * mappings, then we must also mark the new node as such! */
+				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, hinode, mn_writable);
 			}

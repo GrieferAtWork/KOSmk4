@@ -400,13 +400,13 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
  *        - LIST_ISBOUND(self, mn_writable)
  * Also note that the caller is responsible to sync `mm' before unlocking it! */
 FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
-NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
-                                        struct mman *__restrict mm);
+NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
+                                          struct mman *__restrict mm);
 
-/* Same as `mnode_clear_write_locked()', but directory operate on
- * the current page directory. */
+/* Same as `mnode_clear_write_locked_p()', but directory operate
+ * on the current page directory / memory manager. */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
-NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self);
+NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self);
 
 /* Split `lonode' (which contains `addr_where_to_split') at that address.
  * If this cannot be done without blocking, unlock and eventually return `false' */

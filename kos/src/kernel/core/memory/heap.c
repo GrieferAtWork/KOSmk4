@@ -63,6 +63,8 @@
  *       the heap to serve small requests without having to overallocate
  *       as often! */
 #define RBTREE_LEFT_LEANING
+#define RBTREE_CC              FCALL
+#define RBTREE_NOTHROW         NOTHROW
 #define RBTREE(name)           mfree_tree_##name
 #define RBTREE_T               struct mfree
 #define RBTREE_Tkey            uintptr_t
@@ -1184,7 +1186,11 @@ again:
 		if (tail_keep && tail_keep < HEAP_MINSIZE)
 			continue;
 		/* Remove this chain entry. */
+#ifdef CONFIG_HEAP_USE_RBTREE
+		mfree_tree_removenode(&self->h_addr, chain);
+#else /* CONFIG_HEAP_USE_RBTREE */
 		HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
+#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(chain, mf_lsize);
 		sync_endwrite(&self->h_lock);
 

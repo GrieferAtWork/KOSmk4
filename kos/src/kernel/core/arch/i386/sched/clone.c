@@ -208,22 +208,22 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 				byte_t *trampoline_addr;
 				cache_version = 0;
 again_lock_vm:
-				sync_write(&vm_kernel.v_treelock);
+				mman_lock_acquire(&mman_kernel);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-				stack_addr = (byte_t *)vm_getfree(&vm_kernel,
+				stack_addr = (byte_t *)vm_getfree(&mman_kernel,
 				                                  HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
 				                                  CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
 				                                  PAGESIZE,
 				                                  HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-				stack_addr = (byte_t *)vm_getfree(&vm_kernel,
+				stack_addr = (byte_t *)vm_getfree(&mman_kernel,
 				                                  HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
 				                                  CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
 				                                  PAGESIZE,
 				                                  HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 				if unlikely(stack_addr == VM_GETFREE_ERROR) {
-					sync_endwrite(&vm_kernel.v_treelock);
+					mman_lock_release(&mman_kernel);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
@@ -238,18 +238,18 @@ again_lock_vm:
 				vm_node_setmaxaddr(&FORTASK(result, this_kernel_stacknode_), stack_addr + KERNEL_STACKSIZE - 1);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 				if unlikely(!pagedir_prepare(stack_addr, KERNEL_STACKSIZE)) {
-					sync_endwrite(&vm_kernel.v_treelock);
+					mman_lock_release(&mman_kernel);
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, KERNEL_STACKSIZE);
 				}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 				/* Map the trampoline node. */
-				trampoline_addr = (byte_t *)vm_getfree(&vm_kernel,
+				trampoline_addr = (byte_t *)vm_getfree(&mman_kernel,
 				                                       HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
 				                                       PAGESIZE, PAGESIZE,
 				                                       HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 				if unlikely(trampoline_addr == VM_GETFREE_ERROR) {
-					sync_endwrite(&vm_kernel.v_treelock);
+					mman_lock_release(&mman_kernel);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
@@ -272,9 +272,10 @@ again_lock_vm:
 				                    stack_addr,
 				                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				pagedir_unprepare(stack_addr, KERNEL_STACKSIZE);
+				/* Keep the stack prepared! It will only be unprepared once the task gets destroyed! */
+				/*pagedir_unprepare(stack_addr, KERNEL_STACKSIZE);*/
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-				sync_endwrite(&vm_kernel.v_treelock);
+				mman_lock_release(&mman_kernel);
 			} EXCEPT {
 				vm_datapart_do_ccfreeram(&FORTASK(result, this_kernel_stackpart_));
 				RETHROW();

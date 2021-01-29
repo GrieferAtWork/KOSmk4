@@ -693,7 +693,11 @@ search_heap:
 		}
 		if (!chain)
 			continue;
+#ifdef CONFIG_HEAP_USE_RBTREE
+		mfree_tree_removenode(&self->h_addr, chain);
+#else /* CONFIG_HEAP_USE_RBTREE */
 		HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
+#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		/* Track the potentially unused data size as dangling data. */
@@ -1243,7 +1247,11 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			/* Check if the node still contains enough memory for the requested allocation. */
 			if ((alignment_base + alloc_bytes) > (byte_t *)MFREE_END(chain))
 				continue; /* The chain entry is too small once alignment was taken into consideration. */
+#ifdef CONFIG_HEAP_USE_RBTREE
+			mfree_tree_removenode(&self->h_addr, chain);
+#else /* CONFIG_HEAP_USE_RBTREE */
 			HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
+#endif /* !CONFIG_HEAP_USE_RBTREE */
 			LLIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 			/* Trace potentially unused data as dangling. */

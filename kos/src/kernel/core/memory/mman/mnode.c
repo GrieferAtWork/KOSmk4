@@ -209,7 +209,7 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
 		result = MNODE_CLEAR_WRITE_WOULDBLOCK;
 	} else {
 		/* Do the thing! */
-		result = mnode_clear_write_locked(self, mm);
+		result = mnode_clear_write_locked_p(self, mm);
 		if likely(result == MNODE_CLEAR_WRITE_SUCCESS) {
 			/* Sync the memory mamanger. */
 			mman_sync_p(mm,
@@ -234,7 +234,7 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
  *        - LIST_ISBOUND(self, mn_writable)
  * Also note that the caller is responsible to sync `mm' before unlocking it! */
 PUBLIC NOBLOCK NONNULL((1, 2)) unsigned int
-NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
+NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
                                         struct mman *__restrict mm) {
 	pagedir_phys_t pdir;
 	void *addr;
@@ -246,25 +246,23 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 	assertf(self->mn_flags & MNODE_F_PWRITE,
 	        "How could we have been added to the list of writable nodes "
 	        "when we're not actually supposed to be writable at all?");
+	assertf(!(self->mn_flags & MNODE_F_MPREPARED),
+	        "This function should only be called for user-space nodes, "
+	        "and user-space nodes should never have the MPREPARED bit set");
 
 	pdir = mm->mm_pagedir_p;
 	addr = mnode_getaddr(self);
 	size = mnode_getsize(self);
 
-	if (self->mn_flags & MNODE_F_MPREPARED) {
-		/* Delete write permissions. */
-		pagedir_denywrite_p(pdir, addr, size);
-	} else {
-		/* Prepare the page directory */
-		if unlikely(!pagedir_prepare_p(pdir, addr, size))
-			return MNODE_CLEAR_WRITE_BADALLOC;
+	/* Prepare the page directory */
+	if unlikely(!pagedir_prepare_p(pdir, addr, size))
+		return MNODE_CLEAR_WRITE_BADALLOC;
 
-		/* Delete write permissions. */
-		pagedir_denywrite_p(pdir, addr, size);
+	/* Delete write permissions. */
+	pagedir_denywrite_p(pdir, addr, size);
 
-		/* Unprepare the page directory. */
-		pagedir_unprepare_p(pdir, addr, size);
-	}
+	/* Unprepare the page directory. */
+	pagedir_unprepare_p(pdir, addr, size);
 
 	/* Unlink from the list of writable nodes. */
 	LIST_UNBIND(self, mn_writable);
@@ -273,10 +271,10 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self,
 
 
 
-/* Same as `mnode_clear_write_locked()', but directory operate on
- * the current page directory. */
+/* Same as `mnode_clear_write_locked_p()', but directory operate
+ * on the current page directory / memory manager. */
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
-NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self) {
+NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 	void *addr;
 	size_t size;
 	assert(self->mn_part != NULL);
@@ -284,6 +282,9 @@ NOTHROW(FCALL mnode_clear_write_locked_local)(struct mnode *__restrict self) {
 	assertf(self->mn_flags & MNODE_F_PWRITE,
 	        "How could we have been added to the list of writable nodes "
 	        "when we're not actually supposed to be writable at all?");
+	assertf(!(self->mn_flags & MNODE_F_MPREPARED),
+	        "This function should only be called for user-space nodes, "
+	        "and user-space nodes should never have the MPREPARED bit set");
 
 	addr = mnode_getaddr(self);
 	size = mnode_getsize(self);
@@ -461,7 +462,7 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
 		} else {
 			/* Disallow write if there are any other memory mappings of the backing part,
 			 * or if the part isn't anonymous (in which case someone may open(2)+read(2)
-			 * from backing file, which musn't include any modifications made by this
+			 * from backing file, which mustn't include any modifications made by this
 			 * mapping) */
 			if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
 			    LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))

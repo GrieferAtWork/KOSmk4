@@ -129,7 +129,6 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 			node->mn_link.le_prev = prot & PROT_SHARED ? &part->mp_share.lh_first
 			                                           : &part->mp_copy.lh_first;
 			*node->mn_link.le_prev = node;
-			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 		} EXCEPT {
 			kfree(part);
 			RETHROW();
@@ -440,6 +439,7 @@ again_lock_mfile_map:
 			assert(removeme->mn_mman == self);
 			if (LIST_ISBOUND(removeme, mn_writable))
 				LIST_REMOVE(removeme, mn_writable);
+			DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
 			SLIST_INSERT(&old_mappings, removeme, _mn_alloc);
 		}
 
@@ -464,7 +464,6 @@ again_lock_mfile_map:
 			node->mn_fsname = xincref(file_fsname);
 			node->mn_minaddr += file_base_offset + (uintptr_t)result;
 			node->mn_maxaddr += file_base_offset + (uintptr_t)result;
-			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 
 			/* Set the MLOCK flag for the backing mem-part when MAP_LOCKED is given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */
@@ -487,6 +486,7 @@ again_lock_mfile_map:
 			/* If the node was mapped with write-permissions enabled,
 			 * then add it to the list of writable nodes within our
 			 * memory manager. */
+			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 			if (map_prot & PAGEDIR_MAP_FWRITE)
 				LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
@@ -498,6 +498,7 @@ again_lock_mfile_map:
 #ifdef DEFINE_mman_map_res
 		res_node->mn_minaddr = (byte_t *)result;
 		res_node->mn_maxaddr = (byte_t *)result + num_bytes - 1;
+		LIST_ENTRY_UNBOUND_INIT(&res_node->mn_writable);
 		mnode_tree_insert(&self->mm_mappings, res_node);
 #endif /* DEFINE_mman_map_res */
 	}
@@ -526,6 +527,7 @@ again_lock_mfile_map:
 		                        mnode_getsize(node),
 		                        node->mn_partoff,
 		                        mnode_getperm(node));
+		LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 		if (map_prot & PAGEDIR_MAP_FWRITE)
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 		mnode_tree_insert(&self->mm_mappings, node);
@@ -544,7 +546,7 @@ again_lock_mfile_map:
 #endif /* DEFINE_mman_map_res */
 
 	/* If we're not supposed to keep the mappings prepared, then
-	 * clear unprepare them now. */
+	 * unprepare them now. */
 	if (!(flags & MAP_PREPARED))
 		pagedir_unprepare_p(self->mm_pagedir_p, result, num_bytes);
 

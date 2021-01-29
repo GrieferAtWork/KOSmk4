@@ -112,7 +112,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
 	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                    MNODE_F_MLOCK | _MNODE_F_MPREPARED_KERNEL),
+	                    MNODE_F_MLOCK | MNODE_F_MPREPARED),
 	MNODE_INIT_mn_part(&this_kernel_stackpart_),
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
@@ -500,9 +500,6 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 
 
 
-
-DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
-DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
 
 /* Called with a lock to the kernel VM's treelock held. */
 PRIVATE NOBLOCK VM_KERNEL_PENDING_CB_RETURN_T

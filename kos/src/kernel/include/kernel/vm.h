@@ -150,7 +150,7 @@
 #define vm_node_free(...)                             mnode_free(__VA_ARGS__)
 #define vm_node_destroy(...)                          mnode_destory(__VA_ARGS__)
 #define vm_node_update_write_access(...)              mnode_clear_write(__VA_ARGS__)
-#define vm_node_update_write_access_locked_vm(...)    mnode_clear_write_locked(__VA_ARGS__)
+#define vm_node_update_write_access_locked_vm(...)    mnode_clear_write_locked_p(__VA_ARGS__)
 #define VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS           MNODE_CLEAR_WRITE_SUCCESS
 #define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK        MNODE_CLEAR_WRITE_WOULDBLOCK
 #define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC          MNODE_CLEAR_WRITE_BADALLOC
@@ -572,7 +572,7 @@ DECL_END
 #define mnode_free(...)                                vm_node_free(__VA_ARGS__)
 #define mnode_destory(...)                             vm_node_destroy(__VA_ARGS__)
 #define mnode_clear_write(...)                         vm_node_update_write_access(__VA_ARGS__)
-#define mnode_clear_write_locked(...)                  vm_node_update_write_access_locked_vm(__VA_ARGS__)
+#define mnode_clear_write_locked_p(...)                  vm_node_update_write_access_locked_vm(__VA_ARGS__)
 #define MNODE_CLEAR_WRITE_SUCCESS                      VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS
 #define MNODE_CLEAR_WRITE_WOULDBLOCK                   VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK
 #define MNODE_CLEAR_WRITE_BADALLOC                     VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC
