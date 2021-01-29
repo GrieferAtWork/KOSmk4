@@ -134,47 +134,48 @@ NOTHROW(FCALL mchunkvec_truncate)(struct mchunkvec *__restrict self,
                                   physpagecnt_t total_pages,
                                   freefun_t freefun, gfp_t flags,
                                   bool maybe_hinted) {
-	size_t i;
+	size_t keep, i;
 	physpagecnt_t total = 0;
 	assert(total_pages != 0);
 	for (i = 0;; ++i) {
 		assert(i < self->ms_c);
 		total += self->ms_v[i].mc_size;
-		if (total > total_pages) {
-			size_t keep;
-			total -= self->ms_v[i].mc_size;
-			keep = total_pages - total;
-			assert(keep != 0);
-			assert(keep <= self->ms_v[i].mc_size);
-			if (keep < self->ms_v[i].mc_size) {
-				(*freefun)(self->ms_v[i].mc_start + keep,
-				           self->ms_v[i].mc_size - keep,
-				           flags);
-				self->ms_v[i].mc_size = keep;
-			}
-			if (i < (self->ms_c - 1)) {
-				size_t new_count = i;
-				for (++i; i < self->ms_c; ++i) {
-					(*freefun)(self->ms_v[i].mc_start,
-					           self->ms_v[i].mc_size,
-					           flags);
-				}
-				if (maybe_hinted) {
-					krealloc_in_place_nx(self->ms_v,
-					                     new_count * sizeof(struct mchunk),
-					                     flags & ~GFP_CALLOC);
-				} else {
-					struct mchunk *vec;
-					vec = (struct mchunk *)krealloc_nx(self->ms_v,
-					                                   new_count *
-					                                   sizeof(struct mchunk),
-					                                   flags);
-					if likely(vec != NULL)
-						self->ms_v = vec;
-				}
-				self->ms_c = new_count;
-			}
+		if (total >= total_pages)
+			break;
+	}
+	total -= self->ms_v[i].mc_size;
+	keep = total_pages - total;
+	assert(keep != 0);
+	assert(keep <= self->ms_v[i].mc_size);
+	if (keep < self->ms_v[i].mc_size) {
+		(*freefun)(self->ms_v[i].mc_start + keep,
+		           self->ms_v[i].mc_size - keep,
+		           flags);
+		self->ms_v[i].mc_size = keep;
+	}
+	++i;
+	assert(i <= self->ms_c);
+	if (i < self->ms_c) {
+		size_t j;
+		for (j = i; j < self->ms_c; ++j) {
+			(*freefun)(self->ms_v[j].mc_start,
+			           self->ms_v[j].mc_size,
+			           flags);
 		}
+		if (maybe_hinted) {
+			krealloc_in_place_nx(self->ms_v,
+			                     i * sizeof(struct mchunk),
+			                     flags & ~GFP_CALLOC);
+		} else {
+			struct mchunk *vec;
+			vec = (struct mchunk *)krealloc_nx(self->ms_v,
+			                                   i *
+			                                   sizeof(struct mchunk),
+			                                   flags);
+			if likely(vec != NULL)
+				self->ms_v = vec;
+		}
+		self->ms_c = i;
 	}
 }
 
