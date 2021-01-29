@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
+#include <kernel/vm/builder.h>
+#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/mman/mm-map.h>
 #include <kernel/mman/mm-unmapped.h>
 #include <kernel/mman/mnode.h> /* __ALIGNOF_MNODE */
@@ -523,5 +526,6 @@ mbuilder_alloc_peb32_p64(struct mbuilder *__restrict self,
 
 DECL_END
 #endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MBUILDER_H */

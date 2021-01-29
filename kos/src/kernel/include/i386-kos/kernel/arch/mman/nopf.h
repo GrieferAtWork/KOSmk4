@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VM_NOPF_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VM_NOPF_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_MMAN_NOPF_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_MMAN_NOPF_H 1
 
 #include <kernel/compiler.h>
 
@@ -854,4 +854,4 @@ DATDEF byte_t x86_nopf_ret[];     /* Return PC for #PF with `x86_nopf_check(pc) 
 DECL_END
 
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VM_NOPF_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_MMAN_NOPF_H */

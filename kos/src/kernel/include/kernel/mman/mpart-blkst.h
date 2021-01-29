@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
+#include <kernel/vm.h>
+#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/mman/mpart.h>
 
 #include <hybrid/typecore.h>
@@ -79,5 +82,6 @@ typedef uintptr_t mpart_blkst_word_t;
 /* The # of blocks per bitset word. */
 #define MPART_BLKST_BLOCKS_PER_WORD \
 	(BITSOF(mpart_blkst_word_t) / MPART_BLOCK_STBITS)
+#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MPART_BLKST_H */

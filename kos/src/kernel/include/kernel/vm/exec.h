@@ -33,6 +33,12 @@
 #define ei_path            mei_path
 #define thisvm_execinfo    thismman_execinfo
 #else /* CONFIG_USE_NEW_VM */
+#define mexecinfo         vm_execinfo_struct
+#define mei_node          ei_node
+#define mei_dent          ei_dent
+#define mei_path          ei_path
+#define thismman_execinfo thisvm_execinfo
+
 DECL_BEGIN
 
 struct inode;

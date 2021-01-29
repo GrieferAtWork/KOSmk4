@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
+/* --- */
+#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
 #include <kernel/memory.h>      /* `physpage2addr()' */
 #include <kernel/mman/phys.h>
@@ -77,5 +80,6 @@ DECL_BEGIN
 
 DECL_END
 #endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_PHYS_ACCESS_H */

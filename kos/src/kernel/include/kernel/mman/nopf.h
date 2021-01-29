@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/vm/nopf.h>
+#include <kernel/arch/mman/nopf.h>
 
 #include <hybrid/typecore.h>
 

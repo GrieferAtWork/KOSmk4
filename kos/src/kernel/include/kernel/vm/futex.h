@@ -55,6 +55,23 @@
 #define vm_futex_broadcast(futex_address)                    mman_broadcastfutex(futex_address)
 
 #else /* CONFIG_USE_NEW_VM */
+#define mpm_ftx                                  fc_tree
+#define mpm_rtm_vers                             fc_rtm_vers
+#define mfu_refcnt                               vmf_refcnt
+#define mfu_part                                 vmf_part
+#define mfu_mtaent                               vmf_tree
+#define mfu_signal                               vmf_signal
+#define mfutex_free(p)                           vm_futex_free(p)
+#define mfutex_destroy(self)                     vm_futex_destroy(self)
+#define MPART_FUTEX_OOB                          VM_DATAPART_GETFUTEX_OUTOFRANGE
+#define mpart_createfutex(self, datapart_offset) vm_datapart_getfutex(self, datapart_offset)
+#define mpart_lookupfutex(self, datapart_offset) vm_datapart_getfutex_existing(self, datapart_offset)
+#define mfile_createfutex(self, offset)          vm_datablock_getfutex(self, offset)
+#define mfile_lookupfutex(self, offset)          vm_datablock_getfutex_existing(self, offset)
+#define mman_createfutex(effective_vm, addr)     vm_getfutex(effective_vm, addr)
+#define mman_lookupfutex(effective_vm, addr)     vm_getfutex_existing(effective_vm, addr)
+#define mman_broadcastfutex(futex_address)       vm_futex_broadcast(futex_address)
+
 #include <kernel/arch/mman/rtm.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>

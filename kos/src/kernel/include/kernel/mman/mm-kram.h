@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
+#include <kernel/vm.h>
+#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/mman/mpart-lockop.h>
 #include <kernel/paging.h>
@@ -296,5 +299,6 @@ NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
 
 DECL_END
 #endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_KRAM_H */
