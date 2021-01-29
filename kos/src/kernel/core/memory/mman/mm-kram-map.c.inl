@@ -246,6 +246,13 @@ again_lock_mman:
 			goto unlock_and_done;
 		}
 
+		/* Ensure that the resulting address range has been prepared. */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		if unlikely(!pagedir_prepare(result, num_bytes))
+			goto err_nophys_for_backing;
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+
 		/* Check if we may be able to extend a pre-existing node. */
 		if (!(flags & GFP_MAP_NOMERGE)) {
 			struct mnode *neighbor;
@@ -269,7 +276,7 @@ again_lock_mman:
 				union mcorepart *cp;
 				cp = mcoreheap_alloc_locked_nx();
 				if unlikely(!cp)
-					goto err_noheap_for_corepart;
+					goto err_noheap_for_corepart_and_unprepare;
 				node           = &cp->mcp_node;
 				node->mn_flags = MNODE_F_COREPART;
 			}
@@ -277,7 +284,7 @@ again_lock_mman:
 				union mcorepart *cp;
 				cp = mcoreheap_alloc_locked_nx();
 				if unlikely(!cp)
-					goto err_noheap_for_corepart;
+					goto err_noheap_for_corepart_and_unprepare;
 				part = &cp->mcp_part;
 				LOCAL_INIT_PART(part, MPART_F_COREPART);
 			}
@@ -286,6 +293,9 @@ again_lock_mman:
 				node = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
 				                                  inner_flags | GFP_ATOMIC);
 				if unlikely(!node) {
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+					pagedir_unprepare(result, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 					mman_lock_release(&mman_kernel);
 					/* Must allocate without holding a lock to the kernel mman */
 					node = (struct mnode *)LOCAL_kmalloc(sizeof(struct mnode), inner_flags);
@@ -304,6 +314,9 @@ again_lock_mman:
 				part = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
 				                                  inner_flags | GFP_ATOMIC);
 				if unlikely(!part) {
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+					pagedir_unprepare(result, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 					mman_lock_release(&mman_kernel);
 					/* Must allocate without holding a lock to the kernel mman */
 					part = (struct mpart *)LOCAL_kmalloc(sizeof(struct mpart), inner_flags);
@@ -331,7 +344,7 @@ again_lock_mman:
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 			part->mp_mem.mc_start = MY_PAGE_MALLOC(num_pages, &part->mp_mem.mc_size);
 			if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID)
-				goto err_nophys_for_backing;
+				goto err_nophys_for_backing_and_unprepare;
 			assert(part->mp_mem.mc_size != 0);
 			assert(part->mp_mem.mc_size <= num_pages);
 			if likely(part->mp_mem.mc_size >= num_pages) {
@@ -346,6 +359,9 @@ again_lock_mman:
 				                                       inner_flags | GFP_ATOMIC);
 				if unlikely(!vec.ms_v) {
 					did_unlock = true;
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+					pagedir_unprepare(result, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 					mman_lock_release(&mman_kernel);
 					vec.ms_v = (struct mchunk *)LOCAL_kmalloc(2 * sizeof(struct mchunk),
 					                                          inner_flags);
@@ -370,6 +386,9 @@ again_lock_mman:
 								                                      inner_flags | GFP_ATOMIC);
 								if (!newvec) {
 									if (!did_unlock) {
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+										pagedir_unprepare(result, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 										mman_lock_release(&mman_kernel);
 										did_unlock = true;
 									}
@@ -391,7 +410,7 @@ again_lock_mman:
 						page = MY_PAGE_MALLOC(missing, &count);
 						if unlikely(page == PHYSPAGE_INVALID) {
 							kram_freevec(vec.ms_v, vec.ms_c);
-							goto err_nophys_for_backing;
+							goto err_nophys_for_backing_and_unprepare;
 						}
 						assert(count != 0);
 						assert(count <= missing);
@@ -565,7 +584,11 @@ unlock_and_done:
 		return (byte_t *)result + addend;
 
 #ifndef LOCAL_NX
+err_nophys_for_backing_and_unprepare:
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		pagedir_unprepare(result, num_bytes);
 err_nophys_for_backing:
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		mman_lock_release(&mman_kernel);
 		if (kram_reclaim_memory(&cache_version, flags))
 			goto again_lock_mman;
@@ -577,7 +600,10 @@ err_nospace_for_mapping:
 			goto again_lock_mman;
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		      num_bytes);
-err_noheap_for_corepart:
+err_noheap_for_corepart_and_unprepare:
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		pagedir_unprepare(result, num_bytes);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		mman_lock_release(&mman_kernel);
 		if (kram_reclaim_memory(&cache_version, flags))
 			goto again_lock_mman;
@@ -591,9 +617,13 @@ err_noheap_for_corepart:
 	{
 		/* Error handling... */
 #ifdef LOCAL_NX
+err_nophys_for_backing_and_unprepare:
+err_noheap_for_corepart_and_unprepare:
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		pagedir_unprepare(result, num_bytes);
 err_nophys_for_backing:
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 err_nospace_for_mapping:
-err_noheap_for_corepart:
 		mman_lock_release(&mman_kernel);
 		if (kram_reclaim_memory(&cache_version, flags))
 			goto again_lock_mman;
