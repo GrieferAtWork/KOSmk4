@@ -190,6 +190,8 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
                                  size_t min_alignment) {
 #define HAS_EXTENDED_MIN_ALIGNMENT \
 	(min_alignment > PAGESIZE && IS_POWER_OF_TWO(min_alignment))
+#define REQUIRED_ALIGNMENT \
+	(HAS_EXTENDED_MIN_ALIGNMENT ? min_alignment : PAGESIZE)
 	void *result;
 	struct mnode_tree_minmax mima;
 	PAGEDIR_PAGEALIGNED void *allow_minaddr, *allow_maxaddr;
@@ -273,7 +275,7 @@ again_find_good_range:
 	if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
 		uintptr_t aligned_max_start_addr;
 		allow_minaddr = (void *)CEIL_ALIGN((uintptr_t)allow_minaddr, min_alignment);
-		addr           = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
+		addr          = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
 		if (OVERFLOW_USUB((uintptr_t)allow_maxaddr, num_bytes - 1, &aligned_max_start_addr)) {
 err_no_space:
 			/* Try without the +1 additional page of 
@@ -344,12 +346,15 @@ do_set_automatic_userspace_hint:
 		void *alloc_maxaddr;
 		unsigned int alignshift;
 select_from_avail_range:
+		assert(IS_ALIGNED((uintptr_t)allow_minaddr, REQUIRED_ALIGNMENT));
+		assert(IS_ALIGNED((uintptr_t)avail_minaddr, REQUIRED_ALIGNMENT));
 		alignshift = PAGESHIFT;
 		if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
 			alignshift = CTZ(min_alignment);
 
 		/* Figure out the outer bounds of the available range, and
 		 * select a biased result value based on the original hint. */
+		assert(avail_maxaddr >= ((byte_t *)avail_minaddr + num_bytes - 1));
 		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
 		if (avail_minaddr > allow_minaddr) {
 			mnode_tree_minmaxlocate(self->mm_mappings,
@@ -376,12 +381,11 @@ select_from_avail_range:
 			} else {
 				avail_maxaddr = allow_maxaddr;
 			}
-			if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
-				avail_maxaddr = (void *)(FLOOR_ALIGN((uintptr_t)avail_maxaddr + 1, min_alignment) - 1);
 		}
 		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
 		/* Figure out the max address which we're allowed to return. */
 		alloc_maxaddr = ((byte_t *)avail_maxaddr + 1) - num_bytes;
+		assert(alloc_maxaddr >= avail_minaddr);
 		if (addr < avail_minaddr)
 			addr = avail_minaddr;
 		if (addr > alloc_maxaddr)
@@ -592,6 +596,7 @@ select_from_hi_range:
 	return result;
 err:
 	return MAP_FAILED;
+#undef REQUIRED_ALIGNMENT
 #undef HAS_EXTENDED_MIN_ALIGNMENT
 }
 
