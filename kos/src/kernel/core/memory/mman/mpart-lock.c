@@ -252,6 +252,19 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 				i = data->scd_copy_mem_sc.ms_c - 1;
 				/* Trim tailing pages. */
 				while (too_many) {
+					chunk = data->scd_copy_mem_sc.ms_v[i];
+					if (chunk.mc_size <= too_many) {
+						page_ccfree(chunk.mc_start, chunk.mc_size);
+						too_many -= chunk.mc_size;
+						--i;
+						continue;
+					}
+					/* Truncate the last mem-part. */
+					page_ccfree(chunk.mc_start +
+					            chunk.mc_size - too_many,
+					            too_many);
+					data->scd_copy_mem_sc.ms_v[i].mc_size -= too_many;
+					break;
 				}
 				assert(i <= data->scd_copy_mem_sc.ms_c);
 				if (i == 0) {
