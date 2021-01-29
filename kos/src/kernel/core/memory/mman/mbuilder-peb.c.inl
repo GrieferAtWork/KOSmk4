@@ -275,6 +275,9 @@ string_size_changed:
 	}
 	/* Steal the node used to hold the PEB */
 	stolen_node = (struct mbnode *)mnode_tree_remove(&mman_kernel.mm_mappings, peb_temp_base);
+	if likely(LIST_ISBOUND((struct mnode *)stolen_node, mn_writable))
+		LIST_REMOVE((struct mnode *)stolen_node, mn_writable);
+
 	/* Delete the temporary PEB mapping, and sync the address range.
 	 * NOTE: Since the mapping was strictly private to us,
 	 *       there is no need to sync this with another CPU! */
