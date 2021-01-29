@@ -52,8 +52,8 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 	PHYS_VARS;
 	byte_t *map;
 	assert(IS_ALIGNED(buffer, PAGESIZE));
-	IF_PHYS_IDENTITY(dst, num_blocks * PAGESIZE, {
-		memsetl(PHYS_TO_IDENTITY(dst),
+	IF_PHYS_IDENTITY(buffer, num_blocks * PAGESIZE, {
+		memsetl(PHYS_TO_IDENTITY(buffer),
 		        DEBUGHEAP_FRESH_MEMORY,
 		        num_blocks * (PAGESIZE / 4));
 		return;

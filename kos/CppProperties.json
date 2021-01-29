@@ -8,6 +8,7 @@
 					"namespace": "env",
 					"environment": "i386-kos (Optimize, DEBUG)",
 					"TARGET": "i386",
+					"GDBARCH": "i386:intel",
 					"CONFIG": "OD"
 				}
 			],
@@ -37,6 +38,7 @@
 					"namespace": "env",
 					"environment": "i386-kos (Optimize, NDEBUG)",
 					"TARGET": "i386",
+					"GDBARCH": "i386:intel",
 					"CONFIG": "OnD"
 				}
 			],
@@ -67,6 +69,7 @@
 					"namespace": "env",
 					"environment": "i386-kos (DEBUG)",
 					"TARGET": "i386",
+					"GDBARCH": "i386:intel",
 					"CONFIG": "nOD"
 				}
 			],
@@ -95,6 +98,7 @@
 					"namespace": "env",
 					"environment": "i386-kos (NDEBUG)",
 					"TARGET": "i386",
+					"GDBARCH": "i386:intel",
 					"CONFIG": "nOnD"
 				}
 			],
@@ -124,6 +128,7 @@
 					"namespace": "env",
 					"environment": "x86_64-kos (Optimize, DEBUG)",
 					"TARGET": "x86_64",
+					"GDBARCH": "i386:x86-64:intel",
 					"CONFIG": "OD"
 				}
 			],
@@ -153,6 +158,7 @@
 					"namespace": "env",
 					"environment": "x86_64-kos (Optimize, NDEBUG)",
 					"TARGET": "x86_64",
+					"GDBARCH": "i386:x86-64:intel",
 					"CONFIG": "OnD"
 				}
 			],
@@ -183,6 +189,7 @@
 					"namespace": "env",
 					"environment": "x86_64-kos (DEBUG)",
 					"TARGET": "x86_64",
+					"GDBARCH": "i386:x86-64:intel",
 					"CONFIG": "nOD"
 				}
 			],
@@ -211,6 +218,7 @@
 					"namespace": "env",
 					"environment": "x86_64-kos (NDEBUG)",
 					"TARGET": "x86_64",
+					"GDBARCH": "i386:x86-64:intel",
 					"CONFIG": "nOnD"
 				}
 			],

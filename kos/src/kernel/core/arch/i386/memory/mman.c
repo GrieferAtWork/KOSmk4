@@ -474,17 +474,14 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 	        mnode_getsize(node), mpart_getsize(part));
 	addr = mnode_getaddr(node);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
+	if (!pagedir_prepare(addr, part->mp_mem.mc_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
-		             vm_node_getminaddr(node), vm_node_getmaxaddr(node));
+		             mnode_getminaddr(node), mnode_getmaxaddr(node));
 	}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-#ifdef CONFIG_USE_NEW_VM
 	pagedir_map(addr, part->mp_mem.mc_size * PAGESIZE,
 	            physpage2addr(part->mp_mem.mc_start), prot);
-#else /* CONFIG_USE_NEW_VM */
-	pagedir_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	            physpage2addr(part->mp_mem.mc_start), prot);
+#ifndef CONFIG_USE_NEW_VM
 	assertf(part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0,
 	        "part->dp_ramdata.rd_blockv  = %p\n"
 	        "&part->dp_ramdata.rd_block0 = %p\n",

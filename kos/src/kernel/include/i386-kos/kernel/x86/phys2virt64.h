@@ -76,7 +76,7 @@ FUNDEF NOBLOCK NOPREEMPT void KCALL x86_phys2virt64_require(void *addr);
  * physical identity area.
  * Separately, this node's presence within the kernel VM prevents
  * anything else from being mapped into the physical identity range. */
-DATDEF struct vm_node x86_phys2virt64_node;
+DATDEF struct mnode x86_phys2virt64_node;
 
 #endif /* __CC__ */
 

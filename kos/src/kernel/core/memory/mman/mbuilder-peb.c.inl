@@ -51,6 +51,14 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#include <kos/exec/bits/peb32.h>
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#include <kos/exec/bits/peb64.h>
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+#endif /* __ARCH_HAVE_COMPAT */
+
 #ifndef HINT_ADDR
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y

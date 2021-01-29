@@ -593,7 +593,7 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
 	} else if (thread == &_asyncwork) {
 		part->mp_state        = MPART_ST_MEM;
-		node->mn_minaddr      = __kernel_asyncwork_stack_page;
+		node->mn_minaddr      = __kernel_asyncwork_stack;
 		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);
 	}
 	if (part->mp_state != MPART_ST_MEM &&

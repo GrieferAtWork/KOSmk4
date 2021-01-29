@@ -96,7 +96,7 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT);
 					}
-					loadaddr = (byte_t *)(phdr_vector[i].p_vaddr & ~PAGEMASK);
+					loadaddr = (byte_t *)((uintptr_t)phdr_vector[i].p_vaddr & ~PAGEMASK);
 					if (loadstart > phdr_vector[i].p_vaddr)
 						loadstart = phdr_vector[i].p_vaddr;
 					adjusted_filsize = (size_t)phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);

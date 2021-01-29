@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PHYS2VIRT64_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PHYS2VIRT64_C 1
+#define __WANT_MNODE_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -30,11 +31,12 @@
 #include <kernel/boot.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/cpuid.h>
 
 #include <hybrid/align.h>
@@ -97,7 +99,7 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 	if (X86_HAVE_EXECUTE_DISABLE)
 		p64_page_fglobal_and_p64_page_fnoexec |= P64_PAGE_FNOEXEC;
 	/* Check if 1GiB pages are possible.
-	 * If they are, configure physident using them.
+	 * If they are, configure physident to use them.
 	 * Otherwise, pre-allocate up to `CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC'
 	 * pages of physical memory to-be used for dynamic mapping of
 	 * E1-vectors allocated by `x86_phys2virt64_require()' */
@@ -110,11 +112,8 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 		unsigned int vec4;
 		union p64_pdir_e3 e3;
 		printk(FREESTR(KERN_INFO "[p2v] Use 1GiB pages for the phys2virt memory segment\n"));
-		e3.p_word = P64_PAGE_FPRESENT |
-		            P64_PAGE_FWRITE |
-		            P64_PAGE_FACCESSED |
-		            P64_PAGE_FDIRTY |
-		            P64_PAGE_F1GIB |
+		e3.p_word = P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FACCESSED |
+		            P64_PAGE_FDIRTY | P64_PAGE_F1GIB |
 		            p64_page_fglobal_and_p64_page_fnoexec;
 		for (vec4 = P64_PDIR_VEC4INDEX(KERNEL_PHYS2VIRT_BASE);
 		     vec4 < P64_PDIR_VEC4INDEX(KERNEL_PHYS2VIRT_END); ++vec4) {
@@ -245,7 +244,9 @@ again_read_e3_word:
 		pagedir_pushval_t pushval;
 		union p64_pdir_e2 e2, *e2_vector;
 		e2_vector = (union p64_pdir_e2 *)THIS_TRAMPOLINE;
-		pushval   = pagedir_push_mapone(e2_vector, new_e3_word, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+		pushval = pagedir_push_mapone(e2_vector, new_e3_word,
+		                              PAGEDIR_MAP_FREAD |
+		                              PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e2_vector);
 		/* Figure out which physical memory range should be mapped.
 		 * We're going to fill in 512 * 2MiB pages, totaling 1GiB
@@ -298,7 +299,24 @@ done:
  * physical identity area.
  * Separately, this node's presence within the kernel VM prevents
  * anything else from being mapped into the physical identity range. */
-PUBLIC struct vm_node x86_phys2virt64_node = {
+PUBLIC struct mnode x86_phys2virt64_node = {
+#ifdef CONFIG_USE_NEW_VM
+	MNODE_INIT_mn_mement({}),
+	MNODE_INIT_mn_minaddr(KERNEL_PHYS2VIRT_MIN),
+	MNODE_INIT_mn_maxaddr(KERNEL_PHYS2VIRT_MAX),
+	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+	                    MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+	                    MNODE_F_KERNPART | _MNODE_F_MPREPARED_KERNEL |
+	                    MNODE_F_MLOCK),
+	MNODE_INIT_mn_part(NULL), /* Reserved mapping (with custom contents) */
+	MNODE_INIT_mn_fspath(NULL),
+	MNODE_INIT_mn_fsname(NULL),
+	MNODE_INIT_mn_mman(&mman_kernel),
+	MNODE_INIT_mn_partoff(0),
+	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MNODE_INIT__mn_module(NULL)
+#else /* CONFIG_USE_NEW_VM */
 	/* .vn_node = */ {
 		NULL,
 		NULL,
@@ -315,6 +333,7 @@ PUBLIC struct vm_node x86_phys2virt64_node = {
 	/* .vn_fsname = */ NULL,
 	/* .vn_link   = */ LLIST_INITNODE,
 	/* .vn_guard  = */ 0
+#endif /* !CONFIG_USE_NEW_VM */
 };
 
 
