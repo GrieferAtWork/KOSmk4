@@ -20,7 +20,6 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C 1
 #define __WANT_MPART__mp_newglobl
-#define __WANT_MPART__mp_oob2
 #define __WANT_MPART__mp_dead
 #define _KOS_SOURCE 1
 
@@ -30,6 +29,7 @@
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
+#include <kernel/mman/mfile-lockop.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
@@ -139,6 +139,53 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	}
 }
 
+
+#define mpart_destroy_lockop_encode(prt) \
+	((struct mfile_lockop *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_lockop_decode(lop) \
+	container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_destroy_lop_rmall)(struct mfile_postlockop *__restrict self,
+                                       struct mfile *__restrict UNUSED(file)) {
+	struct mpart *me;
+	me = mpart_destroy_lockop_decode(self);
+	if (LIST_ISBOUND(me, mp_allparts)) {
+		/* Must remove from the global list of all known parts. */
+		if (mpart_all_lock_tryacquire()) {
+			LIST_REMOVE(me, mp_allparts);
+			mpart_all_lock_release();
+		} else {
+			SLIST_ATOMIC_INSERT(&mpart_all_dead, me, _mp_dead);
+			_mpart_all_reap();
+			return;
+		}
+	}
+	/* Finally, free the part proper. */
+	mpart_free(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) struct mfile_postlockop *
+NOTHROW(FCALL mpart_destroy_lop_rmfile)(struct mfile_lockop *__restrict self,
+                                        struct mfile *__restrict file) {
+	struct mfile_postlockop *post;
+	struct mpart *me;
+	me = mpart_destroy_lockop_decode(self);
+	/* Remove the dead part from the file's tree of parts. */
+	if likely(!mpart_isanon(me)) {
+		assert(!mfile_isanon(file));
+		mpart_tree_removenode(&file->mf_parts, me);
+	}
+	DBG_memset(&me->mp_filent, 0xcc, sizeof(me->mp_filent));
+	post = (struct mfile_postlockop *)self;
+	/* Remove from the all-parts list and free _after_ the
+	 * lock to the backing mem-file has been released. */
+	post->mfplo_func = &mpart_destroy_lop_rmall;
+	return post;
+}
+
+
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self) {
 	REF struct mfile *file;
@@ -170,8 +217,11 @@ remove_node_from_globals:
 		goto remove_node_from_globals;
 	} else {
 		/* Enqueue the file for later deletion. */
-		SLIST_ATOMIC_INSERT(&file->mf_deadparts, self, _mp_dead);
-		_mfile_deadparts_reap(file);
+		struct mfile_lockop *lop;
+		lop = mpart_destroy_lockop_encode(self);
+		lop->mflo_func = &mpart_destroy_lop_rmfile;
+		SLIST_ATOMIC_INSERT(&file->mf_lockops, lop, mflo_link);
+		_mfile_lockops_reap(file);
 		decref(file);
 		return;
 	}
@@ -179,24 +229,11 @@ remove_node_from_globals:
 	mpart_free(self);
 }
 
-/* Same as `mpart_destroy()', but always enqueue the part via `_mp_dead'
- * NOTE: For this, the caller must ensure that `self->mp_file->mf_parts != MFILE_PARTS_ANONYMOUS' */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_destroy_later)(struct mpart *__restrict self) {
-	REF struct mfile *file;
-	mpart_fini(self);
-	file = self->mp_file;
-	assert(file);
-	assert(file->mf_parts != MFILE_PARTS_ANONYMOUS);
-	SLIST_ATOMIC_INSERT(&file->mf_deadparts, self, _mp_dead);
-	decref(file);
-}
-
 SLIST_HEAD(mpart_postlockop_slist, mpart_postlockop);
 
 /* Reap dead nodes of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mpart_deadnodes_reap)(struct mpart *__restrict self) {
+NOTHROW(FCALL _mpart_lockops_reap)(struct mpart *__restrict self) {
 	struct mpart_lockop_slist lops;
 	struct mpart_postlockop_slist post;
 	struct mpart_lockop *iter;
@@ -445,7 +482,7 @@ again:
 					mpart_lock_acquire_and_setcore_unwrite_nodma(self);
 				} EXCEPT {
 					kfree(bitset);
-					mpart_deadnodes_reap(self);
+					mpart_lockops_reap(self);
 					RETHROW();
 				}
 				/* Check if anything's changed. */
@@ -532,7 +569,7 @@ again:
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			RETHROW();
 		}
 		/* Change the states of all saved pages back to ST_LOAD */
@@ -568,7 +605,7 @@ again:
 			/* Wait for initialization to complete. */
 			task_waitfor();
 		} EXCEPT {
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			RETHROW();
 		}
 		/* Try again. (hopefully now, all INIT-blocks are gone) */
@@ -584,7 +621,7 @@ again:
 	}
 	ATOMIC_AND(self->mp_flags, ~(MPART_F_LOCKBIT | MPART_F_CHANGED |
 	                             MPART_F_MAYBE_BLK_INIT));
-	mpart_deadnodes_reap(self);
+	mpart_lockops_reap(self);
 	return result;
 done_noop:
 	if (keep_lock)

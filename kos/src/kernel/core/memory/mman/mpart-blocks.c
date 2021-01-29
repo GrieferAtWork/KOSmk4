@@ -198,6 +198,48 @@ err_bad_bounds:
 
 
 
+/* Try to add the given `part' to the list of changed parts of `self'
+ * Does nothing when `part' was already marked as changed, or the list
+ * of changed parts of `self' has previously been set to ANON. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
+                                      struct mpart *__restrict part) {
+	if (self->mf_ops->mo_saveblocks != NULL && !mpart_isanon(part) &&
+	    (part->mp_flags & MPART_F_CHANGED) == 0) {
+		struct mpart *next;
+
+		/* Mark the part as changed. */
+		ATOMIC_OR(part->mp_flags, MPART_F_CHANGED);
+		incref(part); /* For the list of changed parts. */
+
+		/* Add the part to its file's changed-list. */
+		do {
+			next = ATOMIC_READ(self->mf_changed.slh_first);
+
+			/* Deal with special case: The file is currently being made
+			 * anonymous. This is quite unlikely, since a fully anon
+			 * file will sooner or later also mark all of its parts as
+			 * anonymous, meaning that `mpart_isanon()' would have
+			 * already failed had `self' been anonymous for a while
+			 * longer. */
+			if unlikely(next == MFILE_PARTS_ANONYMOUS) {
+				ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
+				decref_nokill(part);
+				return;
+			}
+			part->mp_changed.sle_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
+		                             next, part));
+
+		/* If defined, invoke the part-changed callback of the file. */
+		if (self->mf_ops->mo_changed != NULL)
+			(*self->mf_ops->mo_changed)(self, part);
+	}
+}
+
+
+
 /* Commit modifications made to the given backing address range.
  * For this purpose, this function:
  *   - Set the state of all blocks that fully overlap with the given
@@ -305,19 +347,8 @@ after_intermediate_blocks:
 		 * wasn't set as such before, then we must mark this mem-part
 		 * as having changed, and possibly add it to the associated
 		 * file's list of changed parts. */
-		if (did_change && file->mf_ops->mo_saveblocks != NULL &&
-		    !mpart_isanon(self) && (self->mp_flags & MPART_F_CHANGED) == 0) {
-
-			/* Mark the part as changed. */
-			ATOMIC_OR(self->mp_flags, MPART_F_CHANGED);
-
-			/* Add the part to its file's changed-list. */
-			SLIST_ATOMIC_INSERT(&file->mf_changed, self, mp_changed);
-
-			/* If defined, invoke the part-changed callback. */
-			if (file->mf_ops->mo_changed != NULL)
-				(*file->mf_ops->mo_changed)(file, self);
-		}
+		if (did_change)
+			mfile_add_changed_part(file, self);
 	}
 	return num_bytes;
 }
@@ -500,19 +531,8 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 	 * wasn't set as such before, then we must mark this mem-part
 	 * as having changed, and possibly add it to the associated
 	 * file's list of changed parts. */
-	if (did_change && file->mf_ops->mo_saveblocks != NULL &&
-	    !mpart_isanon(self) && (self->mp_flags & MPART_F_CHANGED) == 0) {
-
-		/* Mark the part as changed. */
-		ATOMIC_OR(self->mp_flags, MPART_F_CHANGED);
-
-		/* Add the part to its file's changed-list. */
-		SLIST_ATOMIC_INSERT(&file->mf_changed, self, mp_changed);
-
-		/* If defined, invoke the part-changed callback. */
-		if (file->mf_ops->mo_changed != NULL)
-			(*file->mf_ops->mo_changed)(file, self);
-	}
+	if (did_change)
+		mfile_add_changed_part(file, self);
 }
 
 

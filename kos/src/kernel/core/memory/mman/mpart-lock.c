@@ -119,7 +119,7 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 			mpart_lock_release_f(self);
 			task_waitfor();
 		} EXCEPT {
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			RETHROW();
 		}
 		return false;
@@ -320,7 +320,7 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 					vec = (struct mchunk *)kmalloc(2 * sizeof(struct mchunk),
 					                               GFP_LOCKED | GFP_PREFLT);
 				} EXCEPT {
-					mpart_deadnodes_reap(self);
+					mpart_lockops_reap(self);
 					RETHROW();
 				}
 			}
@@ -344,7 +344,7 @@ do_realloc_in_extend_after_unlock:
 						                                sizeof(struct mchunk),
 						                                GFP_LOCKED | GFP_PREFLT);
 					} EXCEPT {
-						mpart_deadnodes_reap(self);
+						mpart_lockops_reap(self);
 						RETHROW();
 					}
 					data->scd_copy_mem_sc.ms_v = vec;
@@ -423,7 +423,7 @@ err_badalloc:
 	mpart_lock_release_f(self);
 	unlockinfo_xunlock(unlock);
 err_badalloc_after_unlock:
-	mpart_deadnodes_reap(self);
+	mpart_lockops_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, total_pages);
 }
 
@@ -461,7 +461,7 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 				                                                  GFP_LOCKED | GFP_PREFLT |
 				                                                  gfp_flags);
 			} EXCEPT {
-				mpart_deadnodes_reap(self);
+				mpart_lockops_reap(self);
 				RETHROW();
 			}
 			return false;
@@ -719,7 +719,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			}
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			decref_unlikely(self);
 			RETHROW();
 		}
@@ -887,7 +887,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			decref_unlikely(self);
 			RETHROW();
 		}
@@ -926,7 +926,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 			mpart_lock_release_f(self);
 			task_waitfor();
 		} EXCEPT {
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			RETHROW();
 		}
 		return false;
@@ -1149,7 +1149,7 @@ unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
 			copy = (struct mpart *)kmalloc(sizeof(struct mpart),
 			                               GFP_LOCKED | GFP_PREFLT);
 		} EXCEPT {
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			RETHROW();
 		}
 		data->ucd_copy = copy;
@@ -1192,7 +1192,7 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
 			bitset = (mpart_blkst_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
 			                                        GFP_LOCKED | GFP_PREFLT);
 		} EXCEPT {
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			RETHROW();
 		}
 		data->ucd_ucmem.scd_bitset = bitset;
@@ -1332,7 +1332,7 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 				while (!sync_canwrite(mm))
 					task_yield();
 			} EXCEPT {
-				mpart_deadnodes_reap(part);
+				mpart_lockops_reap(part);
 				RETHROW();
 			}
 			return false;
@@ -1386,7 +1386,7 @@ err_badalloc:
 	unsharecow_unlock_unique_mmans(self);
 	mpart_lock_release_f(self);
 	unlockinfo_xunlock(unlock);
-	mpart_deadnodes_reap(self);
+	mpart_lockops_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 }
 
@@ -1680,7 +1680,7 @@ again_try_clear_write:
 					task_yield();
 			} EXCEPT {
 				decref_unlikely(mm);
-				mpart_deadnodes_reap(self);
+				mpart_lockops_reap(self);
 				RETHROW();
 			}
 			decref_unlikely(mm);
@@ -1690,7 +1690,7 @@ again_try_clear_write:
 		assert(error == MNODE_CLEAR_WRITE_BADALLOC);
 		mpart_lock_release_f(self);
 		unlockinfo_xunlock(unlock);
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 	}
 	return true;
@@ -1743,7 +1743,7 @@ mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
 			mpart_lock_acquire(self);
 	} EXCEPT {
 		mpart_setcore_data_fini(&data);
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		RETHROW();
 	}
 }
@@ -1762,7 +1762,7 @@ again:
 		if (!mpart_loadall_or_unlock(self, NULL))
 			goto again;
 	} EXCEPT {
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		RETHROW();
 	}
 }
@@ -1791,7 +1791,7 @@ again:
 		if (!mpart_loadsome_or_unlock(self, NULL, partrel_offset, num_bytes))
 			goto again;
 	} EXCEPT {
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		RETHROW();
 	}
 	return true;
@@ -1814,7 +1814,7 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
 			mpart_lock_acquire_and_setcore(self);
 	} EXCEPT {
 		mpart_unsharecow_data_fini(&uc_data);
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		RETHROW();
 	}
 }
@@ -1852,7 +1852,7 @@ again:
 		if (!mpart_loadsome_or_unlock(self, NULL, partrel_offset, num_bytes))
 			goto again;
 	} EXCEPT {
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		RETHROW();
 	}
 	return true;

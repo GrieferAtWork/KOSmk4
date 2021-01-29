@@ -159,6 +159,8 @@ struct mfile_ops {
 	 */
 };
 
+struct mfile_lockop; /* from "mfile-lockop.h" */
+SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
 
 struct mfile {
 	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */
@@ -170,7 +172,7 @@ struct mfile {
 	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
 	                                            * contained parts changes state from INIT to LOAD. */
-	struct REF mpart_slist      mf_deadparts;  /* [0..n][lock(ATOMIC)] Chain of dead parts (that still have
+	struct mfile_lockop_slist   mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of dead parts (that still have
 	                                            * to be removed from `mf_parts'). */
 	struct REF mpart_slist      mf_changed;    /* [0..n][lock(ATOMIC)]
 	                                            * Chain of references to parts that contain unsaved changes.
@@ -224,18 +226,18 @@ struct mfile {
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 (self)->mf_parts = __NULLPTR,         \
 	 sig_init(&(self)->mf_initdone),       \
-	 SLIST_INIT(&(self)->mf_deadparts),    \
+	 SLIST_INIT(&(self)->mf_lockops),      \
 	 SLIST_INIT(&(self)->mf_changed),      \
 	 mfile_init_blockshift(self, block_shift))
-#define mfile_cinit(self, ops, block_shift)               \
-	((self)->mf_refcnt = 1,                               \
-	 (self)->mf_ops    = (ops),                           \
-	 __mfile_cinit_vio(self)                              \
-	 atomic_rwlock_cinit(&(self)->mf_lock),               \
-	 __hybrid_assert((self)->mf_parts == __NULLPTR),      \
-	 sig_cinit(&(self)->mf_initdone),                     \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_deadparts)), \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_changed)),   \
+#define mfile_cinit(self, ops, block_shift)             \
+	((self)->mf_refcnt = 1,                             \
+	 (self)->mf_ops    = (ops),                         \
+	 __mfile_cinit_vio(self)                            \
+	 atomic_rwlock_cinit(&(self)->mf_lock),             \
+	 __hybrid_assert((self)->mf_parts == __NULLPTR),    \
+	 sig_cinit(&(self)->mf_initdone),                   \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_lockops)), \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_changed)), \
 	 mfile_init_blockshift(self, block_shift))
 
 /* Get a [0..1]-pointer to the VIO operators of `self' */
@@ -247,7 +249,7 @@ struct mfile {
 
 
 #ifdef CONFIG_MFILE_LEGACY_VIO_OPS
-#define MFILE_INIT_EX(refcnt, ops, parts, blockshift)                                  \
+#define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift)                         \
 	{                                                                                  \
 		/* .mf_refcnt     = */ refcnt,                                                 \
 		/* .mf_ops        = */ ops,                                                    \
@@ -255,27 +257,27 @@ struct mfile {
 		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,                                     \
 		/* .mf_parts      = */ parts,                                                  \
 		/* .mf_initdone   = */ SIG_INIT,                                               \
-		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),                              \
-		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                              \
+		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                              \
+		/* .mf_changed    = */ { changed },                                            \
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
 		/* .mf_blockshift = */ blockshift,                                             \
 	}
 #else /* CONFIG_MFILE_LEGACY_VIO_OPS */
-#define MFILE_INIT_EX(refcnt, ops, parts, blockshift)                                  \
+#define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift)                         \
 	{                                                                                  \
 		/* .mf_refcnt     = */ refcnt,                                                 \
 		/* .mf_ops        = */ ops,                                                    \
 		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,                                     \
 		/* .mf_parts      = */ parts,                                                  \
 		/* .mf_initdone   = */ SIG_INIT,                                               \
-		/* .mf_deadparts  = */ SLIST_HEAD_INITIALIZER(~),                              \
-		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                              \
+		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                              \
+		/* .mf_changed    = */ { changed },                                            \
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
 		/* .mf_blockshift = */ blockshift,                                             \
 	}
 #endif /* !CONFIG_MFILE_LEGACY_VIO_OPS */
-#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, blockshift)
-#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, blockshift)
+#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, __NULLPTR, blockshift)
+#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, MFILE_PARTS_ANONYMOUS, blockshift)
 
 
 /* Allocate physical memory for use with mem-parts created for `self'
@@ -306,28 +308,28 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_addr_aligned(self, addr)    (((uint64_t)(addr) & (self)->mf_part_amask) == 0)
 
 
-/* Reap dead parts of `self' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_deadparts_reap)(struct mfile *__restrict self);
-#define mfile_deadparts_mustreap(self) \
-	(__hybrid_atomic_load((self)->mf_deadparts.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+/* Reap lock operations of `self' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_lockops_reap)(struct mfile *__restrict self);
+#define mfile_lockops_mustreap(self) \
+	(__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define mfile_deadparts_reap(self) _mfile_deadparts_reap(self)
+#define mfile_lockops_reap(self) _mfile_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
-#define mfile_deadparts_reap(self) (void)(!mfile_deadparts_mustreap(self) || (_mfile_deadparts_reap(self), 0))
+#define mfile_lockops_reap(self) (void)(!mfile_lockops_mustreap(self) || (_mfile_lockops_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 /* Lock accessor helpers for `struct mfile' */
 #define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)
 #define mfile_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mf_lock)
 #define mfile_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mf_lock)
-#define mfile_lock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->mf_lock), mfile_deadparts_reap(self))
+#define mfile_lock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->mf_lock), mfile_lockops_reap(self))
 #define mfile_lock_endwrite_f(self) atomic_rwlock_endwrite(&(self)->mf_lock)
 #define mfile_lock_read(self)       atomic_rwlock_read(&(self)->mf_lock)
 #define mfile_lock_read_nx(self)    atomic_rwlock_read_nx(&(self)->mf_lock)
 #define mfile_lock_tryread(self)    atomic_rwlock_tryread(&(self)->mf_lock)
-#define mfile_lock_endread(self)    (void)(atomic_rwlock_endread(&(self)->mf_lock) && (mfile_deadparts_reap(self), 0))
+#define mfile_lock_endread(self)    (void)(atomic_rwlock_endread(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
 #define mfile_lock_endread_f(self)  atomic_rwlock_endread(&(self)->mf_lock)
-#define mfile_lock_end(self)        (void)(atomic_rwlock_end(&(self)->mf_lock) && (mfile_deadparts_reap(self), 0))
+#define mfile_lock_end(self)        (void)(atomic_rwlock_end(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
 #define mfile_lock_end_f(self)      atomic_rwlock_end(&(self)->mf_lock)
 #define mfile_lock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mf_lock)
 #define mfile_lock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mf_lock)
@@ -345,7 +347,6 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_deadparts_reap)(struct mfi
  *    all existing mappings are altered. (s.a. `mfile_anon')
  *  - The `MPART_F_NO_GLOBAL_REF' flag is set for all parts
  *  - The `mf_parts' and `mf_changed' are set to `MFILE_PARTS_ANONYMOUS'
- *  - The `mf_deadparts' chain is cleared (one last time)
  * The result of all of this is that it is no longer possible to
  * trace back mappings of parts of `self' to that file.
  *
@@ -359,7 +360,11 @@ mfile_makeanon(struct mfile *__restrict self)
 /* Split a potential part at `minaddr' and `maxaddr', and make
  * it so that all parts between that range are removed from the
  * part-tree of `self', by essentially anonymizing them.
- * This function can be used to implement `ftruncate(2)' */
+ * This function can be used to implement `ftruncate(2)'
+ *
+ * NOTE: Unlike `mfile_makeanon()', this function doesn't mark
+ *       the file itself as anonymous, meaning that more parts
+ *       can still be created at a later point in time! */
 FUNDEF NONNULL((1)) void FCALL
 mfile_makeanon_subrange(struct mfile *__restrict self,
                         PAGEDIR_PAGEALIGNED pos_t minaddr,

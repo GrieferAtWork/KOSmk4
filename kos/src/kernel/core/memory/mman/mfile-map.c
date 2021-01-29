@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MAP_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MAP_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MFILE_MAP_C
+#define GUARD_KERNEL_SRC_MEMORY_MFILE_MAP_C 1
 #define __WANT_MNODE__mn_alloc
 #define _KOS_SOURCE 1
 
@@ -691,4 +691,4 @@ NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict se
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MAP_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MFILE_MAP_C */

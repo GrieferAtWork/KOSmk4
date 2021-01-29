@@ -202,27 +202,11 @@ struct mpart {
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * Memory part state (one of `MPART_ST_*') */
-#if defined(__WANT_MPART__mp_dead) || defined(__WANT_MPART__mp_oob2)
-#ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_file(mp_file) { mp_file }
-#endif /* __WANT_MPART_INIT */
-	union {
-		REF struct mfile         *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
-		                                         * The associated file. (Cannot be altered as long as any `MPART_BLOCK_ST_INIT' blocks exist) */
-#ifdef __WANT_MPART__mp_dead
-		SLIST_ENTRY(mpart)       _mp_dead;      /* [lock(ATOMIC)] Chain of dead parts. */
-#endif /* __WANT_MPART__mp_dead */
-#ifdef __WANT_MPART__mp_oob2
-		SIMPLEQ_ENTRY(mpart)     _mp_oob2;      /* Internal, out-of-band chain of parts. */
-#endif /* __WANT_MPART__mp_oob2 */
-	};
-#else /* __WANT_MPART__mp_dead || __WANT_MPART__mp_oob2 */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_file(mp_file) mp_file
 #endif /* __WANT_MPART_INIT */
 	REF struct mfile             *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
 	                                             * The associated file. (Cannot be altered as long as any `MPART_BLOCK_ST_INIT' blocks exist) */
-#endif /* !__WANT_MPART__mp_dead && !__WANT_MPART__mp_oob2 */
 	/* WARNING: The following 2 lists may contain already-destroyed nodes.
 	 *          To check if a node has been destroyed, you may check if the
 	 *          pointed-to `mn_mman' was destroyed, since that field normally
@@ -237,7 +221,7 @@ struct mpart {
 #endif /* __WANT_MPART_INIT */
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
-	struct mpart_lockop_slist     mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_deadnodes_reap()') */
+	struct mpart_lockop_slist     mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
 #ifdef __WANT_MPART__mp_newglobl
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) { mp_allparts }
@@ -294,7 +278,7 @@ struct mpart {
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file max address of this part. */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
-#ifdef __WANT_MPART__mp_oob
+#ifdef __WANT_MPART__mp_dead
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_changed(...) { __VA_ARGS__ }
 #endif /* __WANT_MPART_INIT */
@@ -307,9 +291,9 @@ struct mpart {
 		                                         * into its file's `mf_changed' list.
 		                                         * Also note that changed mem-parts are kept alive by the associated
 		                                         * file, since this list contains references, rather than weak pointers. */
-		SLIST_ENTRY(mpart)       _mp_oob;       /* Internal, out-of-band chain of parts. */
+		SLIST_ENTRY(mpart)       _mp_dead;      /* [lock(ATOMIC)] Chain of dead parts. */
 	};
-#else /* __WANT_MPART__mp_oob */
+#else /* __WANT_MPART__mp_dead */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_changed(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
@@ -321,7 +305,7 @@ struct mpart {
 	                                             * into its file's `mf_changed' list.
 	                                             * Also note that changed mem-parts are kept alive by the associated
 	                                             * file, since this list contains references, rather than weak pointers. */
-#endif /* !__WANT_MPART__mp_oob */
+#endif /* !__WANT_MPART__mp_dead */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_filent(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
@@ -461,19 +445,16 @@ struct mpart {
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_free)(struct mpart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
-/* Same as `mpart_destroy()', but always enqueue the part via `_mp_dead'
- * NOTE: For this, the caller must ensure that `self->mp_file->mf_parts != MFILE_PARTS_ANONYMOUS' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_destroy_later)(struct mpart *__restrict self);
 
 
 /* Reap lock operations enqueued for execution when `self' can be locked. */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_deadnodes_reap)(struct mpart *__restrict self);
-#define mpart_deadnodes_mustreap(self) \
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart *__restrict self);
+#define mpart_lockops_mustreap(self) \
 	(__hybrid_atomic_load((self)->mp_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define mpart_deadnodes_reap(self) _mpart_deadnodes_reap(self)
+#define mpart_lockops_reap(self) _mpart_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
-#define mpart_deadnodes_reap(self) (void)(!mpart_deadnodes_mustreap(self) || (_mpart_deadnodes_reap(self), 0))
+#define mpart_lockops_reap(self) (void)(!mpart_lockops_mustreap(self) || (_mpart_lockops_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 /* Lock accessor helpers for `struct mpart' */
@@ -481,7 +462,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_deadnodes_reap)(struct mpa
 	(!(__hybrid_atomic_fetchor((self)->mp_flags, MPART_F_LOCKBIT, __ATOMIC_SEQ_CST) & MPART_F_LOCKBIT))
 #define mpart_lock_release(self)                                                \
 	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST), \
-	 mpart_deadnodes_reap(self))
+	 mpart_lockops_reap(self))
 #define mpart_lock_release_f(self) \
 	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST))
 FORCELOCAL NONNULL((1)) void FCALL

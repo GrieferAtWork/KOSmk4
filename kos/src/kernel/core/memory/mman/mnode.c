@@ -152,7 +152,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, mplo_link);
 
 			/* Try to reap dead nodes. */
-			_mpart_deadnodes_reap(part);
+			_mpart_lockops_reap(part);
 
 			/* Drop our old reference to the associated part. */
 			decref(part);

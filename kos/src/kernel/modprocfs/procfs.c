@@ -56,7 +56,7 @@ INTERN struct superblock ProcFS = {
 	/* .s_rootdir = */ {
 		/* .d_node = */ {
 #ifdef CONFIG_USE_NEW_VM
-			/* .i_datablock = */ MFILE_INIT_EX(2, &inode_datablock_type, NULL, PAGESHIFT),
+			/* .i_datablock = */ MFILE_INIT_EX(2, &inode_datablock_type, NULL, NULL, PAGESHIFT),
 			/* .i_lock      = */ RWLOCK_INIT,
 #else /* CONFIG_USE_NEW_VM */
 			/* .i_datablock = */ {

@@ -4378,7 +4378,7 @@ superblock_open(struct superblock_type *__restrict type,
 			assert(result->mf_vio == NULL);
 			assert(result->mf_parts == NULL);
 			sig_cinit(&result->mf_initdone);
-			assert(SLIST_EMPTY(&result->mf_deadparts));
+			assert(SLIST_EMPTY(&result->mf_lockops));
 			assert(SLIST_EMPTY(&result->mf_changed));
 #endif /* CONFIG_USE_NEW_VM */
 			rwlock_cinit(__inode_lock(result));

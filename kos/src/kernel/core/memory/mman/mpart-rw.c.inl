@@ -236,7 +236,7 @@ do_unshare_cow:
 			size_t addend;
 			addend = partrel_offset & ~file->mf_part_amask;
 			decref_unlikely(file),
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			partrel_offset -= addend;
 			hipart = mpart_split(self, addend);
 			if unlikely(!hipart)
@@ -252,7 +252,7 @@ do_unshare_cow:
 		}
 		if (avail <= partrel_offset) {
 			decref_unlikely(file);
-			mpart_deadnodes_reap(self);
+			mpart_lockops_reap(self);
 			return result; /* Part is too small. */
 		}
 		hirel = (partrel_offset + num_bytes + file->mf_part_amask) & ~file->mf_part_amask;

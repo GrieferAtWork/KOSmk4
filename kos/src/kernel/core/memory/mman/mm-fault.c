@@ -447,7 +447,7 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 				                               GFP_LOCKED | GFP_PREFLT);
 				self->mfl_pcopy[1] = node;
 			} EXCEPT {
-				mpart_deadnodes_reap(self->mfl_part);
+				mpart_lockops_reap(self->mfl_part);
 				RETHROW();
 			}
 			return false;
@@ -466,7 +466,7 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 			                               GFP_LOCKED | GFP_PREFLT);
 			self->mfl_pcopy[1] = node;
 		} EXCEPT {
-			mpart_deadnodes_reap(self->mfl_part);
+			mpart_lockops_reap(self->mfl_part);
 			RETHROW();
 		}
 		return false;
@@ -676,7 +676,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 						}
 					}
 				} EXCEPT {
-					mpart_deadnodes_reap(part);
+					mpart_lockops_reap(part);
 					RETHROW();
 				}
 				/* Load the part into the core, and unshare copy-on-write if necessary. */

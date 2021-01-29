@@ -56,7 +56,7 @@ PUBLIC struct superblock devfs = {
 #ifdef CONFIG_USE_NEW_VM
 #define devfs_lock devfs.s_rootdir.d_node.i_lock
 			/* NOTE: 2 = +1: devfs, +1: devfs_type.st_singleton */
-			/* .i_datablock = */ MFILE_INIT_EX(2, &inode_datablock_type, NULL, PAGESHIFT),
+			/* .i_datablock = */ MFILE_INIT_EX(2, &inode_datablock_type, NULL, NULL, PAGESHIFT),
 			/* .i_lock      = */ RWLOCK_INIT,
 #else /* CONFIG_USE_NEW_VM */
 #define devfs_lock devfs.s_rootdir.d_node.i_datablock.db_lock

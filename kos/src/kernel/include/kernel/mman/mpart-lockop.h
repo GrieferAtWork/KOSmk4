@@ -26,10 +26,8 @@
 
 #include <hybrid/sequence/list.h>
 
-
 #ifdef __CC__
 DECL_BEGIN
-
 
 struct mman;
 struct mpart_lockop;
@@ -58,10 +56,7 @@ struct mpart_lockop {
 	mpart_lockop_callback_t   mplo_func; /* [1..1][const] Operation to perform. */
 };
 
-
-
 DECL_END
 #endif /* __CC__ */
-
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MPART_LOCKOP_H */

@@ -192,7 +192,7 @@ PRIVATE void testPath(char const *path) {
 	assert(renameat(dfd, "test2", dfd, "test") == -1);
 	assertf(errno == EEXIST, "%s", strerror(errno));
 
-	/* Try to delete `test2' and re-attempt the re-name */
+	/* Try to delete `test2' and re-attempt the rename */
 	assertf(unlinkat(dfd, "test2", 0) == 0, "%s", strerror(errno));
 
 	/* The "test" file should still be intact */

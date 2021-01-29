@@ -830,7 +830,7 @@ relock_with_data:
 		}
 	} EXCEPT {
 		mpart_split_data_fini(&data);
-		mpart_deadnodes_reap(self);
+		mpart_lockops_reap(self);
 		RETHROW();
 	}
 
@@ -1144,11 +1144,29 @@ maybe_free_unused_hibitset:
 	    file->mf_ops->mo_saveblocks != NULL && !mpart_isanon(self)) {
 		assert(!mfile_isanon(file));
 		if (mpart_really_changed(hipart)) {
-			/* Must add the new `hipart' to the file's list of changed parts. */
-			SLIST_ATOMIC_INSERT(&file->mf_changed, hipart, mp_changed);
+			struct mpart *next;
+
+			/* Must add the new `hipart' to the file's list of changed parts.
+			 *
+			 * NOTE: Special case must be taken to deal with the case where
+			 *       backing the file's changed-part list has been marked
+			 *       as anonymous, or simply doesn't wish to keep track of
+			 *       changed parts. */
+			incref(hipart);
+			do {
+				next = ATOMIC_READ(file->mf_changed.slh_first);
+				if unlikely(next == MFILE_PARTS_ANONYMOUS) {
+					decref_nokill(hipart);
+					goto clear_hipart_changed_bit;
+				}
+				hipart->mp_changed.sle_next = next;
+				COMPILER_WRITE_BARRIER();
+			} while (!ATOMIC_CMPXCH_WEAK(file->mf_changed.slh_first,
+			                             next, hipart));
 		} else {
 			/* The hi-part hasn't ~actually~ changed (so just clear the flag, and don't
 			 * add it to the list of changed parts) */
+clear_hipart_changed_bit:
 			hipart->mp_flags &= ~MPART_F_CHANGED;
 		}
 	}

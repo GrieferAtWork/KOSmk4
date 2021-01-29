@@ -17,35 +17,46 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_RAMFILE_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_RAMFILE_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MFILE_LOCKOP_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MFILE_LOCKOP_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman/mfile.h>
-#include <kernel/mman/mpart.h>
+#include <kernel/types.h>
+
+#include <hybrid/sequence/list.h>
 
 #ifdef __CC__
 DECL_BEGIN
 
-struct mramfile {
-	struct mfile mrf_file; /* The ram-file */
-	struct mpart mrf_part; /* The (only) ram part. */
+struct mman;
+struct mfile_lockop;
+struct mfile_postlockop;
+
+typedef NOBLOCK NONNULL((1, 2)) void
+/*NOTHROW*/ (FCALL *mfile_postlockop_callback_t)(struct mfile_postlockop *__restrict self,
+                                                 struct mfile *__restrict file);
+
+struct mfile_postlockop {
+	SLIST_ENTRY(mfile_postlockop) mfplo_link; /* [lock(ATOMIC)] Next post-lock operation. */
+	mfile_postlockop_callback_t   mfplo_func; /* [1..1][const] Callback to invoke. */
 };
 
-#ifdef __WANT_MPART_INIT
-/* >> MRAMFILE_INIT(struct mramfile &self, physpage_t first_page, physpagecnt_t page_count)
- * Initialize a given mem-ram-file, given a simple physical
- * location of where the file's backing data may be found. */
-#define MRAMFILE_INIT(self, first_page, page_count, num_bytes)                     \
-	{                                                                              \
-		MFILE_INIT_EX(2, &mfile_ndef_ops, &(self).mrf_part, __NULLPTR, PAGESHIFT), \
-		MPART_INIT_PHYS(&(self).mrf_file, first_page, page_count, num_bytes)       \
-	}
-#endif /* __WANT_MPART_INIT */
+
+/* Callback prototype for mfile pending locked operations.
+ * @return: NULL: Completed.
+ * @return: * :   A descriptor for an operation to perform
+ *                after the mfile-lock has been released. */
+typedef NOBLOCK NONNULL((1, 2)) struct mfile_postlockop *
+/*NOTHROW*/ (FCALL *mfile_lockop_callback_t)(struct mfile_lockop *__restrict self,
+                                             struct mfile *__restrict file);
+
+struct mfile_lockop {
+	SLIST_ENTRY(mfile_lockop) mflo_link; /* [lock(ATOMIC)] Next lock operation. */
+	mfile_lockop_callback_t   mflo_func; /* [1..1][const] Operation to perform. */
+};
 
 DECL_END
 #endif /* __CC__ */
 
-
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_RAMFILE_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MFILE_LOCKOP_H */

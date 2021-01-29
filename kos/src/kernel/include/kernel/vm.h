@@ -703,17 +703,17 @@ DECL_END
 	 __hybrid_assert((self)->db_vio == __NULLPTR),   \
 	 __hybrid_assert((self)->db_parts == __NULLPTR), \
 	 mfile_init_blockshift(self, block_shift))
-#define MFILE_INIT_EX(refcnt, ops, parts, blockshift)        \
-	{                                                        \
-		/* .db_refcnt = */ refcnt,                           \
-		/* .db_lock   = */ RWLOCK_INIT,                      \
-		/* .db_type   = */ ops,                              \
-		/* .db_vio    = */ __NULLPTR,                        \
-		/* .db_parts  = */ parts,                            \
-		VM_DATABLOCK_INIT_PAGEINFO(PAGESHIFT - (blockshift)) \
+#define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift) \
+	{                                                          \
+		/* .db_refcnt = */ refcnt,                             \
+		/* .db_lock   = */ RWLOCK_INIT,                        \
+		/* .db_type   = */ ops,                                \
+		/* .db_vio    = */ __NULLPTR,                          \
+		/* .db_parts  = */ parts,                              \
+		VM_DATABLOCK_INIT_PAGEINFO(PAGESHIFT - (blockshift))   \
 	}
-#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, blockshift)
-#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, blockshift)
+#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, __NULLPTR, blockshift)
+#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, MFILE_PARTS_ANONYMOUS, blockshift)
 /************************************************************************/
 
 
