@@ -117,7 +117,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	REF struct mpart *part;
 	assertf((self->mn_flags & MNODE_F_UNMAPPED) || wasdestroyed(self->mn_mman),
 	        "A mem-node may only be destroyed if it's marked as UNMAPPED, "
-	        "or belonges to a dead memory manager");
+	        "or belongs to a dead memory manager");
 	if (self->mn_flags & MNODE_F_MPREPARED) {
 		REF struct mman *mm = self->mn_mman;
 		if (tryincref(mm)) {

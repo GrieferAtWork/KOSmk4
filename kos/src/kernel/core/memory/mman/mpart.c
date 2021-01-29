@@ -172,8 +172,11 @@ remove_node_from_globals:
 		/* Enqueue the file for later deletion. */
 		SLIST_ATOMIC_INSERT(&file->mf_deadparts, self, _mp_dead);
 		_mfile_deadparts_reap(file);
+		decref(file);
+		return;
 	}
 	decref(file);
+	mpart_free(self);
 }
 
 /* Same as `mpart_destroy()', but always enqueue the part via `_mp_dead'

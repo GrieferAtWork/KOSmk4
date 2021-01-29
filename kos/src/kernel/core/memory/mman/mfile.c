@@ -144,7 +144,7 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL destroy_mpart_after_removed_from_file)(struct mpart *__restrict self) {
 	assert(wasdestroyed(self));
-	assert(!(self->mp_flags & MPART_F_NO_GLOBAL_REF));
+	assert(self->mp_flags & MPART_F_NO_GLOBAL_REF);
 	if (LIST_ISBOUND(self, mp_allparts)) {
 		/* Must remove from the global list of all known parts. */
 		if (mpart_all_lock_tryacquire()) {

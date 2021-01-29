@@ -876,7 +876,7 @@ allocate_without_overalloc:
 				 * are always valid (aka. they don't have their contents checked).
 				 * And knowing that `heap_free_raw()' will only modify up to the first `SIZEOF_MFREE'
 				 * bytes, starting at `unused_begin', all we really need to pat out markers for
-				 * no man's land memory within the last page that still has to be allocated for
+				 * no man's land memory within the last page that still has to be initialized for
 				 * `heap_free_raw()' to function properly. */
 				if (flags & GFP_PREFLT) {
 					/* If memory got pre-faulted, we still have to pat _everything_,
@@ -890,6 +890,28 @@ allocate_without_overalloc:
 					if (page_remainder > unused_size)
 						page_remainder = unused_size;
 					mempatl(unused_begin, DEBUGHEAP_NO_MANS_LAND, page_remainder);
+#ifdef CONFIG_USE_NEW_VM
+					/* Go over all remaining pages and check if they've already been
+					 * initialized, because `mman_map_kram()' is allowed to prefault
+					 * pages even if no request was made to prefault them. */
+					if (page_remainder < unused_size) {
+						byte_t *noinit_base;
+						size_t noinit_size;
+						noinit_base = (byte_t *)unused_begin + page_remainder;
+						noinit_size = unused_size - page_remainder;
+						HEAP_ASSERT(noinit_size);
+						HEAP_ASSERT(IS_ALIGNED((uintptr_t)noinit_base, PAGESIZE));
+						HEAP_ASSERT(IS_ALIGNED((uintptr_t)noinit_size, PAGESIZE));
+						for (;;) {
+							if (pagedir_iswritable(noinit_base))
+								memsetl(noinit_base, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
+							if (noinit_size <= PAGESIZE)
+								break;
+							noinit_base += PAGESIZE;
+							noinit_size -= PAGESIZE;
+						}
+					}
+#endif /* CONFIG_USE_NEW_VM */
 				}
 			}
 #endif /* CONFIG_DEBUG_HEAP */

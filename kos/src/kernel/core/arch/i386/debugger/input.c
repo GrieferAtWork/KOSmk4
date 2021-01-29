@@ -152,9 +152,9 @@ NOTHROW(FCALL ps2_keyboard_getbyte)(void) {
 	unsigned int index;
 	__cli();
 	while (!ps2_keyboard_buffer_siz) {
-		__asm__("sti\n\t"
-		        "hlt\n\t"
-		        "cli");
+		__asm__ __volatile__("sti\n\t"
+		                     "hlt\n\t"
+		                     "cli");
 	}
 	if (ps2_keyboard_buffer_pos >= ps2_keyboard_buffer_siz) {
 		index = ps2_keyboard_buffer_pos - ps2_keyboard_buffer_siz;
