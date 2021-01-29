@@ -195,7 +195,6 @@ NOTHROW(KCALL mpart_anon)(struct mpart *__restrict self,
 	assert(!mpart_isanon(self));
 	assert(file->mf_blockshift < COMPILER_LENOF(mfile_anon));
 	self->mp_file = incref(&mfile_anon[file->mf_blockshift]);
-	_mpart_init_asanon(self);
 	decref_nokill(file);
 	if (!(ATOMIC_FETCHOR(self->mp_flags, MPART_F_NO_GLOBAL_REF) & MPART_F_NO_GLOBAL_REF)) {
 		/* Must drop a reference to this part at a later point in time! */
@@ -296,6 +295,7 @@ PRIVATE NONNULL((1)) void
 NOTHROW(FCALL mpart_tree_foreach_release_and_decref_teardown_impl)(struct mpart *__restrict root) {
 	struct mpart *lhs, *rhs;
 again:
+	assert(!mpart_isanon(root));
 	lhs = root->mp_filent.rb_lhs;
 	rhs = root->mp_filent.rb_rhs;
 	_mpart_init_asanon(root);

@@ -35,6 +35,7 @@
 #include <sched/arch/userkern.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
+#include <sched/userkern.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -90,12 +91,13 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 #ifdef CONFIG_NO_USERKERN_SEGMENT
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
+	MNODE_INIT_mn_part(NULL), /* Reserved node */
 #else /* CONFIG_NO_USERKERN_SEGMENT */
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
 	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
+	MNODE_INIT_mn_part(&userkern_segment_part), /* Reserved node */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
-	MNODE_INIT_mn_part(NULL), /* Reserved node */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
 	MNODE_INIT_mn_mman(NULL), /* Filled in during init */

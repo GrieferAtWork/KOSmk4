@@ -193,7 +193,7 @@ PUBLIC struct mpart userkern_segment_part = {
 	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_VIO),
-	MPART_INIT_mp_file(&mfile_ndef),
+	MPART_INIT_mp_file(&userkern_segment_file),
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(userkern_segment_part.mp_copy)),
 	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(userkern_segment_part.mp_share)),
 	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(userkern_segment_part.mp_lockops)),
@@ -249,7 +249,7 @@ PUBLIC struct mpart userkern_segment_part = {
 
 PUBLIC struct mfile userkern_segment_file = {
 #ifdef CONFIG_USE_NEW_VM
-	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.dp_block' */
+	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
 	/* .mf_ops        = */ &mfile_ndef_ops,
 	/* .mf_vio        = */ &userkern_segment_vio,
 	/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,
@@ -355,7 +355,7 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_VIO),
-	MPART_INIT_mp_file(&mfile_ndef),
+	MPART_INIT_mp_file(&userkern_segment_file_compat),
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_copy)),
 	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_share)),
 	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(userkern_segment_part_compat.mp_lockops)),
@@ -410,7 +410,7 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 
 PUBLIC struct vm_datablock userkern_segment_file_compat = {
 #ifdef CONFIG_USE_NEW_VM
-	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.dp_block' */
+	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
 	/* .mf_ops        = */ &mfile_ndef_ops,
 	/* .mf_vio        = */ &userkern_segment_vio_compat,
 	/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,

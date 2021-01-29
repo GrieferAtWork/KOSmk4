@@ -25,6 +25,7 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mbuilder.h>
@@ -35,6 +36,7 @@
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/userkern.h>
 
 #include <hybrid/atomic.h>
 
@@ -185,6 +187,50 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 			iter = next;
 		}
 	}
+
+	/* In compatibility-mode, there is a chance that `thismman_kernel_reservation'
+	 * was resized to span a larger region of memory in order to simulate an
+	 * address space that may be found on the emulated architecture.
+	 * This happens mainly as the result of attempting to access ukern
+	 * at an address that should have been apart of kernel-space, but
+	 * wasn't because kernel-space was actually allocated elsewhere:
+	 * >> PF_HANDLER:
+	 * >>     if (ATTEMTED_TO_ACCESS_UNMAPPED_ADDRESS) {
+	 * >> #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
+	 * >>         if (IN_COMPAT_MODE() &&
+	 * >>             FAULT_ADDR < KERNELSPACE_BASE &&
+	 * >>             FAULT_ADDR >= COMPAT_KERNELSPACE_BASE) {
+	 * >>             struct mman *mm = THIS_MMAN;
+	 * >>             mman_lock_acquire(mm);
+	 * >>             if (!mnode_tree_rlocate(mm->mm_mappings, COMPAT_KERNELSPACE_BASE,
+	 * >>                                     KERNELSPACE_BASE - COMPAT_KERNELSPACE_BASE)) {
+	 * >>                 mnode_tree_removenode(&mm->mm_mappings, &FORMMAN(mm, thismman_kernel_reservation));
+	 * >>                 // Extend the kern-reserve node to fill the
+	 * >>                 // entire compat-mode kernel address space.
+	 * >>                 FORMMAN(mm, thismman_kernel_reservation).mn_minaddr = COMPAT_KERNELSPACE_BASE;
+	 * >>                 mnode_tree_insert(&mm->mm_mappings, &FORMMAN(mm, thismman_kernel_reservation));
+	 * >>                 mman_lock_release(mm);
+	 * >>                 goto try_lookup_node_at_accessed_address;
+	 * >>             }
+	 * >>             mman_lock_release(mm);
+	 * >>         }
+	 * >> #endif // ...
+	 * >>     }
+	 */
+#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_USERKERN_SEGMENT)
+	if (FORMMAN(target, thismman_kernel_reservation).mn_part == &userkern_segment_part_compat) {
+#ifdef KERNELSPACE_HIGHMEM
+#if defined(COMPAT_KERNELSPACE_BASE) && COMPAT_KERNELSPACE_BASE != KERNELSPACE_BASE
+		FORMMAN(target, thismman_kernel_reservation).mn_minaddr = (byte_t *)KERNELSPACE_BASE;
+#endif /* COMPAT_KERNELSPACE_BASE && COMPAT_KERNELSPACE_BASE != KERNELSPACE_BASE */
+#else /* KERNELSPACE_HIGHMEM */
+#if defined(COMPAT_KERNELSPACE_END) && COMPAT_KERNELSPACE_END != KERNELSPACE_END
+		FORMMAN(target, thismman_kernel_reservation).mn_maxaddr = (byte_t *)KERNELSPACE_END - 1;
+#endif /* COMPAT_KERNELSPACE_END && COMPAT_KERNELSPACE_END != KERNELSPACE_END */
+#endif /* !KERNELSPACE_HIGHMEM */
+		FORMMAN(target, thismman_kernel_reservation).mn_part = &userkern_segment_part;
+	}
+#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
 
 	/* Step #8: Re-insert the kernel-reserve node into the new tree */
 	mnode_tree_insert(&target->mm_mappings,
