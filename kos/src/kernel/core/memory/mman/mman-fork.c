@@ -19,8 +19,8 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C 1
-#define _KOS_SOURCE 1
 #define __WANT_MNODE__mn_alloc
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -449,7 +449,7 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 		struct mnode *next;
 		void *addr;
 		size_t size;
-		printk(KERN_TRACE "[mm] fork: delete write-access to %p-%p\n",
+		printk(KERN_TRACE "[mm] fork: deny write-access to %p-%p\n",
 		       mnode_getminaddr(iter), mnode_getmaxaddr(iter));
 		next = LIST_NEXT(iter, mn_writable);
 		LIST_ENTRY_UNBOUND_INIT(&iter->mn_writable);

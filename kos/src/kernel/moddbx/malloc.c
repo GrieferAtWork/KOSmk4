@@ -204,12 +204,12 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 #else /* CONFIG_USE_NEW_VM */
 	last_heap->sh_node.vn_node.a_vmin   = PAGEID_ENCODE((byte_t *)new_heap);
 	last_heap->sh_node.vn_node.a_vmax   = PAGEID_ENCODE((byte_t *)new_heap + min_size - 1);
+	last_heap->sh_node.vn_block         = NULL;
 #endif /* !CONFIG_USE_NEW_VM */
 	last_heap->sh_node.vn_prot          = VM_PROT_READ | VM_PROT_WRITE;
 	last_heap->sh_node.vn_flags         = VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE;
 	last_heap->sh_node.vn_vm            = &vm_kernel;
 	last_heap->sh_node.vn_part          = NULL;
-	last_heap->sh_node.vn_block         = NULL;
 	last_heap->sh_node.vn_fspath        = NULL;
 	last_heap->sh_node.vn_fsname        = NULL;
 	last_heap->sh_node.vn_link.ln_pself = NULL;

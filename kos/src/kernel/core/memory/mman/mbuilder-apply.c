@@ -414,17 +414,17 @@ again:
 #ifndef CONFIG_NO_SMP
 	if (!(additional_actions & MBUILDER_APPLY_AA_TERMTHREADS)) {
 		if (target == THIS_MMAN)
-			pagedir_unmap_userspace_nosync();
+			pagedir_unmap_userspace();
 		else {
-			pagedir_unmap_userspace_nosync_p(target->v_pdir_phys);
+			pagedir_unmap_userspace_p(target->mm_pagedir_p);
 		}
 	} else
 #endif /* !CONFIG_NO_SMP */
 	{
 		if (target == THIS_MMAN)
-			pagedir_unmap_userspace();
+			pagedir_unmap_userspace_nosync();
 		else {
-			pagedir_unmap_userspace_p(target->v_pdir_phys);
+			pagedir_unmap_userspace_nosync_p(target->mm_pagedir_p);
 		}
 	}
 

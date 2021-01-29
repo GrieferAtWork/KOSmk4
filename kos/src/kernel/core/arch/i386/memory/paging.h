@@ -49,12 +49,12 @@
 
 #if !defined(NDEBUG) && 0
 #include <kernel/printk.h>
-#define PG_TRACE_MAP(addr, num_bytes, phys, perm)                                       \
-	printk(KERN_TRACE "[pd] +mmap:%p-%p " __PRINP(__SIZEOF_PHYSADDR_T__) " %c%c%c%c\n", \
-	       addr, (byte_t *)(addr) + (num_bytes)-1, (physaddr_t)(phys),                  \
-	       perm & PAGEDIR_MAP_FEXEC ? 'x' : '-',                                        \
-	       perm & PAGEDIR_MAP_FWRITE ? 'w' : '-',                                       \
-	       perm & PAGEDIR_MAP_FREAD ? 'r' : '-',                                        \
+#define PG_TRACE_MAP(addr, num_bytes, phys, perm)                                         \
+	printk(KERN_TRACE "[pd] +mmap:%p-%p @%" __PRINP(__SIZEOF_PHYSADDR_T__) " %c%c%c%c\n", \
+	       addr, (byte_t *)(addr) + (num_bytes)-1, (physaddr_t)(phys),                    \
+	       perm & PAGEDIR_MAP_FEXEC ? 'x' : '-',                                          \
+	       perm & PAGEDIR_MAP_FWRITE ? 'w' : '-',                                         \
+	       perm & PAGEDIR_MAP_FREAD ? 'r' : '-',                                          \
 	       perm & PAGEDIR_MAP_FUSER ? 'u' : '-')
 #define PG_TRACE_UNMAP(addr, num_bytes)     \
 	printk(KERN_TRACE "[pd] -mmap:%p-%p\n", \

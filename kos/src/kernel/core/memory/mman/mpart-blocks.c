@@ -425,7 +425,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 			FINALLY_DECREF_UNLIKELY(file);
 			task_connect(&file->mf_initdone);
 		}
-		if unlikely(!mpart_hasblocksstate_init(self)) {
+		if unlikely(!(self->mp_flags & MPART_F_MAYBE_BLK_INIT)) {
 			task_disconnectall();
 		} else {
 			task_waitfor();
