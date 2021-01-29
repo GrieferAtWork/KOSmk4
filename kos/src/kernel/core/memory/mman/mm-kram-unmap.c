@@ -1241,8 +1241,6 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 		}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
-		/* When dealing with an in-line */
-
 		/* Check for simple case: unmap a node as a whole. */
 		if (unmap_minaddr == mnode_getminaddr(node) &&
 		    unmap_maxaddr == mnode_getmaxaddr(node)) {

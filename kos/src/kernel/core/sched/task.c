@@ -582,6 +582,8 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	vm_datapart_do_freeram(&FORTASK(self, this_kernel_stackpart_));
 
 #ifdef CONFIG_USE_NEW_VM
+	/* TODO: Use 2-step cleanup and free the task structure _after_ releasing
+	 *       the lock to the kernel mman (through use of a mpostlockop) */
 	{
 		REF struct mman *mm;
 		mm = self->t_mman;

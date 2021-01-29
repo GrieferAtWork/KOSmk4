@@ -242,9 +242,9 @@ again_find_good_range:
 		allow_minaddr = (void *)0;
 #endif /* !KERNELSPACE_BASE */
 #ifdef KERNELSPACE_END
-		allow_maxaddr = (byte_t *)KERNELSPACE_END - num_bytes;
+		allow_maxaddr = (byte_t *)KERNELSPACE_END - 1;
 #else /* KERNELSPACE_END */
-		allow_maxaddr = (byte_t *)0 - num_bytes;
+		allow_maxaddr = (byte_t *)-1;
 #endif /* KERNELSPACE_END */
 	} else {
 		/* Allocate in user-space. */
@@ -255,52 +255,44 @@ again_find_good_range:
 			allow_minaddr = (byte_t *)KERNELSPACE_END;
 #endif /* KERNELSPACE_LOWMEM */
 #ifdef USERSPACE_END
-		allow_maxaddr = (byte_t *)USERSPACE_END - num_bytes;
+		allow_maxaddr = (byte_t *)USERSPACE_END - 1;
 #elif defined(KERNELSPACE_HIGHMEM) && defined(KERNELSPACE_BASE)
-		allow_maxaddr = (byte_t *)KERNELSPACE_BASE - num_bytes;
+		allow_maxaddr = (byte_t *)KERNELSPACE_BASE - 1;
 #else /* USERSPACE_END */
-		allow_maxaddr = (byte_t *)0 - num_bytes;
+		allow_maxaddr = (byte_t *)-1;
 #endif /* USERSPACE_END */
 	}
 #if __SIZEOF_POINTER__ > 4
 	if (flags & MAP_32BIT) {
-		void *limit;
-		limit = (void *)(uintptr_t)(((size_t)UINT32_MAX + 1) - num_bytes);
-		if ((byte_t *)allow_maxaddr > (byte_t *)limit)
-			allow_maxaddr = limit;
+		if (allow_maxaddr > (byte_t *)UINT32_MAX)
+			allow_maxaddr = (byte_t *)UINT32_MAX;
 	}
 #endif /* __SIZEOF_POINTER__ > 4 */
 
 	/* Apply extended alignment requirements to result bounds and the hint address. */
 	if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
-		uintptr_t aligned_max_start_addr;
 		allow_minaddr = (void *)CEIL_ALIGN((uintptr_t)allow_minaddr, min_alignment);
 		addr          = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
-		if (OVERFLOW_USUB((uintptr_t)allow_maxaddr, num_bytes - 1, &aligned_max_start_addr)) {
-err_no_space:
-			/* Try without the +1 additional page of 
-			 * normally included in stack allocations. */
-			if (flags & MAP_STACK) {
-				num_bytes -= 2 * PAGESIZE;
-				flags &= ~(MAP_STACK | MAP_GROWSDOWN | MAP_GROWSUP);
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-				addr = (byte_t *)addr + PAGESIZE;
-				flags |= MAP_GROWSDOWN;
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-				flags |= MAP_GROWSUP;
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-				goto again_find_good_range;
-			}
-			goto err;
-		}
-		aligned_max_start_addr &= ~(min_alignment - 1);
-		aligned_max_start_addr += num_bytes - 1;
-		allow_maxaddr = (void *)aligned_max_start_addr;
 	}
 
 	/* Safety check: Is the range of allowed addresses non-empty? */
-	if unlikely(allow_maxaddr < allow_minaddr)
-		goto err_no_space;
+	if unlikely(allow_maxaddr < allow_minaddr) {
+err_no_space:
+		/* Try without the +1 additional page of 
+		 * normally included in stack allocations. */
+		if (flags & MAP_STACK) {
+			num_bytes -= 2 * PAGESIZE;
+			flags &= ~(MAP_STACK | MAP_GROWSDOWN | MAP_GROWSUP);
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			addr = (byte_t *)addr + PAGESIZE;
+			flags |= MAP_GROWSDOWN;
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+			flags |= MAP_GROWSUP;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+			goto again_find_good_range;
+		}
+		goto err;
+	}
 
 	if ((byte_t *)addr < (byte_t *)allow_minaddr) {
 		if (self == &mman_kernel) {
@@ -318,11 +310,16 @@ do_set_automatic_userspace_hint:
 			}
 			if unlikely((byte_t *)addr < (byte_t *)allow_minaddr)
 				addr = allow_minaddr;
+			else {
+				if (HAS_EXTENDED_MIN_ALIGNMENT)
+					addr = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
+			}
 		}
 	} else if (addr == NULL && self != &mman_kernel) {
 		goto do_set_automatic_userspace_hint;
 	}
 
+	assert(IS_ALIGNED((uintptr_t)addr, REQUIRED_ALIGNMENT));
 	avail_minaddr = (byte_t *)addr;
 	avail_maxaddr = (byte_t *)addr + num_bytes - 1;
 	/* Make sure that the hinted address range lies within the max result bounds.
@@ -330,10 +327,12 @@ do_set_automatic_userspace_hint:
 	if (avail_maxaddr > allow_maxaddr) {
 		if unlikely(OVERFLOW_USUB((uintptr_t)allow_maxaddr, num_bytes - 1, (uintptr_t *)&addr))
 			goto err_no_space;
+		if (HAS_EXTENDED_MIN_ALIGNMENT)
+			addr = (void *)FLOOR_ALIGN((uintptr_t)addr, min_alignment);
 		if unlikely((byte_t *)addr < (byte_t *)allow_minaddr)
 			goto err_no_space;
 		avail_minaddr = (byte_t *)addr;
-		avail_maxaddr = allow_maxaddr;
+		avail_maxaddr = (byte_t *)addr + num_bytes - 1;
 	}
 
 	/* Check if the hinted address range is available. */
