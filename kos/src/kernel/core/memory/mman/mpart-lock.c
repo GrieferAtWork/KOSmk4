@@ -340,8 +340,13 @@ do_realloc_in_extend_after_unlock:
 				chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
 				if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 					goto err_badalloc_after_unlock; /* Insufficient physical memory. */
+				assert(chunk.mc_size <= missing_pages);
 				data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
 				++data->scd_copy_mem_sc.ms_c;
+				done += chunk.mc_size;
+				assert(done <= total_pages);
+				if (done >= total_pages)
+					break;
 			}
 		
 			/* Try to truncate unused memory. */

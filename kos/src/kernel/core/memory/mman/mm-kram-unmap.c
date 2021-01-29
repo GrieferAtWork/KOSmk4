@@ -28,7 +28,6 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/printk.h> /* TODO: REMOVE_ME */
 #include <kernel/mman/mm-kram.h>
 #include <kernel/mman/mm-lockop.h>
 #include <kernel/mman/mm-sync.h>
@@ -50,6 +49,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#if 0
+#include <kernel/printk.h>
+#define TRACE_KRAM(...) printk(__VA_ARGS__)
+#else
+#define TRACE_KRAM(...) (void)0
+#endif
 
 DECL_BEGIN
 
@@ -267,8 +273,8 @@ NOTHROW(FCALL mpart_truncate_trailing)(struct mpart *__restrict self,
                                        freefun_t freefun, gfp_t flags,
                                        uintptr_t node_flags) {
 	physpagecnt_t part_pages;
-	printk(KERN_TRACE "[mm] mpart_truncate_trailing(%p, %Iu, %p, %#x, %#Ix)\n",
-	       self, part_size, freefun, flags, node_flags);
+	TRACE_KRAM(KERN_TRACE "[mm] mpart_truncate_trailing(%p, %Iu, %p, %#x, %#Ix)\n",
+	           self, part_size, freefun, flags, node_flags);
 	assert(self->mp_maxaddr > self->mp_minaddr + part_size - 1);
 	self->mp_maxaddr = self->mp_minaddr + part_size - 1;
 	if (!(self->mp_flags & MPART_F_BLKST_INL) && self->mp_blkst_ptr != NULL) {
@@ -322,8 +328,8 @@ NOTHROW(FCALL mpart_truncate_leading)(struct mpart *__restrict self,
                                       freefun_t freefun, gfp_t flags) {
 	size_t remove_blocks;
 	physpagecnt_t remove_pages;
-	printk(KERN_TRACE "[mm] mpart_truncate_leading(%p, %iu, %p, %#x)\n",
-	       self, remove_size, freefun, flags);
+	TRACE_KRAM(KERN_TRACE "[mm] mpart_truncate_leading(%p, %iu, %p, %#x)\n",
+	           self, remove_size, freefun, flags);
 	assert(remove_size != 0);
 	assert(mpart_getsize(self) > remove_size);
 	remove_pages  = remove_size >> PAGESHIFT;
@@ -443,9 +449,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	size_t losize, hisize, hioffset;
 	size_t unmap_size;
 	freefun_t freefun;
-	printk(KERN_TRACE "[mm] mman_unmap_mpart_subregion(%p(%p-%p),%p,%p,%p,%#x)\n",
-	       node, mnode_getminaddr(node), mnode_getmaxaddr(node), part,
-	       unmap_minaddr, unmap_maxaddr, flags);
+	TRACE_KRAM(KERN_TRACE "[mm] mman_unmap_mpart_subregion(%p(%p-%p),%p,%p,%p,%#x)\n",
+	           node, mnode_getminaddr(node), mnode_getmaxaddr(node), part,
+	           unmap_minaddr, unmap_maxaddr, flags);
 	assert(mman_lock_acquired(&mman_kernel));
 	assert(mpart_lock_acquired(part));
 	assert(!(part->mp_flags & MPART_F_NOSPLIT));
@@ -564,8 +570,8 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	 *
 	 * Note that for this purpose, we may even use `mcoreheap_alloc_locked_nx()'
 	 * in order to dynamically allocate the required additional data structures! */
-	printk(KERN_TRACE "[mm] mman_unmap_mpart_subregion(): Cut a hole %p-%p into %p-%p\n",
-	       unmap_minaddr, unmap_maxaddr, mnode_getminaddr(node), mnode_getmaxaddr(node));
+	TRACE_KRAM(KERN_TRACE "[mm] mman_unmap_mpart_subregion(): Cut a hole %p-%p into %p-%p\n",
+	           unmap_minaddr, unmap_maxaddr, mnode_getminaddr(node), mnode_getmaxaddr(node));
 
 	lonode = node;
 	lopart = part;
