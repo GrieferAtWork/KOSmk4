@@ -347,6 +347,10 @@ again:
 			mman_lock_release(self->ft_oldmm);
 			forktree_unlock_newmm(self);
 			FINALLY_DECREF_UNLIKELY(part); /* The reference from `newtree->mn_part' */
+
+			/* Add `newtree' back into the free-list (because we couldn't add it to our tree) */
+			SLIST_INSERT(&self->ft_freelist, newtree, _mn_alloc);
+
 			/* Must blocking-wait for the part to become available. */
 			do {
 				task_serve();
