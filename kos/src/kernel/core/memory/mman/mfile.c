@@ -122,7 +122,7 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	        "self->db_parts = %p\n",
 	        self->mf_parts);
 	sig_broadcast_for_fini(&self->mf_initdone);
-	if (self->mf_ops) {
+	if (self->mf_ops->mo_destroy) {
 		(*self->mf_ops->mo_destroy)(self);
 	} else {
 		kfree(self);
