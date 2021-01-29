@@ -166,13 +166,36 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT)
 				goto err_not_loaded;
 			++min;
-		}
-		if (((partrel_offset + result->mppl_size) & block_mask) != 0) {
+			if (((partrel_offset + result->mppl_size) & block_mask) != 0) {
+				/* Ending address isn't block-aligned.
+				 * -> This means that the last (trailing) block must be fully initialized. */
+				st = mpart_getblockstate(self, max);
+				if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT) {
+					/* For now, stop writing at the start of the last (NDEF/INIT) block. */
+					result->mppl_size = (max << file->mf_blockshift) - partrel_offset;
+					assertf(result->mppl_size != 0,
+					        "Must be non-empty, because the first couple of bytes "
+					        "should be able to access the unaligned tail of `min'");
+				}
+				if (min >= max)
+					goto done; /* Prevent underflow when `max == 0' */
+				--max;
+			}
+		} else if (((partrel_offset + result->mppl_size) & block_mask) != 0) {
 			/* Ending address isn't block-aligned.
 			 * -> This means that the last (trailing) block must be fully initialized. */
 			st = mpart_getblockstate(self, max);
-			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT)
-				goto err_not_loaded;
+			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT) {
+				if (min == max) {
+					/* Start address may be aligned, but end address
+					 * is apart of the same, not-loaded block! */
+					goto err_not_loaded;
+				}
+				/* For now, stop writing at the start of the last (NDEF/INIT) block. */
+				result->mppl_size = (max << file->mf_blockshift) - partrel_offset;
+				assertf(result->mppl_size != 0,
+				        "Must be non-empty, because we've handle `min == max'");
+			}
 			if (min >= max)
 				goto done; /* Prevent underflow when `max == 0' */
 			--max;
@@ -184,8 +207,17 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 		 * undefined, since they'll just get be overwritten. */
 		for (i = min; i <= max; ++i) {
 			st = mpart_getblockstate(self, max);
-			if (st == MPART_BLOCK_ST_INIT)
-				goto err_not_loaded;
+			if (st == MPART_BLOCK_ST_INIT) {
+				size_t loadend, loadsiz;
+				if (i == min)
+					goto err_not_loaded;
+				loadend = i << file->mf_blockshift;
+				assert(loadend > partrel_offset);
+				loadsiz = loadend - partrel_offset;
+				assert(loadsiz < result->mppl_size);
+				result->mppl_size = loadsiz;
+				goto done;
+			}
 		}
 	}
 done:
@@ -380,8 +412,11 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 
 	/* Check the status of the first part (the one pointed-to by `min'). */
 	st = mpart_getblockstate(self, min);
-	assert(st == MPART_BLOCK_ST_INIT ||
-	       st == MPART_BLOCK_ST_NDEF);
+	if unlikely(st != MPART_BLOCK_ST_INIT && st != MPART_BLOCK_ST_NDEF) {
+		/* Data _is_ available! (this can happen if the caller read
+		 * INIT before, but the block was loaded in the mean time) */
+		return;
+	}
 	if (st == MPART_BLOCK_ST_INIT) {
 		/* Special case: We must wait for someone else to finish initialization! */
 		incref(file);
@@ -390,7 +425,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 			FINALLY_DECREF_UNLIKELY(file);
 			task_connect(&file->mf_initdone);
 		}
-		if unlikely(!(ATOMIC_READ(self->mp_flags) & MPART_F_MAYBE_BLK_INIT)) {
+		if unlikely(!mpart_hasblocksstate_init(self)) {
 			task_disconnectall();
 		} else {
 			task_waitfor();
