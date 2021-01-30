@@ -229,7 +229,7 @@ do_unshare_cow:
 		file  = incref(self->mp_file);
 		avail = mpart_getsize(self);
 		mpart_lock_release_f(self);
-		/* Diminish the overhead of unsharecow by truncating the data-part. */
+		/* Diminish the overhead of unsharecow by truncating the mem-part. */
 		if (partrel_offset > file->mf_part_amask) {
 			/* Can truncate some leading blocks. */
 			REF struct mpart *hipart;

@@ -853,6 +853,28 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_bigfile(int argc, char *argv[], char *envp[]) {
+	fd_t fd;
+	byte_t *data;
+	size_t i, len;
+	(void)argc, (void)argv, (void)envp;
+
+	len  = 4096;
+	data = (byte_t *)malloc(len);
+	for (i = 0; i < len; ++i)
+		data[i] = (byte_t)(i & 0xff);
+	fd = Open("/var/bigfile.dat", O_CREAT | O_RDWR | O_TRUNC, 0644);
+	Write(fd, data, len);
+	fsync(fd);
+	close(fd);
+	free(data);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -887,6 +909,7 @@ PRIVATE DEF defs[] = {
 	{ "leak", &main_leak },
 	{ "vfork", &main_vfork },
 	{ "sigbounce", &main_sigbounce },
+	{ "bigfile", &main_bigfile },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

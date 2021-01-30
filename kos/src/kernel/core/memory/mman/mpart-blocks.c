@@ -206,7 +206,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 		 * Note though that we _do_ allow them to still be
 		 * undefined, since they'll just get be overwritten. */
 		for (i = min; i <= max; ++i) {
-			st = mpart_getblockstate(self, max);
+			st = mpart_getblockstate(self, i);
 			if (st == MPART_BLOCK_ST_INIT) {
 				size_t loadend, loadsiz;
 				if (i == min)
@@ -364,12 +364,12 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 		 * Note though that we _do_ allow them to still be
 		 * undefined, since they've been fully written to. */
 		for (i = min; i <= max; ++i) {
-			st = mpart_getblockstate(self, max);
+			st = mpart_getblockstate(self, i);
 			assert(st == MPART_BLOCK_ST_NDEF ||
 			       st == MPART_BLOCK_ST_LOAD ||
 			       st == MPART_BLOCK_ST_CHNG);
 			if (st != MPART_BLOCK_ST_CHNG) {
-				mpart_setblockstate(self, max, MPART_BLOCK_ST_CHNG);
+				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
 				did_change = true;
 			}
 		}
@@ -418,6 +418,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		return;
 	}
 	if (st == MPART_BLOCK_ST_INIT) {
+		bool hasinit;
 		/* Special case: We must wait for someone else to finish initialization! */
 		incref(file);
 		mpart_lock_release(self);
@@ -425,7 +426,15 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 			FINALLY_DECREF_UNLIKELY(file);
 			task_connect(&file->mf_initdone);
 		}
-		if unlikely(!(self->mp_flags & MPART_F_MAYBE_BLK_INIT)) {
+		TRY {
+			mpart_lock_acquire(self);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
+		hasinit = mpart_hasblocksstate_init(self);
+		mpart_lock_release(self);
+		if unlikely(!hasinit) {
 			task_disconnectall();
 		} else {
 			task_waitfor();
