@@ -18,11 +18,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "mfile.c"
+#include "mfile-rw.c"
 #define DEFINE_mfile_readv
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart.h>
+
+#include <assert.h>
+#include <stddef.h>
 
 #include <libvio/access.h>
 
