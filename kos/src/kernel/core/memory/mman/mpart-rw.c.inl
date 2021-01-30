@@ -353,17 +353,18 @@ again_memaddr:
 			 * buffer. */
 			mpart_lock_release(self);
 #ifdef LOCAL_WRITING
-#define LOCAL_for_writing true
+#define LOCAL_prefault_flags MMAN_FAULT_F_NORMAL /* Writing from a buffer means we only need to read said buffer! */
 #else /* LOCAL_WRITING */
-#define LOCAL_for_writing false
+#define LOCAL_prefault_flags MMAN_FAULT_F_WRITE /* Reading into a buffer means we must write to said buffer! */
 #endif /* !LOCAL_WRITING */
 #ifdef LOCAL_BUFFER_IS_AIO_BUFFER
-			copy_error = mman_prefaultv(buffer, result, num_bytes, LOCAL_for_writing);
+			copy_error = mman_prefaultv(buffer, result, num_bytes,
+			                            LOCAL_prefault_flags);
 #else /* LOCAL_BUFFER_IS_AIO_BUFFER */
 			copy_error = mman_prefault((byte_t *)buffer + result,
-			                           num_bytes, LOCAL_for_writing);
+			                           num_bytes, LOCAL_prefault_flags);
 #endif /* !LOCAL_BUFFER_IS_AIO_BUFFER */
-#undef LOCAL_for_writing
+#undef LOCAL_prefault_flags
 			/* If we've managed to prefault memory, then re-attempt the direct transfer. */
 			if (copy_error != 0)
 				goto again;
