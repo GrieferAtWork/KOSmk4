@@ -26,14 +26,16 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/printk.h> /* TODO: REMOVE_ME */
 #include <kernel/paging.h>
+#include <kernel/printk.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/userkern.h>
 
 #include <hybrid/atomic.h>
 
@@ -51,6 +53,15 @@
  * the kernel mman. As such, we should never have to reap anything! */
 #undef mman_lock_release
 #define mman_lock_release mman_lock_release_f
+
+
+/* In compatibility-mode, the kernel reserve node may change its location
+ * over the course of a process's lifetime. - As such, we must do special
+ * handling for it when it comes to forking an mman. */
+#undef NEED_EXPLICIT_KERN_RESERVE_CHECK
+#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_USERKERN_SEGMENT)
+#define NEED_EXPLICIT_KERN_RESERVE_CHECK
+#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
 
 DECL_BEGIN
 
@@ -294,7 +305,20 @@ again:
 			newtree->mn_flags |= oldtree->mn_flags & MNODE_F__RBRED;
 			goto continue_after_fork_newtree; /* Can re-use this node! */
 		}
+#ifdef NEED_EXPLICIT_KERN_RESERVE_CHECK
+		/* Special handling for a flexible kernel-reserve node in compatibility mode. */
+		if (newtree == &FORMMAN(self->ft_newmm, thismman_kernel_reservation)) {
+			assert(oldtree == &FORMMAN(self->ft_oldmm, thismman_kernel_reservation));
+			newtree->mn_minaddr = oldtree->mn_minaddr;
+			newtree->mn_maxaddr = oldtree->mn_maxaddr;
+			newtree->mn_part    = oldtree->mn_part;
+			newtree->mn_flags &= ~MNODE_F__RBRED;
+			newtree->mn_flags |= oldtree->mn_flags & MNODE_F__RBRED;
+			goto continue_after_fork_newtree; /* Can re-use this node! */
+		}
+#else /* NEED_EXPLICIT_KERN_RESERVE_CHECK */
 		assert(newtree != &FORMMAN(self->ft_newmm, thismman_kernel_reservation));
+#endif /* !NEED_EXPLICIT_KERN_RESERVE_CHECK */
 		/* Different nodes -> Delete the pre-existing, overlapping node. */
 		forktree_mnode_destroy(self, newtree);
 		goto again;
