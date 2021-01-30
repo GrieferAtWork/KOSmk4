@@ -101,9 +101,6 @@ NOTHROW(FCALL mfutex_destroy_later)(struct mfutex *__restrict self) {
  * be holding a lock to the associated `struct mpartmeta::mpm_ftxlock'. */
 DECL_END
 
-#ifndef NDEBUG       /* TODO: REMOVE_ME */
-#define RBTREE_DEBUG /* TODO: REMOVE_ME */
-#endif /* !NDEBUG */ /* TODO: REMOVE_ME */
 #define RBTREE_LEFT_LEANING
 #define RBTREE_WANT_TRYINSERT
 #define RBTREE_WANT_RLOCATE

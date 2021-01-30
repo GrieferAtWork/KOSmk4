@@ -288,9 +288,6 @@ again_service_lops:
  * be holding a lock to the associated file. */
 DECL_END
 
-#ifndef NDEBUG       /* TODO: REMOVE_ME */
-#define RBTREE_DEBUG /* TODO: REMOVE_ME */
-#endif /* !NDEBUG */ /* TODO: REMOVE_ME */
 #undef RBTREE_LEFT_LEANING
 #define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_WANT_PREV_NEXT_NODE

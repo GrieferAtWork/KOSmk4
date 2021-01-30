@@ -46,7 +46,7 @@
 #endif /* !CONFIG_NO_SMP */
 
 #undef CONFIG_USE_NEW_VM
-#if 0
+#if 1
 #define CONFIG_USE_NEW_VM
 #endif
 
