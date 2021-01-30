@@ -143,7 +143,7 @@ again:
 		mman_lock_release(mf.mfl_mman);
 
 		addend = (size_t)(((byte_t *)pagealigned_addr + mf.mfl_size) - (byte_t *)addr);
-		mfault_fini(&mf);
+		/*mfault_fini(&mf);*/ /* Don't finalize here (s.a. the documentation of `mfault_or_unlock()') */
 		/* Account for how much was actually faulted. */
 		assert(addend != 0);
 		if (addend >= num_bytes) {
@@ -296,7 +296,7 @@ again:
 		mman_lock_release(mf.mfl_mman);
 
 		addend = (size_t)(((byte_t *)pagealigned_addr + mf.mfl_size) - (byte_t *)addr);
-		mfault_fini(&mf);
+		/*mfault_fini(&mf);*/ /* Don't finalize here (s.a. the documentation of `mfault_or_unlock()') */
 		if (addend >= num_bytes)
 			break;
 		/* Continue force-faulting more memory... */
