@@ -37,6 +37,8 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
 
+#include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
+
 #if __SIZEOF_POS_T__ > __SIZEOF_POINTER__
 #include <hybrid/__byteorder.h>
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
@@ -100,10 +102,16 @@
 #define MPART_ST_VOID       0x0 /* [lock(MPART_F_LOCKBIT)] Part hasn't been accessed, yet. */
 #define MPART_ST_SWP        0x1 /* [lock(MPART_F_LOCKBIT)] Part has been off-loaded into swap. */
 #define MPART_ST_MEM        0x2 /* [lock(MPART_F_LOCKBIT)] Part has been allocated. */
+#ifdef LIBVIO_CONFIG_ENABLED
 #define MPART_ST_VIO        0x3 /* [const] Part is backed by VIO. */
+#endif /* LIBVIO_CONFIG_ENABLED */
 #define MPART_ST_SWP_SC     0x5 /* [lock(MPART_F_LOCKBIT)] Part has been off-loaded into swap (scattered). */
 #define MPART_ST_MEM_SC     0x6 /* [lock(MPART_F_LOCKBIT)] Part has been allocated (scattered). */
+#ifdef LIBVIO_CONFIG_ENABLED
 #define MPART_ST_HASST(x)   ((x) != MPART_ST_VOID && (x) != MPART_ST_VIO)
+#else /* LIBVIO_CONFIG_ENABLED */
+#define MPART_ST_HASST(x)   ((x) != MPART_ST_VOID)
+#endif /* !LIBVIO_CONFIG_ENABLED */
 #define MPART_ST_INCORE(x)  ((x) >= MPART_ST_MEM && (x) != MPART_ST_SWP_SC)
 #define MPART_ST_INMEM(x)   ((x) == MPART_ST_MEM || (x) == MPART_ST_MEM_SC)
 #define MPART_ST_SCATTER(x) ((x)&4) /* Check if a scatter-list is being used. */

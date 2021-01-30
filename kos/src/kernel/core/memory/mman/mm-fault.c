@@ -111,9 +111,11 @@ again:
 			if unlikely(!mf.mfl_part)
 				goto unlock_and_done;
 
+#ifdef LIBVIO_CONFIG_ENABLED
 			/* Skip VIO parts. */
 			if unlikely(mf.mfl_part->mp_state == MPART_ST_VIO)
 				goto unlock_and_done;
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 			/* Try to fault the backing mem-parts. */
 			if (!mfault_or_unlock(&mf))
@@ -250,6 +252,7 @@ again:
 			if unlikely(!mf.mfl_part)
 				goto err_unmapped;
 
+#ifdef LIBVIO_CONFIG_ENABLED
 			/* Skip VIO parts, or throw an exception. */
 			if unlikely(mf.mfl_part->mp_state == MPART_ST_VIO) {
 				void *old_end_addr, *new_end_addr;
@@ -265,6 +268,7 @@ again:
 				addr      = new_end_addr;
 				goto again_mfault_init;
 			}
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 			/* Try to fault the backing mem-parts. */
 			if (!mfault_or_unlock(&mf))

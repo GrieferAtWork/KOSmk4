@@ -1263,11 +1263,14 @@ clear_hipart_changed_bit:
 	 * NOTE: On this has been done, `hipart' may be considered finalized,
 	 *       meaning that we can no longer go around normal limitations
 	 *       when it comes to writing to its fields. */
-	if (hipart->mp_state != MPART_ST_VIO) {
+#ifdef LIBVIO_CONFIG_ENABLED
+	if (hipart->mp_state == MPART_ST_VIO) {
+		DBG_memset(&hipart->mp_allparts, 0xcc, sizeof(hipart->mp_allparts));
+	} else
+#endif /* LIBVIO_CONFIG_ENABLED */
+	{
 		COMPILER_WRITE_BARRIER();
 		mpart_all_list_insert(hipart);
-	} else {
-		DBG_memset(&hipart->mp_allparts, 0xcc, sizeof(hipart->mp_allparts));
 	}
 
 	/* Update the part-tree of the associated file. */

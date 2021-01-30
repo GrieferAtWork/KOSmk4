@@ -186,6 +186,11 @@ again_lookup_part_locked:
 			 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow_withhint()',
 			 *                which doesn't ensure that accessed blocks have been loaded, whilst we're using
 			 *                `mpart_lock_acquire_and_setcore_unsharecow_loadsome()', which does do so. */
+
+			/* TODO: Can't just blindly use `mpart_lock_acquire_and_setcore_unsharecow_loadsome()' here,
+			 *       unless MNODE_F_SHARED is set. - Since the access is made the context of a mman, we
+			 *       must follow mfault semantics, instead! (as a matter of fact, we should actually be
+			 *       able to just use mfault, as-is! */
 again_lock_part:
 			if (for_writing ? !mpart_lock_acquire_and_setcore_unsharecow_loadsome(part, file_addr, file_size)
 			                : !mpart_lock_acquire_and_setcore_loadsome(part, file_addr, file_size)) {

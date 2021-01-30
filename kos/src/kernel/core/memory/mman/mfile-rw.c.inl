@@ -93,6 +93,7 @@ DECL_BEGIN
 #error "Bad configuration"
 #endif /* !... */
 
+#ifdef LIBVIO_CONFIG_ENABLED
 PUBLIC NONNULL((1)) void KCALL
 LOCAL_mfile_vio_rw(struct mfile *__restrict self,
                    struct mpart *part,
@@ -158,6 +159,8 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
 #error "Bad configuration"
 #endif /* !... */
 }
+#endif /* LIBVIO_CONFIG_ENABLED */
+
 
 PUBLIC NONNULL((1)) void KCALL
 LOCAL_mfile_rw(struct mfile *__restrict self,

@@ -35,7 +35,11 @@
 /* Flags for prefaulting functions below. */
 #define MMAN_FAULT_F_NORMAL 0x0000 /* Normal flags */
 #define MMAN_FAULT_F_WRITE  0x0001 /* Fault for writing */
+#ifdef LIBVIO_CONFIG_ENABLED
 #define MMAN_FAULT_F_NOVIO  0x0002 /* (for `mman_forcefault'): Throw `E_SEGFAULT' if encountering VIO. */
+#else /* LIBVIO_CONFIG_ENABLED */
+#define MMAN_FAULT_F_NOVIO  0x0000 /* Ignored */
+#endif /* !LIBVIO_CONFIG_ENABLED */
 
 #ifdef __CC__
 DECL_BEGIN

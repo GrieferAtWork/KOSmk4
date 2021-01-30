@@ -206,6 +206,7 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	struct mpart_physloc physloc;
 	mpart_reladdr_t part_offs, part_size;
 	/* Deal with VIO parts. */
+#ifdef LIBVIO_CONFIG_ENABLED
 	if unlikely(self->mp_state == MPART_ST_VIO) {
 		REF struct mfile *file;
 		mpart_lock_acquire(self);
@@ -228,6 +229,7 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		                   filepos);
 		return num_bytes;
 	}
+#endif /* LIBVIO_CONFIG_ENABLED */
 	result = 0;
 
 	/* Lock+load the part, unsharing the accessed address range if necessary. */

@@ -41,7 +41,7 @@ typedef NOBLOCK NONNULL((1, 2)) void
                                                  struct mpart *__restrict part);
 
 struct mpart_postlockop {
-	SLIST_ENTRY(mpart_postlockop) mpplo_link; /* [lock(ATOMIC)] Next post-lock operation. */
+	SLIST_ENTRY(mpart_postlockop) mpplo_link; /* [0..1] Next post-lock operation. */
 	mpart_postlockop_callback_t   mpplo_func; /* [1..1][const] Callback to invoke. */
 };
 
@@ -55,7 +55,7 @@ typedef NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
                                              struct mpart *__restrict part);
 
 struct mpart_lockop {
-	SLIST_ENTRY(mpart_lockop) mplo_link; /* [lock(ATOMIC)] Next lock operation. */
+	SLIST_ENTRY(mpart_lockop) mplo_link; /* [0..1] Next lock operation. */
 	mpart_lockop_callback_t   mplo_func; /* [1..1][const] Operation to perform. */
 };
 

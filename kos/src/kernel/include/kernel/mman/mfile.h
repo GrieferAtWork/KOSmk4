@@ -36,6 +36,8 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
+
 #undef CONFIG_MFILE_LEGACY_VIO_OPS
 #if 1 /* TODO: Currently required for backwards compatibility to the old mman.
        * The plan is to eventually disable this option, and merge `inode_type'
@@ -625,6 +627,7 @@ FUNDEF NONNULL((1, 2)) void KCALL mfile_readv_p(struct mfile *__restrict self, s
 FUNDEF NONNULL((1, 2)) void KCALL mfile_writev_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Helpers for directly reading to/from VIO space. */
+#ifdef LIBVIO_CONFIG_ENABLED
 FUNDEF NONNULL((1)) void KCALL mfile_vio_read(struct mfile *__restrict self, struct mpart *part, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL mfile_vio_write(struct mfile *__restrict self, struct mpart *part, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL mfile_vio_read_p(struct mfile *__restrict self, struct mpart *part, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -633,6 +636,7 @@ FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_readv(struct mfile *__restrict self,
 FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_writev(struct mfile *__restrict self, struct mpart *part, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_readv_p(struct mfile *__restrict self, struct mpart *part, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 3)) void KCALL mfile_vio_writev_p(struct mfile *__restrict self, struct mpart *part, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 /* Builtin mem files */
 DATDEF struct mfile /*     */ mfile_phys;     /* Physical memory access (file position is physical memory address) */

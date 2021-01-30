@@ -418,8 +418,10 @@ mpart_sync_impl(struct mpart *__restrict self, bool keep_lock)
 	assert(!task_wasconnected());
 
 	/* Deal with the special case where our part is a VIO-part. */
+#ifdef LIBVIO_CONFIG_ENABLED
 	if unlikely(self->mp_state == MPART_ST_VIO)
 		goto done_noop_nolock;
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 again:
 	if (!(self->mp_flags & MPART_F_CHANGED) && !keep_lock)

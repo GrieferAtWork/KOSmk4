@@ -69,11 +69,14 @@ mfile_private_makepart(struct mfile *__restrict self,
 	result->mp_minaddr = addr;
 	result->mp_maxaddr = addr + num_bytes - 1;
 	result->mp_meta    = NULL;
+#ifdef LIBVIO_CONFIG_ENABLED
 	if (mfile_getvio(self) != NULL) {
 		result->mp_state = MPART_ST_VIO;
 		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 		result->mp_blkst_ptr = NULL;
-	} else {
+	} else
+#endif /* LIBVIO_CONFIG_ENABLED */
+	{
 		size_t num_blocks;
 		num_blocks = num_bytes >> self->mf_blockshift;
 		/* Allocate the block-status bitset. */
@@ -131,8 +134,12 @@ mfile_makepart(struct mfile *__restrict self,
 	_mpart_init_asanon(result);
 
 	/* Add the new part to the global list. */
+#ifdef LIBVIO_CONFIG_ENABLED
 	if (result->mp_state != MPART_ST_VIO)
+#endif /* LIBVIO_CONFIG_ENABLED */
+	{
 		mpart_all_list_insert(result);
+	}
 
 	return result;
 }
@@ -208,8 +215,12 @@ again_lock:
 			COMPILER_WRITE_BARRIER();
 
 			/* Add the new part to the global list. */
+#ifdef LIBVIO_CONFIG_ENABLED
 			if (result->mp_state != MPART_ST_VIO)
+#endif /* LIBVIO_CONFIG_ENABLED */
+			{
 				mpart_all_list_insert(result);
+			}
 
 			return result;
 		}
@@ -218,7 +229,10 @@ again_lock:
 		if (mpart_tree_tryinsert(&self->mf_parts, result)) {
 			/* Success!
 			 * Now also try to add the new part to the list of global parts. */
-			if (result->mp_state != MPART_ST_VIO) {
+#ifdef LIBVIO_CONFIG_ENABLED
+			if (result->mp_state != MPART_ST_VIO)
+#endif /* LIBVIO_CONFIG_ENABLED */
+			{
 				result->mp_flags &= ~MPART_F_NO_GLOBAL_REF;
 				++result->mp_refcnt; /* The reference owned by `mpart_all_list' */
 				COMPILER_WRITE_BARRIER();
