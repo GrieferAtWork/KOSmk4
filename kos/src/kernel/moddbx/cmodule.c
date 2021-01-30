@@ -1957,7 +1957,7 @@ NOTHROW(FCALL cmodule_load_symtab_kern)(struct cmodsymtab *__restrict symtab,
  *       structure, and the name field would be a pointer into the .dynstr
  *       section.
  * NOTE: .symtab and .strtab is loaded/scanned similarly, and is actually
- *       preferred over .dynsym (though only the former may be available if
+ *       preferred over .dynsym (though only the later may be available if
  *       the module had been stripped of debug information)
  *
  * NOTE: This kind of symbol scanning must be done before loading .debug_info
