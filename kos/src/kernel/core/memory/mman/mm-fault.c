@@ -625,7 +625,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 		goto nope;
 
 	TRY {
-	
+
 		/* Simple case: When reading, only need to lock+load the accessed address range. */
 		if (!(self->mfl_flags & MMAN_FAULT_F_WRITE)) {
 			if (!mpart_loadsome_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
@@ -639,7 +639,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 			assert(self->mfl_pcopy[0] == NULL);
 			goto done;
 		}
-	
+
 		/* Deal with writes to shared memory mappings. */
 		if (node->mn_flags & MNODE_F_SHARED) {
 			if (LIST_EMPTY(&part->mp_copy)) {
@@ -733,6 +733,37 @@ done_mark_changed:
 		 *
 		 * This optimization is performed by a trailing call to `mnode_merge()' */
 
+		if unlikely(node->mn_flags & MNODE_F_NOSPLIT) {
+			/* Must unshare the mem-node as a whole (that is: fault the
+			 * entirety of the address range that is described by `node')
+			 *
+			 * Note that we don't have to check the part for `MPART_F_NOSPLIT',
+			 * since we don't actually have to split the part anywhere below! */
+			if (self->mfl_addr != mnode_getaddr(node) ||
+			    self->mfl_size != mnode_getsize(node)) {
+				bool result;
+				PAGEDIR_PAGEALIGNED void *orig_addr;
+				PAGEDIR_PAGEALIGNED size_t orig_size;
+				assert((uintptr_t)self->mfl_addr >=
+				       (uintptr_t)mnode_getaddr(node));
+				assert((uintptr_t)self->mfl_addr + self->mfl_size <=
+				       (uintptr_t)mnode_getendaddr(node));
+				/* Because this is a rather rare scenario, implement support via
+				 * a recursive call, so we don't have to add special handling in
+				 * the regular code path down below. */
+				orig_addr      = self->mfl_addr;
+				orig_size      = self->mfl_size;
+				self->mfl_addr = mnode_getaddr(node);
+				self->mfl_size = mnode_getsize(node);
+				result         = mfault_or_unlock(self);
+				/* NOTE: Technically, `mfl_offs' only need to be adjusted on success. */
+				self->mfl_offs += (size_t)((byte_t *)self->mfl_addr - (byte_t *)orig_addr);
+				self->mfl_addr = orig_addr;
+				self->mfl_size = orig_size;
+				return result;
+			}
+		}
+
 		/* Allocate everything we need to create the anon copy of the accessed range. */
 		if (!mfault_pcopy_makecopy_or_unlock(self))
 			goto nope_reinit_scmem;
@@ -754,6 +785,7 @@ done_mark_changed:
 			endaddr = (byte_t *)self->mfl_addr + self->mfl_size;
 			assert((uintptr_t)self->mfl_addr >= (uintptr_t)mnode_getaddr(node));
 			assert((uintptr_t)endaddr <= (uintptr_t)mnode_getendaddr(node));
+
 			if ((uintptr_t)self->mfl_addr > (uintptr_t)mnode_getaddr(node)) {
 				struct mnode *lonode;
 				mnode_tree_removenode(&self->mfl_mman->mm_mappings, node);
@@ -790,6 +822,7 @@ done_mark_changed:
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, lonode, mn_writable);
 			}
+
 			if ((uintptr_t)endaddr < (uintptr_t)mnode_getendaddr(node)) {
 				struct mnode *hinode;
 				mnode_tree_removenode(&self->mfl_mman->mm_mappings, node);
@@ -834,12 +867,7 @@ done_mark_changed:
 		} /* Scope... */
 
 
-		/* Construct the new mem-part.
-		 * NOTE: We don't copy mem-part meta-data here, since doing so
-		 *       wouldn't really make too much sense, since we'd have
-		 *       no idea who should inherit the data. (since meta-data
-		 *       can't really be copied)
-		 */
+		/* Construct the new mem-part. */
 		{
 			struct mpart *copy;
 			size_t block_offset;
@@ -911,7 +939,10 @@ pcopy_free_unused_block_status:
 			           MAX_C(sizeof(struct mchunk),
 			                 sizeof(struct mchunkvec)));
 
-			/* For now, we don't copy mem-part meta-data. */
+			/* We don't copy mem-part meta-data, since doing so
+			 * wouldn't really make too much sense, and since I
+			 * have no idea how that would even work.
+			 * >> meta-data can't really be copied */
 			copy->mp_meta = NULL;
 
 			/* With that, the new mem-part has been initialized, however we must
@@ -957,6 +988,13 @@ pcopy_free_unused_block_status:
 				self->mfl_offs += (size_t)(old_minaddr - node->mn_minaddr);
 		} /* Scope... */
 	} EXCEPT {
+		/* Must re-initialize `mfl_scdat' on error (it was originally finalized by
+		 * our successful call to `mpart_setcore_or_unlock()' further up above).
+		 *
+		 * This is required to ensure that `self' is in a consistent state, should
+		 * our caller decide to use `mfault_fini()' to destroy the fault-controller
+		 * before propagating the exception that brought us here (which is the most
+		 * likely thing to happen after we re-throw the exception here) */
 		mpart_setcore_data_init(&self->mfl_scdat);
 		RETHROW();
 	}

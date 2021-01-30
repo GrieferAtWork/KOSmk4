@@ -1884,23 +1884,25 @@ mpart_lock_acquire_and_setcore_unsharecow_withhint(struct mpart *__restrict self
 		struct mfile *file;
 		pos_t splitaddr;
 ensure_setcore_with_unshare:
-		file = self->mp_file;
 		/* Diminish the overhead of unsharecow by truncating the mem-part. */
-		if (part_offs > file->mf_part_amask) {
-			/* Can truncate some leading blocks. */
-			splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
+		if likely(!(self->mp_flags & MPART_F_NOSPLIT)) {
+			file = self->mp_file;
+			if (part_offs > file->mf_part_amask) {
+				/* Can truncate some leading blocks. */
+				splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
 unlock_and_split_at_splitaddr_and_done:
-			mpart_lock_release(self);
+				mpart_lock_release(self);
 split_at_splitaddr_and_done:
-			xdecref(mpart_split(self, splitaddr));
-			/* Let the caller start over to discover the new part location. */
-			goto err;
-		}
-		loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
-		assert(loadend <= mpart_getsize(self));
-		if (loadend < mpart_getsize(self)) {
-			splitaddr = self->mp_minaddr + loadend;
-			goto unlock_and_split_at_splitaddr_and_done;
+				xdecref(mpart_split(self, splitaddr));
+				/* Let the caller start over to discover the new part location. */
+				goto err;
+			}
+			loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
+			assert(loadend <= mpart_getsize(self));
+			if (loadend < mpart_getsize(self)) {
+				splitaddr = self->mp_minaddr + loadend;
+				goto unlock_and_split_at_splitaddr_and_done;
+			}
 		}
 		/* Now load the part into the core, and ensure that
 		 * copy-on-write mappings have been unshared. */
@@ -1924,18 +1926,20 @@ again_ensure_incore_for_write:
 							part_size = split_hint;
 						if unlikely(LIST_EMPTY(&self->mp_copy))
 							goto ensure_setcore_without_unshare;
-						file = self->mp_file;
-						if (part_offs > file->mf_part_amask) {
-							splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
+						if likely(!(self->mp_flags & MPART_F_NOSPLIT)) {
+							file = self->mp_file;
+							if (part_offs > file->mf_part_amask) {
+								splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
 unlock_and_fini_setcore_and_uc_and_split_and_done:
-							mpart_lock_release(self);
-							mpart_setcore_data_fini(&data);
-							goto fini_uc_and_split_and_done;
-						}
-						loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
-						if (loadend < mpart_getsize(self)) {
-							splitaddr = self->mp_minaddr + loadend;
-							goto unlock_and_fini_setcore_and_uc_and_split_and_done;
+								mpart_lock_release(self);
+								mpart_setcore_data_fini(&data);
+								goto fini_uc_and_split_and_done;
+							}
+							loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
+							if (loadend < mpart_getsize(self)) {
+								splitaddr = self->mp_minaddr + loadend;
+								goto unlock_and_fini_setcore_and_uc_and_split_and_done;
+							}
 						}
 					}
 				} EXCEPT {
@@ -1960,19 +1964,21 @@ fini_uc_data_and_done:
 					mpart_unsharecow_data_fini(&uc_data);
 					goto ensure_setcore_without_unshare;
 				}
-				file = self->mp_file;
-				if (part_offs > file->mf_part_amask) {
-					splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
+				if likely(!(self->mp_flags & MPART_F_NOSPLIT)) {
+					file = self->mp_file;
+					if (part_offs > file->mf_part_amask) {
+						splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
 unlock_and_fini_uc_and_split_and_done:
-					mpart_lock_release(self);
+						mpart_lock_release(self);
 fini_uc_and_split_and_done:
-					mpart_unsharecow_data_fini(&uc_data);
-					goto split_at_splitaddr_and_done;
-				}
-				loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
-				if (loadend < mpart_getsize(self)) {
-					splitaddr = self->mp_minaddr + loadend;
-					goto unlock_and_fini_uc_and_split_and_done;
+						mpart_unsharecow_data_fini(&uc_data);
+						goto split_at_splitaddr_and_done;
+					}
+					loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
+					if (loadend < mpart_getsize(self)) {
+						splitaddr = self->mp_minaddr + loadend;
+						goto unlock_and_fini_uc_and_split_and_done;
+					}
 				}
 				goto again_ensure_incore_for_write;
 			}
@@ -2000,7 +2006,7 @@ ensure_setcore_without_unshare:
 					if (part_size > split_hint)
 						part_size = split_hint;
 					/* Special case: Must also unshare copy-on-write mappings. */
-					if unlikely(LIST_EMPTY(&self->mp_copy))
+					if unlikely(!LIST_EMPTY(&self->mp_copy))
 						goto ensure_setcore_with_unshare;
 				}
 			} EXCEPT {

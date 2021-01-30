@@ -86,6 +86,24 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
 
 
 
+
+/* Go over all parts and make use of `mpart_loadsome_or_unlock()' or
+ * `mpart_unsharecow_or_unlock()' (and `mpart_split()' if necessary)
+ * in order to populate+unshare (if PROT_WRITE was set) the file-range
+ * that our caller is intending to map. */
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+
+	/* TODO */
+	(void)self;
+	COMPILER_IMPURE();
+
+	return true;
+}
+
+
+
 /* Lookup/create all parts to span the given address range, as
  * well as allocate 1 mem-node for each part, such that everything
  * put together forms 1 continuous range of fully mappable mem-parts.
@@ -137,9 +155,6 @@ again_getpart:
 				decref(part);
 				goto again_getpart;
 			}
-			if (self->mfm_flags & MAP_POPULATE) {
-				/* TODO */
-			}
 		} EXCEPT {
 			decref(part);
 			RETHROW();
@@ -162,14 +177,35 @@ again_getpart:
 	DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
 	DBG_memset(&node->mn_fspath, 0xcc, sizeof(node->mn_fspath));
 	DBG_memset(&node->mn_fsname, 0xcc, sizeof(node->mn_fsname));
+
 	/* Check if `part' already contains the whole mapping needed by `node' */
-	if (mpart_getmaxaddr(part) >= (self->mfm_addr + self->mfm_size - 1))
-		return; /* done! */
+	if (mpart_getmaxaddr(part) >= (self->mfm_addr + self->mfm_size - 1)) {
+		/* Populate the mapping if the callers wants this. */
+		if (self->mfm_flags & MAP_POPULATE) {
+			TRY {
+				if (!mfile_map_populate_or_unlock(self))
+					goto again_acquire;
+			} EXCEPT {
+				mfile_map_fini(self);
+				DBG_memset(self, 0xcc, sizeof(*self));
+				RETHROW();
+			}
+		}
+		/* done! */
+		return;
+	}
+
 	/* Failed to acquire all required parts. - Unlock our's, and re-lock everything
 	 * NOTE: This should never ~really~ happen when `file' is anonymous, though... */
 	mpart_lock_release(part);
+again_acquire:
 	TRY {
 		mfile_map_acquire(self);
+		/* Populate the mapping if the callers wants this. */
+		if (self->mfm_flags & MAP_POPULATE) {
+			if (!mfile_map_populate_or_unlock(self))
+				goto again_acquire;
+		}
 	} EXCEPT {
 		mfile_map_fini(self);
 		DBG_memset(self, 0xcc, sizeof(*self));
@@ -579,14 +615,14 @@ again:
 		goto fail;
 
 	/* Now go through the list of nodes and throw out nodes who's parts
-	 * no longer overlap at all with range that is being mapped by the
-	 * associated node. */
+	 * no longer overlap at all with the range that is being mapped by
+	 * the associated node. */
 	mfile_map_unlock_and_remove_non_overlapping_parts(self);
 
 	/* We now know that _all_ remaining nodes _do_ actually map at least
 	 * some part of the requested address range. As such, try to alter
 	 * the addresses/offsets of nodes to enlarge/truncate them such that
-	 * they may take advantage of nodes parts that have been split/merged
+	 * they may take advantage of mem-parts that have been split/merged
 	 * in the mean time. */
 	mnode_slist_adjusted_mapped_ranges(&self->mfm_nodes,
 	                                   self->mfm_addr,
@@ -596,22 +632,26 @@ again:
 	 * their respective parts, limited only by the overall file-range that
 	 * is supposed to get mapped.
 	 *
-	 * With this in mind, check if the current list of nodes represents the
-	 * single, continuous range of consecutive file-parts, or if there might
-	 * actually be holes between some of the nodes. */
+	 * With this in mind, check if the current list of nodes still
+	 * represents continuous range of consecutive file-parts, or if
+	 * there might actually be holes between some of the nodes. */
 	if (!mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size)) {
+
 		/* There must still be (some) holes between nodes currently being mapped.
 		 * As such, we must release all of the locks, and allocate new nodes, as
 		 * well as parts in order to fill those holes!
 		 *
-		 * NOTE: When allocating new parts, we must be extra careful to check of
+		 * NOTE: When allocating new parts, we must be extra careful to check if
 		 *       there may already be another node bound to the same part, even
-		 *       if that other node is somewhere completely different without our
+		 *       if that other node is somewhere completely different within our
 		 *       local list of parts.
 		 *       If we do find a duplicate part, then we must delete all nodes
 		 *       between where we're found the duplicate (including the node of
 		 *       the duplicate itself), and where we were intending to insert
 		 *       the turns-out-to-be-a-duplicate part. */
+
+		/* XXX: Why not try to do this without blocking before releasing all
+		 *      of those pretty, tasty locks? */
 		mfile_map_release(self);
 		if (!mfile_map_fill_holes(self, unlock))
 			goto fail;
@@ -622,8 +662,10 @@ again:
 		goto again;
 	}
 
+	/* Populate the mapping if the callers wants this. */
 	if (self->mfm_flags & MAP_POPULATE) {
-		/* TODO */
+		if (!mfile_map_populate_or_unlock(self))
+			goto fail;
 	}
 	return true;
 fail:
@@ -661,6 +703,8 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 		 * we are unable to re-acquire those locks, also meaning we have unconditionally
 		 * unlock everything here, rather than still having the chance to do stuff w/o
 		 * having to unlock everything. */
+		/* XXX: Why not try to do this without blocking before releasing all
+		 *      of those pretty, tasty locks? */
 		mfile_map_release(self);
 		unlockinfo_xunlock(unlock);
 		if (mfile_map_fill_holes(self, NULL))
@@ -668,8 +712,10 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 		goto fail;
 	}
 
+	/* Populate the mapping if the callers wants this. */
 	if (self->mfm_flags & MAP_POPULATE) {
-		/* TODO */
+		if (!mfile_map_populate_or_unlock(self))
+			goto fail;
 	}
 
 	return true;

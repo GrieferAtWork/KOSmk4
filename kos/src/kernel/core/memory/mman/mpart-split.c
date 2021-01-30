@@ -738,7 +738,8 @@ again:
  * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
 PUBLIC NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
-            PAGEDIR_PAGEALIGNED pos_t offset) {
+            PAGEDIR_PAGEALIGNED pos_t offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct mpart_split_data data;
 	struct mfile *file;
 #ifdef __INTELLISENSE__

@@ -408,8 +408,9 @@ NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self) {
  * @return: * : The total # of bytes that were synced.
  * NOTE: The caller is responsible for adding/removing the part to/from
  *       the associated file's list of changed parts! */
-PRIVATE NOBLOCK NONNULL((1)) size_t FCALL
-mpart_sync_impl(struct mpart *__restrict self, bool keep_lock) {
+PRIVATE NONNULL((1)) size_t FCALL
+mpart_sync_impl(struct mpart *__restrict self, bool keep_lock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	size_t result = 0;
 	struct mfile *file;
 	size_t start, block_count;
@@ -461,13 +462,12 @@ again:
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
 			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
 		} else {
+			size_t bitset_words;
 			size_t bitset_size;
 			mpart_blkst_word_t *bitset;
 			/* Must allocate the bitset on the heap! */
-			bitset_size = CEILDIV(block_count,
-			                      BITSOF(mpart_blkst_word_t) /
-			                      MPART_BLOCK_STBITS) *
-			              sizeof(mpart_blkst_word_t);
+			bitset_words = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD);
+			bitset_size  = bitset_words * sizeof(mpart_blkst_word_t);
 			bitset = (mpart_blkst_word_t *)kmalloc_nx(bitset_size,
 			                                          GFP_ATOMIC | GFP_LOCKED |
 			                                          GFP_PREFLT);
@@ -495,12 +495,11 @@ again:
 				}
 				/* Nothing's changed, so we can just write-back the new bitset. */
 			}
+
 			/* Initialize the bitset. */
-#if MPART_BLOCK_ST_CHNG == ((1 << MPART_BLOCK_STBITS) - 1)
-			memset(bitset, 0xff, bitset_size);
-#else /* ... */
-#error "Unimplemeneted case"
-#endif /* !... */
+			memsetc(bitset, MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG),
+			        bitset_words, sizeof(mpart_blkst_word_t));
+
 			/* Write-back the bitset. */
 			self->mp_blkst_ptr = bitset;
 		}
@@ -647,13 +646,15 @@ done_noop_nolock:
  * NOTE: The caller is responsible for adding/removing the part to/from
  *       the associated file's list of changed parts! */
 PUBLIC NOBLOCK NONNULL((1)) size_t FCALL
-mpart_sync(struct mpart *__restrict self) {
+mpart_sync(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return mpart_sync_impl(self, false);
 }
 
 /* Same as `mpart_sync()', but keep on holding onto the lock to `self' */
 PUBLIC NOBLOCK NONNULL((1)) size_t FCALL
-mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self) {
+mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return mpart_sync_impl(self, true);
 }
 

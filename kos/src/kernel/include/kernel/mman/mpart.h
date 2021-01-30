@@ -682,7 +682,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct mpart_unsharecow_data *__restrict data);
 
 /* Ensure that:
- * >> LIST_FOREACH(node, &self->mp_copy, mn_link)
+ * >> LIST_FOREACH (node, &self->mp_copy, mn_link)
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
 FUNDEF NONNULL((1)) __BOOL FCALL
 mpart_unwrite_or_unlock(struct mpart *__restrict self,
@@ -965,7 +965,8 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
  * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
 FUNDEF NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
-            PAGEDIR_PAGEALIGNED pos_t offset);
+            PAGEDIR_PAGEALIGNED pos_t offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Try to merge the given part with other, neighboring parts from
  * its associated file, or, in case that file is anonymous, try to
@@ -980,11 +981,13 @@ NOTHROW(FCALL mpart_merge)(struct mpart *__restrict self);
  * NOTE: The caller is responsible for adding/removing the part to/from
  *       the associated file's list of changed parts! */
 FUNDEF NOBLOCK NONNULL((1)) size_t FCALL
-mpart_sync(struct mpart *__restrict self);
+mpart_sync(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `mpart_sync()', but keep on holding onto the lock to `self' */
 FUNDEF NOBLOCK NONNULL((1)) size_t FCALL
-mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self);
+mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
 /* (Re-)map the given mem-part into a page directory.

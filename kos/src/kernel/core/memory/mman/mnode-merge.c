@@ -48,9 +48,13 @@ NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {
 	assert(!self->mn_part || mpart_lock_acquired(self->mn_part));
 	assert(self->mn_mman);
 	assert(mman_lock_acquired(self->mn_mman));
+	/* If we're not allowed to merge this node, then don't even try... */
+	if unlikely(self->mn_flags & MNODE_F_NOMERGE)
+		goto done;
 
 	/* TODO */
 
+done:
 	return self;
 }
 
