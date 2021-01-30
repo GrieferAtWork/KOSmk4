@@ -35,8 +35,10 @@
 #include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/execabi.h>
+#include <kernel/heap.h>
 #include <kernel/vm.h>
-#include <kernel/vm/exec.h>
+#include <kernel/mman/mm-execinfo.h>
 #include <kernel/vm/usermod.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
@@ -50,6 +52,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "include/obnote.h"
@@ -83,7 +86,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
                          unsigned int *__restrict pstatus) {
 	ssize_t temp, result = 0;
 	struct task *thread = (struct task *)pointer;
-	struct vm_execinfo_struct *execinfo;
+	struct mexecinfo *execinfo;
 	char const *exec_name = NULL;
 	u16 exec_namelen      = 0;
 	uintptr_t thread_flags;
@@ -102,8 +105,8 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 			goto badobj;
 		thread_cpu_id = thread_cpu->c_id;
 		thread_flags  = thread->t_flags;
-		execinfo      = &FORVM(thread->t_mman, thisvm_execinfo);
-		dent          = execinfo->ei_dent;
+		execinfo      = &FORVM(thread->t_mman, thismman_execinfo);
+		dent          = execinfo->mei_dent;
 		if (dent) {
 			if (dent->de_refcnt == 0)
 				goto badobj;
@@ -527,11 +530,11 @@ err:
 }
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_vm)(pformatprinter printer, void *arg,
-                       KERNEL CHECKED void const *pointer,
-                       unsigned int *__restrict pstatus) {
+NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
+                         KERNEL CHECKED void const *pointer,
+                         unsigned int *__restrict pstatus) {
 	ssize_t result;
-	struct vm *me = (struct vm *)pointer;
+	struct mman *me = (struct mman *)pointer;
 	struct path *exec_path;
 	struct directory_entry *exec_dent;
 	TRY {
@@ -548,8 +551,8 @@ NOTHROW(KCALL note_vm)(pformatprinter printer, void *arg,
 		if (me->v_pdir_phys != pagedir_translate(me))
 			goto badobj;
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
-		exec_path = FORVM(me, thisvm_execinfo).ei_path;
-		exec_dent = FORVM(me, thisvm_execinfo).ei_dent;
+		exec_path = FORVM(me, thismman_execinfo).mei_path;
+		exec_dent = FORVM(me, thismman_execinfo).mei_dent;
 		if (!exec_dent)
 			exec_path = NULL;
 		else {
@@ -618,6 +621,178 @@ badobj:
 }
 
 
+#ifdef CONFIG_USE_NEW_VM
+PRIVATE NOBLOCK char const *
+NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self, char buf[64]) {
+	char const *result = NULL;
+	if (self == &mfile_zero) {
+		result = "/dev/zero";
+	} else if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon)) {
+		result = buf;
+		sprintf(buf, "[anon:%u]", (unsigned int)(self - mfile_anon));
+	} else if (self == &mfile_ndef) {
+		result = "[undef]";
+	} else if (self == &mfile_phys) {
+		result = "/dev/mem";
+	} else if (self == &execabi_system_rtld_file.mrf_file) {
+		result = "/lib/libdl.so";
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+	} else if (self == &compat_execabi_system_rtld_file.mrf_file) {
+		result = "/lib64/libdl.so";
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+	} else if (self == &compat_execabi_system_rtld_file.mrf_file) {
+		result = "/lib32/libdl.so";
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+#endif /* __ARCH_HAVE_COMPAT */
+#ifdef CONFIG_DEBUG_HEAP
+	} else if (self == &mfile_dbgheap) {
+		result = "[dbgheap]";
+#endif /* CONFIG_DEBUG_HEAP */
+	}
+	return result;
+}
+
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_mnode)(pformatprinter printer, void *arg,
+                          KERNEL CHECKED void const *pointer,
+                          unsigned int *__restrict pstatus) {
+	ssize_t result, temp;
+	struct mnode *me = (struct mnode *)pointer;
+	struct path *file_path = NULL;
+	struct directory_entry *file_dent = NULL;
+	struct mpart *part;
+	struct mfile *file = NULL;
+	pos_t file_position = 0;
+	byte_t *minaddr, *maxaddr;
+	TRY {
+		struct mnode *parent;
+		parent = me->mn_mement.rb_par;
+		if (parent != NULL) {
+			if (!ADDR_ISKERN(parent))
+				goto badobj;
+			if (parent->mn_mement.rb_lhs != me &&
+			    parent->mn_mement.rb_rhs != me)
+				goto badobj;
+		}
+		minaddr = me->mn_minaddr;
+		maxaddr = me->mn_maxaddr;
+		if (!IS_ALIGNED((uintptr_t)minaddr, PAGESIZE))
+			goto badobj;
+		if (!IS_ALIGNED((uintptr_t)maxaddr + 1, PAGESIZE))
+			goto badobj;
+		if (minaddr >= maxaddr)
+			goto badobj;
+		if (ADDR_ISKERN(minaddr) != ADDR_ISKERN(maxaddr))
+			goto badobj;
+		if (!IS_ALIGNED((uintptr_t)me->mn_mman, PAGEDIR_ALIGN))
+			goto badobj;
+		if (!ADDR_ISKERN(me->mn_mman))
+			goto badobj;
+		if (me->mn_writable.le_prev != NULL) {
+			if (!ADDR_ISKERN(me->mn_writable.le_prev))
+				goto badobj;
+			if (*me->mn_writable.le_prev != me)
+				goto badobj;
+			if (me->mn_writable.le_next != NULL) {
+				if (!ADDR_ISKERN(me->mn_writable.le_next))
+					goto badobj;
+				if (me->mn_writable.le_next->mn_writable.le_prev != &me->mn_writable.le_next)
+					goto badobj;
+			}
+		}
+		part = me->mn_part;
+		if (part != NULL) {
+			file_position = (pos_t)me->mn_partoff;
+			if (!IS_ALIGNED(file_position, PAGESIZE))
+				goto badobj;
+			if (!ADDR_ISKERN(part))
+				goto badobj;
+			if (!ADDR_ISKERN(me->mn_link.le_prev))
+				goto badobj;
+			if (*me->mn_link.le_prev != me)
+				goto badobj;
+			if (me->mn_link.le_next != NULL) {
+				if (!ADDR_ISKERN(me->mn_link.le_next))
+					goto badobj;
+				if (me->mn_link.le_next->mn_link.le_prev != &me->mn_link.le_next)
+					goto badobj;
+			}
+			if (!IS_ALIGNED(part->mp_minaddr, PAGESIZE))
+				goto badobj;
+			if (!IS_ALIGNED(part->mp_maxaddr + 1, PAGESIZE))
+				goto badobj;
+			file_position += part->mp_minaddr;
+			if ((pos_t)(me->mn_partoff + (size_t)(maxaddr - minaddr) + 1) >
+			    (pos_t)((part->mp_maxaddr - part->mp_minaddr) + 1))
+				goto badobj;
+			file = part->mp_file;
+			if (!ADDR_ISKERN(file))
+				goto badobj;
+			file_path = me->mn_fspath;
+			file_dent = me->mn_fsname;
+			if (!file_dent)
+				file_path = NULL;
+			else {
+				if (!ADDR_ISKERN(file_dent))
+					goto badobj;
+				if (file_path && !ADDR_ISKERN(file_path))
+					goto badobj;
+			}
+		}
+	} EXCEPT {
+		goto badobj;
+	}
+	result = format_printf(printer, arg, "%p-%p", minaddr, maxaddr);
+	if (result < 0)
+		goto done;
+	if (part) {
+		PRINT(":");
+		if (file_dent) {
+			DO(note_pathpair(printer, arg, file_path, file_dent, pstatus));
+		} else {
+			char const *known_name;
+			char buf[64];
+			known_name = mfile_known_name(file, buf);
+			if (known_name) {
+				DO((*printer)(arg, known_name, strlen(known_name)));
+			} else {
+				PRINT("??" "?");
+			}
+		}
+		PRINTF("+%#" PRIxN(__SIZEOF_POS_T__), file_position);
+	}
+done:
+	return result;
+err:
+	return temp;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+#if 0
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
+                          KERNEL CHECKED void const *pointer,
+                          unsigned int *__restrict pstatus) {
+	/* TODO: Print info about the part's mapping range, and the base mfile */
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
+                          KERNEL CHECKED void const *pointer,
+                          unsigned int *__restrict pstatus) {
+	/* TODO: Try to discover a name for the mfile (via the fsname of a mapping mnode)
+	 *       Additionally, give name to the known builtin files (mfile_anon, etc...) */
+}
+#endif
+
+#endif /* CONFIG_USE_NEW_VM */
+
+
+
 PRIVATE struct obnote_entry const notes[] = {
 	{ "ansitty_device", &note_character_device },
 	{ "basic_block_device", &note_block_device },
@@ -642,7 +817,14 @@ PRIVATE struct obnote_entry const notes[] = {
 #ifdef CONFIG_HAVE_USERMOD
 	{ "usermod", &note_usermod },
 #endif /* CONFIG_HAVE_USERMOD */
-	{ "vm", &note_vm },
+#ifdef CONFIG_USE_NEW_VM
+	{ "mnode", &note_mnode },
+//	{ "mpart", &note_mpart },
+//	{ "mfile", &note_mfile },
+	{ "mman", &note_mman },
+#else /* CONFIG_USE_NEW_VM */
+	{ "vm", &note_mman },
+#endif /* !CONFIG_USE_NEW_VM */
 };
 
 
