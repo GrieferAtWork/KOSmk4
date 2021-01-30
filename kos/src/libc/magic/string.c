@@ -4158,66 +4158,66 @@ void *__NOTHROW_NCX(mempsetc)(void *__restrict __dst, __T __byte, size_t __word_
 } /* extern "C++" */
 #elif defined(__UINT64_TYPE__)
 #ifndef __NO_builtin_choose_expr
-#define memsetc(dst, word, word_count, word_size)                                                           \
-	__builtin_choose_expr((word_size) == 1,                                                                 \
-	                      (void *)__NAMESPACE_STD_SYM memset(dst, (int)(__UINT8_TYPE__)(word), word_count), \
-	__builtin_choose_expr((word_size) == 2,                                                                 \
-	                      (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count),                        \
-	__builtin_choose_expr((word_size) == 4,                                                                 \
-	                      (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count),                        \
+#define memsetc(dst, word, word_count, word_size)                                                             \
+	__builtin_choose_expr((word_size) == 1,                                                                   \
+	                      (void *)(__NAMESPACE_STD_SYM memset)(dst, (int)(__UINT8_TYPE__)(word), word_count), \
+	__builtin_choose_expr((word_size) == 2,                                                                   \
+	                      (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count),                          \
+	__builtin_choose_expr((word_size) == 4,                                                                   \
+	                      (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count),                          \
 	                      (void *)memsetq(dst, (__UINT64_TYPE__)(word), word_count))))
-#define mempsetc(dst, word, word_count, word_size)                                       \
-	__builtin_choose_expr((word_size) == 1,                                              \
-	                      (void *)mempset(dst, (int)(__UINT8_TYPE__)(word), word_count), \
-	__builtin_choose_expr((word_size) == 2,                                              \
-	                      (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count),    \
-	__builtin_choose_expr((word_size) == 4,                                              \
-	                      (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count),    \
+#define mempsetc(dst, word, word_count, word_size)                                         \
+	__builtin_choose_expr((word_size) == 1,                                                \
+	                      (void *)(mempset)(dst, (int)(__UINT8_TYPE__)(word), word_count), \
+	__builtin_choose_expr((word_size) == 2,                                                \
+	                      (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count),      \
+	__builtin_choose_expr((word_size) == 4,                                                \
+	                      (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count),      \
 	                      (void *)mempsetq(dst, (__UINT64_TYPE__)(word), word_count))))
 #else /* !__NO_builtin_choose_expr */
-#define memsetc(dst, word, word_count, word_size)                                       \
-	((word_size) == 1                                                                   \
-	 ? (void *)__NAMESPACE_STD_SYM memset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
-	 : (word_size) == 2                                                                 \
-	   ? (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count)                      \
-	   : (word_size) == 4                                                               \
-	     ? (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count)                    \
+#define memsetc(dst, word, word_count, word_size)                                         \
+	((word_size) == 1                                                                     \
+	 ? (void *)(__NAMESPACE_STD_SYM memset)(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                                   \
+	   ? (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count)                        \
+	   : (word_size) == 4                                                                 \
+	     ? (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count)                      \
 	     : (void *)memsetq(dst, (__UINT64_TYPE__)(word), word_count))
-#define mempsetc(dst, word, word_count, word_size)                    \
-	((word_size) == 1                                                 \
-	 ? (void *)mempset(dst, (int)(__UINT8_TYPE__)(word), word_count)  \
-	 : (word_size) == 2                                               \
-	   ? (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count)   \
-	   : (word_size) == 4                                             \
-	     ? (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count) \
+#define mempsetc(dst, word, word_count, word_size)                     \
+	((word_size) == 1                                                  \
+	 ? (void *)(mempset)(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                \
+	   ? (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count)    \
+	   : (word_size) == 4                                              \
+	     ? (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count)  \
 	     : (void *)mempsetq(dst, (__UINT64_TYPE__)(word), word_count))
 #endif /* __NO_builtin_choose_expr */
 #else /* __UINT64_TYPE__ */
 #ifndef __NO_builtin_choose_expr
-#define memsetc(dst, word, word_count, word_size)                                                           \
-	__builtin_choose_expr((word_size) == 1,                                                                 \
-	                      (void *)__NAMESPACE_STD_SYM memset(dst, (int)(__UINT8_TYPE__)(word), word_count), \
-	__builtin_choose_expr((word_size) == 2,                                                                 \
-	                      (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count),                        \
+#define memsetc(dst, word, word_count, word_size)                                                             \
+	__builtin_choose_expr((word_size) == 1,                                                                   \
+	                      (void *)(__NAMESPACE_STD_SYM memset)(dst, (int)(__UINT8_TYPE__)(word), word_count), \
+	__builtin_choose_expr((word_size) == 2,                                                                   \
+	                      (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count),                          \
 	                      (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count)))
-#define mempsetc(dst, word, word_count, word_size)                                       \
-	__builtin_choose_expr((word_size) == 1,                                              \
-	                      (void *)mempset(dst, (int)(__UINT8_TYPE__)(word), word_count), \
-	__builtin_choose_expr((word_size) == 2,                                              \
-	                      (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count),    \
+#define mempsetc(dst, word, word_count, word_size)                                         \
+	__builtin_choose_expr((word_size) == 1,                                                \
+	                      (void *)(mempset)(dst, (int)(__UINT8_TYPE__)(word), word_count), \
+	__builtin_choose_expr((word_size) == 2,                                                \
+	                      (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count),      \
 	                      (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count)))
 #else /* !__NO_builtin_choose_expr */
-#define memsetc(dst, word, word_count, word_size)                                       \
-	((word_size) == 1                                                                   \
-	 ? (void *)__NAMESPACE_STD_SYM memset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
-	 : (word_size) == 2                                                                 \
-	   ? (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count)                      \
+#define memsetc(dst, word, word_count, word_size)                                         \
+	((word_size) == 1                                                                     \
+	 ? (void *)(__NAMESPACE_STD_SYM memset)(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                                   \
+	   ? (void *)memsetw(dst, (__UINT16_TYPE__)(word), word_count)                        \
 	   : (void *)memsetl(dst, (__UINT32_TYPE__)(word), word_count))
-#define mempsetc(dst, word, word_count, word_size)                   \
-	((word_size) == 1                                                \
-	 ? (void *)mempset(dst, (int)(__UINT8_TYPE__)(word), word_count) \
-	 : (word_size) == 2                                              \
-	   ? (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count)  \
+#define mempsetc(dst, word, word_count, word_size)                     \
+	((word_size) == 1                                                  \
+	 ? (void *)(mempset)(dst, (int)(__UINT8_TYPE__)(word), word_count) \
+	 : (word_size) == 2                                                \
+	   ? (void *)mempsetw(dst, (__UINT16_TYPE__)(word), word_count)    \
 	   : (void *)mempsetl(dst, (__UINT32_TYPE__)(word), word_count))
 #endif /* __NO_builtin_choose_expr */
 #endif /* !__UINT64_TYPE__ */
