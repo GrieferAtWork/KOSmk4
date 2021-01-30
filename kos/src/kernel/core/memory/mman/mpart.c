@@ -604,10 +604,7 @@ again:
 #endif /* !__OPTIMIZE_SIZE__ */
 					goto again;
 				}
-				mpart_lock_release_f(self);
-#ifndef __OPTIMIZE_SIZE__
-				mpart_lockops_reap(self);
-#endif /* !__OPTIMIZE_SIZE__ */
+				mpart_lock_release(self);
 			}
 			/* Wait for initialization to complete. */
 			task_waitfor();
@@ -657,33 +654,6 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return mpart_sync_impl(self, true);
 }
-
-
-
-
-
-#ifndef __INTELLISENSE__
-DECL_END
-
-#define DEFINE_mpart_read
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_write
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_read_p
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_write_p
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_readv
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_writev
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_readv_p
-#include "mpart-rw.c.inl"
-#define DEFINE_mpart_writev_p
-#include "mpart-rw.c.inl"
-
-DECL_BEGIN
-#endif /* !__INTELLISENSE__ */
 
 
 

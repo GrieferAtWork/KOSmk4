@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "mpart.c"
+#include "mpart-rw.c"
 //#define DEFINE_mpart_read
 #define DEFINE_mpart_write
 //#define DEFINE_mpart_read_p
@@ -30,13 +30,17 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-fault.h> /* mman_prefault(), mman_prefaultv() */
+#include <kernel/mman/mpart.h>
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
 #include <alloca.h>
+#include <assert.h>
+#include <string.h>
 
 #include <libvio/access.h>
 
