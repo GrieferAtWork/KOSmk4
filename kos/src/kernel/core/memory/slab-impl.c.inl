@@ -33,9 +33,9 @@
 
 DECL_BEGIN
 
-#define DESC        FUNC(slab_desc)
-#define BITSET(s)   ((uintptr_t *)((struct slab *)(s) + 1))
-#define SEGMENTS(s) ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
+#define DESC            FUNC(slab_desc)
+#define INUSE_BITSET(s) ((uintptr_t *)((struct slab *)(s) + 1))
+#define SEGMENTS(s)     ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
 
 INTERN struct slab_descriptor DESC = {
 	/* .sd_lock = */ ATOMIC_LOCK_INIT,
@@ -62,7 +62,7 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 	index = (((uintptr_t)ptr & PAGEMASK) - SEGMENT_OFFSET) / SEGMENT_SIZE;
 	assert(index < SEGMENT_COUNT);
 	assert(index == (size_t)((struct FUNC(segment) *)ptr - SEGMENTS(self)));
-	assertf(BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)] & SLAB_SEGMENT_STATUS_ALLOC_N(index),
+	assertf(INUSE_BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)] & SLAB_SEGMENT_STATUS_ALLOC_N(index),
 	        "Double free of %" PRIuSIZ "-byte segment at %p, in page at %p\n"
 	        "index        = %" PRIuSIZ "\n"
 	        "self->s_free = %" PRIuSIZ,
@@ -70,7 +70,7 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 	        (size_t)self->s_free);
 	assert(self->s_free < SEGMENT_COUNT);
 	/* Clear the is-allocated bit. */
-	(BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)]) &= ~SLAB_SEGMENT_STATUS_ALLOC_N(index);
+	(INUSE_BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)]) &= ~SLAB_SEGMENT_STATUS_ALLOC_N(index);
 	++self->s_free;
 	assert(self->s_free <= SEGMENT_COUNT);
 	if (self->s_free == SEGMENT_COUNT) {
@@ -182,7 +182,7 @@ again:
 			u8 page_flags;
 			assertf(i < LENGTHOF_BITSET, "i = %u, LENGTHOF_BITSET = %u",
 			        i, (unsigned int)LENGTHOF_BITSET);
-			word = BITSET(result_page)[i];
+			word = INUSE_BITSET(result_page)[i];
 #if _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC) == UINTPTR_MAX
 			if (word == _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC))
 				continue; /* Fully allocated */
@@ -199,7 +199,7 @@ again:
 			assert(j < (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS));
 			assert(mask == (uintptr_t)SLAB_SEGMENT_STATUS_ALLOC << (j * SLAB_SEGMENT_STATUS_BITS));
 			/* Add our new allocation mask to mark our new segment as allocated. */
-			(BITSET(result_page)[i]) = word | mask;
+			(INUSE_BITSET(result_page)[i]) = word | mask;
 			page_flags = result_page->s_flags;
 			COMPILER_READ_BARRIER();
 			result = &SEGMENTS(result_page)[j + i * (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS)];
@@ -256,8 +256,8 @@ again:
 	result_page->s_pself = &DESC.sd_free;
 	result_page->s_next  = NULL;
 	if (!(flags & GFP_CALLOC))
-		memset(&BITSET(result_page)[1], 0, SIZEOF_BITSET - sizeof(uintptr_t));
-	(BITSET(result_page)[0]) = SLAB_SEGMENT_STATUS_ALLOC;
+		memset(&INUSE_BITSET(result_page)[1], 0, SIZEOF_BITSET - sizeof(uintptr_t));
+	(INUSE_BITSET(result_page)[0]) = SLAB_SEGMENT_STATUS_ALLOC;
 	result = &SEGMENTS(result_page)[0];
 
 	if unlikely(!sync_trywrite(&DESC.sd_lock)) {
@@ -325,7 +325,7 @@ NOTHROW(KCALL FUNC(slab_kmalloc_nx))(gfp_t flags) {
 
 
 #undef SEGMENTS
-#undef BITSET
+#undef INUSE_BITSET
 #undef DESC
 
 DECL_END

@@ -316,14 +316,14 @@ uvio_requestx(/*in|out*/ struct vioargs *__restrict args,
 /* Define wrappers for operators from `uvio_operators' */
 #define DEFINE_UNARY_VIO_OPERATOR(name, bwlqx, T, opcode)                          \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                               \
-	name(struct vioargs *__restrict args, vio_addr_t addr) {                      \
+	name(struct vioargs *__restrict args, vio_addr_t addr) {                       \
 		return uvio_request##bwlqx(args, addr,                                     \
 		                           KERNEL_UVIO_COMMAND(opcode,                     \
 		                                               UVIO_REQUEST_FLAG_NORMAL)); \
 	}
 #define DEFINE_BINARY_VIO_OPERATOR_VOID(name, bwlqx, T, opcode)            \
 	PRIVATE NONNULL((1)) void LIBVIO_CC                                    \
-	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0) {      \
+	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0) {       \
 		uvio_request##bwlqx(args, addr,                                    \
 		                    KERNEL_UVIO_COMMAND(opcode,                    \
 		                                        UVIO_REQUEST_FLAG_NORMAL), \
@@ -331,7 +331,7 @@ uvio_requestx(/*in|out*/ struct vioargs *__restrict args,
 	}
 #define DEFINE_BINARY_VIO_OPERATOR_ATOMIC(name, bwlqx, T, opcode)                          \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                                       \
-	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0, bool atomic) {         \
+	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0, bool atomic) {          \
 		return uvio_request##bwlqx(args, addr,                                             \
 		                           KERNEL_UVIO_COMMAND(opcode,                             \
 		                                               atomic ? UVIO_REQUEST_FLAG_ATOMIC   \
@@ -341,7 +341,7 @@ uvio_requestx(/*in|out*/ struct vioargs *__restrict args,
 
 #define DEFINE_TRINARY_VIO_OPERATOR_ATOMIC(name, bwlqx, T, opcode)                         \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                                       \
-	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0, T arg1, bool atomic) { \
+	name(struct vioargs *__restrict args, vio_addr_t addr, T arg0, T arg1, bool atomic) {  \
 		return uvio_request##bwlqx(args, addr,                                             \
 		                           KERNEL_UVIO_COMMAND(opcode,                             \
 		                                               atomic ? UVIO_REQUEST_FLAG_ATOMIC   \

@@ -36,6 +36,7 @@
 #include <kos/fcntl.h>
 #include <kos/kernel/types.h>
 #include <kos/ksysctl.h>
+#include <kos/malloc.h>
 #include <kos/rtm.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
@@ -861,7 +862,7 @@ int main_bigfile(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 
 	len  = 4096;
-	data = (byte_t *)malloc(len);
+	data = (byte_t *)Malloc(len);
 	for (i = 0; i < len; ++i)
 		data[i] = (byte_t)(i & 0xff);
 	fd = Open("/var/bigfile.dat", O_CREAT | O_RDWR | O_TRUNC, 0644);

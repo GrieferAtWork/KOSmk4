@@ -577,6 +577,7 @@
 #define ATTR_BSS_S(x)
 #define ATTR_PERCPU
 #define ATTR_PERVM
+#define ATTR_PERMMAN
 #define ATTR_PERTASK
 #define ATTR_DBGTEXT
 #define ATTR_DBGRODATA
@@ -1334,6 +1335,12 @@
 #define DEFINE_PERTASK_FINI(func)
 #define DEFINE_PERTASK_CLONE(func)
 #define DEFINE_PERTASK_ONEXIT(func)
+
+#define PAGEDIR_P_BEGINUSE(...)
+#define PAGEDIR_P_ENDUSE(...)
+#define PAGEDIR_P_BEGINUSE_KEEP_PR(...)
+#define PAGEDIR_P_ENDUSE_KEEP_PR(...)
+
 
 #define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T) \
 	bool compare_exchange_weak(T &exp, T val, memory_order succ, memory_order fail); bool compare_exchange_weak(T &exp, T val, memory_order succ, memory_order fail) volatile; \

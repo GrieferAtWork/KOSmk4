@@ -114,7 +114,7 @@ DECL_BEGIN
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment)
-THROWS(E_BADALLOC, E_WOULDBLOCK)
+		THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_mman_map_kram_nx)
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *
@@ -126,14 +126,12 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 #ifdef LOCAL_NX
 #define LOCAL_krealloc                       krealloc_nx
 #define LOCAL_kmalloc                        kmalloc_nx
-#define LOCAL_IFX(...)                       /* nothing */
 #define LOCAL_IFNX(...)                      __VA_ARGS__
 #define LOCAL_IFELSE_NX(without_nx, with_nx) with_nx
 #define LOCAL_THROW(...)                     goto err
 #else /* LOCAL_NX */
 #define LOCAL_krealloc                       krealloc
 #define LOCAL_kmalloc                        kmalloc
-#define LOCAL_IFX(...)                       __VA_ARGS__
 #define LOCAL_IFNX(...)                      /* nothing */
 #define LOCAL_IFELSE_NX(without_nx, with_nx) without_nx
 #define LOCAL_THROW                          THROW
@@ -184,7 +182,10 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 	inner_flags &= ~(GFP_CALLOC | GFP_MAP_FLAGS);
 
 again_lock_mman:
-	LOCAL_IFX(TRY) {
+#ifndef LOCAL_NX
+	TRY
+#endif /* !LOCAL_NX */
+	{
 		/* Acquire a lock to the kernel mman. */
 		if (!mman_lock_tryacquire(&mman_kernel)) {
 			if (flags & GFP_ATOMIC)
@@ -369,7 +370,10 @@ again_lock_mman:
 				}
 				vec.ms_v[0] = part->mp_mem;
 				vec.ms_c    = 1;
-				LOCAL_IFX(TRY) {
+#ifndef LOCAL_NX
+				TRY
+#endif /* !LOCAL_NX */
+				{
 					for (;;) {
 						physpage_t page;
 						physpagecnt_t count;
@@ -645,7 +649,6 @@ err_preempt:
 #endif /* !LOCAL_NX */
 #undef LOCAL_krealloc
 #undef LOCAL_kmalloc
-#undef LOCAL_IFX
 #undef LOCAL_IFNX
 #undef LOCAL_IFELSE_NX
 #undef LOCAL_THROW
