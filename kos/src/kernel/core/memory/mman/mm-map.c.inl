@@ -363,8 +363,8 @@ do_insert_without_file:
 					 * >> FOREACH(struct mnode *node: map.mmwu_map.mfm_nodes) {
 					 * >>     struct mpart *part = node->mn_part;
 					 * >>     if (prot & PROT_SHARED) {
-					 * >>         mpart_split(part, mnode_getmapminaddr(node)); // conditional
-					 * >>         mpart_split(part, mnode_getmapendaddr(node)); // conditional
+					 * >>         mpart_split(part, mnode_getfileminaddr(node)); // conditional
+					 * >>         mpart_split(part, mnode_getfileendaddr(node)); // conditional
 					 * >>     }
 					 * >>     mpart_setcore_or_unlock(part);
 					 * >>     mpart_loadsome_or_unlock(part, mnode_getmapaddr(node), mnode_getsize(node));

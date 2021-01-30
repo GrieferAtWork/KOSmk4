@@ -410,7 +410,8 @@ mfault_pcopy_makememdat_or_unlock(struct mfault *__restrict self) {
 
 #define unlockall(self)                      \
 	(mpart_lock_release_f((self)->mfl_part), \
-	 mman_lock_release((self)->mfl_mman))
+	 mman_lock_release((self)->mfl_mman),    \
+	 mpart_lockops_reap((self)->mfl_part))
 
 /* Allocate `self->mfl_pcopy[0]' (and possibly `self->mfl_pcopy[1]') if necessary */
 PRIVATE NONNULL((1)) bool FCALL
@@ -436,20 +437,15 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 		                                  GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 		if unlikely(!node) {
 			unlockall(self);
-			TRY {
-				node = (struct mnode *)kmalloc(sizeof(struct mnode),
-				                               GFP_LOCKED | GFP_PREFLT);
-				self->mfl_pcopy[0] = node;
-				if (reqcnt == 1)
-					return false; /* Got everything we need! */
-				/* Must also allocate the second node. */
-				node = (struct mnode *)kmalloc(sizeof(struct mnode),
-				                               GFP_LOCKED | GFP_PREFLT);
-				self->mfl_pcopy[1] = node;
-			} EXCEPT {
-				mpart_lockops_reap(self->mfl_part);
-				RETHROW();
-			}
+			node = (struct mnode *)kmalloc(sizeof(struct mnode),
+			                               GFP_LOCKED | GFP_PREFLT);
+			self->mfl_pcopy[0] = node;
+			if (reqcnt == 1)
+				return false; /* Got everything we need! */
+			/* Must also allocate the second node. */
+			node = (struct mnode *)kmalloc(sizeof(struct mnode),
+			                               GFP_LOCKED | GFP_PREFLT);
+			self->mfl_pcopy[1] = node;
 			return false;
 		}
 		self->mfl_pcopy[0] = node;
@@ -461,14 +457,9 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 	                                  GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 	if unlikely(!node) {
 		unlockall(self);
-		TRY {
-			node = (struct mnode *)kmalloc(sizeof(struct mnode),
-			                               GFP_LOCKED | GFP_PREFLT);
-			self->mfl_pcopy[1] = node;
-		} EXCEPT {
-			mpart_lockops_reap(self->mfl_part);
-			RETHROW();
-		}
+		node = (struct mnode *)kmalloc(sizeof(struct mnode),
+		                               GFP_LOCKED | GFP_PREFLT);
+		self->mfl_pcopy[1] = node;
 		return false;
 	}
 	self->mfl_pcopy[1] = node;
@@ -609,6 +600,11 @@ mfault_or_unlock(struct mfault *__restrict self)
 	acc_offs       = noderel_offset + node->mn_partoff;
 	acc_size       = self->mfl_size;
 	self->mfl_offs = acc_offs;
+	/* NOTE: No need to check that `acc_offs' is still in-bounds of `part'!
+	 *       Our caller originally acquiring a lock to their mman has since
+	 *       guarantied that any mem-part mapped by any of its mem-nodes (of
+	 *       which the one we're supposed to fault is one of) can't have its
+	 *       min/max address be altered until said mman-lock is released! */
 
 	/* Limit the accessed address range so that it ends with the containing node. */
 	max_size = (size_t)((uintptr_t)mnode_getendaddr(node) -
@@ -652,32 +648,31 @@ mfault_or_unlock(struct mfault *__restrict self)
 				/* Free data which may have been allocated for a previous unshare-cow attempt. */
 				mpart_unsharecow_data_fini(&self->mfl_ucdat);
 			} else {
+				size_t acc_stop;
 				/* If the part actually contains copy-on-write mappings,
 				 * split it so we don't have to unshare too many of them. */
-				TRY {
-					size_t acc_stop;
-					if (acc_offs > 0) {
-						size_t aligned_offs;
-						aligned_offs = acc_offs & ~part->mp_file->mf_part_amask;
-						if (aligned_offs > 0) {
-							mpart_lock_release_f(part);
-							xdecref(mpart_split(part, aligned_offs));
-							goto nope;
-						}
+				if (acc_offs > 0) {
+					size_t aligned_offs;
+					aligned_offs = acc_offs & ~part->mp_file->mf_part_amask;
+					if (aligned_offs > 0) {
+						pos_t absaddr;
+						absaddr = part->mp_minaddr + aligned_offs;
+						mpart_lock_release(part);
+						xdecref(mpart_split(part, absaddr));
+						goto nope;
 					}
-					acc_stop = acc_offs + acc_size;
-					if (acc_stop < mpart_getsize(part)) {
-						size_t aligned_stop;
-						aligned_stop = (acc_stop + part->mp_file->mf_part_amask) & ~part->mp_file->mf_part_amask;
-						if (aligned_stop < mpart_getsize(part)) {
-							mpart_lock_release_f(part);
-							xdecref(mpart_split(part, aligned_stop));
-							goto nope;
-						}
+				}
+				acc_stop = acc_offs + acc_size;
+				if (acc_stop < mpart_getsize(part)) {
+					size_t aligned_stop;
+					aligned_stop = (acc_stop + part->mp_file->mf_part_amask) & ~part->mp_file->mf_part_amask;
+					if (aligned_stop < mpart_getsize(part)) {
+						pos_t absaddr;
+						absaddr = part->mp_minaddr + aligned_stop;
+						mpart_lock_release(part);
+						xdecref(mpart_split(part, absaddr));
+						goto nope;
 					}
-				} EXCEPT {
-					mpart_lockops_reap(part);
-					RETHROW();
 				}
 				/* Load the part into the core, and unshare copy-on-write if necessary. */
 				if (!mpart_unsharecow_or_unlock(part, &self->mfl_unlck, &self->mfl_ucdat))

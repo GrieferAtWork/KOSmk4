@@ -86,7 +86,7 @@ handle_datapart_tryas(struct vm_datapart *__restrict self,
 
 
 
-/* TODO */
+#ifndef CONFIG_USE_NEW_VM
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datapart_pread(struct vm_datapart *__restrict self,
                       USER CHECKED void *dst, size_t num_bytes,
@@ -132,6 +132,7 @@ handle_datapart_pwritev(struct vm_datapart *__restrict self,
 #endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
 	return vm_datapart_writev(self, src, num_bytes, (size_t)addr);
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_datablock *KCALL
 vm_datapart_get_datablock(struct vm_datapart *__restrict self) {
@@ -158,6 +159,7 @@ handle_datapart_ioctl(struct vm_datapart *__restrict self,
 	      cmd);
 }
 
+#ifndef CONFIG_USE_NEW_VM
 INTERN NONNULL((1)) void KCALL
 handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 #if __SIZEOF_POINTER__ < 8
@@ -166,6 +168,7 @@ handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 #endif /* __SIZEOF_POINTER__ < 8 */
 	xdecref(vm_datapart_split(self, (size_t)(new_size / PAGESIZE)));
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 handle_datapart_mmap(struct vm_datapart *__restrict self,
@@ -271,6 +274,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 
+#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATAPART_OPEN_FUTEX:
 	case HOP_DATAPART_OPEN_FUTEX_EXISTING: {
 		size_t struct_size;
@@ -299,7 +303,6 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		return handle_installhop(&data->dof_openfd, hnd);
 	}	break;
 
-#ifndef CONFIG_USE_NEW_VM
 	case HOP_DATAPART_STAT: {
 		size_t struct_size;
 		struct hop_datapart_stat info;

@@ -148,11 +148,6 @@ struct mbnode {
 #define mbnode_iskern(self)     ADDR_ISKERN((self)->mbn_minaddr)
 #define mbnode_isuser(self)     ADDR_ISUSER((self)->mbn_minaddr)
 
-/* Return the part-relative min-/max-address that is being mapped. */
-#define mbnode_getmapminaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff))
-#define mbnode_getmapmaxaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff + ((size_t)((self)->mbn_maxaddr - (self)->mbn_minaddr))))
-#define mbnode_getmapendaddr(self) ((mpart_reladdr_t)((self)->mbn_partoff + mbnode_getsize(self)))
-
 
 
 /* Mem-builder-node tree API. */

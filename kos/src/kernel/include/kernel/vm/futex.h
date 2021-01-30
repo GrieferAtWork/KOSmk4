@@ -46,8 +46,6 @@
 
 /* Futex API */
 #define VM_DATAPART_GETFUTEX_OUTOFRANGE                      MPART_FUTEX_OOB
-#define vm_datapart_getfutex(self, datapart_offset)          mpart_createfutex(self, datapart_offset)
-#define vm_datapart_getfutex_existing(self, datapart_offset) mpart_lookupfutex(self, datapart_offset)
 #define vm_datablock_getfutex(self, offset)                  mfile_createfutex(self, offset)
 #define vm_datablock_getfutex_existing(self, offset)         mfile_lookupfutex(self, offset)
 #define vm_getfutex(effective_vm, addr)                      mman_createfutex(effective_vm, addr)
@@ -64,8 +62,6 @@
 #define mfutex_free(p)                           vm_futex_free(p)
 #define mfutex_destroy(self)                     vm_futex_destroy(self)
 #define MPART_FUTEX_OOB                          VM_DATAPART_GETFUTEX_OUTOFRANGE
-#define mpart_createfutex(self, datapart_offset) vm_datapart_getfutex(self, datapart_offset)
-#define mpart_lookupfutex(self, datapart_offset) vm_datapart_getfutex_existing(self, datapart_offset)
 #define mfile_createfutex(self, offset)          vm_datablock_getfutex(self, offset)
 #define mfile_lookupfutex(self, offset)          vm_datablock_getfutex_existing(self, offset)
 #define mman_createfutex(effective_vm, addr)     vm_getfutex(effective_vm, addr)

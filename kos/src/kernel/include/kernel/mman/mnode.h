@@ -354,6 +354,11 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self);
 #define mnode_getmapminaddr(self) ((mpart_reladdr_t)((self)->mn_partoff))
 #define mnode_getmapmaxaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr))))
 #define mnode_getmapendaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + mnode_getsize(self)))
+/* Return the file-absolute min-/max-address that is being mapped. (caller must ensure a non-NULL `mn_part') */
+#define mnode_getfileaddr(self)    (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff)
+#define mnode_getfileminaddr(self) (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff)
+#define mnode_getfilemaxaddr(self) (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff + (size_t)((self)->mn_maxaddr - (self)->mn_minaddr))
+#define mnode_getfileendaddr(self) (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff + (size_t)((self)->mn_maxaddr - (self)->mn_minaddr) + 1)
 
 
 /* Free/destroy a given mem-node */

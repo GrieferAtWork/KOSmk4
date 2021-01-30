@@ -173,7 +173,7 @@ again:
  * if not already allocated in the past. This function should not be called
  * when already holding a lock to `self'. - Use `mpart_hasmeta_or_unlock()'
  * for that purpose instead! */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mpartmeta *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mpartmeta *FCALL
 mpart_getmeta(struct mpart *__restrict self) THROWS(E_BADALLOC) {
 	struct mpartmeta *result;
 	result = self->mp_meta;
@@ -189,110 +189,141 @@ mpart_getmeta(struct mpart *__restrict self) THROWS(E_BADALLOC) {
 	return result;
 }
 
-/* Return a reference to the futex associated with `partrel_offset' within the given part.
+/* Return a reference to the futex associated with `file_position' within the given part.
  * If no such futex already exists, use this chance to allocate it, as well as a potentially
  * missing `mfutex_controller' when `self->mp_meta' was `NULL' when this function was called.
- * @param: partrel_offset:   Part-relative futex address (will be floor-aligned by
- *                           `MFUTEX_ADDR_ALIGNMENT' internally)
- * @return: * :              A reference to the futex associated with `partrel_offset'
- * @return: MPART_FUTEX_OOB: The given `partrel_offset' is greater than `mpart_getsize(self)'. */
+ * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
+ *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
+ * @return: * :              A reference to the futex associated with `file_position'
+ * @return: MPART_FUTEX_OOB: The given `file_position' isn't mapped by `self'. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL
-mpart_createfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
+mpart_createfutex(struct mpart *__restrict self, pos_t file_position)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct mfutex *result;
 	struct mpartmeta *meta;
+	mpart_reladdr_t partrel_offset;
 	/* Enforce proper alignment. */
-	partrel_offset &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
+	file_position &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 
 	meta = mpart_getmeta(self);
 again:
 	mpartmeta_ftxlock_read(meta);
-	if unlikely(partrel_offset >= mpart_getsize(self)) {
+	if unlikely(file_position < mpart_getminaddr(self) ||
+	            file_position > mpart_getmaxaddr(self)) {
 		result = MPART_FUTEX_OOB;
 		mpartmeta_ftxlock_endread(meta);
-	} else {
-		/* Check for an existing futex. */
-		result = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
-		if (result && tryincref(result)) {
-			mpartmeta_ftxlock_endread(meta);
-		} else {
-			/* Must create a new futex object.
-			 * But note that we're currently holding a lock to `meta',
-			 * so only non-blocking operations before releasing it! */
-			result = (REF struct mfutex *)kmalloc_nx(sizeof(struct mfutex),
-			                                         GFP_ATOMIC);
-			if unlikely(!result) {
-				struct mfutex *old_futex;
-				mpartmeta_ftxlock_endread(meta);
-				result = (REF struct mfutex *)kmalloc(sizeof(struct mfutex),
-				                                      GFP_NORMAL);
-				TRY {
-					mpartmeta_ftxlock_write(meta);
-				} EXCEPT {
-					kfree(result);
-					RETHROW();
-				}
-check_old_futex:
-				/* Initialize the new futex object. */
-				mfutex_init(result, self, partrel_offset);
-				/* Try to insert the new futex into the tree. */
-				if (!mfutex_tree_tryinsert(&meta->mpm_ftx, result)) {
-					bool refok;
-					old_futex = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
-					assert(old_futex);
-					refok = tryincref(old_futex);
-					mpartmeta_ftxlock_endwrite(meta);
-					kfree(result);
-					if likely(refok)
-						return old_futex;
-					/* Try again (the dead futex should have been
-					 * reaped by `mpartmeta_ftxlock_endwrite()') */
-					goto again;
-				}
-			} else {
-				TRY {
-					if (!mpartmeta_ftxlock_upgrade(meta))
-						goto check_old_futex;
-				} EXCEPT {
-					kfree(result);
-					RETHROW();
-				}
-				/* Initialize the new futex object. */
-				mfutex_init(result, self, partrel_offset);
-				/* Insert the new futex into the tree. */
-				mfutex_tree_insert(&meta->mpm_ftx, result);
-			}
-			mpartmeta_ftxlock_endwrite(meta);
+		goto done;
+	}
+	partrel_offset = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
+
+	/* Check for an existing futex. */
+	result = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
+	if (result && tryincref(result)) {
+		mpartmeta_ftxlock_endread(meta);
+		goto done;
+	}
+
+	/* Must create a new futex object.
+	 * But note that we're currently holding a lock to `meta',
+	 * so only non-blocking operations before releasing it! */
+	result = (REF struct mfutex *)kmalloc_nx(sizeof(struct mfutex),
+	                                         GFP_ATOMIC);
+	if unlikely(!result) {
+		struct mfutex *old_futex;
+		mpartmeta_ftxlock_endread(meta);
+		result = (REF struct mfutex *)kmalloc(sizeof(struct mfutex),
+		                                      GFP_NORMAL);
+		TRY {
+			mpartmeta_ftxlock_write(meta);
+		} EXCEPT {
+			kfree(result);
+			RETHROW();
 		}
+check_old_futex:
+		if unlikely(file_position < mpart_getminaddr(self) ||
+		            file_position > mpart_getmaxaddr(self)) {
+			kfree(result);
+			mpartmeta_ftxlock_endwrite(meta);
+			result = MPART_FUTEX_OOB;
+			goto done;
+		}
+		partrel_offset = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
+		/* Initialize the new futex object. */
+		mfutex_init(result, self, partrel_offset);
+		/* Try to insert the new futex into the tree. */
+		if (!mfutex_tree_tryinsert(&meta->mpm_ftx, result)) {
+			bool refok;
+			old_futex = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
+			assert(old_futex);
+			refok = tryincref(old_futex);
+			mpartmeta_ftxlock_endwrite(meta);
+			kfree(result);
+			if likely(refok)
+				return old_futex;
+			/* Try again (the dead futex should have been
+			 * reaped by `mpartmeta_ftxlock_endwrite()') */
+			goto again;
+		}
+	} else {
+		TRY {
+			if (!mpartmeta_ftxlock_upgrade(meta))
+				goto check_old_futex;
+		} EXCEPT {
+			kfree(result);
+			RETHROW();
+		}
+		/* Initialize the new futex object. */
+		mfutex_init(result, self, partrel_offset);
+		/* Insert the new futex into the tree. */
+		mfutex_tree_insert(&meta->mpm_ftx, result);
+	}
+	mpartmeta_ftxlock_endwrite(meta);
+done:
+	return result;
+}
+
+
+
+/* Same as `mpart_createfutex()', but don't allocate a new futex object if none already
+ * exists for the given `file_position'
+ * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
+ *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
+ * @return: * :              A reference to the futex bound to the given `partrel_offset'
+ * @return: NULL:            No futex exists for the given `partrel_offset'.
+ * @return: MPART_FUTEX_OOB: The given `file_position' isn't mapped by `self'. */
+PUBLIC WUNUSED NONNULL((1)) REF struct mfutex *FCALL
+mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
+		THROWS(E_WOULDBLOCK) {
+	REF struct mfutex *result = NULL;
+	struct mpartmeta *meta;
+	/* Enforce proper alignment. */
+	file_position &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
+	meta = ATOMIC_READ(self->mp_meta);
+	if (meta) {
+		mpartmeta_ftxlock_read(meta);
+		if likely(file_position >= mpart_getminaddr(self) &&
+		          file_position <= mpart_getmaxaddr(self)) {
+			mpart_reladdr_t reladdr;
+			reladdr = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
+			result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+			/* If we found anything, try to acquire a reference. */
+			if (result && !tryincref(result))
+				result = NULL;
+		} else {
+			result = MPART_FUTEX_OOB;
+		}
+		mpartmeta_ftxlock_endread(meta);
+	} else {
+		/* Must still validate that this part is mapping the given `file_position' */
+		mpart_lock_acquire(self);
+		if unlikely(file_position < mpart_getminaddr(self) ||
+		            file_position > mpart_getmaxaddr(self))
+			result = MPART_FUTEX_OOB;
+		mpart_lock_release(self);
 	}
 	return result;
 }
 
-/* Same as `mpart_createfutex()', but don't allocate a new futex object if none already
- * exists for the given `partrel_offset'
- * @param: partrel_offset:   Part-relative futex address (will be floor-aligned by
- *                           `MFUTEX_ADDR_ALIGNMENT' internally)
- * @return: * :              A reference to the futex bound to the given `partrel_offset'
- * @return: NULL:            No futex exists for the given `partrel_offset'.
- * @return: MPART_FUTEX_OOB: The given `partrel_offset' is greater than `mpart_getsize(self)'. */
-PUBLIC WUNUSED NONNULL((1)) REF struct mfutex *FCALL
-mpart_lookupfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
-		THROWS(E_WOULDBLOCK) {
-	REF struct mfutex *result = NULL;
-	struct mpartmeta *meta;
-	meta = self->mp_meta;
-	if (meta) {
-		/* Enforce proper alignment. */
-		partrel_offset &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
-		mpartmeta_ftxlock_read(meta);
-		result = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
-		/* If we found anything, try to acquire a reference. */
-		if (result && !tryincref(result))
-			result = NULL;
-		mpartmeta_ftxlock_endread(meta);
-	}
-	return result;
-}
 
 
 /* Lookup a futex at a given address that is offset from the start of a given
@@ -322,10 +353,8 @@ mfile_createfutex(struct mfile *__restrict self, pos_t addr)
 again:
 	part = mfile_getpart(self, addr, self->mf_part_amask + 1);
 	{
-		mpart_reladdr_t reladdr;
 		FINALLY_DECREF_UNLIKELY(part);
-		reladdr = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
-		result  = mpart_createfutex(part, reladdr);
+		result  = mpart_createfutex(part, addr);
 	}
 	if unlikely(result == MPART_FUTEX_OOB)
 		goto again;
@@ -348,6 +377,7 @@ mfile_lookupfutex(struct mfile *__restrict self, pos_t addr)
 	mpart_reladdr_t reladdr;
 	if unlikely(mfile_isanon(self))
 		goto done;
+	addr &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 again:
 	mfile_lock_read(self);
 	if unlikely(!mfile_isanon(self))
@@ -364,7 +394,6 @@ unlock_file_and_done:
 	if (!meta)
 		goto unlock_file_and_done;
 	reladdr = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
-	reladdr &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 	if (mpartmeta_ftxlock_tryread(meta)) {
 		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
@@ -379,11 +408,13 @@ unlock_file_and_done:
 		mfile_lock_endread(self);
 		FINALLY_DECREF_UNLIKELY(part);
 		mpartmeta_ftxlock_read(meta);
-		if unlikely(reladdr >= mpart_getsize(part)) {
+		if unlikely(addr < mpart_getminaddr(part) ||
+		            addr > mpart_getminaddr(part)) {
 			mpartmeta_ftxlock_endread(meta);
 			goto again;
 		}
-		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+		reladdr = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
+		result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
 		mpartmeta_ftxlock_endread(meta);
@@ -402,7 +433,7 @@ mman_createfutex(struct mman *__restrict self, UNCHECKED void *addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct mfutex *result;
 	REF struct mpart *part;
-	mpart_reladdr_t reladdr;
+	pos_t filepos;
 	struct mnode *node;
 again:
 	mman_lock_read(self);
@@ -416,12 +447,13 @@ again:
 	}
 	assert(!wasdestroyed(part));
 	incref(part);
-	reladdr = node->mn_partoff + ((byte_t *)addr - node->mn_minaddr);
+	filepos = part->mp_minaddr + node->mn_partoff +
+	          ((byte_t *)addr - node->mn_minaddr);
 	mman_lock_endread(self);
 	{
 		FINALLY_DECREF_UNLIKELY(part);
-		/* Construct the futex at the requested address within the part. */
-		result = mpart_createfutex(part, reladdr);
+		/* Construct the futex at the requested address within the file. */
+		result = mpart_createfutex(part, filepos);
 	}
 	if unlikely(result == MPART_FUTEX_OOB)
 		goto again;
@@ -470,6 +502,8 @@ unlock_mman_and_return_null:
 	} else {
 		/* Must acquire a temporary reference to the part,
 		 * so we can drop our lock to the underlying mman. */
+		pos_t filepos;
+		filepos = part->mp_minaddr + reladdr;
 		incref(part);
 		mman_lock_endread(self);
 		FINALLY_DECREF_UNLIKELY(part);
@@ -483,12 +517,13 @@ unlock_mman_and_return_null:
 		 *
 		 * However, what we _do_ need to check is `part' having
 		 * gotten split in the mean time. */
-		if unlikely(reladdr >= mpart_getsize(part)) {
+		if unlikely(filepos < mpart_getminaddr(part) ||
+		            filepos > mpart_getmaxaddr(part)) {
 			mpartmeta_ftxlock_endread(meta);
 			goto again;
 		}
-
-		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+		reladdr = (mpart_reladdr_t)(filepos - mpart_getminaddr(part));
+		result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
 		mpartmeta_ftxlock_endread(meta);

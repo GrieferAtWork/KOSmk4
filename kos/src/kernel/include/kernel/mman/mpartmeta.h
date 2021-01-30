@@ -238,26 +238,26 @@ mpart_getmeta(struct mpart *__restrict self) THROWS(E_BADALLOC);
  * `partrel_offset >= PAGESIZE' as the result of the accessed part being split. */
 #define MPART_FUTEX_OOB ((struct mfutex *)-1)
 
-/* Return a reference to the futex associated with `partrel_offset' within the given part.
+/* Return a reference to the futex associated with `file_position' within the given part.
  * If no such futex already exists, use this chance to allocate it, as well as a potentially
  * missing `mfutex_controller' when `self->mp_meta' was `NULL' when this function was called.
- * @param: partrel_offset:   Part-relative futex address (will be floor-aligned by
- *                           `MFUTEX_ADDR_ALIGNMENT' internally)
- * @return: * :              A reference to the futex associated with `partrel_offset'
- * @return: MPART_FUTEX_OOB: The given `partrel_offset' is greater than `mpart_getsize(self)'. */
+ * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
+ *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
+ * @return: * :              A reference to the futex associated with `file_position'
+ * @return: MPART_FUTEX_OOB: The given `file_position' isn't mapped by `self'. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL
-mpart_createfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
+mpart_createfutex(struct mpart *__restrict self, pos_t file_position)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `mpart_createfutex()', but don't allocate a new futex object if none already
- * exists for the given `partrel_offset'
- * @param: partrel_offset:   Part-relative futex address (will be floor-aligned by
- *                           `MFUTEX_ADDR_ALIGNMENT' internally)
+ * exists for the given `file_position'
+ * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
+ *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
  * @return: * :              A reference to the futex bound to the given `partrel_offset'
  * @return: NULL:            No futex exists for the given `partrel_offset'.
- * @return: MPART_FUTEX_OOB: The given `partrel_offset' is greater than `mpart_getsize(self)'. */
+ * @return: MPART_FUTEX_OOB: The given `file_position' isn't mapped by `self'. */
 FUNDEF WUNUSED NONNULL((1)) REF struct mfutex *FCALL
-mpart_lookupfutex(struct mpart *__restrict self, mpart_reladdr_t partrel_offset)
+mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 		THROWS(E_WOULDBLOCK);
 
 /* Lookup a futex at a given address that is offset from the start of a given

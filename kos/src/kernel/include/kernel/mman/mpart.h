@@ -253,33 +253,38 @@ struct mpart {
 #define MPART_INIT_mp_maxaddr _MPART_INIT_ADDR
 	union {
 		uintptr_t                _mp_static_minaddr[__SIZEOF_POS_T__ / __SIZEOF_POINTER__];
-		PAGEDIR_PAGEALIGNED pos_t mp_minaddr;   /* [const] In-file starting address of this part.
+		PAGEDIR_PAGEALIGNED pos_t mp_minaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
+		                                         *       WRITE(MPART_F_LOCKBIT && mp_meta->mpm_ftxlock && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
+		                                         *                                \------------------/    \--------------/
+		                                         *                                 Only if allocated      Only if not anon!
+		                                         * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
+		                                         *           mp_meta->mpm_dmalocks != 0)]
+		                                         * In-file starting address of this part.
 		                                         * Aligned by PAGESIZE, and the associated file's block-size. */
 	};
 	union {
 		uintptr_t                _mp_static_maxaddr[__SIZEOF_POS_T__ / __SIZEOF_POINTER__];
-		pos_t                     mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
-		                                         *       WRITE(MPART_F_LOCKBIT && mp_meta->mpm_ftxlock && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
-		                                         *                                \------------------/    \--------------/
-		                                         *                                 Only if allocated       Only if not anon!
-		                                         * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
-		                                         *           mp_meta->mpm_dmalocks != 0)]
-		                                         * In-file max address of this part. */
+		pos_t                     mp_maxaddr;   /* [lock(like(mp_minaddr))][const_if(like(mp_minaddr))]
+		                                         * In-file max address of this part. (NOTE: when 1 is
+		                                         * added, also aligned like `mp_minaddr' must be) */
 	};
 #else /* __WANT_MPART_INIT && __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_minaddr (pos_t)
 #define MPART_INIT_mp_maxaddr (pos_t)
 #endif /* __WANT_MPART_INIT */
-	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [const] In-file starting address of this part.
-	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
-	pos_t                         mp_maxaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
+	/* TODO: Change all system components such that everything is able to deal with `mp_minaddr' being altered! */
+	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
 	                                             *       WRITE(MPART_F_LOCKBIT && mp_meta->mpm_ftxlock && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
 	                                             *                                \------------------/    \--------------/
-	                                             *                                 Only if allocated       Only if not anon!
+	                                             *                                 Only if allocated      Only if not anon!
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
-	                                             * In-file max address of this part. */
+	                                             * In-file starting address of this part.
+	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
+	pos_t                         mp_maxaddr;   /* [lock(like(mp_minaddr))][const_if(like(mp_minaddr))]
+	                                             * In-file max address of this part. (NOTE: when 1 is
+	                                             * added, also aligned like `mp_minaddr' must be) */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
 #ifdef __WANT_MPART__mp_dead
 #ifdef __WANT_MPART_INIT
@@ -409,12 +414,12 @@ struct mpart {
 
 
 /* Get bounds for the given mem-node. */
-#define mpart_getminaddr(self) (self)->mp_minaddr
+#define mpart_getminaddr(self) (self)->mp_minaddr                                      /* WARNING: This one requires a lock! */
 #define mpart_getmaxaddr(self) (self)->mp_maxaddr                                      /* WARNING: This one requires a lock! */
 #define mpart_getendaddr(self) ((self)->mp_maxaddr + 1)                                /* WARNING: This one requires a lock! */
 #define mpart_getsize(self)    ((size_t)((self)->mp_maxaddr - (self)->mp_minaddr) + 1) /* WARNING: This one requires a lock! */
 
-#define mpart_getminblock(self, file)   (mfile_block_t)(mpart_getminaddr(self) >> (file)->mf_blockshift)
+#define mpart_getminblock(self, file)   (mfile_block_t)(mpart_getminaddr(self) >> (file)->mf_blockshift) /* WARNING: This one requires a lock! */
 #define mpart_getmaxblock(self, file)   (mfile_block_t)(mpart_getmaxaddr(self) >> (file)->mf_blockshift) /* WARNING: This one requires a lock! */
 #define mpart_getendblock(self, file)   (mfile_block_t)(mpart_getendaddr(self) >> (file)->mf_blockshift) /* WARNING: This one requires a lock! */
 #define mpart_getblockcount(self, file) (size_t)(mpart_getsize(self) >> (file)->mf_blockshift)           /* WARNING: This one requires a lock! */
@@ -593,7 +598,7 @@ NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
  *   - return == true:   assume(REQUESTED_CONDITION_MET);
  *                       assume(mpart_lock_acquired(self));
  *                       undefined(out(data));        (If a `data' argument is present)
- *   - return == false:  mpart_lock_release_f(self);  // Meaning that dead nodes may not have been reaped!
+ *   - return == false:  mpart_lock_release(self);
  *   - EXCEPT:           mpart_lock_release(self);
  ************************************************************************/
 
@@ -706,12 +711,14 @@ mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
- * If the given address range ends up not fully contained within the
- * bounds of `self', then no lock is acquired, and `false' is returned. */
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
+ * # of bytes that may need to be loaded)
+ *
+ * HINT: This function is used to implement `mpart_read()' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
-                                        mpart_reladdr_t partrel_offset,
-                                        size_t num_bytes)
+                                        pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Acquire a lock until `mpart_setcore_or_unlock() && mpart_unsharecow_or_unlock()' */
@@ -726,11 +733,26 @@ mpart_lock_acquire_and_setcore_unsharecow_loadall(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
- * and `mpart_lock_acquire_and_setcore_loadsome()' */
+ * and `mpart_lock_acquire_and_setcore_loadsome()'. If appropriate, this
+ * function will also split the given part `self' to reduce the impact of
+ * a potential copy-on-write unshare. (such that part-borders are created
+ * at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + max_load_bytes)')
+ *
+ * HINT: This function is used to implement `mman_startdma()' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self,
-                                                   mpart_reladdr_t partrel_offset,
-                                                   size_t num_bytes)
+                                                   pos_t filepos, size_t max_load_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Same as `mpart_lock_acquire_and_setcore_unsharecow()', but validates that the
+ * given address range is contained by `self', any may also split `self' into
+ * smaller parts if doing so would reduce the impact of unsharing. (such that part-
+ * borders are created at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + split_hint)')
+ *
+ * HINT: This function is used to implement `mpart_write()' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mpart_lock_acquire_and_setcore_unsharecow_withhint(struct mpart *__restrict self,
+                                                   pos_t filepos, size_t split_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
@@ -827,17 +849,13 @@ struct mpart_physloc {
  * NOTE: If necessary, the length of the returned range may be truncated in
  *       order to accommodate the requirements on the state of contained blocks.
  *
- * @return: MPART_MEMADDR_SUCCESS:    Success
- * @return: MPART_MEMADDR_NOT_LOADED: Error: At least one accessed block has a state that
- *                                           is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT'
- * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-FUNDEF NOBLOCK NONNULL((1)) unsigned int
+ * @return: true:  Success
+ * @return: false: Error: At least one accessed block has a state that
+ *                        is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
                                       mpart_reladdr_t partrel_offset, size_t num_bytes,
                                       struct mpart_physloc *__restrict result);
-#define MPART_MEMADDR_SUCCESS    0 /* Successfully filled in `result' to represent at least 1 byte starting at `partrel_offset' */
-#define MPART_MEMADDR_NOT_LOADED 1 /* The associated physical memory hasn't been initialized. */
-#define MPART_MEMADDR_BAD_BOUNDS 2 /* The given `partrel_offset' is outside the bounds of `self' */
 
 /* Same as `mpart_memaddr()', but have a looser requirement in regards to
  * the current state of blocks that are entirely contained within the to-
@@ -851,13 +869,12 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
  * All of the blocks that fully overlap with the returned range are only
  * required to not have a state set to `MPART_BLOCK_ST_INIT'.
  *
- * @return: MPART_MEMADDR_SUCCESS:    Success
- * @return: MPART_MEMADDR_NOT_LOADED: Error: At least one fully accessed block has a state
- *                                           that is `MPART_BLOCK_ST_INIT', or at least one
- *                                           of the 0-2 border blocks has a state that is one
- *                                           of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF'
- * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-FUNDEF NOBLOCK NONNULL((1)) unsigned int
+ * @return: true:  Success
+ * @return: false: Error: At least one fully accessed block has a state
+ *                        that is `MPART_BLOCK_ST_INIT', or at least one
+ *                        of the 0-2 border blocks has a state that is one
+ *                        of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
                                        mpart_reladdr_t partrel_offset, size_t num_bytes,
                                        struct mpart_physloc *__restrict result);
@@ -938,8 +955,9 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 
 
 /* Split the given mem-part `self' (which should be a member of `file')
- * after `offset' bytes from the start of `self'. For this purpose, the
- * given `offset' must be non-0, and both page- and block-aligned.
+ * after `offset' bytes from the start of backing file. For this purpose,
+ * the given `offset' should be `> mpart_getminaddr(self)', and both page-
+ * and block-aligned.
  * @return: NULL: The given `offset' is greater than the size of the part
  *                at the time the request was made. The caller should handle
  *                this case by re-checking for a missing part, and creating
@@ -947,7 +965,7 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
  * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
 FUNDEF NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
-            PAGEDIR_PAGEALIGNED mpart_reladdr_t partrel_offset);
+            PAGEDIR_PAGEALIGNED pos_t offset);
 
 /* Try to merge the given part with other, neighboring parts from
  * its associated file, or, in case that file is anonymous, try to
@@ -1040,23 +1058,24 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 
 
 /* Read/write raw data to/from a given mem-part.
- * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part is too small. */
-FUNDEF NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_write_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+ * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
+ *              is too small, or if the given `filepos' lies outside of the part's bounds. */
+FUNDEF NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL mpart_write_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the above, but these use an intermediate (stack) buffer for transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
-FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_readv(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t partrel_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_readv(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 

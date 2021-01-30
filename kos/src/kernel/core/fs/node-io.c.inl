@@ -40,11 +40,11 @@
 #undef DEFINE_IO_VECTOR
 #undef DEFINE_IO_KERNEL
 
-//#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_ASYNC 1
 #define DEFINE_IO_READ 1
 //#define DEFINE_IO_WRITE 1
-#define DEFINE_IO_PHYS 1
-#define DEFINE_IO_VECTOR 1
+//#define DEFINE_IO_PHYS 1
+//#define DEFINE_IO_VECTOR 1
 //#define DEFINE_IO_KERNEL 1
 #endif /* __INTELLISENSE__ */
 
@@ -300,7 +300,39 @@ load_next_part:
 		                               FLOOR_ALIGN(file_position, PAGESIZE),
 		                               CEIL_ALIGN(num_bytes + (file_position % PAGESIZE), PAGESIZE));
 		TRY {
-			pos_t part_offset = (pos_t)(file_position - vm_datapart_startbyte(part));
+#ifdef CONFIG_USE_NEW_VM
+#ifdef DEFINE_IO_VECTOR
+#ifdef DEFINE_IO_PHYS
+#ifdef DEFINE_IO_READ
+			max_io_bytes = mpart_readv_p(part, buf, buf_offset, num_bytes, file_position);
+#else /* DEFINE_IO_READ */
+			max_io_bytes = mpart_writev_p(part, buf, buf_offset, num_bytes, file_position);
+#endif /* !DEFINE_IO_READ */
+#else /* DEFINE_IO_PHYS */
+#ifdef DEFINE_IO_READ
+			max_io_bytes = mpart_readv(part, buf, buf_offset, num_bytes, file_position);
+#else /* DEFINE_IO_READ */
+			max_io_bytes = mpart_writev(part, buf, buf_offset, num_bytes, file_position);
+#endif /* !DEFINE_IO_READ */
+#endif /* !DEFINE_IO_PHYS */
+#else /* DEFINE_IO_VECTOR */
+#ifdef DEFINE_IO_PHYS
+#ifdef DEFINE_IO_READ
+			max_io_bytes = mpart_read_p(part, buf, num_bytes, file_position);
+#else /* DEFINE_IO_READ */
+			max_io_bytes = mpart_write_p(part, buf, num_bytes, file_position);
+#endif /* !DEFINE_IO_READ */
+#else /* DEFINE_IO_PHYS */
+#ifdef DEFINE_IO_READ
+			max_io_bytes = mpart_read(part, buf, num_bytes, file_position);
+#else /* DEFINE_IO_READ */
+			max_io_bytes = mpart_write(part, buf, num_bytes, file_position);
+#endif /* !DEFINE_IO_READ */
+#endif /* !DEFINE_IO_PHYS */
+#endif /* !DEFINE_IO_VECTOR */
+#else /* CONFIG_USE_NEW_VM */
+			pos_t part_offset;
+			part_offset = (pos_t)(file_position - vm_datapart_startbyte(part));
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
@@ -327,6 +359,7 @@ load_next_part:
 			max_io_bytes = FUNC0(vm_datapart_write)(part, buf, num_bytes, num_bytes, part_offset);
 #endif /* !DEFINE_IO_READ */
 #endif
+#endif /* !CONFIG_USE_NEW_VM */
 		} EXCEPT {
 			decref(part);
 			RETHROW();

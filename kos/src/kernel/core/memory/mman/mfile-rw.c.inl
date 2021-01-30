@@ -187,8 +187,7 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 		                       buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */
 		                       num_bytes,
-		                       (mpart_reladdr_t)(offset -
-		                                         part->mp_minaddr));
+		                       offset);
 		assert(count <= num_bytes);
 		if (count >= num_bytes)
 			break;

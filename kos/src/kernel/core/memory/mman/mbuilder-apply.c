@@ -146,7 +146,9 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 			struct mpart *part;
 			part    = iter->mbn_part;
 			fm_iter = fm_base + (size_t)(iter->mbn_minaddr - mm_base);
-			assert(fm_iter >= part->mp_minaddr);
+			assertf(fm_iter >= part->mp_minaddr,
+			        "This should have been asserted earlier, and we should "
+			        "have been holding a lock to `part' ever since!");
 			iter->_mbn_partoff = (mpart_reladdr_t)(fm_iter - part->mp_minaddr);
 
 			/* Add the node to the part's relevant list of nodes. */

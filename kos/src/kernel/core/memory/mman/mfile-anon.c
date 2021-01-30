@@ -449,26 +449,22 @@ again_lock:
 		goto done; /* Simple case: Nothing to make anonymous! */
 	/* Check if we may need to split the lower/upper node. */
 	if (minaddr > mima.mm_min->mp_minaddr) {
-		mpart_reladdr_t offset;
 		if unlikely(!tryincref(mima.mm_min))
 			mima.mm_min = NULL;
 		mfile_lock_endwrite(self);
 		if likely(mima.mm_min) {
 			FINALLY_DECREF_UNLIKELY(mima.mm_min);
-			offset = (mpart_reladdr_t)(minaddr - mima.mm_min->mp_minaddr);
-			xdecref(mpart_split(mima.mm_min, offset));
+			xdecref(mpart_split(mima.mm_min, minaddr));
 		}
 		goto again_lock;
 	}
 	if (maxaddr < mima.mm_max->mp_maxaddr) {
-		mpart_reladdr_t offset;
 		if unlikely(!tryincref(mima.mm_max))
 			mima.mm_max = NULL;
 		mfile_lock_endwrite(self);
 		if likely(mima.mm_max) {
 			FINALLY_DECREF_UNLIKELY(mima.mm_max);
-			offset = (mpart_reladdr_t)((maxaddr + 1) - mima.mm_max->mp_minaddr);
-			xdecref(mpart_split(mima.mm_max, offset));
+			xdecref(mpart_split(mima.mm_max, maxaddr + 1));
 		}
 		goto again_lock;
 	}

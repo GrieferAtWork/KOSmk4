@@ -338,9 +338,7 @@ struct mpart_split_data {
 
 PRIVATE NONNULL((1, 2)) void FCALL
 mpart_split_data_init(struct mpart_split_data *__restrict self,
-                      struct mpart *__restrict lopart,
-                      PAGEDIR_PAGEALIGNED mpart_reladdr_t offset) {
-	self->msd_offset = offset;
+                      struct mpart *__restrict lopart) {
 	self->msd_lopart = lopart;
 	self->msd_hipart = (REF struct mpart *)kmalloc(sizeof(struct mpart),
 	                                               GFP_LOCKED | GFP_PREFLT);
@@ -730,8 +728,9 @@ again:
 
 
 /* Split the given mem-part `self' (which should be a member of `file')
- * after `offset' bytes from the start of `self'. For this purpose, the
- * given `offset' must be non-0, and both page- and block-aligned.
+ * after `offset' bytes from the start of backing file. For this purpose,
+ * the given `offset' should be `> mpart_getminaddr(self)', and both page-
+ * and block-aligned.
  * @return: NULL: The given `offset' is greater than the size of the part
  *                at the time the request was made. The caller should handle
  *                this case by re-checking for a missing part, and creating
@@ -739,7 +738,7 @@ again:
  * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
 PUBLIC NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
-            PAGEDIR_PAGEALIGNED mpart_reladdr_t partrel_offset) {
+            PAGEDIR_PAGEALIGNED pos_t offset) {
 	struct mpart_split_data data;
 	struct mfile *file;
 #ifdef __INTELLISENSE__
@@ -749,22 +748,34 @@ mpart_split(struct mpart *__restrict self,
 #define lopart data.msd_lopart
 #define hipart data.msd_hipart
 #endif /* !__INTELLISENSE__ */
-	mpart_split_data_init(&data, self, partrel_offset);
+	assert(mfile_addr_aligned(self->mp_file, offset));
+	mpart_split_data_init(&data, self);
 	TRY {
 again:
-		/* Acquire a lock and ensure that there aren't any INIT-blocks,
-		 * and that no-one is holding any DMA-locks onto `self', the
-		 * later also being allowed to prevent a part from being split. */
-		mpart_lock_acquire_and_initdone_nodma(self);
+		/* Acquire a lock. */
+		mpart_lock_acquire(self);
 
-		/* Quick check: If the given `data.msd_offset' is out-of-bounds,
+		/* Quick check: If the given `offset' is out-of-bounds,
 		 *              then we actually have to return `NULL'! */
-		if unlikely(data.msd_offset >= mpart_getsize(self)) {
+		if unlikely(offset <= mpart_getminaddr(self) ||
+		            offset >= mpart_getendaddr(self)) {
 release_and_return_null:
 			mpart_split_data_fini(&data);
 			mpart_lock_release(self);
 			return NULL;
 		}
+
+		/* Ensure that there aren't any INIT-blocks. */
+		if (!mpart_initdone_or_unlock(self, NULL))
+			goto again;
+
+		/* Ensure that no-one is holding any DMA-locks onto `self',
+		 * which may be used to prevent a part from being split */
+		if (!mpart_nodma_or_unlock(self, NULL))
+			goto again;
+
+		/* Calculate the part-relative offset where the split should be made. */
+		data.msd_offset = (mpart_reladdr_t)(offset - mpart_getminaddr(self));
 
 		file = self->mp_file;
 		assertf(data.msd_offset != 0, "Invalid split-offset: 0");
@@ -830,7 +841,6 @@ relock_with_data:
 		}
 	} EXCEPT {
 		mpart_split_data_fini(&data);
-		mpart_lockops_reap(self);
 		RETHROW();
 	}
 

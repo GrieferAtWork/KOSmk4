@@ -83,6 +83,21 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 }
 
 
+#define UNLOCK(self, unlock)     \
+	(mpart_lock_release_f(self), \
+	 unlockinfo_xunlock(unlock), \
+	 mpart_lockops_reap(self))
+#ifdef __OPTIMIZE_SIZE__
+#define UNLOCK_OPTREAP(self, unlock) \
+	(mpart_lock_release_f(self),     \
+	 unlockinfo_xunlock(unlock))
+#else /* __OPTIMIZE_SIZE__ */
+#define UNLOCK_OPTREAP(self, unlock) \
+	UNLOCK(self, unlock)
+#endif /* !__OPTIMIZE_SIZE__ */
+
+
+
 /************************************************************************/
 /* MPart API to lock a part, alongside doing some other operations.     */
 /************************************************************************/
@@ -98,8 +113,7 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 			/* Wait for init-done to be signaled. */
 			REF struct mfile *file;
 			file = incref(self->mp_file);
-			mpart_lock_release_f(self);
-			unlockinfo_xunlock(unlock);
+			UNLOCK_OPTREAP(self, unlock);
 			{
 				FINALLY_DECREF_UNLIKELY(file);
 				task_connect(&file->mf_initdone);
@@ -112,11 +126,11 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 			}
 			/* Check for init-parts once again. */
 			if unlikely(!mpart_hasblocksstate_init(self)) {
-				mpart_lock_release_f(self);
+				mpart_lock_release(self);
 				task_disconnectall();
 				return false;
 			}
-			mpart_lock_release_f(self);
+			mpart_lock_release(self);
 			task_waitfor();
 		} EXCEPT {
 			mpart_lockops_reap(self);
@@ -136,8 +150,7 @@ mpart_nodma_or_unlock(struct mpart *__restrict self,
 	if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
 		/* Must blocking-wait until all DMA locks have been released. */
 		incref(self);
-		mpart_lock_release_f(self);
-		unlockinfo_xunlock(unlock);
+		UNLOCK(self, unlock);
 		{
 			FINALLY_DECREF_UNLIKELY(self);
 			task_connect(&meta->mpm_dma_done);
@@ -163,8 +176,7 @@ mpart_hasmeta_or_unlock(struct mpart *__restrict self,
 		if (meta == NULL) {
 			/* Must allocate while blocking. */
 			incref(self);
-			mpart_lock_release_f(self);
-			unlockinfo_xunlock(unlock);
+			UNLOCK(self, unlock);
 			FINALLY_DECREF_UNLIKELY(self);
 			meta = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
 			                                   GFP_CALLOC);
@@ -312,17 +324,13 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 		if unlikely(!vec) {
 			mpart_lock_release_f(self);
 			unlockinfo_xunlock(unlock);
+			mpart_lockops_reap(self);
 			/* Must do the allocation with blocking */
 			vec = (struct mchunk *)kmalloc_nx(4 * sizeof(struct mchunk),
 			                                  GFP_LOCKED | GFP_PREFLT);
 			if unlikely(!vec) {
-				TRY {
-					vec = (struct mchunk *)kmalloc(2 * sizeof(struct mchunk),
-					                               GFP_LOCKED | GFP_PREFLT);
-				} EXCEPT {
-					mpart_lockops_reap(self);
-					RETHROW();
-				}
+				vec = (struct mchunk *)kmalloc(2 * sizeof(struct mchunk),
+				                               GFP_LOCKED | GFP_PREFLT);
 			}
 			data->scd_copy_mem_sc.ms_v = vec;
 			data->scd_copy_mem_sc.ms_c = 1;
@@ -338,15 +346,10 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 				assert(avail >= data->scd_copy_mem_sc.ms_c);
 				if (avail <= data->scd_copy_mem_sc.ms_c) {
 do_realloc_in_extend_after_unlock:
-					TRY {
-						vec = (struct mchunk *)krealloc(data->scd_copy_mem_sc.ms_v,
-						                                (data->scd_copy_mem_sc.ms_c + 1) *
-						                                sizeof(struct mchunk),
-						                                GFP_LOCKED | GFP_PREFLT);
-					} EXCEPT {
-						mpart_lockops_reap(self);
-						RETHROW();
-					}
+					vec = (struct mchunk *)krealloc(data->scd_copy_mem_sc.ms_v,
+					                                (data->scd_copy_mem_sc.ms_c + 1) *
+					                                sizeof(struct mchunk),
+					                                GFP_LOCKED | GFP_PREFLT);
 					data->scd_copy_mem_sc.ms_v = vec;
 				}
 				/* Allocate the new chunk. */
@@ -393,8 +396,7 @@ extend_vector:
 			                                   GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 			if unlikely(!vec) {
 				/* Must do the thing with blocking. */
-				mpart_lock_release_f(self);
-				unlockinfo_xunlock(unlock);
+				UNLOCK(self, unlock);
 				goto do_realloc_in_extend_after_unlock;
 			}
 			data->scd_copy_mem_sc.ms_v = vec;
@@ -420,10 +422,8 @@ extend_vector:
 		data->scd_copy_mem_sc.ms_v = vec;
 	return true;
 err_badalloc:
-	mpart_lock_release_f(self);
-	unlockinfo_xunlock(unlock);
+	UNLOCK(self, unlock);
 err_badalloc_after_unlock:
-	mpart_lockops_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, total_pages);
 }
 
@@ -454,16 +454,10 @@ setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
 		                                               GFP_PREFLT | gfp_flags);
 		if unlikely(!new_bitset) {
 			/* Must allocate the bitset while blocking. */
-			mpart_lock_release_f(self);
-			unlockinfo_xunlock(unlock);
-			TRY {
-				data->scd_bitset = (mpart_blkst_word_t *)krealloc(data->scd_bitset, req_size,
-				                                                  GFP_LOCKED | GFP_PREFLT |
-				                                                  gfp_flags);
-			} EXCEPT {
-				mpart_lockops_reap(self);
-				RETHROW();
-			}
+			UNLOCK(self, unlock);
+			data->scd_bitset = (mpart_blkst_word_t *)krealloc(data->scd_bitset, req_size,
+			                                                  GFP_LOCKED | GFP_PREFLT |
+			                                                  gfp_flags);
 			return false;
 		}
 		data->scd_bitset = new_bitset;
@@ -677,8 +671,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		/* Release our lock to `self' so we can safely invoke swap-callbacks. */
 		incref(self);
 		incref(file);
-		mpart_lock_release_f(self);
-		unlockinfo_xunlock(unlock);
+		UNLOCK(self, unlock);
 		TRY {
 			struct mchunkvec mem_data;
 			struct mchunkvec swp_data;
@@ -719,7 +712,6 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			}
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			mpart_lockops_reap(self);
 			decref_unlikely(self);
 			RETHROW();
 		}
@@ -776,7 +768,7 @@ done_swap:
 		 *
 		 * However, the next time around, our part is probably
 		 * still going to be loaded in-core, so we'll succeed then! */
-		mpart_lock_release_f(self);
+		mpart_lock_release(self);
 		decref_unlikely(self);
 
 		/* Ensure a consistent state when returning `false' */
@@ -872,8 +864,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		/* Release the lock from the part, so we can load
 		 * blocks without holding that non-recursive, and
 		 * non-preemptive lock! */
-		mpart_lock_release_f(self);
-		unlockinfo_xunlock(unlock);
+		UNLOCK(self, unlock);
 		TRY {
 			/* Actually do the load. */
 			if likely(file->mf_ops->mo_loadblocks) {
@@ -887,7 +878,6 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			mpart_lockops_reap(self);
 			decref_unlikely(self);
 			RETHROW();
 		}
@@ -905,8 +895,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		FINALLY_DECREF_UNLIKELY(self);
 		TRY {
 			incref(file);
-			mpart_lock_release_f(self);
-			unlockinfo_xunlock(unlock);
+			UNLOCK_OPTREAP(self, unlock);
 			{
 				FINALLY_DECREF_UNLIKELY(file);
 				task_connect(&file->mf_initdone);
@@ -919,11 +908,11 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 			}
 			/* Check for init-parts once again. */
 			if unlikely(!mpart_hasblocksstate_init(self)) {
-				mpart_lock_release_f(self);
+				mpart_lock_release(self);
 				task_disconnectall();
 				return false;
 			}
-			mpart_lock_release_f(self);
+			mpart_lock_release(self);
 			task_waitfor();
 		} EXCEPT {
 			mpart_lockops_reap(self);
@@ -1143,15 +1132,9 @@ unsharecow_makecopy_or_unlock(struct mpart *__restrict self,
 	                                  GFP_PREFLT);
 	if unlikely(!copy) {
 		/* Must allocate while blocking. */
-		mpart_lock_release_f(self);
-		unlockinfo_xunlock(unlock);
-		TRY {
-			copy = (struct mpart *)kmalloc(sizeof(struct mpart),
-			                               GFP_LOCKED | GFP_PREFLT);
-		} EXCEPT {
-			mpart_lockops_reap(self);
-			RETHROW();
-		}
+		UNLOCK(self, unlock);
+		copy = (struct mpart *)kmalloc(sizeof(struct mpart),
+		                               GFP_LOCKED | GFP_PREFLT);
 		data->ucd_copy = copy;
 		return false;
 	}
@@ -1183,18 +1166,12 @@ unsharecow_makeblkext_or_unlock(struct mpart *__restrict self,
 	/* This is the case where we need the dynamically allocated block-status bitset. */
 	reqsize = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
 	bitset  = (mpart_blkst_word_t *)krealloc_nx(data->ucd_ucmem.scd_bitset, reqsize,
-                                               GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
+	                                            GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 	if unlikely(!bitset) {
 		/* Must allocate while blocking. */
-		mpart_lock_release_f(self);
-		unlockinfo_xunlock(unlock);
-		TRY {
-			bitset = (mpart_blkst_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
-			                                        GFP_LOCKED | GFP_PREFLT);
-		} EXCEPT {
-			mpart_lockops_reap(self);
-			RETHROW();
-		}
+		UNLOCK(self, unlock);
+		bitset = (mpart_blkst_word_t *)krealloc(data->ucd_ucmem.scd_bitset, reqsize,
+		                                        GFP_LOCKED | GFP_PREFLT);
 		data->ucd_ucmem.scd_bitset = bitset;
 		return false;
 	}
@@ -1324,17 +1301,11 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 			unsharecow_unlock_unique_mmans_until(part, node);
 
 			/* Drop our lock to the original part. */
-			mpart_lock_release_f(part);
-			unlockinfo_xunlock(unlock);
+			UNLOCK(part, unlock);
 
 			/* Wait until the lock of this mman becomes available. */
-			TRY {
-				while (!sync_canwrite(mm))
-					task_yield();
-			} EXCEPT {
-				mpart_lockops_reap(part);
-				RETHROW();
-			}
+			while (!sync_canwrite(mm))
+				task_yield();
 			return false;
 		}
 	}
@@ -1456,6 +1427,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 			unsharecow_unlock_unique_mmans(self);
 			mpart_lock_release_f(self);
 			unlockinfo_xunlock(unlock);
+			mpart_lockops_reap(self);
 			goto nope_decref_mmans;
 		}
 	} EXCEPT {
@@ -1675,15 +1647,10 @@ again_try_clear_write:
 				goto again_try_clear_write;
 			mpart_lock_release_f(self);
 			unlockinfo_xunlock(unlock);
-			TRY {
-				while (!sync_canwrite(mm))
-					task_yield();
-			} EXCEPT {
-				decref_unlikely(mm);
-				mpart_lockops_reap(self);
-				RETHROW();
-			}
-			decref_unlikely(mm);
+			mpart_lockops_reap(self);
+			FINALLY_DECREF_UNLIKELY(mm);
+			while (!sync_canwrite(mm))
+				task_yield();
 			return false;
 		}
 		/* Hard error: bad allocation :( */
@@ -1770,31 +1737,58 @@ again:
 
 
 /* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
- * If the given address range ends up not fully contained within the
- * bounds of `self', then no lock is acquired, and `false' is returned. */
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
+ * # of bytes that may need to be loaded)
+ *
+ * HINT: This function is used to implement `mpart_read()' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
-                                        mpart_reladdr_t partrel_offset,
-                                        size_t num_bytes)
+                                        pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	mpart_reladdr_t endaddr;
+	mpart_reladdr_t reladdr;
+	struct mpart_setcore_data data;
+	size_t loadbytes;
 again:
-	mpart_lock_acquire_and_setcore(self);
-	if (OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) ||
-	    endaddr > mpart_getsize(self)) {
-		/* Out-of-bounds... */
-		mpart_lock_release_f(self);
-		return false;
+	mpart_lock_acquire(self);
+	/* Check if the given address range is in-bounds. */
+	if (OVERFLOW_USUB(filepos, mpart_getminaddr(self), &reladdr))
+		goto unlock_and_err;
+	if (OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &loadbytes))
+		goto unlock_and_err;
+	/* Check: is the part already in the expected state? */
+	if (!MPART_ST_INCORE(self->mp_state)) {
+		mpart_setcore_data_init(&data);
+		TRY {
+			while (!mpart_setcore_or_unlock(self, NULL, &data)) {
+				mpart_lock_acquire(self);
+				/* Check if the given address range is in-bounds. */
+				if (OVERFLOW_USUB(filepos, mpart_getminaddr(self), &reladdr))
+					goto unlock_and_fini_data_err;
+				if (OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &loadbytes))
+					goto unlock_and_fini_data_err;
+			}
+		} EXCEPT {
+			mpart_setcore_data_fini(&data);
+			mpart_lockops_reap(self);
+			RETHROW();
+		}
 	}
-	TRY {
-		/* Ensure that the given range has been loaded. */
-		if (!mpart_loadsome_or_unlock(self, NULL, partrel_offset, num_bytes))
-			goto again;
-	} EXCEPT {
-		mpart_lockops_reap(self);
-		RETHROW();
-	}
+	++loadbytes;
+	if (loadbytes > max_load_bytes)
+		loadbytes = max_load_bytes;
+	/* As requested, ensure that the accessed address range is loaded. */
+	if (!mpart_loadsome_or_unlock(self, NULL, reladdr, loadbytes))
+		goto again;
 	return true;
+unlock_and_fini_data_err:
+	mpart_lock_release(self);
+	mpart_setcore_data_fini(&data);
+	goto err;
+unlock_and_err:
+	mpart_lock_release(self);
+err:
+	return false;
 }
 
 
@@ -1831,32 +1825,199 @@ mpart_lock_acquire_and_setcore_unsharecow_loadall(struct mpart *__restrict self)
 	} while (!mpart_loadall_or_unlock(self, NULL));
 }
 
+
+
 /* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
- * and `mpart_lock_acquire_and_setcore_loadsome()' */
+ * and `mpart_lock_acquire_and_setcore_loadsome()'. If appropriate, this
+ * function will also split the given part `self' to reduce the impact of
+ * a potential copy-on-write unshare. (such that part-borders are created
+ * at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + max_load_bytes)')
+ *
+ * HINT: This function is used to implement `mman_startdma()' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self,
-                                                   mpart_reladdr_t partrel_offset,
-                                                   size_t num_bytes)
+                                                   pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	mpart_reladdr_t endaddr;
+	bool result;
 again:
-	mpart_lock_acquire_and_setcore_unsharecow(self);
-	if (OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) ||
-	    endaddr > mpart_getsize(self)) {
-		/* Out-of-bounds... */
-		mpart_lock_release_f(self);
-		return false;
-	}
-	TRY {
-		/* Ensure that the given range has been loaded. */
-		if (!mpart_loadsome_or_unlock(self, NULL, partrel_offset, num_bytes))
+	result = mpart_lock_acquire_and_setcore_unsharecow_withhint(self, filepos, max_load_bytes);
+	if likely(result) {
+		mpart_reladdr_t reladdr, loadbytes;
+		reladdr   = (mpart_reladdr_t)(filepos - mpart_getminaddr(self));
+		loadbytes = (mpart_reladdr_t)(mpart_getendaddr(self) - reladdr);
+		if (loadbytes > max_load_bytes)
+			loadbytes = max_load_bytes;
+		if (!mpart_loadsome_or_unlock(self, NULL, reladdr, loadbytes))
 			goto again;
-	} EXCEPT {
-		mpart_lockops_reap(self);
-		RETHROW();
 	}
-	return true;
+	return result;
 }
+
+
+
+/* Same as `mpart_lock_acquire_and_setcore_unsharecow()', but validates that the
+ * given address range is contained by `self', any may also split `self' into
+ * smaller parts if doing so would reduce the impact of unsharing. (such that part-
+ * borders are created at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + split_hint)')
+ *
+ * HINT: This function is used to implement `mpart_write()' */
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
+mpart_lock_acquire_and_setcore_unsharecow_withhint(struct mpart *__restrict self,
+                                                   pos_t filepos, size_t split_hint)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	mpart_reladdr_t part_offs, part_size;
+	mpart_lock_acquire(self);
+
+	/* Check if the given `filepos' is in-bounds of `self' */
+	if unlikely(OVERFLOW_USUB(filepos, mpart_getminaddr(self), &part_offs))
+		goto unlock_and_err;
+	if unlikely(OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size))
+		goto unlock_and_err;
+	++part_size;
+	if (part_size > split_hint)
+		part_size = split_hint;
+
+	/* Check for special case: Must also unshare copy-on-write mappings. */
+	if (!LIST_EMPTY(&self->mp_copy)) {
+		struct mpart_unsharecow_data uc_data;
+		mpart_reladdr_t loadend;
+		struct mfile *file;
+		pos_t splitaddr;
+ensure_setcore_with_unshare:
+		file = self->mp_file;
+		/* Diminish the overhead of unsharecow by truncating the mem-part. */
+		if (part_offs > file->mf_part_amask) {
+			/* Can truncate some leading blocks. */
+			splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
+unlock_and_split_at_splitaddr_and_done:
+			mpart_lock_release(self);
+split_at_splitaddr_and_done:
+			xdecref(mpart_split(self, splitaddr));
+			/* Let the caller start over to discover the new part location. */
+			goto err;
+		}
+		loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
+		assert(loadend <= mpart_getsize(self));
+		if (loadend < mpart_getsize(self)) {
+			splitaddr = self->mp_minaddr + loadend;
+			goto unlock_and_split_at_splitaddr_and_done;
+		}
+		/* Now load the part into the core, and ensure that
+		 * copy-on-write mappings have been unshared. */
+		mpart_unsharecow_data_init(&uc_data);
+		TRY {
+again_ensure_incore_for_write:
+			if (!MPART_ST_INCORE(self->mp_state)) {
+				struct mpart_setcore_data data;
+				mpart_setcore_data_init(&data);
+				TRY {
+					while (!mpart_setcore_or_unlock(self, NULL, &data)) {
+						mpart_lock_acquire(self);
+						if unlikely(OVERFLOW_USUB(filepos, mpart_getminaddr(self), &part_offs) ||
+						            OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size)) {
+							mpart_lock_release(self);
+							mpart_setcore_data_fini(&data);
+							goto fini_uc_data_and_done;
+						}
+						++part_size;
+						if (part_size > split_hint)
+							part_size = split_hint;
+						if unlikely(LIST_EMPTY(&self->mp_copy))
+							goto ensure_setcore_without_unshare;
+						file = self->mp_file;
+						if (part_offs > file->mf_part_amask) {
+							splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
+unlock_and_fini_setcore_and_uc_and_split_and_done:
+							mpart_lock_release(self);
+							mpart_setcore_data_fini(&data);
+							goto fini_uc_and_split_and_done;
+						}
+						loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
+						if (loadend < mpart_getsize(self)) {
+							splitaddr = self->mp_minaddr + loadend;
+							goto unlock_and_fini_setcore_and_uc_and_split_and_done;
+						}
+					}
+				} EXCEPT {
+					mpart_setcore_data_fini(&data);
+					mpart_lockops_reap(self);
+					RETHROW();
+				}
+			}
+			if (!mpart_unsharecow_or_unlock(self, NULL, &uc_data)) {
+				mpart_lock_acquire(self);
+				if unlikely(OVERFLOW_USUB(filepos, mpart_getminaddr(self), &part_offs) ||
+				            OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size)) {
+					mpart_lock_release(self);
+fini_uc_data_and_done:
+					mpart_unsharecow_data_fini(&uc_data);
+					goto err;
+				}
+				++part_size;
+				if (part_size > split_hint)
+					part_size = split_hint;
+				if unlikely(LIST_EMPTY(&self->mp_copy)) {
+					mpart_unsharecow_data_fini(&uc_data);
+					goto ensure_setcore_without_unshare;
+				}
+				file = self->mp_file;
+				if (part_offs > file->mf_part_amask) {
+					splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
+unlock_and_fini_uc_and_split_and_done:
+					mpart_lock_release(self);
+fini_uc_and_split_and_done:
+					mpart_unsharecow_data_fini(&uc_data);
+					goto split_at_splitaddr_and_done;
+				}
+				loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
+				if (loadend < mpart_getsize(self)) {
+					splitaddr = self->mp_minaddr + loadend;
+					goto unlock_and_fini_uc_and_split_and_done;
+				}
+				goto again_ensure_incore_for_write;
+			}
+		} EXCEPT {
+			mpart_unsharecow_data_fini(&uc_data);
+			mpart_lockops_reap(self);
+			RETHROW();
+		}
+	} else {
+ensure_setcore_without_unshare:
+		/* Make sure that in-core data is available. */
+		if (!MPART_ST_INCORE(self->mp_state)) {
+			struct mpart_setcore_data data;
+			mpart_setcore_data_init(&data);
+			TRY {
+				while (!mpart_setcore_or_unlock(self, NULL, &data)) {
+					mpart_lock_acquire(self);
+					if unlikely(OVERFLOW_USUB(filepos, mpart_getminaddr(self), &part_offs) ||
+					            OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size)) {
+						mpart_lock_release(self);
+						mpart_setcore_data_fini(&data);
+						goto err;
+					}
+					++part_size;
+					if (part_size > split_hint)
+						part_size = split_hint;
+					/* Special case: Must also unshare copy-on-write mappings. */
+					if unlikely(LIST_EMPTY(&self->mp_copy))
+						goto ensure_setcore_with_unshare;
+				}
+			} EXCEPT {
+				mpart_setcore_data_fini(&data);
+				mpart_lockops_reap(self);
+				RETHROW();
+			}
+		}
+	}
+
+	return true;
+unlock_and_err:
+	mpart_lock_release(self);
+err:
+	return false;
+}
+
 
 
 

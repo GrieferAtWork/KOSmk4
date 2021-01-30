@@ -124,8 +124,8 @@ mman_enumdmav(struct mman *__restrict self,
 	while (num_bytes != 0) {
 		struct mnode *node;
 		struct mpart *part;
-		mpart_reladdr_t partrel_addr;
-		size_t partrel_size;
+		pos_t file_addr;
+		size_t file_size;
 
 		/* Lookup the node at the given address */
 again_lookup_part:
@@ -141,17 +141,18 @@ again_lookup_part_locked:
 			goto err_release_and_unmapped; /* Reserved mapping */
 
 		/* Figure out the part-relative address range that is being enumerated. */
-		partrel_addr = node->mn_partoff + (size_t)((byte_t const *)addr - (byte_t const *)mnode_getaddr(node));
-		partrel_size = (size_t)((byte_t const *)mnode_getendaddr(node) - (byte_t const *)addr);
-		if (partrel_size > num_bytes)
-			partrel_size = num_bytes;
+		file_addr = mpart_getminaddr(part) + node->mn_partoff +
+		            (size_t)((byte_t const *)addr - (byte_t const *)mnode_getaddr(node));
+		file_size = (size_t)((byte_t const *)mnode_getendaddr(node) - (byte_t const *)addr);
+		if (file_size > num_bytes)
+			file_size = num_bytes;
 
 #ifndef LOCAL_IS_ENUM
 		if (result >= lockcnt) {
 			if (result == lockcnt)
 				mman_stopdma(lockvec, lockcnt); /* Release already acquired locks. */
-			addr = (byte_t *)addr + partrel_size;
-			num_bytes -= partrel_size;
+			addr = (byte_t *)addr + file_size;
+			num_bytes -= file_size;
 			++result;
 			goto again_lookup_part_locked;
 		}
@@ -161,6 +162,7 @@ again_lookup_part_locked:
 		incref(part);
 		mman_lock_release(self);
 		TRY {
+			mpart_reladdr_t partrel_addr, partrel_size;
 			size_t enum_size;
 #ifdef LOCAL_IS_ENUM
 			struct mdmalock dma_lock;
@@ -170,7 +172,7 @@ again_lookup_part_locked:
 			 * range have their state set to `MPART_BLOCK_ST_LOAD' for
 			 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
 			 *
-			 * XXX: If would be cool to have optimization for writes, such that
+			 * XXX: It would be cool to have optimization for writes, such that
 			 *      DMA operations which target whole, previously uninitialized
 			 *      blocks (MPART_BLOCK_ST_NDEF), didn't have to load those
 			 *      blocks prior to the DMA operation being performed.
@@ -179,18 +181,30 @@ again_lookup_part_locked:
 			 *      The problem with this is that this would also require
 			 *      the extension of `struct mdmalock', but that would then
 			 *      require a re-write of `AtaAIOHandleData' or an increase
-			 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'... */
+			 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'...
+			 *
+			 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow_withhint()',
+			 *                which doesn't ensure that accessed blocks have been loaded, whilst we're using
+			 *                `mpart_lock_acquire_and_setcore_unsharecow_loadsome()', which does do so. */
 again_lock_part:
-			if (for_writing ? !mpart_lock_acquire_and_setcore_unsharecow_loadsome(part, partrel_addr, partrel_size)
-			                : !mpart_lock_acquire_and_setcore_loadsome(part, partrel_addr, partrel_size)) {
+			if (for_writing ? !mpart_lock_acquire_and_setcore_unsharecow_loadsome(part, file_addr, file_size)
+			                : !mpart_lock_acquire_and_setcore_loadsome(part, file_addr, file_size)) {
 				/* Deal with the case where the part was truncated. */
 				decref_unlikely(part);
 				goto again_lookup_part;
 			}
 
-			/* Ensure that `part->mp_meta' has been allocated */
+			/* Also ensure that `part->mp_meta' has been allocated */
 			if (!mpart_hasmeta_or_unlock(part, NULL))
 				goto again_lock_part;
+
+			/* Load the effective address */
+			assert(file_addr >= mpart_getminaddr(part));
+			assert(file_addr <= mpart_getmaxaddr(part));
+			partrel_addr = (mpart_reladdr_t)(file_addr - mpart_getminaddr(part));
+			partrel_size = (mpart_reladdr_t)(mpart_getendaddr(part) - partrel_addr);
+			if (partrel_size > file_size)
+				partrel_size = file_size;
 
 			/* If we're doing a write-DMA, mark the accessed address range as changed. */
 			if (for_writing)
@@ -235,6 +249,10 @@ again_lock_part:
 			}
 
 #undef LOCAL_dma_lock
+
+			/* Account for everything that was enumerated. */
+			addr = (byte_t *)addr + partrel_size;
+			num_bytes -= partrel_size;
 		} EXCEPT {
 			decref_unlikely(part);
 			RETHROW();
@@ -242,15 +260,9 @@ again_lock_part:
 #ifdef LOCAL_IS_ENUM
 		decref_unlikely(part);
 #endif /* LOCAL_IS_ENUM */
-
-		/* Account for everything that was enumerated. */
-		addr = (byte_t *)addr + partrel_size;
-		num_bytes -= partrel_size;
-		mman_lock_acquire(self);
 	}
 #undef addr
 #undef num_bytes
-	mman_lock_release(self);
 	return result;
 err_release_and_unmapped:
 	mman_lock_release(self);

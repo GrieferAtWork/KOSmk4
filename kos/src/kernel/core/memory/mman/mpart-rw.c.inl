@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "mpart.c"
-#define DEFINE_mpart_read
-//#define DEFINE_mpart_write
+//#define DEFINE_mpart_read
+#define DEFINE_mpart_write
 //#define DEFINE_mpart_read_p
 //#define DEFINE_mpart_write_p
 //#define DEFINE_mpart_readv
@@ -123,6 +123,9 @@ DECL_BEGIN
 #endif /* !... */
 
 #ifdef LOCAL__mpart_buffered_rw
+/* Same as the above, but these use an intermediate (stack) buffer for transfer.
+ * As such, these functions are called by the above when `memcpy_nopf()' produces
+ * transfer errors that cannot be resolved by `mman_prefault()' */
 PUBLIC ATTR_NOINLINE NONNULL((1)) size_t KCALL
 LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
                          LOCAL_buffer_t buffer,
@@ -130,7 +133,7 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
                          size_t buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */
                          size_t num_bytes,
-                         mpart_reladdr_t partrel_offset)
+                         pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t bufsize, result = 0;
 	void *stk_buf;
@@ -152,11 +155,11 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 #endif /* !LOCAL_BUFFER_IS_AIO */
 
 		/* Write `stk_buf' to the file. */
-		ok = mpart_write(self, stk_buf, part, partrel_offset);
+		ok = mpart_write(self, stk_buf, part, filepos);
 #else /* LOCAL_WRITING */
 
 		/* Read `stk_buf' from the file. */
-		ok = mpart_read(self, stk_buf, part, partrel_offset);
+		ok = mpart_read(self, stk_buf, part, filepos);
 
 		/* Copy data from `stk_buf' */
 #ifdef LOCAL_BUFFER_IS_AIO
@@ -175,13 +178,17 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 #else /* LOCAL_BUFFER_IS_AIO */
 		buffer = (LOCAL_buffer_t)((LOCAL_ubuffer_t)buffer + result);
 #endif /* !LOCAL_BUFFER_IS_AIO */
-		partrel_offset += ok;
+		filepos += ok;
 		num_bytes -= ok;
 	}
 	return result;
 }
 #endif /* LOCAL__mpart_buffered_rw */
 
+
+/* Read/write raw data to/from a given mem-part.
+ * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
+ *              is too small, or if the given `filepos' lies outside of the part's bounds. */
 PUBLIC NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw(struct mpart *__restrict self,
                LOCAL_buffer_t buffer,
@@ -189,11 +196,11 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
                size_t buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */
                size_t num_bytes,
-               mpart_reladdr_t partrel_offset)
+               pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t result;
-	unsigned int status;
 	struct mpart_physloc physloc;
+	mpart_reladdr_t part_offs, part_size;
 	/* Deal with VIO parts. */
 	if unlikely(self->mp_state == MPART_ST_VIO) {
 		REF struct mfile *file;
@@ -206,91 +213,43 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		 * This is unlikely, but can happen if the file has been anonymized! */
 		if unlikely(mfile_getvio(file) == NULL)
 			return 0;
+		/* Technically, we're supposed to check that `filepos' is still in-bounds
+		 * of our mem-part, but doing so is kind-of redundant, which is why we
+		 * don't actually do that check! */
 		LOCAL_mfile_vio_rw(file, self, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
 		                   buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */
 		                   num_bytes,
-		                   (pos_t)(self->mp_minaddr +
-		                           partrel_offset));
+		                   filepos);
 		return num_bytes;
 	}
 	result = 0;
 
-again: ATTR_UNUSED;
+	/* Lock+load the part, unsharing the accessed address range if necessary. */
+again:
 #ifdef LOCAL_WRITING
-	/* Special case: Must also unshare copy-on-write mappings. */
-	if (!LIST_EMPTY(&self->mp_copy)) {
-		REF struct mfile *file;
-		mpart_reladdr_t hirel;
-		size_t avail;
-do_unshare_cow:
-		mpart_lock_acquire(self);
-		file  = incref(self->mp_file);
-		avail = mpart_getsize(self);
-		mpart_lock_release_f(self);
-		/* Diminish the overhead of unsharecow by truncating the mem-part. */
-		if (partrel_offset > file->mf_part_amask) {
-			/* Can truncate some leading blocks. */
-			REF struct mpart *hipart;
-			size_t addend;
-			addend = partrel_offset & ~file->mf_part_amask;
-			decref_unlikely(file),
-			mpart_lockops_reap(self);
-			partrel_offset -= addend;
-			hipart = mpart_split(self, addend);
-			if unlikely(!hipart)
-				return 0; /* Part is too small. */
-			FINALLY_DECREF_UNLIKELY(hipart);
-			result += LOCAL_mpart_rw(hipart, buffer,
-#ifdef LOCAL_BUFFER_IS_AIO
-			                         buf_offset,
-#endif /* LOCAL_BUFFER_IS_AIO */
-			                         num_bytes,
-			                         partrel_offset);
-			return result;
-		}
-		if (avail <= partrel_offset) {
-			decref_unlikely(file);
-			mpart_lockops_reap(self);
-			return result; /* Part is too small. */
-		}
-		hirel = (partrel_offset + num_bytes + file->mf_part_amask) & ~file->mf_part_amask;
-		decref_unlikely(file);
-		if (hirel > avail) {
-			/* Can truncate some trailing blocks. */
-			xdecref(mpart_split(self, hirel));
-			goto again;
-		}
-		/* Now load the part into the core, and ensure that
-		 * copy-on-write mappings have been unshared. */
-		mpart_lock_acquire_and_setcore_unsharecow(self);
-	} else
-#endif /* LOCAL_WRITING */
-	{
-		/* Lock the part and make sure that in-core data is available. */
-		mpart_lock_acquire_and_setcore(self);
-#ifdef LOCAL_WRITING
-		/* Special case: Must also unshare copy-on-write mappings. */
-		if unlikely(!LIST_EMPTY(&self->mp_copy)) {
-			mpart_lock_release(self);
-			goto do_unshare_cow;
-		}
-#endif /* LOCAL_WRITING */
-	}
+	if (!mpart_lock_acquire_and_setcore_unsharecow_withhint(self, filepos, num_bytes))
+		goto done;
+#else /* LOCAL_WRITING */
+	if (!mpart_lock_acquire_and_setcore_loadsome(self, filepos, num_bytes))
+		goto done;
+#endif /* !LOCAL_WRITING */
+
+	/* Figure out the part-relative offset+size */
+	part_offs = (mpart_reladdr_t)(filepos - mpart_getminaddr(self));
+	part_size = (mpart_reladdr_t)(mpart_getendaddr(self) - filepos);
+	if (part_size > num_bytes)
+		part_size = num_bytes;
 
 	/* Load the physical location of the requested segment. */
 again_memaddr:
 #ifdef LOCAL_WRITING
-	status = mpart_memaddr_for_write(self, partrel_offset, num_bytes, &physloc);
+	if (!mpart_memaddr_for_write(self, part_offs, part_size, &physloc))
 #else /* LOCAL_WRITING */
-	status = mpart_memaddr_for_read(self, partrel_offset, num_bytes, &physloc);
+	if (!mpart_memaddr_for_read(self, part_offs, part_size, &physloc))
 #endif /* !LOCAL_WRITING */
-	if (status != MPART_MEMADDR_SUCCESS) {
-		if (status == MPART_MEMADDR_BAD_BOUNDS)
-			goto done;
-		assert(status == MPART_MEMADDR_NOT_LOADED);
-
+	{
 		/* Must initialize more backing memory.
 		 * NOTE: When writing, we only initialize a single block,
 		 *       so-as to take advantage of the possibility of
@@ -299,23 +258,11 @@ again_memaddr:
 #ifdef LOCAL_WRITING
 		physloc.mppl_size = 1;
 #endif /* LOCAL_WRITING */
-		mpart_memload_and_unlock(self, partrel_offset, &physloc);
-		mpart_lock_acquire_and_setcore(self);
-
-#ifdef LOCAL_WRITING
-		/* Must make sure that there still aren't any copy-on-write mappings.
-		 * New ones may have appeared since `mpart_memload_relock()' had to
-		 * temporarily release our lock on `self' */
-		if unlikely(!LIST_EMPTY(&self->mp_copy)) {
-			mpart_lock_release_f(self);
-			goto again;
-		}
-#endif /* LOCAL_WRITING */
-
-		goto again_memaddr;
+		mpart_memload_and_unlock(self, part_offs, &physloc);
+		goto again;
 	}
 	assert(physloc.mppl_size != 0);
-	assert(physloc.mppl_size <= num_bytes);
+	assert(physloc.mppl_size <= part_size);
 
 	/* Actually transfer data! */
 #ifdef LOCAL_BUFFER_TRANSFER_NOEXCEPT
@@ -337,10 +284,10 @@ again_memaddr:
 				/* Commit the partial write success (and limit the # of
 				 * successfully written bytes to what we were actually
 				 * able to commit). */
-				ok = mpart_memaddr_for_write_commit(self, partrel_offset, ok);
+				ok = mpart_memaddr_for_write_commit(self, part_offs, ok);
 #endif /* LOCAL_WRITING */
 				result += ok;
-				partrel_offset += ok;
+				filepos += ok;
 				num_bytes -= ok;
 			}
 			/* Can't use memcpy_nopf() to transfer memory from the given buffer.
@@ -372,10 +319,10 @@ again_memaddr:
 			 * must use an intermediate buffer for transfer */
 #ifdef LOCAL_BUFFER_IS_AIO
 			result += LOCAL__mpart_buffered_rw(self, buffer, buf_offset + result,
-			                                   num_bytes, partrel_offset);
+			                                   num_bytes, filepos);
 #else /* LOCAL_BUFFER_IS_AIO */
 			result += LOCAL__mpart_buffered_rw(self, (LOCAL_buffer_t)((LOCAL_ubuffer_t)buffer + result),
-			                                   num_bytes, partrel_offset);
+			                                   num_bytes, filepos);
 #endif /* !LOCAL_BUFFER_IS_AIO */
 			return result;
 		} /* if unlikely(copy_error != 0) */
@@ -387,22 +334,22 @@ again_memaddr:
 	 * NOTE: In this case, `mpart_memaddr_for_write_commit()' should always
 	 *       re-return `physloc.mppl_size', but we don't actually assert this
 	 *       here! */
-	physloc.mppl_size = mpart_memaddr_for_write_commit(self,
-	                                                   partrel_offset,
+	physloc.mppl_size = mpart_memaddr_for_write_commit(self, part_offs,
 	                                                   physloc.mppl_size);
 #endif /* LOCAL_WRITING */
 
 	result += physloc.mppl_size;
 
 	/* Check if there is more data for us to transfer. */
-	if (result < num_bytes) {
-		partrel_offset += physloc.mppl_size;
+	if (part_size > physloc.mppl_size) {
+		part_offs += physloc.mppl_size;
+		filepos += physloc.mppl_size;
+		part_size -= physloc.mppl_size;
 		num_bytes -= physloc.mppl_size;
 		goto again_memaddr;
 	}
-
-done:
 	mpart_lock_release(self);
+done:
 	return result;
 }
 

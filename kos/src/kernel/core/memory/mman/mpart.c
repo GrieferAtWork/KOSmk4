@@ -473,13 +473,12 @@ again:
 			                                          GFP_PREFLT);
 			if unlikely(!bitset) {
 				/* Must allocate the new bitset while blocking! */
-				mpart_lock_release_f(self);
+				mpart_lock_release(self);
 				bitset = (mpart_blkst_word_t *)kmalloc(bitset_size, GFP_LOCKED | GFP_PREFLT);
 				TRY {
 					mpart_lock_acquire_and_setcore_unwrite_nodma(self);
 				} EXCEPT {
 					kfree(bitset);
-					mpart_lockops_reap(self);
 					RETHROW();
 				}
 				/* Check if anything's changed. */
@@ -489,6 +488,9 @@ again:
 				            mpart_hasblockstate(self)) {
 					mpart_lock_release_f(self);
 					kfree(bitset);
+#ifndef __OPTIMIZE_SIZE__
+					mpart_lockops_reap(self);
+#endif /* !__OPTIMIZE_SIZE__ */
 					goto again;
 				}
 				/* Nothing's changed, so we can just write-back the new bitset. */
@@ -580,6 +582,9 @@ again:
 	if unlikely(has_initializing_parts) {
 		incref(file);
 		mpart_lock_release_f(self);
+#ifndef __OPTIMIZE_SIZE__
+		mpart_lockops_reap(self);
+#endif /* !__OPTIMIZE_SIZE__ */
 		/* Wait until parts that are being initialized finish doing that. */
 		TRY {
 			{
@@ -595,9 +600,15 @@ again:
 				if unlikely(!mpart_hasblocksstate_init(self)) {
 					mpart_lock_release_f(self);
 					task_disconnectall();
+#ifndef __OPTIMIZE_SIZE__
+					mpart_lockops_reap(self);
+#endif /* !__OPTIMIZE_SIZE__ */
 					goto again;
 				}
 				mpart_lock_release_f(self);
+#ifndef __OPTIMIZE_SIZE__
+				mpart_lockops_reap(self);
+#endif /* !__OPTIMIZE_SIZE__ */
 			}
 			/* Wait for initialization to complete. */
 			task_waitfor();

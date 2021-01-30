@@ -60,17 +60,14 @@ DECL_BEGIN
  * NOTE: If necessary, the length of the returned range may be truncated in
  *       order to accommodate the requirements on the state of contained blocks.
  *
- * @return: MPART_MEMADDR_SUCCESS:    Success
- * @return: MPART_MEMADDR_NOT_LOADED: Error: At least one accessed block has a state that
- *                                           is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT'
- * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-PUBLIC NOBLOCK NONNULL((1)) unsigned int
+ * @return: true:  Success
+ * @return: false: Error: At least one accessed block has a state that
+ *                        is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT' */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
                                       mpart_reladdr_t partrel_offset, size_t num_bytes,
                                       struct mpart_physloc *__restrict result) {
-	/* Check for special case: Our part doesn't contain `partrel_offset' */
-	if unlikely(partrel_offset >= mpart_getsize(self))
-		goto err_bad_bounds;
+	assert(partrel_offset < mpart_getsize(self));
 
 	/* Calculate the largest, continuous physical
 	 * address range starting at `partrel_offset' */
@@ -106,11 +103,9 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
 			}
 		}
 	}
-	return MPART_MEMADDR_SUCCESS;
+	return true;
 err_not_loaded:
-	return MPART_MEMADDR_NOT_LOADED;
-err_bad_bounds:
-	return MPART_MEMADDR_BAD_BOUNDS;
+	return false;
 }
 
 
@@ -127,19 +122,16 @@ err_bad_bounds:
  * All of the blocks that fully overlap with the returned range are only
  * required to not have a state set to `MPART_BLOCK_ST_INIT'.
  *
- * @return: MPART_MEMADDR_SUCCESS:    Success
- * @return: MPART_MEMADDR_NOT_LOADED: Error: At least one fully accessed block has a state
- *                                           that is `MPART_BLOCK_ST_INIT', or at least one
- *                                           of the 0-2 border blocks has a state that is one
- *                                           of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF'
- * @return: MPART_MEMADDR_BAD_BOUNDS: Error: `partrel_offset >= mpart_getsize(self)' */
-PUBLIC NOBLOCK NONNULL((1)) unsigned int
+ * @return: true:  Success
+ * @return: false: Error: At least one fully accessed block has a state
+ *                        that is `MPART_BLOCK_ST_INIT', or at least one
+ *                        of the 0-2 border blocks has a state that is one
+ *                        of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF' */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
                                        mpart_reladdr_t partrel_offset, size_t num_bytes,
                                        struct mpart_physloc *__restrict result) {
-	/* Check for special case: Our part doesn't contain `partrel_offset' */
-	if unlikely(partrel_offset >= mpart_getsize(self))
-		goto err_bad_bounds;
+	assert(partrel_offset < mpart_getsize(self));
 
 	/* Calculate the largest, continuous physical
 	 * address range starting at `partrel_offset' */
@@ -221,11 +213,9 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 		}
 	}
 done:
-	return MPART_MEMADDR_SUCCESS;
+	return true;
 err_not_loaded:
-	return MPART_MEMADDR_NOT_LOADED;
-err_bad_bounds:
-	return MPART_MEMADDR_BAD_BOUNDS;
+	return false;
 }
 
 
