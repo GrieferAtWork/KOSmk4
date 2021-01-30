@@ -779,7 +779,7 @@ done_mark_changed:
 				lonode->_mn_module = NULL; /* XXX: Inherit from `node'? */
 
 				node->mn_minaddr = (byte_t *)self->mfl_addr;
-				/*node->mn_partoff += mnode_getsize(lonode);*/ /* Not really necessary (always gets overwritten below) */
+				node->mn_partoff += mnode_getsize(lonode); /* Potentially needed for `hinode->mn_partoff' */
 
 				/* Consume the first p-copy node. */
 				self->mfl_pcopy[0] = self->mfl_pcopy[1];
