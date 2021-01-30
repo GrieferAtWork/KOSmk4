@@ -1232,18 +1232,19 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			unmap_maxaddr = (byte_t *)mnode_getmaxaddr(node);
 		unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		/* Make sure that the (accessed) address range has been prepared. */
-		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
-			if (!pagedir_prepare(unmap_minaddr, unmap_size))
-				goto failed;
-			ATOMIC_OR(node->mn_flags, MNODE_F_MPREPARED);
-		}
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-
 		/* Check for simple case: unmap a node as a whole. */
 		if (unmap_minaddr == mnode_getminaddr(node) &&
 		    unmap_maxaddr == mnode_getmaxaddr(node)) {
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+			/* Make sure that the (accessed) address range has been prepared. */
+			if (!(node->mn_flags & MNODE_F_MPREPARED)) {
+				if (!pagedir_prepare(unmap_minaddr, unmap_size))
+					goto failed;
+			} else {
+				node->mn_flags &= ~MNODE_F_MPREPARED; /* Prevent double-unprepare! */
+			}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 			mnode_tree_removenode(&mman_kernel.mm_mappings, node);
 			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
 
@@ -1251,7 +1252,6 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 
 			/* Just delete the node as a whole! */
-			node->mn_flags &= ~MNODE_F_MPREPARED; /* Prevent double-unprepare! */
 			mnode_destroy(node);
 			goto continue_nextpart;
 		}
@@ -1285,6 +1285,14 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			}
 		}
 
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		/* Make sure that the (accessed) address range has been prepared. */
+		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
+			if (!pagedir_prepare(unmap_minaddr, unmap_size))
+				goto failed;
+		}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 		/* At this point, we've got a lock to the part, so try to unmap it! */
 		{
 			bool unmap_ok;
@@ -1296,8 +1304,21 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			if (part != locked_part)
 				mpart_lock_release(part);
 			decref_unlikely(part);
-			if (!unmap_ok)
+			if (!unmap_ok) {
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+				/* If we've manually prepared the affected address range above,
+				 * then we must still undo this upon failure, so-as not to leave
+				 * memory prepared when it shouldn't be. */
+				if (!(node->mn_flags & MNODE_F_MPREPARED))
+					pagedir_unprepare(unmap_minaddr, unmap_size);
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				goto failed;
+			}
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+			/* Upon success, `mman_unmap_mpart_subregion()' will have already
+			 * unmapped+unprepared the affected address range, meaning we don't
+			 * have to unprepare it anymore. */
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		}
 
 		/* Continue after the successfully unmapped address range. */
