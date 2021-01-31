@@ -24,8 +24,9 @@
 #include <kernel/compiler.h>
 
 #include <dev/tty.h>
-#include <kernel/vm.h>
-#include <kernel/vm/exec.h>
+#include <kernel/mman.h>
+#include <kernel/mman/execinfo.h>
+#include <kernel/mman/mnode.h>
 #include <sched/cpu.h>
 #include <sched/pid-ctty.h>
 #include <sched/pid.h>
@@ -139,8 +140,13 @@ PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) size_t
 NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman const *__restrict self) {
 	if unlikely(!self->mm_mappings)
 		return 0;
+#ifdef CONFIG_USE_NEW_VM
+	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,
+	                                         &FORMMAN(self, thismman_kernel_reservation));
+#else /* CONFIG_USE_NEW_VM */
 	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,
 	                                         vm_get_kernreserve_node(self));
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 
@@ -150,7 +156,7 @@ ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
 	upid_t pid;
 	REF struct taskpid *tpid;
 	REF struct task *thread = NULL;
-	REF struct vm *v = NULL;
+	REF struct vm *mm = NULL;
 	struct pidns *myns = THIS_PIDNS;
 	pid  = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	tpid = pidns_trylookup(myns, pid);
@@ -159,16 +165,16 @@ ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
 		thread = taskpid_gettask(tpid);
 	FINALLY_XDECREF_UNLIKELY(thread);
 	if (thread)
-		v = task_getvm(thread);
-	FINALLY_XDECREF_UNLIKELY(v);
+		mm = task_getmman(thread);
+	FINALLY_XDECREF_UNLIKELY(mm);
 	if (format_printf(printer, arg,
 	                  "%" PRIuN(__SIZEOF_PID_T__) " (", pid) < 0)
 		goto done;
-	if (v) {
+	if (mm) {
 		REF struct directory_entry *exec_dent;
-		sync_read(v);
-		exec_dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
-		sync_endread(v);
+		sync_read(mm);
+		exec_dent = xincref(FORMMAN(mm, thismman_execinfo).mei_dent);
+		sync_endread(mm);
 		if (!exec_dent)
 			goto no_exec;
 		FINALLY_DECREF_UNLIKELY(exec_dent);
@@ -297,14 +303,22 @@ nofproc:
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done; /* TODO: nice */
 	/* num_threads */
-	if (v) {
+	if (mm) {
 		size_t thread_count = 0;
 		struct task *iter;
-		sync_read(&v->v_tasklock);
-		LIST_FOREACH (iter, &v->v_tasks, t_mman_tasks) {
+#ifdef CONFIG_USE_NEW_VM
+		mman_threadslock_acquire(mm);
+		LIST_FOREACH (iter, &mm->mm_threads, t_mman_tasks) {
 			++thread_count;
 		}
-		sync_endread(&v->v_tasklock);
+		mman_threadslock_release(mm);
+#else /* CONFIG_USE_NEW_VM */
+		sync_read(&mm->v_tasklock);
+		LIST_FOREACH (iter, &mm->v_tasks, t_mman_tasks) {
+			++thread_count;
+		}
+		sync_endread(&mm->v_tasklock);
+#endif /* !CONFIG_USE_NEW_VM */
 		if (format_printf(printer, arg, "%" PRIuSIZ " ",
 		                  thread_count) < 0)
 			goto done;
@@ -317,11 +331,11 @@ nofproc:
 	/* starttimes */
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done;
-	if (v) {
+	if (mm) {
 		size_t vsize;
-		sync_read(v);
-		vsize = mman_get_total_mapped_bytes(v);
-		sync_endread(v);
+		sync_read(mm);
+		vsize = mman_get_total_mapped_bytes(mm);
+		sync_endread(mm);
 		if (format_printf(printer, arg, "%" PRIuSIZ " ", vsize) < 0)
 			goto done;
 	} else {

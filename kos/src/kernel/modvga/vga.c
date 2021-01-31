@@ -28,6 +28,7 @@
 #include <dev/char.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
@@ -1635,7 +1636,7 @@ VGA_MMap(struct character_device *__restrict self,
 	VGA *me = (VGA *)self;
 	*pminoffset = (pos_t)me->v_vram_addr;
 	*pnumbytes  = (pos_t)me->v_vram_size;
-	return incref(&vm_datablock_physical);
+	return incref(&mfile_phys);
 }
 
 PRIVATE bool KCALL

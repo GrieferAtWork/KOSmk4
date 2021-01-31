@@ -77,7 +77,7 @@ opt.append("-Os");
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/rtm.h>
+#include <kernel/mman/rtm.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/emulock.h>
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */

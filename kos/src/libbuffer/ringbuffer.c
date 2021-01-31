@@ -42,7 +42,6 @@
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/heap.h>
-#include <kernel/vm.h>
 #include <kernel/mman/nopf.h>
 
 #include <sys/poll.h>

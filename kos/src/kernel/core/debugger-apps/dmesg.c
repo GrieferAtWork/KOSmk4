@@ -31,8 +31,8 @@
 #include <debugger/debugger.h>
 #include <fs/vfs.h>
 #include <kernel/dmesg.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/panic.h>
-#include <kernel/vm/exec.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -193,13 +193,13 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 				} EXCEPT {
 				}
 				if (sender) {
-					struct vm_execinfo_struct *ei;
-					ei = &FORMMAN(sender->t_mman, thisvm_execinfo);
-					if (ei->ei_path && ei->ei_dent) {
+					struct mexecinfo *ei;
+					ei = &FORMMAN(sender->t_mman, thismman_execinfo);
+					if (ei->mei_path && ei->mei_dent) {
 						dbg_pprinter(&printer, DBGSTR(":"), 1);
-						path_printentex(ei->ei_path,
-						                ei->ei_dent->de_name,
-						                ei->ei_dent->de_namelen,
+						path_printentex(ei->mei_path,
+						                ei->mei_dent->de_name,
+						                ei->mei_dent->de_namelen,
 						                &dbg_pprinter, &printer,
 						                PATH_PRINT_MODE_NORMAL,
 						                &vfs_kernel);

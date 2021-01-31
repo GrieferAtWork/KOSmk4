@@ -41,7 +41,6 @@
 
 #ifdef __KERNEL__
 #include <kernel/except.h>
-#include <kernel/vm.h>
 #include <kernel/mman/nopf.h>
 #include <sched/signal.h>
 #define HEAP_FREE(base, size) \

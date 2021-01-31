@@ -26,7 +26,7 @@
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/vm/rtm.h>
+#include <kernel/mman/rtm.h>
 
 #include <stddef.h>
 

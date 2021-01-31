@@ -25,8 +25,8 @@
 
 #include <drivers/usb.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/dma.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <misc/atomic-ref.h>
 #include <sched/atomic64.h>
 #include <sched/signal.h>
@@ -72,8 +72,8 @@ struct uhci_aio_data {
 	REF struct uhci_osqh       *ud_osqh;       /* [1..1][const] The Queue head associated with this request. */
 	REF struct uhci_controller *ud_ctrl;       /* [1..1][const] The associated USB controller. */
 	union {
-		struct vm_dmalock       ud_dmalock;    /* [valid_if(!UHCI_AIO_FSERVED && UHCI_AIO_FONEDMA)] Single DMA lock */
-		struct vm_dmalock      *ud_dmalockvec; /* [valid_if(!UHCI_AIO_FSERVED && !UHCI_AIO_FONEDMA)][0..1][owned] Vector of DMA locks
+		struct mdmalock       ud_dmalock;    /* [valid_if(!UHCI_AIO_FSERVED && UHCI_AIO_FONEDMA)] Single DMA lock */
+		struct mdmalock      *ud_dmalockvec; /* [valid_if(!UHCI_AIO_FSERVED && !UHCI_AIO_FONEDMA)][0..1][owned] Vector of DMA locks
 		                                        * NOTE: This vector is terminated by a sentinel DMA
 		                                        *       lock with its `dl_part' pointer set to `NULL' */
 	};

@@ -29,9 +29,9 @@
 #include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/uname.h>
 #include <kernel/vm.h>
-#include <kernel/vm/exec.h>
 #include <kernel/vm/usermod.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
@@ -133,15 +133,15 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 		result = GDBInfo_PrintKernelFilename(printer, arg, filename_only);
 	else {
 		if (GDBThread_IsAllStopModeActive) {
-			dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
-			path = xincref(FORMMAN(v, thisvm_execinfo).ei_path);
+			dent = xincref(FORMMAN(v, thismman_execinfo).mei_dent);
+			path = xincref(FORMMAN(v, thismman_execinfo).mei_path);
 		} else {
 			/* FIXME: What if one of the suspended threads is holding the VM lock?
 			 *        We should have some kind of timeout here, and switch to all-stop
 			 *        mode if the timeout expires. */
 			sync_read(v);
-			dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
-			path = xincref(FORMMAN(v, thisvm_execinfo).ei_path);
+			dent = xincref(FORMMAN(v, thismman_execinfo).mei_dent);
+			path = xincref(FORMMAN(v, thismman_execinfo).mei_path);
 			sync_endread(v);
 		}
 		if (filename_only && (dent || path)) {

@@ -37,8 +37,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/addr2line.h>
-#include <kernel/vm.h>
-#include <kernel/vm/exec.h>
+#include <kernel/mman.h>
+#include <kernel/mman/execinfo.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
@@ -78,12 +78,12 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	if (task_getprocess_of(thread) == task_getprocess_of(dbg_current))
 		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 	{
-		struct vm_execinfo_struct *execinfo;
-		execinfo = &FORMMAN(thread->t_mman, thisvm_execinfo);
-		if (execinfo->ei_dent) {
+		struct mexecinfo *ei;
+		ei = &FORMMAN(thread->t_mman, thismman_execinfo);
+		if (ei->mei_dent) {
 			len = dbg_printer(NULL,
-			                  execinfo->ei_dent->de_name,
-			                  execinfo->ei_dent->de_namelen);
+			                  ei->mei_dent->de_name,
+			                  ei->mei_dent->de_namelen);
 		} else if (thread->t_flags & TASK_FKERNTHREAD) {
 			len = dbg_print(DBGSTR("kernel"));
 		} else {

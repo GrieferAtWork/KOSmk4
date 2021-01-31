@@ -25,8 +25,8 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <kernel/vm.h>
-#include <kernel/vm/exec.h>
+#include <kernel/mman.h>
+#include <kernel/mman/execinfo.h>
 #include <sched/pid.h>
 
 #include <stdio.h>
@@ -41,7 +41,7 @@ ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
                            size_t bufsize) {
 	upid_t pid;
 	REF struct task *thread;
-	REF struct vm *v;
+	REF struct mman *mm;
 	struct pidns *myns = THIS_PIDNS;
 	REF struct directory_entry *exec_dent;
 	REF struct path            *exec_path;
@@ -49,13 +49,13 @@ ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
 	thread = pidns_lookup_task(myns, pid);
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		v = task_getvm(thread);
+		mm = task_getmman(thread);
 	}
-	FINALLY_DECREF_UNLIKELY(v);
-	sync_read(v);
-	exec_dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
-	exec_path = xincref(FORMMAN(v, thisvm_execinfo).ei_path);
-	sync_endread(v);
+	FINALLY_DECREF_UNLIKELY(mm);
+	sync_read(mm);
+	exec_dent = xincref(FORMMAN(mm, thismman_execinfo).mei_dent);
+	exec_path = xincref(FORMMAN(mm, thismman_execinfo).mei_path);
+	sync_endread(mm);
 	if unlikely(!exec_dent || !exec_path) {
 		xdecref_unlikely(exec_dent);
 		xdecref_unlikely(exec_path);

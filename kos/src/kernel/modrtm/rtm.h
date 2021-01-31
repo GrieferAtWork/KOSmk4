@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/vm/rtm.h>
+#include <kernel/mman/rtm.h>
 #include <kernel/types.h>
 
 #ifndef ARCH_HAVE_RTM

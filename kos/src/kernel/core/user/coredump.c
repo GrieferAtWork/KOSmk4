@@ -47,7 +47,7 @@
 #include <debugger/debugger.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <kernel/vm/exec.h>
+#include <kernel/mman/execinfo.h>
 #include <sched/pid.h>
 
 #include <libinstrlen/instrlen.h>
@@ -84,14 +84,14 @@ dbg_coredump(void const *const *traceback_vector,
 		dbg_pprint(0, dbg_screen_height - 1, nonfatal_msg);
 	}
 	{
-		struct vm_execinfo_struct *execinfo;
-		execinfo = &FORMMAN(dbg_current->t_mman, thisvm_execinfo);
+		struct mexecinfo *ei;
+		ei = &FORMMAN(dbg_current->t_mman, thismman_execinfo);
 		dbg_setcolor(ANSITTY_CL_RED, ANSITTY_CL_GREY);
 		dbg_print(DBGSTR("Coredump "));
-		if (execinfo->ei_path && execinfo->ei_dent) {
-			path_printent(execinfo->ei_path,
-			              execinfo->ei_dent->de_name,
-			              execinfo->ei_dent->de_namelen,
+		if (ei->mei_path && ei->mei_dent) {
+			path_printent(ei->mei_path,
+			              ei->mei_dent->de_name,
+			              ei->mei_dent->de_namelen,
 			              &dbg_printer,
 			              NULL);
 			dbg_putc(' ');

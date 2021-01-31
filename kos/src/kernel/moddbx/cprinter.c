@@ -53,12 +53,6 @@
 #include "include/malloc.h"
 #include "include/obnote.h"
 
-/*For custom pointer-to-object-printers*/
-#include <kernel/vm/exec.h>
-#include <sched/pid.h>
-
-#include <sys/mmio.h>
-
 DECL_BEGIN
 
 

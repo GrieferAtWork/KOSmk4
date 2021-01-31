@@ -33,8 +33,8 @@ opt.append("-Os");
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/panic.h>
-#include <kernel/vm/exec.h>
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
 #include <kernel/x86/idt.h>
 #include <sched/pid.h>
@@ -63,14 +63,14 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 		dbg_pprint(0, dbg_screen_height - 1, nonfatal_msg);
 	}
 	{
-		struct vm_execinfo_struct *execinfo;
-		execinfo = &FORMMAN(dbg_current->t_mman, thisvm_execinfo);
+		struct mexecinfo *ei;
+		ei = &FORMMAN(dbg_current->t_mman, thismman_execinfo);
 		dbg_setcolor(ANSITTY_CL_RED, ANSITTY_CL_GREY);
 		dbg_print(DBGSTR("Breakpoint "));
-		if (execinfo->ei_path && execinfo->ei_dent) {
-			path_printent(execinfo->ei_path,
-			              execinfo->ei_dent->de_name,
-			              execinfo->ei_dent->de_namelen,
+		if (ei->mei_path && ei->mei_dent) {
+			path_printent(ei->mei_path,
+			              ei->mei_dent->de_name,
+			              ei->mei_dent->de_namelen,
 			              &dbg_printer,
 			              NULL);
 			dbg_putc(' ');
