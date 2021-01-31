@@ -45,7 +45,7 @@
 #include <string.h>
 
 #if defined(__i386__) || defined(__x86_64__)
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/segment.h>

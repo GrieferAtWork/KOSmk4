@@ -35,7 +35,7 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 #include <sched/task.h>
 
 #include <hybrid/__assert.h>

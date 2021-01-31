@@ -36,7 +36,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 #include <sched/cpu.h> /* CONFIG_NO_SMP */
 #include <sched/cred.h>
 

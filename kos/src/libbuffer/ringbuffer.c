@@ -43,7 +43,7 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/vm.h>
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 
 #include <sys/poll.h>
 #else /* __KERNEL__ */

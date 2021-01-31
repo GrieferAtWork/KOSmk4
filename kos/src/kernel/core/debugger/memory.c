@@ -36,7 +36,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/vm.h>
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>

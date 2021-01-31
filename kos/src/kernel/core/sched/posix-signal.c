@@ -34,7 +34,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 #include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>

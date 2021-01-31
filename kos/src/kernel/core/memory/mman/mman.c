@@ -417,8 +417,7 @@ INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_user_mman)(void) {
 	REF struct mman *umm;
 	umm = mman_new();
-	task_setmman(umm);
-	decref(umm);
+	task_setmman_inherit(umm);
 }
 
 

@@ -24,7 +24,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/malloc.h>
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 
 #include <asm/cacheline.h>
 

@@ -26,7 +26,7 @@
 
 #include <kernel/except.h>
 #include <kernel/vm.h>
-#include <kernel/vm/nopf.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
