@@ -39,6 +39,7 @@
 #include <kernel/except.h>
 #include <kernel/execabi.h>
 #include <kernel/handle.h>
+#include <kernel/mman/mm-exec.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
@@ -3052,15 +3053,15 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	/* Deal with the special VFORK mode. */
 	args->ea_change_mman_to_effective_mman = true;
 	if (thread_flags & TASK_FVFORK) {
-		REF struct vm *newvm;
+		REF struct mman *newmm;
 		/* Construct the new VM for the process after the exec. */
-		newvm = vm_alloc();
+		newmm = mman_new();
 		{
-			FINALLY_DECREF_UNLIKELY(newvm);
-			args->ea_mman = newvm;
-			vm_exec(args);
+			FINALLY_DECREF_UNLIKELY(newmm);
+			args->ea_mman = newmm;
+			mman_exec(args);
 			/* Load the newly initialized VM as our current VM */
-			task_setvm(newvm);
+			task_setmman(newmm);
 		}
 		/* ==== Point of no return: This is where we
 		 *      indicate success to our parent process. */
@@ -3102,8 +3103,8 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
 		sigmask_check();
 	} else {
-		args->ea_mman = THIS_VM;
-		vm_exec(args);
+		args->ea_mman = THIS_MMAN;
+		mman_exec(args);
 #ifdef CONFIG_HAVE_USERPROCMASK
 		/* If the previous process used to have a userprocmask, and didn't make proper
 		 * use of calling `sys_sigmask_check()', we check for pending signals in the
@@ -3139,7 +3140,7 @@ kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 		 * allocation failing can still be handled by user-space.
 		 * NOTE: We always allocate this buffer on the heap, since file paths can get quite long,
 		 *       an being as far to the bottom of the kernel stack as we are, it could be a bit
-		 *       risky to allocate a huge stack-based structure when we still have to call `vm_exec()',
+		 *       risky to allocate a huge stack-based structure when we still have to call `mman_exec()',
 		 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
 		buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
 		TRY {

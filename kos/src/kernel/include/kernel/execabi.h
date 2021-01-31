@@ -117,29 +117,17 @@ typedef USER UNCHECKED char const *USER CHECKED const *execabi_strings_t;
 
 struct driver;
 struct icpustate;
-#ifdef CONFIG_USE_NEW_VM
 struct mman;
-#else /* CONFIG_USE_NEW_VM */
-struct vm;
-#endif /* !CONFIG_USE_NEW_VM */
 struct path;
 struct directory_entry;
 struct regular_node;
 
 struct execargs {
-#ifdef CONFIG_USE_NEW_VM
 	struct mman                *ea_mman;        /* [1..1] The mman into which to map the executable.
 	                                             * This must not be the kernel mman, which causes an assertion failure.
 	                                             * NOTE: When `ea_change_mman_to_effective_mman' is `true', prior to a successful
 	                                             *       return of `execabi::ea_exec', it will also do a `task_setmman(ea_mman)',
 	                                             *       meaning that the caller will become apart of the given mman. */
-#else /* CONFIG_USE_NEW_VM */
-	struct vm                  *ea_mman;        /* [1..1] The VM into which to map the executable.
-	                                             * This must not be the kernel VM, which causes an assertion failure.
-	                                             * NOTE: When `ea_change_mman_to_effective_mman' is `true', prior to a successful
-	                                             *       return of `execabi::ea_exec', it will also do a `task_setvm(ea_mman)',
-	                                             *       meaning that the caller will become apart of the given VM. */
-#endif /* !CONFIG_USE_NEW_VM */
 	struct icpustate           *ea_state;       /* [1..1] The user-space CPU state to update upon success in a manner
 	                                             *        that proper execution of the loaded binary is possible.
 	                                             * Note however that in the case of a dynamic binary, a dynamic linker

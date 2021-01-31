@@ -126,7 +126,16 @@ FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_fork(void) THROWS(E_B
 /* Set the mman active within the calling thread, as well as
  * change page directories to make use of the new mman before
  * returning. */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL task_setmman)(struct mman *__restrict newmman);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_setmman)(struct mman *__restrict newmman);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_setmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman);
+
+/* Same as `task_setmman()', but return a reference to the old mman. */
+FUNDEF NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+NOTHROW(FCALL task_xchmman)(struct mman *__restrict newmman);
+FUNDEF NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+NOTHROW(FCALL task_xchmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman);
 
 /* Return the active mman of the given `thread' */
 FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *

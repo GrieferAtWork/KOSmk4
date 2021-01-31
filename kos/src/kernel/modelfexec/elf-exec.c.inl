@@ -325,12 +325,16 @@ err_overlap:
 			/* Change the calling thread's vm to `args->ea_mman' */
 			if (oldvm != args->ea_mman) {
 				incref(oldvm);
+#ifdef CONFIG_USE_NEW_VM
+				task_setvm(args->ea_mman);
+#else /* CONFIG_USE_NEW_VM */
 				TRY {
 					task_setvm(args->ea_mman);
 				} EXCEPT {
 					decref_nokill(oldvm);
 					RETHROW();
 				}
+#endif /* !CONFIG_USE_NEW_VM */
 			}
 			TRY {
 				size_t ustack_size;
@@ -362,19 +366,22 @@ err_overlap:
 					                                                entry_pc);
 				}
 			} EXCEPT {
-				if (oldvm != args->ea_mman) {
-					FINALLY_DECREF(oldvm);
-					task_setvm(oldvm);
-				}
+				task_setmman_inherit(oldvm);
 				RETHROW();
 			}
 			if (oldvm != args->ea_mman) {
+#ifdef CONFIG_USE_NEW_VM
+				if unlikely(!args->ea_change_mman_to_effective_mman)
+					task_setmman(oldvm);
+				decref(oldvm);
+#else /* CONFIG_USE_NEW_VM */
 				if likely(args->ea_change_mman_to_effective_mman) {
 					decref(oldvm);
 				} else {
 					FINALLY_DECREF(oldvm);
 					task_setvm(oldvm);
 				}
+#endif /* !CONFIG_USE_NEW_VM */
 			}
 		}
 	} EXCEPT {

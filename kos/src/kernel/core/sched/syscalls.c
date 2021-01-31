@@ -503,8 +503,7 @@ PRIVATE void KCALL unshare_vm(void) {
 #ifdef CONFIG_USE_NEW_VM
 		REF struct mman *newmm;
 		newmm = mman_fork();
-		task_setmman(newmm);
-		decref_nokill(newmm);
+		task_setmman_inherit(newmm);
 #else /* CONFIG_USE_NEW_VM */
 		REF struct vm *newvm;
 		newvm = vm_clone(myvm);

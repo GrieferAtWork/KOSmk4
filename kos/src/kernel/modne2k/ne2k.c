@@ -482,27 +482,22 @@ Ne2k_PrintData(struct ne2k_upload_printer_data *__restrict self,
 PRIVATE void KCALL
 Ne2k_UploadPacket(port_t dataport,
                   struct nic_packet const *__restrict self,
-                  struct vm *__restrict payload_vm) {
+                  struct mman *__restrict payload_mm) {
 	struct ne2k_upload_printer_data d;
 	d.nup_dataport = dataport;
 	d.nup_hashalf  = false;
 #define PRINT_SEGMENT(p, s) Ne2k_PrintData(&d, p, s)
 	{
-		REF struct vm *oldvm = incref(THIS_VM);
+		REF struct mman *oldmm;
+		oldmm = task_xchmman(payload_mm);
 		TRY {
-			/* The payload must be printed from the perspective of `payload_vm'!
-			 * TODO: This is a really _bad_ way of switching VM, especially
-			 *       because `task_setvm(oldvm);' can throw an E_WOULDBLOCK
-			 *       exception when preemption is currently disabled... */
-			task_setvm(payload_vm);
+			/* The payload must be printed from the perspective of `payload_mm'! */
 			nic_packet_print(self, PRINT_SEGMENT);
-			task_setvm(oldvm);
 		} EXCEPT {
-			task_setvm(oldvm);
-			decref_unlikely(oldvm);
+			task_setmman_inherit(oldmm);
 			RETHROW();
 		}
-		decref_unlikely(oldvm);
+		task_setmman_inherit(oldmm);
 	}
 #undef PRINT_SEGMENT
 	if unlikely(d.nup_hashalf) {

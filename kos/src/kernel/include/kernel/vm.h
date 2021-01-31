@@ -2387,6 +2387,24 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *KCALL
 task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 
 
+/* For forward-compatibility. */
+#define task_setmman_inherit(newmman) (task_setvm(newmman), decref_nokill(newmman))
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *
+NOTHROW(KCALL task_xchmman)(struct vm *__restrict newvm) {
+	REF struct vm *result;
+	result = incref(THIS_VM);
+	task_setvm(newvm); /* XXX: Ignore exceptions to cause panic instead! */
+	return result;
+}
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *
+NOTHROW(KCALL task_xchmman_inherit)(REF struct vm *__restrict newvm) {
+	REF struct vm *result;
+	result = incref(THIS_VM);
+	task_setvm(newvm); /* XXX: Ignore exceptions to cause panic instead! */
+	decref_nokill(newvm);
+	return result;
+}
+
 
 /* Acquire locks to the tree of the kernel VM */
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) bool KCALL vm_kernel_treelock_writef(gfp_t flags) THROWS(E_WOULDBLOCK);

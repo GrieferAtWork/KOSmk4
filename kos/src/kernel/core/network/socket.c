@@ -617,7 +617,7 @@ socket_sendv(struct socket *__restrict self,
 
 struct connect_and_send_job {
 	WEAK REF struct socket   *cas_socket;   /* [0..1][lock(CLEAR_ONCE)] Weak reference to the associated socket. */
-	REF struct vm            *cas_bufvm;    /* [0..1][lock(CLEAR_ONCE)] VM for user-space buffers. */
+	REF struct mman          *cas_bufmm;    /* [0..1][lock(CLEAR_ONCE)] VM for user-space buffers. */
 	struct ancillary_message *cas_pcontrol; /* [0..1][const] Pointer to ancillary message data. */
 	struct ancillary_message  cas_control;  /* [const][valid_if(cas_pcontrol)] ancillary message data. */
 	syscall_ulong_t           cas_msgflags; /* [const] Message flags */
@@ -635,7 +635,7 @@ NOTHROW(ASYNC_CALLBACK_CC connect_and_send_fini)(async_job_t self) {
 	if (me->cas_buffer.ab_entc != 1)
 		kfree((void *)me->cas_buffer.ab_entv);
 	xweakdecref_unlikely(me->cas_socket);
-	xdecref_unlikely(me->cas_bufvm);
+	xdecref_unlikely(me->cas_bufmm);
 }
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
@@ -665,12 +665,10 @@ connect_and_send_work(async_job_t self) {
 	aio_handle_generic_fini(&me->cas_aio);
 	aio_handle_generic_init(&me->cas_aio);
 	TRY {
-		REF struct vm *oldvm;
-		oldvm = incref(THIS_VM);
-		FINALLY_DECREF_UNLIKELY(oldvm);
-		task_setvm(me->cas_bufvm); /* TODO: Bad way of switching VMs! */
-		decref_nokill(me->cas_bufvm);
-		me->cas_bufvm = NULL;
+		REF struct mman *oldmm;
+		oldmm = task_xchmman(me->cas_bufmm);
+		decref_nokill(me->cas_bufmm);
+		me->cas_bufmm = NULL;
 		TRY {
 			(*me->cas_socket->sk_ops->so_sendv)(me->cas_socket,
 			                                    &me->cas_buffer,
@@ -679,10 +677,10 @@ connect_and_send_work(async_job_t self) {
 			                                    me->cas_msgflags,
 			                                    &me->cas_aio);
 		} EXCEPT {
-			task_setvm(oldvm); /* TODO: This might throw an exception! */
+			task_setmman_inherit(oldmm);
 			RETHROW();
 		}
-		task_setvm(oldvm);
+		task_setmman_inherit(oldmm);
 	} EXCEPT {
 		aio_handle_init_noop(&me->cas_aio, AIO_COMPLETION_FAILURE);
 		decref_unlikely(me->cas_socket);
@@ -773,14 +771,14 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 			job->cas_buffer.ab_last         = buf->ab_last;
 		}
 		aio_handle_generic_init(&job->cas_aio);
-		job->cas_bufvm = incref(THIS_VM);
+		job->cas_bufmm = incref(THIS_VM);
 		TRY {
 			/* Initiate the connect() operation. */
 			(*self->sk_ops->so_connect)(self, addr, addr_len, &job->cas_aio);
 		} EXCEPT {
 			if (job->cas_buffer.ab_entc != 1)
 				kfree((void *)job->cas_buffer.ab_entv);
-			decref_unlikely(job->cas_bufvm);
+			decref_unlikely(job->cas_bufmm);
 			RETHROW();
 		}
 	} EXCEPT {

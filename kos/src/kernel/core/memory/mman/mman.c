@@ -299,9 +299,30 @@ PRIVATE struct atomic_lock setmman_lock = ATOMIC_LOCK_INIT;
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_setmman)(struct mman *__restrict newmman) {
 	REF struct mman *oldmman;
+	newmman = incref(newmman);
+	oldmman = task_xchmman_inherit(newmman);
+	decref(oldmman);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_setmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman) {
+	REF struct mman *oldmman;
+	oldmman = task_xchmman_inherit(newmman);
+	decref(oldmman);
+}
+
+/* Same as `task_setmman()', but return a reference to the old mman. */
+PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+NOTHROW(FCALL task_xchmman)(struct mman *__restrict newmman) {
+	return task_xchmman_inherit(incref(newmman));
+}
+
+/* Same as `task_setmman()', but return a reference to the old mman. */
+PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+NOTHROW(FCALL task_xchmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman) {
+	REF struct mman *oldmman;
 	struct task *me = THIS_TASK;
 	pflag_t was;
-	incref(newmman); /* Reference to `me->t_mman' */
 #ifndef CONFIG_NO_SMP
 again:
 #endif /* CONFIG_NO_SMP */
@@ -312,8 +333,7 @@ again:
 		/* No-op (but must check explicitly to prevent dead-
 		 * lock from acquiring `newmman->mm_threadslock' twice) */
 		PREEMPTION_POP(was);
-		decref_nokill(newmman);
-		return;
+		return newmman;
 	}
 
 	/* Acquire all of the necessary locks. */
@@ -357,11 +377,16 @@ again:
 	/* Set the new mman as the active manager for the current CPU.
 	 * NOTE: To prevent the CPU from changing, do this before re-
 	 *       enabling preemption. */
-	cpu_setmman_ex(me->t_cpu, newmman);
+#if defined(CONFIG_NO_SMP) && !defined(__OPTIMIZE_SIZE__)
+	if (oldmman != newmman)
+#endif /* CONFIG_NO_SMP && !__OPTIMIZE_SIZE__ */
+	{
+		cpu_setmman_ex(me->t_cpu, newmman);
+	}
 	PREEMPTION_POP(was);
 
-	/* Drop our reference to the old mman. */
-	decref_unlikely(oldmman);
+	/* Return a reference to the old mman. */
+	return oldmman;
 }
 
 

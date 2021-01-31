@@ -265,10 +265,10 @@ enum_locals_at_with_debug_sections(void const *absolute_pc,
                                    debuginfo_enum_locals_callback_t callback,
                                    void *arg) {
 	ssize_t result;
-	struct vm *required_vm = &vm_kernel;
+	struct vm *required_mm = &vm_kernel;
 	if (ADDR_ISUSER(absolute_pc))
-		required_vm = dbg_current->t_mman;
-	if (required_vm == THIS_VM) {
+		required_mm = dbg_current->t_mman;
+	if (required_mm == THIS_VM) {
 		result = enum_locals_at_with_debug_sections_impl(absolute_pc,
 		                                                 callback,
 		                                                 arg);
@@ -277,24 +277,17 @@ enum_locals_at_with_debug_sections(void const *absolute_pc,
 		result = 0;
 	} else {
 		/* Switch to the foreign VM, so we can directly access user-space memory. */
-		REF struct vm *oldvm;
-		oldvm = incref(THIS_VM);
+		REF struct mman *oldmm;
+		oldmm = task_xchmman(required_mm);
 		TRY {
-			task_setvm(required_vm);
-			TRY {
-				result = enum_locals_at_with_debug_sections_impl(absolute_pc,
-				                                                 callback,
-				                                                 arg);
-			} EXCEPT {
-				task_setvm(oldvm);
-				RETHROW();
-			}
-			task_setvm(oldvm);
+			result = enum_locals_at_with_debug_sections_impl(absolute_pc,
+			                                                 callback,
+			                                                 arg);
 		} EXCEPT {
-			decref_unlikely(oldvm);
+			task_setmman_inherit(oldmm);
 			RETHROW();
 		}
-		decref_unlikely(oldvm);
+		task_setmman_inherit(oldmm);
 	}
 	return result;
 }
