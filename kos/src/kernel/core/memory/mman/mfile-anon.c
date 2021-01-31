@@ -181,7 +181,7 @@ again:
 	if (!wasdestroyed(root)) {
 		/* Set the NO_GLOBAL_REF bit, thus essentially unloading the part from the
 		 * global part cache (should this mem-part still be apart of said cache) */
-		if (!(ATOMIC_FETCHOR(root->mp_flags, MPART_F_NO_GLOBAL_REF) & MPART_F_NO_GLOBAL_REF))
+		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root); /* The global reference... */
 		_mpart_init_asanon(root);
 		assert(root->mp_file == file);
@@ -212,7 +212,7 @@ again:
  *  - Existing mappings of all mem-parts are altered to point
  *    at anonymous memory files. For this purpose, the nodes of
  *    all existing mappings are altered.
- *  - The `MPART_F_NO_GLOBAL_REF' flag is set for all parts
+ *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' are set to `MFILE_PARTS_ANONYMOUS'
  * The result of all of this is that it is no longer possible to
  * trace back mappings of parts of `self' to that file.
@@ -252,7 +252,7 @@ again_lock:
 
 	/* For every node within the tree, do the following:
 	 * >> if (!wasdestroyed(part)) {
-	 * >>     if (!(ATOMIC_FETCHOR(part->mp_flags, MPART_F_NO_GLOBAL_REF) & MPART_F_NO_GLOBAL_REF))
+	 * >>     if (ATOMIC_FETCHAND(part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 	 * >>         decref_nokill(part);
 	 * >>     _mpart_init_asanon(part);
 	 * >>     assert(part->mp_file == self);
@@ -487,7 +487,7 @@ again_lock:
 			if (!wasdestroyed(part)) {
 				/* Set the NO_GLOBAL_REF bit, thus essentially unloading the part from the
 				 * global part cache (should this mem-part still be apart of said cache) */
-				if (!(ATOMIC_FETCHOR(part->mp_flags, MPART_F_NO_GLOBAL_REF) & MPART_F_NO_GLOBAL_REF))
+				if (ATOMIC_FETCHAND(part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 					decref_nokill(part); /* The global reference... */
 				_mpart_init_asanon(part);
 				assert(part->mp_file == self);

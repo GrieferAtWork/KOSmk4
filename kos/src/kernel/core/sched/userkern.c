@@ -189,8 +189,7 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 PUBLIC struct mpart userkern_segment_part = {
 #ifdef CONFIG_USE_NEW_VM
 	MPART_INIT_mp_refcnt(1),
-	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF |
-	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_VIO),
 	MPART_INIT_mp_file(&userkern_segment_file),
@@ -357,8 +356,7 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 PUBLIC struct vm_datapart userkern_segment_part_compat = {
 #ifdef CONFIG_USE_NEW_VM
 	MPART_INIT_mp_refcnt(1),
-	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF |
-	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_VIO),
 	MPART_INIT_mp_file(&userkern_segment_file_compat),

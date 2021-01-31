@@ -946,7 +946,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 	/* Initialize the hi-part. */
 	hipart->mp_refcnt = 1;
-	hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT | MPART_F_NO_GLOBAL_REF |
+	hipart->mp_flags |= lopart->mp_flags & (MPART_F_MAYBE_BLK_INIT |
 	                                        MPART_F_CHANGED | MPART_F_NOFREE |
 	                                        MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
 	/*hipart->mp_state = ...;*/ /* Already initialized above */
@@ -973,12 +973,12 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 	/* Mirror the part-of-global-list status of `lopart' in `hipart' */
 	if (LIST_ISBOUND(hipart, mp_allparts)) {
-		if (!(lopart->mp_flags & MPART_F_NO_GLOBAL_REF))
+		if (lopart->mp_flags & MPART_F_GLOBAL_REF)
 			hipart->mp_refcnt = 2; /* +1 for the global list. */
 		mpart_all_list_insert(hipart);
 	} else {
 	    LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);
-		assertf(lopart->mp_flags & MPART_F_NO_GLOBAL_REF,
+		assertf(!(lopart->mp_flags & MPART_F_GLOBAL_REF),
 		        "How can you have a global ref, but not be part of the global list?");
 	}
 

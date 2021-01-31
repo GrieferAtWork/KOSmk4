@@ -69,9 +69,9 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 			/* Initialize everything. */
 			part->mp_refcnt = 1; /* +1: `node' */
 #if MAP_LOCKED == MPART_F_MLOCK
-			part->mp_flags = MPART_F_NORMAL | MPART_F_NO_GLOBAL_REF | (flags & MAP_LOCKED);
+			part->mp_flags = MPART_F_NORMAL | (flags & MAP_LOCKED);
 #else /* MAP_LOCKED == MPART_F_MLOCK */
-			part->mp_flags = MPART_F_NORMAL | MPART_F_NO_GLOBAL_REF;
+			part->mp_flags = MPART_F_NORMAL;
 			if (flags & MAP_LOCKED)
 				part->mp_flags |= MPART_F_MLOCK;
 #endif /* MAP_LOCKED != MPART_F_MLOCK */

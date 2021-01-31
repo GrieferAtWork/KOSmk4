@@ -160,8 +160,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	node->_mn_module = NULL;
 
 	part->mp_refcnt = 1;
-	part->mp_flags  = MPART_F_NO_GLOBAL_REF |
-	                  MPART_F_NOFREE | MPART_F_COREPART |
+	part->mp_flags  = MPART_F_NOFREE | MPART_F_COREPART |
 	                  MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                  MPART_F_MLOCK_FROZEN | MPART_F_MLOCK;
 	part->mp_state  = MPART_ST_MEM;

@@ -83,8 +83,7 @@ INTDEF struct mpart __bootcpu_x86_dfstack_part;
 
 PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
 	MPART_INIT_mp_refcnt(2), /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode.mn_part' */
-	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF |
-	                    MPART_F_NOFREE | MPART_F_NOSPLIT |
+	MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |
 	                    MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN |
 	                    MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_MEM),

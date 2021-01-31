@@ -192,7 +192,7 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 #ifdef CONFIG_USE_NEW_VM
 	/* Initialize... */
 	part->mp_refcnt = 1;
-	part->mp_flags  = MPART_F_NO_GLOBAL_REF;
+	part->mp_flags  = MPART_F_NORMAL;
 	part->mp_state  = MPART_ST_MEM;
 	part->mp_file   = incref(&mfile_zero);
 	LIST_INIT(&part->mp_copy);

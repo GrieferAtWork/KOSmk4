@@ -879,7 +879,7 @@ done_mark_changed:
 			copy = self->mfl_ucdat.ucd_copy;
 			assert(copy);
 			copy->mp_refcnt = 1; /* This reference will be inherited by the node we create below */
-			copy->mp_flags  = MPART_F_NO_GLOBAL_REF | MPART_F_LOCKBIT;
+			copy->mp_flags  = MPART_F_LOCKBIT;
 #if MNODE_F_MLOCK == MPART_F_MLOCK
 			copy->mp_flags |= node->mn_flags & MNODE_F_MLOCK;
 #else /* MNODE_F_MLOCK == MPART_F_MLOCK */

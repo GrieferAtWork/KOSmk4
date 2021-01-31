@@ -64,12 +64,11 @@
 #define MPART_F_NORMAL         0x0000 /* Normal flags. */
 #define MPART_F_LOCKBIT        0x0001 /* Lock-bit for this m-part */
 #define MPART_F_MAYBE_BLK_INIT 0x0002 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
-/* TODO: Invert the meaning of the `MPART_F_NO_GLOBAL_REF' flag and rename it! */
-#define MPART_F_NO_GLOBAL_REF  0x0004 /* [lock(WRITE_ONCE)] `mpart_all_list' doesn't hold a reference to this
-                                       * part. When memory is running low, and the kernel tries to unload unused
-                                       * memory parts, it will set this flag for all parts there are.
-                                       * Also note that this flag is set by default when the associated block's
-                                       * `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
+#define MPART_F_GLOBAL_REF     0x0004 /* [lock(WRITE_ONCE)] `mpart_all_list' holds a reference to this part.
+                                       * When memory is running low, and the kernel tries to unload unused
+                                       * memory parts, it will clear this flag for all parts there are.
+                                       * Also note that this flag is cleared by default when the associated
+                                       * file's `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
 #define MPART_F_CHANGED        0x0008 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
                                        *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
@@ -184,8 +183,7 @@ SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
 
 #if 0 /* Static initializer template: */
 	MPART_INIT_mp_refcnt(FILLME),
-	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF |
-	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
+	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_MEM),
 	MPART_INIT_mp_file(&mfile_ndef),
@@ -401,9 +399,8 @@ struct mpart {
 #define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)     \
 	{                                                                \
 		MPART_INIT_mp_refcnt(1),                                     \
-		MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_NOFREE | \
-		                    MPART_F_NOSPLIT | MPART_F_MLOCK |        \
-		                    MPART_F_MLOCK_FROZEN),                   \
+		MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |       \
+		                    MPART_F_MLOCK | MPART_F_MLOCK_FROZEN),   \
 		MPART_INIT_mp_state(MPART_ST_MEM),                           \
 		MPART_INIT_mp_file(file),                                    \
 		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),                \
@@ -1107,12 +1104,9 @@ DATDEF struct atomic_lock mpart_all_lock;
 #define mpart_all_lock_available()  atomic_lock_available(&mpart_all_lock)
 
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
- * List of all memory parts currently in use.
+ * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't already
- *       destroyed, and doesn't have the `MPART_F_NO_GLOBAL_REF' flag set.
- * NOTE: You are allowed to atomically add new elements to these lists, such that
- *       you don't have to acquire `mpart_all_lock' first. However in order to (properly)
- *       remove elements, you _do_ have to acquire that lock! */
+ *       destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
 DATDEF struct mpart_list mpart_all_list;
 
 /* [0..n][CHAIN(_mp_dead)][lock(ATOMIC)]

@@ -560,11 +560,11 @@ do_prefault:
 		part->mp_refcnt = 1;
 		part->mp_flags |= MPART_F_NORMAL |
 #if MNODE_F_MLOCK == MPART_F_MLOCK
-		                  ((node->mn_flags & MNODE_F_MLOCK)) |
+		                  ((node->mn_flags & MNODE_F_MLOCK))
 #else  /* MNODE_F_MLOCK == MPART_F_MLOCK */
-	                  ((node->mn_flags & MNODE_F_MLOCK) ? MPART_F_MLOCK : 0) |
+		                  ((node->mn_flags & MNODE_F_MLOCK) ? MPART_F_MLOCK : 0)
 #endif /* MNODE_F_MLOCK != MPART_F_MLOCK */
-		                  MPART_F_NO_GLOBAL_REF;
+		                  ;
 		/*part->mp_state = ...;*/ /* Already initialized */
 		/*part->mp_file  = ...;*/ /* Already initialized */
 		incref(part->mp_file);

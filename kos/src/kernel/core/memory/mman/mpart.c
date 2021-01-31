@@ -94,7 +94,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	assert(LIST_EMPTY(&self->mp_copy));
 	assert(LIST_EMPTY(&self->mp_share));
-	assert(self->mp_flags & MPART_F_NO_GLOBAL_REF);
+	assert(!(self->mp_flags & MPART_F_GLOBAL_REF));
 	/* Make sure that we've served _all_ dead nodes that may have still been there. */
 	while (!SLIST_EMPTY(&self->mp_lockops)) {
 		struct mpart_lockop *lop;
@@ -667,7 +667,7 @@ PUBLIC struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't already
- *       destroyed, and doesn't have the `MPART_F_NO_GLOBAL_REF' flag set. */
+ *       destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
 PUBLIC struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
 
 /* [0..n][CHAIN(_mp_dead)][lock(ATOMIC)]

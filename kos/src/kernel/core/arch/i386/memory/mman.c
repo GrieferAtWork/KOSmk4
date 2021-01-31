@@ -179,8 +179,7 @@ INTDEF struct mnode x86_vmnode_transition_reserve;
 #define INIT_MPART(self, node, pageptr, num_pages, num_bytes)                 \
 	{                                                                         \
 		MPART_INIT_mp_refcnt(2), /* 2 == 1(myself) + 1(node) */               \
-		MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF |                           \
-		                    MPART_F_NOSPLIT | MPART_F_NOMERGE |               \
+		MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |               \
 		                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |            \
 		                    MPART_F_NOFREE),                                  \
 		MPART_INIT_mp_state(MPART_ST_MEM),                                    \

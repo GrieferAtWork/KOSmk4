@@ -350,7 +350,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_lockops_reap)(struct mfile
  *  - Existing mappings of all mem-parts are altered to point
  *    at anonymous memory files. For this purpose, the nodes of
  *    all existing mappings are altered. (s.a. `mfile_anon')
- *  - The `MPART_F_NO_GLOBAL_REF' flag is set for all parts
+ *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' are set to `MFILE_PARTS_ANONYMOUS'
  * The result of all of this is that it is no longer possible to
  * trace back mappings of parts of `self' to that file.

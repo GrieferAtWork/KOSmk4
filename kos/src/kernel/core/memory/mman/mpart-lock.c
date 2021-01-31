@@ -1485,7 +1485,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	assert(bounds.ucb_mapsize != 0);
 
 	/* Initialize misc. fields of the mem-part copy. */
-	copy->mp_flags = (self->mp_flags & MPART_F_MLOCK) | MPART_F_NO_GLOBAL_REF | MPART_F_LOCKBIT;
+	copy->mp_flags = (self->mp_flags & MPART_F_MLOCK) | MPART_F_LOCKBIT;
 	copy->mp_file  = incref(&mfile_anon[self->mp_file->mf_blockshift]);
 	LIST_INIT(&copy->mp_share);
 	SLIST_INIT(&copy->mp_lockops);

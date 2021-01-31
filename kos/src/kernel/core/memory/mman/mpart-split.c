@@ -853,13 +853,13 @@ relock_with_data:
 	hipart->mp_refcnt = 1;
 
 	/* Fill in flags for the new pat. */
-	hipart->mp_flags = (lopart->mp_flags & (MPART_F_NO_GLOBAL_REF |
+	hipart->mp_flags = (lopart->mp_flags & (MPART_F_GLOBAL_REF |
 	                                        MPART_F_CHANGED |
 	                                        MPART_F_NOFREE |
 	                                        MPART_F_BLKST_INL)) |
 	                   (MPART_F_LOCKBIT);
 
-	if (!(hipart->mp_flags & MPART_F_NO_GLOBAL_REF))
+	if (hipart->mp_flags & MPART_F_GLOBAL_REF)
 		++hipart->mp_refcnt; /* The reference that'll be stored in global data! */
 	hipart->mp_state = lopart->mp_state;
 	hipart->mp_file  = incref(file);

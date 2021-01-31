@@ -48,7 +48,7 @@ DECL_BEGIN
 
 
 /* Create a new part, but don't add it to the global chain of parts, yet.
- * NOTE: The returned part will have the `MPART_F_NO_GLOBAL_REF' flag set! */
+ * NOTE: The returned part does not ahve the `MPART_F_GLOBAL_REF' flag set! */
 PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
 mfile_private_makepart(struct mfile *__restrict self,
                        PAGEDIR_PAGEALIGNED pos_t addr,
@@ -59,7 +59,7 @@ mfile_private_makepart(struct mfile *__restrict self,
 	result = (REF struct mpart *)kmalloc(sizeof(struct mpart),
 	                                     GFP_LOCKED);
 	result->mp_refcnt = 1;
-	result->mp_flags  = MPART_F_NORMAL | MPART_F_NO_GLOBAL_REF;
+	result->mp_flags  = MPART_F_NORMAL;
 	result->mp_state  = MPART_ST_VOID;
 	result->mp_file   = incref(self);
 	LIST_INIT(&result->mp_copy);
@@ -233,7 +233,7 @@ again_lock:
 			if (result->mp_state != MPART_ST_VIO)
 #endif /* LIBVIO_CONFIG_ENABLED */
 			{
-				result->mp_flags &= ~MPART_F_NO_GLOBAL_REF;
+				result->mp_flags |= MPART_F_GLOBAL_REF;
 				++result->mp_refcnt; /* The reference owned by `mpart_all_list' */
 				COMPILER_WRITE_BARRIER();
 
@@ -244,7 +244,7 @@ again_lock:
 			return result;
 		}
 	} EXCEPT {
-		if (!(ATOMIC_FETCHOR(result->mp_flags, MPART_F_NO_GLOBAL_REF) & MPART_F_NO_GLOBAL_REF))
+		if (ATOMIC_FETCHAND(result->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(result);
 		decref(result);
 		RETHROW();
