@@ -32,11 +32,11 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mm-execinfo.h>
 #include <kernel/module.h>
 #include <kernel/panic.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/exec.h>
 #include <misc/atomic-ref.h>
 
 #include <hybrid/align.h>
@@ -1565,7 +1565,7 @@ DBG_COMMAND(lslib,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_print(DBGSTR("name                            loadaddr minaddr  maxaddr\n"));
 	vm_enumusermod(dbg_current->t_mman, &lslib_enum_cb,
-	               FORVM(dbg_current->t_mman, thisvm_execinfo).ei_node);
+	               FORVM(dbg_current->t_mman, thismman_execinfo).mei_node);
 	return 0;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

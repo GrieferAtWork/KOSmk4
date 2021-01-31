@@ -152,7 +152,7 @@ again_lookup_part_locked:
 				goto err_release_and_unmapped; /* Reserved mapping */
 #ifdef LIBVIO_CONFIG_ENABLED
 			if unlikely(mf.mfl_part->mp_state == MPART_ST_VIO)
-				goto err_release_and_unmapped; /* Cannot use VIO as DMA target. */
+				goto err_release_and_unmapped; /* Cannot use VIO for DMA buffers. */
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 			page_offset = (size_t)addr & PAGEMASK;

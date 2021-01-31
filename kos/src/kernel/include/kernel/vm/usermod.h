@@ -30,8 +30,8 @@
 #include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
 #include <kernel/arch/vm/usermod.h>
 #include <kernel/malloc-defs.h>
+#include <kernel/mman.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <elf.h>
 
@@ -150,7 +150,7 @@ struct usermod {
 	REF struct inode           *um_file;      /* [1..1][const] The backing file of the executable. */
 	REF struct path            *um_fspath;    /* [0..1][const] Optional mapping path */
 	REF struct directory_entry *um_fsname;    /* [0..1][const] Optional mapping name */
-	struct vm                  *um_vm;        /* [1..1][const] The associated VM. Warning: not a reference!
+	struct mman                *um_vm;        /* [1..1][const] The associated VM. Warning: not a reference!
 	                                           * If the VM is destroyed, this pointer will be dangling! */
 	REF struct usermod         *um_next;      /* [0..1][lock(INTERNAL(um_vm))] Next usermod object. */
 	uintptr_t                   um_modtype;   /* [const] Module type (one of `USERMOD_TYPE_*') */
@@ -215,20 +215,20 @@ FUNDEF NONNULL((1)) void KCALL usermod_load_elf_shstrtab(struct usermod *__restr
  * @return: * :   A reference to the user-module that overlaps with the given address.
  * @return: NULL: No executable object exists at the given location. */
 FUNDEF REF struct usermod *FCALL
-vm_getusermod(struct vm *__restrict self,
+vm_getusermod(struct mman *__restrict self,
               USER void const *addr,
               __BOOL addr_must_be_executable DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 /* Same as `vm_getusermod()', but return `NULL', rather than throwing an exception. */
 FUNDEF REF struct usermod *
-NOTHROW(FCALL vm_getusermod_nx)(struct vm *__restrict self,
+NOTHROW(FCALL vm_getusermod_nx)(struct mman *__restrict self,
                                 USER void const *addr,
                                 __BOOL addr_must_be_executable DFL(0));
 
 /* Find the first usermod object that maps some page containing a pointer `>= addr'
  * If no module fulfills this requirement, return NULL instead. */
 FUNDEF REF struct usermod *FCALL
-vm_getusermod_above(struct vm *__restrict self,
+vm_getusermod_above(struct mman *__restrict self,
                     USER void *addr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -236,7 +236,7 @@ vm_getusermod_above(struct vm *__restrict self,
  * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (USER void *)0)'.
  * If no module exists that matches this criteria, return `NULL' instead. */
 FUNDEF REF struct usermod *FCALL
-vm_getusermod_next(struct vm *__restrict self,
+vm_getusermod_next(struct mman *__restrict self,
                    struct usermod *prev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -262,7 +262,7 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
 /* Clear out all unused usermod objects from `self' and
  * return non-zero if the cache wasn't already empty. */
 FUNDEF NOBLOCK size_t
-NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self);
+NOTHROW(FCALL vm_clear_usermod)(struct mman *__restrict self);
 
 
 /* Callback prototype for `vm_enumusermod()'
@@ -281,7 +281,7 @@ typedef ssize_t (KCALL *vm_enumusermod_callback_t)(void *cookie, struct usermod 
  * @return: >= 0:  The sum of all return values of `cb'
  * @return: < 0:   The first negative value returned by `cb' */
 FUNDEF ssize_t FCALL
-vm_enumusermod(struct vm *__restrict self,
+vm_enumusermod(struct mman *__restrict self,
                vm_enumusermod_callback_t cb,
                void *cookie)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);

@@ -37,7 +37,6 @@
 #include <kernel/except.h>
 #include <kernel/execabi.h>
 #include <kernel/heap.h>
-#include <kernel/vm.h>
 #include <kernel/mman/mm-execinfo.h>
 #include <kernel/vm/usermod.h>
 #include <sched/cpu.h>
@@ -540,15 +539,15 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 	TRY {
 		if (!IS_ALIGNED((uintptr_t)me, PAGEDIR_ALIGN))
 			goto badobj;
-		if (me->v_refcnt == 0)
+		if (me->mm_refcnt == 0)
 			goto badobj;
-		if (me->v_weakrefcnt == 0)
+		if (me->mm_weakrefcnt == 0)
 			goto badobj;
 #ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
-		if (me->v_pdir_phys != (PHYS pagedir_t *)(uintptr_t)pagedir_translate(me))
+		if (me->mm_pagedir_p != (PHYS pagedir_t *)(uintptr_t)pagedir_translate(me))
 			goto badobj;
 #else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
-		if (me->v_pdir_phys != pagedir_translate(me))
+		if (me->mm_pagedir_p != pagedir_translate(me))
 			goto badobj;
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 		exec_path = FORVM(me, thismman_execinfo).mei_path;
