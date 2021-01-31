@@ -198,7 +198,7 @@ struct mfault {
 	 * though may also be modified when `mfault_or_unlock()' returns `false'
 	 * Leave them alone. - They're needed to make `mfault_or_unlock()'
 	 * fully re-entrant following a lock re-acquisition. */
-	struct unlockinfo             mfl_unlck;    /* Unlock controller. */
+	struct unlockinfo                   mfl_unlck;    /* Unlock controller. */
 	struct mpart_setcore_data           mfl_scdat;    /* Load-data for setcore. */
 	struct mpart_unsharecow_data        mfl_ucdat;    /* Load-data for unshare. */
 	struct mnode                       *mfl_pcopy[2]; /* [0..1][*] Up to 2 additional mem-nodes used for private unsharing. */

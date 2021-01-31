@@ -19,17 +19,20 @@
  */
 #ifdef __INTELLISENSE__
 #include "mm-dma.c"
-//#define DEFINE_mman_startdma
-#define DEFINE_mman_startdmav
+#define DEFINE_mman_startdma
+//#define DEFINE_mman_startdmav
 //#define DEFINE_mman_enumdma
 //#define DEFINE_mman_enumdmav
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
+#include <kernel/malloc.h>
+#include <kernel/mman/mm-fault.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <sched/task.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
@@ -116,156 +119,186 @@ mman_enumdmav(struct mman *__restrict self,
 #endif /* LOCAL_IS_VECTOR */
 	size_t result = 0;
 
+#ifndef LOCAL_IS_ENUM
+	TRY
+#endif /* !LOCAL_IS_ENUM */
+	{
 #ifdef LOCAL_IS_VECTOR
-	AIO_BUFFER_FOREACH(_addrv_ent, addr_v)
+		AIO_BUFFER_FOREACH(_addrv_ent, addr_v)
 #define addr      _addrv_ent.ab_base
 #define num_bytes _addrv_ent.ab_size
 #endif /* LOCAL_IS_VECTOR */
-	while (num_bytes != 0) {
-		struct mnode *node;
-		struct mpart *part;
-		pos_t file_addr;
-		size_t file_size;
-
-		/* Lookup the node at the given address */
-again_lookup_part:
-		mman_lock_acquire(self);
-#ifndef LOCAL_IS_ENUM
-again_lookup_part_locked:
-#endif /* !LOCAL_IS_ENUM */
-		node = mnode_tree_locate(self->mm_mappings, addr);
-		if unlikely(!node)
-			goto err_release_and_unmapped; /* No mapping at all */
-		part = node->mn_part;
-		if unlikely(!part)
-			goto err_release_and_unmapped; /* Reserved mapping */
-
-		/* Figure out the part-relative address range that is being enumerated. */
-		file_addr = mpart_getminaddr(part) + node->mn_partoff +
-		            (size_t)((byte_t const *)addr - (byte_t const *)mnode_getaddr(node));
-		file_size = (size_t)((byte_t const *)mnode_getendaddr(node) - (byte_t const *)addr);
-		if (file_size > num_bytes)
-			file_size = num_bytes;
-
-#ifndef LOCAL_IS_ENUM
-		if (result >= lockcnt) {
-			if (result == lockcnt)
-				mman_stopdma(lockvec, lockcnt); /* Release already acquired locks. */
-			addr = (byte_t *)addr + file_size;
-			num_bytes -= file_size;
-			++result;
-			goto again_lookup_part_locked;
-		}
-#endif /* !LOCAL_IS_ENUM */
-
-		/* Keep a reference to the part so we can unlock the mman. */
-		incref(part);
-		mman_lock_release(self);
-		TRY {
-			mpart_reladdr_t partrel_addr, partrel_size;
-			size_t enum_size;
+		while (num_bytes != 0) {
+			struct mfault mf;
+			size_t page_offset, tail_offset, maxsize;
 #ifdef LOCAL_IS_ENUM
 			struct mdmalock dma_lock;
 #endif /* LOCAL_IS_ENUM */
+again_lookup_part_reinit:
+			__mfault_init(&mf);
 
-			/* Ensure that all blocks that overlap with the given address
-			 * range have their state set to `MPART_BLOCK_ST_LOAD' for
-			 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
-			 *
-			 * XXX: It would be cool to have optimization for writes, such that
-			 *      DMA operations which target whole, previously uninitialized
-			 *      blocks (MPART_BLOCK_ST_NDEF), didn't have to load those
-			 *      blocks prior to the DMA operation being performed.
-			 *      For one, this would require a differentiation between a
-			 *      successful and a failed write-related DMA operation.
-			 *      The problem with this is that this would also require
-			 *      the extension of `struct mdmalock', but that would then
-			 *      require a re-write of `AtaAIOHandleData' or an increase
-			 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'...
-			 *
-			 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow_withhint()',
-			 *                which doesn't ensure that accessed blocks have been loaded, whilst we're using
-			 *                `mpart_lock_acquire_and_setcore_unsharecow_loadsome()', which does do so. */
+			/* Lookup the node at the given address */
+again_lookup_part:
+			mman_lock_acquire(self);
+#ifndef LOCAL_IS_ENUM
+again_lookup_part_locked:
+#endif /* !LOCAL_IS_ENUM */
+			mf.mfl_mman = self;
+			mf.mfl_node = mnode_tree_locate(self->mm_mappings, addr);
+			if unlikely(!mf.mfl_node)
+				goto err_release_and_unmapped; /* No mapping at all */
+			mf.mfl_part = mf.mfl_node->mn_part;
+			if unlikely(!mf.mfl_part)
+				goto err_release_and_unmapped; /* Reserved mapping */
+#ifdef LIBVIO_CONFIG_ENABLED
+			if unlikely(mf.mfl_part->mp_state == MPART_ST_VIO)
+				goto err_release_and_unmapped; /* Cannot use VIO as DMA target. */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
-			/* TODO: Can't just blindly use `mpart_lock_acquire_and_setcore_unsharecow_loadsome()' here,
-			 *       unless MNODE_F_SHARED is set. - Since the access is made the context of a mman, we
-			 *       must follow mfault semantics, instead! (as a matter of fact, we should actually be
-			 *       able to just use mfault, as-is! */
-again_lock_part:
-			if (for_writing ? !mpart_lock_acquire_and_setcore_unsharecow_loadsome(part, file_addr, file_size)
-			                : !mpart_lock_acquire_and_setcore_loadsome(part, file_addr, file_size)) {
-				/* Deal with the case where the part was truncated. */
-				decref_unlikely(part);
-				goto again_lookup_part;
+			page_offset = (size_t)addr & PAGEMASK;
+			mf.mfl_addr = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+			mf.mfl_size = (size_t)((byte_t *)mnode_getendaddr(mf.mfl_node) - (byte_t *)mf.mfl_addr);
+			maxsize     = page_offset + num_bytes;
+			tail_offset = (PAGESIZE - (maxsize & PAGEMASK)) & PAGEMASK;
+			maxsize += tail_offset;
+			if (mf.mfl_size > maxsize)
+				mf.mfl_size = maxsize;
+			mf.mfl_flags = MMAN_FAULT_F_NORMAL;
+			if (for_writing) /* XXX: Why not just pass a `unsigned int flags' instead of `bool for_writing'? */
+				mf.mfl_flags |= MMAN_FAULT_F_WRITE;
+
+#ifndef LOCAL_IS_ENUM
+			if (result >= lockcnt) {
+				if (result == lockcnt)
+					mman_stopdma(lockvec, lockcnt); /* Release already acquired locks. */
+				mf.mfl_size -= page_offset;
+				mf.mfl_size -= tail_offset;
+				addr = (byte_t *)addr + mf.mfl_size;
+				num_bytes -= mf.mfl_size;
+				++result;
+				goto again_lookup_part_locked;
+			}
+#endif /* !LOCAL_IS_ENUM */
+
+			TRY {
+				/* Ensure that all blocks that overlap with the given address
+				 * range have their state set to `MPART_BLOCK_ST_LOAD' for
+				 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
+				 *
+				 * XXX: It would be cool to have optimization for writes, such that
+				 *      DMA operations which target whole, previously uninitialized
+				 *      blocks (MPART_BLOCK_ST_NDEF), didn't have to load those
+				 *      blocks prior to the DMA operation being performed.
+				 *      For one, this would require a differentiation between a
+				 *      successful and a failed write-related DMA operation.
+				 *      The problem with this is that this would also require
+				 *      the extension of `struct mdmalock', but that would then
+				 *      require a re-write of `AtaAIOHandleData' or an increase
+				 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'...
+				 *
+				 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow_withhint()',
+				 *                which doesn't ensure that accessed blocks have been loaded, whilst our use
+				 *                of `mfault_or_unlock()' (rightfully) does do so. */
+
+				/* Fault the accessed address under the relevant access-mode. */
+				if (!mfault_or_unlock(&mf))
+					goto again_lookup_part;
+			} EXCEPT {
+				mfault_fini(&mf);
+				RETHROW();
 			}
 
-			/* Also ensure that `part->mp_meta' has been allocated */
-			if (!mpart_hasmeta_or_unlock(part, NULL))
-				goto again_lock_part;
+			/* No longer need the mman-lock! */
+			incref(mf.mfl_part);
+			mman_lock_release(mf.mfl_mman);
 
-			/* Load the effective address */
-			assert(file_addr >= mpart_getminaddr(part));
-			assert(file_addr <= mpart_getmaxaddr(part));
-			partrel_addr = (mpart_reladdr_t)(file_addr - mpart_getminaddr(part));
-			partrel_size = (mpart_reladdr_t)(mpart_getendaddr(part) - partrel_addr);
-			if (partrel_size > file_size)
-				partrel_size = file_size;
+			/* We're now only holding a lock to `mf.mfl_part', which has been unshared
+			 * in the context of the backing node from `mf.mfl_mman' (although that node
+			 * may have been unmapped since, as we're no longer locking the mman) */
+
+			TRY {
+				/* Ensure that `mf.mfl_part->mp_meta' has been allocated */
+				if (!mpart_hasmeta_or_unlock(mf.mfl_part, NULL))
+					goto again_lookup_part_reinit;
+			} EXCEPT {
+				decref_unlikely(mf.mfl_part);
+				RETHROW();
+			}
+
+			/* Adjust the faulted address range to not include the unaligned page-offset
+			 * of the actually DMA location. (we had to subtract this originally, since
+			 * mfault_or_unlock() requires that it be given page-aligned addresses) */
+			mf.mfl_offs += page_offset;
+			mf.mfl_size -= page_offset;
+			mf.mfl_size -= tail_offset;
 
 			/* If we're doing a write-DMA, mark the accessed address range as changed. */
 			if (for_writing)
-				mpart_changed(part, partrel_addr, partrel_size);
+				mpart_changed(mf.mfl_part, mf.mfl_offs, mf.mfl_size);
 
-			/* Create the actual DMA-lock. */
-			mpart_dma_addlock(part);
-			mpart_lock_release(part);
+			/* Create the actual DMA-lock. (and release our exclusive lock on the mem-part) */
+			mpart_dma_addlock(mf.mfl_part);
+			mpart_lock_release(mf.mfl_part);
 
 #ifndef LOCAL_IS_ENUM
-			/* Append `part' to the given list of DMA locks. */
-			lockvec[result].mdl_part = part; /* Inherit reference */
+			/* Append `mf.mfl_part' to the given list of DMA locks. */
+			lockvec[result].mdl_part = mf.mfl_part; /* Inherit reference */
 			++result;
 #define LOCAL_dma_lock (&lockvec[result - 1])
 #else /* !LOCAL_IS_ENUM */
-			dma_lock.mdl_part = part;
+			dma_lock.mdl_part = mf.mfl_part;
 #define LOCAL_dma_lock (&dma_lock)
 #endif /* !LOCAL_IS_ENUM */
 
+			/* Account for everything that will be enumerated. */
+			addr = (byte_t *)addr + mf.mfl_size;
+			num_bytes -= mf.mfl_size;
+
 			/* Invoke `prange' (through use of `mpart_memaddr_direct()') */
-			enum_size = partrel_size;
 			for (;;) {
 				struct mpart_physloc pl;
 				bool ok;
-				mpart_memaddr_direct(part, partrel_addr, &pl);
-				if (pl.mppl_size > enum_size)
-					pl.mppl_size = enum_size;
+				mpart_memaddr_direct(mf.mfl_part, mf.mfl_offs, &pl);
+				if (pl.mppl_size > mf.mfl_size)
+					pl.mppl_size = mf.mfl_size;
+#ifdef LOCAL_IS_ENUM
+				TRY {
+					ok = (*prange)(cookie, pl.mppl_addr, pl.mppl_size, LOCAL_dma_lock);
+				} EXCEPT {
+					decref_unlikely(mf.mfl_part);
+					RETHROW();
+				}
+#else /* LOCAL_IS_ENUM */
 				ok = (*prange)(cookie, pl.mppl_addr, pl.mppl_size, LOCAL_dma_lock);
+#endif /* !LOCAL_IS_ENUM */
 				if (!ok) {
 #ifdef LOCAL_IS_ENUM
-					decref_unlikely(part);
+					decref_unlikely(mf.mfl_part);
 #endif /* LOCAL_IS_ENUM */
 					goto err_unmapped;
 				}
 #ifdef LOCAL_IS_ENUM
 				result += pl.mppl_size;
 #endif /* LOCAL_IS_ENUM */
-				if (pl.mppl_size >= enum_size)
+				if (pl.mppl_size >= mf.mfl_size)
 					break;
-				partrel_addr += pl.mppl_size;
-				enum_size -= pl.mppl_size;
+				mf.mfl_offs += pl.mppl_size;
+				mf.mfl_size -= pl.mppl_size;
 			}
-
 #undef LOCAL_dma_lock
 
-			/* Account for everything that was enumerated. */
-			addr = (byte_t *)addr + partrel_size;
-			num_bytes -= partrel_size;
-		} EXCEPT {
-			decref_unlikely(part);
-			RETHROW();
-		}
 #ifdef LOCAL_IS_ENUM
-		decref_unlikely(part);
+			decref_unlikely(mf.mfl_part);
 #endif /* LOCAL_IS_ENUM */
+		}
 	}
+#ifndef LOCAL_IS_ENUM
+	EXCEPT {
+		if (result <= lockcnt)
+			mman_stopdma(lockvec, result);
+		RETHROW();
+	}
+#endif /* !LOCAL_IS_ENUM */
 #undef addr
 #undef num_bytes
 	return result;
