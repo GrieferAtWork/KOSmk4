@@ -987,6 +987,22 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	mnode_tree_insert(&mman_kernel.mm_mappings, lonode);
 	mnode_tree_insert(&mman_kernel.mm_mappings, hinode);
 
+	if (hipart->mp_flags & MPART_F_CHANGED) {
+		/* Must insert into the list of changed parts. */
+		struct mfile *file = hipart->mp_file;
+		struct mpart *next;
+		do {
+			next = ATOMIC_READ(file->mf_changed.slh_first);
+			if unlikely(next == MFILE_PARTS_ANONYMOUS) {
+				hipart->mp_flags &= ~MPART_F_CHANGED;
+				break;
+			}
+			hipart->mp_changed.sle_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(file->mf_changed.slh_first,
+		                             next, hipart));
+	}
+
 	/* And we're done! */
 	return true;
 fail_hinode_hipart_bitset:

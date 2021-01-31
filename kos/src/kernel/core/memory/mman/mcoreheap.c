@@ -292,7 +292,7 @@ NOTHROW(FCALL is_coreheap_node)(struct mnode *__restrict node) {
 	 * seeing the part in question. */
 	if (isshared(part))
 		goto nope;
-	if (part->mp_flags != (MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	if (part->mp_flags != (MPART_F_NO_GLOBAL_REF |
 	                       MPART_F_COREPART | MPART_F_MLOCK_FROZEN |
 	                       MPART_F_MLOCK))
 		goto nope;
@@ -537,7 +537,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 
 	/* Initialize the (remainder of the) mem-part */
 	part->mp_refcnt = 1;
-	part->mp_flags  = MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	part->mp_flags  = MPART_F_NO_GLOBAL_REF |
 	                  MPART_F_COREPART | MPART_F_MLOCK_FROZEN |
 	                  MPART_F_MLOCK;
 	part->mp_state  = MPART_ST_MEM;

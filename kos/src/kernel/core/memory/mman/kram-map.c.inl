@@ -564,7 +564,7 @@ do_prefault:
 #else  /* MNODE_F_MLOCK == MPART_F_MLOCK */
 	                  ((node->mn_flags & MNODE_F_MLOCK) ? MPART_F_MLOCK : 0) |
 #endif /* MNODE_F_MLOCK != MPART_F_MLOCK */
-		                  MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED;
+		                  MPART_F_NO_GLOBAL_REF;
 		/*part->mp_state = ...;*/ /* Already initialized */
 		/*part->mp_file  = ...;*/ /* Already initialized */
 		incref(part->mp_file);

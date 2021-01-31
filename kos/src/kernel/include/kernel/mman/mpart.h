@@ -73,6 +73,7 @@
 #define MPART_F_CHANGED        0x0008 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
                                        *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
+                                       * [valid_if(:mfile::mf_changed != MFILE_PARTS_ANONYMOUS)]
                                        * Blocks of this part (may) have changed. This flag must be cleared by the
                                        * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
@@ -183,7 +184,7 @@ SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
 
 #if 0 /* Static initializer template: */
 	MPART_INIT_mp_refcnt(FILLME),
-	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
+	MPART_INIT_mp_flags(MPART_F_NO_GLOBAL_REF |
 	                    MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
 	MPART_INIT_mp_state(MPART_ST_MEM),

@@ -89,7 +89,7 @@ PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 	MPART_INIT_mp_refcnt(1),
 	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
-	                    MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED),
+	                    MPART_F_NO_GLOBAL_REF),
 	MPART_INIT_mp_state(MPART_ST_MEM),
 	MPART_INIT_mp_file(&mfile_zero),
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_copy)),
