@@ -544,8 +544,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      all of the relocations does). - Maybe not implement this as part of the libdl
 	 *      core, but rather within some auxiliary helper library? */
 
-	/* TODO: Make the x86 LDT object ATTR_PERVM, and reload LDT registers during a VM switch.
-	 *       On linux, they're PERVM, too, so we really should do the same. */
+	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during a VM switch.
+	 *       On linux, they're PERMMAN, too, so we really should do the same. */
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:

@@ -25,7 +25,7 @@
 #include <dev/block.h>
 #include <kernel/driver.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
+#include <kernel/mman/mfile.h>
 
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -829,12 +829,12 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
 #ifdef __CC__
 struct inode
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
-	: vm_datablock
+	: mfile                             /* The underlying mem-file. */
 #endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 {
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-#define __inode_as_datablock(x) (&(x)->i_datablock)
-	struct vm_datablock i_datablock;    /* The underlying data-block. */
+#define __inode_as_datablock(x) (&(x)->i_memfile)
+	struct mfile       i_memfile;       /* The underlying mem-file. */
 #else /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 #define __inode_as_datablock(x)   (x)
 #endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
@@ -900,8 +900,8 @@ struct inode
 /* The data block type used to identify INodes. */
 DATDEF struct vm_datablock_type inode_datablock_type;
 
-/* Check if a given `struct vm_datablock *x' is an INode. */
-#define vm_datablock_isinode(x) ((x)->db_type == &inode_datablock_type)
+/* Check if a given `struct mfile *x' is an INode. */
+#define vm_datablock_isinode(x) ((x)->mf_ops == &inode_datablock_type)
 #endif /* !vm_datablock_isinode */
 
 
@@ -910,7 +910,7 @@ DATDEF struct vm_datablock_type inode_datablock_type;
 
 #ifndef ____devfs_datablock_defined
 #define ____devfs_datablock_defined 1
-DATDEF struct vm_datablock __devfs_datablock ASMNAME("devfs");
+DATDEF struct mfile __devfs_datablock ASMNAME("devfs");
 
 /* Devfs locking functions */
 FUNDEF void KCALL devfs_lock_read(void) THROWS(E_BADALLOC, E_INTERRUPT, ...);

@@ -53,8 +53,8 @@ ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
 	}
 	FINALLY_DECREF_UNLIKELY(v);
 	sync_read(v);
-	exec_dent = xincref(FORVM(v, thisvm_execinfo).ei_dent);
-	exec_path = xincref(FORVM(v, thisvm_execinfo).ei_path);
+	exec_dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
+	exec_path = xincref(FORMMAN(v, thisvm_execinfo).ei_path);
 	sync_endread(v);
 	if unlikely(!exec_dent || !exec_path) {
 		xdecref_unlikely(exec_dent);

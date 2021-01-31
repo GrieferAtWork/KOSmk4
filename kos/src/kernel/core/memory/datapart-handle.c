@@ -330,7 +330,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		/* Gather information about the datapart. */
 		sync_read(self);
 		info.ds_features = self->dp_flags;
-		if (self->dp_block->db_parts == VM_DATABLOCK_ANONPARTS)
+		if (self->dp_block->db_parts == MFILE_PARTS_ANONYMOUS)
 			info.ds_features |= HOP_DATAPART_STAT_FEATURE_ISANON;
 		if (self->dp_futex) {
 			info.ds_features |= HOP_DATAPART_STAT_FEATURE_HASFUTEXCTRL;

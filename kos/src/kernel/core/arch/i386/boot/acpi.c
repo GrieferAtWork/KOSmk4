@@ -29,7 +29,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 #include <kernel/x86/acpi.h>
 
 #include <hybrid/align.h>
@@ -52,12 +52,12 @@ PUBLIC physaddr_t acpi_root = 0;
 PUBLIC size_t acpi_sdt_count = 0;
 
 #ifdef NO_PHYS_IDENTITY
-#define vm_copyfromphys_noidentity vm_copyfromphys
+#define copyfromphys_noidentity copyfromphys
 #else /* NO_PHYS_IDENTITY */
 PRIVATE ATTR_FREETEXT size_t
-NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
-                                                  PHYS physaddr_t src,
-                                                  size_t num_bytes) {
+NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
+                                               PHYS physaddr_t src,
+                                               size_t num_bytes) {
 	uintptr_t offset;
 	size_t result;
 	byte_t *vsrc = THIS_TRAMPOLINE;
@@ -89,15 +89,15 @@ NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
  * that memory bank initialization has been finalized, which it
  * isn't yet (as indicative of `x86_initialize_acpi()' below
  * calling `minfo_addbank()')
- * This function behaves the same as `vm_copyfromphys()', however
+ * This function behaves the same as `copyfromphys()', however
  * will not make use of the phys2virt identity segment. */
 PRIVATE ATTR_FREETEXT void
-NOTHROW(KCALL vm_copyfromphys_noidentity)(void *__restrict dst,
-                                          PHYS physaddr_t src,
-                                          size_t num_bytes) {
+NOTHROW(KCALL copyfromphys_noidentity)(void *__restrict dst,
+                                       PHYS physaddr_t src,
+                                       size_t num_bytes) {
 	for (;;) {
 		size_t temp;
-		temp = vm_copyfromphys_noidentity_partial(dst, src, num_bytes);
+		temp = copyfromphys_noidentity_partial(dst, src, num_bytes);
 		if (temp >= num_bytes)
 			break;
 		dst = (byte_t *)dst + temp;
@@ -123,7 +123,7 @@ NOTHROW(KCALL acpi_memsum_phys)(physaddr_t p, size_t n_bytes) {
 	byte_t result = 0;
 	while (n_bytes) {
 		size_t cnt = MIN(n_bytes, COMPILER_LENOF(buf));
-		vm_copyfromphys_noidentity(buf, p, cnt);
+		copyfromphys_noidentity(buf, p, cnt);
 		result += acpi_memsum(buf, cnt);
 		n_bytes -= cnt;
 		p += cnt;
@@ -223,7 +223,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			acpi_root = (physaddr_t)rsdp->rsdp_xsdtaddr;
 		}
 	}
-	vm_copyfromphys_noidentity(&header, acpi_root, sizeof(ACPISDTHeader));
+	copyfromphys_noidentity(&header, acpi_root, sizeof(ACPISDTHeader));
 	/* Validate the header. */
 	if unlikely(acpi_memsum_phys(acpi_root, header.rsdp_length) != 0) {
 		printk(FREESTR(KERN_ERR "[acpi] Corrupted %cSDT checksum [table: "
@@ -264,9 +264,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 			/* Dereference the base pointer. */
 			base = 0;
-			vm_copyfromphys_noidentity(&base, addr, ACPI_POINTER_SIZE);
+			copyfromphys_noidentity(&base, addr, ACPI_POINTER_SIZE);
 			/* Load the component header. */
-			vm_copyfromphys_noidentity(&header, base, sizeof(header));
+			copyfromphys_noidentity(&header, base, sizeof(header));
 			/* Validate the table. */
 			if unlikely(acpi_memsum_phys(base, header.rsdp_length) != 0) {
 				printk(FREESTR(KERN_ERR "[acpi:sdt:%" PRIuSIZ ":%.?q] corrupted table [table: "
@@ -279,8 +279,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 				       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 				       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
 				memset(header.rsdp_signature, 0, sizeof(header.rsdp_signature));
-				vm_copytophys(base + offsetof(ACPISDTHeader, rsdp_signature),
-				              &header.rsdp_signature[0], sizeof(header.rsdp_signature));
+				copytophys(base + offsetof(ACPISDTHeader, rsdp_signature),
+				           &header.rsdp_signature[0], sizeof(header.rsdp_signature));
 				continue;
 			}
 			printk(FREESTR(KERN_INFO "[acpi:sdt:%" PRIuSIZ ":%.?q] found table [table: "
@@ -318,9 +318,9 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 		size_t missing;
 		addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 		base = ACPI_POINTER_SIZE == 4
-		       ? (physaddr_t)vm_readphysl_unaligned(addr)
-		       : (physaddr_t)vm_readphysq_unaligned(addr);
-		vm_copyfromphys(buf, base, sizeof(ACPISDTHeader));
+		       ? (physaddr_t)peekphysl_unaligned(addr)
+		       : (physaddr_t)peekphysq_unaligned(addr);
+		copyfromphys(buf, base, sizeof(ACPISDTHeader));
 		if (*(u32 *)((ACPISDTHeader *)buf)->rsdp_signature != *(u32 *)signature)
 			continue;
 		result = ((ACPISDTHeader *)buf)->rsdp_length;
@@ -333,9 +333,9 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 		}
 		if (missing > sizeof(ACPISDTHeader)) {
 			/* Copy additional data. */
-			vm_copyfromphys((byte_t *)buf + sizeof(ACPISDTHeader),
-			                (physaddr_t)(base + sizeof(ACPISDTHeader)),
-			                missing - sizeof(ACPISDTHeader));
+			copyfromphys((byte_t *)buf + sizeof(ACPISDTHeader),
+			             (physaddr_t)(base + sizeof(ACPISDTHeader)),
+			             missing - sizeof(ACPISDTHeader));
 		}
 		if (ptableaddr)
 			*ptableaddr = base;

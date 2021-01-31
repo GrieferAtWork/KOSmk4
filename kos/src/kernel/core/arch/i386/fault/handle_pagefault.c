@@ -28,11 +28,11 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman/nopf.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/mman/nopf.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/phys2virt64.h>
@@ -467,7 +467,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	if (ADDR_ISUSER(addr) || FAULT_IS_USER) {
 #ifndef NDEBUG
 		/* Special case: When the TLS segment contains an invalid pointer, us
-		 *               trying to obtain THIS_VM at this point is just going
+		 *               trying to obtain THIS_MMAN at this point is just going
 		 *               to result in a #DF:
 		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
 		 *   #2: Trigger #PF at `%tls.base'
@@ -499,7 +499,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			mf.mfl_mman = x86_repair_broken_tls_state()->t_mman;
 		}
 #else /* !NDEBUG */
-		mf.mfl_mman = THIS_VM;
+		mf.mfl_mman = THIS_MMAN;
 #endif /* NDEBUG */
 	}
 
@@ -1233,7 +1233,7 @@ do_unwind_state:
 			assert(hinted_node->vn_part->dp_crefs == NULL);
 			assert(!isshared(hinted_node->vn_part));
 			assert(hinted_node->vn_part->dp_block == hinted_node->vn_block);
-			assert(hinted_node->vn_block->db_parts == VM_DATABLOCK_ANONPARTS);
+			assert(hinted_node->vn_block->db_parts == MFILE_PARTS_ANONYMOUS);
 			assert(hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_LOCKED);
 			assert(hinted_node->vn_part->dp_state == VM_DATAPART_STATE_LOCKED);
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
@@ -1258,7 +1258,7 @@ do_unwind_state:
 	if (ADDR_ISUSER(addr) || FAULT_IS_USER) {
 #ifndef NDEBUG
 		/* Special case: When the TLS segment contains an invalid pointer, us
-		 *               trying to obtain THIS_VM at this point is just going
+		 *               trying to obtain THIS_MMAN at this point is just going
 		 *               to result in a #DF:
 		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
 		 *   #2: Trigger #PF at `%tls.base'
@@ -1290,7 +1290,7 @@ do_unwind_state:
 			effective_vm = x86_repair_broken_tls_state()->t_mman;
 		}
 #else /* !NDEBUG */
-		effective_vm = THIS_VM;
+		effective_vm = THIS_MMAN;
 #endif /* NDEBUG */
 	}
 	{
@@ -1862,7 +1862,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
 					 * mappings. */
 					if (!(node_prot & VM_PROT_SHARED) &&
-					    (ATOMIC_READ(part->dp_block->db_parts) != VM_DATABLOCK_ANONPARTS ||
+					    (ATOMIC_READ(part->dp_block->db_parts) != MFILE_PARTS_ANONYMOUS ||
 					     part->dp_srefs != NULL || part->dp_crefs != node ||
 					     node->vn_link.ln_next != NULL))
 						pagedir_prot &= ~PAGEDIR_MAP_FWRITE;

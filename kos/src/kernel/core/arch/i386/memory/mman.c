@@ -27,11 +27,11 @@
 #include <kernel/compiler.h>
 
 #include <kernel/memory.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/x86/tss.h>
@@ -360,10 +360,10 @@ INTERN struct mnode x86_kernel_vm_nodes[8] = {
 	                  VM_PROT_NONE),
 #else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 	INIT_MNODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-	                  X86_VM_KERNEL_PDIR_RESERVED_BASE,
-	                  X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - 1,
-	                  PAGEID_ENCODE(X86_VM_KERNEL_PDIR_RESERVED_BASE),
-	                  PAGEID_ENCODE(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE) - 1,
+	                  X86_MMAN_KERNEL_PDIR_RESERVED_BASE,
+	                  X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1,
+	                  PAGEID_ENCODE(X86_MMAN_KERNEL_PDIR_RESERVED_BASE),
+	                  PAGEID_ENCODE(X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE) - 1,
 	                  VM_PROT_NONE),
 #endif /* !X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 };
@@ -509,8 +509,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	{
 		/* Calculate the PDIR Identity reservation at runtime. */
 		byte_t *minaddr, *maxaddr;
-		minaddr = (byte_t *)(X86_VM_KERNEL_PDIR_RESERVED_BASE);
-		maxaddr = (byte_t *)(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - 1);
+		minaddr = (byte_t *)(X86_MMAN_KERNEL_PDIR_RESERVED_BASE);
+		maxaddr = (byte_t *)(X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1);
 		vm_node_setminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE], minaddr);
 		vm_node_setmaxaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE], maxaddr);
 	}

@@ -273,7 +273,7 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 	 * Note that we don't use task_setvm() to change our's, since
 	 * that function may throw an exception, and would already be
 	 * complete overkill for our purposes. */
-	myvm     = THIS_VM;
+	myvm     = THIS_MMAN;
 	threadvm = self->t_mman;
 	if (myvm != threadvm)
 		pagedir_set(threadvm->v_pdir_phys);

@@ -334,13 +334,13 @@ struct p64_pdir {
 #endif /* __CC__ */
 
 
-#define P64_VM_KERNEL_PDIR_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNELSPACE_BASE + 512GiB */
-#define P64_VM_KERNEL_PDIR_IDENTITY_SIZE  __UINT64_C(0x0000008000000000) /* 512GiB */
-#define P64_VM_KERNEL_PDIR_RESERVED_BASE  __UINT64_C(0xffff808000000000) /* Start of the address range reserved for page-directory self-modifications. */
-#define P64_VM_KERNEL_PDIR_RESERVED_SIZE  __UINT64_C(0x0000008000000000) /* Amount of memory reserved for page-directory self-modifications. */
+#define P64_MMAN_KERNEL_PDIR_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNELSPACE_BASE + 512GiB */
+#define P64_MMAN_KERNEL_PDIR_IDENTITY_SIZE  __UINT64_C(0x0000008000000000) /* 512GiB */
+#define P64_MMAN_KERNEL_PDIR_RESERVED_BASE  __UINT64_C(0xffff808000000000) /* Start of the address range reserved for page-directory self-modifications. */
+#define P64_MMAN_KERNEL_PDIR_RESERVED_SIZE  __UINT64_C(0x0000008000000000) /* Amount of memory reserved for page-directory self-modifications. */
 
-#define X86_VM_KERNEL_PDIR_RESERVED_BASE P64_VM_KERNEL_PDIR_RESERVED_BASE
-#define X86_VM_KERNEL_PDIR_RESERVED_SIZE P64_VM_KERNEL_PDIR_RESERVED_SIZE
+#define X86_MMAN_KERNEL_PDIR_RESERVED_BASE P64_MMAN_KERNEL_PDIR_RESERVED_BASE
+#define X86_MMAN_KERNEL_PDIR_RESERVED_SIZE P64_MMAN_KERNEL_PDIR_RESERVED_SIZE
 
 
 /* Page directory self-mapping addresses.

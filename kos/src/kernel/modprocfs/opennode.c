@@ -59,7 +59,7 @@ ProcFS_OpenNode(struct superblock *__restrict UNUSED(self),
 		}
 #endif /* !PROCFS_NO_CUSTOM */
 		node->i_fsdata = (struct inode_data *)ProcFS_Singleton_FsData[id];
-		node->db_parts = VM_DATABLOCK_ANONPARTS;
+		node->mf_parts = MFILE_PARTS_ANONYMOUS;
 		if (id >= PROCFS_SINGLETON_START_LNK_DYN)
 			node->i_type = &ProcFS_Singleton_DynamicSymlink_Type;
 		else if (id >= PROCFS_SINGLETON_START_REG_RW)
@@ -91,7 +91,7 @@ ProcFS_OpenNode(struct superblock *__restrict UNUSED(self),
 			break;
 		}
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
-		node->db_parts = VM_DATABLOCK_ANONPARTS;
+		node->mf_parts = MFILE_PARTS_ANONYMOUS;
 		if (id >= PROCFS_PERPROC_START_LNK_DYN)
 			node->i_type = &ProcFS_PerProc_DynamicSymlink_Type;
 		else if (id >= PROCFS_PERPROC_START_REG_RW)

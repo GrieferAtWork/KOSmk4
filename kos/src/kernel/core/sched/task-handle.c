@@ -451,7 +451,7 @@ handle_task_tryas(struct taskpid *__restrict self,
 	case HANDLE_TYPE_VM:
 		if (self != THIS_TASKPID)
 			break;
-		return incref(THIS_VM);
+		return incref(THIS_MMAN);
 
 	case HANDLE_TYPE_FS:
 		if (self != THIS_TASKPID)

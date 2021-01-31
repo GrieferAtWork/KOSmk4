@@ -39,6 +39,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vboxgdb.h>
+#include <kernel/vm.h>
 #include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 #include <misc/atomic-ref.h>
 #include <sched/task.h>

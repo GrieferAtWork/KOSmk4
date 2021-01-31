@@ -194,7 +194,7 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 				}
 				if (sender) {
 					struct vm_execinfo_struct *ei;
-					ei = &FORVM(sender->t_mman, thisvm_execinfo);
+					ei = &FORMMAN(sender->t_mman, thisvm_execinfo);
 					if (ei->ei_path && ei->ei_dent) {
 						dbg_pprinter(&printer, DBGSTR(":"), 1);
 						path_printentex(ei->ei_path,

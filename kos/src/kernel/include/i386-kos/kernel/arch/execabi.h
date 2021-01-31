@@ -54,7 +54,7 @@ DATDEF byte_t execabi_system_rtld32_size[];
  * core, and is mapped via copy-on-write into any user-space process
  * that requests the use of a dynamic linker
  * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
-DATDEF struct vm_ramfile execabi_system_rtld32_file;
+DATDEF struct mramfile execabi_system_rtld32_file;
 #endif /* __x86_64__ */
 
 DECL_END

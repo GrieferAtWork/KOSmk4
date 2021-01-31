@@ -30,6 +30,7 @@
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/personality.h>
 #include <kernel/profiler.h>
 #include <kernel/syscall.h>
@@ -540,16 +541,16 @@ again_get_oldpath:
 	case KSYSCTL_OPEN_KERNEL_VM: {
 		struct handle temp;
 		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_FS;
+		temp.h_type = HANDLE_TYPE_VM;
 		temp.h_mode = IO_RDWR;
-		temp.h_data = &vm_kernel;
+		temp.h_data = &mman_kernel;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_ROOT_PIDNS: {
 		struct handle temp;
 		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_FS;
+		temp.h_type = HANDLE_TYPE_PIDNS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &pidns_root;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);

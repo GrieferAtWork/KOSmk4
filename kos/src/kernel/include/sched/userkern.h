@@ -31,17 +31,16 @@
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #include <sched/arch/userkern.h>
-
 #ifndef CONFIG_NO_USERKERN_SEGMENT
-#include <kernel/vm.h>
-#include <sched/pertask.h>
-
 #include <compat/config.h>
-#include <kos/ukern.h>
 
 #ifdef __CC__
 
 DECL_BEGIN
+
+struct vio_operators;
+struct mfile;
+struct mpart;
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
 DATDEF struct vio_operators userkern_segment_vio;

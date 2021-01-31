@@ -169,7 +169,7 @@ do_unshare_cow:
 		 *    be reached from the outside. */
 		vm_datapart_lockread_setcore(part);
 		if (/* The part is anonymous */
-		    ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS &&
+		    ATOMIC_READ(part->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS &&
 		    /* The part isn't mapped as shared by anyone */
 		    part->dp_srefs == NULL &&
 		    /* There aren't any other copy-on-write nodes. */
@@ -415,7 +415,7 @@ did_alloc_ramdata_in_new_part:
 			}
 			/* If the node isn't prepared, make sure that we can map memory. */
 			if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-				if unlikely(!(self == THIS_VM || self == &vm_kernel
+				if unlikely(!(self == THIS_MMAN || self == &vm_kernel
 				              ? pagedir_prepare(pageaddr, part_num_vpages * PAGESIZE)
 				              : pagedir_prepare_p(self->v_pdir_phys, pageaddr, part_num_vpages * PAGESIZE))) {
 					sync_endwrite(self);
@@ -441,7 +441,7 @@ did_alloc_ramdata_in_new_part:
 				pagedir_prot |= PAGEDIR_MAP_FUSER;
 
 			/* Actually map the accessed page(s)! */
-			if (self == THIS_VM || self == &vm_kernel) {
+			if (self == THIS_MMAN || self == &vm_kernel) {
 				vm_datapart_map_ram(new_part, pageaddr, pagedir_prot);
 			} else {
 				vm_datapart_map_ram_p(new_part,
@@ -463,7 +463,7 @@ did_alloc_ramdata_in_new_part:
 			assert(node->vn_part == part);
 			decref_nokill(part);      /* node->vn_part */
 			node->vn_part = new_part; /* Inherit reference */
-			assert(ATOMIC_READ(new_part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS);
+			assert(ATOMIC_READ(new_part->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS);
 			assert(new_part->dp_srefs == NULL);
 			assert(new_part->dp_crefs == node);
 			assert(node->vn_link.ln_pself == &new_part->dp_crefs);
@@ -826,7 +826,7 @@ again_acquire_part_lock:
 				 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
 				 * mappings. */
 				if (!(node_prot & VM_PROT_SHARED) &&
-				    (ATOMIC_READ(part->dp_block->db_parts) != VM_DATABLOCK_ANONPARTS ||
+				    (ATOMIC_READ(part->dp_block->db_parts) != MFILE_PARTS_ANONYMOUS ||
 				     part->dp_srefs != NULL || part->dp_crefs != node ||
 				     node->vn_link.ln_next != NULL))
 					pagedir_prot &= ~PAGEDIR_MAP_FWRITE;

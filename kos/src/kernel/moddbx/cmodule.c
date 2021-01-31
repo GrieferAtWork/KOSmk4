@@ -311,7 +311,7 @@ NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
 	}
 	/* Enumerate user-space modules. */
 	if (dbg_current && dbg_current->t_self == dbg_current &&
-	    dbg_current->t_mman != NULL && dbg_current->t_mman != &vm_kernel) {
+	    dbg_current->t_mman != NULL && dbg_current->t_mman != &mman_kernel) {
 		temp = cmodule_enum_uservm_except(dbg_current->t_mman, cb, cookie, start_module);
 		if unlikely(temp < 0)
 			goto err;
@@ -381,7 +381,7 @@ PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 			struct vm *modvm;
 			modvm = module_vm(iter->cm_module,
 			                  iter->cm_modtyp);
-			if (modvm == &vm_kernel ||
+			if (modvm == &mman_kernel ||
 			    modvm == dbg_current->t_mman) {
 				/* Don't remove this one. */
 				piter = &iter->cm_cache;

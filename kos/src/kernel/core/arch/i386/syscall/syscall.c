@@ -36,8 +36,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/idt.h>
 #include <kernel/x86/syscall-tables.h>
@@ -125,7 +124,7 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
 	s32 offset;
 	offset = (s32)(intptr_t)((uintptr_t)dest - ((uintptr_t)pcrel + 4));
-	vm_writephysl_unaligned(V2P(pcrel), (u32)offset);
+	pokephysl_unaligned(V2P(pcrel), (u32)offset);
 }
 
 
@@ -195,9 +194,9 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 #else /* __x86_64__ */
 #define SYSCALL_EMULATE_DONT_TRACE_WORD 0xa5f3 /* rep; movsl */
 #endif /* !__x86_64__ */
-	vm_writephysw_unaligned(V2P(&x86_syscall_emulate_r_redirection[0]),
-	                        enable ? (u16)(uintptr_t)x86_syscall_emulate_r_redirection_jmp
-	                               : SYSCALL_EMULATE_DONT_TRACE_WORD);
+	pokephysw_unaligned(V2P(&x86_syscall_emulate_r_redirection[0]),
+	                    enable ? (u16)(uintptr_t)x86_syscall_emulate_r_redirection_jmp
+	                           : SYSCALL_EMULATE_DONT_TRACE_WORD);
 #undef SYSCALL_EMULATE_DONT_TRACE_WORD
 	__flush_instruction_cache();
 	result = syscall_tracing_enabled;

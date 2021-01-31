@@ -28,11 +28,12 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
+#include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
@@ -65,6 +66,8 @@
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #include <kernel/rand.h>
 #include <sched/userkern.h>
+
+#include <kos/ukern.h>
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 DECL_BEGIN

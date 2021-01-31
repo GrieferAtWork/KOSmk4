@@ -95,7 +95,7 @@ vm_protect(struct vm *__restrict self,
 			THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_UNMAP);
 		maxpageid = __ARCH_PAGEID_MAX;
 	}
-	myvm   = THIS_VM;
+	myvm   = THIS_MMAN;
 	result = 0;
 	TRY {
 again_lock_vm:

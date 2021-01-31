@@ -19,17 +19,18 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_P32_C_INL
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_P32_C_INL 1
+#define __OMIT_PAGING_CONSTANT_P_WRAPPERS
+#define __WANT_MMAN_EXCLUDE_PAGEDIR
 #define _KOS_SOURCE 1
-#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1
-#define __OMIT_PAGING_CONSTANT_P_WRAPPERS 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging32-p32.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -50,7 +51,7 @@ STATIC_ASSERT(sizeof(struct p32_pdir) == P32_PDIR_SIZE);
 STATIC_ASSERT(sizeof(struct p32_pdir) == 4096);
 STATIC_ASSERT(sizeof(union p32_pdir_e2) == 4);
 STATIC_ASSERT(sizeof(union p32_pdir_e1) == 4);
-STATIC_ASSERT(P32_PDIR_E1_IDENTITY_BASE == P32_VM_KERNEL_PDIR_IDENTITY_BASE);
+STATIC_ASSERT(P32_PDIR_E1_IDENTITY_BASE == P32_MMAN_KERNEL_PDIR_IDENTITY_BASE);
 STATIC_ASSERT(P32_PDIR_E2_IDENTITY_BASE == (P32_PDIR_E1_IDENTITY_BASE + (P32_PDIR_VEC2INDEX(P32_PDIR_E1_IDENTITY_BASE) * P32_PDIR_E1_SIZE)));
 
 /* Return the physical page ID of a given physical address. */
@@ -66,8 +67,8 @@ NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
 	/* Assert some constants assumed below. */
 	STATIC_ASSERT(P32_PDIR_VEC2INDEX(KERNELSPACE_BASE) == 768);
 	STATIC_ASSERT(P32_PDIR_VEC1INDEX(KERNELSPACE_BASE) == 0);
-	STATIC_ASSERT(P32_PDIR_VEC2INDEX(P32_VM_KERNEL_PDIR_IDENTITY_BASE) == 1023);
-	STATIC_ASSERT(P32_PDIR_VEC1INDEX(P32_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	STATIC_ASSERT(P32_PDIR_VEC2INDEX(P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 1023);
+	STATIC_ASSERT(P32_PDIR_VEC1INDEX(P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
 
@@ -259,8 +260,8 @@ NOTHROW(FCALL p32_pagedir_sync_flattened_e1_vector)(unsigned int vec2) {
 	void *sync_pageaddr;
 	sync_pageaddr = P32_PDIR_E1_IDENTITY[vec2];
 	if (vec2 >= P32_PDIR_VEC2INDEX(KERNELSPACE_BASE)) {
-		/* Sync as part of the kernel VM */
-		vm_supersyncone(sync_pageaddr);
+		/* Sync as part of the kernel MMan */
+		mman_supersyncone(sync_pageaddr);
 	} else {
 		/* Sync as part of the current page directory. */
 		pagedir_syncone_smp(sync_pageaddr);

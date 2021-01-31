@@ -233,7 +233,7 @@ again_lock_vm:
 					           /* If this is the second copy-on-write mapping of an anonymous data part,
 					            * then the first one may have had write permissions which must now be
 					            * unshared (this is the case for general purpose RAM during fork()) */
-					           ATOMIC_READ(node_part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS) {
+					           ATOMIC_READ(node_part->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS) {
 						error = vm_node_update_write_access_locked_vm(node_part->dp_crefs, self);
 						if unlikely(error != VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS) {
 							blocking_vm = node_part->dp_crefs->vn_vm;
@@ -357,8 +357,8 @@ handle_remove_write_error:
 	/* Copy execinfo */
 	{
 		struct vm_execinfo_struct *dst, *src;
-		dst = &FORVM(result, thisvm_execinfo);
-		src = &FORVM(self, thisvm_execinfo);
+		dst = &FORMMAN(result, thisvm_execinfo);
+		src = &FORMMAN(self, thisvm_execinfo);
 		dst->ei_node = (REF struct inode *)xincref(src->ei_node);
 		dst->ei_dent = xincref(src->ei_dent);
 		dst->ei_path = xincref(src->ei_path);

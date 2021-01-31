@@ -224,7 +224,7 @@ NOTHROW(KCALL vm_read_nopf)(struct vm *__restrict self, UNCHECKED void const *ad
 direct_copy:
 		result += memcpy_nopf(buf, addr, num_bytes);
 	} else {
-		if (THIS_VM == self)
+		if (THIS_MMAN == self)
 			goto direct_copy; /* Simple case: same VM */
 		if (ADDRRANGE_ISKERN((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
@@ -292,7 +292,7 @@ NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
 direct_copy:
 		result += memcpy_nopf(addr, buf, num_bytes);
 	} else {
-		if (THIS_VM == self)
+		if (THIS_MMAN == self)
 			goto direct_copy; /* Simple case: same VM */
 		if (ADDRRANGE_ISKERN((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Source buffer is located in kernel-space.
@@ -354,7 +354,7 @@ NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
 direct_copy:
 		result += memset_nopf(addr, byte, num_bytes);
 	} else {
-		if (THIS_VM == self)
+		if (THIS_MMAN == self)
 			goto direct_copy; /* Simple case: same VM */
 		result += memset_into_vm_nopf(self, addr, byte, num_bytes);
 	}
@@ -417,7 +417,7 @@ vm_read(struct vm *__restrict self,
 			goto copy_from_vm;
 		}
 	} else {
-		if (THIS_VM == self) {
+		if (THIS_MMAN == self) {
 			/* Simple case: same VM */
 			TRY {
 				memcpy(buf, addr, num_bytes);
@@ -491,7 +491,7 @@ vm_write(struct vm *__restrict self,
 			goto copy_to_vm;
 		}
 	} else {
-		if (THIS_VM == self) {
+		if (THIS_MMAN == self) {
 			/* Simple case: same VM */
 			TRY {
 				memcpy(addr, buf, num_bytes);
@@ -560,7 +560,7 @@ vm_memset(struct vm *__restrict self,
 			goto copy_to_vm;
 		}
 	} else {
-		if (THIS_VM == self) {
+		if (THIS_MMAN == self) {
 			/* Simple case: same VM */
 			TRY {
 				memset(addr, byte, num_bytes);

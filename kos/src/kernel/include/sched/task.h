@@ -104,7 +104,7 @@ struct task {
 	REF struct vm          *t_mman;       /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
 	                                       *             write(THIS_TASK && INTERN(lock)))]
 	                                       * The VM used to host this task.
-	                                       * NOTE: Also accessible via the `this_vm' field. */
+	                                       * NOTE: Also accessible via the `this_mman' field. */
 	LIST_ENTRY(task)        t_mman_tasks; /* [lock(t_mman->v_tasklock)] Chain of tasks using `t_mman' */
 	size_t                  t_heapsz;     /* [const] Allocated heap size of this task. */
 	union {

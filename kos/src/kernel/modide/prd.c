@@ -155,7 +155,7 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *ba
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
 	if (ADDR_ISUSER(base))
-		effective_vm = THIS_VM;
+		effective_vm = THIS_MMAN;
 	data.ad_base = data.ad_buf = prd_buf;
 	data.ad_siz = data.ad_max = prd_siz;
 	/* Try to start DMAing within the given address range. */
@@ -268,7 +268,7 @@ AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
 	if (ADDR_ISUSER(buf->ab_head.ab_base))
-		effective_vm = THIS_VM;
+		effective_vm = THIS_MMAN;
 	assert(num_bytes == aio_buffer_size(buf));
 	data.ad_base = data.ad_buf = prd_buf;
 	data.ad_siz = data.ad_max = prd_siz;

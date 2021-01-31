@@ -474,11 +474,11 @@ PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 	/* An anonymous data-block can't refer to any existing
 	 * data parts, so there can't be any existing futex objects! */
 again:
-	if unlikely(ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS)
+	if unlikely(ATOMIC_READ(self->db_parts) == MFILE_PARTS_ANONYMOUS)
 		return NULL;
 	sync_read(self);
 	COMPILER_READ_BARRIER();
-	if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS) {
+	if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS) {
 		sync_endread(self);
 		return NULL;
 	}
@@ -591,7 +591,7 @@ PUBLIC void FCALL
 vm_futex_broadcast(UNCHECKED void *futex_address)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct vm_futex *f;
-	struct vm *effective_vm = THIS_VM;
+	struct vm *effective_vm = THIS_MMAN;
 	if (ADDR_ISKERN(futex_address))
 		effective_vm = &vm_kernel;
 	/* Lookup a futex at the given address. */

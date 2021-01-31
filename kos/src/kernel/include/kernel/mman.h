@@ -72,9 +72,9 @@ LIST_HEAD(task_list, WEAK task);
 
 
 struct mman {
-#ifndef __MMAN_INTERNAL_EXCLUDE_PAGEDIR
+#ifndef __WANT_MMAN_EXCLUDE_PAGEDIR
 	pagedir_t                      mm_pagedir;     /* [lock(mm_lock)] The page directory associated with the mman. */
-#endif /* !__MMAN_INTERNAL_EXCLUDE_PAGEDIR */
+#endif /* !__WANT_MMAN_EXCLUDE_PAGEDIR */
 	WEAK refcnt_t                  mm_refcnt;      /* Reference counter. */
 	WEAK refcnt_t                  mm_weakrefcnt;  /* Weak reference counter */
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN

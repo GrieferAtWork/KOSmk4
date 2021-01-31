@@ -174,7 +174,7 @@ devfs_insert(USER CHECKED char const *name,
 	if (pdevfs_node)
 		*pdevfs_node = node;
 	else {
-		decref_unlikely(&node->i_datablock);
+		decref_unlikely(&node->i_memfile);
 	}
 	return true;
 }

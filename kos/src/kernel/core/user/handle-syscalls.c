@@ -32,6 +32,7 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
+#include <kernel/mman.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -2584,15 +2585,15 @@ kcmp_get_handle_from_pid(pid_t pid, unsigned int fd) {
 	return result;
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED REF struct vm *KCALL
-kcmp_get_vm_from_pid(pid_t pid) {
-	REF struct vm *result;
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct mman *KCALL
+kcmp_get_mman_from_pid(pid_t pid) {
+	REF struct mman *result;
 	REF struct task *thread;
 	/* Lookup the thread in question */
 	thread = kcmp_get_thread_from_pid(pid);
 	FINALLY_DECREF_UNLIKELY(thread);
-	/* Retrieve the thread's vm. */
-	result = task_getvm(thread);
+	/* Retrieve the thread's mman. */
+	result = task_getmman(thread);
 	return result;
 }
 
@@ -2659,13 +2660,13 @@ DEFINE_SYSCALL5(syscall_slong_t, kcmp,
 	}	break;
 
 	case KCMP_VM: {
-		REF struct vm *vm1;
-		REF struct vm *vm2;
-		vm1 = kcmp_get_vm_from_pid(pid1);
-		FINALLY_DECREF_UNLIKELY(vm1);
-		vm2 = kcmp_get_vm_from_pid(pid2);
-		FINALLY_DECREF_UNLIKELY(vm2);
-		result = kcmp_pointer(vm1, vm2);
+		REF struct mman *mm1;
+		REF struct mman *mm2;
+		mm1 = kcmp_get_mman_from_pid(pid1);
+		FINALLY_DECREF_UNLIKELY(mm1);
+		mm2 = kcmp_get_mman_from_pid(pid2);
+		FINALLY_DECREF_UNLIKELY(mm2);
+		result = kcmp_pointer(mm1, mm2);
 	}	break;
 
 	case KCMP_FILES: {

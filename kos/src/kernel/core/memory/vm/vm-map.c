@@ -205,7 +205,7 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
                                  size_t num_pages,
                                  uintptr_half_t prot)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	if (ATOMIC_READ(data->db_parts) == VM_DATABLOCK_ANONPARTS) {
+	if (ATOMIC_READ(data->db_parts) == MFILE_PARTS_ANONYMOUS) {
 		/* Simple case: We can allocate the part in its entirety, all from the get-go! */
 		info->pv_vec            = info->pv_buf;
 		info->pv_cnt            = 1;
@@ -318,7 +318,7 @@ again_lock_all_parts:
 				 * >>  if (part->dp_crefs == NULL)
 				 * >>      PAGEDIR_REMOVE_WRITE_FOR_ALL(part->dp_srefs);
 				 * >>  else if (NEXT(part->dp_crefs) == NULL &&
-				 * >>           ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS) {
+				 * >>           ATOMIC_READ(part->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS) {
 				 * >>      // If this is the second copy-on-write mapping of an anonymous data part,
 				 * >>      // then the first one may have had write permissions which must now be
 				 * >>      // unshared (this is the case for general purpose RAM during fork())
@@ -351,7 +351,7 @@ again_lock_all_parts:
 					           /* If this is the second copy-on-write mapping of an anonymous data part,
 					            * then the first one may have had write permissions which must now be
 					            * unshared (this is the case for general purpose RAM during fork()) */
-					           ATOMIC_READ(vecpart->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS) {
+					           ATOMIC_READ(vecpart->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS) {
 						error = vm_node_update_write_access(vecpart->dp_crefs);
 						if unlikely(error != VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS) {
 							blocking_vm = vecpart->dp_crefs->vn_vm;

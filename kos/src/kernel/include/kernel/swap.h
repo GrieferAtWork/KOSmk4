@@ -24,7 +24,6 @@
 
 #include <kernel/memory.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 DECL_BEGIN
 

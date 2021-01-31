@@ -503,7 +503,7 @@ again:
 	        "Attempted to unmap kernel-space node at %p...%p, backed "
 	        "by a data part referring to a part of the kernel core",
 	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
-	assertf(part->dp_block->db_parts == VM_DATABLOCK_ANONPARTS,
+	assertf(part->dp_block->db_parts == MFILE_PARTS_ANONYMOUS,
 	        "Cannot unmap non-anonymous kernel-space node at %p...%p as RAM",
 	        vm_node_getminaddr(node), vm_node_getmaxaddr(node));
 	assertf(part->dp_tree.a_vmin == 0,

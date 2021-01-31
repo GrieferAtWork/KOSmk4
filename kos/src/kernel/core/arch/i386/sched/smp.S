@@ -1041,10 +1041,10 @@ INTERN_FUNCTION(x86_smp_entry64)
 .Ldo_init_with_task_and_stack:
 
 	/* Load the VM of the target task. */
-	EXTERN(this_vm)
-	movP   this_vm(R_TASK), %Pcx
-	EXTERN(thisvm_pdir_phys)
-	movP   thisvm_pdir_phys(%Pcx), %Pax
+	EXTERN(this_mman)
+	movP   this_mman(R_TASK), %Pcx
+	EXTERN(thismman_pagedir_p)
+	movP   thismman_pagedir_p(%Pcx), %Pax
 	EXTERN(thiscpu_pdir)
 	movP   %Pax, thiscpu_pdir(R_CPU) /* Update the per-cpu current-pdir field. */
 	movP   %Pax, %cr3

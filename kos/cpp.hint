@@ -576,7 +576,6 @@
 #define ATTR_DATA_S(x)
 #define ATTR_BSS_S(x)
 #define ATTR_PERCPU
-#define ATTR_PERVM
 #define ATTR_PERMMAN
 #define ATTR_PERTASK
 #define ATTR_DBGTEXT

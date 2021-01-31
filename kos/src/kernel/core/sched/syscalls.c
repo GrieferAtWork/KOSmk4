@@ -498,7 +498,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_UNSHARE
 PRIVATE void KCALL unshare_vm(void) {
-	struct vm *myvm = THIS_VM;
+	struct vm *myvm = THIS_MMAN;
 	if (isshared(myvm)) {
 #ifdef CONFIG_USE_NEW_VM
 		REF struct mman *newmm;

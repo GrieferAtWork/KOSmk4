@@ -39,6 +39,8 @@
 #include <kernel/except.h>
 #include <kernel/execabi.h>
 #include <kernel/handle.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mm-event.h>
 #include <kernel/mman/mm-exec.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
@@ -3290,7 +3292,10 @@ kernel_execveat(fd_t dirfd,
 	                                                                &args.ea_xdentry);
 	TRY {
 		/* Assert that the specified node is a regular file. */
+#ifndef CONFIG_USE_NEW_VM /* TODO */
 		vm_exec_assert_regular(args.ea_xnode);
+#endif /* !CONFIG_USE_NEW_VM */
+
 		/* Check for execute permissions? */
 		inode_access(args.ea_xnode, R_OK | X_OK);
 

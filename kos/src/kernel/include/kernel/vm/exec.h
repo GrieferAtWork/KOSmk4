@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
-#include <kernel/vm.h>
-
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman/mm-execinfo.h>
 #define vm_execinfo_struct mexecinfo
@@ -33,6 +30,9 @@
 #define ei_path            mei_path
 #define thisvm_execinfo    thismman_execinfo
 #else /* CONFIG_USE_NEW_VM */
+#include <kernel/types.h>
+#include <kernel/vm.h>
+
 #define mexecinfo         vm_execinfo_struct
 #define mei_node          ei_node
 #define mei_dent          ei_dent
@@ -46,13 +46,13 @@ struct directory_entry;
 struct path;
 
 struct vm_execinfo_struct {
-	REF struct inode           *ei_node; /* [0..1][lock(:THIS_VM)] Exec INode */
-	REF struct directory_entry *ei_dent; /* [0..1][lock(:THIS_VM)] Exec directory entry */
-	REF struct path            *ei_path; /* [0..1][lock(:THIS_VM)] Exec path */
+	REF struct inode           *ei_node; /* [0..1][lock(:THIS_MMAN)] Exec INode */
+	REF struct directory_entry *ei_dent; /* [0..1][lock(:THIS_MMAN)] Exec directory entry */
+	REF struct path            *ei_path; /* [0..1][lock(:THIS_MMAN)] Exec path */
 };
 
 /* VM exec() information */
-DATDEF ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo;
+DATDEF ATTR_PERMMAN struct vm_execinfo_struct thisvm_execinfo;
 
 DECL_END
 #endif /* !CONFIG_USE_NEW_VM */

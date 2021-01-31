@@ -346,7 +346,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		parts = ATOMIC_READ(self->db_parts);
 		if (!parts)
 			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISEMPTY;
-		else if (parts == VM_DATABLOCK_ANONPARTS)
+		else if (parts == MFILE_PARTS_ANONYMOUS)
 			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISANON;
 		else {
 			datablock_stat_parts(parts, &st);
@@ -1329,7 +1329,7 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 		/* Generic data-block stat */
 		size_t partcount = 0;
 		mfile_lock_read(self);
-		if (self->db_parts && self->db_parts != VM_DATABLOCK_ANONPARTS)
+		if (self->db_parts && self->db_parts != MFILE_PARTS_ANONYMOUS)
 			partcount = vm_datablock_count_part(self->db_parts);
 		mfile_lock_endread(self);
 		COMPILER_BARRIER();

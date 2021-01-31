@@ -695,7 +695,7 @@ again_lock_parts:
 			           /* If this is the second copy-on-write mapping of an anonymous data part,
 			           * then the first one may have had write permissions which must now be
 			           * unshared (this is the case for general purpose RAM during fork()) */
-			           ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS) {
+			           ATOMIC_READ(part->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS) {
 				update_write_error = vm_node_update_write_access(part->dp_crefs);
 				if unlikely(update_write_error != VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS) {
 					blocking_vm = part->dp_crefs->vn_vm;
@@ -858,8 +858,8 @@ handle_remove_write_error:
 	}
 	/* Set the given execinfo if the caller wants us to do so. */
 	if (additional_actions & VMB_APPLY_AA_SETEXECINFO) {
-		memcpy(&old_execinfo, &FORVM(target, thisvm_execinfo), sizeof(struct vm_execinfo_struct));
-		memcpy(&FORVM(target, thisvm_execinfo), execinfo, sizeof(struct vm_execinfo_struct));
+		memcpy(&old_execinfo, &FORMMAN(target, thisvm_execinfo), sizeof(struct vm_execinfo_struct));
+		memcpy(&FORMMAN(target, thisvm_execinfo), execinfo, sizeof(struct vm_execinfo_struct));
 		xincref(execinfo->ei_node);
 		xincref(execinfo->ei_dent);
 		xincref(execinfo->ei_path);
@@ -924,19 +924,19 @@ handle_remove_write_error:
 		 * >>         if (IN_COMPAT_MODE() &&
 		 * >>             FAULT_ADDR < KERNELSPACE_BASE &&
 		 * >>             FAULT_ADDR >= COMPAT_KERNELSPACE_BASE) {
-		 * >>             sync_write(THIS_VM);
-		 * >>             if (!vm_isused(THIS_VM, COMPAT_KERNELSPACE_BASE,
+		 * >>             sync_write(THIS_MMAN);
+		 * >>             if (!vm_isused(THIS_MMAN, COMPAT_KERNELSPACE_BASE,
 		 * >>                            KERNELSPACE_BASE - COMPAT_KERNELSPACE_BASE)) {
-		 * >>                 struct vm_node *kr = vm_node_remove(THIS_VM, KERNELSPACE_BASE);
-		 * >>                 assert(kr == &THIS_VM->v_kernreserve);
+		 * >>                 struct vm_node *kr = vm_node_remove(THIS_MMAN, KERNELSPACE_BASE);
+		 * >>                 assert(kr == &THIS_MMAN->v_kernreserve);
 		 * >>                 // Extend the kern-reserve node to fill the
 		 * >>                 // entire compat-mode kernel address space.
 		 * >>                 kr->vn_node.a_vmin = PAGEID_ENCODE(COMPAT_KERNELSPACE_BASE);
 		 * >>                 vm_node_insert(kr);
-		 * >>                 sync_endwrite(THIS_VM);
+		 * >>                 sync_endwrite(THIS_MMAN);
 		 * >>                 goto try_lookup_node_at_accessed_address;
 		 * >>             }
-		 * >>             sync_endwrite(THIS_VM);
+		 * >>             sync_endwrite(THIS_MMAN);
 		 * >>         }
 		 * >> #endif // ...
 		 * >>     }
@@ -969,7 +969,7 @@ handle_remove_write_error:
 		 *       can unmap user-space without having to keep on syncing the VM! */
 #ifndef CONFIG_NO_SMP
 		if (!(additional_actions & VMB_APPLY_AA_TERMTHREADS)) {
-			if (target == THIS_VM)
+			if (target == THIS_MMAN)
 				pagedir_unmap_userspace_nosync();
 			else {
 				pagedir_unmap_userspace_nosync_p(target->v_pdir_phys);
@@ -977,7 +977,7 @@ handle_remove_write_error:
 		} else
 #endif /* !CONFIG_NO_SMP */
 		{
-			if (target == THIS_VM)
+			if (target == THIS_MMAN)
 				pagedir_unmap_userspace();
 			else {
 				pagedir_unmap_userspace_p(target->v_pdir_phys);
@@ -995,7 +995,7 @@ handle_remove_write_error:
 			 * the only CPU using it). - Because of this, we don't even need to go down the
 			 * rabbit hole of proper VM syncing since everything is now contained to our own
 			 * thread. */
-			if (THIS_VM == target)
+			if (THIS_MMAN == target)
 				pagedir_syncall();
 		}
 

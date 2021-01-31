@@ -122,7 +122,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_VM, uaddr);
+		f = vm_getfutex_existing(THIS_MMAN, uaddr);
 		result = 0;
 		if (f) {
 			if (count == (size_t)-1) {
@@ -177,13 +177,13 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_VM, uaddr);
+		f = vm_getfutex_existing(THIS_MMAN, uaddr);
 		result = 0;
 		if (!f) {
 			APPLY_MASK();
 			/* Do a second check for the futex, thus ensuring
 			 * that we're interlocked with `APPLY_MASK()' */
-			f = vm_getfutex_existing(THIS_VM, uaddr);
+			f = vm_getfutex_existing(THIS_MMAN, uaddr);
 			if unlikely(f) {
 				result = sig_broadcast(&f->vmf_signal);
 				decref_unlikely(f);
@@ -228,7 +228,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 
 	case LFUTEX_WAIT: {
 		validate_user(uaddr, 1);
-		f = vm_getfutex(THIS_VM, uaddr);
+		f = vm_getfutex(THIS_MMAN, uaddr);
 		FINALLY_DECREF(f);
 		task_connect(&f->vmf_signal);
 		TRY {
@@ -263,7 +263,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			/* Lock isn't available (connect to it, then set the
 			 * is-waiting bit and sleep until it becomes available) */
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
-			f = vm_getfutex(THIS_VM, uaddr);
+			f = vm_getfutex(THIS_MMAN, uaddr);
 			FINALLY_DECREF(f);
 			task_connect(&f->vmf_signal);
 			TRY {
@@ -287,7 +287,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		validate(uaddr, sizeof(*uaddr));                              \
 		/* Connect to the futex first, thus performing the            \
 		 * should-wait checked in a manner that is interlocked. */    \
-		f = vm_getfutex(THIS_VM, uaddr);                              \
+		f = vm_getfutex(THIS_MMAN, uaddr);                              \
 		FINALLY_DECREF(f);                                            \
 		task_connect(&f->vmf_signal);                                   \
 		/* Read the futex value. */                                   \

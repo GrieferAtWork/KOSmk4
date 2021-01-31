@@ -369,14 +369,11 @@ struct fat_superblock
 	u16                     f_flags;       /* Set of `FAT_F*' */
 	u8                      f_pad;         /* ... */
 	u8                      f_fat_count;   /* [const] Amount of redundant FAT copies. */
-#define FAT_SECTORMASK(x)  (FAT_SECTORSIZE(x) - 1)    /* == FAT_SECTORSIZE - 1 */
-#define FAT_SECTORSIZE(x)   VM_DATABLOCK_PAGESIZE(x)  /* Size of a single sector (in bytes) */
-#define FAT_SECTORSHIFT(x)  VM_DATABLOCK_ADDRSHIFT(x) /* `x << FAT_SECTORSHIFT(fat) == x * FAT_SECTORSIZE(fat)' */
 #ifdef __INTELLISENSE__
 	size_t                  f_sectorshift; /* [const] ilog2(f_sectorsize) (in bytes). */
 	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
 #else /* __INTELLISENSE__ */
-#define f_sectorshift       db_addrshift   /* [const] ilog2(f_sectorsize) (in bytes). */
+#define f_sectorshift       mf_blockshift  /* [const] ilog2(f_sectorsize) (in bytes). */
 #ifdef CONFIG_USE_NEW_VM
 	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
 #else /* CONFIG_USE_NEW_VM */
@@ -527,7 +524,7 @@ Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos) THROWS(...);
 
 /* Returns the on-disk address of a given sector number. */
 #define FAT_SECTORADDR(self, sector_num)   \
-	((pos_t)(sector_num) << FAT_SECTORSHIFT(self))
+	((pos_t)(sector_num) << (self)->f_sectorshift)
 
 /* Returns the sector number of a given cluster, which then spans `self->f_sec4clus' sectors. */
 #define FAT_CLUSTERSTART(self, cluster_id) \

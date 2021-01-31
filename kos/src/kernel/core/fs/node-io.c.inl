@@ -205,7 +205,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			}
 		}
 #endif /* !DEFINE_IO_READ */
-		if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS) {
+		if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS) {
 			/* The INode uses anonymous parts. -> Use read-through / write-through */
 #ifdef DEFINE_IO_READ
 			if (!self->i_type->it_file.RW_OPERATOR)

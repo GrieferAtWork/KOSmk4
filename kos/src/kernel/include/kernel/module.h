@@ -27,6 +27,7 @@
  * their related types. */
 
 #include <kernel/driver.h>
+#include <kernel/mman.h>
 #include <kernel/vm/usermod.h>
 
 #include <hybrid/__atomic.h>
@@ -226,7 +227,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_getloadaddr(self, typ)                 (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadaddr[typ]))
 #define module_getloadstart(self, typ)                (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadstart[typ]))
 #define module_getloadend(self, typ)                  (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadend[typ]))
-#define module_vm(self, typ)                          ((typ) == MODULE_TYPE_DRIVER ? &vm_kernel : (self)->m_usrmod.um_vm)
+#define module_vm(self, typ)                          ((typ) == MODULE_TYPE_DRIVER ? &mman_kernel : (self)->m_usrmod.um_vm)
 #define module_locksection(self, typ, name, flags)    (*module_abi.ma_section_lock[typ])(self, name, flags)
 #define module_locksection_nx(self, typ, name, flags) (*module_abi.ma_section_lock_nx[typ])(self, name, flags)
 #else /* CONFIG_HAVE_USERMOD */
@@ -251,7 +252,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_getloadaddr(self, typ)                 (self)->d_loadaddr
 #define module_getloadstart(self, typ)                (self)->d_loadstart
 #define module_getloadend(self, typ)                  (self)->d_loadend
-#define module_vm(self, typ)                          (&vm_kernel)
+#define module_vm(self, typ)                          (&mman_kernel)
 #define module_locksection(self, typ, name, flags)    driver_section_lock(self, name, flags)
 #define module_locksection_nx(self, typ, name, flags) driver_section_lock_nx(self, name, flags)
 #endif /* !CONFIG_HAVE_USERMOD */

@@ -29,12 +29,12 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/uvio.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
-#include <kernel/vm/uvio.h>
 #include <sched/pid.h>
 #include <sched/rwlock.h>
 
@@ -182,8 +182,8 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 	struct kernel_uvio_request *slot;
 	assert(!task_wasconnected());
 	self = (struct uvio *)args->va_file;
-	assert(self->db_type == &uvio_datablock_type);
-	assert(self->db_vio == &uvio_operators);
+	assert(self->mf_ops == &uvio_datablock_type);
+	assert(self->mf_vio == &uvio_operators);
 
 	/* UVIO request have a _mandatory_ dependency on preemption being enabled.
 	 * If preemption were disabled, `uvio_freerequest()' could deadlock... */
@@ -941,27 +941,27 @@ NOTHROW(KCALL uvio_server_polltest)(struct vm_datablock *__restrict self,
 
 
 /* The datablock type used by UVIO objects. */
-PUBLIC_CONST struct vm_datablock_type const uvio_datablock_type = {
-	/* .dt_destroy            = */ NULL,
-	/* .dt_initpart           = */ NULL,
-	/* .dt_loadpart           = */ NULL,
-	/* .dt_savepart           = */ NULL,
-	/* .dt_changed            = */ NULL,
-	/* .dt_handle_read        = */ &uvio_server_read,
-	/* .dt_handle_write       = */ &uvio_server_write,
-	/* .dt_handle_pollconnect = */ &uvio_server_pollconnect,
-	/* .dt_handle_polltest    = */ &uvio_server_polltest,
+PUBLIC_CONST struct mfile_ops const uvio_datablock_type = {
+	/* .mo_destroy            = */ NULL,
+	/* .mo_initpart           = */ NULL,
+	/* .mo_loadpart           = */ NULL,
+	/* .mo_savepart           = */ NULL,
+	/* .mo_changed            = */ NULL,
+	/* .mo_handle_read        = */ &uvio_server_read,
+	/* .mo_handle_write       = */ &uvio_server_write,
+	/* .mo_handle_pollconnect = */ &uvio_server_pollconnect,
+	/* .mo_handle_polltest    = */ &uvio_server_polltest,
 };
 
 /* Construct a new UVIO object.
- * Note that UVIO is derived from vm_datablock, so the returned
+ * Note that UVIO is derived from `struct mfile', so the returned
  * object can be stored in a handle slot as `HANDLE_TYPE_DATABLOCK' */
 PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
 	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),
 	                                    GFP_NORMAL);
 	mfile_init(result, &uvio_datablock_type, PAGESHIFT);
-	result->db_vio = &uvio_operators;
+	result->mf_vio = &uvio_operators;
 	sig_init(&result->uv_reqmore);
 	sig_init(&result->uv_reqdlvr);
 	sig_init(&result->uv_reqdone);

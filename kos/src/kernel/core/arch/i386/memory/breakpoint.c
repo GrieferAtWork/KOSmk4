@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/mman.h>
 #include <kernel/types.h>
 #include <kernel/x86/breakpoint.h>
 
@@ -35,33 +36,35 @@
 
 DECL_BEGIN
 
-/* Per-vm debug registers. (lazily loaded during VM switches)
- * NOTE: When setting a debug register (using __wrdrN0123()), you
+/* Per-MMan debug registers. (lazily loaded during task switches)
+ * NOTE: When setting a debug register (using __wrdrN()), you
  *       must also update these fields accordingly. - Otherwise,
- *       any changes made will become lost the next time the VM
- *       is changed. */
-PUBLIC ATTR_PERVM void *thisvm_x86_dr0 = 0;
-PUBLIC ATTR_PERVM void *thisvm_x86_dr1 = 0;
-PUBLIC ATTR_PERVM void *thisvm_x86_dr2 = 0;
-PUBLIC ATTR_PERVM void *thisvm_x86_dr3 = 0;
-PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr7 = 0;
+ *       any changes made will become lost the next time the mman
+ *       is changed.
+ * NOTE: These fields are _NOT_ inherited during `mman_fork()'! */
+PUBLIC ATTR_PERMMAN void *thismman_x86_dr0 = 0;
+PUBLIC ATTR_PERMMAN void *thismman_x86_dr1 = 0;
+PUBLIC ATTR_PERMMAN void *thismman_x86_dr2 = 0;
+PUBLIC ATTR_PERMMAN void *thismman_x86_dr3 = 0;
+PUBLIC ATTR_PERMMAN uintptr_t thismman_x86_dr7 = 0;
 
-#define thisvm_x86_drN(n) (*thisvm_x86_drN_impl(n))
-LOCAL ATTR_CONST void **KCALL thisvm_x86_drN_impl(unsigned int n) {
+
+#define thismman_x86_drN(n) (*thismman_x86_drN_impl(n))
+LOCAL ATTR_CONST void **KCALL thismman_x86_drN_impl(unsigned int n) {
 	void **result;
 	switch (n) {
 
 	case 0:
-		result = &thisvm_x86_dr0;
+		result = &thismman_x86_dr0;
 		break;
 	case 1:
-		result = &thisvm_x86_dr1;
+		result = &thismman_x86_dr1;
 		break;
 	case 2:
-		result = &thisvm_x86_dr2;
+		result = &thismman_x86_dr2;
 		break;
 	case 3:
-		result = &thisvm_x86_dr3;
+		result = &thismman_x86_dr3;
 		break;
 
 	default: __builtin_unreachable();
@@ -118,11 +121,11 @@ LOCAL void KCALL __wrdrN0123(unsigned int n, void *value) {
  * @param: br_cond: Breakpoint condition (One of `DR_C(EXEC|WRITE|READWRITE)')
  * @return: true:   Successfully added/deleted the breakpoint.
  * @return: false:  No unused breakpoints exist / the given breakpoint doesn't exist * */
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
-                             void *addr,
-                             unsigned int br_cond,
-                             unsigned int br_size) {
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mman_addhwbreak)(struct mman *__restrict self,
+                               void *addr,
+                               unsigned int br_cond,
+                               unsigned int br_size) {
 	bool result = false;
 	uintptr_t dr7;
 	unsigned int i;
@@ -135,7 +138,7 @@ NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
 #endif /* !__x86_64__ */
 	assert(br_size == DR_S1 || br_size == DR_S2 ||
 	       br_size == DR_S4 || br_size == DR_S8);
-	dr7 = FORVM(self, thisvm_x86_dr7);
+	dr7 = FORMMAN(self, thismman_x86_dr7);
 	for (i = 0; i < DR7_BREAKPOINT_COUNT; ++i) {
 		if (dr7 & (DR7_LN(i) | DR7_GN(i)))
 			continue; /* Already in use */
@@ -143,9 +146,9 @@ NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
 		dr7 &= ~(DR7_CN(i) | DR7_SN(i));
 		dr7 |= br_cond << DR7_CN_SHIFT(i);
 		dr7 |= br_size << DR7_SN_SHIFT(i);
-		FORVM(self, thisvm_x86_drN(i)) = addr;
-		FORVM(self, thisvm_x86_dr7) = dr7;
-		if (self == THIS_VM) {
+		FORMMAN(self, thismman_x86_drN(i)) = addr;
+		FORMMAN(self, thismman_x86_dr7) = dr7;
+		if (self == THIS_MMAN) {
 			/* Activate the breakpoint. */
 			__wrdrN0123(i, addr);
 			__wrdr7(dr7);
@@ -157,11 +160,11 @@ NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
 }
 
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
-                             void *addr,
-                             unsigned int br_cond,
-                             unsigned int br_size) {
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mman_delhwbreak)(struct mman *__restrict self,
+                               void *addr,
+                               unsigned int br_cond,
+                               unsigned int br_size) {
 	bool result = false;
 	uintptr_t dr7;
 	unsigned int i;
@@ -174,12 +177,12 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 #endif /* !__x86_64__ */
 	assert(br_size == DR_S1 || br_size == DR_S2 ||
 	       br_size == DR_S4 || br_size == DR_S8);
-	dr7 = FORVM(self, thisvm_x86_dr7);
+	dr7 = FORMMAN(self, thismman_x86_dr7);
 	for (i = 0; i < DR7_BREAKPOINT_COUNT; ++i) {
 		void *br_addr;
 		if (!(dr7 & DR7_LN(i)))
 			continue; /* unused */
-		br_addr = FORVM(self, thisvm_x86_drN(i));
+		br_addr = FORMMAN(self, thismman_x86_drN(i));
 		if (br_addr != addr)
 			continue; /* Different address. */
 		if (((dr7 & DR7_CN(i)) >> DR7_CN_SHIFT(i)) != br_cond)
@@ -188,8 +191,8 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 			continue; /* Different breakpoint size. */
 		/* Found it! */
 		dr7 &= ~DR7_LN(i);
-		FORVM(self, thisvm_x86_dr7) = dr7;
-		if (self == THIS_VM) {
+		FORMMAN(self, thismman_x86_dr7) = dr7;
+		if (self == THIS_MMAN) {
 			/* Deactivate the breakpoint. */
 			__wrdr7(dr7);
 		}
@@ -201,12 +204,12 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 
 /* Clear all hardware breakpoints from `self' */
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_clrhwbreak)(struct vm *__restrict self) {
+NOTHROW(KCALL mman_clrhwbreak)(struct mman *__restrict self) {
 	uintptr_t dr7;
-	dr7 = FORVM(self, thisvm_x86_dr7);
+	dr7 = FORMMAN(self, thismman_x86_dr7);
 	dr7 &= ~(DR7_L0 | DR7_L1 | DR7_L2 | DR7_L3);
-	FORVM(self, thisvm_x86_dr7) = dr7;
-	if (self == THIS_VM)
+	FORMMAN(self, thismman_x86_dr7) = dr7;
+	if (self == THIS_MMAN)
 		__wrdr7(dr7);
 }
 

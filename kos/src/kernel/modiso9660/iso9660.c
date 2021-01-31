@@ -47,7 +47,7 @@ DECL_BEGIN
 #endif
 
 #define INODE_GETADDR(self, pos) \
-	(((pos_t)(u32)(uintptr_t)(self)->i_fsdata << VM_DATABLOCK_ADDRSHIFT(self)) + (pos))
+	(((pos_t)(u32)(uintptr_t)(self)->i_fsdata << (self)->mf_blockshift) + (pos))
 
 
 /* Read/Write data to/from an iso9660 INode. */

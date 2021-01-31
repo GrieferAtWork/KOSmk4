@@ -31,41 +31,23 @@
 #if defined(__INTELLISENSE__) && defined(__cplusplus)
 struct task;
 struct cpu;
-#ifdef CONFIG_USE_NEW_VM
 struct mman;
-#else /* CONFIG_USE_NEW_VM */
-struct vm;
-#endif /* !CONFIG_USE_NEW_VM */
 extern "C++" {
 #define FORTASK FORTASK
 #define FORCPU  FORCPU
-#define FORVM   FORVM
 template<class __T> __T &(FORTASK)(struct task *__restrict self, __T &symbol);
 template<class __T> __T const &(FORTASK)(struct task const *__restrict self, __T const &symbol);
 template<class __T> __T &(FORCPU)(struct cpu *__restrict self, __T &symbol);
 template<class __T> __T const &(FORCPU)(struct cpu const *__restrict self, __T const &symbol);
-#ifdef CONFIG_USE_NEW_VM
-template<class __T> __T &(FORVM)(struct mman *__restrict self, __T &symbol);
-template<class __T> __T const &(FORVM)(struct mman const *__restrict self, __T const &symbol);
-#else /* CONFIG_USE_NEW_VM */
-template<class __T> __T &(FORVM)(struct vm *__restrict self, __T &symbol);
-template<class __T> __T const &(FORVM)(struct vm const *__restrict self, __T const &symbol);
-#endif /* !CONFIG_USE_NEW_VM */
 #ifndef FORMMAN
 #define FORMMAN FORMMAN
-#ifdef CONFIG_USE_NEW_VM
 template<class __T> __T &(FORMMAN)(struct mman *__restrict self, __T &symbol);
 template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T const &symbol);
-#else /* CONFIG_USE_NEW_VM */
-template<class __T> __T &(FORMMAN)(struct vm *__restrict self, __T &symbol);
-template<class __T> __T const &(FORMMAN)(struct vm const *__restrict self, __T const &symbol);
-#endif /* !CONFIG_USE_NEW_VM */
 #endif /* !FORMMAN */
 } /* extern "C++" */
 #else /* __INTELLISENSE__ && __cplusplus */
 #define FORTASK(self, symbol) (*(__typeof__(&(symbol)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(symbol)))
 #define FORCPU(self, symbol)  (*(__typeof__(&(symbol)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(symbol)))
-#define FORVM(self, symbol)   (*(__typeof__(&(symbol)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(symbol)))
 #ifndef FORMMAN
 #define FORMMAN(self, symbol) (*(__typeof__(&(symbol)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(symbol)))
 #endif /* !FORMMAN */

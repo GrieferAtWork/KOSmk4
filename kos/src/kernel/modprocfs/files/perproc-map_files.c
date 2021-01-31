@@ -24,6 +24,8 @@
 #include <kernel/compiler.h>
 
 #include <fs/vfs.h>
+#include <kernel/mman.h>
+#include <kernel/vm.h>
 #include <sched/pid.h>
 
 #include <hybrid/align.h>
@@ -117,7 +119,7 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 	REF struct directory_entry *result;
 	upid_t pid;
 	REF struct task *thread;
-	REF struct vm *threadvm;
+	REF struct vm *threadmm;
 	UNCHECKED void *minaddr;
 	UNCHECKED void *maxaddr;
 	/* Try to parse the min/max address range from `name' */
@@ -137,10 +139,10 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 	/* Lookup the associated VM. */
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadvm = task_getvm(thread);
+		threadmm = task_getmman(thread);
 	}
 	{
-		FINALLY_DECREF_UNLIKELY(threadvm);
+		FINALLY_DECREF_UNLIKELY(threadmm);
 		size_t nodeid = 0;
 		struct vm_node *node;
 		/* Check if `threadvm' contains a node that starts at `minaddr',
@@ -149,22 +151,22 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 		 * Note that we could in theory also check if all nodes within
 		 * this area could be merged, but that isn't really necessary,
 		 * and not doing so doesn't introduce any glaring inconsistencies. */
-		vm_treelock_read(threadvm);
+		vm_treelock_read(threadmm);
 #ifdef CONFIG_USE_NEW_VM
 		{
 			struct mnode_tree_minmax mima;
-			mnode_tree_minmaxlocate(threadvm->mm_mappings,
+			mnode_tree_minmaxlocate(threadmm->mm_mappings,
 			                        (void *)0, (void *)-1,
 			                        &mima);
 			node = mima.mm_min;
 		}
 #else /* CONFIG_USE_NEW_VM */
-		node = threadvm->v_byaddr;
+		node = threadmm->v_byaddr;
 #endif /* !CONFIG_USE_NEW_VM */
 		for (;;) {
 			if unlikely(!node) {
 unlock_threadvm_and_goto_err:
-				vm_treelock_endread(threadvm);
+				vm_treelock_endread(threadmm);
 				goto err;
 			}
 			if (mnode_getminaddr(node) >= minaddr)
@@ -186,7 +188,7 @@ unlock_threadvm_and_goto_err:
 				goto unlock_threadvm_and_goto_err; /* Non-consecutive */
 			node = succ;
 		}
-		vm_treelock_endread(threadvm);
+		vm_treelock_endread(threadmm);
 		/* Found it! - It's the `nodeid'th node! */
 		result = directory_entry_alloc(namelen);
 		/* Re-print the proper filename to prevent duplicate access
@@ -256,7 +258,7 @@ ProcFS_PerProc_MapFiles_Enum(struct directory_node *__restrict self,
 	/* Lookup the associated VM. */
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadvm = task_getvm(thread);
+		threadvm = task_getmman(thread);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY(threadvm);
@@ -313,7 +315,7 @@ ProcFS_PerProc_MapFiles_Entry_Readlink(struct symlink_node *__restrict self,
 	/* Lookup the associated VM. */
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadvm = task_getvm(thread);
+		threadvm = task_getmman(thread);
 	}
 	{
 		struct vm_node *node;

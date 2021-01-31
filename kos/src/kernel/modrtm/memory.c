@@ -815,7 +815,7 @@ again_rw_region:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 		{
 			size_t maxsize;
-			effective_vm = THIS_VM;
+			effective_vm = THIS_MMAN;
 			/* Check if the entire address range is apart of user-space. */
 			maxsize = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 			if unlikely(num_bytes > maxsize) {
@@ -846,7 +846,7 @@ again_rw_region:
 #endif /* ADDR_IS_NONCANON */
 		}
 #else /* KERNELSPACE_HIGHMEM */
-		effective_vm = THIS_VM;
+		effective_vm = THIS_MMAN;
 #if !CONFIG_RTM_USERSPACE_ONLY
 		if (ADDR_ISKERN(addr)) {
 			size_t maxsize;
@@ -1074,7 +1074,7 @@ verify_access_range:
 #if !CONFIG_RTM_USERSPACE_ONLY
 			aliasing_node_vm = &vm_kernel;
 			if (ADDR_ISUSER(region->mr_addrlo))
-				aliasing_node_vm = THIS_VM;
+				aliasing_node_vm = THIS_MMAN;
 			if likely(aliasing_node_vm == effective_vm)
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			{
@@ -1447,7 +1447,7 @@ rtm_memory_apply(struct rtm_memory const *__restrict self) {
 	bool has_modified_kern;
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	bool has_modified_user;
-	myvm  = THIS_VM;
+	myvm  = THIS_MMAN;
 again_forcefault:
 	/* Step #1: prefault the address ranges of all modified regions. */
 	for (i = 0; i < self->rm_regionc; ++i) {

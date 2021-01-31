@@ -831,12 +831,12 @@ unlock_and_nope:
 
 
 struct vm_usermod_cache {
-	XATOMIC_REF(struct usermod) uc_first; /* [0..1][lock(THIS_VM)]
+	XATOMIC_REF(struct usermod) uc_first; /* [0..1][lock(THIS_MMAN)]
 	                                       * Sorted (via `um_loadstart') chain of
 	                                       * cached user-space modules. */
 };
 
-PRIVATE ATTR_PERVM struct vm_usermod_cache usermod_cache = { XATOMIC_REF_INIT(NULL) };
+PRIVATE ATTR_PERMMAN struct vm_usermod_cache usermod_cache = { XATOMIC_REF_INIT(NULL) };
 
 /* Clear out all unused usermod objects from `self' and
  * return non-zero if the cache wasn't already empty. */
@@ -845,7 +845,7 @@ NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 	REF struct usermod *chain;
 	/* TODO: Run this function for every VM in existence
 	 *       when `system_clearcaches()' is called. */
-	chain = FORVM(self, usermod_cache).uc_first.exchange_inherit_new(NULL);
+	chain = FORMMAN(self, usermod_cache).uc_first.exchange_inherit_new(NULL);
 	if (!chain)
 		return 0;
 	/* This will recursively delete usermod objects that aren't in use anymore. */
@@ -857,7 +857,7 @@ NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 /* Clear the usermod cache during exec() */
 DEFINE_PERVM_ONEXEC(usermod_onexec);
 PRIVATE ATTR_USED void KCALL usermod_onexec(void) {
-	vm_clear_usermod(THIS_VM);
+	vm_clear_usermod(THIS_MMAN);
 }
 
 /* Also clear the chain when finalizing the VM */
@@ -882,7 +882,7 @@ NOTHROW(FCALL vm_usermod_cache_insert_and_unify_and_unlock)(struct vm *__restric
 	struct vm_usermod_cache *uc;
 	REF struct usermod *head;
 	assert(sync_writing(self));
-	uc = (struct vm_usermod_cache *)&FORVM(self, usermod_cache);
+	uc = (struct vm_usermod_cache *)&FORMMAN(self, usermod_cache);
 again:
 	head = uc->uc_first.get();
 	if (!head) {
@@ -963,7 +963,7 @@ vm_getusermod(struct vm *__restrict self,
 		REF struct usermod *chain;
 		result = NULL;
 		sync_read(self);
-		chain = FORVM(self, usermod_cache).uc_first.get();
+		chain = FORMMAN(self, usermod_cache).uc_first.get();
 		if (chain) {
 			result = chain;
 			do {
@@ -1058,7 +1058,7 @@ again:
 	/* Search the cache of `self'. */
 	{
 		REF struct usermod *chain;
-		chain = FORVM(self, usermod_cache).uc_first.get();
+		chain = FORMMAN(self, usermod_cache).uc_first.get();
 		if (chain) {
 			result = chain;
 			do {
@@ -1226,7 +1226,7 @@ getusermod(USER void const *addr,
 	REF struct usermod *result;
 	if (!dbg_active) {
 		/* Use the current VM */
-		return vm_getusermod(THIS_VM, addr, addr_must_be_executable);
+		return vm_getusermod(THIS_MMAN, addr, addr_must_be_executable);
 	}
 	/* Use the VM of the thread currently selected by the debugger. */
 	result = vm_getusermod(dbg_current->t_mman,
@@ -1241,7 +1241,7 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
 	REF struct usermod *result;
 	if (!dbg_active) {
 		/* Use the current VM */
-		return vm_getusermod_nx(THIS_VM, addr, addr_must_be_executable);
+		return vm_getusermod_nx(THIS_MMAN, addr, addr_must_be_executable);
 	}
 	/* Use the VM of the thread currently selected by the debugger. */
 	result = vm_getusermod_nx(dbg_current->t_mman,
@@ -1326,7 +1326,7 @@ unwind_userspace(void const *absolute_pc,
 		/* In order to properly unwind memory, we'd have to switch our VM to
 		 * match `um->um_vm'. An operation like that would be too dangerous
 		 * to perform after the kernel's already been poisoned. */
-		if (kernel_poisoned() && um->um_vm != THIS_VM) {
+		if (kernel_poisoned() && um->um_vm != THIS_MMAN) {
 			decref_unlikely(um);
 			goto done;
 		}
@@ -1555,7 +1555,7 @@ DBG_COMMAND(lslib,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_print(DBGSTR("name                            loadaddr minaddr  maxaddr\n"));
 	vm_enumusermod(dbg_current->t_mman, &lslib_enum_cb,
-	               FORVM(dbg_current->t_mman, thismman_execinfo).mei_node);
+	               FORMMAN(dbg_current->t_mman, thismman_execinfo).mei_node);
 	return 0;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

@@ -682,9 +682,9 @@ tx_switch_to_idle:
 			/* Continue working with `used_aio' */
 			aio = used_aio;
 		}
-		packet_vm = aio_data->pd_payloadvm; /* Inherit reference */
+		packet_vm = aio_data->pd_payloadmm; /* Inherit reference */
 #ifndef NDEBUG
-		memset(&aio_data->pd_payloadvm, 0xcc, sizeof(aio_data->pd_payloadvm));
+		memset(&aio_data->pd_payloadmm, 0xcc, sizeof(aio_data->pd_payloadmm));
 #endif /* !NDEBUG */
 		COMPILER_WRITE_BARRIER();
 		/* This field gets cleared by aio_cancel() if the operation should get canceled
@@ -1001,7 +1001,7 @@ NOTHROW(KCALL Ne2k_TxAioCancel)(struct aio_handle *__restrict self) {
 		bool did_find;
 		WEAK struct aio_handle *transit, **piter, *iter;
 		decref_likely(packet);
-		decref_unlikely(aio_data->pd_payloadvm);
+		decref_unlikely(aio_data->pd_payloadmm);
 again_poll_transit:
 		/* In this case, we've already stopped the AIO before it could even start.
 		 * However, we must still account for the possibility that the async-worker
@@ -1134,7 +1134,7 @@ Ne2k_SendPacket(struct nic_device *__restrict self,
 	me       = (Ne2kDevice *)self;
 	aio_data = Ne2kAIOHandleData_Of(aio);
 	/* Fill in AIO data fields required for sending the packet. */
-	aio_data->pd_payloadvm = incref(THIS_VM);
+	aio_data->pd_payloadmm = incref(THIS_MMAN);
 	aio_data->pd_packet    = incref(packet);
 	aio_data->pd_device    = (Ne2kDevice *)incref(me);
 	aio_handle_init(aio, &Ne2k_TxAioType);

@@ -30,11 +30,11 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/gdt.h>
@@ -177,7 +177,7 @@ PRIVATE ATTR_FREETEXT REF struct mpart *KCALL
 mpart_create_lockram(size_t num_pages) {
 	REF struct mpart *result;
 	result = (struct mpart *)kmalloc(sizeof(struct mpart),
-	                                       GFP_LOCKED | GFP_PREFLT);
+	                                 GFP_LOCKED | GFP_PREFLT);
 #ifdef CONFIG_USE_NEW_VM
 	result->mp_refcnt = 1;
 	result->mp_flags  = (MPART_F_NO_GLOBAL_REF | MPART_F_CHANGED |
@@ -846,9 +846,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			}
 			COMPILER_WRITE_BARRIER();
 			/* Copy AP entry code. */
-			vm_copytophys(physpage2addr(entry_page),
-			              x86_smp_entry,
-			              x86_smp_entry_size);
+			copytophys(physpage2addr(entry_page),
+			           x86_smp_entry,
+			           x86_smp_entry_size);
 	
 			/* Allocate control structures for secondary cores. */
 			i386_allocate_secondary_cores();

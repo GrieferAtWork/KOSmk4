@@ -896,7 +896,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	req_pdir = old_pdir;
 	mod      = self->cv_expr.v_expr.v_module;
 	if (mod)
-		req_pdir = cmodule_vm(mod)->v_pdir_phys;
+		req_pdir = cmodule_vm(mod)->mm_pagedir_p;
 	/* This must run in the context of `cmodule_vm(mod)' */
 	if (old_pdir != req_pdir) {
 		if unlikely(!dbg_verifypagedir(req_pdir))
@@ -947,7 +947,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			{
 				pagedir_phys_t old_pdir, req_pdir;
 				old_pdir = pagedir_get();
-				req_pdir = cmodule_vm(mod)->v_pdir_phys;
+				req_pdir = cmodule_vm(mod)->mm_pagedir_p;
 				if (old_pdir != req_pdir) {
 					if unlikely(!dbg_verifypagedir(req_pdir))
 						return DBX_EFAULT;
@@ -3077,7 +3077,9 @@ do_increase_addend:
 						/* Guard against bad memory accesses when `dbg_current'
 						 * has become corrupt for whatever reason. */
 						TRY {
-							if (name[4] == 'v' && name[5] == 'm' && name[6] == '_') {
+							if (name[4] == 'm' && name[5] == 'm' &&
+							    name[6] == 'a' && name[7] == 'n' &&
+							    name[8] == '_') {
 								if unlikely(!ADDR_ISKERN(dbg_current))
 									goto err_fefault_symtype;
 								addend = (uintptr_t)dbg_current->t_mman;

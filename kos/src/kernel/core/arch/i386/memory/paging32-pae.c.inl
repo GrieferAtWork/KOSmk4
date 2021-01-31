@@ -19,18 +19,19 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_PAE_C_INL
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_PAE_C_INL 1
+#define __OMIT_PAGING_CONSTANT_P_WRAPPERS
+#define __WANT_MMAN_EXCLUDE_PAGEDIR
 #define _KOS_SOURCE 1
-#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1
-#define __OMIT_PAGING_CONSTANT_P_WRAPPERS 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging32-pae.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/cpuid.h>
 
 #include <hybrid/align.h>
@@ -141,7 +142,7 @@ STATIC_ASSERT(sizeof(struct pae_pdir) == 32);
 STATIC_ASSERT(sizeof(union pae_pdir_e3) == 8);
 STATIC_ASSERT(sizeof(union pae_pdir_e2) == 8);
 STATIC_ASSERT(sizeof(union pae_pdir_e1) == 8);
-STATIC_ASSERT(PAE_PDIR_E1_IDENTITY_BASE == PAE_VM_KERNEL_PDIR_IDENTITY_BASE);
+STATIC_ASSERT(PAE_PDIR_E1_IDENTITY_BASE == PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE);
 
 
 
@@ -153,9 +154,9 @@ INTERN NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	u64 e3[4];
 	/* Assert constants that are used below. */
-	STATIC_ASSERT(PAE_PDIR_VEC3INDEX(PAE_VM_KERNEL_PDIR_IDENTITY_BASE) == 3);
-	STATIC_ASSERT(PAE_PDIR_VEC2INDEX(PAE_VM_KERNEL_PDIR_IDENTITY_BASE) == 508);
-	STATIC_ASSERT(PAE_PDIR_VEC1INDEX(PAE_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	STATIC_ASSERT(PAE_PDIR_VEC3INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 3);
+	STATIC_ASSERT(PAE_PDIR_VEC2INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 508);
+	STATIC_ASSERT(PAE_PDIR_VEC1INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 
 	e3[0] = (u64)page_mallocone();
@@ -183,13 +184,13 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	e3[2] = (u64)physpage2addr((physpage_t)e3[2]);
 	e3[3] = (u64)physpage2addr((physpage_t)e3[3]);
 	if (!page_iszero((physpage_t)e3[0]))
-		vm_memsetphyspage((physaddr_t)e3[0], 0);
+		memsetphyspage((physaddr_t)e3[0], 0);
 	if (!page_iszero((physpage_t)e3[1]))
-		vm_memsetphyspage((physaddr_t)e3[1], 0);
+		memsetphyspage((physaddr_t)e3[1], 0);
 	if (!page_iszero((physpage_t)e3[2]))
-		vm_memsetphyspage((physaddr_t)e3[2], 0);
+		memsetphyspage((physaddr_t)e3[2], 0);
 	/* Kernel share (copy from our own page directory) */
-	vm_copytophys_onepage((physaddr_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
+	copytophys_onepage((physaddr_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	self->p_e3[0].p_word = e3[0] | PAE_PAGE_FPRESENT;
 	self->p_e3[1].p_word = e3[1] | PAE_PAGE_FPRESENT;
 	self->p_e3[2].p_word = e3[2] | PAE_PAGE_FPRESENT;
@@ -199,10 +200,10 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	/* Identity mapping */
-	vm_copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
-	                      508 * 8,
-	                      e3,
-	                      4 * 8);
+	copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
+	                   508 * 8,
+	                   e3,
+	                   4 * 8);
 	return true;
 err_3:
 	page_ccfree((physpage_t)e3[2], 1);
@@ -226,10 +227,7 @@ pae_pagedir_init(VIRT struct pae_pdir *__restrict self)
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 4 * PAGESIZE);
 }
 
-/* Because we're omitting the `v_pagedir' field from the start of the VM, we have
- * to adjust for that fact when we're trying to access the `v_pdir_phys' field! */
-#define VM_GET_V_PDIR_PHYS_PTR(x) \
-	(*(PHYS pagedir_t **)((byte_t *)(x) + sizeof(pagedir_t) + offsetof(struct vm, v_pdir_phys)))
+
 
 
 /* Finalize a given page directory. */
@@ -448,8 +446,8 @@ NOTHROW(FCALL pae_pagedir_sync_flattened_e1_vector)(unsigned int vec3,
 	void *sync_pageaddr;
 	sync_pageaddr = PAE_PDIR_E1_IDENTITY[vec3][vec2];
 	if (vec3 >= PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE)) {
-		/* Sync as part of the kernel VM */
-		vm_supersyncone(sync_pageaddr);
+		/* Sync as part of the kernel MMan */
+		mman_supersyncone(sync_pageaddr);
 	} else {
 		/* Sync as part of the current page directory. */
 		pagedir_syncone_smp(sync_pageaddr);

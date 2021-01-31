@@ -283,7 +283,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	void *boot_trampoline_pages;
 	DEFINE_PUBLIC_SYMBOL(this_task, offsetof(struct task, t_self), sizeof(struct task));
 	DEFINE_PUBLIC_SYMBOL(this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
-	DEFINE_PUBLIC_SYMBOL(this_vm, offsetof(struct task, t_mman), sizeof(struct vm *));
+	DEFINE_PUBLIC_SYMBOL(this_mman, offsetof(struct task, t_mman), sizeof(struct mman *));
 	DEFINE_PUBLIC_SYMBOL(this_sstate, offsetof(struct task, t_state), sizeof(struct scpustate *));
 	DEFINE_PUBLIC_SYMBOL(this_exception_code, &this_exception_info.ei_code, sizeof(this_exception_info.ei_code));
 	DEFINE_PUBLIC_SYMBOL(this_exception_data, &this_exception_info.ei_data, sizeof(this_exception_info.ei_data));
@@ -305,7 +305,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, 0, 0);
 #endif /* CONFIG_NO_SMP */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
-	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys, offsetof(struct vm, v_pdir_phys), sizeof(physaddr_t));
+	DEFINE_PUBLIC_SYMBOL(thismman_pagedir_p, offsetof(struct mman, mm_pagedir_p), sizeof(physaddr_t));
 
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);
@@ -833,10 +833,10 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct task *
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct task *result;
 	if (clone_flags & TASK_CLONE_VM) {
-		result = task_alloc(THIS_VM);
+		result = task_alloc(THIS_MMAN);
 	} else {
 		REF struct vm *result_vm;
-		result_vm = vm_clone(THIS_VM, false);
+		result_vm = vm_clone(THIS_MMAN, false);
 		FINALLY_DECREF_UNLIKELY(result_vm);
 		result = task_alloc(result_vm);
 	}

@@ -147,7 +147,7 @@ DECL_BEGIN
  * >> // Prefault all modified memory locations
  * >> for (local start, data, changed, none, none: accessedParts) {
  * >>     if (changed) {
- * >>         vm_forcefault(THIS_VM, start, #data,
+ * >>         vm_forcefault(THIS_MMAN, start, #data,
  * >>                       VM_FORCEFAULT_FLAG_WRITE |
  * >>                       VM_FORCEFAULT_FLAG_NOVIO);
  * >>     }

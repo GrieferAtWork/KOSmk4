@@ -37,7 +37,11 @@
 #include <kernel/except.h>
 #include <kernel/execabi.h>
 #include <kernel/heap.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mm-execinfo.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
+#include <kernel/mman/ramfile.h>
 #include <kernel/vm/usermod.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
@@ -104,7 +108,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 			goto badobj;
 		thread_cpu_id = thread_cpu->c_id;
 		thread_flags  = thread->t_flags;
-		execinfo      = &FORVM(thread->t_mman, thismman_execinfo);
+		execinfo      = &FORMMAN(thread->t_mman, thismman_execinfo);
 		dent          = execinfo->mei_dent;
 		if (dent) {
 			if (dent->de_refcnt == 0)
@@ -550,8 +554,8 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 		if (me->mm_pagedir_p != pagedir_translate(me))
 			goto badobj;
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
-		exec_path = FORVM(me, thismman_execinfo).mei_path;
-		exec_dent = FORVM(me, thismman_execinfo).mei_dent;
+		exec_path = FORMMAN(me, thismman_execinfo).mei_path;
+		exec_dent = FORMMAN(me, thismman_execinfo).mei_dent;
 		if (!exec_dent)
 			exec_path = NULL;
 		else {
@@ -563,7 +567,7 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 	} EXCEPT {
 		goto badobj;
 	}
-	if (me == &vm_kernel) {
+	if (me == &mman_kernel) {
 		result = RAWPRINT("kernel");
 	} else if (exec_dent) {
 		result = note_pathpair(printer, arg,

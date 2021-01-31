@@ -32,28 +32,27 @@
 #endif
 
 #ifdef CONFIG_TRACE_MALLOC
-#include <kernel/malloc.h>
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
+#include <kernel/malloc.h>
+#include <kernel/mman/mcoreheap.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/syslog.h>
+#include <kernel/vm.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
-#ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/mcoreheap.h>
-#endif /* CONFIG_USE_NEW_VM */
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sequence/rbtree.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>

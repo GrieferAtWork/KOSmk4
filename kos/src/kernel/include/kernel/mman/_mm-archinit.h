@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_VM
+#include <kernel/vm.h>
+#else /* !CONFIG_USE_NEW_VM */
 #ifdef __CC__
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #include <kernel/mman.h>
@@ -56,5 +59,6 @@ DECL_BEGIN
 DECL_END
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN__MM_ARCHINIT_H */

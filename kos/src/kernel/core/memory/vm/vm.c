@@ -94,8 +94,8 @@ DEFINE_DBG_BZERO_OBJECT(vm_datablock_physical.db_lock);
 DEFINE_DBG_BZERO_OBJECT(vm_datablock_anonymous.db_lock);
 DEFINE_DBG_BZERO_OBJECT(vm_kernel.v_treelock);
 DEFINE_DBG_BZERO_OBJECT(vm_kernel.v_tasklock);
-DEFINE_DBG_BZERO_IF(THIS_VM != NULL, &THIS_VM->v_treelock, sizeof(((struct vm *)0)->v_treelock));
-DEFINE_DBG_BZERO_IF(THIS_VM != NULL, &THIS_VM->v_tasklock, sizeof(((struct vm *)0)->v_tasklock));
+DEFINE_DBG_BZERO_IF(THIS_MMAN != NULL, &THIS_MMAN->v_treelock, sizeof(((struct vm *)0)->v_treelock));
+DEFINE_DBG_BZERO_IF(THIS_MMAN != NULL, &THIS_MMAN->v_tasklock, sizeof(((struct vm *)0)->v_tasklock));
 DEFINE_DBG_BZERO_VECTOR(&vm_datablock_anonymous_zero_vec[0].db_lock,
                         COMPILER_LENOF(vm_datablock_anonymous_zero_vec),
                         sizeof(vm_datablock_anonymous_zero_vec[0].db_lock),
@@ -1808,7 +1808,7 @@ NOTHROW(FCALL vm_stopdma)(struct vm_dmalock *__restrict lockvec, size_t lockcnt)
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datablock_destroy)(struct vm_datablock *__restrict self) {
 	assertf(self->db_parts == NULL ||
-	        self->db_parts == VM_DATABLOCK_ANONPARTS,
+	        self->db_parts == MFILE_PARTS_ANONYMOUS,
 	        "Any remaining part should have kept us alive!\n"
 	        "self->db_parts = %p\n",
 	        self->db_parts);
@@ -1936,7 +1936,7 @@ vm_datablock_anonymize(struct vm_datablock *__restrict self)
 again:
 	sync_write(self);
 	chain = self->db_parts;
-	if (chain == VM_DATABLOCK_ANONPARTS) {
+	if (chain == MFILE_PARTS_ANONYMOUS) {
 		/* Block has already been anonymized! */
 		sync_endwrite(self);
 		return false;
@@ -1976,7 +1976,7 @@ again:
 	/* Drop all of the references we've stolen before. */
 	vm_datablock_lock_decref_parts(chain);
 done:
-	self->db_parts = VM_DATABLOCK_ANONPARTS;
+	self->db_parts = MFILE_PARTS_ANONYMOUS;
 	sync_endwrite(self);
 	return true;
 }
@@ -2252,7 +2252,7 @@ again_lock_datapart:
 			goto again_lock_datapart;
 		}
 		{
-			struct vm *myvm = THIS_VM;
+			struct vm *myvm = THIS_MMAN;
 			struct vm_node *node;
 			for (node = self->dp_srefs; node; node = node->vn_link.ln_next) {
 				struct vm *v;
@@ -2387,7 +2387,7 @@ vm_datablock_sync(struct vm_datablock *__restrict self,
 again:
 	sync_read(self);
 	if unlikely(self->db_parts == NULL ||
-	            self->db_parts == VM_DATABLOCK_ANONPARTS) {
+	            self->db_parts == MFILE_PARTS_ANONYMOUS) {
 		/* No parts reachable! */
 		sync_endread(self);
 	} else {
@@ -2550,7 +2550,7 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 	sync_read(self);
 	/* Step #1: Check if there is a part containing the given page number! */
 	COMPILER_READ_BARRIER();
-	if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS)
+	if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS)
 		goto create_anon_endread;
 	minmax.mm_min = minmax.mm_max = NULL;
 	vm_parttree_minmaxlocate(self->db_parts,
@@ -2578,7 +2578,7 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 	if unlikely(!sync_upgrade(self)) {
 		/* Need to check again! */
 		COMPILER_READ_BARRIER();
-		if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS)
+		if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS)
 			goto create_anon_endwrite;
 		minmax.mm_min = minmax.mm_max = NULL;
 		vm_parttree_minmaxlocate(self->db_parts,
@@ -2623,7 +2623,7 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 		}
 		/* Must search the given range once again! */
 		COMPILER_READ_BARRIER();
-		if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS)
+		if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS)
 			goto create_anon_endwrite_freer;
 		minmax.mm_min = minmax.mm_max = NULL;
 		vm_parttree_minmaxlocate(self->db_parts,
@@ -2689,7 +2689,7 @@ set_inline_ppp:
 			}
 			/* Must search the given range once again! */
 			COMPILER_READ_BARRIER();
-			if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS)
+			if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS)
 				goto create_anon_endwrite_freer_ppp;
 			minmax.mm_min = minmax.mm_max = NULL;
 			vm_parttree_minmaxlocate(self->db_parts,
@@ -2772,7 +2772,7 @@ create_anon_endread:
 
 
 /* Lookup and return a reference the data part containing the given `start_offset'
- * NOTE: When `self' is an anonymous data block (`self->db_parts == VM_DATABLOCK_ANONPARTS'),
+ * NOTE: When `self' is an anonymous data block (`self->db_parts == MFILE_PARTS_ANONYMOUS'),
  *       the the returned data part will be allocated anonymously as well, meaning that
  *       it will not be shared (`!isshared(return)'), and not be re-returned when the
  *       call is repeated with the same arguments passed once again. */
@@ -2783,7 +2783,7 @@ vm_datablock_locatepart(struct vm_datablock *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct vm_datapart *result;
 	assert(!task_wasconnected());
-	if (ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS) {
+	if (ATOMIC_READ(self->db_parts) == MFILE_PARTS_ANONYMOUS) {
 		result = vm_datablock_createpart(self,
 		                                 start_offset,
 		                                 num_bytes_hint);
@@ -2815,7 +2815,7 @@ vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
 	assert((max_num_bytes & PAGEMASK) == 0);
 	assert(!task_wasconnected());
 	/* Check for special case: anonymous data block tree. */
-	if (ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS) {
+	if (ATOMIC_READ(self->db_parts) == MFILE_PARTS_ANONYMOUS) {
 		result = vm_datablock_createpart(self,
 		                                 start_offset,
 		                                 max_num_bytes);
@@ -2963,9 +2963,9 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			{
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if (self->vn_vm == THIS_VM || PAGEID_ISKERN(vm_node_getstartpageid(self)))
+				if (self->vn_vm == THIS_MMAN || PAGEID_ISKERN(vm_node_getstartpageid(self)))
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-				if (self->vn_vm == THIS_VM)
+				if (self->vn_vm == THIS_MMAN)
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				{
 					pagedir_unprepare_p(self->vn_vm->v_pdir_phys,
@@ -3060,7 +3060,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 	addr = vm_node_getaddr(self);
 	size = vm_node_getsize(self);
 	log_updating_access_rights(self);
-	if (self->vn_vm == THIS_VM) {
+	if (self->vn_vm == THIS_MMAN) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
 			if (!pagedir_prepare(addr, size)) {
 				sync_endwrite(self->vn_vm);
@@ -3117,7 +3117,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 	addr = vm_node_getaddr(self);
 	size = vm_node_getsize(self);
 	log_updating_access_rights(self);
-	if (self->vn_vm == THIS_VM) {
+	if (self->vn_vm == THIS_MMAN) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
 			if (!pagedir_prepare(addr, size)) {
 				if (self->vn_vm != locked_vm)

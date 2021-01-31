@@ -44,7 +44,7 @@ typedef struct {
 	/* The Ne2k-specific AIO-handle data */
 	REF struct ne2k_device *pd_device;    /* [1..1][const] The device servicing this packet. */
 	REF struct nic_packet  *pd_packet;    /* [0..1][lock(CLEAR_ONCE)] The packet that is being transmit. */
-	REF struct vm          *pd_payloadvm; /* [1..1][valid_if(pd_packet)][const] The VM that contains the payload. */
+	REF struct mman        *pd_payloadmm; /* [1..1][valid_if(pd_packet)][const] The VM that contains the payload. */
 } Ne2kAIOHandleData;
 
 #define Ne2kAIOHandleData_Of(h) ((Ne2kAIOHandleData *)(h)->ah_data)

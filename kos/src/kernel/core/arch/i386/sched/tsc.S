@@ -640,10 +640,10 @@ INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 	.cfi_remember_state
 
 	/* Update the used page directory pointer. */
-	EXTERN(this_vm)
-	movP   this_vm(%Pax), %Pcx
-	EXTERN(thisvm_pdir_phys)
-	movP   thisvm_pdir_phys(%Pcx), %Pdi
+	EXTERN(this_mman)
+	movP   this_mman(%Pax), %Pcx
+	EXTERN(thismman_pagedir_p)
+	movP   thismman_pagedir_p(%Pcx), %Pdi
 	EXTERN(thiscpu_pdir)
 	movP   %Pdi, thiscpu_pdir(%Pbx) /* Update the per-cpu current-pdir field. */
 	movP   %cr3, %Pdx

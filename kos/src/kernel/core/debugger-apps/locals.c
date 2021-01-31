@@ -265,10 +265,10 @@ enum_locals_at_with_debug_sections(void const *absolute_pc,
                                    debuginfo_enum_locals_callback_t callback,
                                    void *arg) {
 	ssize_t result;
-	struct vm *required_mm = &vm_kernel;
+	struct mman *required_mm = &mman_kernel;
 	if (ADDR_ISUSER(absolute_pc))
 		required_mm = dbg_current->t_mman;
-	if (required_mm == THIS_VM) {
+	if (required_mm == THIS_MMAN) {
 		result = enum_locals_at_with_debug_sections_impl(absolute_pc,
 		                                                 callback,
 		                                                 arg);

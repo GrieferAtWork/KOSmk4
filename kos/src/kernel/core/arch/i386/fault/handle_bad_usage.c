@@ -76,6 +76,7 @@ opt.append("-Os");
 #include <kernel/restart-interrupt.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <kernel/vm.h>
 #include <kernel/vm/rtm.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/emulock.h>
@@ -114,7 +115,7 @@ opt.append("-Os");
 
 #ifdef __x86_64__
 #include <kernel/driver.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 #include <kernel/x86/fsgsbase.h> /* x86_fsgsbase_patch() */
 
 #include <int128.h>
@@ -957,7 +958,7 @@ setgsbase(uintptr_t value) {
 PRIVATE struct icpustate *FCALL
 dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	struct vio_emulate_args args;
-	struct vm *myvm = THIS_VM;
+	struct vm *myvm = THIS_MMAN;
 
 	/* The VIO emulation will span the entirety of the KERNRESERVE node. */
 	args.vea_ptrlo = vm_node_getminaddr(vm_get_kernreserve_node(myvm));
@@ -1023,7 +1024,7 @@ assert_user_address_range(struct icpustate *__restrict state,
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UADD((uintptr_t)addr, num_bytes, &endaddr) ||
 	            endaddr > KERNELSPACE_BASE) {
-		struct vm *myvm = THIS_VM;
+		struct vm *myvm = THIS_MMAN;
 		/* Dispatch the current instruction through VIO */
 		if ((byte_t *)addr >= vm_node_getminaddr(vm_get_kernreserve_node(myvm)) &&
 		    (byte_t *)addr <= vm_node_getmaxaddr(vm_get_kernreserve_node(myvm))) {
@@ -1616,7 +1617,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 		 * loaded into LOCKED memory, the backing banks are still allowed to
 		 * be changed, which can only be prevented by holding a lock to the
 		 * kernel VM. */
-		if (sync_trywrite(&vm_kernel)) {
+		if (mman_lock_tryacquire(&mman_kernel)) {
 			/* With a lock to the kernel VM held, do another sanity check to ensure
 			 * that the backing memory of return-PC is still mapped into memory.
 			 * There isn't any rule against drivers doing weird trickery with their
@@ -1666,7 +1667,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 					}
 				}
 			}
-			sync_endwrite(&vm_kernel);
+			mman_lock_release(&mman_kernel);
 		}
 	}
 	decref_unlikely(d);

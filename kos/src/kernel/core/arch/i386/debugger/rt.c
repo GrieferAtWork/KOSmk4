@@ -35,9 +35,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
+#include <kernel/mman/phys.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h>
@@ -816,17 +816,17 @@ reset_pdir_pae(struct pae_pdir *__restrict self) {
 			return false;
 	}
 	/* Kernel share (copy from our own page directory) */
-	vm_copytophys_onepage((physaddr_t)e3[3] & PAE_PAGE_FVECTOR,
-	                      PAE_PDIR_E2_IDENTITY[3], 508 * 8);
+	copytophys_onepage((physaddr_t)e3[3] & PAE_PAGE_FVECTOR,
+	                   PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	e3[0] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[1] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	/* Identity mapping */
-	vm_copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
-	                      508 * 8,
-	                      e3,
-	                      4 * 8); /* Identity mapping */
+	copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
+	                   508 * 8,
+	                   e3,
+	                   4 * 8); /* Identity mapping */
 	return true;
 }
 #endif /* !CONFIG_NO_PAGING_PAE */
@@ -847,38 +847,38 @@ reset_pdir_p32(struct p32_pdir *__restrict self, u32 phys_self) {
 
 PRIVATE ATTR_DBGTEXT void KCALL
 reset_pdir(struct task *mythread) {
-	struct vm *myvm;
-	myvm = mythread->t_mman;
-	if unlikely((uintptr_t)myvm < KERNELSPACE_BASE)
+	struct mman *mymm;
+	mymm = mythread->t_mman;
+	if unlikely((uintptr_t)mymm < KERNELSPACE_BASE)
 		return;
-	if unlikely((physaddr_t)myvm->v_pdir_phys != pagedir_translate(&myvm->v_pagedir))
+	if unlikely((physaddr_t)mymm->mm_pagedir_p != pagedir_translate(&mymm->mm_pagedir))
 		return;
-	if unlikely(((uintptr_t)myvm->v_pdir_phys & PAGEMASK) != 0)
+	if unlikely(((uintptr_t)mymm->mm_pagedir_p & PAGEMASK) != 0)
 		return;
-	if (myvm == &vm_kernel)
+	if (mymm == &vm_kernel)
 		return; /* nothing to do here. */
 
-	/* Make sure that the kernel-share segment of `myvm' is initialized correctly! */
+	/* Make sure that the kernel-share segment of `mymm' is initialized correctly! */
 #ifdef __x86_64__
-	reset_pdir_p64(&myvm->v_pagedir, (u64)myvm->v_pdir_phys);
+	reset_pdir_p64(&mymm->mm_pagedir, (u64)mymm->mm_pagedir_p);
 #elif defined(CONFIG_NO_PAGING_PAE)
-	reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys);
+	reset_pdir_p32(&mymm->mm_pagedir.pd_p32, (u32)mymm->mm_pagedir_p);
 #elif defined(CONFIG_NO_PAGING_P32)
-	if (!reset_pdir_pae(&myvm->v_pagedir.pd_pae))
+	if (!reset_pdir_pae(&mymm->mm_pagedir.pd_pae))
 		return;
 #else
 	if (X86_PAGEDIR_USES_PAE()) {
-		if (!reset_pdir_pae(&myvm->v_pagedir.pd_pae))
+		if (!reset_pdir_pae(&mymm->mm_pagedir.pd_pae))
 			return;
 	} else {
-		reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys);
+		reset_pdir_p32(&mymm->mm_pagedir.pd_p32, (u32)mymm->mm_pagedir_p);
 	}
 #endif
 
 	/* The page directory seems to be consistent. -> Use it instead to
 	 * minimize the number of necessary page directory switches when
 	 * inspecting memory. */
-	pagedir_set(myvm->v_pdir_phys);
+	pagedir_set(mymm->mm_pagedir_p);
 }
 
 

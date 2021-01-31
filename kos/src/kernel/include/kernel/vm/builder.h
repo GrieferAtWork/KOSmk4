@@ -22,14 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
-#include <kernel/vm.h>
-
-#include <hybrid/__assert.h>
-
-#include <asm/pageid.h>
-#include <compat/config.h> /* __ARCH_HAVE_COMPAT */
-
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman/mbuilder.h>
 #define VMB_INIT       MBUILDER_INIT
@@ -43,10 +35,10 @@ DECL_BEGIN
 
 #ifdef TRY
 FORCELOCAL WUNUSED NONNULL((1, 4)) bool
-vmb_mapat(struct vmb *__restrict self,
+vmb_mapat(struct mbuilder *__restrict self,
           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
           PAGEDIR_PAGEALIGNED size_t num_bytes,
-          struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+          struct mfile *__restrict data DFL(&mfile_zero),
           struct path *fspath DFL(__NULLPTR),
           struct directory_entry *fsname DFL(__NULLPTR),
           PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
@@ -94,6 +86,15 @@ DECL_END
 #endif /* __ARCH_HAVE_COMPAT */
 
 #else /* CONFIG_USE_NEW_VM */
+#include <kernel/types.h>
+#include <kernel/vm.h>
+
+#include <hybrid/__assert.h>
+
+#include <asm/pageid.h>
+#include <compat/config.h> /* __ARCH_HAVE_COMPAT */
+
+
 DECL_BEGIN
 
 /* A small, helper-type for safely constructing and applying a VM state.

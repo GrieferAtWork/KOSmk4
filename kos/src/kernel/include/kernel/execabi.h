@@ -80,7 +80,7 @@ DATDEF byte_t execabi_system_rtld_size[];
  * NOTE: The associated source code can be found in `/kos/src/libdl/...', and
  *       the (unstripped) library file can be found on-disk as `/lib/libdl.so' */
 #ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD_FILE
-DATDEF struct vm_ramfile execabi_system_rtld_file;
+DATDEF struct mramfile execabi_system_rtld_file;
 #endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD_FILE */
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -103,7 +103,7 @@ DATDEF byte_t compat_execabi_system_rtld_size[];
  * that requests the use of a dynamic linker
  * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
 #ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE
-DATDEF struct vm_ramfile compat_execabi_system_rtld_file;
+DATDEF struct mramfile compat_execabi_system_rtld_file;
 #endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE */
 #endif /* __ARCH_HAVE_COMPAT */
 

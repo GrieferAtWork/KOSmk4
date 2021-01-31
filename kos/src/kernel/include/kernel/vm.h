@@ -82,8 +82,6 @@
 #define vm_datapart_getstate(...)                     mpart_getblockstate(__VA_ARGS__)
 #define vm_datapart_setstate(...)                     mpart_setblockstate(__VA_ARGS__)
 #define vm_datapart_isstatewritable(...)              mpart_hasblockstate(__VA_ARGS__)
-#define VM_DATABLOCK_ANONPARTS                        MFILE_PARTS_ANONYMOUS
-#define VM_DATABLOCK_ANONPARTS_INIT                   MFILE_PARTS_ANONYMOUS
 #define db_refcnt                                     mf_refcnt
 #define db_lock                                       mf_lock
 #define db_type                                       mf_ops
@@ -165,9 +163,6 @@
 #define v_tasks                                       mm_threads
 #define v_tasklock                                    mm_threadslock
 #define vm_kernel                                     mman_kernel
-#define this_vm                                       this_mman
-#define THIS_VM                                       THIS_MMAN
-#define PERVM                                         PERMMAN
 #define vm_free(...)                                  mman_free(__VA_ARGS__)
 #define vm_destroy(...)                               mman_destroy(__VA_ARGS__)
 #define vm_alloc(...)                                 mman_new(__VA_ARGS__)
@@ -499,7 +494,6 @@ DECL_END
 #define mpart_getblockstate(...)                       vm_datapart_getstate(__VA_ARGS__)
 #define mpart_setblockstate(...)                       vm_datapart_setstate(__VA_ARGS__)
 #define mpart_hasblockstate(...)                       vm_datapart_isstatewritable(__VA_ARGS__)
-#define MFILE_PARTS_ANONYMOUS                          VM_DATABLOCK_ANONPARTS
 #define mf_refcnt                                      db_refcnt
 #define mf_ops                                         db_type
 #define mf_parts                                       db_parts
@@ -580,9 +574,6 @@ DECL_END
 #define mm_threads                                     v_tasks
 #define mm_threadslock                                 v_tasklock
 #define mman_kernel                                    vm_kernel
-#define this_mman                                      this_vm
-#define THIS_MMAN                                      THIS_VM
-#define PERMMAN                                        PERVM
 #define mman_free(...)                                 vm_free(__VA_ARGS__)
 #define mman_destroy(...)                              vm_destroy(__VA_ARGS__)
 #define mman_new(...)                                  vm_alloc(__VA_ARGS__)
@@ -702,8 +693,10 @@ DECL_END
 		/* .db_parts  = */ parts,                              \
 		VM_DATABLOCK_INIT_PAGEINFO(PAGESHIFT - (blockshift))   \
 	}
-#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, __NULLPTR, blockshift)
-#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, MFILE_PARTS_ANONYMOUS, blockshift)
+#define MFILE_INIT(ops, blockshift) \
+	MFILE_INIT_EX(1, ops, __NULLPTR, __NULLPTR, blockshift)
+#define MFILE_INIT_ANON(ops, blockshift) \
+	MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, MFILE_PARTS_ANONYMOUS, blockshift)
 /************************************************************************/
 
 
@@ -1666,8 +1659,7 @@ struct vm_datablock_type {
 
 /* Value for `db_parts' when all parts are not tracked as shared, but are instead
  * newly allocated each time they are accessed through `vm_paged_datablock_locatepart()'. */
-#define VM_DATABLOCK_ANONPARTS      ((struct vm_datapart *)-1)
-#define VM_DATABLOCK_ANONPARTS_INIT VM_DATABLOCK_ANONPARTS
+#define MFILE_PARTS_ANONYMOUS ((struct vm_datapart *)-1)
 
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -1692,10 +1684,10 @@ struct vm_datablock {
 	struct vio_operators const         *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
 #endif /* LIBVIO_CONFIG_ENABLED */
 	REF ATREE_HEAD(struct vm_datapart)  db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
-	                                                * NOTE: When set to `VM_DATABLOCK_ANONPARTS', new parts are always
+	                                                * NOTE: When set to `MFILE_PARTS_ANONYMOUS', new parts are always
 	                                                *       allocated anonymously, and never added to the actual datablock.
 	                                                * NOTE: Due the process of anonymizing a data block, this field is set
-	                                                *       to `VM_DATABLOCK_ANONPARTS', as is done when (e.g.) the associated
+	                                                *       to `MFILE_PARTS_ANONYMOUS', as is done when (e.g.) the associated
 	                                                *       file gets deleted. */
 	/* Page index conversion.
 	 * NOTE: This can entirely be ignored for most data
@@ -1945,13 +1937,13 @@ NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
 #else /* __INTELLISENSE__ */
 #define vm_datablock_deanonymize(self)                                \
 	(__hybrid_assert(vm_datablock_allow_deanonymize(self)),           \
-	 __hybrid_atomic_cmpxch((self)->db_parts, VM_DATABLOCK_ANONPARTS, \
+	 __hybrid_atomic_cmpxch((self)->db_parts, MFILE_PARTS_ANONYMOUS, \
 	                        __NULLPTR, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #endif /* !__INTELLISENSE__ */
 
 /* Check if `self' is an anonymous datablock */
 #define vm_datablock_isanonymous(self) \
-	(__hybrid_atomic_load((self)->db_parts, __ATOMIC_ACQUIRE) == VM_DATABLOCK_ANONPARTS)
+	(__hybrid_atomic_load((self)->db_parts, __ATOMIC_ACQUIRE) == MFILE_PARTS_ANONYMOUS)
 
 
 /* Synchronize all modified data pages within the specified address range.
@@ -1996,7 +1988,7 @@ vm_paged_datablock_createpart(struct vm_datablock *__restrict self,
 }
 
 /* Lookup and return a reference the data part containing the given `start_offset'
- * NOTE: When `self' is an anonymous data block (`self->db_parts == VM_DATABLOCK_ANONPARTS'),
+ * NOTE: When `self' is an anonymous data block (`self->db_parts == MFILE_PARTS_ANONYMOUS'),
  *       the the returned data part will be allocated anonymously as well, meaning that
  *       it will not be shared (`!isshared(return)'), and not be re-returned when the
  *       call is repeated with the same arguments passed once again. */
@@ -2102,7 +2094,7 @@ DATDEF struct vm_datablock_type vm_datablock_anonymous_zero_type_vec[PAGESHIFT +
 
 
 
-struct vm_ramfile {
+struct mramfile {
 	/* RAM File (a datablock type that can be used to represent a
 	 * limited segment of physical RAM available as a generic data
 	 * block) - This type of data block is used to safely load dynamic
@@ -2111,7 +2103,7 @@ struct vm_ramfile {
 	struct vm_ramblock  rf_data;  /* [const] The ram data of the file. */
 };
 
-/* The datablock type used by `vm_ramfile' */
+/* The datablock type used by `mramfile' */
 DATDEF struct vm_datablock_type vm_ramfile_type;
 
 #define VM_RAMFILE_INIT(/*physpage_t*/ start, /*size_t*/ num_pages) \
@@ -2159,7 +2151,7 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
                                           *  - node->vn_part->dp_crefs == NULL
                                           *  - !isshared(node->vn_part)
                                           *  - node->vn_part->dp_block == node->vn_block
-                                          *  - node->vn_block->db_parts == VM_DATABLOCK_ANONPARTS
+                                          *  - node->vn_block->db_parts == MFILE_PARTS_ANONYMOUS
                                           *  - node->vn_part->dp_flags & VM_DATAPART_FLAG_LOCKED
                                           *  - node->vn_part->dp_state == VM_DATAPART_STATE_LOCKED
                                           * Additionally, this `struct vm_node' must be hinted towards by the
@@ -2317,9 +2309,9 @@ LIST_HEAD(task_list, WEAK task);
 
 struct vm {
 	/* Top-level controller for virtual memory bindings. */
-#ifndef __VM_INTERNAL_EXCLUDE_PAGEDIR
+#ifndef __WANT_MMAN_EXCLUDE_PAGEDIR
 	pagedir_t                  v_pagedir;       /* [lock(v_treelock)] The page directory associated with the VM. */
-#endif /* !__VM_INTERNAL_EXCLUDE_PAGEDIR */
+#endif /* !__WANT_MMAN_EXCLUDE_PAGEDIR */
 	PHYS pagedir_phys_t        v_pdir_phys;     /* [1..1][const] Physical pointer of the page directory */
 	WEAK refcnt_t              v_refcnt;        /* Reference counter */
 	WEAK refcnt_t              v_weakrefcnt;    /* Weak reference counter */
@@ -2348,9 +2340,9 @@ struct vm {
 DATDEF struct vm vm_kernel;
 
 /* The VM that is currently active within the calling thread */
-DATDEF ATTR_PERTASK REF struct vm *this_vm;
-#define THIS_VM  PERTASK_GET(this_vm)
-#define PERVM(x) (*(__typeof__(&(x)))((uintptr_t)THIS_VM + (uintptr_t)&(x)))
+DATDEF ATTR_PERTASK REF struct vm *this_mman;
+#define THIS_MMAN  PERTASK_GET(this_mman)
+#define PERMMAN(x) (*(__typeof__(&(x)))((uintptr_t)THIS_MMAN + (uintptr_t)&(x)))
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_free)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_destroy)(struct vm *__restrict self);
@@ -2392,14 +2384,14 @@ task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *
 NOTHROW(KCALL task_xchmman)(struct vm *__restrict newvm) {
 	REF struct vm *result;
-	result = incref(THIS_VM);
+	result = incref(THIS_MMAN);
 	task_setvm(newvm); /* XXX: Ignore exceptions to cause panic instead! */
 	return result;
 }
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *
 NOTHROW(KCALL task_xchmman_inherit)(REF struct vm *__restrict newvm) {
 	REF struct vm *result;
-	result = incref(THIS_VM);
+	result = incref(THIS_MMAN);
 	task_setvm(newvm); /* XXX: Ignore exceptions to cause panic instead! */
 	decref_nokill(newvm);
 	return result;
@@ -2498,7 +2490,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  *      `pagedir_sync_smp_p(self->v_pdir_phys)'
  *
  * this_vm_sync():
- *    - Same as `vm_sync(THIS_VM)'
+ *    - Same as `vm_sync(THIS_MMAN)'
  *
  * vm_supersync():
  *    - Same as `vm_sync(&vm_kernel)'
@@ -2542,7 +2534,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_syncall)(struct vm *__restrict
 
 #ifndef CONFIG_NO_SMP
 
-/* Same as `vm_sync(THIS_VM)' (The sync is done on every CPU that uses the caller's VM) */
+/* Same as `vm_sync(THIS_MMAN)' (The sync is done on every CPU that uses the caller's VM) */
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncall)(void);
@@ -3429,7 +3421,7 @@ NOTHROW(vm_kernel_locked_operation)(T *__restrict obj,
 
 /* List of callbacks that should be invoked after vm_exec()
  * These are called alongside stuff like `handle_manager_cloexec()'
- * NOTE: The passed vm is always `THIS_VM', and is never `&vm_kernel' */
+ * NOTE: The passed vm is always `THIS_MMAN', and is never `&vm_kernel' */
 DATDEF CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks;
 /* VM initialization/finalization callbacks. */
 DATDEF CALLBACK_LIST(void FCALL(struct vm *)) vm_oninit_callbacks;

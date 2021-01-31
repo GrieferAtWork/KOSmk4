@@ -29,7 +29,9 @@
 #include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mm-sync.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-lockop.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>

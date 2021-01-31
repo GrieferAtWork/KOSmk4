@@ -19,10 +19,9 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_C_INL
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_C_INL 1
+#define __OMIT_PAGING_CONSTANT_P_WRAPPERS
+#define __WANT_MMAN_EXCLUDE_PAGEDIR
 #define _KOS_SOURCE 1
-#define __VM_INTERNAL_EXCLUDE_PAGEDIR 1 /* TODO: Remove once `CONFIG_USE_NEW_VM' becomes the default */
-#define __MMAN_INTERNAL_EXCLUDE_PAGEDIR 1
-#define __OMIT_PAGING_CONSTANT_P_WRAPPERS 1
 
 #include <kernel/compiler.h>
 
@@ -33,16 +32,13 @@
 #include <kernel/arch/paging64.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/_mm-archinit.h>
+#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman.h>
-#include <kernel/mman/_mm-archinit.h>
-#else /* CONFIG_USE_NEW_VM */
-#include <kernel/vm.h>
-#endif /* !CONFIG_USE_NEW_VM */
-#include <kernel/vm/phys.h>
 #include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
 #include <sched/userkern.h>
@@ -104,7 +100,7 @@ STATIC_ASSERT(sizeof(union p64_pdir_e3) == 8);
 STATIC_ASSERT(sizeof(union p64_pdir_e2) == 8);
 STATIC_ASSERT(sizeof(union p64_pdir_e1) == 8);
 
-STATIC_ASSERT(P64_PDIR_E1_IDENTITY_BASE == P64_VM_KERNEL_PDIR_IDENTITY_BASE);
+STATIC_ASSERT(P64_PDIR_E1_IDENTITY_BASE == P64_MMAN_KERNEL_PDIR_IDENTITY_BASE);
 STATIC_ASSERT(P64_PDIR_E2_IDENTITY_BASE == P64_PDIR_E1_IDENTITY_BASE + (P64_PDIR_VEC4INDEX(P64_PDIR_E1_IDENTITY_BASE) * P64_PDIR_E3_SIZE));
 STATIC_ASSERT(P64_PDIR_E3_IDENTITY_BASE == P64_PDIR_E2_IDENTITY_BASE + (P64_PDIR_VEC3INDEX(P64_PDIR_E2_IDENTITY_BASE) * P64_PDIR_E2_SIZE));
 STATIC_ASSERT(P64_PDIR_E4_IDENTITY_BASE == P64_PDIR_E3_IDENTITY_BASE + (P64_PDIR_VEC2INDEX(P64_PDIR_E3_IDENTITY_BASE) * P64_PDIR_E1_SIZE));
@@ -269,10 +265,10 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 	 * of it (we intentionally don't use `KERNELSPACE_BASE' itself as base address in order to keep
 	 * the first page of kernel-space unmapped (meaning that given the 512GiB alignment
 	 * requirements of the identity mapping, we end up with `KERNELSPACE_BASE + 512GiB')) */
-	STATIC_ASSERT(P64_PDIR_VEC4INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 257);
-	STATIC_ASSERT(P64_PDIR_VEC3INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
-	STATIC_ASSERT(P64_PDIR_VEC2INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
-	STATIC_ASSERT(P64_PDIR_VEC1INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	STATIC_ASSERT(P64_PDIR_VEC4INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 257);
+	STATIC_ASSERT(P64_PDIR_VEC3INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	STATIC_ASSERT(P64_PDIR_VEC2INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	STATIC_ASSERT(P64_PDIR_VEC1INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	/* Assert that the page directory is properly aligned. */
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
@@ -282,11 +278,6 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 	self->p_e4[257].p_word = (u64)phys_self | P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT;
 }
 
-
-/* Because we're omitting the `v_pagedir' field from the start of the VM, we have
- * to adjust for that fact when we're trying to access the `v_pdir_phys' field! */
-#define VM_GET_V_PDIR_PHYS_PTR(x) \
-	(*(PHYS pagedir_t **)((byte_t *)(x) + sizeof(pagedir_t) + offsetof(struct vm, v_pdir_phys)))
 
 
 /* Finalize a given page directory. */
@@ -414,7 +405,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 
 
 LOCAL NOBLOCK physpage_t
-NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct vm_ptram *__restrict ptram,
+NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct mptram *__restrict ptram,
                                                  u64 e2_word,
                                                  unsigned int vec1_prepare_start,
                                                  unsigned int vec1_prepare_size) {
@@ -424,7 +415,7 @@ NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct vm_ptram *__restrict ptr
 	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 	/* Fill in the E1 vector. */
-	e1_p = (union p64_pdir_e1 *)vm_ptram_mappage(ptram, result);
+	e1_p = (union p64_pdir_e1 *)mptram_mappage(ptram, result);
 	if (e2_word & P64_PAGE_FPRESENT) {
 		/* Convert a 2MiB mapping into 512 * 4KiB mappings */
 		assert(e2_word & P64_PAGE_F2MIB);
@@ -472,7 +463,7 @@ done:
 
 /* Create an E2-vector from a given E3-word  */
 LOCAL NOBLOCK physpage_t
-NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct vm_ptram *__restrict ptram,
+NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct mptram *__restrict ptram,
                                                                u64 e3_word,
                                                                unsigned int vec2,
                                                                physpage_t e1_vector,
@@ -483,7 +474,7 @@ NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct vm_ptram *
 	result = page_mallocone();
 	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
-	e2_p = (union p64_pdir_e2 *)vm_ptram_mappage(ptram, result);
+	e2_p = (union p64_pdir_e2 *)mptram_mappage(ptram, result);
 	if (e3_word & P64_PAGE_FPRESENT) {
 		unsigned int vec2_i;
 		assert(e3_word & P64_PAGE_F1GIB);
@@ -589,7 +580,7 @@ again:
 		union p64_pdir_e3 *e3_p;
 		union p64_pdir_e2 *e2_p;
 		union p64_pdir_e1 *e1_p;
-		struct vm_ptram ptram;
+		struct mptram ptram;
 		assertf(VEC4_IS_USERSPACE,
 		        "All E4 entries for kernel-space must contain pre-allocated E3-vectors\n"
 		        "vec4      = %u\n"
@@ -619,9 +610,9 @@ err_e3_vector:
 			page_freeone(e2_vector);
 			goto err_e3_vector;
 		}
-		vm_ptram_init(&ptram);
+		mptram_init(&ptram);
 		/* Initialize the E1-vector. */
-		e1_p = (union p64_pdir_e1 *)vm_ptram_mappage(&ptram, e1_vector);
+		e1_p = (union p64_pdir_e1 *)mptram_mappage(&ptram, e1_vector);
 		if (vec1_prepare_size == 512) {
 			assert(vec1_prepare_start == 0);
 			memsetq(e1_p, P64_PAGE_FPREPARED, 512);
@@ -632,7 +623,7 @@ err_e3_vector:
 			                                     512 - (vec1_prepare_start + vec1_prepare_size));
 		}
 		/* Initialize the E2-vector. */
-		e2_p = (union p64_pdir_e2 *)vm_ptram_mappage(&ptram, e2_vector);
+		e2_p = (union p64_pdir_e2 *)mptram_mappage(&ptram, e2_vector);
 #if P64_PAGE_ABSENT == 0
 		if (!page_iszero(e2_vector))
 #endif /* P64_PAGE_ABSENT == 0 */
@@ -642,7 +633,7 @@ err_e3_vector:
 		e2_p[vec2].p_word = (u64)physpage2addr(e1_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		/* Initialize the E3-vector. */
-		e3_p = (union p64_pdir_e3 *)vm_ptram_mappage(&ptram, e3_vector);
+		e3_p = (union p64_pdir_e3 *)mptram_mappage(&ptram, e3_vector);
 #if P64_PAGE_ABSENT == 0
 		if (!page_iszero(e3_vector))
 #endif /* P64_PAGE_ABSENT == 0 */
@@ -652,7 +643,7 @@ err_e3_vector:
 		e3_p[vec3].p_word = (u64)physpage2addr(e2_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		COMPILER_BARRIER();
-		vm_ptram_fini(&ptram);
+		mptram_fini(&ptram);
 		/* Try to install the new E3-vector as an E4-word. */
 		new_e4_word = (u64)physpage2addr(e3_vector) | P64_PAGE_FPRESENT |
 		              P64_PAGE_FWRITE | P64_PAGE_FUSER;
@@ -684,7 +675,7 @@ err_e3_vector:
 	if (!e3.p_vec2.v_present || e3.p_1gib.d_1gib_1) {
 		/* Convert the 1GiB mapping into
 		 *  - 511 * 2MiB mappings + 512 * 4KiB mappings (the later being `vec2') */
-		struct vm_ptram ptram;
+		struct mptram ptram;
 		physpage_t e1_vector; /* 512 * 4KiB */
 		physpage_t e2_vector; /* 511 * 2MiB + 1 * VEC1 */
 		union p64_pdir_e2 e2_word;
@@ -702,13 +693,13 @@ err_e3_vector:
 		} else {
 			assert(!e2_word.p_vec1.v_present);
 		}
-		vm_ptram_init(&ptram);
+		mptram_init(&ptram);
 		e1_vector = p64_create_e1_vector_from_e2_word(&ptram,
 		                                              e2_word.p_word,
 		                                              vec1_prepare_start,
 		                                              vec1_prepare_size);
 		if (e1_vector == PHYSPAGE_INVALID) {
-			vm_ptram_fini(&ptram);
+			mptram_fini(&ptram);
 			goto err;
 		}
 		/* Construct an E2 vector pointing to the E1 vector created earlier. */
@@ -716,7 +707,7 @@ err_e3_vector:
 		                                                            vec2, e1_vector,
 		                                                            VEC4_IS_USERSPACE);
 		COMPILER_BARRIER();
-		vm_ptram_fini(&ptram);
+		mptram_fini(&ptram);
 		if (e2_vector == PHYSPAGE_INVALID) {
 			page_freeone(e1_vector);
 			goto err;
@@ -758,16 +749,16 @@ word_changed_after_e2_vector:
 	if (!e2.p_vec1.v_present || e2.p_2mib.d_2mib_1) {
 		/* Convert the 2MiB mapping into
 		 *  - 512 * 4KiB mappings */
-		struct vm_ptram ptram;
+		struct mptram ptram;
 		physpage_t e1_vector;
 		u64 new_word, new_e2_word;
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
-		vm_ptram_init(&ptram);
+		mptram_init(&ptram);
 		e1_vector = p64_create_e1_vector_from_e2_word(&ptram, e2.p_word,
 		                                              vec1_prepare_start,
 		                                              vec1_prepare_size);
 		COMPILER_BARRIER();
-		vm_ptram_fini(&ptram);
+		mptram_fini(&ptram);
 		if unlikely(e1_vector == PHYSPAGE_INVALID)
 			goto err;
 		/* Re-acquire the prepare lock and make sure that the vectors
@@ -1018,8 +1009,8 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e1_vector)(unsigned int vec4,
 	void *sync_pageaddr;
 	sync_pageaddr = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2];
 	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
-		/* Sync as part of the kernel VM */
-		vm_supersyncone(sync_pageaddr);
+		/* Sync as part of the kernel MMan */
+		mman_supersyncone(sync_pageaddr);
 	} else {
 		/* Sync as part of the current page directory. */
 		pagedir_syncone_smp(sync_pageaddr);
@@ -1034,7 +1025,7 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e2_vector)(unsigned int vec4,
 #if 1 /* It's faster to just sync everything... */
 	(void)vec3;
 	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
-		vm_supersyncall();
+		mman_supersyncall();
 	} else {
 		pagedir_syncall_smp();
 	}
@@ -1047,11 +1038,11 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e2_vector)(unsigned int vec4,
 	void *sync_pageaddr;
 	sync_pageaddr = P64_PDIR_E2_IDENTITY[vec4][vec3];
 	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
-		/* Sync as part of the kernel VM */
-		vm_supersyncone(sync_pageaddr);
+		/* Sync as part of the kernel MMan */
+		mman_supersyncone(sync_pageaddr);
 		/* Must also sync:
 		 * P64_PDIR_E1_IDENTITY[vec4][vec3][0..511][0..511] */
-		vm_supersync(P64_PDIR_E1_IDENTITY[vec4][vec3],
+		mman_supersync(P64_PDIR_E1_IDENTITY[vec4][vec3],
 		               512 * 512 * 8);
 	} else {
 		/* Sync as part of the current page directory. */
@@ -1070,7 +1061,7 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL p64_pagedir_sync_flattened_e3_vector)(unsigned int vec4) {
 #if 1 /* It's faster to just sync everything... */
 	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
-		vm_supersyncall();
+		mman_supersyncall();
 	} else {
 		pagedir_syncall_smp();
 	}
@@ -1083,15 +1074,15 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e3_vector)(unsigned int vec4) {
 	void *sync_pageaddr;
 	sync_pageaddr = P64_PDIR_E3_IDENTITY[vec4];
 	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
-		/* Sync as part of the kernel VM */
-		vm_supersyncone(sync_pageaddr);
+		/* Sync as part of the kernel MMan */
+		mman_supersyncone(sync_pageaddr);
 		/* Must also sync:
 		 * P64_PDIR_E2_IDENTITY[vec4][0..511][0..511] */
-		vm_supersync(P64_PDIR_E2_IDENTITY[vec4],
+		mman_supersync(P64_PDIR_E2_IDENTITY[vec4],
 		               512 * 512 * 8);
 		/* Must also sync:
 		 * P64_PDIR_E1_IDENTITY[vec4][0..511][0..511][0..511] */
-		vm_supersync(P64_PDIR_E1_IDENTITY[vec4],
+		mman_supersync(P64_PDIR_E1_IDENTITY[vec4],
 		               512 * 512 * 512 * 8);
 	} else {
 		/* Sync as part of the current page directory. */
@@ -2675,8 +2666,8 @@ struct p64_enumdat {
 PRIVATE ATTR_DBGTEXT void KCALL
 p64_printident(struct p64_enumdat *__restrict data) {
 	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
-	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE,
-	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE + P64_VM_KERNEL_PDIR_IDENTITY_SIZE - 1,
+	           (byte_t *)P64_MMAN_KERNEL_PDIR_IDENTITY_BASE,
+	           (byte_t *)P64_MMAN_KERNEL_PDIR_IDENTITY_BASE + P64_MMAN_KERNEL_PDIR_IDENTITY_SIZE - 1,
 	           data->ed_identcnt);
 	data->ed_identcnt = 0;
 }
@@ -2786,9 +2777,9 @@ p64_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 		}
 	}
 	if (data->ed_prevsize) {
-		if ((byte_t *)data->ed_prevstart >= (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE &&
-		    (byte_t *)data->ed_prevstart + data->ed_prevsize <= (byte_t *)(P64_VM_KERNEL_PDIR_IDENTITY_BASE +
-		                                                                   P64_VM_KERNEL_PDIR_IDENTITY_SIZE)) {
+		if ((byte_t *)data->ed_prevstart >= (byte_t *)P64_MMAN_KERNEL_PDIR_IDENTITY_BASE &&
+		    (byte_t *)data->ed_prevstart + data->ed_prevsize <= (byte_t *)(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE +
+		                                                                   P64_MMAN_KERNEL_PDIR_IDENTITY_SIZE)) {
 			++data->ed_identcnt;
 			goto done_print; /* Skip entires within the identity mapping. */
 		}
@@ -2832,8 +2823,8 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
                  "lspd [MODE:kernel|user=user]\n"
                  "\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
                  "\t" AC_WHITE("mode") " can be specified as either " AC_WHITE("kernel")
-                 " or " AC_WHITE("user") " to select if " AC_WHITE("vm_kernel") "\n"
-                 "\tor " AC_WHITE("THIS_VM") " should be dumped\n",
+                 " or " AC_WHITE("user") " to select if " AC_WHITE("mman_kernel") "\n"
+                 "\tor " AC_WHITE("THIS_MMAN") " should be dumped\n",
                  argc, argv) {
 	pagedir_phys_t pdir;
 	if (argc == 2) {

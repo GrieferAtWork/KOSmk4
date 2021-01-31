@@ -207,7 +207,7 @@ handle_vio_or_not_faulted:
 	PREEMPTION_POP(was);
 	{
 		/* Check if this is a VIO segment (or maybe not mapped at all) */
-		struct vm *effective_vm = THIS_VM;
+		struct vm *effective_vm = THIS_MMAN;
 		struct vm_node *node;
 		PAGEDIR_PAGEALIGNED void *addr_page;
 #ifdef LIBVIO_CONFIG_ENABLED

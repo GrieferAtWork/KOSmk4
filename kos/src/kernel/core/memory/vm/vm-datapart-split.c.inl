@@ -492,7 +492,7 @@ again_lock_datapart:
 		 * However, we still need to acquire a lock to the associated data block, in case
 		 * that block isn't anonymous, we must also acquire a lock to it, so-as to be able
 		 * to update its part tree with the upper half we intend on constructing. */
-		if (self->dp_block->db_parts != VM_DATABLOCK_ANONPARTS) {
+		if (self->dp_block->db_parts != MFILE_PARTS_ANONYMOUS) {
 			/* Also need to acquire a lock to the datablock. */
 			if (!sync_trywrite(self->dp_block)) {
 				REF struct vm_datablock *block;
@@ -591,7 +591,7 @@ again_lock_datapart:
 					                                      GFP_PREFLT | GFP_VCBASE);
 					if (!new_bitset) {
 						/* Must allocate the bitset whilst blocking! */
-						if (self->dp_block->db_parts != VM_DATABLOCK_ANONPARTS)
+						if (self->dp_block->db_parts != MFILE_PARTS_ANONYMOUS)
 							sync_endwrite(self->dp_block);
 						vm_set_lockendwrite_all(&vms);
 						sync_endwrite(self);
@@ -1132,7 +1132,7 @@ done_futex:
 		datapage_t new_max_data_page;
 		new_max_data_page = self->dp_tree.a_vmin;
 		new_max_data_page += ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
-		if (self->dp_block->db_parts != VM_DATABLOCK_ANONPARTS) {
+		if (self->dp_block->db_parts != MFILE_PARTS_ANONYMOUS) {
 			vm_parttree_remove(&self->dp_block->db_parts,
 			                   self->dp_tree.a_vmin);
 			atomic64_write((atomic64_t *)&self->dp_tree.a_vmax, (u64)new_max_data_page);

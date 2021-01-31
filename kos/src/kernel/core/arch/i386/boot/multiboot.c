@@ -28,11 +28,11 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/multiboot.h>
 
 #include <hybrid/align.h>
@@ -142,9 +142,9 @@ NOTHROW(KCALL x86_initialize_commandline_himem)(void) {
 		char *arg;
 		/* Copy the kernel commandline from physical memory. */
 		cmdline_copy = (char *)kmalloc((x86_kernel_cmdline_length + 2) * sizeof(char), GFP_LOCKED);
-		vm_copyfromphys(cmdline_copy,
-		                (physaddr_t)((uintptr_t)kernel_driver.d_cmdline - KERNEL_CORE_BASE),
-		                x86_kernel_cmdline_length * sizeof(char));
+		copyfromphys(cmdline_copy,
+		             (physaddr_t)((uintptr_t)kernel_driver.d_cmdline - KERNEL_CORE_BASE),
+		             x86_kernel_cmdline_length * sizeof(char));
 		cmdline_copy[x86_kernel_cmdline_length + 0] = '\0';
 		cmdline_copy[x86_kernel_cmdline_length + 1] = '\0';
 		kernel_driver.d_cmdline = cmdline_copy;
@@ -234,9 +234,9 @@ load_bootloader_driver(PHYS u32 blob_addr, size_t blob_size,
 		cmdline = (char *)malloca((cmdline_maxsize + 1) * sizeof(char));
 		TRY {
 			/* Copy the commandline into our buffer. */
-			vm_copyfromphys(cmdline,
-			                (physaddr_t)cmdline_addr,
-			                cmdline_maxsize);
+			copyfromphys(cmdline,
+			             (physaddr_t)cmdline_addr,
+			             cmdline_maxsize);
 			cmdline[cmdline_maxsize] = '\0';
 			/* Load the driver blob. */
 			load_bootloader_driver2(blob_addr,
@@ -260,9 +260,9 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 		mb_module_t driver_descriptor;
 		size_t i;
 		for (i = 0; i < x86_boot_driver_size; ++i) {
-			vm_copyfromphys(&driver_descriptor,
-			                (physaddr_t)((uintptr_t)&((PHYS mb_module_t *)x86_boot_driver_base)[i]),
-			                sizeof(driver_descriptor));
+			copyfromphys(&driver_descriptor,
+			             (physaddr_t)((uintptr_t)&((PHYS mb_module_t *)x86_boot_driver_base)[i]),
+			             sizeof(driver_descriptor));
 			if unlikely(driver_descriptor.mod_start >= driver_descriptor.mod_end)
 				continue;
 			TRY {
@@ -286,7 +286,7 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 		tag_end   = (struct mb2_tag *)((byte_t *)tag_begin + x86_boot_driver_size);
 		for (tag_iter = tag_begin; tag_iter < tag_end;) {
 			struct mb2_tag_module_no_cmdline tag;
-			vm_copyfromphys(&tag, (physaddr_t)(uintptr_t)tag_iter, sizeof(tag));
+			copyfromphys(&tag, (physaddr_t)(uintptr_t)tag_iter, sizeof(tag));
 			if (tag.type == MB2_TAG_TYPE_MODULE) {
 				/* Got a driver tag. */
 				if unlikely(tag.mod_start >= tag.mod_end)

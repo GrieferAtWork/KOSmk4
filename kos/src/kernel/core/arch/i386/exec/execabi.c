@@ -40,7 +40,7 @@ MRAMFILE_INIT(execabi_system_rtld_file,
               (size_t)execabi_system_rtld_numpages,
               execabi_system_rtld_size);
 #else /* CONFIG_USE_NEW_VM */
-PUBLIC struct vm_ramfile execabi_system_rtld_file =
+PUBLIC struct mramfile execabi_system_rtld_file =
 VM_RAMFILE_INIT((physpage_t)execabi_system_rtld_startpage_p,
                 (size_t)execabi_system_rtld_numpages);
 #endif /* !CONFIG_USE_NEW_VM */
@@ -55,7 +55,7 @@ MRAMFILE_INIT(execabi_system_rtld32_file,
               (size_t)execabi_system_rtld32_numpages,
               execabi_system_rtld32_size);
 #else /* CONFIG_USE_NEW_VM */
-PUBLIC struct vm_ramfile execabi_system_rtld32_file =
+PUBLIC struct mramfile execabi_system_rtld32_file =
 VM_RAMFILE_INIT((physpage_t)execabi_system_rtld32_startpage_p,
                 (size_t)execabi_system_rtld32_numpages);
 #endif /* !CONFIG_USE_NEW_VM */

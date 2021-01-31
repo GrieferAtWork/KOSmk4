@@ -771,7 +771,7 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 			job->cas_buffer.ab_last         = buf->ab_last;
 		}
 		aio_handle_generic_init(&job->cas_aio);
-		job->cas_bufmm = incref(THIS_VM);
+		job->cas_bufmm = incref(THIS_MMAN);
 		TRY {
 			/* Initiate the connect() operation. */
 			(*self->sk_ops->so_connect)(self, addr, addr_len, &job->cas_aio);

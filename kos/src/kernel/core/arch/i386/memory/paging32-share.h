@@ -33,7 +33,7 @@ struct ATTR_ALIGNED(4096) p32_kernel_share {
 	 * kernel-space memory within all page directories by only ever changing the
 	 * contents of these E1-entires which are pointed-to by every page directory.
 	 * Note that we don't need 256 of these entires, since the last one already
-	 * gets used as the identity vector (s.a. `P32_VM_KERNEL_PDIR_IDENTITY_BASE')
+	 * gets used as the identity vector (s.a. `P32_MMAN_KERNEL_PDIR_IDENTITY_BASE')
 	 *
 	 * The initialization in _start32.S looks like this:
 	 * >> VECTOR_FLAGS = P32_PAGE_FACCESSED | P32_PAGE_FWRITE | P32_PAGE_FPRESENT;

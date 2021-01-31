@@ -29,8 +29,7 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 #include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
@@ -140,7 +139,7 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 	result->ib_pages  = physpage2addr(iob);
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
-	vm_memsetphyspages(result->ib_pages, 0xff, 2);
+	memsetphyspages(result->ib_pages, 0xff, 2 * PAGESIZE);
 	return result;
 }
 
@@ -159,7 +158,7 @@ REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags) {
 		result->ib_pages  = physpage2addr(iob);
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;
-		vm_memsetphyspages(result->ib_pages, 0xff, 2);
+		memsetphyspages(result->ib_pages, 0xff, 2 * PAGESIZE);
 	}
 	return result;
 }
@@ -188,7 +187,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 	result->ib_pages  = physpage2addr(iob);
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
-	vm_copypagesinphys(result->ib_pages, self->ib_pages, 2);
+	copypagesinphys(result->ib_pages, self->ib_pages, 2 * PAGESIZE);
 	return result;
 }
 
@@ -207,7 +206,7 @@ NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict sel
 		result->ib_pages  = physpage2addr(iob);
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;
-		vm_copypagesinphys(result->ib_pages, self->ib_pages, 2);
+		copypagesinphys(result->ib_pages, self->ib_pages, 2 * PAGESIZE);
 	}
 	return result;
 }
@@ -223,12 +222,12 @@ LOCAL NOBLOCK void
 NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
                                       size_t byte_index, u8 byte_mask, u8 byte_flag) {
 	u8 *byte, oldval;
-	struct vm_ptram pt = VM_PTRAM_INIT;
-	byte = vm_ptram_map(&pt, self->ib_pages + byte_index);
+	struct mptram pt = MPTRAM_INIT;
+	byte = mptram_map(&pt, self->ib_pages + byte_index);
 	do {
 		oldval = ATOMIC_READ(*byte);
 	} while (!ATOMIC_CMPXCH_WEAK(*byte, oldval, (oldval & byte_mask) | byte_flag));
-	vm_ptram_fini(&pt);
+	mptram_fini(&pt);
 }
 
 LOCAL NOBLOCK void
@@ -271,9 +270,9 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 	ioperm_bitmap_maskbyte_c(self, maxbyte, 0, (maxport & 7) + 1, turn_on);
 	/* Fill in all intermediate bytes. */
 	if (minbyte + 1 < maxbyte) {
-		vm_memsetphys(self->ib_pages + minbyte,
-		              turn_on ? 0x00 : 0xff,
-		              (maxbyte - minbyte) - 1);
+		memsetphys(self->ib_pages + minbyte + 1,
+		           turn_on ? 0x00 : 0xff,
+		           (maxbyte - minbyte) - 1);
 	}
 }
 

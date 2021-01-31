@@ -968,7 +968,7 @@ typedef struct di_debug_sections_struct {
 #define di_debug_sections_as_di_enum_locals_sections(x)         ((di_enum_locals_sections_t *)&(x)->ds_debug_addr_start)
 #define di_debug_sections_as_di_debuginfo_cu_parser_sections(x) ((di_debuginfo_cu_parser_sections_t *)&(x)->ds_debug_loc_start)
 #define di_debug_sections_as_di_addr2line_sections(x)           ((di_addr2line_sections_t *)&(x)->ds_debug_abbrev_start)
-#define di_debug_sections_from_di_enum_locals_sections(x)       __COMPILER_CONTAINER_OF(x, di_debug_sections_t, ds_debug_addr_start)
+#define di_debug_sections_from_di_enum_locals_sections(x)       __COMPILER_CONTAINER_OF((__byte_t const **)(x), di_debug_sections_t, ds_debug_addr_start)
 
 typedef struct di_debug_dl_sections_struct {
 	__REF module_section_t *ds_eh_frame;      /* [0..1] `.eh_frame' */

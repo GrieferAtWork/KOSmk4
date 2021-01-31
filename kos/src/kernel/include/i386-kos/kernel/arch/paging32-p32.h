@@ -200,10 +200,10 @@ struct p32_pdir {
 
 
 
-#define P32_VM_KERNEL_PDIR_IDENTITY_BASE __UINT32_C(0xffc00000) /* E1 vectors are mapped here. */
-#define P32_VM_KERNEL_PDIR_IDENTITY_SIZE __UINT32_C(0x00400000) /* 4MiB */
-#define P32_VM_KERNEL_PDIR_RESERVED_BASE __UINT32_C(0xffc00000) /* Start of the address range reserved for page-directory self-modifications. */
-#define P32_VM_KERNEL_PDIR_RESERVED_SIZE __UINT32_C(0x00400000) /* 4MiB */
+#define P32_MMAN_KERNEL_PDIR_IDENTITY_BASE __UINT32_C(0xffc00000) /* E1 vectors are mapped here. */
+#define P32_MMAN_KERNEL_PDIR_IDENTITY_SIZE __UINT32_C(0x00400000) /* 4MiB */
+#define P32_MMAN_KERNEL_PDIR_RESERVED_BASE __UINT32_C(0xffc00000) /* Start of the address range reserved for page-directory self-modifications. */
+#define P32_MMAN_KERNEL_PDIR_RESERVED_SIZE __UINT32_C(0x00400000) /* 4MiB */
 
 #define P32_PDIR_E1_IDENTITY_BASE    __UINT32_C(0xffc00000) /* E1 vectors are mapped here. */
 #define P32_PDIR_E2_IDENTITY_BASE    __UINT32_C(0xfffff000) /* The `p32_pdir::p_e2' vector is mapped here. */

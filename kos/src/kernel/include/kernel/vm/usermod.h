@@ -243,7 +243,7 @@ vm_getusermod_next(struct mman *__restrict self,
 /* Same as `vm_getusermod()', but automatically determine the VM to which `addr' belongs.
  * When the kernel was configured with the builtin debugger enabled, this function will
  * check if the builtin debugger is enabled, and if so, lookup `addr' in `task_getvm(dbg_current)'.
- * Otherwise, `THIS_VM' will always searched for `addr' instead. */
+ * Otherwise, `THIS_MMAN' will always searched for `addr' instead. */
 #ifdef CONFIG_HAVE_DEBUGGER
 FUNDEF REF struct usermod *FCALL
 getusermod(USER void const *addr,
@@ -254,9 +254,9 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
                              __BOOL addr_must_be_executable DFL(0));
 #else /* CONFIG_HAVE_DEBUGGER */
 #define getusermod(addr, addr_must_be_executable) \
-	vm_getusermod(THIS_VM, addr, addr_must_be_executable)
+	vm_getusermod(THIS_MMAN, addr, addr_must_be_executable)
 #define getusermod_nx(addr, addr_must_be_executable) \
-	vm_getusermod_nx(THIS_VM, addr, addr_must_be_executable)
+	vm_getusermod_nx(THIS_MMAN, addr, addr_must_be_executable)
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
 /* Clear out all unused usermod objects from `self' and

@@ -130,7 +130,7 @@ NOTHROW(FCALL vm_sync)(struct vm *__restrict self,
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 #ifdef CONFIG_NO_SMP
-	if (self == THIS_VM || self == &vm_kernel)
+	if (self == THIS_MMAN || self == &vm_kernel)
 		pagedir_sync(addr, num_bytes);
 #else /* CONFIG_NO_SMP */
 	{
@@ -154,7 +154,7 @@ NOTHROW(FCALL vm_syncone)(struct vm *__restrict self,
                           PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 #ifdef CONFIG_NO_SMP
-	if (self == THIS_VM || self == &vm_kernel)
+	if (self == THIS_MMAN || self == &vm_kernel)
 		pagedir_syncone(addr);
 #else /* CONFIG_NO_SMP */
 	{
@@ -179,7 +179,7 @@ NOTHROW(FCALL vm_syncall)(struct vm *__restrict self) {
 		vm_supersyncall();
 	} else {
 #ifdef CONFIG_NO_SMP
-		if (self == THIS_VM)
+		if (self == THIS_MMAN)
 			pagedir_syncall_user();
 #else /* CONFIG_NO_SMP */
 		void *args[CPU_IPI_ARGCOUNT];
@@ -197,7 +197,7 @@ NOTHROW(FCALL vm_syncall)(struct vm *__restrict self) {
 
 #ifndef CONFIG_NO_SMP
 
-/* Sync memory within `THIS_VM' */
+/* Sync memory within `THIS_MMAN' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
@@ -206,7 +206,7 @@ NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		struct vm *myvm = THIS_VM;
+		struct vm *myvm = THIS_MMAN;
 		struct cpu *me  = THIS_CPU;
 		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
@@ -231,7 +231,7 @@ NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		struct vm *myvm   = THIS_VM;
+		struct vm *myvm   = THIS_MMAN;
 		struct cpu *me = THIS_CPU;
 		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
@@ -253,7 +253,7 @@ NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 
 PUBLIC NOBLOCK void
 NOTHROW(FCALL this_vm_syncall)(void) {
-	struct vm *myvm = THIS_VM;
+	struct vm *myvm = THIS_MMAN;
 #ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];

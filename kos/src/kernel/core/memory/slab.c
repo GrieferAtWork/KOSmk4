@@ -35,6 +35,7 @@
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/types.h>
+#include <kernel/vm.h>
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman/mm-kram.h>
 #endif /* CONFIG_USE_NEW_VM */

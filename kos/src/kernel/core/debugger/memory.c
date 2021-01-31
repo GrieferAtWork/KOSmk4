@@ -172,9 +172,9 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 				} EXCEPT {
 					goto done_nopanic_copy;
 				}
-				old_vm = THIS_VM;
+				old_vm = THIS_MMAN;
 				ok     = num_bytes - error;
-				PERTASK_SET(this_vm, dbg_current->t_mman);
+				PERTASK_SET(this_mman, dbg_current->t_mman);
 				TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,
@@ -183,7 +183,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 					error = 0;
 				} EXCEPT {
 				}
-				PERTASK_SET(this_vm, old_vm);
+				PERTASK_SET(this_mman, old_vm);
 			}
 done_nopanic_copy:
 			;
@@ -269,9 +269,9 @@ again_memcpy_nopf:
 				} EXCEPT {
 					goto done_nopanic_copy;
 				}
-				old_vm = THIS_VM;
+				old_vm = THIS_MMAN;
 				ok     = num_bytes - error;
-				PERTASK_SET(this_vm, dbg_current->t_mman);
+				PERTASK_SET(this_mman, dbg_current->t_mman);
 				TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,
@@ -280,7 +280,7 @@ again_memcpy_nopf:
 					error = 0;
 				} EXCEPT {
 				}
-				PERTASK_SET(this_vm, old_vm);
+				PERTASK_SET(this_mman, old_vm);
 			}
 done_nopanic_copy:
 			if (force) {

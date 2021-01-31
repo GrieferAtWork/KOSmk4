@@ -36,8 +36,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman.h>
+#include <kernel/mman/phys.h>
 
 #include <hybrid/overflow.h>
 
@@ -80,7 +80,7 @@ dbg_overwrite_bytes(void const *dst,
 	bool result = false;
 	physaddr_t phys;
 	if (!dbg_active)
-		sync_write(&vm_kernel);
+		mman_lock_acquire(&mman_kernel);
 	if (!pagedir_ismapped(dst))
 		goto done;
 	while (num_bytes) {
@@ -90,7 +90,7 @@ dbg_overwrite_bytes(void const *dst,
 		if (do_copy > num_bytes)
 			do_copy = num_bytes;
 		phys = pagedir_translate(dst);
-		vm_copytophys(phys, src, do_copy);
+		copytophys(phys, src, do_copy);
 		if (do_copy >= num_bytes)
 			break;
 		dst = (byte_t *)dst + do_copy;
@@ -100,7 +100,7 @@ dbg_overwrite_bytes(void const *dst,
 	result = true;
 done:
 	if (!dbg_active)
-		sync_endwrite(&vm_kernel);
+		mman_lock_release(&mman_kernel);
 	/* This flush is required because we used an aliasing
 	 * memory mapping to override the hook's actual data. */
 	COMPILER_BARRIER();

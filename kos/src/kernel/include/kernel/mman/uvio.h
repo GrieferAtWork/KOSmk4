@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_VM_UVIO_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_VM_UVIO_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UVIO_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UVIO_H 1
 
 #include <kernel/compiler.h>
 
@@ -92,8 +92,8 @@
 
 
 #ifdef LIBVIO_CONFIG_ENABLED
+#include <kernel/mman/mfile.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/signal.h>
 
 #include <hybrid/byteorder.h>
@@ -293,11 +293,11 @@ struct kernel_uvio_request {
 
 struct uvio
 #ifdef __cplusplus
-    : vm_datablock
+    : mfile                                /* The underlying mem-file */
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct vm_datablock        uv_datablock; /* The underlying datablock */
+	struct mfile               uv_file;    /* The underlying mem-file */
 #endif /* __cplusplus */
 	struct sig                 uv_reqmore; /* Signal send when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_PENDING'. */
 	struct sig                 uv_reqdlvr; /* Signal broadcast when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_DELIVERED'. */
@@ -307,13 +307,13 @@ struct uvio
 };
 
 /* The datablock type used by UVIO objects. */
-DATDEF struct vm_datablock_type const uvio_datablock_type;
+DATDEF struct mfile_ops const uvio_datablock_type;
 
 /* VIO operator callbacks for UVIO datablocks. */
 DATDEF struct vio_operators const uvio_operators;
 
 /* Construct a new UVIO object.
- * Note that UVIO is derived from vm_datablock, so the returned
+ * Note that UVIO is derived from `struct mfile', so the returned
  * object can be stored in a handle slot as `HANDLE_TYPE_DATABLOCK' */
 FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
 
@@ -378,4 +378,4 @@ DECL_END
 
 #endif /* LIBVIO_CONFIG_ENABLED */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_UVIO_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UVIO_H */

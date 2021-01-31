@@ -26,8 +26,9 @@
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/except.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/rwlock-intern.h>
 

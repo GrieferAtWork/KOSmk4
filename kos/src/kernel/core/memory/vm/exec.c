@@ -47,13 +47,13 @@ DEFINE_PERVM_FINI(pervm_fini_execinfo);
 INTERN NONNULL((1)) void
 NOTHROW(KCALL pervm_fini_execinfo)(struct vm *__restrict self) {
 	struct vm_execinfo_struct *execinfo;
-	execinfo = &FORVM(self, thisvm_execinfo);
+	execinfo = &FORMMAN(self, thisvm_execinfo);
 	xdecref(execinfo->ei_node);
 	xdecref(execinfo->ei_dent);
 	xdecref(execinfo->ei_path);
 }
 
-PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
+PUBLIC ATTR_PERMMAN struct vm_execinfo_struct thisvm_execinfo = {
 	/* .ei_node = */ NULL,
 	/* .ei_dent = */ NULL,
 	/* .ei_path = */ NULL
@@ -67,7 +67,7 @@ PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
 
 /* List of callbacks that should be invoked after vm_exec()
  * These are called alongside stuff like `handle_manager_cloexec()'
- * NOTE: The passed vm is always `THIS_VM', and is never `&vm_kernel' */
+ * NOTE: The passed vm is always `THIS_MMAN', and is never `&vm_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
 
 /* Load an executable binary `exec_node' into a temporary, emulated VM.
@@ -201,7 +201,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	vm_exec_assert_regular(args.ea_xnode);
 
 	/* Fill in the remaining fields of `args' (which we make use of) */
-	args.ea_mman        = THIS_VM;
+	args.ea_mman        = THIS_MMAN;
 	args.ea_argc_inject = 1;
 	args.ea_argv_inject = (char **)kmalloc(1 * sizeof(char *), GFP_NORMAL);
 	{

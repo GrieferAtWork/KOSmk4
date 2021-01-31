@@ -321,7 +321,7 @@ err_overlap:
 #endif /* WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY */
 
 		{
-			REF struct vm *oldvm = THIS_VM;
+			REF struct vm *oldvm = THIS_MMAN;
 			/* Change the calling thread's vm to `args->ea_mman' */
 			if (oldvm != args->ea_mman) {
 				incref(oldvm);

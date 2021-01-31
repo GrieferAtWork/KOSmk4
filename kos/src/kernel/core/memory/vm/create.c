@@ -159,7 +159,7 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_free)(struct vm *__restrict self) {
 	/* Actually free the VM. */
-	assert(self != THIS_VM);
+	assert(self != THIS_MMAN);
 	heap_free(&kernel_heaps[GFP_LOCKED],
 	          self,
 	          self->v_heap_size,
@@ -170,7 +170,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 	struct vm_node *iter, *next;
 	/* Destroy all remaining nodes. */
-	assert(self != THIS_VM);
+	assert(self != THIS_MMAN);
 	assert(self != &vm_kernel);
 	assert(LIST_EMPTY(&self->v_tasks));
 	assert(!self->v_deltasks);
@@ -243,7 +243,7 @@ again:
 		task_yield();
 		goto again;
 	}
-	oldvm = FORTASK(caller, this_vm);
+	oldvm = FORTASK(caller, this_mman);
 	if likely(oldvm != newvm) {
 		if unlikely(!vm_tasklock_trywrite(newvm)) {
 			PREEMPTION_POP(was);
@@ -270,7 +270,7 @@ again:
 		}
 		LIST_INSERT_HEAD(&newvm->v_tasks, caller, t_mman_tasks);
 		vm_tasklock_endwrite(newvm);
-		FORTASK(caller, this_vm) = incref(newvm);
+		FORTASK(caller, this_mman) = incref(newvm);
 		cpu_setvm_ex(caller->t_cpu, newvm);
 		sync_endwrite(&change_vm_lock);
 		PREEMPTION_POP(was);

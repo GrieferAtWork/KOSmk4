@@ -32,7 +32,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_POISON_HEAP
 #include <kernel/driver-param.h>
 #include <kernel/types.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
@@ -133,9 +133,9 @@ INTERN ATTR_COLDTEXT NOBLOCK void NOTHROW(KCALL ph_install)(void) {
 			}
 		}
 		/* Write the modified instruction */
-		vm_copytophys((physaddr_t)((uintptr_t)item->pi_loc -
-		                          KERNEL_CORE_BASE),
-		              buf, buflen);
+		copytophys((physaddr_t)((uintptr_t)item->pi_loc -
+		                       KERNEL_CORE_BASE),
+		           buf, buflen);
 	}
 	__flush_instruction_cache();
 }

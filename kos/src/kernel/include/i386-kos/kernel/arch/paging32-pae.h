@@ -231,10 +231,10 @@ struct pae_pdir {
 
 
 
-#define PAE_VM_KERNEL_PDIR_IDENTITY_BASE __UINT32_C(0xff800000) /* E1 vectors are mapped here. */
-#define PAE_VM_KERNEL_PDIR_IDENTITY_SIZE __UINT32_C(0x00800000) /* 8MiB */
-#define PAE_VM_KERNEL_PDIR_RESERVED_BASE __UINT32_C(0xff800000) /* Start of the address range reserved for page-directory self-modifications. */
-#define PAE_VM_KERNEL_PDIR_RESERVED_SIZE __UINT32_C(0x00800000) /* 8MiB */
+#define PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE __UINT32_C(0xff800000) /* E1 vectors are mapped here. */
+#define PAE_MMAN_KERNEL_PDIR_IDENTITY_SIZE __UINT32_C(0x00800000) /* 8MiB */
+#define PAE_MMAN_KERNEL_PDIR_RESERVED_BASE __UINT32_C(0xff800000) /* Start of the address range reserved for page-directory self-modifications. */
+#define PAE_MMAN_KERNEL_PDIR_RESERVED_SIZE __UINT32_C(0x00800000) /* 8MiB */
 
 #define PAE_PDIR_E1_IDENTITY_BASE __UINT32_C(0xff800000) /* E1 vectors are mapped here. */
 #define PAE_PDIR_E2_IDENTITY_BASE __UINT32_C(0xffffc000) /* E2 vectors are mapped here. */

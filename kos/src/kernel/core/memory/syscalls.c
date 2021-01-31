@@ -100,13 +100,13 @@ DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
 	addr   = (void *)((uintptr_t)addr & ~PAGEMASK);
 	if (OVERFLOW_UADD(length, offset, &length))
 		length = (size_t)-1;
-	if (vm_unmap(THIS_VM,
+	if (vm_unmap(THIS_MMAN,
 	             addr,
 	             CEIL_ALIGN(length, PAGESIZE),
 	             VM_UNMAP_ANYTHING |
 	             VM_UNMAP_NOKERNPART)) {
 #ifdef CONFIG_HAVE_USERMOD
-		vm_clear_usermod(THIS_VM);
+		vm_clear_usermod(THIS_MMAN);
 #endif /* CONFIG_HAVE_USERMOD */
 	}
 	return -EOK;
@@ -133,7 +133,7 @@ DEFINE_SYSCALL3(errno_t, mprotect,
 	VALIDATE_FLAGSET(prot,
 	                 PROT_EXEC | PROT_WRITE | PROT_READ,
 	                 E_INVALID_ARGUMENT_CONTEXT_MPROTECT_PROT);
-	vm_protect(THIS_VM,
+	vm_protect(THIS_MMAN,
 	           addr,
 	           CEIL_ALIGN(length, PAGESIZE),
 	           VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
@@ -277,11 +277,11 @@ err_bad_length:
 			result = (byte_t *)((uintptr_t)addr & ~PAGEMASK);
 			if (flags & MAP_DONT_MAP) {
 				/* Don't actually map memory. - Just check if the region is already in use */
-				sync_read(THIS_VM);
-				isused = vm_isused(THIS_VM,
+				sync_read(THIS_MMAN);
+				isused = vm_isused(THIS_MMAN,
 				                   result,
 				                   num_bytes);
-				sync_endread(THIS_VM);
+				sync_endread(THIS_MMAN);
 			} else {
 				guard      = 0;
 				node_flags = VM_NODE_FLAG_NORMAL;
@@ -302,7 +302,7 @@ err_bad_length:
 				}
 again_mapat:
 				/* XXX: vm_mapat_override(...)? */
-				isused = !vm_mapat_subrange(THIS_VM,
+				isused = !vm_mapat_subrange(THIS_MMAN,
 				                            result,
 				                            num_bytes,
 				                            datablock,
@@ -315,13 +315,13 @@ again_mapat:
 				                            node_flags,
 				                            guard / PAGESIZE);
 				if (isused && !(flags & MAP_FIXED_NOREPLACE)) {
-					if (vm_unmap(THIS_VM,
+					if (vm_unmap(THIS_MMAN,
 					             result,
 					             num_bytes + guard,
 					             VM_UNMAP_ANYTHING |
 					             VM_UNMAP_NOKERNPART)) {
 #ifdef CONFIG_HAVE_USERMOD
-						vm_clear_usermod(THIS_VM);
+						vm_clear_usermod(THIS_MMAN);
 #endif /* CONFIG_HAVE_USERMOD */
 						/* Try again, now that the existing mapping was deleted. */
 						goto again_mapat;
@@ -356,13 +356,13 @@ again_mapat:
 			}
 			if (flags & MAP_DONT_MAP) {
 				/* Don't actually map memory. - Just find a free region */
-				sync_read(THIS_VM);
-				result = (byte_t *)vm_getfree(THIS_VM,
+				sync_read(THIS_MMAN);
+				result = (byte_t *)vm_getfree(THIS_MMAN,
 				                              hint,
 				                              num_bytes,
 				                              PAGESIZE,
 				                              getfree_mode);
-				sync_endread(THIS_VM);
+				sync_endread(THIS_MMAN);
 				if unlikely(result == (byte_t *)VM_GETFREE_ERROR)
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
 			} else {
@@ -384,7 +384,7 @@ again_mapat:
 					node_flags |= MAP_GROWSDOWN;
 #endif /* CONFIG_USE_NEW_VM */
 				}
-				result = (byte_t *)vm_map_subrange(THIS_VM,
+				result = (byte_t *)vm_map_subrange(THIS_MMAN,
 				                                   hint,
 				                                   num_bytes,
 				                                   PAGESIZE,

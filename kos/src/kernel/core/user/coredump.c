@@ -85,7 +85,7 @@ dbg_coredump(void const *const *traceback_vector,
 	}
 	{
 		struct vm_execinfo_struct *execinfo;
-		execinfo = &FORVM(dbg_current->t_mman, thisvm_execinfo);
+		execinfo = &FORMMAN(dbg_current->t_mman, thisvm_execinfo);
 		dbg_setcolor(ANSITTY_CL_RED, ANSITTY_CL_GREY);
 		dbg_print(DBGSTR("Coredump "));
 		if (execinfo->ei_path && execinfo->ei_dent) {

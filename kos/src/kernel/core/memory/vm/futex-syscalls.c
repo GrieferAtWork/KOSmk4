@@ -98,7 +98,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 	case FUTEX_WAIT: {
 		/* while(*uaddr == val) wait(uaddr, rel_timeout); */
 		validate_user(uaddr, sizeof(*uaddr));
-		f = vm_getfutex(THIS_VM, uaddr);
+		f = vm_getfutex(THIS_MMAN, uaddr);
 		FINALLY_DECREF(f);
 		task_connect(&f->vmf_signal);
 		TRY {
@@ -118,7 +118,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 	case FUTEX_WAKE_BITSET: /* XXX: Channel support? */
 	case FUTEX_WAKE: /* wake(uaddr); */
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_VM, uaddr);
+		f = vm_getfutex_existing(THIS_MMAN, uaddr);
 		result = 0;
 		if (f) {
 			if (val == (uint32_t)-1) {

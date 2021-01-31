@@ -133,15 +133,15 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 		result = GDBInfo_PrintKernelFilename(printer, arg, filename_only);
 	else {
 		if (GDBThread_IsAllStopModeActive) {
-			dent = xincref(FORVM(v, thisvm_execinfo).ei_dent);
-			path = xincref(FORVM(v, thisvm_execinfo).ei_path);
+			dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
+			path = xincref(FORMMAN(v, thisvm_execinfo).ei_path);
 		} else {
 			/* FIXME: What if one of the suspended threads is holding the VM lock?
 			 *        We should have some kind of timeout here, and switch to all-stop
 			 *        mode if the timeout expires. */
 			sync_read(v);
-			dent = xincref(FORVM(v, thisvm_execinfo).ei_dent);
-			path = xincref(FORVM(v, thisvm_execinfo).ei_path);
+			dent = xincref(FORMMAN(v, thisvm_execinfo).ei_dent);
+			path = xincref(FORMMAN(v, thisvm_execinfo).ei_path);
 			sync_endread(v);
 		}
 		if (filename_only && (dent || path)) {

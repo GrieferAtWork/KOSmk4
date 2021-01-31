@@ -25,6 +25,7 @@
 #ifndef CONFIG_USE_NEW_VM
 #include <kernel/vm.h>
 #else /* !CONFIG_USE_NEW_VM */
+#include <kernel/mman.h> /* Needed for `struct mman' for `mman_findunmapped_in_usertree()' */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 

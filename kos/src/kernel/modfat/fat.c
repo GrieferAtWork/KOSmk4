@@ -2644,7 +2644,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 	self->f_fat_start   = (FatSectorIndex)LETOH16(disk_header.bpb.bpb_reserved_sectors);
 	self->f_sec4clus    = (size_t)disk_header.bpb.bpb_sectors_per_cluster;
 	self->f_fat_count   = (u32)disk_header.bpb.bpb_fatc;
-	self->f_clustersize = (size_t)self->f_sec4clus << FAT_SECTORSHIFT(self);
+	self->f_clustersize = (size_t)self->f_sec4clus << self->f_sectorshift;
 
 	/* Figure out what kind of FAT filesystem this is. */
 	if (!disk_header.bpb.bpb_sectors_per_fat || !disk_header.bpb.bpb_maxrootsize) {
@@ -2655,8 +2655,8 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		u32 fat_size, root_sectors;
 		u32 data_sectors, total_clusters;
 		root_sectors = (LETOH16(disk_header.bpb.bpb_maxrootsize) * sizeof(FatFile) +
-		                (FAT_SECTORSIZE(self) - 1)) >>
-		               FAT_SECTORSHIFT(self);
+		                (self->f_sectorsize - 1)) >>
+		               self->f_sectorshift;
 		fat_size          = (disk_header.bpb.bpb_fatc * LETOH16(disk_header.bpb.bpb_sectors_per_fat));
 		self->f_dat_start = LETOH16(disk_header.bpb.bpb_reserved_sectors);
 		self->f_dat_start += fat_size;
@@ -2691,7 +2691,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		memcpy(self->f_label, disk_header.fat32.f32_label, sizeof(disk_header.fat32.f32_label));
 		memcpy(self->f_sysname, disk_header.fat32.f32_sysname, sizeof(disk_header.fat32.f32_sysname));
 		self->f_sec4fat            = LETOH32(disk_header.fat32.f32_sectors_per_fat);
-		self->f_cluster_eof        = (self->f_sec4fat << FAT_SECTORSHIFT(self)) / 4;
+		self->f_cluster_eof        = (self->f_sec4fat << self->f_sectorshift) / 4;
 		self->f_cluster_eof_marker = 0xffffffff;
 		/* Must lookup the cluster of the root directory. */
 		self->f_root.i_clusterc    = 1;
@@ -2721,11 +2721,11 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		memcpy(self->f_sysname, disk_header.fat16.f16_sysname, sizeof(disk_header.fat16.f16_sysname));
 		self->f_root.i16_root.f16_rootpos = (pos_t)LETOH16(disk_header.bpb.bpb_reserved_sectors);
 		self->f_root.i16_root.f16_rootpos += (disk_header.bpb.bpb_fatc * LETOH16(disk_header.bpb.bpb_sectors_per_fat));
-		self->f_root.i16_root.f16_rootpos <<= FAT_SECTORSHIFT(self);
+		self->f_root.i16_root.f16_rootpos <<= self->f_sectorshift;
 		self->f_sec4fat                   = LETOH16(disk_header.bpb.bpb_sectors_per_fat);
 		self->f_root.i16_root.f16_rootsiz = (u32)LETOH16(disk_header.bpb.bpb_maxrootsize);
 		self->f_root.i16_root.f16_rootsiz *= sizeof(FatFile);
-		self->f_cluster_eof = (self->f_sec4fat << FAT_SECTORSHIFT(self)) / 2;
+		self->f_cluster_eof = (self->f_sec4fat << self->f_sectorshift) / 2;
 		/* It is possible to create a FAT16 filesystem with 0x10000 sectors.
 		 * This is a special case since sector 0xffff still needs to be reserved
 		 * as the special sector used for marking file EOF.
@@ -2745,7 +2745,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 	self->i_fsdata = &self->f_root;
 
 	memcpy(&self->f_oem, disk_header.bpb.bpb_oem, 8, sizeof(char));
-	self->f_fat_size = (size_t)self->f_sec4fat << FAT_SECTORSHIFT(self);
+	self->f_fat_size = (size_t)self->f_sec4fat << self->f_sectorshift;
 	trimspecstring(self->f_oem, 8);
 	trimspecstring(self->f_label, 11);
 	trimspecstring(self->f_sysname, 8);

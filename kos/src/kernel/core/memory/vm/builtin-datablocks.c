@@ -193,7 +193,7 @@ PUBLIC struct vm_datablock vm_datablock_anonymous = {
 #ifdef LIBVIO_CONFIG_ENABLED
 	/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-	/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+	/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };
 
@@ -225,16 +225,16 @@ PUBLIC struct vm_datablock vm_datablock_physical = {
 #ifdef LIBVIO_CONFIG_ENABLED
 	/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-	/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT, /* No need to track page properties here... */
+	/* .db_parts  = */ MFILE_PARTS_ANONYMOUS, /* No need to track page properties here... */
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_ramfile_initpart)(struct vm_datapart *__restrict self) {
-	struct vm_ramfile *file;
+	struct mramfile *file;
 	assert(self->dp_state == VM_DATAPART_STATE_ABSENT);
-	file = (struct vm_ramfile *)self->dp_block;
+	file = (struct mramfile *)self->dp_block;
 	if (self->dp_tree.a_vmax < (datapage_t)file->rf_data.rb_size) {
 		self->dp_state = VM_DATAPART_STATE_LOCKED;
 		self->dp_flags |= (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_KEEPRAM);
@@ -580,7 +580,7 @@ function print_ent(n) {
 	print "#ifdef LIBVIO_CONFIG_ENABLED";
 	print "\t\t/" "* .db_vio    = *" "/ NULL,";
 	print "#endif /" "* LIBVIO_CONFIG_ENABLED *" "/";
-	print "\t\t/" "* .db_parts  = *" "/ VM_DATABLOCK_ANONPARTS_INIT,";
+	print "\t\t/" "* .db_parts  = *" "/ MFILE_PARTS_ANONYMOUS,";
 	print "\t\tVM_DATABLOCK_INIT_PAGEINFO(" + n + ")";
 	print "\t}";
 }
@@ -601,7 +601,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(0)
 	}
 #if PAGESHIFT >= 1
@@ -612,7 +612,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(1)
 	}
 #if PAGESHIFT >= 2
@@ -623,7 +623,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(2)
 	}
 #if PAGESHIFT >= 3
@@ -634,7 +634,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(3)
 	}
 #if PAGESHIFT >= 4
@@ -645,7 +645,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(4)
 	}
 #if PAGESHIFT >= 5
@@ -656,7 +656,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(5)
 	}
 #if PAGESHIFT >= 6
@@ -667,7 +667,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(6)
 	}
 #if PAGESHIFT >= 7
@@ -678,7 +678,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(7)
 	}
 #if PAGESHIFT >= 8
@@ -689,7 +689,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(8)
 	}
 #if PAGESHIFT >= 9
@@ -700,7 +700,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(9)
 	}
 #if PAGESHIFT >= 10
@@ -711,7 +711,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(10)
 	}
 #if PAGESHIFT >= 11
@@ -722,7 +722,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(11)
 	}
 #if PAGESHIFT >= 12
@@ -733,7 +733,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(12)
 	}
 #if PAGESHIFT >= 13
@@ -744,7 +744,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(13)
 	}
 #if PAGESHIFT >= 14
@@ -755,7 +755,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(14)
 	}
 #if PAGESHIFT >= 15
@@ -766,7 +766,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(15)
 	}
 #if PAGESHIFT >= 16
@@ -777,7 +777,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(16)
 	}
 #if PAGESHIFT >= 17
@@ -788,7 +788,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(17)
 	}
 #if PAGESHIFT >= 18
@@ -799,7 +799,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(18)
 	}
 #if PAGESHIFT >= 19
@@ -810,7 +810,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(19)
 	}
 #if PAGESHIFT >= 20
@@ -821,7 +821,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(20)
 	}
 #if PAGESHIFT >= 21
@@ -832,7 +832,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(21)
 	}
 #if PAGESHIFT >= 22
@@ -843,7 +843,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(22)
 	}
 #if PAGESHIFT >= 23
@@ -854,7 +854,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(23)
 	}
 #if PAGESHIFT >= 24
@@ -865,7 +865,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(24)
 	}
 #if PAGESHIFT >= 25
@@ -876,7 +876,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(25)
 	}
 #if PAGESHIFT >= 26
@@ -887,7 +887,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(26)
 	}
 #if PAGESHIFT >= 27
@@ -898,7 +898,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(27)
 	}
 #if PAGESHIFT >= 28
@@ -909,7 +909,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(28)
 	}
 #if PAGESHIFT >= 29
@@ -920,7 +920,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(29)
 	}
 #if PAGESHIFT >= 30
@@ -931,7 +931,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(30)
 	}
 #if PAGESHIFT >= 31
@@ -942,7 +942,7 @@ for (local n: [max_n - 1:0,-1]) {
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-		/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+		/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 		VM_DATABLOCK_INIT_PAGEINFO(31)
 	}
 #endif /* PAGESHIFT >= 31 */

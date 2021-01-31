@@ -213,7 +213,7 @@ NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
 	else {
 		cond = DR_CREADWRITE;
 	}
-	if (!vm_addhwbreak(effective_vm, addr, cond, DR_S1))
+	if (!mman_addhwbreak(effective_vm, addr, cond, DR_S1))
 		return ENOMEM;
 	return EOK;
 }
@@ -233,7 +233,7 @@ NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm,
 	else {
 		cond = DR_CREADWRITE;
 	}
-	if (!vm_addhwbreak(effective_vm, addr, cond, DR_S1))
+	if (!mman_addhwbreak(effective_vm, addr, cond, DR_S1))
 		return ENOENT;
 	return EOK;
 }

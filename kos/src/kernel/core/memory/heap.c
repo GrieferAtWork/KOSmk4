@@ -226,7 +226,7 @@ PUBLIC struct vm_datablock vm_datablock_debugheap = {
 #ifdef LIBVIO_CONFIG_ENABLED
 	/* .db_vio    = */ NULL,
 #endif /* LIBVIO_CONFIG_ENABLED */
-	/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
+	/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };
 

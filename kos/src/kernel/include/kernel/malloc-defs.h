@@ -246,17 +246,7 @@ typedef unsigned int gfp_t;
                             *       calling thread to block, either through task_yield(), or
                             *       through `task_waitfor()', the allocation will only fail
                             *       by throwing an E_WOULDBLOCK error, or returning NULL in
-                            *       NX mode.
-                            * WARNING: Atomically allocating memory may still block when allocating
-                            *          memory in a way where accessing the resulting memory itself
-                            *          may be a blocking operation.
-                            *          In general, this can easily be avoided by also allocating
-                            *          with the `GFP_LOCKED' flag set, but even if not, the blocking
-                            *          itself will only happen as a result of swap-subsystems, which
-                            *          themself are required to use LOCKED memory for their data
-                            *          structures.
-                            *          For more information, see `Page fault handling & non-blocking-ness',
-                            *          as documented in <kernel/vm.h> */
+                            *       NX mode. */
 #define GFP_NOOVER  0x1000 /* FLAG: Don't overallocate memory when allocating new pages.
                             *       This only affects overallocation of full pages. Allocating
                             *       heap memory in such a way that less than 1 page of overflow

@@ -889,7 +889,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		job->adj_dev    = (REF struct nic_device *)incref(dev);
 		job->adj_peer   = peer; /* Inherit reference */
 		job->adj_gram   = incref(packet);
-		job->adj_grammm = incref(THIS_VM);
+		job->adj_grammm = incref(THIS_MMAN);
 		job->adj_arptmo = ktime();
 		nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 		job->adj_arpc = 5; /* Must not be 0, but should be configurable */
@@ -1180,7 +1180,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 	job->adj_dev    = (REF struct nic_device *)incref(dev);
 	job->adj_peer   = peer; /* Inherit reference */
 	job->adj_arptmo = ktime();
-	job->adj_grammm = incref(THIS_VM);
+	job->adj_grammm = incref(THIS_MMAN);
 	nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 	job->adj_arpc = 5; /* Must not be 0, but should be configurable */
 	decref(async_job_start(aj, aio));

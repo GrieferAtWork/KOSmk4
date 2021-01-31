@@ -34,6 +34,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/user.h>
+#include <kernel/vm.h>
 #include <sched/cred.h>
 
 #include <hybrid/align.h>

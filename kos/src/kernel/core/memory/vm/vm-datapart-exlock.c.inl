@@ -400,7 +400,7 @@ again_scan_nodes:
 				sync_endwrite(self);
 				goto again_lock_datapart;
 			}
-			v = THIS_VM;
+			v = THIS_MMAN;
 			do {
 				if unlikely(wasdestroyed(node->vn_vm))
 					continue;

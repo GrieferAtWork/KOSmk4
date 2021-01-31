@@ -31,6 +31,7 @@
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
+#include <kernel/vm.h>
 
 #include <hybrid/align.h>
 
@@ -1382,7 +1383,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 	 * the offset into the file, alongside the original pointer:
 	 * `0x12345678 ("/path/to/file"+offset_into_file)' */
 	{
-		struct vm *effective_vm;
+		struct mman *effective_vm;
 		effective_vm = &vm_kernel;
 		if (ADDR_ISUSER(ptr) && ADDR_ISKERN(dbg_current))
 			effective_vm = dbg_current->t_mman;

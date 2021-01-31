@@ -36,6 +36,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/sync.h>

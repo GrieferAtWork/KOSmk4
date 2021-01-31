@@ -179,7 +179,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 #endif /* !DEFINE_COMPAT_MAPLIBRARY */
 {
 	byte_t *result;
-	struct vm *v = THIS_VM;
+	struct vm *v = THIS_MMAN;
 	size_t i, min_alignment, total_bytes;
 	uintptr_t addr_page_offset, min_page;
 	REF struct vm_datablock *file;
@@ -187,7 +187,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	REF struct directory_entry *file_fsname;
 	pos_t file_minoffset, file_maxnumbytes;
 	bool is_first;
-	v                = THIS_VM;
+	v                = THIS_MMAN;
 	addr_page_offset = 0; /* Sub-page offset for the load address (usually 0) */
 	min_page         = 0;
 	file             = NULL;
@@ -234,11 +234,11 @@ DEFINE_SYSCALL5(void *, maplibrary,
 			total_bytes = (CEILDIV(max_addr, PAGESIZE) -
 			               FLOORDIV(min_addr, PAGESIZE)) *
 			              PAGESIZE;
-			sync_read(THIS_VM);
-			isused = vm_isused(THIS_VM,
+			sync_read(THIS_MMAN);
+			isused = vm_isused(THIS_MMAN,
 			                   result,
 			                   total_bytes);
-			sync_endread(THIS_VM);
+			sync_endread(THIS_MMAN);
 			if (isused)
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 			goto done;
