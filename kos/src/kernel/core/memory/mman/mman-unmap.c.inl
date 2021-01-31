@@ -18,16 +18,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "mm-unmap.c"
+#include "mman-unmap.c"
 #define DEFINE_mman_unmap
 //#define DEFINE_mman_protect
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-flags.h>
-#include <kernel/mman/mm-map.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/map.h>
+#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/panic.h>

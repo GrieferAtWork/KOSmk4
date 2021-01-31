@@ -28,7 +28,6 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/mman/phys.h>
 #include <kernel/x86/acpi.h>
 

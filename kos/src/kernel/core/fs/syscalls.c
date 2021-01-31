@@ -40,8 +40,8 @@
 #include <kernel/execabi.h>
 #include <kernel/handle.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mm-event.h>
-#include <kernel/mman/mm-exec.h>
+#include <kernel/mman/event.h>
+#include <kernel/mman/exec.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>

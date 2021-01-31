@@ -17,50 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_DMA_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_DMA_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_RW_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_RW_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman.h>
-#include <kernel/mman/mm-dma.h>
-
-#include <kos/except.h>
-
-#include <stdbool.h>
-
-DECL_BEGIN
-
-/* Stop DMAing by releasing all of the specified DMA locks.
- * NOTE: The caller must ensure that `lockcnt == return(mman_startdma*())', and
- *       that the specified `lockvec' is either the exact same `lockvec' originally
- *       passed to `mman_startdma[v]()', or an identical memory copy of it. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec,
-                            size_t lockcnt) {
-	size_t i;
-	/* Release all DMA locks first, and then decref everything in a second
-	 * pass, thus improve cache-locality, as well as semantics, such that
-	 * we're invocing decref() with less locks held that we'd do otherwise. */
-	for (i = lockcnt; i--;)
-		mpart_dma_dellock(lockvec[i].mdl_part);
-	for (i = lockcnt; i--;)
-		decref_unlikely(lockvec[i].mdl_part);
-}
-
-DECL_END
-
 #ifndef __INTELLISENSE__
-#define DEFINE_mman_startdma
-#include "mm-dma.c.inl"
-#define DEFINE_mman_startdmav
-#include "mm-dma.c.inl"
-#define DEFINE_mman_enumdma
-#include "mm-dma.c.inl"
-#define DEFINE_mman_enumdmav
-#include "mm-dma.c.inl"
+#define DEFINE_mman_read_nopf
+#include "mman-rw.c.inl"
+#define DEFINE_mman_write_nopf
+#include "mman-rw.c.inl"
+#define DEFINE_mman_memset_nopf
+#include "mman-rw.c.inl"
+#define DEFINE_mman_read
+#include "mman-rw.c.inl"
+#define DEFINE_mman_write
+#include "mman-rw.c.inl"
+#define DEFINE_mman_memset
+#include "mman-rw.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_DMA_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_RW_C */

@@ -17,14 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_SYNC_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_SYNC_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_SYNC_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_SYNC_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <sched/cpu.h>
 
@@ -437,4 +437,4 @@ NOTHROW(FCALL pagedir_syncall_smp)(void) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_SYNC_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_SYNC_C */

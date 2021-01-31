@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_MAP_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_MAP_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -26,7 +26,7 @@
 #include <kernel/driver.h>
 #include <kernel/heap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-kram.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
@@ -149,9 +149,9 @@ DECL_END
 
 #ifndef __INTELLISENSE__
 #define DEFINE_mman_map_kram
-#include "mm-kram-map.c.inl"
+#include "kram-map.c.inl"
 #define DEFINE_mman_map_kram_nx
-#include "mm-kram-map.c.inl"
+#include "kram-map.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_MAP_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_MAP_C */

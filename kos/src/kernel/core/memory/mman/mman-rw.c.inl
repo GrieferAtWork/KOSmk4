@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "mm-rw.c"
+#include "mman-rw.c"
 #define DEFINE_mman_read_nopf
 //#define DEFINE_mman_write_nopf
 //#define DEFINE_mman_memset_nopf
@@ -28,7 +28,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman.h>
-#include <kernel/mman/mm-rw.h>
+#include <kernel/mman/rw.h>
 
 #include <kos/except.h>
 

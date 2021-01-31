@@ -29,7 +29,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mbuilder.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-flags.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <sched/rpc-internal.h>

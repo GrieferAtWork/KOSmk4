@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "mm-kram-map.c"
+#include "kram-map.c"
 //#define DEFINE_mman_map_kram
 #define DEFINE_mman_map_kram_nx
 #endif /* __INTELLISENSE__ */
@@ -27,9 +27,9 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
-#include <kernel/mman/mm-flags.h>
-#include <kernel/mman/mm-kram.h>
-#include <kernel/mman/mm-unmapped.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>

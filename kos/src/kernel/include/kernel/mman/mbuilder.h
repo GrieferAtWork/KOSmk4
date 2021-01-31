@@ -25,8 +25,8 @@
 #ifndef CONFIG_USE_NEW_VM
 #include <kernel/vm/builder.h>
 #else /* !CONFIG_USE_NEW_VM */
-#include <kernel/mman/mm-map.h>
-#include <kernel/mman/mm-unmapped.h>
+#include <kernel/mman/map.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/mman/mnode.h> /* __ALIGNOF_MNODE */
 #include <kernel/paging.h>
 #include <kernel/types.h>

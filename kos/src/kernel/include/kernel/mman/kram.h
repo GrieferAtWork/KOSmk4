@@ -17,15 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_KRAM_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_KRAM_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_KRAM_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_KRAM_H 1
 
 #include <kernel/compiler.h>
 
 #ifndef CONFIG_USE_NEW_VM
 #include <kernel/vm.h>
 #else /* !CONFIG_USE_NEW_VM */
-#include <kernel/mman/mm-lockop.h>
+#include <kernel/mman/lockop.h>
 #include <kernel/mman/mpart-lockop.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
@@ -301,4 +301,4 @@ DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_VM */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_KRAM_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_KRAM_H */

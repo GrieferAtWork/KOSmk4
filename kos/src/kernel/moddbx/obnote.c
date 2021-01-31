@@ -38,7 +38,7 @@
 #include <kernel/execabi.h>
 #include <kernel/heap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-execinfo.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/ramfile.h>

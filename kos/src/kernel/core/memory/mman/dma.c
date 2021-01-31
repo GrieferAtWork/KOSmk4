@@ -17,74 +17,50 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_C 1
-#define __WANT_MNODE__mn_alloc
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_DMA_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_DMA_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-map.h>
-#include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart.h>
+#include <kernel/mman/dma.h>
 
 #include <kos/except.h>
 
-#include <assert.h>
 #include <stdbool.h>
-#include <string.h>
 
 DECL_BEGIN
 
-#ifndef NDEBUG
-#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
-#else /* !NDEBUG */
-#define DBG_memset(dst, byte, num_bytes) (void)0
-#endif /* NDEBUG */
-
-/* Sync all changes made to file mappings within the given
- * address range with on-disk file images. (s.a. `mfile_sync()')
- * NOTE: Memory ranges that aren't actually mapped, aren't mapped
- *       with WRITE and SHARED, or aren't mapped to write-back files
- *       are simply ignored. */
-PUBLIC void FCALL
-mman_syncmem(struct mman *__restrict self,
-             UNCHECKED void *addr, size_t num_bytes)
-		THROWS(E_WOULDBLOCK, ...) {
-	void *maxaddr = (byte_t *)addr + num_bytes - 1;
-	while (addr <= maxaddr) {
-		REF struct mpart *part;
-		struct mnode_tree_minmax mima;
-		mman_lock_read(self);
-		mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
-		if (!mima.mm_min) {
-			mman_lock_endread(self);
-			break;
-		}
-		addr = mnode_getendaddr(mima.mm_min);
-		part = xincref(mima.mm_min->mn_part);
-		mman_lock_endread(self);
-		if (part) {
-			FINALLY_DECREF_UNLIKELY(part);
-			/* Sync the backing data-part. */
-			mpart_sync(part);
-		}
-	}
+/* Stop DMAing by releasing all of the specified DMA locks.
+ * NOTE: The caller must ensure that `lockcnt == return(mman_startdma*())', and
+ *       that the specified `lockvec' is either the exact same `lockvec' originally
+ *       passed to `mman_startdma[v]()', or an identical memory copy of it. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec,
+                            size_t lockcnt) {
+	size_t i;
+	/* Release all DMA locks first, and then decref everything in a second
+	 * pass, thus improve cache-locality, as well as semantics, such that
+	 * we're invocing decref() with less locks held that we'd do otherwise. */
+	for (i = lockcnt; i--;)
+		mpart_dma_dellock(lockvec[i].mdl_part);
+	for (i = lockcnt; i--;)
+		decref_unlikely(lockvec[i].mdl_part);
 }
-
 
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define DEFINE_mman_map
-#include "mm-map.c.inl"
-#define DEFINE_mman_map_subrange
-#include "mm-map.c.inl"
-#define DEFINE_mman_map_res
-#include "mm-map.c.inl"
+#define DEFINE_mman_startdma
+#include "dma.c.inl"
+#define DEFINE_mman_startdmav
+#include "dma.c.inl"
+#define DEFINE_mman_enumdma
+#include "dma.c.inl"
+#define DEFINE_mman_enumdmav
+#include "dma.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_MAP_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_DMA_C */

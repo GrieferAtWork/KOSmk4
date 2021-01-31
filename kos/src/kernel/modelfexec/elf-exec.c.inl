@@ -36,7 +36,7 @@
 #endif /* __INTELLISENSE__ */
 
 #ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/mm-flags.h>
+#include <kernel/mman/flags.h>
 #endif /* CONFIG_USE_NEW_VM */
 
 #ifdef LOCAL_EXEC_ARGV_SIZE

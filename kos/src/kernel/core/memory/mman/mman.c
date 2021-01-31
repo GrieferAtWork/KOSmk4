@@ -26,10 +26,10 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mm-event.h>
-#include <kernel/mman/mm-execinfo.h>
-#include <kernel/mman/mm-flags.h>
-#include <kernel/mman/mm-kram.h>
+#include <kernel/mman/event.h>
+#include <kernel/mman/execinfo.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
 #include <sched/arch/userkern.h>

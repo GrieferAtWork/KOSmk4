@@ -17,14 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_ENUM_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_ENUM_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_ENUM_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_ENUM_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
-#include <kernel/mman/mm-enum.h>
+#include <kernel/mman/enum.h>
 
 #include <kos/except.h>
 
@@ -66,4 +66,4 @@ mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_ENUM_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_ENUM_C */

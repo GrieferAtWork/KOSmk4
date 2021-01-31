@@ -38,7 +38,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-unmapped.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/slab.h>

@@ -32,7 +32,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/mm-execinfo.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/module.h>
 #include <kernel/panic.h>
 #include <kernel/user.h>

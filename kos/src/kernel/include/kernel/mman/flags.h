@@ -17,18 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_FLAGS_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_FLAGS_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_FLAGS_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_FLAGS_H 1
 
 #include <kernel/compiler.h>
 
 #ifndef CONFIG_USE_NEW_VM
 #include <kernel/vm.h>
 #else /* !CONFIG_USE_NEW_VM */
-#include <kernel/malloc-defs.h>  /* GFP_* */
-#include <kernel/mman/mm-kram.h> /* GFP_MAP_* */
-#include <kernel/mman/mm-map.h>  /* PROT_*, MAP_* */
-#include <kernel/mman/mnode.h>   /* MNODE_F_* */
+#include <kernel/malloc-defs.h> /* GFP_* */
+#include <kernel/mman/kram.h>   /* GFP_MAP_* */
+#include <kernel/mman/map.h>    /* PROT_*, MAP_* */
+#include <kernel/mman/mnode.h>  /* MNODE_F_* */
 
 #include <elf.h> /* PF_* */
 
@@ -302,4 +302,4 @@ DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_VM */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_FLAGS_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_FLAGS_H */

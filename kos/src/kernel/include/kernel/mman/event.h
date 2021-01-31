@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXEC_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXEC_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EVENT_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EVENT_H 1
 
 #include <kernel/compiler.h>
 
@@ -28,37 +28,35 @@
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
-#include <kernel/mman/mpart.h>
+#include <kernel/driver-callbacks.h>
 
 #ifdef __CC__
 DECL_BEGIN
 
-struct execargs; /* from <kernel/execabi.h> */
+/* List of callbacks that should be invoked after mman_exec()
+ * These are called alongside stuff like `handle_manager_cloexec()'
+ * NOTE: The passed mman is always `THIS_MMAN', and is never `&mman_kernel' */
+DATDEF CALLBACK_LIST(void KCALL(void)) mman_onexec_callbacks;
+/* Mman initialization/finalization callbacks. */
+DATDEF CALLBACK_LIST(void FCALL(struct mman *)) mman_oninit_callbacks;
+DATDEF CALLBACK_LIST(void FCALL(struct mman *)) mman_onfini_callbacks;
+DATDEF CALLBACK_LIST(void FCALL(struct mman * /*newmman*/, struct mman * /*oldmman*/)) mman_onclone_callbacks;
 
-/* Load an executable binary into a temporary, emulated mman.
- * If this succeeds, clear all of the mappings from the given `ea_mman',
- * and replace them with the contents of the temporary, emulated mman
- * (such that the entire process of mapping the new contents is always
- * able to either seamlessly restore the old memory mappings, or not
- * even touch them at all upon error)
- * -> This function is used to implement the exec() family of system calls
- *    in such that exec() is always able to allow the calling program to
- *    handle load errors (at least so long as those errors aren't caused
- *    by the executable's initialization, such as missing libraries)
- * NOTE: Upon successful return, all threads using `ea_mman' (excluding
- *       the caller themself if they are using the mman, too) will have
- *       been terminated.
- * @param: args:             Exec arguments.
- * @throw: E_BADALLOC:       Insufficient memory.
- * @throw: E_SEGFAULT:       The given `ea_argv', `ea_envp', or one of their pointed-to strings is faulty.
- * @throw: E_NOT_EXECUTABLE: The given `ea_xnode' was not recognized as an acceptable binary. */
-FUNDEF NONNULL((1)) void KCALL
-mman_exec(/*in|out*/ struct execargs *__restrict args)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT,
-		       E_NOT_EXECUTABLE, E_IOERROR);
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+/* >> void KCALL func(void);
+ * Invoked before returning to user-space after a new application was loaded. */
+#define DEFINE_PERMMAN_ONEXEC(func) DEFINE_CALLBACK(".rodata.callback.permman.onexec", func)
+/* >> void KCALL func(struct mman *__restrict self); */
+#define DEFINE_PERMMAN_INIT(func)   DEFINE_CALLBACK(".rodata.callback.permman.init", func)
+/* >> NOBLOCK void NOTHROW(KCALL func)(struct mman *__restrict self); */
+#define DEFINE_PERMMAN_FINI(func)   DEFINE_CALLBACK(".rodata.callback.permman.fini", func)
+/* >> NOBLOCK void KCALL func(struct mman *__restrict newmman, struct mman *__restrict oldmman); */
+#define DEFINE_PERMMAN_CLONE(func)  DEFINE_CALLBACK(".rodata.callback.permman.clone", func)
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
 
 DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_VM */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXEC_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EVENT_H */

@@ -17,25 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C 1
-#define _KOS_SOURCE 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EXECINFO_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EXECINFO_H 1
 
 #include <kernel/compiler.h>
 
-#ifndef __INTELLISENSE__
-#define DEFINE_mman_read_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_write_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_memset_nopf
-#include "mm-rw.c.inl"
-#define DEFINE_mman_read
-#include "mm-rw.c.inl"
-#define DEFINE_mman_write
-#include "mm-rw.c.inl"
-#define DEFINE_mman_memset
-#include "mm-rw.c.inl"
-#endif /* !__INTELLISENSE__ */
+#ifndef CONFIG_USE_NEW_VM
+#include <kernel/vm/exec.h>
+#else /* !CONFIG_USE_NEW_VM */
+#ifdef __CC__
+DECL_BEGIN
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_RW_C */
+struct inode;
+struct directory_entry;
+struct path;
+
+struct mexecinfo {
+	REF struct inode           *mei_node; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
+	REF struct directory_entry *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
+	REF struct path            *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
+};
+
+/* MMan exec() information */
+DATDEF ATTR_PERMMAN struct mexecinfo thismman_execinfo;
+
+DECL_END
+#endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_VM */
+
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EXECINFO_H */

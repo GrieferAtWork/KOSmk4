@@ -29,7 +29,7 @@
 #include <kernel/paging.h>
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman.h>
-#include <kernel/mman/_mm-archinit.h>
+#include <kernel/mman/_archinit.h>
 #else /* CONFIG_USE_NEW_VM */
 #include <kernel/vm.h>
 #endif /* !CONFIG_USE_NEW_VM */

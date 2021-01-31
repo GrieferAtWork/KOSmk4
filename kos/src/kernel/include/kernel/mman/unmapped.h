@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_UNMAPPED_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_UNMAPPED_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UNMAPPED_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UNMAPPED_H 1
 
 #include <kernel/compiler.h>
 
@@ -228,4 +228,4 @@ DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_VM */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_UNMAPPED_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UNMAPPED_H */

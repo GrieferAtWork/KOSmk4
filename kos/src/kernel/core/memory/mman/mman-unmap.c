@@ -17,32 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXECINFO_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXECINFO_H 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_UNMAP_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_UNMAP_C 1
+#define __WANT_MNODE__mn_dead
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm/exec.h>
-#else /* !CONFIG_USE_NEW_VM */
-#ifdef __CC__
-DECL_BEGIN
+#ifndef __INTELLISENSE__
+#define DEFINE_mman_unmap
+#include "mman-unmap.c.inl"
+#define DEFINE_mman_protect
+#include "mman-unmap.c.inl"
+#endif /* !__INTELLISENSE__ */
 
-struct inode;
-struct directory_entry;
-struct path;
-
-struct mexecinfo {
-	REF struct inode           *mei_node; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
-	REF struct directory_entry *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
-	REF struct path            *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
-};
-
-/* MMan exec() information */
-DATDEF ATTR_PERMMAN struct mexecinfo thismman_execinfo;
-
-DECL_END
-#endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
-
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MM_EXECINFO_H */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_UNMAP_C */

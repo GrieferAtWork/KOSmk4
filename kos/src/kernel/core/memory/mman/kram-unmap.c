@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_UNMAP_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_UNMAP_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_UNMAP_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_UNMAP_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -28,9 +28,9 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-kram.h>
-#include <kernel/mman/mm-lockop.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/lockop.h>
+#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
@@ -1597,4 +1597,4 @@ NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_KRAM_UNMAP_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_UNMAP_C */

@@ -33,9 +33,9 @@
 #include <kernel/except.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
-#include <kernel/mman/_mm-archinit.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/_archinit.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>

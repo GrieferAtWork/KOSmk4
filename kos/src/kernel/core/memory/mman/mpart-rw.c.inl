@@ -31,7 +31,7 @@
 
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-fault.h> /* mman_prefault(), mman_prefaultv() */
+#include <kernel/mman/fault.h> /* mman_prefault(), mman_prefaultv() */
 #include <kernel/mman/mpart.h>
 #include <kernel/vm/phys.h>
 

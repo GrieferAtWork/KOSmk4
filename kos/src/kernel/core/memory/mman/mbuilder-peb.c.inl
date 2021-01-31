@@ -31,7 +31,7 @@
 #include <kernel/compat.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mbuilder.h>
-#include <kernel/mman/mm-map.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>

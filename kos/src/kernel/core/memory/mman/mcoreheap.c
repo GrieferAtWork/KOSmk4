@@ -26,10 +26,10 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-kram.h>
-#include <kernel/mman/mm-lockop.h>
-#include <kernel/mman/mm-sync.h>
-#include <kernel/mman/mm-unmapped.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/lockop.h>
+#include <kernel/mman/sync.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MM_EXEC_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MM_EXEC_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_EXEC_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_EXEC_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -30,7 +30,7 @@
 #include <kernel/driver.h>
 #include <kernel/execabi.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mm-exec.h>
+#include <kernel/mman/exec.h>
 #include <sched/rpc.h> /* task_serve() */
 
 #include <kos/except/reason/fs.h>
@@ -199,4 +199,4 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MM_EXEC_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_EXEC_C */

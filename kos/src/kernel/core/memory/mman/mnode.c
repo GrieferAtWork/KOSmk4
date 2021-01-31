@@ -29,7 +29,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-lockop.h>
 #include <kernel/mman/mpart.h>

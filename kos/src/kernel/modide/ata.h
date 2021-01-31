@@ -28,9 +28,9 @@
 #include <kernel/cache.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
+#include <kernel/mman/dma.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/signal.h>
 #include <sched/tsc.h>

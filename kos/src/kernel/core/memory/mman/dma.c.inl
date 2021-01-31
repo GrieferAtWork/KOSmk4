@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "mm-dma.c"
+#include "dma.c"
 #define DEFINE_mman_startdma
 //#define DEFINE_mman_startdmav
 //#define DEFINE_mman_enumdma
@@ -27,7 +27,7 @@
 
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/mm-fault.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <sched/task.h>

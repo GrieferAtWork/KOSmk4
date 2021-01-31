@@ -28,7 +28,7 @@
 #include <kernel/arch/paging32-p32.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/sync.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 

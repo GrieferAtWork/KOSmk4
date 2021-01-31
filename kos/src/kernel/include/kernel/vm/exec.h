@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/mm-execinfo.h>
+#include <kernel/mman/execinfo.h>
 #define vm_execinfo_struct mexecinfo
 #define ei_node            mei_node
 #define ei_dent            mei_dent

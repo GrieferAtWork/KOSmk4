@@ -27,7 +27,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mm-map.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <sched/task.h>

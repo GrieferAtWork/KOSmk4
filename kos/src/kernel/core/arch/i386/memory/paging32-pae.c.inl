@@ -29,7 +29,7 @@
 #include <kernel/except.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mm-sync.h>
+#include <kernel/mman/sync.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/x86/cpuid.h>
