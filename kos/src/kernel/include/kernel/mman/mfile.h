@@ -462,7 +462,7 @@ struct mfile_map {
 	struct mfile              *mfm_file;  /* [1..1][const] File from which to allocate nodes. */
 	PAGEDIR_PAGEALIGNED pos_t  mfm_addr;  /* [const] Starting address within the source file. */
 	PAGEDIR_PAGEALIGNED size_t mfm_size;  /* [const] Total # of bytes that should be mapped. */
-	unsigned int               mfm_prot;  /* Set of `0 | PROT_WRITE' (other flags are silently ignored) */
+	unsigned int               mfm_prot;  /* Set of `0 | PROT_WRITE | PROT_SHARED' (other flags are silently ignored) */
 	unsigned int               mfm_flags; /* Set of `0 | MAP_POPULATE | MAP_NONBLOCK' (other flags are silently ignored)
 	                                       * MAP_POPULATE -- Ensure the following conditions when locking data parts:
 	                                       *                  - mpart_setcore_or_unlock()

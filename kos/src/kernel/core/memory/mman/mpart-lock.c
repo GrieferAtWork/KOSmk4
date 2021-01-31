@@ -1376,6 +1376,24 @@ PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data) {
+	/* TODO: Instead of unsharing _all_ copy-on-write mappings, extend this function to
+	 *       only unshare those that are mapping pages from a specific sub-region of
+	 *       the given mem-part (where copy-on-write mem-nodes overlap partially with
+	 *       the sub-region being unshared, those mem-nodes should be split)
+	 * Currently, the callers of `mpart_unsharecow_or_unlock()' works around this issue
+	 * by using `mpart_split()' to narrow down the address range actually being unshared
+	 * in this situation, but in theory, the backing mem-part wouldn't actually need to
+	 * be split at all!
+	 *
+	 * Additionally, the should-write-be-allowed checks in `mnode_getperm()' should also
+	 * be adjusted to only disallow write if only the area being mapped is also being
+	 * shared with another mapping, rather than the part itself. This would also resolve
+	 * the really-a-non-issue where a non-shared mapping with write-permissions has its
+	 * backing mem-part merged, such that more than 1 copy-on-write mapping exists
+	 * afterwards, which would normally result in the mem-node being (needlessly) mapped
+	 * w/o write, even though the old mapping (with write access) still continues to
+	 * persist.
+	 */
 	struct mpart *copy;
 	struct mnode *node;
 	size_t block_count;
@@ -1457,8 +1475,8 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 			/* Transfer this node to the new mem-part. */
 			assert(node->mn_part == self);
 			LIST_INSERT_HEAD(&copy->mp_copy, node, mn_link);
-			++copy->mp_refcnt; /* New reference (to-be) held by `node->mn_part' */
-			decref_nokill(self);        /* Old reference held by `node->mn_part' */
+			++copy->mp_refcnt;   /* New reference (to-be) held by `node->mn_part' */
+			decref_nokill(self); /* Old reference held by `node->mn_part' */
 		}
 		node = next_node;
 	}
@@ -1533,7 +1551,7 @@ free_unused_block_status:
 
 	/* Tell all of the pre-existing nodes about the new backing part!
 	 * We do this only now, so-as to ensure that we directly jump from
-	 * one completely valid node to another. */
+	 * one completely valid mem-part to another. */
 	LIST_FOREACH (node, &copy->mp_copy, mn_link) {
 		node->mn_partoff -= bounds.ucb_mapmin;
 		node->mn_part = copy;
@@ -1626,10 +1644,15 @@ nope:
 }
 
 /* Ensure that:
- * >> LIST_FOREACH(node, &self->mp_copy, mn_link)
- * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
+ * >> LIST_FOREACH (node, &self->mp_share, mn_link)
+ * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS
+ * Note that when `!mpart_isanon(self)', any nodes apart of `mp_copy' wouldn't
+ * have gotten write-access to begin with (since this requires such a node to
+ * create its own private copy of `self'), so it is sufficient to only deny
+ * write access to MNODE_F_SHARED-nodes in order to ensure that no memory
+ * mappings exist that may still have write-access! */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
-mpart_unwrite_or_unlock(struct mpart *__restrict self,
+mpart_denywrite_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock) {
 	struct mnode *node;
 	/* Enumerate all shared nodes in order to delete write-access from them. */
@@ -2059,7 +2082,7 @@ mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
 	do {
 		mpart_lock_acquire_and_setcore(self);
 	} while (!mpart_nodma_or_unlock(self, NULL) ||
-	         !mpart_unwrite_or_unlock(self, NULL));
+	         !mpart_denywrite_or_unlock(self, NULL));
 }
 
 

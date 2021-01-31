@@ -651,7 +651,7 @@ do_split_many_chunks_after_lo_pages:
 			 *  #1:  Change the 2nd changed block to INIT
 			 *  #2:  Allocate a new swap-page
 			 *  #3:  Allocate a temporary physical memory page
-			 *  #4:  Read the single, modified by from offset=1
+			 *  #4:  Read the single, modified byte from offset=1
 			 *       in the swap-page of lo-part (we can do this
 			 *       because we've marked the associated page as
 			 *       INIT)
@@ -1088,7 +1088,6 @@ maybe_free_unused_mvec:
 		break;
 	}
 
-
 	/* Fill in the block-status bitset for `hipart' */
 	if (lopart->mp_flags & MPART_F_BLKST_INL) {
 		/* If everything already managed to fit into a single word in the lo-part,
@@ -1185,7 +1184,7 @@ clear_hipart_changed_bit:
 	/* Fill in the MLOCK flags for the new part. */
 	if (lopart->mp_flags & MPART_F_MLOCK_FROZEN) {
 		/* If the original part's mlock-status is frozen, then just
-		 * inherit the status and that condition into the new part. */
+		 * inherit the status and that fact for the new part. */
 		hipart->mp_flags |= lopart->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
 	} else if (lopart->mp_flags & MPART_F_MLOCK) {
 		/* Must update the MLOCK status of both the lo- and hi-parts */

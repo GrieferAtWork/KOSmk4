@@ -684,17 +684,22 @@ struct mpart_unsharecow_data {
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that no alive copy-nodes still exist! */
-FUNDEF NONNULL((1, 3)) __BOOL FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data);
 
 /* Ensure that:
- * >> LIST_FOREACH (node, &self->mp_copy, mn_link)
- * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS */
-FUNDEF NONNULL((1)) __BOOL FCALL
-mpart_unwrite_or_unlock(struct mpart *__restrict self,
-                        struct unlockinfo *unlock);
+ * >> LIST_FOREACH (node, &self->mp_share, mn_link)
+ * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS
+ * Note that when `!mpart_isanon(self)', any nodes apart of `mp_copy' wouldn't
+ * have gotten write-access to begin with (since this requires such a node to
+ * create its own private copy of `self'), so it is sufficient to only deny
+ * write access to MNODE_F_SHARED-nodes in order to ensure that no memory
+ * mappings exist that may still have write-access! */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mpart_denywrite_or_unlock(struct mpart *__restrict self,
+                          struct unlockinfo *unlock);
 /************************************************************************/
 
 

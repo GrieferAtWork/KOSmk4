@@ -51,6 +51,11 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
+/* Check if 2 given ranges overlap (that is: share at least 1 common address) */
+#define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
+	((a_max) >= (b_min) && (a_min) <= (b_max))
+
+
 /* Free/destroy a given mem-node */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_free)(struct mnode *__restrict self) {
@@ -457,13 +462,32 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
 			/* Disallow write to a shared mapping if there are other copy-on-write nodes.
 			 * This way, copy-on-write nodes can be unshared lazily once the first write
 			 * happens. */
-			if (!LIST_EMPTY(&part->mp_copy))
-				result &= ~PAGEDIR_MAP_FWRITE;
+			if (!LIST_EMPTY(&part->mp_copy)) {
+				/* Only deny write if a copy-on-write mapping overlaps with our SHARED mapping. */
+				struct mnode *cow;
+				mpart_reladdr_t mapmin, mapmax;
+				mapmin = mnode_getmapminaddr(self);
+				mapmax = mnode_getmapmaxaddr(self);
+				LIST_FOREACH (cow, &part->mp_copy, mn_link) {
+					if (RANGE_OVERLAPS(mapmin, mapmax,
+					                   mnode_getmapminaddr(cow),
+					                   mnode_getmapmaxaddr(cow))) {
+						result &= ~PAGEDIR_MAP_FWRITE;
+						break;
+					}
+				}
+			}
 		} else {
 			/* Disallow write if there are any other memory mappings of the backing part,
 			 * or if the part isn't anonymous (in which case someone may open(2)+read(2)
 			 * from backing file, which mustn't include any modifications made by this
 			 * mapping) */
+			/* NOTE: Technically, we'd only need to deny write if the part isn't anon, or
+			 *       one of the other mem-nodes's part-rel mapped range overlaps with our's.
+			 *       However, this isn't something that could easily happen (you'd have to
+			 *       do a very specific sequence of mmap()+fork()+munmap() calls). As such,
+			 *       and given that even without this, `mfault' still does copy-on-write
+			 *       properly, we don't actually do this! */
 			if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
 			    LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
 				result &= ~PAGEDIR_MAP_FWRITE;
