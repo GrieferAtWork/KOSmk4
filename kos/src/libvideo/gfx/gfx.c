@@ -1,8 +1,7 @@
 /*[[[magic
-// Turn on full optimizations for this file!
-local opt = options.setdefault("GCC.options", []);
-opt.removeif([](e) -> e.startswith("-O"));
-opt.append("-O3");
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.removeif([](x) -> x.startswith("-O"));
+gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
