@@ -204,7 +204,7 @@ NOTHROW(CC libphys_copyinphys)(PHYS physaddr_t dst,
 	if unlikely(temp == MAP_FAILED)
 		return;
 	WITHMEM(pwrite64(dev_mem, temp, num_bytes, (pos64_t)dst), (void)0);
-	munmap(temp, num_bytes);
+	libphys_munmapphys(temp, num_bytes);
 }
 
 INTERN NOBLOCK void
@@ -215,7 +215,7 @@ NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
 	if unlikely(temp == MAP_FAILED)
 		return;
 	temp = memset(temp, byte, num_bytes);
-	munmap(temp, num_bytes);
+	libphys_munmapphys(temp, num_bytes);
 }
 /************************************************************************/
 
@@ -227,12 +227,12 @@ NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
  * error (s.a. `errno' and `mmap(2)')
  * Memory is always mapped as `PROT_READ | PROT_WRITE'.
  *
- * The returned memory block can later be unmapped as `munmap(return, num_bytes)'
+ * The returned memory block should be unmapped as `munmapphys(return, num_bytes)'
  * The caller need not concern themself with the alignment of `addr' and/or
  * `num_bytes', as this function will automatically CEIL_ALIGN the requested
  * address range to contain whole pages, and later adjusted the returned
  * pointed to account for a potential in-page alignment offset of `addr'
- * This adjustment will later be undone automatically by `munmap(2)'
+ * This adjustment will later be undone automatically by `munmapphys(3)'
  *
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
@@ -250,6 +250,15 @@ NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes) {
 	                         (pos64_t)addr)) != MAP_FAILED,
 	        (result = MAP_FAILED));
 	return result;
+}
+
+INTERN NOBLOCK void
+NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes) {
+	/* For now, this is a simple wrapper, but in the future, a cache of
+	 * recently used physical memory location may be added to libphys,
+	 * at which point this function would be used to mark cache entires
+	 * as no-longer-in-use. */
+	munmap(base, num_bytes);
 }
 /************************************************************************/
 
@@ -276,6 +285,7 @@ DEFINE_PUBLIC_ALIAS(copytophys, libphys_copytophys);
 DEFINE_PUBLIC_ALIAS(copyinphys, libphys_copyinphys);
 DEFINE_PUBLIC_ALIAS(memsetphys, libphys_memsetphys);
 DEFINE_PUBLIC_ALIAS(mmapphys, libphys_mmapphys);
+DEFINE_PUBLIC_ALIAS(munmapphys, libphys_munmapphys);
 
 DECL_END
 

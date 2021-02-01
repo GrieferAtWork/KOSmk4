@@ -429,7 +429,7 @@ NOTHROW(CC vga_vm86_state_fini)(vga_vm86_state_t *__restrict self) {
 		         VGA_VM86_BIOS_SIZE);
 	}
 #else /* __KERNEL__ */
-	munmap(self->vv_biosbase, VGA_VM86_BIOS_SIZE);
+	munmapphys(self->vv_biosbase, VGA_VM86_BIOS_SIZE);
 #endif /* !__KERNEL__ */
 }
 

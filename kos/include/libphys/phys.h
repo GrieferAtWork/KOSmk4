@@ -115,18 +115,20 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC memsetphys)(__PHYS physaddr_t d
  * error (s.a. `errno' and `mmap(2)')
  * Memory is always mapped as `PROT_READ | PROT_WRITE'.
  *
- * The returned memory block can later be unmapped as `munmap(return, num_bytes)'
+ * The returned memory block should be unmapped as `munmapphys(return, num_bytes)'
  * The caller need not concern themself with the alignment of `addr' and/or
  * `num_bytes', as this function will automatically CEIL_ALIGN the requested
  * address range to contain whole pages, and later adjusted the returned
  * pointed to account for a potential in-page alignment offset of `addr'
- * This adjustment will later be undone automatically by `munmap(2)'
+ * This adjustment will later be undone automatically by `munmapphys(3)'
  *
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
 typedef __NOBLOCK void * /*__NOTHROW*/ (LIBPHYS_CC *PMMAPPHYS)(__PHYS physaddr_t addr, size_t num_bytes);
+typedef __NOBLOCK void /*__NOTHROW*/ (LIBPHYS_CC *PMUNMAPPHYS)(void *base, size_t num_bytes);
 #ifdef LIBPHYS_WANT_PROTOTYPES
 LIBPHYS_DECL __NOBLOCK void *__NOTHROW(LIBPHYS_CC mmapphys)(__PHYS physaddr_t addr, size_t num_bytes);
+LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC munmapphys)(void *base, size_t num_bytes);
 #endif /* LIBPHYS_WANT_PROTOTYPES */
 /************************************************************************/
 
