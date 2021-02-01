@@ -204,16 +204,12 @@ mpart_create_lockram(size_t num_pages) {
 #else /* CONFIG_USE_NEW_VM */
 	result->dp_refcnt = 1;
 	shared_rwlock_init(&result->dp_lock);
-#ifndef NDEBUG
-	memset(&result->dp_tree.a_min, 0xcc, sizeof(result->dp_tree.a_min));
-	memset(&result->dp_tree.a_max, 0xcc, sizeof(result->dp_tree.a_max));
-#endif /* !NDEBUG */
+	DBG_memset(&result->dp_tree.a_min, sizeof(result->dp_tree.a_min));
+	DBG_memset(&result->dp_tree.a_max, sizeof(result->dp_tree.a_max));
 	result->dp_tree.a_vmin = 0;
 	result->dp_tree.a_vmax = (datapage_t)(num_pages - 1);
 	result->dp_crefs = NULL;
-#ifndef NDEBUG
-/*	memset(&result->dp_srefs, 0xcc, sizeof(result->dp_srefs)); */ /* Initialized by the caller */
-#endif /* !NDEBUG */
+/*	DBG_memset(&result->dp_srefs, 0xcc, sizeof(result->dp_srefs)); */ /* Initialized by the caller */
 	result->dp_stale = NULL;
 	result->dp_block = incref(&vm_datablock_anonymous_zero);
 	result->dp_flags = VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_HEAPPPP | VM_DATAPART_FLAG_KERNPRT;
@@ -381,16 +377,14 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	/* Copy the TSS template. */
 	memcpy(&FORCPU(result, thiscpu_x86_tss), &__kernel_percpu_tss, SIZEOF_TSS);
 
-#ifndef NDEBUG
 	/* Also fill the area before thiscpu_idle with CCh bytes. */
-	memset((byte_t *)result + (uintptr_t)__kernel_percpu_size, 0xcc,
-	       (size_t)&thiscpu_idle - (size_t)__kernel_percpu_size);
+	DBG_memset((byte_t *)result + (uintptr_t)__kernel_percpu_size, 0xcc,
+	           (size_t)&thiscpu_idle - (size_t)__kernel_percpu_size);
 
 	/* Also fill the area between thiscpu_idle and thiscpu_x86_tss with CCh bytes. */
-	memset((byte_t *)result + ((uintptr_t)&thiscpu_idle + (size_t)__kernel_pertask_size), 0xcc,
-	       (uintptr_t)&thiscpu_x86_tss - ((uintptr_t)&thiscpu_idle +
-	                                 (size_t)__kernel_pertask_size));
-#endif /* !NDEBUG */
+	DBG_memset((byte_t *)result + ((uintptr_t)&thiscpu_idle + (size_t)__kernel_pertask_size), 0xcc,
+	           (uintptr_t)&thiscpu_x86_tss - ((uintptr_t)&thiscpu_idle +
+	                                          (size_t)__kernel_pertask_size));
 
 	/* Fill in the IOB node mapping for this CPU. */
 	result = (struct cpu *)cpu_baseaddr;
@@ -431,10 +425,8 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	 *       uninitialized, as it is (currently) unused. */
 	FORCPU(result, thiscpu_x86_iob_[65536/8]) = 0xff;
 
-#ifndef NDEBUG
 	/* Fill unused memory with CCh so that unintended access problems are reproducible. */
-	memset(&FORCPU(result, thiscpu_x86_iob_[(65536/8) + 1]), 0xcc, PAGESIZE - 1);
-#endif /* !NDEBUG */
+	DBG_memset(&FORCPU(result, thiscpu_x86_iob_[(65536/8) + 1]), 0xcc, PAGESIZE - 1);
 
 	/* Initialize the CPU's pagedir_identity:iob pointer. */
 	FORCPU(result, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer(result);

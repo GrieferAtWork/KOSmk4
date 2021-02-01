@@ -1125,8 +1125,8 @@ sighand_reset_handler(signo_t signo,
 		return false;
 	}
 	/* Reset the action. */
-	memset(&hand->sh_actions[signo - 1],
-	       0, sizeof(struct kernel_sigaction));
+	memset(&hand->sh_actions[signo - 1], 0,
+	       sizeof(struct kernel_sigaction));
 	sync_endwrite(hand);
 	/* Drop the reference held by the `sh_actions' vector.
 	 * Note however that since the caller must have copied that action at one point,

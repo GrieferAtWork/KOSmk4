@@ -356,9 +356,9 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 				                                                              sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
 				if likely(list) {
 #ifdef CACHE_RECALLOC_DOES_NOT_CLEAR
-					memset(list + self->dua_cache_size, 0,
-					       (new_cache_size - self->dua_cache_size) *
-					       sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
+					bzero(list + self->dua_cache_size,
+					      new_cache_size - self->dua_cache_size,
+					      sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
 #endif /* CACHE_RECALLOC_DOES_NOT_CLEAR */
 					self->dua_cache_list = list;
 					self->dua_cache_next = self->dua_cache_size;

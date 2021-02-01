@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
 		return libc_seterrno(EINVAL);
 #endif /* UINT_MAX > SEM_COUNT_MASK */
 #ifndef NDEBUG
-	memset(sem, 0xaa, __SIZEOF_SEM_T);
+	memset(sem, 0xcc, __SIZEOF_SEM_T);
 #endif /* !NDEBUG */
 	sem->s_count = value;
 	return 0;

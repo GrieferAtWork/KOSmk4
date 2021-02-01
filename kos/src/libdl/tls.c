@@ -41,6 +41,13 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+
 struct dtls_extension {
 	/* Tree for mapping TLS extensions data tables to modules.
 		* NOTE: These extension tables are allocated lazily! */
@@ -477,10 +484,8 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
 	result = (DlModule *)malloc(SIZEOF_DL_MODULE_FOR_TLS);
 	if unlikely(!result)
 		goto err_nomem;
-#ifndef NDEBUG
 	/* Invalidate all of the `struct link_map' emulation garbage. */
-	memset(result, 0xcc, OFFSETOF_DL_MODULE_FOR_TLS);
-#endif /* !NDEBUG */
+	DBG_memset(result, 0xcc, OFFSETOF_DL_MODULE_FOR_TLS);
 	result->dm_tlsoff   = 0;
 	result->dm_tlsinit  = NULL;
 	result->dm_tlsfsize = template_size;

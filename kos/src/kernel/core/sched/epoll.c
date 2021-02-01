@@ -52,6 +52,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 /* Mask of events which can be polled using epoll */
 #define EPOLL_WHATMASK                                           \
 	(EPOLLIN | EPOLLPRI | EPOLLOUT | EPOLLRDNORM | EPOLLRDBAND | \
@@ -1044,10 +1050,8 @@ scan_monitors:
 							/* Monitor isn't actually raised (spurious
 							 * signal, or edge has already fallen again).
 							 * -> Handle this case by prime `monitor' once again. */
-#ifndef NDEBUG
-							memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
+							DBG_memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
 							COMPILER_WRITE_BARRIER();
-#endif /* !NDEBUG */
 							ATOMIC_WRITE(monitor->ehm_raised, 0);
 							epoll_handle_monitor_pollconnect(monitor, monitor_handptr);
 							what = epoll_handle_monitor_polltest(monitor, monitor_handptr);

@@ -49,6 +49,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 #define ZT_CACHE_BITS         10
 #define ZT_CACHE_SIZE         (1 << ZT_CACHE_BITS)
 #define ZT_CACHEENT_SIZESHIFT 9
@@ -104,9 +110,7 @@ PRIVATE void CC zlib_cache_free(/*nullable*/ struct zlib_cache *self) {
 INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libzlib_reader_init)(struct zlib_reader *__restrict self,
                                     void const *blob, size_t blob_size) {
-#ifndef NDEBUG
-	memset(self, 0xcc, sizeof(*self));
-#endif /* !NDEBUG */
+	DBG_memset(self, 0xcc, sizeof(*self));
 	self->zr_inbase      = (byte_t const *)blob;
 	self->zr_incur       = (byte_t const *)blob;
 	self->zr_inend       = (byte_t const *)blob + blob_size;
@@ -124,9 +128,7 @@ INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libzlib_reader_fini)(struct zlib_reader *__restrict self) {
 	zlib_cache_free(self->zr_symbolcache);
 	/* ... */
-#ifndef NDEBUG
-	memset(self, 0xcc, sizeof(*self));
-#endif /* !NDEBUG */
+	DBG_memset(self, 0xcc, sizeof(*self));
 }
 
 
@@ -208,7 +210,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree,
                                           struct zlib_cache *__restrict cache) {
 	u16 i;
-	memset(cache->c_lookup, 0, sizeof(cache->c_lookup));
+	bzero(cache->c_lookup, sizeof(cache->c_lookup));
 	for (i = 0; i < tree->zr_count; ++i) {
 		u16 cacheent, rev_code;
 		u8 len = tree->zt_tree[i].te_len;
@@ -473,7 +475,7 @@ case 2:
 				assert(self->zr_symboltree.zr_count >= 257 && self->zr_symboltree.zr_count <= 288);
 				assert(self->zr_disttree.zr_count >= 1 && self->zr_disttree.zr_count <= 32);
 				assert(self->zr_clentree.zr_count >= 4 && self->zr_clentree.zr_count <= 19);
-				memset(self->zr_clentree.zt_tree, 0, sizeof(self->zr_clentree.zt_tree));
+				bzero(self->zr_clentree.zt_tree, sizeof(self->zr_clentree.zt_tree));
 				for (self->zr_index = 0;
 				     self->zr_index < self->zr_clentree.zr_count; ++self->zr_index) {
 					PRIVATE u8 const demangle_bitspercln_index[] = {

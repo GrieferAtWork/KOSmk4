@@ -29,8 +29,8 @@
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/fault.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
@@ -47,11 +47,6 @@
 #include <stddef.h>
 #include <string.h>
 
-/*TODO:REMOVE_ME*/
-#include <kernel/printk.h>
-#include <kernel/mman/nopf.h>
-/*TODO:REMOVE_ME*/
-
 DECL_BEGIN
 
 #ifdef NDEBUG
@@ -59,8 +54,6 @@ DECL_BEGIN
 #else /* NDEBUG */
 #define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
 #endif /* !NDEBUG */
-#define DBG_inval(obj) DBG_memset(&(obj), 0xcc, sizeof(obj))
-
 
 
 /* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
@@ -867,7 +860,7 @@ done_mark_changed:
 				kfree(self->mfl_pcopy[1]);
 				kfree(self->mfl_pcopy[0]);
 			}
-			DBG_inval(self->mfl_pcopy);
+			DBG_memset(&self->mfl_pcopy, 0xcc, sizeof(self->mfl_pcopy));
 		} /* Scope... */
 
 
@@ -889,7 +882,7 @@ done_mark_changed:
 			copy->mp_file = incref(&mfile_anon[part->mp_file->mf_blockshift]);
 			LIST_INIT(&copy->mp_share);
 			SLIST_INIT(&copy->mp_lockops);
-			DBG_inval(copy->mp_changed);
+			DBG_memset(&copy->mp_changed, 0xcc, sizeof(copy->mp_changed));
 			copy->mp_minaddr = part->mp_minaddr + acc_offs;
 			copy->mp_maxaddr = copy->mp_minaddr + acc_size - 1;
 			_mpart_init_asanon(copy);
@@ -914,7 +907,8 @@ done_mark_changed:
 pcopy_free_unused_block_status:
 				if unlikely(self->mfl_ucdat.ucd_ucmem.scd_bitset)
 					kfree(self->mfl_ucdat.ucd_ucmem.scd_bitset);
-				DBG_inval(self->mfl_ucdat.ucd_ucmem.scd_bitset);
+				DBG_memset(&self->mfl_ucdat.ucd_ucmem.scd_bitset, 0xcc,
+				           sizeof(self->mfl_ucdat.ucd_ucmem.scd_bitset));
 			} else if (part->mp_blkst_ptr == NULL) {
 				copy->mp_blkst_ptr = NULL;
 				goto pcopy_free_unused_block_status;
@@ -926,7 +920,8 @@ pcopy_free_unused_block_status:
 				assert(block_count <= mpart_getblockcount(part, part->mp_file));
 				/* Copy over block-status bitset data. */
 				copy->mp_blkst_ptr = self->mfl_ucdat.ucd_ucmem.scd_bitset;
-				DBG_inval(self->mfl_ucdat.ucd_ucmem.scd_bitset);
+				DBG_memset(&self->mfl_ucdat.ucd_ucmem.scd_bitset, 0xcc,
+				           sizeof(self->mfl_ucdat.ucd_ucmem.scd_bitset));
 				copybits(copy->mp_blkst_ptr, part->mp_blkst_ptr, 0,
 				         block_offset * MPART_BLOCK_STBITS,
 				         block_count * MPART_BLOCK_STBITS);
@@ -934,7 +929,8 @@ pcopy_free_unused_block_status:
 
 			/* Fill in information on the backing storage. */
 			copy->mp_state = self->mfl_ucdat.ucd_ucmem.scd_copy_state;
-			DBG_inval(self->mfl_ucdat.ucd_ucmem.scd_bitset);
+			DBG_memset(&self->mfl_ucdat.ucd_ucmem.scd_bitset, 0xcc,
+			           sizeof(self->mfl_ucdat.ucd_ucmem.scd_bitset));
 			memcpy(&copy->mp_mem,
 			       &self->mfl_ucdat.ucd_ucmem.scd_copy_mem,
 			       MAX_C(sizeof(struct mchunk),
@@ -1003,8 +999,8 @@ pcopy_free_unused_block_status:
 		RETHROW();
 	}
 done:
-	DBG_inval(self->mfl_scdat);
-	DBG_inval(self->mfl_ucdat);
+	DBG_memset(&self->mfl_scdat, 0xcc, sizeof(self->mfl_scdat));
+	DBG_memset(&self->mfl_ucdat, 0xcc, sizeof(self->mfl_ucdat));
 	DBG_memset(self->mfl_pcopy, 0xcc, sizeof(self->mfl_pcopy));
 	assert(self->mfl_size != 0);
 	return true;

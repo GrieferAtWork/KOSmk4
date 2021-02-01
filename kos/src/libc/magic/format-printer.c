@@ -145,14 +145,14 @@ $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	__libc_memsetc(buffer, ch, FORMAT_REPEAT_BUFSIZE, __SIZEOF_CHAR__);
 @@pp_else@@
 	char buffer[FORMAT_REPEAT_BUFSIZE];
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	__libc_memsetc(buffer, ch, FORMAT_REPEAT_BUFSIZE, __SIZEOF_CHAR__);
 @@pp_endif@@
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if unlikely(result < 0)

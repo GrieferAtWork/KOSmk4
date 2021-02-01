@@ -658,8 +658,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      on itself, its branch should simply be ignored (but if all branches
 	 *      end up being ignored, unwinding also fails) */
 
-	/* TODO: Go through all uses of `memset()' and `mempset()' and make use of
-	 *       the new 4-argument overload where appropriate. */
+	/* TODO: Implement a deemon script that parses the mult-line c-comments from
+	 *       source files in an attempt to detect paragraphs. Once detected, re-
+	 *       flow the text from those paragraphs by repeating existing spaces to
+	 *       evenly spread out the text.
+	 * It's purely cosmetic, but I think it'd look really nice :) */
 
 	/* Xorg X-Window server support roadmap.
 	 *

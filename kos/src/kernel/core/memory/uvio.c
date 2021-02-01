@@ -53,6 +53,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 PRIVATE NOBLOCK WUNUSED u8
 NOTHROW(KCALL kernel_uvio_request_randuid)(struct kernel_uvio_request *__restrict self) {
 	u32 result;
@@ -150,11 +156,9 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
 		task_tryyield_or_pause();
 	/* Mark as free */
 	ATOMIC_WRITE(slot->kur_args, NULL);
-#ifndef NDEBUG
-	memset(&slot->kur_orig, 0xcc,
-	       sizeof(struct kernel_uvio_request) -
-	       offsetof(struct kernel_uvio_request, kur_orig));
-#endif /* !NDEBUG */
+	DBG_memset(&slot->kur_orig, 0xcc,
+	           sizeof(struct kernel_uvio_request) -
+	           offsetof(struct kernel_uvio_request, kur_orig));
 	sync_endwrite(&slot->kur_lock);
 
 	/* Signal that a free slot became available */
@@ -972,11 +976,9 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 			atomic_rwlock_init(&result->uv_req[reqid].kur_lock);
 			result->uv_req[reqid].kur_nextuid_seed = krand32();
 			result->uv_req[reqid].kur_args         = NULL; /* Free slot */
-#ifndef NDEBUG
-			memset(&result->uv_req[reqid].kur_orig, 0xcc,
-			       sizeof(struct kernel_uvio_request) -
-			       offsetof(struct kernel_uvio_request, kur_orig));
-#endif /* !NDEBUG */
+			DBG_memset(&result->uv_req[reqid].kur_orig, 0xcc,
+			           sizeof(struct kernel_uvio_request) -
+			           offsetof(struct kernel_uvio_request, kur_orig));
 		}
 	}
 	return result;

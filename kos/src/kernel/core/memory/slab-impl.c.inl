@@ -33,6 +33,14 @@
 
 DECL_BEGIN
 
+#ifndef DBG_memset
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+#endif /* !DBG_memset */
+
 #define DESC            FUNC(slab_desc)
 #define INUSE_BITSET(s) ((uintptr_t *)((struct slab *)(s) + 1))
 #define SEGMENTS(s)     ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
@@ -214,9 +222,7 @@ again:
 				DESC.sd_used         = result_page;
 #else /* CONFIG_TRACE_MALLOC */
 				result_page->s_pself = NULL;
-#ifndef NDEBUG
-				memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
-#endif /* !NDEBUG */
+				DBG_memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
 #endif /* !CONFIG_TRACE_MALLOC */
 			}
 			FUNC(slab_endwrite)();

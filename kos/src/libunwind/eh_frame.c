@@ -324,7 +324,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
                                           unwind_cfa_value_t *__restrict result,
                                           void const *absolute_pc) {
 	unsigned int error;
-	memset(result, 0, sizeof(*result));
+	bzero(*result);
 	error = libuw_unwind_fde_exec_cfa_until(self,
 	                                        self->f_inittext,
 	                                        self->f_inittextend,
@@ -351,7 +351,7 @@ execute_eh_frame_expression(byte_t const *__restrict expression_pointer,
 	unwind_emulator_t emulator;
 	size_t expr_length;
 	expr_length = dwarf_decode_uleb128((byte_t const **)&expression_pointer);
-	memset(&emulator, 0, sizeof(emulator));
+	bzero(emulator);
 	emulator.ue_pc             = expression_pointer;
 	emulator.ue_pc_start       = expression_pointer;
 	emulator.ue_pc_end         = expression_pointer + expr_length;
@@ -824,7 +824,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
 	unsigned int capsule_recursion = 0;
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 	(void)landingpad_pc;
-	memset(result, 0, sizeof(*result));
+	bzero(*result);
 	cfa_reader = self->f_evaltext;
 	cfa_end    = self->f_evaltextend;
 	assertf(((uintptr_t)absolute_pc >= (uintptr_t)self->f_pcstart &&

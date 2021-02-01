@@ -75,6 +75,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 /* FDE Cache API */
 struct driver_fde_cache_node {
 	struct {
@@ -2834,12 +2840,10 @@ again_read_section:
 		result->ds_index   = index;
 		result->ds_cdata   = (void *)-1;
 		result->ds_csize   = 0;
-#ifndef NDEBUG
 #if __SIZEOF_POINTER__ > 4
-		memset(result->__ds_pad, 0xcc, sizeof(result->__ds_pad));
+		DBG_memset(result->__ds_pad, 0xcc, sizeof(result->__ds_pad));
 #endif /* __SIZEOF_POINTER__ > 4 */
-		memset(&result->ds_dangling, 0xcc, sizeof(result->ds_dangling));
-#endif /* !NDEBUG */
+		DBG_memset(&result->ds_dangling, 0xcc, sizeof(result->ds_dangling));
 		if (sect->sh_flags & SHF_ALLOC) {
 			/* Section is already allocated in member. */
 			result->ds_data      = (void *)(self->d_loadaddr + sect->sh_addr);

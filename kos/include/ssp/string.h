@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7efd2ae8 */
+/* HASH CRC-32:0x577845f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -571,13 +571,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_ARTIFIC
 #ifdef __SSP_FORTIFY_LEVEL
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memset) && \
      defined(__CRT_HAVE___memset_chk) && __has_builtin(__builtin___memset_chk))
-#undef memset
-#define memset(dst, byte, n_bytes)                                                                      \
+#undef __PRIVATE_memset_3
+#define __PRIVATE_memset_3(dst, byte, n_bytes)                                                          \
 	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memset_chk(dst, byte, n_bytes, __ssp_bos0(dst)) \
 	                                      : __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst)))
 #else /* ... */
-#undef memset
-#define memset(dst, byte, n_bytes) __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
+#undef __PRIVATE_memset_3
+#define __PRIVATE_memset_3(dst, byte, n_bytes) __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
 #endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memcpy) && \
      defined(__CRT_HAVE___memcpy_chk) && __has_builtin(__builtin___memcpy_chk))
@@ -625,8 +625,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_ARTIFIC
 #endif /* __USE_GNU */
 
 #ifdef __USE_KOS
-#undef mempset
-#define mempset(dst, byte, n_bytes) __mempset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
 #undef memcpyc
 #define memcpyc(dst, src, elem_count, elem_size) __memcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
 #undef memmovec
@@ -643,6 +641,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_ARTIFIC
 #define memmovedownc(dst, src, elem_count, elem_size) __memmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
 #undef mempmovedownc
 #define mempmovedownc(dst, src, elem_count, elem_size) __mempmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#undef __PRIVATE_mempset_3
+#define __PRIVATE_mempset_3(dst, byte, n_bytes) __mempset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
 #undef __PRIVATE_mempmove_3
 #define __PRIVATE_mempmove_3(dst, src, n_bytes) __mempmove_chk(dst, src, n_bytes, __ssp_bos0(dst))
 #undef __PRIVATE_memmoveup_3
@@ -752,13 +752,16 @@ __NAMESPACE_STD_USING(__forward_voidp)
 #endif /* !__forward_voidp_defined */
 #endif /* !__std___forward_voidp_defined */
 #endif /* __cplusplus */
+#undef memset
 #undef memcpy
 #undef memmove
 #ifdef __USE_STRING_OVERLOADS
 #ifdef __cplusplus
+#define memset(...)  __forward_voidp(__HYBRID_PP_VA_OVERLOAD(__PRIVATE_memset_, (__VA_ARGS__))(__VA_ARGS__))
 #define memcpy(...)  __forward_voidp(__HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__))
 #define memmove(...) __forward_voidp(__HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__))
 #else /* __cplusplus */
+#define memset(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memset_, (__VA_ARGS__))(__VA_ARGS__)
 #define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
 #define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* !__cplusplus */
@@ -767,11 +770,13 @@ __NAMESPACE_STD_USING(__forward_voidp)
 #define mempcpy(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempcpy_, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
+#undef mempset
 #undef mempmove
 #undef mempmoveup
 #undef mempmovedown
 #undef memmoveup
 #undef memmovedown
+#define mempset(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempset_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmove(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmoveup(...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmovedown(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (__VA_ARGS__))(__VA_ARGS__)
@@ -779,6 +784,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 #define memmovedown(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmovedown_, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* __USE_KOS */
 #else /* __USE_STRING_OVERLOADS */
+#define memset(dst, src, n_bytes)  __forward_voidp(__PRIVATE_memset_3(dst, src, n_bytes))
 #define memcpy(dst, src, n_bytes)  __forward_voidp(__PRIVATE_memcpy_3(dst, src, n_bytes))
 #define memmove(dst, src, n_bytes) __forward_voidp(__PRIVATE_memmove_3(dst, src, n_bytes))
 #ifdef __USE_GNU
@@ -786,11 +792,13 @@ __NAMESPACE_STD_USING(__forward_voidp)
 #define mempcpy(dst, src, n_bytes) __PRIVATE_mempcpy_3(dst, src, n_bytes)
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
+#undef mempset
 #undef mempmove
 #undef mempmoveup
 #undef mempmovedown
 #undef memmoveup
 #undef memmovedown
+#define mempset(dst, src, n_bytes)      __PRIVATE_mempset_3(dst, src, n_bytes)
 #define mempmove(dst, src, n_bytes)     __PRIVATE_mempmove_3(dst, src, n_bytes)
 #define mempmoveup(dst, src, n_bytes)   __PRIVATE_mempmoveup_3(dst, src, n_bytes)
 #define mempmovedown(dst, src, n_bytes) __PRIVATE_mempmovedown_3(dst, src, n_bytes)

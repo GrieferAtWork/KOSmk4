@@ -27,12 +27,12 @@
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>
 #include <sched/signal.h>
@@ -51,12 +51,11 @@
 
 DECL_BEGIN
 
-#ifdef NDEBUG
-#define DBG_memset(ptr, byte, num_bytes) (void)0
-#else /* NDEBUG */
-#define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
-#endif /* !NDEBUG */
-#define DBG_inval(obj) DBG_memset(&(obj), 0xcc, sizeof(obj))
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mchunk_freemem)(struct mchunk *__restrict self) {
@@ -583,7 +582,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			/* Can use the inline bitset. */
 			if unlikely(data->scd_bitset != NULL) {
 				kfree(data->scd_bitset);
-				DBG_inval(data->scd_bitset);
+				DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
 			}
 			/* All blocks are undefined by default! */
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
@@ -596,7 +595,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			 *       already been initialized to `MPART_BLOCK_ST_NDEF'! */
 			self->mp_blkst_ptr = data->scd_bitset;
 			ATOMIC_AND(self->mp_flags, ~MPART_F_BLKST_INL);
-			DBG_inval(data->scd_bitset);
+			DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
 		}
 #ifndef NDEBUG
 		else {
@@ -741,7 +740,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		 * and we can safely transition to on of the MEM-states. */
 done_swap:
 		kfree(data->scd_bitset);
-		DBG_inval(data->scd_bitset);
+		DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
 
 		/* Free the swap storage area used by this part. */
 		if (self->mp_state == MPART_ST_SWP) {
@@ -754,7 +753,7 @@ done_swap:
 
 		/* Fill in information on the backing storage. */
 		self->mp_state = data->scd_copy_state;
-		DBG_inval(data->scd_copy_state);
+		DBG_memset(&data->scd_copy_state, 0xcc, sizeof(data->scd_copy_state));
 		memcpy(&self->mp_mem, &data->scd_copy_mem,
 		       MAX_C(sizeof(struct mchunk),
 		             sizeof(struct mchunkvec)));
@@ -781,7 +780,8 @@ done_swap:
 
 	/* Fill in information on the backing storage. */
 	self->mp_state = data->scd_copy_state;
-	DBG_inval(data->scd_copy_state);
+	DBG_memset(&data->scd_copy_state, 0xcc,
+	           sizeof(data->scd_copy_state));
 	memcpy(&self->mp_mem, &data->scd_copy_mem,
 	       MAX_C(sizeof(struct mchunk),
 	             sizeof(struct mchunkvec)));
@@ -1498,7 +1498,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	 *          that belong to dead mmans) */
 	assert(!LIST_EMPTY(&self->mp_copy));
 	copy = data->ucd_copy;
-	DBG_inval(data->ucd_copy);
+	DBG_memset(&data->ucd_copy, 0xcc, sizeof(data->ucd_copy));
 	copy->mp_refcnt = 0;
 	LIST_INIT(&copy->mp_copy);
 	for (node = LIST_FIRST(&self->mp_copy); node;) {
@@ -1522,7 +1522,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	copy->mp_file  = incref(&mfile_anon[self->mp_file->mf_blockshift]);
 	LIST_INIT(&copy->mp_share);
 	SLIST_INIT(&copy->mp_lockops);
-	DBG_inval(copy->mp_changed);
+	DBG_memset(&copy->mp_changed, 0xcc, sizeof(copy->mp_changed));
 	copy->mp_minaddr = self->mp_minaddr + bounds.ucb_mapmin;
 	copy->mp_maxaddr = self->mp_minaddr + bounds.ucb_mapmax;
 	assert(copy->mp_maxaddr <= self->mp_maxaddr);
@@ -1544,7 +1544,8 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 free_unused_block_status:
 		if unlikely(data->ucd_ucmem.scd_bitset)
 			kfree(data->ucd_ucmem.scd_bitset);
-		DBG_inval(data->ucd_ucmem.scd_bitset);
+		DBG_memset(&data->ucd_ucmem.scd_bitset, 0xcc,
+		           sizeof(data->ucd_ucmem.scd_bitset));
 	} else if (self->mp_blkst_ptr == NULL) {
 		copy->mp_blkst_ptr = NULL;
 		goto free_unused_block_status;
@@ -1559,12 +1560,14 @@ free_unused_block_status:
 		                                                  self->mp_blkst_ptr,
 		                                                  block_count / MPART_BLKST_BLOCKS_PER_WORD,
 		                                                  sizeof(mpart_blkst_word_t));
-		DBG_inval(data->ucd_ucmem.scd_bitset);
+		DBG_memset(&data->ucd_ucmem.scd_bitset, 0xcc,
+		           sizeof(data->ucd_ucmem.scd_bitset));
 	}
 
 	/* Fill in information on the backing storage. */
 	copy->mp_state = data->ucd_ucmem.scd_copy_state;
-	DBG_inval(data->ucd_ucmem.scd_bitset);
+	DBG_memset(&data->ucd_ucmem.scd_bitset, 0xcc,
+	           sizeof(data->ucd_ucmem.scd_bitset));
 	memcpy(&copy->mp_mem,
 	       &data->ucd_ucmem.scd_copy_mem,
 	       MAX_C(sizeof(struct mchunk),

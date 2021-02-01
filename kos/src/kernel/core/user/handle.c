@@ -62,6 +62,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 #ifdef NDEBUG
 #define handle_manager_assert_integrity(self) (void)0
 #else /* NDEBUG */
@@ -239,9 +245,7 @@ check_new_alloc_linear:
 			COMPILER_READ_BARRIER();
 			if unlikely(self->hm_clofork_count >= self->hm_count) {
 				kfree(result->hm_hashvector.hm_hashvec);
-#ifndef NDEBUG
-				memset(&result->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
-#endif /* !NDEBUG */
+				DBG_memset(&result->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
 				kfree(vec);
 				goto set_empty_copy;
 			}
@@ -311,9 +315,7 @@ check_new_alloc_linear:
 			if (minfree > self->hm_minfree)
 				minfree = self->hm_minfree;
 			result->hm_minfree = minfree;
-#ifndef NDEBUG
-			memset(&result->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
-#endif /* !NDEBUG */
+			DBG_memset(&result->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
 		} else {
 			struct handle_hashent *map;
 			unsigned int count;
@@ -338,9 +340,7 @@ check_new_alloc_linear:
 					sync_endread(&self->hm_lock);
 					alloc = result->hm_linear.hm_alloc;
 					vec   = result->hm_linear.hm_vector;
-#ifndef NDEBUG
-					memset(&result->hm_linear.hm_vector, 0xcc, sizeof(void *));
-#endif /* !NDEBUG */
+					DBG_memset(&result->hm_linear.hm_vector, 0xcc, sizeof(void *));
 					while (alloc--)
 						decref(vec[alloc]);
 					kfree(vec);
@@ -543,12 +543,10 @@ handle_manager_cloexec(struct handle_manager *__restrict self)
 		self->hm_linear.hm_alloc  = 0;
 		if (self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR) {
 			hashvec = self->hm_hashvector.hm_hashvec;
-#ifndef NDEBUG
-			memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
-			memset(&self->hm_hashvector.hm_hashmsk, 0xcc, sizeof(unsigned int));
-			memset(&self->hm_hashvector.hm_hashuse, 0xcc, sizeof(unsigned int));
-			memset(&self->hm_hashvector.hm_vecfree, 0xcc, sizeof(unsigned int));
-#endif /* !NDEBUG */
+			DBG_memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
+			DBG_memset(&self->hm_hashvector.hm_hashmsk, 0xcc, sizeof(unsigned int));
+			DBG_memset(&self->hm_hashvector.hm_hashuse, 0xcc, sizeof(unsigned int));
+			DBG_memset(&self->hm_hashvector.hm_vecfree, 0xcc, sizeof(unsigned int));
 			self->hm_mode = HANDLE_MANAGER_MODE_LINEAR;
 		}
 		sync_endwrite(&self->hm_lock);
@@ -676,7 +674,7 @@ NOTHROW(FCALL handle_manager_flatten_handle_vector)(struct handle_manager *__res
 #if HANDLE_TYPE_UNDEFINED == 0
 	                                   |
 	                                   GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 	                                   );
 	if likely(vec) {
 		self->hm_hashvector.hm_vector = vec;
@@ -765,9 +763,7 @@ NOTHROW(FCALL handle_manager_try_downhash)(struct handle_manager *__restrict sel
 					}
 				}
 				kfree(self->hm_hashvector.hm_hashvec);
-#ifndef NDEBUG
-				memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
-#endif /* !NDEBUG */
+				DBG_memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
 				kfree(self->hm_hashvector.hm_vector);
 				self->hm_mode             = HANDLE_MANAGER_MODE_LINEAR;
 				self->hm_linear.hm_alloc  = max_fd_number + 1;
@@ -828,9 +824,7 @@ do_delete_handle:
 					/* Free the vector if all elements are now gone. */
 					if (self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR) {
 						kfree(self->hm_hashvector.hm_hashvec);
-#ifndef NDEBUG
-						memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
-#endif /* !NDEBUG */
+						DBG_memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
 						self->hm_mode = HANDLE_MANAGER_MODE_LINEAR;
 					}
 					kfree(self->hm_linear.hm_vector);
@@ -1013,9 +1007,7 @@ do_delete_handle:
 			/* Free the vector if all elements are now gone. */
 			if (self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR) {
 				kfree(self->hm_hashvector.hm_hashvec);
-#ifndef NDEBUG
-				memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
-#endif /* !NDEBUG */
+				DBG_memset(&self->hm_hashvector.hm_hashvec, 0xcc, sizeof(void *));
 				self->hm_mode = HANDLE_MANAGER_MODE_LINEAR;
 			}
 			kfree(self->hm_linear.hm_vector);

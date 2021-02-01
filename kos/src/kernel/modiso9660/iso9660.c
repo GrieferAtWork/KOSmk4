@@ -279,7 +279,6 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 
 	/* Search for the `VOLUME_DESCRIPTOR_TYPE_PRIMARY_VOLUME' descriptor. */
 	for (;;) {
-		memset(&volume, 0xcc, sizeof(volume));
 		block_device_read(self->s_device, &volume, sizeof(volume), offset);
 		if (volume.vd_ident[0] != 'C' || volume.vd_ident[1] != 'D' ||
 		    volume.vd_ident[2] != '0' || volume.vd_ident[3] != '0' ||

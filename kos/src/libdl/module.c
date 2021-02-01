@@ -41,6 +41,13 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+
 /* Make sure that offsets in `struct link_map' are correct. */
 STATIC_ASSERT(offsetof(struct link_map, l_addr) == offsetof(DlModule, dm_loadaddr));
 STATIC_ASSERT(offsetof(struct link_map, l_name) == offsetof(DlModule, dm_filename));
@@ -208,9 +215,7 @@ again_free_sections:
 			        "If this was true, then the section should have kept a reference to us!");
 			sect->ds_module = NULL;
 			atomic_rwlock_endwrite(&sect->ds_module_lock);
-#ifndef NDEBUG
-			memset(&self->dm_sections[i], 0xcc, sizeof(self->dm_sections[i]));
-#endif /* !NDEBUG */
+			DBG_memset(&self->dm_sections[i], 0xcc, sizeof(self->dm_sections[i]));
 		}
 		{
 			REF DlSection *dangle, *next;

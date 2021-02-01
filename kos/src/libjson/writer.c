@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBJSON_WRITER_C
 #define GUARD_LIBJSON_WRITER_C 1
+#define _KOS_SOURCE 1
 
 #include "writer.h"
 
@@ -106,12 +107,12 @@ json_linefeed_and_indent(struct json_writer *__restrict self) {
 		char buf[16];
 		buf[0] = '\n';
 		if likely(self->jw_depth <= COMPILER_LENOF(buf) - 1) {
-			memset(buf + 1, '\t', self->jw_depth);
+			memset(buf + 1, '\t', self->jw_depth, sizeof(char));
 			if unlikely(json_print(self, buf, self->jw_depth + 1))
 				goto err;
 		} else {
 			unsigned int missing;
-			memset(buf + 1, '\t', COMPILER_LENOF(buf) - 1);
+			memset(buf + 1, '\t', COMPILER_LENOF(buf) - 1, sizeof(char));
 			if unlikely(json_print(self, buf, COMPILER_LENOF(buf)))
 				goto err;
 			missing = self->jw_depth - (COMPILER_LENOF(buf) - 1);

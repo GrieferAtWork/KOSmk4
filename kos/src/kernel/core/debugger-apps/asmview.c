@@ -84,20 +84,20 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self) {
-	enum { MAXTEXTLEN = 128 };
+	enum { MAXTEXTSIZ = 128 };
 	/* This `12' must be >= the max number of remaining zero-bytes
 	 * following after any other sequence of instruction bytes.
 	 * This is used to ensure that libdisasm sees that our instruction
 	 * sequence terminates after a certain offset. */
 	enum { TEXTTAILSIZE = 12 };
-	byte_t textbuf[MAXTEXTLEN + TEXTTAILSIZE], *old_pc;
-	size_t textlen;
-	textlen = MAXTEXTLEN - dbg_readmemory(self->d_pc, textbuf, MAXTEXTLEN);
-	if (!textlen)
+	byte_t textbuf[MAXTEXTSIZ + TEXTTAILSIZE], *old_pc;
+	size_t textsiz;
+	textsiz = MAXTEXTSIZ - dbg_readmemory(self->d_pc, textbuf, MAXTEXTSIZ);
+	if (!textsiz)
 		return false;
 	/* zero-fill a small tail area after the text to
 	 * ensure that instructions are terminated. */
-	memset(textbuf + textlen, 0, TEXTTAILSIZE);
+	memset(textbuf + textsiz, 0, TEXTTAILSIZE);
 	/* Print instructions from our text buffer. */
 	old_pc          = self->d_pc;
 	self->d_pc      = textbuf;

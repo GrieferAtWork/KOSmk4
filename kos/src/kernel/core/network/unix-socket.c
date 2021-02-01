@@ -56,6 +56,12 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 typedef struct unix_socket UnixSocket;
 
 /************************************************************************/
@@ -353,11 +359,9 @@ NOTHROW(FCALL unix_server_pop_acceptme)(struct unix_server *__restrict self) {
 			/* Re-append all of the other clients. */
 			unix_server_append_acceptme(self, next, last, NULL);
 		}
-#ifndef NDEBUG
 		/* Invalidate the next-pointer, now that this client
 		 * is no longer apart of the waiting-clients-chain. */
-		memset(&result->uc_next, 0xcc, sizeof(result->uc_next));
-#endif /* !NDEBUG */
+		DBG_memset(&result->uc_next, 0xcc, sizeof(result->uc_next));
 	}
 	return result;
 }

@@ -59,11 +59,11 @@ DECL_BEGIN
 			(ptr) = _new_ptr;                                              \
 	}	__WHILE0
 
-#ifdef NDEBUG
-#define DBG_memset(ptr, byte, num_bytes) (void)0
-#else /* NDEBUG */
-#define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
-#endif /* !NDEBUG */
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
 #define vector_getblockstatus(vector, i)                            \
 	(((vector)[(i) / MPART_BLKST_BLOCKS_PER_WORD] >>                \

@@ -1821,11 +1821,11 @@ again:
 			if (!result) {
 				/* Clear all fd_set bits leading words. */
 				if (readfds)
-					memset(readfds, 0, i * sizeof(fds_word_t));
+					memset(readfds, 0, i, sizeof(fds_word_t));
 				if (writefds)
-					memset(writefds, 0, i * sizeof(fds_word_t));
+					memset(writefds, 0, i, sizeof(fds_word_t));
 				if (exceptfds)
-					memset(exceptfds, 0, i * sizeof(fds_word_t));
+					memset(exceptfds, 0, i, sizeof(fds_word_t));
 			}
 			++result;
 			if (what & POLLSELECT_READFDS)

@@ -76,6 +76,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 DEFINE_CMDLINE_FLAG_VAR(opt_disable_noack, "disable_noack");
 
 
@@ -1105,8 +1111,8 @@ return_zero:
 			oldlen = (size_t)(datastart - o) - 2;
 			newlen = sprintf(temp, "%Ix", used_count);
 			assert(newlen <= oldlen);
-			memset(o + 1, '0', (oldlen - newlen) * sizeof(char));
-			memcpy(o + 1 + oldlen - newlen, temp, newlen * sizeof(char));
+			memset(o + 1, '0', oldlen - newlen, sizeof(char));
+			memcpy(o + 1 + oldlen - newlen, temp, newlen, sizeof(char));
 		}
 		o = dataend;
 	} else if (strcmp(command, "pwrite") == 0) {
@@ -1147,9 +1153,7 @@ return_zero:
 		h = GDBFs_LookupHandle((fd_t)fd);
 		if unlikely(!h)
 			goto err_BADF;
-#ifndef NDEBUG
-		memset(&st, 0xcc, sizeof(st));
-#endif /* !NDEBUG */
+		DBG_memset(&st, 0xcc, sizeof(st));
 		TRY {
 			handle_stat(*h, &st);
 		} EXCEPT {
@@ -1221,7 +1225,8 @@ return_zero:
 				buflen -= lenlen - 2;
 				lenlen2 = sprintf(temp2, "%Ix", buflen);
 				assert(lenlen2 <= lenlen);
-				memcpy(mempset(temp, '0', lenlen - lenlen2), temp2, lenlen2);
+				memcpy(mempset(temp, '0', lenlen - lenlen2, sizeof(char)),
+				       temp2, lenlen2, sizeof(char));
 				lenlen = lenlen2;
 			}
 			assert(lenlen >= 3);

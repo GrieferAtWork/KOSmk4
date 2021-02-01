@@ -61,6 +61,14 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+
+
 PRIVATE ATTR_FREETEXT void KCALL
 kernel_initialize_threadstack(struct task *__restrict thread,
                               byte_t *__restrict sp_base,
@@ -221,9 +229,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	memmoveup(&rpc_state->ics_gpregs, &state->scs_gpregs, sizeof(struct gpregsnsp)); /* Pass the original GP registers to `func' */
 	assert(&rpc_state->ics_irregs == &state->scs_irregs);
 	/* Set-up the register state for calling `x86_rpc_kernel_redirection()' */
-#ifndef NDEBUG
-	memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
-#endif /* !NDEBUG */
+	DBG_memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
 	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
 	sched_state->scs_irregs.ir_rflags = rpc_state->ics_irregs.ir_rflags;
@@ -258,9 +264,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	memmoveup(&rpc_state->ics_gpregs, &state->scs_gpregs, sizeof(struct gpregsnsp)); /* Pass the original GP registers to `func' */
 	assert(&rpc_state->ics_irregs == &state->scs_irregs);
 	/* Set-up the register state for calling `x86_rpc_kernel_redirection()' */
-#ifndef NDEBUG
-	memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
-#endif /* !NDEBUG */
+	DBG_memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
 	memcpy(bufcopy, buf, bufsize);
 	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;

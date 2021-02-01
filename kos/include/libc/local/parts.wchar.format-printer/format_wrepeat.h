@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xced72b4e */
+/* HASH CRC-32:0xd5d53578 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,6 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/wformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: memset from string */
-#ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
-#ifdef __CRT_HAVE_memset
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* __CRT_HAVE_memset */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memset.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-#define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !__CRT_HAVE_memset */
-#endif /* !__local___localdep_memset_defined */
-__NAMESPACE_LOCAL_END
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -64,14 +41,14 @@ __LOCAL_LIBC(format_wrepeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
 	__buffer = (__WCHAR_TYPE__ *)__hybrid_alloca(64);
-	__localdep_memset(__buffer, __ch, 64);
+	__libc_memsetc(__buffer, __ch, 64, __SIZEOF_WCHAR_T__);
 #else /* __hybrid_alloca */
 	__WCHAR_TYPE__ __buffer[64];
 	if __likely(__num_repetitions <= 64) {
 		__libc_memsetc(__buffer, __ch, __num_repetitions, __SIZEOF_WCHAR_T__);
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
-	__localdep_memset(__buffer, __ch, 64);
+	__libc_memsetc(__buffer, __ch, 64, __SIZEOF_WCHAR_T__);
 #endif /* !__hybrid_alloca */
 	__result = (*__printer)(__arg, __buffer, 64);
 	if __unlikely(__result < 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc54e5ef4 */
+/* HASH CRC-32:0x9f09f77a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,14 +65,14 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char *)__hybrid_alloca(64);
-	libc_memset(buffer, ch, 64);
+	__libc_memsetc(buffer, ch, 64, __SIZEOF_CHAR__);
 #else /* __hybrid_alloca */
 	char buffer[64];
 	if likely(num_repetitions <= 64) {
 		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	libc_memset(buffer, ch, 64);
+	__libc_memsetc(buffer, ch, 64, __SIZEOF_CHAR__);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)

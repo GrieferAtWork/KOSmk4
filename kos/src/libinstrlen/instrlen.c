@@ -158,7 +158,8 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 	NESTED_EXCEPTION; /* Needed for the TRY in `predmaxone' */
 #endif /* __NON_CALL_EXCEPTIONS */
 	memset(maxlen, ARCH_INSTRUCTION_MAXLENGTH,
-	       LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE);
+	       LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE,
+	       sizeof(uint8_t));
 	lowest_iter = (byte_t const *)pc;
 	iter        = (byte_t const *)pc;
 	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE; ++i) {

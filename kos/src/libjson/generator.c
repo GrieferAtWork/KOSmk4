@@ -21,9 +21,8 @@
 #define GUARD_LIBJSON_GENERATOR_C 1
 #define _KOS_SOURCE 1
 
-#include "generator.h"
-
 #include "api.h"
+/**/
 
 #include <__stdinc.h>
 
@@ -36,6 +35,7 @@
 
 #include <libjson/generator.h>
 
+#include "generator.h"
 #include "parser.h"
 #include "writer.h"
 

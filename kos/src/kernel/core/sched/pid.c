@@ -74,6 +74,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL sigqueue_entry_freechain)(struct sigqueue_entry *head) {
@@ -411,10 +417,8 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 					task_tryyield_or_pause();
 				LIST_REMOVE_P(self, KEY__this_taskgroup__tg_proc_group_siblings);
 				sync_endwrite(&FORTASK(group_leader, this_taskgroup).tg_pgrp_processes_lock);
-#ifndef NDEBUG
-				memset(&mygroup.tg_proc_group_siblings, 0xcc, sizeof(mygroup.tg_proc_group_siblings));
-				memset(&mygroup.tg_proc_group, 0xcc, sizeof(mygroup.tg_proc_group));
-#endif /* !NDEBUG */
+				DBG_memset(&mygroup.tg_proc_group_siblings, 0xcc, sizeof(mygroup.tg_proc_group_siblings));
+				DBG_memset(&mygroup.tg_proc_group, 0xcc, sizeof(mygroup.tg_proc_group));
 				decref_unlikely(group_leader);
 			}
 			decref(group_leader_pid);
@@ -579,10 +583,8 @@ task_setprocess(struct task *__restrict self,
 		assert(sessionpid);
 		grouppid = incref(FORTASK(self, this_taskpid));
 		FORTASK(self, this_taskgroup).tg_proc_group = grouppid; /* Inherit reference */
-#ifndef NDEBUG
-		memset(&FORTASK(self, this_taskgroup).tg_proc_group_siblings, 0xcc,
-		       sizeof(FORTASK(self, this_taskgroup).tg_proc_group_siblings));
-#endif /* !NDEBUG */
+		DBG_memset(&FORTASK(self, this_taskgroup).tg_proc_group_siblings, 0xcc,
+		           sizeof(FORTASK(self, this_taskgroup).tg_proc_group_siblings));
 		LIST_INIT(&FORTASK(self, this_taskgroup).tg_pgrp_processes);
 		FORTASK(self, this_taskgroup).tg_pgrp_session = sessionpid; /* Inherit reference */
 	} else {
@@ -710,10 +712,8 @@ again_set_self:
 			thread_taskgroup.tg_proc_group = incref(threadpid); /* Inherit old reference into `old_group_pid' */
 			atomic_rwlock_init(&thread_taskgroup.tg_pgrp_processes_lock);
 			atomic_rwlock_init(&thread_taskgroup.tg_pgrp_session_lock);
-#ifndef NDEBUG
-			memset(&thread_taskgroup.tg_proc_group_siblings, 0xcc,
-			       sizeof(thread_taskgroup.tg_proc_group_siblings));
-#endif /* !NDEBUG */
+			DBG_memset(&thread_taskgroup.tg_proc_group_siblings, 0xcc,
+			           sizeof(thread_taskgroup.tg_proc_group_siblings));
 			LIST_INIT(&thread_taskgroup.tg_pgrp_processes);
 			if (!session_pid)
 				session_pid = incref(threadpid);
@@ -979,10 +979,8 @@ again_set_self:
 			thread_taskgroup.tg_proc_group = incref(FORTASK(thread, this_taskpid)); /* Inherit old reference into `old_group' */
 			atomic_rwlock_init(&thread_taskgroup.tg_pgrp_processes_lock);
 			atomic_rwlock_init(&thread_taskgroup.tg_pgrp_session_lock);
-#ifndef NDEBUG
-			memset(&thread_taskgroup.tg_proc_group_siblings, 0xcc,
-			       sizeof(thread_taskgroup.tg_proc_group_siblings));
-#endif /* !NDEBUG */
+			DBG_memset(&thread_taskgroup.tg_proc_group_siblings, 0xcc,
+			           sizeof(thread_taskgroup.tg_proc_group_siblings));
 			LIST_INIT(&thread_taskgroup.tg_pgrp_processes);
 			thread_taskgroup.tg_pgrp_session = new_session_leader; /* Inherit reference */
 			if (pnew_session_leader)

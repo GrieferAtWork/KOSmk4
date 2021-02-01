@@ -68,13 +68,13 @@ NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t i
 	 * This is used to ensure that libdisasm sees that our instruction
 	 * sequence terminates after a certain offset. */
 	byte_t textbuf[ARCH_INSTRUCTION_MAXLENGTH], *result;
-	size_t textlen;
-	textlen = ARCH_INSTRUCTION_MAXLENGTH -
+	size_t textsiz;
+	textsiz = ARCH_INSTRUCTION_MAXLENGTH -
 	          dbg_readmemory(pc, textbuf, ARCH_INSTRUCTION_MAXLENGTH);
-	if (!textlen)
+	if (!textsiz)
 		return NULL;
 	/* zero-fill a small tail area after the text. */
-	memset(textbuf + textlen, 0, ARCH_INSTRUCTION_MAXLENGTH - textlen);
+	memset(textbuf + textsiz, 0, ARCH_INSTRUCTION_MAXLENGTH - textsiz);
 	result = instruction_succ_nx(textbuf, isa);
 	if (result)
 		result = (byte_t *)pc + (result - textbuf);
@@ -108,27 +108,27 @@ PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
 NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
 	byte_t const *iter, *lowest_iter;
 	unsigned int i;
-	u8 maxlen[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
-	memset(maxlen, ARCH_INSTRUCTION_MAXLENGTH,
+	u8 maxsiz[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
+	memset(maxsiz, ARCH_INSTRUCTION_MAXLENGTH,
 	       LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE);
 	lowest_iter = (byte_t const *)pc;
 	iter        = (byte_t const *)pc;
 	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE; ++i) {
 		u8 length;
 find_shorter_instructions:
-		length = dbg_predmaxone(iter, isa, maxlen[i]);
+		length = dbg_predmaxone(iter, isa, maxsiz[i]);
 		if (!length) {
 			/* Try to go back and find a shorter instruction. */
 			while (i) {
 				--i;
-				iter += maxlen[i];
-				--maxlen[i];
-				if (maxlen[i] != 0)
+				iter += maxsiz[i];
+				--maxsiz[i];
+				if (maxsiz[i] != 0)
 					goto find_shorter_instructions;
 			}
 			goto done_backtrack;
 		}
-		maxlen[i] = length;
+		maxsiz[i] = length;
 		iter -= length;
 		if (lowest_iter > iter)
 			lowest_iter = iter;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1a1bf3e */
+/* HASH CRC-32:0xe76cf99c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,14 +66,14 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char16_t *)__hybrid_alloca(64);
-	libc_memset(buffer, ch, 64);
+	__libc_memsetc(buffer, ch, 64, 2);
 #else /* __hybrid_alloca */
 	char16_t buffer[64];
 	if likely(num_repetitions <= 64) {
 		__libc_memsetc(buffer, ch, num_repetitions, 2);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	libc_memset(buffer, ch, 64);
+	__libc_memsetc(buffer, ch, 64, 2);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)
@@ -118,14 +118,14 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char32_t *)__hybrid_alloca(64);
-	libc_memset(buffer, ch, 64);
+	__libc_memsetc(buffer, ch, 64, 4);
 #else /* __hybrid_alloca */
 	char32_t buffer[64];
 	if likely(num_repetitions <= 64) {
 		__libc_memsetc(buffer, ch, num_repetitions, 4);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	libc_memset(buffer, ch, 64);
+	__libc_memsetc(buffer, ch, 64, 4);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)

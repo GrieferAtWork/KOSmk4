@@ -55,8 +55,14 @@
 #define NE2K_DEBUG(...) (void)0
 #endif
 
-
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 
 /* Returns `true' if the first transit handle got added. */
 PRIVATE NOBLOCK bool
@@ -683,9 +689,7 @@ tx_switch_to_idle:
 			aio = used_aio;
 		}
 		packet_vm = aio_data->pd_payloadmm; /* Inherit reference */
-#ifndef NDEBUG
-		memset(&aio_data->pd_payloadmm, 0xcc, sizeof(aio_data->pd_payloadmm));
-#endif /* !NDEBUG */
+		DBG_memset(&aio_data->pd_payloadmm, 0xcc, sizeof(aio_data->pd_payloadmm));
 		COMPILER_WRITE_BARRIER();
 		/* This field gets cleared by aio_cancel() if the operation should get canceled
 		 * at any point after  */
@@ -695,10 +699,7 @@ tx_switch_to_idle:
 		/* Restore all other pending AIO handles. */
 		if (aio->ah_next)
 			Ne2k_RestorePendingTxChain(me, aio->ah_next);
-#ifndef NDEBUG
-		memset(&aio->ah_next, 0xcc, sizeof(aio->ah_next));
-		assert(aio->ah_next != AIO_HANDLE_NEXT_COMPLETED);
-#endif /* !NDEBUG */
+		DBG_memset(&aio->ah_next, 0xcc, sizeof(aio->ah_next));
 
 		PREEMPTION_ENABLE();
 

@@ -40,6 +40,13 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
@@ -178,14 +185,10 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 		       ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
 		if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE && ent->ah_type)
 			aio_handle_fini(ent);
-#ifndef NDEBUG
-		memset(ent, 0xcc, sizeof(*ent));
-#endif /* !NDEBUG */
+		DBG_memset(ent, 0xcc, sizeof(*ent));
 	}
 	iter = self->am_ext;
-#ifndef NDEBUG
-	memset(&self->am_ext, 0xcc, sizeof(self->am_ext));
-#endif /* !NDEBUG */
+	DBG_memset(&self->am_ext, 0xcc, sizeof(self->am_ext));
 	while (iter) {
 		next = iter->ame_next;
 		for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
@@ -199,11 +202,9 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 		kfree(iter);
 		iter = next;
 	}
-#ifndef NDEBUG
-	memset(&self->am_func, 0xcc, sizeof(self->am_func));
-	memset(&self->am_status, 0xcc, sizeof(self->am_status));
-	memset(&self->am_error, 0xcc, sizeof(self->am_error));
-#endif /* !NDEBUG */
+	DBG_memset(&self->am_func, 0xcc, sizeof(self->am_func));
+	DBG_memset(&self->am_status, 0xcc, sizeof(self->am_status));
+	DBG_memset(&self->am_error, 0xcc, sizeof(self->am_error));
 }
 
 
@@ -262,9 +263,7 @@ fini_and_fill_in_result:
 		self->am_ext   = iter;
 	}
 fill_in_result:
-#ifndef NDEBUG
-	memset(result, 0xcc, sizeof(struct aio_handle));
-#endif /* !NDEBUG */
+	DBG_memset(result, 0xcc, sizeof(struct aio_handle));
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
 	/* Required by `aio_multihandle_cancel()'
@@ -322,9 +321,7 @@ fini_and_fill_in_result:
 		self->am_ext   = iter;
 	}
 fill_in_result:
-#ifndef NDEBUG
-	memset(result, 0xcc, sizeof(struct aio_handle));
-#endif /* !NDEBUG */
+	DBG_memset(result, 0xcc, sizeof(struct aio_handle));
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
 	/* Required by `aio_multihandle_cancel()'
@@ -506,9 +503,7 @@ NOTHROW(KCALL aio_handle_async_alloc_exising)(void) {
 nothing_to_restore:
 		/* Finalize the old handle. */
 		aio_handle_fini(result);
-#ifndef NDEBUG
-		memset(&result->aah_next, 0xcc, sizeof(result->aah_next));
-#endif /* !NDEBUG */
+		DBG_memset(&result->aah_next, 0xcc, sizeof(result->aah_next));
 		return result;
 	}
 	return NULL;

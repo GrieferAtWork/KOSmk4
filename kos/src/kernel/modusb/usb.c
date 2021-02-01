@@ -51,6 +51,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 struct usb_probe_entry {
 	union {
 		PUSB_DEVICE_PROBE    c_device; /* [1..1] Device probe callback */
@@ -1125,9 +1131,7 @@ strange_device_without_configs:
 			 * identify what's the deal with it, and select the configuration
 			 * for us. */
 			for (i = 0; i < probes->upv_count; ++i) {
-#ifndef NDEBUG
-				memset(&dev->ud_config, 0xcc, sizeof(dev->ud_config));
-#endif /* !NDEBUG */
+				DBG_memset(&dev->ud_config, 0xcc, sizeof(dev->ud_config));
 				if ((*probes->upv_elem[i].c_device)(self, dev)) {
 #ifndef NDEBUG
 					do  {

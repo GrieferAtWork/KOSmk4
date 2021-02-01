@@ -53,10 +53,13 @@
 #define HEAP_FREE(base, size) free(base)
 #endif /* !__KERNEL__ */
 
-
-
-
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
 
 #ifndef __KERNEL__
@@ -125,9 +128,7 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 		HEAP_FREE(capture->lc_base,
 		          capture->lc_alloc);
 	}
-#ifndef NDEBUG
-	memset(capture, 0xcc, sizeof(*capture));
-#endif
+	DBG_memset(capture, 0xcc, sizeof(*capture));
 	return result;
 }
 

@@ -262,7 +262,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 			}
 			/* Copy the used portion of the string, and clear the unused portion. */
 			memcpy(dst, str, len, sizeof(char));
-			memset((char *)dst + len, 0, ((size_t)maxlen - len) * sizeof(char));
+			memset((char *)dst + len, 0, (size_t)maxlen - len, sizeof(char));
 		} else {
 			if (type == JSON_TYPE_STRING_WITH_LENGTH_OP) {
 				uint16_t len_offset;

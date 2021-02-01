@@ -1427,14 +1427,14 @@ do_return_empty_string:
 	total_length = strnlen(dst, total_length);
 	if unlikely(!total_length) {
 		/* Special case: empty string. */
-		memset((char *)start, 1, (size_t)(self->jp_pos - start));
+		memset((char *)start, 1, (size_t)(self->jp_pos - start), sizeof(char));
 		goto do_return_empty_string;
 	}
 	/* Normal, inlined utf-8 string -> Initialize leading and trailing markers. */
 	assert(dst > start);
 	assert(self->jp_pos > (dst + total_length));
-	memset((char *)start, 0, (size_t)(dst - start));
-	memset((char *)dst + total_length, 0, (size_t)(self->jp_pos - (dst + total_length)));
+	memset((char *)start, 0, (size_t)(dst - start), sizeof(char));
+	memset((char *)dst + total_length, 0, (size_t)(self->jp_pos - (dst + total_length)), sizeof(char));
 	return dst;
 }
 

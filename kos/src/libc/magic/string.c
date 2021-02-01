@@ -6886,7 +6886,7 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
  * >> void *memset(void *dst, T word, size_t word_count, size_t word_size);
  * >> void *mempset(void *dst, int byte, size_t num_bytes);
  * >> void *mempset(void *dst, T word, size_t word_count, size_t word_size); */
-#if defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
+#ifdef __USE_STRING_OVERLOADS
 #if defined(__cplusplus) && defined(__INTELLISENSE__)
 extern "C++" {
 template<class __T, class = decltype((int)(*(__T *)0 >> 0))> __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1))
@@ -6896,7 +6896,7 @@ template<class __T, class = decltype((int)(*(__T *)0 >> 0))> __ATTR_LEAF __ATTR_
 void *__NOTHROW_NCX(mempset)(void *__restrict __dst, __T __byte, size_t __word_count, size_t __word_size);
 #endif /* __USE_KOS */
 } /* extern "C++" */
-#else /* __cplusplus && __INTELLISENSE__ */
+#elif defined(__HYBRID_PP_VA_OVERLOAD)
 #define __PRIVATE_memset_3 (memset)
 #ifdef __USE_KOS
 #define __PRIVATE_memset_4  memsetc
@@ -6956,8 +6956,8 @@ __SYSDECL_BEGIN
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define memset(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memset_, (args))(args)
 #endif /* ... */
-#endif /* !__cplusplus || !__INTELLISENSE__ */
-#endif /* __USE_STRING_OVERLOADS && __HYBRID_PP_VA_OVERLOAD */
+#endif /* __HYBRID_PP_VA_OVERLOAD */
+#endif /* __USE_STRING_OVERLOADS */
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads:

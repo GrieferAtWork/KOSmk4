@@ -231,6 +231,9 @@ makeanon:
 			loadmax   = mpart_getminaddr(mima.mm_min) - 1;
 			num_bytes = (size_t)(loadmax - addr) + 1;
 		}
+		/* TODO: Try to extend a successor/predecessor mem-part to include
+		 *       the address range which we're supposed to return to our
+		 *       caller! */
 	}
 	mfile_lock_endread(self);
 

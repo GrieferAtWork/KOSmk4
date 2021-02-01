@@ -159,18 +159,6 @@ struct mfile_ops {
 	/*NOTHROW*/ (FCALL *mo_changed)(struct mfile *__restrict self,
 	                                struct mpart *__restrict part);
 
-#ifdef CONFIG_USE_NEW_FS
-	/* [0..1] Called when `self->mf_size' is about to be changed to `newsize'.
-	 * This function is always called with a non-zero value for `mf_size',
-	 * meaning that this function may assume that the file's size cannot be
-	 * altered again until it returns to the caller.
-	 * @param: newsize: The new size value that will be set by the caller upon
-	 *                  a successful return from this function (iow: won't be
-	 *                  set if this function returns with an exception) */
-	NONNULL((1)) void (FCALL *mo_truncate)(struct mfile *__restrict self, pos_t newsize) THROWS(...);
-#endif /* CONFIG_USE_NEW_FS */
-
-
 #ifndef CONFIG_MFILE_LEGACY_VIO_OPS
 	/* [0..1] VIO file operators. (when non-NULL, then this file is backed by VIO,
 	 *        and the `mo_loadblocks' and `mo_saveblocks' operators are ignored) */
@@ -267,89 +255,37 @@ struct mfile {
 
 	/* TODO: Change `mfile_makeanon_subrange()' to `mfile_truncate()' (which can
 	 *       be used to dynamically alter the `mf_size' value of a given mem-file) */
+
 	/* TODO: Change `mfile_write()' to include special handling when writing beyond
 	 *       the end of a mem-file, such that it will automatically increase the
-	 *       size of the given mem-file in this scenario:
-	 * >> mfile_write(struct mfile *self, void *buf, size_t len, pos_t addr) {
-	 * >>     mfile_lock_read(self);
-	 * >>     if (addr + len <= self->mf_size) {
-	 * >>         mfile_sizelock_inc(self);
-	 * >>         mfile_lock_endread(self);
-	 * >>         ... // Only overwrite existing data (lookup parts & write-to-parts)
-	 * >>         mfile_sizelock_dec(self);
-	 * >>         return;
-	 * >>     }
-	 * >>     if (addr < self->mf_size) {
-	 * >>         size_t existing;
-	 * >>         existing = self->mf_size - addr;
-	 * >>         ... // Only overwrite existing data as far as possible.
-	 * >>         addr = self->mf_size;
-	 * >>         buf  = (byte_t *)buf + existing;
-	 * >>         len -= existing;
-	 * >>     }
-	 * >>     part = mpart_tree_locate(self->mf_parts, addr);
-	 * >>     if (part) {
-	 * >>         size_t tailsize;
-	 * >>         // Pre-existing part with partially uninitialized page-tail.
-	 * >>         assert(part->mp_maxaddr == CEIL_ALIGN(addr, self->mf_part_amask) - 1);
-	 * >>         tailsize = (part->mp_maxaddr + 1) - addr;
-	 * >>         if (tailsize > len)
-	 * >>             tailsize = len;
-	 * >>         incref(part);
-	 * >>         mfile_sizelock_inc(self);
-	 * >>         mfile_lock_release(self);
-	 * >>         FINALLY_DECREF_UNLIKELY(part);
-	 * >>         mpart_lock_acquire(part);
-	 * >>         ... // Copy `tailsize' bytes of data beyond the tail of `part', but
-	 * >>             // leave the associated blocks's status bits set to `ST_INIT'.
-	 * >>             // For reference, see the impl. of `mpart_write()'
-	 * >>         mpart_lock_release(part);
-	 * >>         TRY {
-	 * >>             pos_t newsize;
-	 * >>             newsize = self->mf_size + tailsize;
-	 * >>             TRY {
-	 * >>                 (*self->mf_ops->mo_truncate)(self, newsize);
-	 * >>             } EXCEPT {
-	 * >>                 mfile_sizelock_dec_nosignal(self);
-	 * >>                 RETHROW();
-	 * >>             }
-	 * >>             atomic64_write(&self->mf_size, newsize);
-	 * >>             mfile_sizelock_dec_nosignal(self);
-	 * >>         } EXCEPT {
-	 * >>             // If the first block that used to overlap with the end of the file
-	 * >>             // had a state different from `MPART_BLOCK_ST_NDEF' before, then that
-	 * >>             // original state must be restored here.
-	 * >>             FOREACH(block_index: BLOCK_RANGE_OF(addr, tailsize))
-	 * >>                 mpart_setblockstate(part, block_index, MPART_BLOCK_ST_NDEF);
-	 * >>             sig_broadcast(&self->mf_initdone);
-	 * >>             RETHROW();
-	 * >>         }
-	 * >>         FOREACH(block_index: BLOCK_RANGE_OF(addr, tailsize))
-	 * >>             mpart_setblockstate(part, block_index, MPART_BLOCK_ST_CHNG);
-	 * >>         sig_broadcast(&self->mf_initdone);
-	 * >>         addr += tailsize;
-	 * >>         buf  = (byte_t *)buf + tailsize;
-	 * >>         len -= tailsize;
-	 * >>     }
-	 * >>     mfile_lock_endread(self);
-	 * >>     part = ... // Create a new mem-part and before adding it to the file, initialize
-	 * >>                // its backing data to the data that should be written to the file.
-	 * >>     ... // TODO
-	 * >> }
-	 *
-	 * NOTE: The file-size-increase must happen _after_ data has already been written
-	 *       to the relevant part (i.e. has been written to the relevant mem-part, as
-	 *       this write may include an access of user-space memory and as such may
-	 *       fail sporadically). The call to `mo_truncate()' should then be made
-	 *       afterwards, and include  */
+	 *       size of the given mem-file in this scenario. For this purpose, the write
+	 *       must happen without releasing any locks that may be required in order to
+	 *       undo the operation, and `mf_size' must then (somehow) be increased atomically.
+	 *       Note that since it's a 64-bit number, doing this atomically doesn't normally
+	 *       work in 32-bit mode... */
+
+	/* TODO: When the size of a file is changed, a flag `MFILE_F_ATTRCHANGED' should
+	 *       be set, followed by `mo_changed()' being called. The flag should behave
+	 *       the same as `MFILE_F_CHANGED', meaning that it can be used to enqueue the
+	 *       mem-file for containing modified attributes. */
+
+	/* TODO: Change `mo_changed()' to not take a mem-part, but instead a set of flags
+	 *       of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED' that describe in which way the
+	 *       file should be marked as having changed. */
 
 	/* TODO: Change `mfile_read()' to not read beyond the end of a file, and instead
 	 *       return the actual # of bytes read. (Trying to read all data from beyond
 	 *       the end of a file should return `0', thus indicating end-of-file) */
+
 	/* TODO: Add a new function `mfile_tailread()' that behaves just like `mfile_read()',
 	 *       but when an attempt is made to read from a location beyond the natural end
 	 *       of the associated file, then the function will block until the file's size
-	 *       has increased to the point where  */
+	 *       has increased to allow for at least one byte to be read at the specified
+	 *       location */
+
+	/* TODO: Add a new function `mfile_tailwrite()' that always writes data at the
+	 *       allocated end of the file (O_APPEND-style) */
+
 #ifdef CONFIG_USE_NEW_FS
 	uintptr_t                   mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                 mf_sizelock;   /* [lock(INC([mpart].mp_flags & MPART_F_LOCKBIT), DEC(ATOMIC))]
@@ -358,8 +294,8 @@ struct mfile {
 	                                            * parts of this file, or a lock to the file itself. However,
 	                                            * decrementing it doesn't impose such a requirement. When this
 	                                            * counter hits 0, then `mf_initdone' must be broadcast. */
-	pos_t                       mf_size;       /* [lock(INCREMENT: mf_sizelock != 0,
-	                                            *       DECREMENT: mf_lock && mf_sizelock == 0 && mpart_lock_acquired(ALL(mf_parts)))]
+	pos_t                       mf_size;       /* [lock(INCREMENT: WRITE(mf_lock),
+	                                            *       DECREMENT: WRITE(mf_lock) && mf_sizelock == 0 && mpart_lock_acquired(ALL(mf_parts)))]
 	                                            * [const_if(MFILE_F_NOTRUNCATE || mf_sizelock != 0)]
 	                                            * [valid_if(!mfile_isanon(self))]
 	                                            * File size field.

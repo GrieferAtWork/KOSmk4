@@ -64,7 +64,7 @@ ProcFS_Sys_Kernel_Domainname_Write(struct regular_node *__restrict UNUSED(self),
 		THROW(E_BUFFER_TOO_SMALL, bufsize, _UTSNAME_DOMAIN_LENGTH);
 	cred_require_sysadmin();
 	memcpy(temp, buf, bufsize, sizeof(char));
-	memset(temp + bufsize, 0, (_UTSNAME_DOMAIN_LENGTH - bufsize) * sizeof(char));
+	memset(temp + bufsize, 0, _UTSNAME_DOMAIN_LENGTH - bufsize, sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(kernel_uname.domainname, temp, sizeof(temp));
 }
