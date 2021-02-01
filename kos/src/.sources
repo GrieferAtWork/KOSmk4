@@ -117,7 +117,7 @@ BEGIN
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		DEFINE_SIMPLE_LIBRARY("libvm86")
 		DEFINE_SIMPLE_LIBRARY("libemu86")
-		DEFINE_SIMPLE_LIBRARY("libvgastate", USELIB("libvm86"))
+		DEFINE_SIMPLE_LIBRARY("libvgastate", USELIB("libvm86") USELIB("libphys"))
 	}
 
 	BEGIN GROUP("libs.libvideo-codec") { COMPILE, LINK, ARCHIVE, MCOPY };

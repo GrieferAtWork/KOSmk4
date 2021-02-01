@@ -56,12 +56,7 @@
 
 
 #define VGA_STATE_ERROR_SUCCESS 0 /* Success */
-#define VGA_STATE_ERROR_IO      1 /* I/O error */
-#define VGA_STATE_ERROR_NOMEM   2 /* Insufficient memory */
-#ifndef __KERNEL__
-#define VGA_STATE_ERROR_ACCES   3 /* Access denied */
-#endif /* !__KERNEL__ */
-
+#define VGA_STATE_ERROR_NOMEM   1 /* Insufficient memory */
 
 #define VGA_BIOS_FEAT_NONE      0x0000 /* ... */
 #define VGA_BIOS_FEAT_VESA_MODE 0x0001 /* vb_vesa_mode */

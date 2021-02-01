@@ -42,6 +42,7 @@ opt.removeif([](e) -> e.startswith("-O"));
 #include <string.h>
 #include <strings.h>
 
+#include <libphys/phys.h>
 #include <libvgastate/vga.h>
 #include <libvm86/emulator.h>
 
@@ -53,7 +54,6 @@ opt.removeif([](e) -> e.startswith("-O"));
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #else /* __KERNEL__ */
 #include <sys/mman.h>
 
@@ -62,47 +62,10 @@ opt.removeif([](e) -> e.startswith("-O"));
 #include <unistd.h>
 #endif /* !__KERNEL__ */
 
-#define obzero(obj) bzero(&(obj), sizeof(obj))
 
 DECL_BEGIN
 
-#ifndef __KERNEL__
-PRIVATE fd_t dev_mem = -1;
-
-#define vga_copyfromphys(/*void **/ dst, src, num_bytes)             \
-	(pread64(dev_mem, dst, num_bytes, (pos64_t)(src)) == (num_bytes) \
-	 ? VGA_STATE_ERROR_SUCCESS                                       \
-	 : VGA_STATE_ERROR_IO)
-
-#define vga_copytophys(dst, /*void const **/ src, num_bytes)          \
-	(pwrite64(dev_mem, src, num_bytes, (pos64_t)(dst)) == (num_bytes) \
-	 ? VGA_STATE_ERROR_SUCCESS                                        \
-	 : VGA_STATE_ERROR_IO)
-
-
-PRIVATE WUNUSED unsigned int
-NOTHROW_KERNEL(CC init_phys)(void) {
-	if (ATOMIC_READ(dev_mem) == -1) {
-		fd_t fd;
-		fd = open("/dev/mem", O_RDWR);
-		if (fd == -1)
-			return VGA_STATE_ERROR_ACCES;
-		if (!ATOMIC_CMPXCH(dev_mem, -1, fd))
-			close(fd);
-	}
-	return VGA_STATE_ERROR_SUCCESS;
-
-}
-#else /* !__KERNEL__ */
-#define init_phys() \
-	VGA_STATE_ERROR_SUCCESS
-#define vga_copyfromphys(/*void **/ dst, src, num_bytes) \
-	(vm_copyfromphys(/*void **/ dst, src, num_bytes), VGA_STATE_ERROR_SUCCESS)
-#define vga_copytophys(dst, /*void const **/ src, num_bytes) \
-	(vm_copytophys(dst, /*void const **/ src, num_bytes), VGA_STATE_ERROR_SUCCESS)
-#endif /* __KERNEL__ */
-
-
+#define obzero(obj) bzero(&(obj), sizeof(obj))
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int
 NOTHROW_KERNEL(CC save_vga_mode)(struct vga_mode *__restrict self) {
@@ -268,41 +231,33 @@ NOTHROW_KERNEL(CC end_vga_font_access)(struct vga_font_access_regs *__restrict r
 	vga_wgfx(VGA_GFX_MISC, regs->old_gfx_misc);
 }
 
-PRIVATE WUNUSED NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) void
 NOTHROW_KERNEL(CC save_vga_font)(struct vga_font *__restrict self) {
-	unsigned int i, result;
+	unsigned int i;
 	struct vga_font_access_regs regs;
 	u32 src = 0;
 	begin_vga_font_access(&regs);
-	result = VGA_STATE_ERROR_SUCCESS;
 	for (i = 0; i < 256; ++i) {
-		result = vga_copyfromphys(&self->vf_blob[i], VGA_VRAM_BASE + src, 16);
-		if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-			break;
+		copyfromphys(&self->vf_blob[i], VGA_VRAM_BASE + src, 16);
 		src += 32;
 	}
 	end_vga_font_access(&regs);
-	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) void
 NOTHROW_KERNEL(CC load_vga_font)(struct vga_font const *__restrict self) {
-	unsigned int i, result;
+	unsigned int i;
 	struct vga_font_access_regs regs;
 	u32 src = 0;
 	begin_vga_font_access(&regs);
-	result = VGA_STATE_ERROR_SUCCESS;
 	for (i = 0; i < 256; ++i) {
-		result = vga_copytophys(VGA_VRAM_BASE + src, &self->vf_blob[i], 16);
-		if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-			break;
+		copytophys(VGA_VRAM_BASE + src, &self->vf_blob[i], 16);
 		src += 32;
 	}
 	end_vga_font_access(&regs);
-	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) void
 NOTHROW_KERNEL(CC save_vga_palette)(struct vga_color *__restrict pal,
                                     size_t num_bytes) {
 	unsigned int i;
@@ -312,10 +267,9 @@ NOTHROW_KERNEL(CC save_vga_palette)(struct vga_color *__restrict pal,
 		((byte_t *)pal)[i] = vga_r(VGA_PEL_D);
 	for (; i < 768; ++i)
 		vga_r(VGA_PEL_D);
-	return VGA_STATE_ERROR_SUCCESS;
 }
 
-PRIVATE WUNUSED NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) void
 NOTHROW_KERNEL(CC load_vga_palette)(struct vga_color const *__restrict pal,
                                     size_t num_bytes) {
 	unsigned int i;
@@ -325,7 +279,6 @@ NOTHROW_KERNEL(CC load_vga_palette)(struct vga_color const *__restrict pal,
 		vga_w(VGA_PEL_D, ((byte_t *)pal)[i]);
 	for (; i < 768; ++i)
 		vga_w(VGA_PEL_D, 0);
-	return VGA_STATE_ERROR_SUCCESS;
 }
 
 struct vga_text_access_regs {
@@ -366,30 +319,26 @@ NOTHROW_KERNEL(CC end_vga_text_access)(struct vga_text_access_regs const *__rest
 	vga_wgfx(VGA_GFX_MISC, regs->old_gfx_misc);
 }
 
-PRIVATE WUNUSED NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) void
 NOTHROW_KERNEL(CC save_vga_text)(u16 textbuf[80 * 25]) {
-	unsigned int result;
 	struct vga_text_access_regs regs;
 	begin_vga_text_access(&regs);
 
 	/* Save old text memory. */
-	result = vga_copyfromphys(textbuf, VGA_VRAM_TEXT, 80 * 25 * 2);
+	copyfromphys(textbuf, VGA_VRAM_TEXT, 80 * 25 * 2);
 
 	end_vga_text_access(&regs);
-	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) void
 NOTHROW_KERNEL(CC load_vga_text)(u16 const textbuf[80 * 25]) {
-	unsigned int result;
 	struct vga_text_access_regs regs;
 	begin_vga_text_access(&regs);
 
 	/* Save old text memory. */
-	result = vga_copytophys(VGA_VRAM_TEXT, textbuf, 80 * 25 * 2);
+	copytophys(VGA_VRAM_TEXT, textbuf, 80 * 25 * 2);
 
 	end_vga_text_access(&regs);
-	return result;
 }
 
 /* Base address where the virtual memory mapping for vm86 begins. */
@@ -455,7 +404,7 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 	}
 #else /* __KERNEL__ */
 	void *bios;
-	bios = mmap(NULL, VGA_VM86_BIOS_SIZE, dev_mem, MAP_SHARED, dev_mem, 0);
+	bios = mmapphys(0, VGA_VM86_BIOS_SIZE);
 	if (bios == MAP_FAILED)
 		return VGA_STATE_ERROR_NOMEM;
 	self->vv_biosbase = (byte_t *)bios;
@@ -553,8 +502,8 @@ NOTHROW_KERNEL(CC bios_interrupt)(vga_vm86_state_t *__restrict self, u8 intno) {
 #define BIOS_BUF_NULL                                physpage2addr(PHYSPAGE_INVALID)
 #define BIOS_BUF_ALLOC(num_bytes)                    physpage2addr(page_malloc(CEILDIV(num_bytes, PAGESIZE)))
 #define BIOS_BUF_FREE(buf, num_bytes)                page_free(physaddr2page(buf), CEILDIV(num_bytes, PAGESIZE))
-#define BIOS_BUF_PREAD(buf, dst, num_bytes, offset)  vm_copyfromphys(dst, (buf) + (offset), num_bytes)
-#define BIOS_BUF_PWRITE(buf, src, num_bytes, offset) vm_copytophys((buf) + (offset), src, num_bytes)
+#define BIOS_BUF_PREAD(buf, dst, num_bytes, offset)  copyfromphys(dst, (buf) + (offset), num_bytes)
+#define BIOS_BUF_PWRITE(buf, src, num_bytes, offset) copytophys((buf) + (offset), src, num_bytes)
 #else /* __KERNEL__ */
 #define BIOS_BUF_NULL                                NULL
 #define BIOS_BUF_ALLOC(num_bytes)                    ((__byte_t *)malloc(num_bytes))
@@ -739,21 +688,12 @@ INTERN NONNULL((1)) unsigned int
 NOTHROW_KERNEL(CC libvga_state_save)(struct vga_state *__restrict self) {
 	unsigned int result;
 	obzero(*self);
-	result = init_phys();
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
 	result = save_vga_mode(&self->vs_mode);
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
-	result = save_vga_palette(&self->vs_pal.vp_pal[0], sizeof(self->vs_pal.vp_pal));
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	result = save_vga_font(&self->vs_font);
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	result = save_vga_text(self->vs_text);
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
+	save_vga_palette(&self->vs_pal.vp_pal[0], sizeof(self->vs_pal.vp_pal));
+	save_vga_font(&self->vs_font);
+	save_vga_text(self->vs_text);
 	/* Try to check if the BIOS can tell us anything we don't already know */
 	save_vga_bios(&self->vs_bios);
 done:
@@ -765,20 +705,10 @@ NOTHROW_KERNEL(CC libvga_state_load)(struct vga_state const *__restrict self) {
 	unsigned int result;
 	/* Use the BIOS to restore state-data that we're received from it specifically. */
 	load_vga_bios(&self->vs_bios);
-	result = init_phys();
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	result = load_vga_text(self->vs_text);
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	result = load_vga_font(&self->vs_font);
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	result = load_vga_palette(&self->vs_pal.vp_pal[0], sizeof(self->vs_pal.vp_pal));
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
+	load_vga_text(self->vs_text);
+	load_vga_font(&self->vs_font);
+	load_vga_palette(&self->vs_pal.vp_pal[0], sizeof(self->vs_pal.vp_pal));
 	result = load_vga_mode(&self->vs_mode, 0x00);
-done:
 	return result;
 }
 
@@ -1132,12 +1062,8 @@ NOTHROW_KERNEL(CC libvga_state_text)(void) {
 	result = load_vga_mode(&textmode, 0xff);
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
-	result = load_vga_palette(textpal.vp_pal, sizeof(textpal.vp_pal));
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	result = load_vga_font(&textfont);
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
+	load_vga_palette(textpal.vp_pal, sizeof(textpal.vp_pal));
+	load_vga_font(&textfont);
 done:
 	return result;
 }
