@@ -101,7 +101,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL outsphysb)(port_t port, PHYS physaddr_t addr, 
 FUNDEF NOBLOCK void NOTHROW(KCALL outsphysw)(port_t port, /*aligned(2)*/ PHYS physaddr_t addr, size_t num_words);
 FUNDEF NOBLOCK void NOTHROW(KCALL outsphysl)(port_t port, /*aligned(4)*/ PHYS physaddr_t addr, size_t num_dwords);
 
-/* Copy memory to/from the physical address space. */
+/* Copy memory to/from/within the physical address space. */
 #ifdef __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS
 FUNDEF void KCALL copyfromphys(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL copytophys(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);

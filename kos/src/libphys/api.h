@@ -17,14 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBREGEX_API_H
-#define GUARD_LIBREGEX_API_H 1
+#ifndef GUARD_LIBPHYS_API_H
+#define GUARD_LIBPHYS_API_H 1
 
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
-#include <libregex/api.h>
+#include <libphys/api.h>
 
-#define CC LIBREGEX_CC
+#define CC LIBPHYS_CC
 
-#endif /* !GUARD_LIBREGEX_API_H */
+#endif /* !GUARD_LIBPHYS_API_H */
