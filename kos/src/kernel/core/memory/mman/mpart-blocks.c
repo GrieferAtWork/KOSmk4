@@ -28,6 +28,7 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/phys.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -255,8 +256,15 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 		                             next, part));
 
 		/* If defined, invoke the part-changed callback of the file. */
+#ifdef CONFIG_USE_NEW_FS
+		if (!(ATOMIC_FETCHOR(self->mf_flags, MFILE_F_CHANGED) & MFILE_F_CHANGED)) {
+			if (self->mf_ops->mo_changed != NULL)
+				(*self->mf_ops->mo_changed)(self, part);
+		}
+#else /* CONFIG_USE_NEW_FS */
 		if (self->mf_ops->mo_changed != NULL)
 			(*self->mf_ops->mo_changed)(self, part);
+#endif /* !CONFIG_USE_NEW_FS */
 	}
 }
 
@@ -456,6 +464,9 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	/* With INIT now set for all of the parts in min...max,
 	 * we can proceed to actually do the initialization now! */
 	incref(file);
+#ifdef CONFIG_USE_NEW_FS
+	mfile_sizelock_inc(file);
+#endif /* CONFIG_USE_NEW_FS */
 	mpart_lock_release(self);
 
 	/* Calculate the actual physical address of the first byte
@@ -466,23 +477,55 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 
 	/* Actually load blocks. */
 	TRY {
-		if likely(file->mf_ops->mo_loadblocks != NULL) {
-			(*file->mf_ops->mo_loadblocks)(file, (self->mp_minaddr >> file->mf_blockshift) + min,
-			                               min_addr, (max - min) + 1);
+		pos_t addr;
+		size_t num_bytes;
+		auto mo_loadblocks = file->mf_ops->mo_loadblocks;
+
+		addr      = self->mp_minaddr + (min << file->mf_blockshift);
+		num_bytes = ((max - min) + 1) << file->mf_blockshift;
+
+#ifdef CONFIG_USE_NEW_FS
+		if unlikely(addr + num_bytes > file->mf_size) {
+			/* Limit the load-range by the size of the file, and zero-initialize
+			 * any memory that is being mapped beyond the end natural end of the
+			 * file. */
+			if (addr >= file->mf_size) {
+				bzerophyscc(min_addr, num_bytes);
+			} else {
+				size_t load_bytes;
+				load_bytes = (size_t)(file->mf_size - addr);
+				assert(load_bytes < num_bytes);
+				if likely(mo_loadblocks != NULL)
+					(*mo_loadblocks)(file, addr, min_addr, load_bytes);
+				bzerophyscc(min_addr + load_bytes,
+				            num_bytes - load_bytes);
+			}
+		} else
+#endif /* CONFIG_USE_NEW_FS */
+		{
+			if likely(mo_loadblocks != NULL)
+				(*mo_loadblocks)(file, addr, min_addr, num_bytes);
 		}
 	} EXCEPT {
 		/* Change back all INIT-parts to UNDEF */
 		for (i = min; i <= max; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
+#ifdef CONFIG_USE_NEW_FS
+		mfile_sizelock_dec_nosignal(file);
+#endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		RETHROW();
 	}
+
 	/* Mark all INIT-pages as loaded. */
 	for (i = min; i <= max; ++i)
 		mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
 
 	/* Broadcast that init has finished. */
+#ifdef CONFIG_USE_NEW_FS
+	mfile_sizelock_dec_nosignal(file);
+#endif /* CONFIG_USE_NEW_FS */
 	sig_broadcast(&file->mf_initdone);
 
 	decref_unlikely(file);
@@ -669,12 +712,13 @@ again_read_st:
 		if (st == MPART_BLOCK_ST_NDEF) {
 			auto mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
 			if likely(mo_loadblocks != NULL) {
-				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW! */
+				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW!
+				 *       We also don't have to call `mfile_sizelock_inc()', since
+				 *       doing so wouldn't make any sense for any of the valid use-
+				 *       cases of hinted memory mappings. */
 				(*mo_loadblocks)(self->mp_file,
-				                 (mfile_block_t)((mpart_getminaddr(self) >>
-				                                  PAGESHIFT) +
-				                                 block_index),
-				                 pl.mppl_addr, 1);
+				                 mpart_getminaddr(self) + (block_index << PAGESHIFT),
+				                 pl.mppl_addr, PAGESIZE);
 			}
 		}
 

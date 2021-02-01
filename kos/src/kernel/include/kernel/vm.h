@@ -93,7 +93,7 @@
 #define db_parts                                      mf_parts
 #define db_addrshift                                  mf_blockshift
 #define vm_datablock_destroy(...)                     mfile_destroy(__VA_ARGS__)
-#define vm_datablock_anonymize(...)                   (mfile_makeanon(__VA_ARGS__), 1)
+#define vm_datablock_anonymize(...)                   (mfile_delete(__VA_ARGS__), 1)
 #define vm_datablock_isanonymous(...)                 mfile_isanon(__VA_ARGS__)
 #define vm_datablock_sync(...)                        mfile_sync(__VA_ARGS__)
 #define vm_datablock_locatepart(...)                  mfile_getpart(__VA_ARGS__)
@@ -499,7 +499,7 @@ DECL_END
 #define mf_parts                                       db_parts
 #define mf_blockshift                                  db_addrshift
 #define mfile_destroy(...)                             vm_datablock_destroy(__VA_ARGS__)
-#define mfile_makeanon(...)                            vm_datablock_anonymize(__VA_ARGS__)
+#define mfile_delete(...)                            vm_datablock_anonymize(__VA_ARGS__)
 #define mfile_isanon(...)                              vm_datablock_isanonymous(__VA_ARGS__)
 #define mfile_sync(...)                                vm_datablock_sync(__VA_ARGS__)
 #define mfile_getpart(...)                             vm_datablock_locatepart(__VA_ARGS__)
@@ -1638,11 +1638,11 @@ struct vm_datablock_type {
 	 * These callbacks are used by UVIO datablocks to implement the
 	 * server/client architecture for user-space driven VIO emulation. */
 	WUNUSED NONNULL((1)) size_t
-	(KCALL *dt_handle_read)(struct vm_datablock *__restrict self,
+	(KCALL *mo_stream_read)(struct vm_datablock *__restrict self,
 	                        USER CHECKED void *dst,
 	                        size_t num_bytes, iomode_t mode) THROWS(...);
 	WUNUSED NONNULL((1)) size_t
-	(KCALL *dt_handle_write)(struct vm_datablock *__restrict self,
+	(KCALL *mo_stream_write)(struct vm_datablock *__restrict self,
 	                         USER CHECKED void const *src,
 	                         size_t num_bytes, iomode_t mode) THROWS(...);
 	/* [0..1] Same as above, but used when polling for data being available.

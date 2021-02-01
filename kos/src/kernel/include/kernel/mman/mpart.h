@@ -79,7 +79,13 @@
                                        * The backing block-state bitset exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
 /*efine MPART_F_               0x0040  * ... */
-/*efine MPART_F_               0x0080  * ... */
+#define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag may not be cleared to free up
+                                       * memory. This flag is still cleared when the is being anonymized as the result of
+                                       * a call to `mfile_delete()' or `mfile_makeanon_subrange()'. The only place where
+                                       * this flag makes a difference, is when the global list of mem-parts is scanned for
+                                       * parts which are no longer in-use, and can be destroyed by deleting their global
+                                       * reference. - This flag is set by default for parts of files that have the
+                                       * `MFILE_F_PERSISTENT' flag set. */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 /*efine MPART_F_               0x0200  * ... */
 #define MPART_F_NOSPLIT        0x0400 /* [const] This mem-part cannot be split, and if doing so would be necessary,
@@ -1125,7 +1131,8 @@ DATDEF struct mpart_slist mpart_all_dead;
  * would have otherwise prevented it from being destroyed) */
 DATDEF struct REF mpart_slist mpart_all_pending;
 
-/* Add the given mpart `self' to the global list of parts. */
+/* Add the given mpart `self' to the global list of parts.
+ * This function will initialize `self->mp_allparts' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self);
 

@@ -172,6 +172,9 @@ copytophys(PHYS physaddr_t dst,
 
 FUNDEF NOBLOCK void NOTHROW(KCALL copyinphys)(PHYS physaddr_t dst, PHYS physaddr_t src, size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(KCALL memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes);
+/* Same as `memsetphys(dst, 0, num_bytes)', but includes a special optimization
+ * where it will skip whole physical pages when `page_iszero()' returns true. */
+FUNDEF NOBLOCK void NOTHROW(KCALL bzerophyscc)(PHYS physaddr_t dst, size_t num_bytes);
 
 /* no-#PF variants of `copy(from|to)phys()'.
  * @return: 0 : The copy operation completed without any problems.

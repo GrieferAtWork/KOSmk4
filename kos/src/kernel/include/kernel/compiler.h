@@ -50,6 +50,11 @@
 #define CONFIG_USE_NEW_VM
 #endif
 
+#undef CONFIG_USE_NEW_FS
+#if 0
+#define CONFIG_USE_NEW_FS
+#endif
+
 
 #ifdef CONFIG_USE_NEW_VM
 /* Backward-compatibility */

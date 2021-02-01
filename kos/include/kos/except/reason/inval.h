@@ -198,6 +198,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED,          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,                   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
+	E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -371,6 +372,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
+#define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -541,6 +543,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          149 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   150 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  151 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
+#define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            152 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -36,8 +36,7 @@ DECL_BEGIN
 /* Same as the regular `struct rwlock', however neither read-after-write,
  * nor write-after-read is allowed. However read-after-read is allowed,
  * and unlike with `struct rwlock', read/write-locks created by one thread
- * can be inherited by another. (these are semantics required by the DMA
- * lock of `struct vm')
+ * can be inherited by another.
  * Essentially, a `shared_rwlock' is the same as an `atomic_rwlock', with
  * the addition that a `shared_rwlock' includes a signal with which one can
  * do blocking waits for the lock to become available. */

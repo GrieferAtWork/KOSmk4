@@ -31,8 +31,10 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -46,40 +48,23 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
-
-/* Create a new part, but don't add it to the global chain of parts, yet.
- * NOTE: The returned part does not ahve the `MPART_F_GLOBAL_REF' flag set! */
-PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
-mfile_private_makepart(struct mfile *__restrict self,
-                       PAGEDIR_PAGEALIGNED pos_t addr,
-                       PAGEDIR_PAGEALIGNED size_t num_bytes)
+LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
+_mfile_newpart(struct mfile *__restrict self,
+               PAGEDIR_PAGEALIGNED pos_t addr,
+               PAGEDIR_PAGEALIGNED size_t num_bytes)
 		THROWS(E_WOULDBLOCK, ...) {
 	REF struct mpart *result;
-	assert(mfile_addr_aligned(self, addr));
-	result = (REF struct mpart *)kmalloc(sizeof(struct mpart),
-	                                     GFP_LOCKED);
-	result->mp_refcnt = 1;
-	result->mp_flags  = MPART_F_NORMAL;
-	result->mp_state  = MPART_ST_VOID;
-	result->mp_file   = incref(self);
-	LIST_INIT(&result->mp_copy);
-	LIST_INIT(&result->mp_share);
-	SLIST_INIT(&result->mp_lockops);
-	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
-	result->mp_minaddr = addr;
-	result->mp_maxaddr = addr + num_bytes - 1;
-	result->mp_meta    = NULL;
-#ifdef LIBVIO_CONFIG_ENABLED
-	if (mfile_getvio(self) != NULL) {
-		result->mp_state = MPART_ST_VIO;
-		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
-		result->mp_blkst_ptr = NULL;
-	} else
-#endif /* LIBVIO_CONFIG_ENABLED */
-	{
+	if (self->mf_ops->mo_newpart) {
+		result = (*self->mf_ops->mo_newpart)(self, addr, num_bytes);
+		assert(!(result->mp_flags & (MPART_F_GLOBAL_REF | MPART_F_LOCKBIT |
+		                             MPART_F_CHANGED | MPART_F_PERSISTENT |
+		                             MPART_F__RBRED)));
+	} else {
 		size_t num_blocks;
-		num_blocks = num_bytes >> self->mf_blockshift;
-		/* Allocate the block-status bitset. */
+		result = (REF struct mpart *)kmalloc(sizeof(struct mpart),
+		                                     GFP_LOCKED | GFP_PREFLT);
+		result->mp_flags = MPART_F_NORMAL;
+		num_blocks = (num_bytes + (((size_t)1 << self->mf_blockshift) - 1)) >> self->mf_blockshift;
 		if (num_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
 			result->mp_flags |= MPART_F_BLKST_INL;
 			result->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
@@ -98,28 +83,20 @@ mfile_private_makepart(struct mfile *__restrict self,
 				RETHROW();
 			}
 #if MPART_BLOCK_ST_NDEF != 0
-			memset(bitset, MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF),
-			       num_words, sizeof(mpart_blkst_word_t));
+			memsetc(bitset, MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF),
+			        num_words, sizeof(mpart_blkst_word_t));
 #endif /* MPART_BLOCK_ST_NDEF != 0 */
 			result->mp_blkst_ptr = bitset;
 		}
-	}
-	if (self->mf_ops->mo_initpart) {
-		/* Service custom part initializer. */
-		TRY {
-			(*self->mf_ops->mo_initpart)(self, result);
-		} EXCEPT {
-			decref_nokill(self);
-			if (!(result->mp_flags & MPART_F_BLKST_INL))
-				kfree(result->mp_blkst_ptr);
-			kfree(result);
-			RETHROW();
-		}
+		result->mp_state = MPART_ST_VOID;
+		result->mp_meta  = NULL;
+#ifdef LIBVIO_CONFIG_ENABLED
+		if unlikely(mfile_getvio(self) != NULL)
+			result->mp_state = MPART_ST_VIO;
+#endif /* LIBVIO_CONFIG_ENABLED */
 	}
 	return result;
 }
-
-
 
 /* Same as `mfile_getpart()', but may _only_ be used when `self' is an
  * anonymous file! As such, this function is mainly used to allocate
@@ -130,131 +107,209 @@ mfile_makepart(struct mfile *__restrict self,
                PAGEDIR_PAGEALIGNED size_t num_bytes)
 		THROWS(E_WOULDBLOCK, ...) {
 	REF struct mpart *result;
-	result = mfile_private_makepart(self, addr, num_bytes);
+	assert(mfile_isanon(self));
+	assert(mfile_addr_aligned(self, addr));
+	assert(mfile_addr_aligned(self, num_bytes));
+	assert(num_bytes != 0);
+	result = _mfile_newpart(self, addr, num_bytes);
+
+	/* Initialize remaining fields. */
+	result->mp_refcnt = 1;
+	result->mp_file   = self;
+#ifdef CONFIG_USE_NEW_FS
+	if (self->mf_flags & MFILE_F_DELETED)
+		result->mp_file = &mfile_anon[self->mf_blockshift];
+#endif /* CONFIG_USE_NEW_FS */
+	incref(result->mp_file);
+	LIST_INIT(&result->mp_copy);
+	LIST_INIT(&result->mp_share);
+	SLIST_INIT(&result->mp_lockops);
+	LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
+	result->mp_minaddr = addr;
+	result->mp_maxaddr = addr + num_bytes - 1;
+	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	_mpart_init_asanon(result);
-
-	/* Add the new part to the global list. */
-#ifdef LIBVIO_CONFIG_ENABLED
-	if (result->mp_state != MPART_ST_VIO)
-#endif /* LIBVIO_CONFIG_ENABLED */
-	{
-		mpart_all_list_insert(result);
-	}
-
 	return result;
 }
 
 
 
-/* Check `self' for a known mem-part that contains `addr', and (if found),
- * return that part. Otherwise, construct a new part start starts at `addr'
- * and spans at most `max_num_bytes' bytes (less may be returned if another part
- * already exists that describes the mapping above the requested location)
- * NOTE: The caller must ensure that:
- * >> mfile_addr_aligned(addr) && mfile_addr_aligned(max_num_bytes)
+/* Check `self' for a known mem-part that contains `addr', and (if
+ * found), return that part. Otherwise, construct a new part start
+ * starts at `addr' and spans around `hint_bytes' bytes (less may
+ * be returned if another part already exists that describes the
+ * mapping above the requested location, and more may be returned
+ * if a pre-existing part was spans beyond `addr +hint_bytes -1')
+ *
+ * See also the effect that `mf_size' and `MFILE_F_DELETED' have
+ * on the behavior of this function.
+ *
+ * Note that the caller must ensure that:
+ * >> mfile_addr_aligned(addr) && mfile_addr_aligned(hint_bytes)
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no longer contain that address now as
- *              the result of being truncated since. */
+ *              the result of being truncated since.
+ * @throw: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE: ... */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED pos_t addr,
-              PAGEDIR_PAGEALIGNED size_t max_num_bytes)
-		THROWS(E_WOULDBLOCK, ...) {
+              PAGEDIR_PAGEALIGNED size_t hint_bytes)
+		THROWS(E_WOULDBLOCK, E_INVALID_ARGUMENT, ...) {
 	REF struct mpart *result;
-	struct mpart_tree_minmax mima;
-	size_t limit;
+	size_t num_bytes;
+	pos_t loadmax;
+again:
+	if (mfile_isanon(self)) {
+makeanon:
+		return mfile_makepart(self, addr, hint_bytes);
+	}
+
 	assert(mfile_addr_aligned(self, addr));
-	assert(mfile_addr_aligned(self, max_num_bytes));
-	assert(max_num_bytes != 0);
-	if (self->mf_parts == MFILE_PARTS_ANONYMOUS) {
-create_anon_part:
-		return mfile_makepart(self, addr, max_num_bytes);
-	}
-again_lock:
+	assert(mfile_addr_aligned(self, hint_bytes));
+	assert(hint_bytes != 0);
+
+	/* Check for a pre-existing part at the given location,
+	 * as well as making sure that `addr' lies in-bounds of
+	 * our file. */
 	mfile_lock_read(self);
-	result = self->mf_parts;
-	if (result == MFILE_PARTS_ANONYMOUS) {
+	if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS) {
 		mfile_lock_endread(self);
-		goto create_anon_part;
+		goto makeanon;
 	}
-	result = mpart_tree_locate(result, addr);
-	if (result) {
-		if unlikely(!tryincref(result)) {
-			/* This can happen if `result' is currently pending for destruction... */
-			mfile_lock_endread_f(self);
-			while (mfile_lockops_mustreap(self))
-				_mfile_lockops_reap(self);
-			goto again_lock;
-		}
+#ifdef CONFIG_USE_NEW_FS
+	assert(!(self->mf_flags & MFILE_F_DELETED));
+#endif /* CONFIG_USE_NEW_FS */
+	result = mpart_tree_locate(self->mf_parts, addr);
+	if (result != NULL && tryincref(result)) {
+		/* Found a pre-existing part. */
 		mfile_lock_endread(self);
 		return result;
 	}
-	/* TODO: Try to extend a preceding mem-part! */
 
-	/* No node exists for `addr'. - Figure out what the next-larger node is. */
-	mpart_tree_minmaxlocate(self->mf_parts, addr, addr + max_num_bytes - 1, &mima);
-	limit = max_num_bytes;
-	if (mima.mm_min) {
-		limit = (size_t)(mpart_getminaddr(mima.mm_min) - addr);
-		if (limit > max_num_bytes)
-			limit = max_num_bytes;
+	/* Figure out the max address range which we're
+	 * allowed to assign to the to-be created part. */
+	num_bytes = hint_bytes;
+	if (OVERFLOW_UADD(addr, num_bytes - 1, &loadmax)) {
+		num_bytes = (size_t)((pos_t)0 - addr);
+		loadmax   = (pos_t)-1;
+	}
+
+#ifdef CONFIG_USE_NEW_FS
+	/* Check if `addr' lies in-bounds of the file, and limit the max #
+	 * of bytes for the new mem-part to always stop just shy of the block-
+	 * aligned ceil-size of the underlying mem-part. */
+	{
+		pos_t filsiz;
+		filsiz = self->mf_size;
+		filsiz += self->mf_part_amask;
+		filsiz &= ~self->mf_part_amask;
+		if likely(filsiz >= self->mf_part_amask) {
+			if unlikely(addr >= filsiz) {
+				mfile_lock_endread(self);
+				THROW(E_INVALID_ARGUMENT,
+				      E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,
+				      (uintptr_t)addr);
+			}
+			if (loadmax >= (filsiz - 1)) {
+				size_t diff;
+				diff    = (size_t)(loadmax - (filsiz - 1));
+				loadmax = (filsiz - 1);
+				num_bytes -= diff;
+			}
+		}
+	}
+#endif /* CONFIG_USE_NEW_FS */
+
+	/* Limit the given `num_bytes' by the distance
+	 * until the next already-present mem-part. */
+	{
+		struct mpart_tree_minmax mima;
+		mpart_tree_minmaxlocate(self->mf_parts, addr, loadmax, &mima);
+		if (mima.mm_min != NULL) {
+			assert(addr < mpart_getminaddr(mima.mm_min));
+			assert(loadmax >= mpart_getminaddr(mima.mm_min));
+			loadmax   = mpart_getminaddr(mima.mm_min) - 1;
+			num_bytes = (size_t)(loadmax - addr) + 1;
+		}
 	}
 	mfile_lock_endread(self);
-	/* Construct the new part. */
-	result = mfile_private_makepart(self, addr, limit);
+
+	/* Must construct a new mem-part. */
+	result = _mfile_newpart(self, addr, num_bytes);
+
+	/* Initialize remaining fields. */
+	result->mp_refcnt = 2; /* +1: return, +1: MPART_F_GLOBAL_REF */
+	result->mp_file   = incref(self);
+	LIST_INIT(&result->mp_copy);
+	LIST_INIT(&result->mp_share);
+	SLIST_INIT(&result->mp_lockops);
+	/*LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);*/ /* Initialized later... */
+	result->mp_minaddr = addr;
+	result->mp_maxaddr = loadmax;
+	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
+	_mpart_init_asanon(result);
+	result->mp_flags |= MPART_F_GLOBAL_REF;
+
+	/* Mark the part as persistent if our file is, too. */
+#ifdef CONFIG_USE_NEW_FS
+#if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
+	result->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
+#else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
+	if (self->mf_flags & MFILE_F_PERSISTENT)
+		result->mp_flags |= MPART_F_PERSISTENT;
+#endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
+#endif /* CONFIG_USE_NEW_FS */
+
 	TRY {
-/*again_lock_after_result_created:*/
 		mfile_lock_write(self);
-		/* Make sure that nothing else appeared in the mean time. */
-		if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS) {
-			mfile_lock_endwrite(self);
-			assert(result->mp_file == self);
-			decref_nokill(self);
-			assert(self->mf_blockshift < COMPILER_LENOF(mfile_anon));
-			result->mp_file = incref(&mfile_anon[self->mf_blockshift]);
-			COMPILER_WRITE_BARRIER();
-
-			/* Add the new part to the global list. */
-#ifdef LIBVIO_CONFIG_ENABLED
-			if (result->mp_state != MPART_ST_VIO)
-#endif /* LIBVIO_CONFIG_ENABLED */
-			{
-				mpart_all_list_insert(result);
-			}
-
-			return result;
-		}
-
-		/* Try to insert the new node. */
-		if (mpart_tree_tryinsert(&self->mf_parts, result)) {
-			/* Success!
-			 * Now also try to add the new part to the list of global parts. */
-#ifdef LIBVIO_CONFIG_ENABLED
-			if (result->mp_state != MPART_ST_VIO)
-#endif /* LIBVIO_CONFIG_ENABLED */
-			{
-				result->mp_flags |= MPART_F_GLOBAL_REF;
-				++result->mp_refcnt; /* The reference owned by `mpart_all_list' */
-				COMPILER_WRITE_BARRIER();
-
-				/* Add the new part to the global list. */
-				mpart_all_list_insert(result);
-			}
-			mfile_lock_endwrite(self);
-			return result;
-		}
 	} EXCEPT {
-		if (ATOMIC_FETCHAND(result->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
-			decref_nokill(result);
-		decref(result);
-		RETHROW();
+		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
+		result->mp_refcnt = 0;
+		mpart_destroy(result);
 	}
-	/* The insert failed because of an overlap. */
+
+	/* Verify that nothing's changed in the mean time. */
+	if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS)
+		goto startover;
+#ifdef CONFIG_USE_NEW_FS
+	if (self->mf_size < (loadmax + 1) || loadmax == (pos_t)-1) {
+		pos_t filsiz;
+		filsiz = self->mf_size;
+		filsiz += self->mf_part_amask;
+		filsiz &= ~self->mf_part_amask;
+		--filsiz;
+		if unlikely(filsiz < loadmax)
+			goto startover;
+	}
+#endif /* CONFIG_USE_NEW_FS */
+
+	/* Try to insert the new part into the tree. */
+	if unlikely(!mpart_tree_tryinsert(&self->mf_parts, result))
+		goto startover;
+
+	/* Add the new part to the list of all parts. (but only if it's not a VIO part) */
+#ifdef LIBVIO_CONFIG_ENABLED
+	if unlikely(result->mp_state == MPART_ST_VIO) {
+		/* Don't insert VIO-parts into the global list. Note that getting here
+		 * is highly unlikely, since VIO files are usually also anonymous, or
+		 * have their backing mem-parts be pre-allocated... */
+		result->mp_flags &= ~MPART_F_GLOBAL_REF;
+		result->mp_refcnt = 1;
+		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
+	} else
+#endif /* LIBVIO_CONFIG_ENABLED */
+	{
+		mpart_all_list_insert(result);
+	}
+
+	mfile_lock_endwrite(self);
+	return result;
+startover:
 	mfile_lock_endwrite(self);
 	LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
-	_mpart_init_asanon(result);
+	result->mp_refcnt = 0;
 	mpart_destroy(result);
-	goto again_lock;
+	goto again;
 }
 
 DECL_END

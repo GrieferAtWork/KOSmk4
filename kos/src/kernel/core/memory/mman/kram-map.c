@@ -47,27 +47,28 @@ DECL_BEGIN
 #ifdef CONFIG_DEBUG_HEAP
 PRIVATE NONNULL((1)) void KCALL
 mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
-                         mfile_block_t UNUSED(first_block),
-                         physaddr_t buffer, size_t num_blocks) {
+                         pos_t UNUSED(addr),
+                         physaddr_t buf, size_t num_bytes) {
 	PHYS_VARS;
 	byte_t *map;
-	assert(IS_ALIGNED(buffer, PAGESIZE));
-	IF_PHYS_IDENTITY(buffer, num_blocks * PAGESIZE, {
-		memsetl(PHYS_TO_IDENTITY(buffer),
+	assert(IS_ALIGNED(buf, PAGESIZE));
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	IF_PHYS_IDENTITY(buf, num_bytes, {
+		memsetl(PHYS_TO_IDENTITY(buf),
 		        DEBUGHEAP_FRESH_MEMORY,
-		        num_blocks * (PAGESIZE / 4));
+		        num_bytes / 4);
 		return;
 	});
-	if unlikely(!num_blocks)
+	if unlikely(!num_bytes)
 		return;
-	map = phys_pushpage(buffer);
+	map = phys_pushpage(buf);
 	for (;;) {
 		memsetl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE / 4);
-		--num_blocks;
-		if (!num_blocks)
+		if (num_bytes <= PAGESIZE)
 			break;
-		buffer += PAGESIZE;
-		map = phys_loadpage(buffer);
+		num_bytes -= PAGESIZE;
+		buf += PAGESIZE;
+		map = phys_loadpage(buf);
 	}
 	phys_pop();
 }

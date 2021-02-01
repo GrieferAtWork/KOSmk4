@@ -221,13 +221,18 @@ again:
  * or has become unavailable for some other reason (e.g. the backing
  * filesystem has been unmounted) */
 PUBLIC NONNULL((1)) void FCALL
-mfile_makeanon(struct mfile *__restrict self)
+mfile_delete(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	struct mpart_slist dead;
 
 	/* Quick check: is the file already anonymous? */
+#ifdef CONFIG_USE_NEW_FS
+	if (self->mf_flags & MFILE_F_DELETED)
+		return; /* Nothing to do here! */
+#else /* CONFIG_USE_NEW_FS */
 	if (ATOMIC_READ(self->mf_parts) == MFILE_PARTS_ANONYMOUS)
 		return; /* Nothing to do here! */
+#endif /* !CONFIG_USE_NEW_FS */
 	SLIST_INIT(&dead);
 again_lock:
 	mfile_lock_write(self);
@@ -294,6 +299,12 @@ do_clear_changed_parts:
 	} /* Scope... */
 
 done:
+
+#ifdef CONFIG_USE_NEW_FS
+	/* Mark the file as having been deleted. */
+	ATOMIC_OR(self->mf_flags, MFILE_F_DELETED);
+#endif /* CONFIG_USE_NEW_FS */
+
 	mfile_lock_endwrite_f(self);
 
 	/* Destroy all mem-parts apart of the dead-list. */
@@ -426,8 +437,8 @@ mfile_lockparts_or_decref_and_unlock_inrange(struct mfile *__restrict self,
  * part-tree of `self', by essentially anonymizing them.
  * This function can be used to implement `ftruncate(2)'
  *
- * NOTE: Unlike `mfile_makeanon()', this function doesn't mark
- *       the file itself as anonymous, meaning that more parts
+ * NOTE: Unlike `mfile_delete()', this function doesn't mark
+ *       the file itself as deleted, meaning that more parts
  *       can still be created at a later point in time! */
 PUBLIC NONNULL((1)) void FCALL
 mfile_makeanon_subrange(struct mfile *__restrict self,

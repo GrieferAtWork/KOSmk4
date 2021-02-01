@@ -57,11 +57,11 @@ handle_datablock_read(struct vm_datablock *__restrict self,
                       USER CHECKED void *dst,
                       size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
-	if unlikely(!self->db_type->dt_handle_read) {
+	if unlikely(!self->db_type->mo_stream_read) {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 		      E_FILESYSTEM_OPERATION_READ);
 	}
-	result = (*self->db_type->dt_handle_read)(self, dst, num_bytes, mode);
+	result = (*self->db_type->mo_stream_read)(self, dst, num_bytes, mode);
 	return result;
 }
 
@@ -70,11 +70,11 @@ handle_datablock_write(struct vm_datablock *__restrict self,
                        USER CHECKED void const *src,
                        size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
-	if unlikely(!self->db_type->dt_handle_write) {
+	if unlikely(!self->db_type->mo_stream_write) {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 		      E_FILESYSTEM_OPERATION_WRITE);
 	}
-	result = (*self->db_type->dt_handle_write)(self, src, num_bytes, mode);
+	result = (*self->db_type->mo_stream_write)(self, src, num_bytes, mode);
 	return result;
 }
 

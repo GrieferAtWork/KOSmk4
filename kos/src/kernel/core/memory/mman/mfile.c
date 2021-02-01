@@ -28,7 +28,7 @@
 #include <kernel/mman/mfile-lockop.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -232,6 +232,15 @@ mfile_sync(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK, ...) {
 	pos_t result = 0;
 	REF struct mpart *changes;
+#ifdef CONFIG_USE_NEW_FS
+	/* Clear the changed flag.
+	 * This has to be happen _before_ we read out the changed-part
+	 * list, such that changed parts added after we've consumed all
+	 * currently changed parts will cause the CHANGED flag to be
+	 * set once again, without it ever being cleared when there are
+	 * no changed parts at all. */
+	ATOMIC_AND(self->mf_flags, ~MFILE_F_CHANGED);
+#endif /* CONFIG_USE_NEW_FS */
 	do {
 		changes = ATOMIC_READ(self->mf_changed.slh_first);
 		if (!changes || changes == MFILE_PARTS_ANONYMOUS)
@@ -260,29 +269,29 @@ mfile_sync(struct mfile *__restrict self)
 PUBLIC struct mfile mfile_phys = MFILE_INIT_ANON(&mfile_phys_ops, PAGESHIFT);
 PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void FCALL
-memfile_phys_initpart(struct mfile *__restrict UNUSED(self),
-                      struct mpart *__restrict part) {
-	if (!(part->mp_flags & MPART_F_BLKST_INL))
-		kfree(part->mp_blkst_ptr);
+PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
+mfile_phys_newpart(struct mfile *__restrict UNUSED(self),
+                   PAGEDIR_PAGEALIGNED pos_t minaddr,
+                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	REF struct mpart *result;
+	result = (REF struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
 	/* (re-)configure the part to point to static, physical memory. */
-	part->mp_flags        = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
-	part->mp_state        = MPART_ST_MEM;
-	part->mp_blkst_ptr    = NULL; /* Disable block status (thus having the system act like all
-	                               * blocks were using `MPART_BLOCK_ST_CHNG' as their status) */
-	part->mp_mem.mc_start = (physpage_t)part->mp_minaddr >> PAGESHIFT;
-	part->mp_mem.mc_size  = mpart_getsize(part) >> PAGESHIFT;
+	result->mp_flags        = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
+	result->mp_state        = MPART_ST_MEM;
+	result->mp_blkst_ptr    = NULL; /* Disable block status (thus having the system act like all
+	                                 * blocks were using `MPART_BLOCK_ST_CHNG' as their status) */
+	result->mp_mem.mc_start = (physpage_t)minaddr >> PAGESHIFT;
+	result->mp_mem.mc_size  = num_bytes >> PAGESHIFT;
+	result->mp_meta         = NULL;
 
 	/* Define the alias symbols for the builtin zero-memory file. */
 	DEFINE_PUBLIC_SYMBOL(mfile_zero, &mfile_anon[PAGESHIFT], sizeof(struct mfile));
 	DEFINE_PUBLIC_SYMBOL(mfile_zero_ops, &mfile_anon_ops[PAGESHIFT], sizeof(struct mfile_ops));
+	return result;
 }
 
 PUBLIC_CONST struct mfile_ops const mfile_phys_ops = {
-	/* .mo_destroy    = */ NULL,
-	/* .mo_initpart   = */ &memfile_phys_initpart,
-	/* .mo_loadblocks = */ NULL,
-	/* .mo_saveblocks = */ NULL,
+	.mo_newpart = &mfile_phys_newpart,
 };
 
 PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
@@ -297,7 +306,7 @@ PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
 /* Fallback files for anonymous memory. These behave the same as `mfile_zero',
  * but one exists for every possible `mf_blockshift' (where the index into this
  * array is equal to that file's `mf_blockshift' value)
- * As such, these files are used by `mfile_makeanon()' as replacement mappings
+ * As such, these files are used by `mfile_delete()' as replacement mappings
  * of the original file. */
 PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 #define INIT_ANON_FILE(i) MFILE_INIT_ANON(&mfile_anon_ops[i], i)
@@ -382,42 +391,37 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 	((i) == PAGESHIFT ? &mfile_zero_loadpages \
 	                  : &mfile_zero_loadblocks)
 
-PRIVATE NONNULL((1)) void KCALL
-mfile_zero_loadpages(struct mfile *__restrict UNUSED(self),
-                     mfile_block_t UNUSED(first_block),
-                     physaddr_t buffer, size_t num_blocks) {
+PRIVATE NONNULL((1)) void
+NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict UNUSED(self),
+                                    pos_t UNUSED(addr),
+                                    physaddr_t buf, size_t num_bytes) {
+	size_t start, end, num_pages;
+	physpage_t page;
 	/* Skip pages that were already zero-initialized before-hand! */
-	if likely(IS_ALIGNED(buffer, PAGESIZE)) {
-		size_t start, end;
-		physpage_t page;
-		page = physaddr2page(buffer);
-		for (start = 0; start < num_blocks;) {
-			if (page_iszero(page + start)) {
-				++start;
-				continue;
-			}
-			end = start + 1;
-			while (end < num_blocks && !page_iszero(page + end))
-				++end;
-			/* Manually zero-init all pages from start...end */
-			vm_memsetphyspages(physpage2addr(page + start),
-			                   0, end - start);
-			start = end + 1;
+	assert(IS_ALIGNED(buf, PAGESIZE));
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	page      = physaddr2page(buf);
+	num_pages = num_bytes >> PAGESHIFT;
+	for (start = 0; start < num_pages;) {
+		if (page_iszero(page + start)) {
+			++start;
+			continue;
 		}
-	} else {
-		/* Fallback for unaligned buffers (should actually happen, though...) */
-		vm_memsetphys(buffer, 0, num_blocks * PAGESIZE);
+		end = start + 1;
+		while (end < num_pages && !page_iszero(page + end))
+			++end;
+		/* Manually zero-init all pages from start...end */
+		memsetphyspages(physpage2addr(page + start), 0,
+		                (end - start) * PAGESIZE);
+		start = end + 1;
 	}
 }
 
-PRIVATE NONNULL((1)) void KCALL
-mfile_zero_loadblocks(struct mfile *__restrict self,
-                      mfile_block_t UNUSED(first_block),
-                      physaddr_t buffer, size_t num_blocks) {
-	size_t num_bytes;
-	/* Generic physical memory zero-function */
-	num_bytes = num_blocks << self->mf_blockshift;
-	vm_memsetphys(buffer, 0, num_bytes);
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mfile_zero_loadblocks)(struct mfile *__restrict UNUSED(self),
+                                     pos_t UNUSED(addr),
+                                     physaddr_t buf, size_t num_bytes) {
+	memsetphys(buf, 0, num_bytes);
 }
 
 

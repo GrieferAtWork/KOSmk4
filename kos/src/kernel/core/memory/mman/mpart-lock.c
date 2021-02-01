@@ -861,21 +861,51 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		incref(self);
 		incref(file);
+#ifdef CONFIG_USE_NEW_FS
+		mfile_sizelock_inc(file);
+#endif /* CONFIG_USE_NEW_FS */
 		/* Release the lock from the part, so we can load
 		 * blocks without holding that non-recursive, and
 		 * non-preemptive lock! */
 		UNLOCK(self, unlock);
 		TRY {
 			/* Actually do the load. */
-			if likely(file->mf_ops->mo_loadblocks) {
-				(*file->mf_ops->mo_loadblocks)(file,
-				                               (self->mp_minaddr >> file->mf_blockshift) + start,
-				                               loc.mppl_addr, end - start);
+			pos_t addr;
+			size_t num_bytes;
+			auto mo_loadblocks = file->mf_ops->mo_loadblocks;
+
+			addr      = self->mp_minaddr + (start << file->mf_blockshift);
+			num_bytes = (end - start) << file->mf_blockshift;
+
+#ifdef CONFIG_USE_NEW_FS
+			if unlikely(addr + num_bytes > file->mf_size) {
+				/* Limit the load-range by the size of the file, and zero-initialize
+				 * any memory that is being mapped beyond the end natural end of the
+				 * file. */
+				if (addr >= file->mf_size) {
+					bzerophyscc(loc.mppl_addr, num_bytes);
+				} else {
+					size_t load_bytes;
+					load_bytes = (size_t)(file->mf_size - addr);
+					assert(load_bytes < num_bytes);
+					if likely(mo_loadblocks != NULL)
+						(*mo_loadblocks)(file, addr, loc.mppl_addr, load_bytes);
+					bzerophyscc(loc.mppl_addr + load_bytes,
+					            num_bytes - load_bytes);
+				}
+			} else
+#endif /* CONFIG_USE_NEW_FS */
+			{
+				if likely(mo_loadblocks != NULL)
+					(*mo_loadblocks)(file, addr, loc.mppl_addr, num_bytes);
 			}
 		} EXCEPT {
 			/* Set block states back to NDEF */
 			for (i = start; i < end; ++i)
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
+#ifdef CONFIG_USE_NEW_FS
+			mfile_sizelock_dec_nosignal(file);
+#endif /* CONFIG_USE_NEW_FS */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
 			decref_unlikely(self);
@@ -884,6 +914,9 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		/* Set loaded states back to LOAD */
 		for (i = start; i < end; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
+#ifdef CONFIG_USE_NEW_FS
+		mfile_sizelock_dec_nosignal(file);
+#endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		decref_unlikely(self);

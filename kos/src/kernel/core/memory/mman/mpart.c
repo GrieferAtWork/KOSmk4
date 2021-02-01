@@ -553,29 +553,57 @@ again:
 
 		/* Now to do the actual work: */
 		incref(file);
+#ifdef CONFIG_USE_NEW_FS
+		mfile_sizelock_inc(file);
+#endif /* CONFIG_USE_NEW_FS */
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		mpart_lock_release_f(self);
 		TRY {
+			pos_t addr;
+			size_t num_bytes;
+
 			/* Account for synced pages. */
-			result += (end - start) << file->mf_blockshift;
+			addr      = self->mp_minaddr + (start << file->mf_blockshift);
+			num_bytes = (end - start) << file->mf_blockshift;
+
+#ifdef CONFIG_USE_NEW_FS
+			if unlikely(addr + num_bytes > file->mf_size) {
+				/* Limit the write-back address range by the size of the file,
+				 * or do nothing if the entirety of said range lies outside of
+				 * the file's effective bounds. */
+				if (addr >= file->mf_size)
+					goto done_writeback;
+				num_bytes = (size_t)(file->mf_size - addr);
+			}
+#endif /* CONFIG_USE_NEW_FS */
+
 			/* Actually do the save. */
-			(*file->mf_ops->mo_saveblocks)(file,
-			                               (self->mp_minaddr >> file->mf_blockshift) + start,
-			                               loc.mppl_addr, end - start);
+			result += num_bytes;
+			(*file->mf_ops->mo_saveblocks)(file, addr, loc.mppl_addr, num_bytes);
 		} EXCEPT {
 			/* The write-back failed. - As such we must restore the ST_CHNG status
 			 * of all of the pages we've altered to INIT, as well as broadcast the
 			 * init-done signal of the associated file. */
 			for (i = start; i < end; ++i)
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
+#ifdef CONFIG_USE_NEW_FS
+			mfile_sizelock_dec_nosignal(file);
+#endif /* CONFIG_USE_NEW_FS */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
 			mpart_lockops_reap(self);
 			RETHROW();
 		}
+#ifdef CONFIG_USE_NEW_FS
+done_writeback:
+#endif /* CONFIG_USE_NEW_FS */
+
 		/* Change the states of all saved pages back to ST_LOAD */
 		for (i = start; i < end; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
+#ifdef CONFIG_USE_NEW_FS
+		mfile_sizelock_dec_nosignal(file);
+#endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		/* Scan for more changes. */
@@ -719,7 +747,8 @@ again:
 }
 
 
-/* Add the given mpart `self' to the global list of parts. */
+/* Add the given mpart `self' to the global list of parts.
+ * This function will initialize `self->mp_allparts' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
 	if (mpart_all_lock_tryacquire()) {
