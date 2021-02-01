@@ -34,7 +34,7 @@ __DECL_BEGIN
 
 /* Definitions for a simple tile-based font file format.
  * This file format is defined to be saved to a file that is then mmap()-ed
- * into a processes memory, at which point a header can be head to quickly
+ * into a processes memory, at which point a header can be read to quickly
  * determine the file offset (and thus memory address) of a bitmask-based
  * descriptor of which pixels to turn on/off for representing some given
  * character.
@@ -76,7 +76,7 @@ typedef struct {
 	__uint8_t     h_log2chsize;          /* log2(Character tile size (in bytes)) (usually `3' (for 8) or `4' (for 16)) */
 	__uint8_t     h_ngroups;             /* Number of unicode character groups. */
 	__uint16_t    h_nchars;              /* Number of characters in `h_chars' (<= 0xffa1 == 0x10000 - 95) (little endian). */
-/*	__byte_t      h_pad[offsetafter(TLFT_Hdr, h_ngroups) - h_hdrsize]; */
+/*	__byte_t      h_pad[offsetafter(TLFT_Hdr, h_nchars) - h_hdrsize]; */
 /*	TLFT_UniGroup h_groups[h_ngroups];   /* Unicode character groups */
 /*	__byte_t      h_ascii[95][1 << h_log2chsize]; /* Representations for U+0020-U+007e */
 /*	__byte_t      h_chars[][1 << h_log2chsize];   /* Unicode group blobs. */
@@ -95,7 +95,7 @@ typedef struct {
 	__uint16_t ug_minuni; /* Lowest unicode character within this group (little endian) */
 	__uint16_t ug_maxuni; /* Greatest unicode character within this group  */
 	__uint16_t ug_offset; /* Offset of the first character bitmap within this group
-	                       * To-be multiplied by `h_chwidth' and added to `h_chars' */
+	                       * To-be shifted by `h_log2chsize' and added to `h_chars' */
 	__uint8_t _ug_pad[2]; /* Unused (for now) */
 } TLFT_UniGroup;
 

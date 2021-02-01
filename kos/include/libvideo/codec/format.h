@@ -41,6 +41,17 @@ __DECL_BEGIN
 struct video_codec;
 struct video_palette;
 
+/* Helper macros for doing low-level video data manipulations. */
+#define video_format_getpixel(self, line, x)        (*(self)->vf_codec->vc_getpixel)(line, x)
+#define video_format_setpixel(self, line, x, pixel) (*(self)->vf_codec->vc_setpixel)(line, x, pixel);
+#define video_format_getcolor(self, line, x)        video_format_pixel2color(self, video_format_getpixel(self, line, x))
+#define video_format_setcolor(self, line, x, color) video_format_pixel2color(self, video_format_getpixel(self, line, x))
+#define video_format_pixel2color(self, pixel)       (*(self)->vf_codec->vc_pixel2color)(self, pixel)
+#define video_format_color2pixel(self, color)       (*(self)->vf_codec->vc_color2pixel)(self, color)
+#define video_format_linecopy(self, dst_line, dst_x, src_line, src_x, num_pixels) \
+	(*(self)->vf_codec->vc_linecopy)(dst_line, dst_x, src_line, src_x, num_pixels)
+#define video_format_linefill(self, dst_line, dst_x, pixel, num_pixels) \
+	(*(self)->vf_codec->vc_linefill)(dst_line, dst_x, pixel, num_pixels)
 
 struct video_format {
 	struct video_codec           *vf_codec;  /* [1..1] Video codec. */
@@ -49,45 +60,28 @@ struct video_format {
 public: /* Low-level, memory-based pixel accessor functions. */
 
 	/* Get a pixel (The caller must ensure that the given x/y are in-bounds) */
-	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC getpixel(__byte_t const *__restrict line,
-	                                                           __uintptr_t x) const {
-		return (*vf_codec->vc_getpixel)(line, x);
-	}
-	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC getcolor(__byte_t const *__restrict line,
-	                                                           __uintptr_t x) const {
-		return pixel2color(getpixel(line, x));
-	}
+	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC getpixel(__byte_t const *__restrict line, __uintptr_t x) const { return video_format_getpixel(this, line, x); }
+	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC getcolor(__byte_t const *__restrict line, __uintptr_t x) const { return video_format_getcolor(this, line, x); }
 
 	/* Set a pixel (The caller must ensure that the given x/y are in-bounds) */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setpixel(__byte_t *__restrict line,
-	                                                  __uintptr_t x, video_pixel_t pixel) const {
-		(*vf_codec->vc_setpixel)(line, x, pixel);
-	}
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setcolor(__byte_t *__restrict line,
-	                                                  __uintptr_t x,
-	                                                  video_color_t color) const {
-		setpixel(line, x, color2pixel(color));
-	}
+	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setpixel(__byte_t *__restrict line, __uintptr_t x, video_pixel_t pixel) const { video_format_setpixel(this, line, x, pixel); }
+	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setcolor(__byte_t *__restrict line, __uintptr_t x, video_color_t color) const { video_format_setcolor(this, line, x, color); }
 
 	/* Convert between color and pixel values. */
-	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC pixel2color(video_pixel_t pixel) const {
-		return (*vf_codec->vc_pixel2color)(this, pixel);
-	}
-	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC color2pixel(video_color_t pixel) const {
-		return (*vf_codec->vc_color2pixel)(this, pixel);
-	}
+	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC pixel2color(video_pixel_t pixel) const { return video_format_pixel2color(this, pixel); }
+	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC color2pixel(video_color_t color) const { return video_format_color2pixel(this, color); }
 
 	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
 	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linecopy(__byte_t *__restrict dst_line, __uintptr_t dst_x,
 	                                                  __byte_t const *__restrict src_line, __uintptr_t src_x,
 	                                                  __size_t num_pixels) const {
-		(*vf_codec->vc_linecopy)(dst_line, dst_x, src_line, src_x, num_pixels);
+		video_format_linecopy(this, dst_line, dst_x, src_line, src_x, num_pixels);
 	}
 
 	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
 	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linefill(__byte_t *__restrict line, __uintptr_t dst_x,
 	                                                  video_pixel_t pixel, __size_t num_pixels) const {
-		(*vf_codec->vc_linefill)(line, dst_x, pixel, num_pixels);
+		video_format_linefill(this, line, dst_x, pixel, num_pixels);
 	}
 
 #endif /* __cplusplus */

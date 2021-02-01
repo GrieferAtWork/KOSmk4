@@ -1323,6 +1323,7 @@ CC libvideo_codec_lookup(video_codec_t codec) {
 	case codec: {                                                       \
 		PRIVATE struct video_codec _codec_##codec = {                   \
 			/* .vc_codec                  = */ codec,                   \
+			/* ._vc_flags                 = */ VD_FORMAT_FLAG_NORMAL,   \
 			/* .vc_align                  = */ align,                   \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
 			/* .vc_getpixel               = */ &getpixel,               \
@@ -1340,8 +1341,9 @@ CC libvideo_codec_lookup(video_codec_t codec) {
                      pixel2color, color2pixel)                                  \
 	case codec: {                                                               \
 		PRIVATE struct video_codec _codec_##codec = {                           \
-			/* .vc_codec       = */ codec,                                      \
-			/* .vc_align       = */ align                                       \
+			/* .vc_codec  = */ codec,                                           \
+			/* ._vc_flags = */ VD_FORMAT_FLAG_NORMAL,                           \
+			/* .vc_align  = */ align                                            \
 		};                                                                      \
 		if (!_codec_##codec.vc_color2pixel) {                                   \
 			/* Lazily initialize to prevent relocations */                      \

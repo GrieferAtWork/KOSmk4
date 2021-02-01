@@ -116,17 +116,19 @@ LOCAL void KCALL vga_wattr(u8 reg, u8 val) {
 
 #ifdef __cplusplus
 typedef struct: video_device
-#else
+#else /* __cplusplus */
 typedef struct
-#endif
+#endif /* !__cplusplus */
 {
 #ifndef __cplusplus
 	struct video_device     v_dev;       /* The underlying ansi video device. */
-#endif
+#endif /* !__cplusplus */
 	struct atomic_lock      v_lock;      /* Lock for accessing the VGA Hardware. */
 	PHYS physaddr_t         v_vram_addr; /* [const] VRAM base address (physical). */
 	VIRT byte_t            *v_vram;      /* [const] VRAM base address (virtual). */
 	size_t                  v_vram_size; /* [const] VRAM size (in bytes). */
+	PHYS physaddr_t         v_bios_addr; /* BIOS-given video RAM base address (physical). */
+	size_t                  v_bios_size; /* BIOS-given video RAM size (in bytes). */
 	/* VGA color/mono registers (Determined by `vga_r(v_mmio, VGA_MIS_R) & VGA_MIS_COLOR') */
 	port_t                  v_crt_i;     /* [const] CRT Controller Index (Either `VGA_CRT_IC' or `VGA_CRT_IM') */
 	port_t                  v_crt_d;     /* [const] CRT Controller Data Register (Either `VGA_CRT_DC' or `VGA_CRT_DM') */
@@ -134,7 +136,8 @@ typedef struct
 #define VGA_STATE_FNORMAL    0x0000 /* Normal VGA state flags. */
 #define VGA_STATE_FSCREENOFF 0x0001 /* The screen has been turned off. */
 #define VGA_STATE_FGRAPHICS  0x0002 /* Graphics mode enabled. */
-#define VGA_STATE_FCURSOR    0x0004 /* Cursor is being shown. */
+#define VGA_STATE_FBIOSGFX   0x0004 /* For use with `VGA_STATE_FGRAPHICS': Graphics mode is controlled by the BIOS. */
+#define VGA_STATE_FCURSOR    0x0008 /* Cursor is being shown. */
 	u16                     v_state;     /* [lock(v_lock)] VGA state flags (Set of `VGA_STATE_F*'). */
 	struct vga_font        *v_savedfont; /* [0..1][owned][lock(v_lock)] Saved text-mode font while in graphics-mode */
 	struct atomic_rwlock    v_textlock;  /* Lock for accessing the text pointers. */
@@ -175,6 +178,11 @@ INTDEF void KCALL VGA_ScreenOff(VGA *__restrict self);
 
 INTDEF void KCALL VGA_SetFont(VGA *__restrict self, USER CHECKED struct vga_font const *__restrict font);
 INTDEF void KCALL VGA_GetFont(VGA *__restrict self, USER CHECKED struct vga_font *__restrict font);
+
+
+INTDEF void KCALL BIOS_GetMode(struct vga_mode *__restrict mode);
+INTDEF void KCALL BIOS_SetMode(struct vga_mode const *__restrict mode);
+
 
 
 DECL_END

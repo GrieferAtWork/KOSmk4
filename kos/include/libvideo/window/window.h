@@ -83,7 +83,7 @@ struct video_window {
 
 
 /* Create and return a new window, or return NULL and set `errno'
- * NOTE: The preferred video format is deterined by the window server.
+ * NOTE: The preferred video format is determined by the window server.
  * @param: title:      Initial window title (or `NULL' to default to the `readlink("/proc/self/exe")')
  * @param: pos_x:      Initial X position of the new window's top-left corner
  * @param: pos_y:      Initial Y position of the new window's top-left corner

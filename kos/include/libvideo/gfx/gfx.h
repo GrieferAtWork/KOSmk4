@@ -270,7 +270,7 @@ struct video_gfx {
 	struct video_buffer   *vx_buffer;    /* [1..1][const] The associated buffer. */
 	gfx_blendmode_t        vx_blend;     /* [const] Blending mode. */
 	__uintptr_t            vx_flags;     /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
-	video_color_t          vx_colorkey;  /* [const] Transparent __color key (or any __color with alpha=0 when disabled). */
+	video_color_t          vx_colorkey;  /* [const] Transparent color key (or any color with alpha=0 when disabled). */
 	__intptr_t             vx_offt_x;    /* [const] Buffer starting offset in X (<= `vx_buffer->vb_size_x') */
 	__intptr_t             vx_offt_y;    /* [const] Buffer starting offset in Y (<= `vx_buffer->vb_size_y') */
 	__uintptr_t            vx_xmin;      /* [const] == vx_offt_x <= 0 ? 0 : vx_offt_x */

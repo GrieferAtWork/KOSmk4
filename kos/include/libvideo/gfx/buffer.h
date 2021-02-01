@@ -72,7 +72,7 @@ struct video_buffer_ops {
 	int (LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict __self,
 	                               struct video_lock *__restrict __result);
 
-	/* Unlock a video buffer that has previously been mapped into memory. */
+	/* Unlock a video buffer that had previously been mapped into memory. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
 	                                  struct video_lock const *__restrict __lock);
@@ -100,7 +100,8 @@ struct video_buffer_ops {
 	                             struct video_buffer_rect const *__clip);
 
 	/* Clip the given `GFX', given a set of coords relative to the current clip state `GFX',
-	 * and store the newly  */
+	 * and store the newly created GFX context in `*RESULT' (note that `GFX' and `RESULT'
+	 * may be identical for this purpose!) */
 	__ATTR_NONNULL((1, 2)) void
 	(LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
 	                              struct video_gfx *__result,
