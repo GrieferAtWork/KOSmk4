@@ -698,7 +698,7 @@ PRIVATE NOBLOCK NONNULL((1)) REF struct block_device_partition *
 NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
                                      lba_t part_min, lba_t part_max) {
 	struct block_device_partition *result;
-	SLIST_FOREACH(result, &self->bd_parts, bp_parts) {
+	SLIST_FOREACH (result, &self->bd_parts, bp_parts) {
 		if (result->bp_min != part_min)
 			continue;
 		if (result->bp_max != part_max)
@@ -830,7 +830,7 @@ again:
 		return;
 	COMPILER_READ_BARRIER();
 	block_device_acquire_partlock_write(self);
-	SLIST_FOREACH(part, &self->bd_parts, bp_parts) {
+	SLIST_FOREACH (part, &self->bd_parts, bp_parts) {
 		if (tryincref(part))
 			break;
 	}
@@ -1590,7 +1590,7 @@ again:
 		do_dump_block_device(self,
 		                     longest_device_name,
 		                     longest_driver_name);
-		SLIST_FOREACH(parts, &me->bd_parts, bp_parts) {
+		SLIST_FOREACH (parts, &me->bd_parts, bp_parts) {
 			do_dump_block_device(parts,
 			                     longest_device_name,
 			                     longest_driver_name);

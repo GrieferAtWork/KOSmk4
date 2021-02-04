@@ -189,7 +189,7 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mman *
 NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 	struct mnode *node;
 	struct mman *mm;
-	LIST_FOREACH(node, &self->mp_copy, mn_link) {
+	LIST_FOREACH (node, &self->mp_copy, mn_link) {
 		mm = node->mn_mman;
 		if unlikely(wasdestroyed(mm))
 			continue;
@@ -210,7 +210,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 			return blocking_mm;
 		}
 	}
-	LIST_FOREACH(node, &self->mp_share, mn_link) {
+	LIST_FOREACH (node, &self->mp_share, mn_link) {
 		mm = node->mn_mman;
 		if unlikely(wasdestroyed(mm))
 			continue;
@@ -234,7 +234,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 				sync_endwrite(mm);
 			}
 			/* Unlock all copy-on-write nodes. */
-			LIST_FOREACH(node, &self->mp_copy, mn_link) {
+			LIST_FOREACH (node, &self->mp_copy, mn_link) {
 				mm = node->mn_mman;
 				if unlikely(wasdestroyed(mm))
 					continue;
@@ -255,7 +255,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 	struct mnode *node;
 	struct mman *mm;
-	LIST_FOREACH(node, &self->mp_share, mn_link) {
+	LIST_FOREACH (node, &self->mp_share, mn_link) {
 		mm = node->mn_mman;
 		if unlikely(wasdestroyed(mm))
 			continue;
@@ -265,7 +265,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 			continue; /* Already enumerated. */
 		sync_endwrite(mm);
 	}
-	LIST_FOREACH(node, &self->mp_copy, mn_link) {
+	LIST_FOREACH (node, &self->mp_copy, mn_link) {
 		mm = node->mn_mman;
 		if unlikely(wasdestroyed(mm))
 			continue;
@@ -381,7 +381,7 @@ NOTHROW(FCALL mpart_count_needed_nodes_in_list)(struct mpart_split_data const *_
                                                 struct mnode_list const *__restrict list) {
 	size_t result = 0;
 	struct mnode *node;
-	LIST_FOREACH(node, list, mn_link) {
+	LIST_FOREACH (node, list, mn_link) {
 		mpart_reladdr_t min, max;
 		if unlikely(wasdestroyed(node->mn_mman))
 			continue; /* Skip nodes that were destroyed. */

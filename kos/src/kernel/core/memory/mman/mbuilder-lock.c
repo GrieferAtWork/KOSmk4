@@ -134,7 +134,7 @@ PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) struct mbnode *
 NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder const *__restrict self,
                                             struct mpart const *__restrict part) {
 	struct mbnode *iter;
-	LIST_FOREACH(iter, mbnode_partset_listof(&self->mb_uparts, part), mbn_nxtuprt) {
+	LIST_FOREACH (iter, mbnode_partset_listof(&self->mb_uparts, part), mbn_nxtuprt) {
 		if (iter->mbn_part == part)
 			break; /* Found it! */
 	}

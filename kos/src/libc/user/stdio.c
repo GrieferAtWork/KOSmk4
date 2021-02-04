@@ -567,7 +567,7 @@ again:
 	if (LIST_EMPTY(&changed_linebuffered_files))
 		return;
 	atomic_lock_acquire(&changed_linebuffered_files_lock);
-	LIST_FOREACH(fp, &changed_linebuffered_files, if_exdata->io_lnch) {
+	LIST_FOREACH (fp, &changed_linebuffered_files, if_exdata->io_lnch) {
 		/* Skip files which we can't incref. */
 		if (!file_tryincref(fp))
 			continue;
@@ -593,7 +593,7 @@ void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
 		atomic_rwlock_read(&all_files_lock);
-		LIST_FOREACH(fp, &all_files, if_exdata->io_link) {
+		LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 			if (fp->if_exdata->io_fver != version) {
 				if (file_tryincref(fp))
 					break;
@@ -632,7 +632,7 @@ void LIBCCALL file_do_syncall_unlocked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
 		atomic_rwlock_read(&all_files_lock);
-		LIST_FOREACH(fp, &all_files, if_exdata->io_link) {
+		LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 			if (fp->if_exdata->io_fver != version) {
 				if (file_tryincref(fp))
 					break;
@@ -2977,7 +2977,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 	FILE *fp;
 again:
 	atomic_rwlock_write(&all_files_lock);
-	LIST_FOREACH(fp, &all_files, if_exdata->io_link) {
+	LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 		if (!file_tryincref(fp))
 			continue;
 		LIST_UNBIND(fp, if_exdata->io_link);

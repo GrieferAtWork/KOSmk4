@@ -117,9 +117,9 @@ INTDEF struct dlmodule_dlist DlModule_AllList;
 INTDEF struct atomic_rwlock DlModule_AllLock;
 
 #define DlModule_GlobalList_FOREACH(mod) \
-	LIST_FOREACH(mod, &DlModule_GlobalList, dm_globals)
+	LIST_FOREACH (mod, &DlModule_GlobalList, dm_globals)
 #define DlModule_AllList_FOREACH(mod) \
-	DLIST_FOREACH(mod, &DlModule_AllList, dm_modules)
+	DLIST_FOREACH (mod, &DlModule_AllList, dm_modules)
 
 /* The module describing the RTLD library itself. */
 INTDEF DlModule dl_rtld_module;

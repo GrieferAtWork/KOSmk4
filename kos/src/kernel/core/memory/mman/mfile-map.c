@@ -348,7 +348,7 @@ NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self) {
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mpart *
 NOTHROW(FCALL mfile_map_trylockall)(struct mfile_map *__restrict self) {
 	struct mnode *node;
-	SLIST_FOREACH(node, &self->mfm_nodes, _mn_alloc) {
+	SLIST_FOREACH (node, &self->mfm_nodes, _mn_alloc) {
 		struct mpart *part = node->mn_part;
 		if (!mpart_lock_tryacquire(part)) {
 			/* Blocking-wait for this part to become available. */
@@ -425,7 +425,7 @@ NOTHROW(FCALL mnode_slist_adjusted_mapped_ranges)(struct mnode_slist *__restrict
 again:
 	changed = false;
 	prev    = NULL;
-	SLIST_FOREACH(node, self, _mn_alloc) {
+	SLIST_FOREACH (node, self, _mn_alloc) {
 		struct mnode *next = SLIST_NEXT(node, _mn_alloc);
 		struct mpart *part = node->mn_part;
 		pos_t want_map_minaddr, want_map_maxaddr;
@@ -507,7 +507,7 @@ NOTHROW(FCALL mnode_slist_is_complete_range)(struct mnode_slist const *__restric
 	struct mnode const *node;
 	byte_t *expected_minaddr;
 	expected_minaddr = (byte_t *)0;
-	SLIST_FOREACH(node, self, _mn_alloc) {
+	SLIST_FOREACH (node, self, _mn_alloc) {
 		if (node->mn_minaddr != expected_minaddr)
 			return false;
 		expected_minaddr = node->mn_maxaddr + 1;

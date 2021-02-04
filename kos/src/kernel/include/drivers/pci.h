@@ -159,7 +159,7 @@ NOTHROW(KCALL pci_getclassname)(u8 classid);
 
 /* Enumerate all PCI devices. */
 #define PCI_FOREACH(dev) \
-	SLIST_FOREACH(dev, &pci_list, pd_chain)
+	SLIST_FOREACH (dev, &pci_list, pd_chain)
 
 /* Enumerate all PCI devices matching the given class and subclass ID. */
 #define PCI_FOREACH_CLASS(dev, classid, subclassid) \

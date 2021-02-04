@@ -478,7 +478,7 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 			struct block_device_partition *iter;
 			me = (struct block_device *)self;
 			sync_read(&me->bd_parts_lock);
-			SLIST_FOREACH(iter, &me->bd_parts, bp_parts) {
+			SLIST_FOREACH (iter, &me->bd_parts, bp_parts) {
 				++st.bs_partcount;
 			}
 			sync_endread(&me->bd_parts_lock);

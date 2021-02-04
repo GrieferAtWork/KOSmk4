@@ -1958,7 +1958,7 @@ do_detach_self:
 		/* Go through the list of children of this process. */
 again:
 		sync_write(&procgroup->tg_proc_threads_lock);
-		LIST_FOREACH(iter, &procgroup->tg_proc_threads, tp_siblings) {
+		LIST_FOREACH (iter, &procgroup->tg_proc_threads, tp_siblings) {
 			REF struct task *tpid_thread;
 			if (iter != tpid)
 				continue;
@@ -2131,7 +2131,7 @@ again_enum_children:
 			sync_read(&mygroup.tg_proc_threads_lock);
 again_enum_children_locked:
 			num_candidates = 0;
-			LIST_FOREACH(child, &mygroup.tg_proc_threads, tp_siblings) {
+			LIST_FOREACH (child, &mygroup.tg_proc_threads, tp_siblings) {
 				REF struct task *child_thread;
 				if (which == P_PID) {
 					if (child->tp_pids[my_indirection] != upid)

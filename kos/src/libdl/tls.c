@@ -121,7 +121,7 @@ DlModule_RemoveTLSExtension(DlModule *__restrict self) {
 	chain = NULL;
 again:
 	atomic_rwlock_read(&static_tls_lock);
-	LIST_FOREACH(iter, &static_tls_list, ts_threads) {
+	LIST_FOREACH (iter, &static_tls_list, ts_threads) {
 		if (!atomic_rwlock_trywrite(&iter->ts_exlock)) {
 			atomic_rwlock_endread(&static_tls_lock);
 			sys_sched_yield();

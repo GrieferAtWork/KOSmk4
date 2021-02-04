@@ -380,7 +380,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
  * >>         ...
  * >>     } else {
  * >>         if (part->mp_copy == NULL) {
- * >>             LIST_FOREACH(node, &part->mp_share, mn_link) {
+ * >>             LIST_FOREACH (node, &part->mp_share, mn_link) {
  * >>                 mnode_clear_write(node);
  * >>             }
  * >>         } else if (LIST_NEXT(part->mp_copy, mn_link) != NULL &&

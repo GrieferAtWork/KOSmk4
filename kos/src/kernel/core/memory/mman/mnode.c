@@ -74,11 +74,11 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 	/* Check if there are any nodes mapping our part that use LOCK flags.
 	 * For this purpose, both copy-on-write and shared nodes can lock the part. */
 	struct mnode *node;
-	LIST_FOREACH(node, &self->mp_copy, mn_link) {
+	LIST_FOREACH (node, &self->mp_copy, mn_link) {
 		if (node->mn_flags & MNODE_F_MLOCK)
 			return;
 	}
-	LIST_FOREACH(node, &self->mp_share, mn_link) {
+	LIST_FOREACH (node, &self->mp_share, mn_link) {
 		if (node->mn_flags & MNODE_F_MLOCK)
 			return;
 	}
@@ -179,7 +179,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
  * >>         ...
  * >>     } else {
  * >>         if (part->mp_copy == NULL) {
- * >>             LIST_FOREACH(node, &part->mp_share, mn_link) {
+ * >>             LIST_FOREACH (node, &part->mp_share, mn_link) {
  * >>                 mnode_clear_write(node);
  * >>             }
  * >>         } else if (LIST_NEXT(part->mp_copy, mn_link) != NULL &&
