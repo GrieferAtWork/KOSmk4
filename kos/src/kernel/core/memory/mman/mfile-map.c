@@ -26,8 +26,9 @@
 
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/map.h>
+#include <kernel/mman/mfile-map.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <sched/task.h>
@@ -81,25 +82,132 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
 		kfree(iter);
 		iter = next;
 	}
+	mpart_setcore_data_fini(&self->mfm_scdat);
+	mpart_unsharecow_data_fini(&self->mfm_ucdat);
 }
 
 
 
+struct mfile_map_unlockall_except_info: unlockinfo {
+	struct mfile_map *mmuaei_fmap;   /* [1..1] The file-map from which all parts should be unlocked. */
+	struct mpart     *mmuaei_skipme; /* [1..1] The part that shouldn't be unlocked. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_unlockall_except_info_cb)(struct unlockinfo *__restrict self) {
+	struct mnode *node;
+	struct mfile_map_unlockall_except_info *me;
+	me = (struct mfile_map_unlockall_except_info *)self;
+	SLIST_FOREACH (node, &me->mmuaei_fmap->mfm_nodes, _mn_alloc) {
+		struct mpart *part = node->mn_part;
+		if (part != me->mmuaei_skipme)
+			mpart_lock_release(part);
+	}
+
+}
+
+
+
+/* Check if any of the copy-on-write mappings of `self' overlap with the given address range. */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL mpart_must_unshare_copy)(struct mpart *__restrict self,
+                                       mpart_reladdr_t minaddr,
+                                       mpart_reladdr_t maxaddr) {
+	struct mnode *node;
+	if (LIST_EMPTY(&self->mp_copy))
+		return false;
+	LIST_FOREACH (node, &self->mp_copy, mn_link) {
+		if (mnode_ismapping(node, minaddr, maxaddr))
+			return true;
+	}
+	return false;
+}
 
 
 /* Go over all parts and make use of `mpart_load_or_unlock()' or
- * `mpart_unsharecow_or_unlock()' (and `mpart_split()' if necessary)
- * in order to populate+unshare (if PROT_WRITE was set) the file-range
- * that our caller is intending to map. */
+ * `mpart_unsharecow_or_unlock()' in order to populate+unshare
+ * (if PROT_WRITE was set) the file-range that our caller is
+ * intending to map. */
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct mnode *node;
+	struct mfile_map_unlockall_except_info unlock;
+	assert(self->mfm_flags & MAP_POPULATE);
+	unlock.ui_unlock   = &mfile_map_unlockall_except_info_cb;
+	unlock.mmuaei_fmap = self;
 
-	/* TODO */
-	(void)self;
-	COMPILER_IMPURE();
+	/* Make sure that all parts have been loaded into the core,
+	 * and that all accessed memory has been loaded from-disk. */
+	SLIST_FOREACH (node, &self->mfm_nodes, _mn_alloc) {
+		struct mpart *part;
+		part                 = node->mn_part;
+		unlock.mmuaei_skipme = part;
 
+		/* Make sure that the part is in-core. */
+		if (!MPART_ST_INCORE(part->mp_state)) {
+			if (!mpart_setcore_or_unlock(part, &unlock, &self->mfm_scdat))
+				goto fail;
+			/* Re-initialize set-core data (since it became invalid after
+			 * a successful return from `mpart_setcore_or_unlock()') */
+			mpart_setcore_data_init(&self->mfm_scdat);
+		}
+
+		if (self->mfm_prot & PROT_WRITE) {
+			mpart_reladdr_t minaddr, maxaddr;
+			minaddr = mnode_getmapminaddr(node);
+			maxaddr = mnode_getmapmaxaddr(node);
+			if (self->mfm_prot & PROT_SHARED) {
+				/* Check if we must unshare copy-on-write mappings from this node.  */
+				if (mpart_must_unshare_copy(part, minaddr, maxaddr)) {
+					if (!mpart_unsharecow_or_unlock(part, &unlock, &self->mfm_ucdat,
+					                                minaddr, (maxaddr - minaddr) + 1))
+						goto fail;
+					/* Re-initialize unshare-cow data (since it became invalid after
+					 * a successful return from `mpart_unsharecow_or_unlock()') */
+					mpart_unsharecow_data_init(&self->mfm_ucdat);
+				}
+			} else {
+				/* The caller wants to create a private mapping.
+				 * As such, we must ensure that there aren't any SHARED mappings
+				 * of `part', and that `part' belongs to an anonymous file. */
+				if (!mpart_isanon(part) ||          /* `part' could be accessed via its file. */
+				    !LIST_EMPTY(&part->mp_copy) ||  /* `part' already has other copy-on-write mappings. */
+				    !LIST_EMPTY(&part->mp_share)) { /* `part' already has other shared mappings. */
+
+					/* TODO: Create our own private copy of `part'
+					 *       Essentially, we have to do the same as is also done by `mfault()',
+					 *       only that instead of faulting a node/part pair found within some
+					 *       given memory manager, we need to fault a part that hasn't actually
+					 *       been added to its proper node, yet. */
+
+					/* TODO: While using `self->mfm_ucdat' as intermediate buffer, allocate:
+					 *     - self->mfm_ucdat.ucd_copy                     (as a new `struct mpart')
+					 *     - self->mfm_ucdat.ucd_ucmem.scd_bitset         (if needed)
+					 *     - self->mfm_ucdat.ucd_ucmem.scd_copy_mem[_sc]  (as needed) */
+
+					/* TODO: Copy backing physical memory from `part' into `self->mfm_ucdat.ucd_copy' */
+					/* TODO: Initialize `self->mfm_ucdat.ucd_copy' as a duplicate of `part' */
+					/* TODO: Replace `part' from `node->mn_part' with `self->mfm_ucdat.ucd_copy' */
+
+					/* With this, `node' no longer references the original file, but rather contains
+					 * its own, private copy of the relevant portion from the original file! :) */
+
+					/* TODO: Check the preceding file-mapping node (from the `self->mfm_nodes' list)
+					 *       to see if it might be possible to merge those 2 node/part pairs. For this
+					 *       purpose, we can simply use:
+					 *       `!isshared(PREV->mn_part) && mpart_isanon(PREV->mn_part) && PREV->mn_part->mp_file == &mfile_anon[*]'
+					 *       The combination of these checks is already enough to identify 2 consecutive
+					 *       parts that have both been replaced with private copies.
+					 *       When found, simply merge the 2 parts & nodes into the same object, thus
+					 *       simplifying the resulting mapping. */
+				}
+			}
+		}
+	}
 	return true;
+fail:
+	return false;
 }
 
 
@@ -131,6 +239,8 @@ _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 	block_aligned_addr = self->mfm_addr & ~file->mf_part_amask;
 	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
 	block_aligned_size = (block_aligned_size + file->mf_part_amask) & ~file->mf_part_amask;
+	mpart_setcore_data_init(&self->mfm_scdat);
+	mpart_unsharecow_data_init(&self->mfm_ucdat);
 
 	SLIST_INIT(&self->mfm_nodes);
 	/* Allocate the initial node! */

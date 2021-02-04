@@ -26,9 +26,10 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/mbuilder.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/flags.h>
+#include <kernel/mman/mbuilder.h>
+#include <kernel/mman/mfile-map.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <misc/unlockinfo.h>
@@ -178,6 +179,8 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict s
 	fm->mfmfr_fspath        = fmnode->mbn_fspath;
 	fm->mfmfr_fsname        = fmnode->mbn_fsname;
 	DBG_memset(&self->_mb_fnodes, 0xcc, sizeof(self->_mb_fnodes));
+	mpart_setcore_data_init(&fm->mfm_scdat);
+	mpart_unsharecow_data_init(&fm->mfm_ucdat);
 
 	for (iter = fmnode;;) {
 		struct mbnode *next;
@@ -245,6 +248,11 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder *__restrict se
 	/* Fill in basic mapping information. */
 	fmnode->mbn_file   = fm->mfm_file; /* Inherit reference. */
 	fmnode->mbn_filpos = fm->mfm_addr;
+
+	self->_mb_fnodes = fm->mfm_flist; /* Steal the free-list */
+	DBG_memset(&fm->mfm_flist, 0xcc, sizeof(fm->mfm_flist));
+	mpart_setcore_data_fini(&fm->mfm_scdat);
+	mpart_unsharecow_data_fini(&fm->mfm_ucdat);
 
 	for (;;) {
 		struct mbnode *next;

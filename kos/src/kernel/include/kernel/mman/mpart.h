@@ -638,6 +638,10 @@ struct mpart_setcore_data {
 		struct mchunkvec scd_copy_mem_sc; /* [valid_if(scd_copy_state == MPART_ST_MEM_SC)][owned] */
 	};
 };
+#define MPART_SETCORE_DATA_INIT       \
+	{                                 \
+		__NULLPTR, MPART_ST_VOID, { } \
+	}
 #define mpart_setcore_data_init(self)          \
 	(void)((self)->scd_bitset     = __NULLPTR, \
 	       (self)->scd_copy_state = MPART_ST_VOID)
@@ -669,6 +673,8 @@ struct mpart_unsharecow_data {
 	struct mpart_setcore_data ucd_ucmem; /* Data for unshare. */
 	struct mpart             *ucd_copy;  /* [0..1] The duplicate of the original mem-part. */
 };
+#define MPART_UNSHARECOW_DATA_INIT \
+	{ MPART_SETCORE_DATA_INIT, __NULLPTR }
 #define mpart_unsharecow_data_init(self)                \
 	(void)(mpart_setcore_data_init(&(self)->ucd_ucmem), \
 	       (self)->ucd_copy = __NULLPTR)

@@ -98,10 +98,13 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
 	assert(mfile_addr_ceilalign(self, atomic64_read(&self->mf_filesize)) >= data->mep_maxaddr + 1);
 #endif /* CONFIG_USE_NEW_FS */
 	assert(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
+
 	/* TODO */
+
 	(void)self;
 	(void)unlock;
 	mfile_extendpart_data_fini(data);
+
 	return MFILE_EXTENDPART_OR_UNLOCK_NOSIB;
 }
 

@@ -28,14 +28,15 @@
 #include <fs/vfs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/map.h>
-#include <kernel/mman/sync.h>
-#include <kernel/mman/unmapped.h>
+#include <kernel/mman/mfile-map.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/sync.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <misc/unlockinfo.h>
 #include <sched/task.h>
@@ -357,25 +358,6 @@ do_insert_without_file:
 		TRY {
 #ifdef HAVE_FILE
 			for (;;) {
-				if ((flags & MAP_POPULATE) && (prot & PROT_WRITE)) {
-					/* TODO: Unshare shared mappings / create a private copy if necessary.
-					 *       What needs to happen here is similar to what happens in `mfault_or_unlock()'!
-					 * >> FOREACH(struct mnode *node: map.mmwu_map.mfm_nodes) {
-					 * >>     struct mpart *part = node->mn_part;
-					 * >>     if (prot & PROT_SHARED) {
-					 * >>         mpart_split(part, mnode_getfileminaddr(node)); // conditional
-					 * >>         mpart_split(part, mnode_getfileendaddr(node)); // conditional
-					 * >>     }
-					 * >>     mpart_setcore_or_unlock(part);
-					 * >>     mpart_load_or_unlock(part, mnode_getmapaddr(node), mnode_getsize(node));
-					 * >>     if (prot & PROT_SHARED) {
-					 * >>         mpart_unsharecow_or_unlock(part);
-					 * >>     } else {
-					 * >>         node->mn_part = CREATE_PRIVATE_ANONYMOUS_COPY(part);
-					 * >>     }
-					 * >> }
-					 */
-				}
 				if (mman_lock_tryacquire(self))
 					break;
 				mfile_map_release(&map.mmwu_map);
