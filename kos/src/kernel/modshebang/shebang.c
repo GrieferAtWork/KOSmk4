@@ -174,9 +174,6 @@ shebang_exec(struct execargs *__restrict args) {
 				                                         sizeof(char *),
 				                                         GFP_NORMAL);
 				/* Duplicate the 1-2 arguments we want to inject. */
-				/* TODO: Don't directly use `execfile'. - Instead, re-print
-				 *       that filename via `path_print()' in order to force
-				 *       it to become an absolute path. */
 				inject_arg0 = (char *)kmalloc((size_t)((execfile_end - execfile) + 1) *
 				                              sizeof(char),
 				                              GFP_NORMAL);
@@ -217,6 +214,7 @@ shebang_exec(struct execargs *__restrict args) {
 				decref_unlikely(interp_node);
 				RETHROW();
 			}
+
 			/* Replace the exec-path with that of the interpreter. */
 			decref_unlikely(args->ea_xpath);
 			decref_unlikely(args->ea_xdentry);

@@ -356,7 +356,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
  * given that symbol's `name'. For this purpose, `name' can be (in order):
  *   - A function-to-compilation-unit-scoped variable/argument/enum
- *   - An PUBLIC/INTERN variable from the module containing the current PC
+ *   - A PUBLIC/INTERN variable from the module containing the current PC
  * if (ADDR_ISUSER(CURRENT_PC)) {
  *   - A PUBLIC/INTERN variable from any loaded user-space module
  *   - A PUBLIC/INTERN variable from any loaded kernel-space module

@@ -740,7 +740,7 @@ doparen_expr:
 		unsigned int shift = 0;
 		char const *reader, *end;
 		reader = self->c_tokstart;
-		end    = self->c_tokstart;
+		end    = self->c_tokend;
 		unicode_readutf8_rev_n(&end, reader); /* Trailing '\'' */
 		unicode_readutf8_n(&reader, end);     /* Leading '\'' */
 		for (;;) {

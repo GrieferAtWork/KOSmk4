@@ -541,6 +541,9 @@ try_pointer_register:
 		break;
 
 	case X86_REGISTER_FLOAT:
+	case X86_REGISTER_MMX:
+	case X86_REGISTER_XMM:
+	case X86_REGISTER_YMM:
 		if (buflen == SIZEOF_CTYPE_IEEE754_FLOAT) {
 			return incref(&ctype_ieee754_float);
 		} else if (buflen == SIZEOF_CTYPE_IEEE754_DOUBLE) {

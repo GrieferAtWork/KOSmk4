@@ -30,8 +30,9 @@ DECL_BEGIN
 /* Max # of bytes from the start of an executable file, to
  * immediately after the line-feed following the first line.
  *
- * If more bytes than this amount appear in the first line (not counting the
- * leading #!), will fail with `E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC' */
+ * If more bytes than this amount appear in the first
+ * line (not counting the leading #!), exec will fail
+ * with `E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC' */
 #ifndef CONFIG_SHEBANG_INTERPRETER_LINE_MAX
 #define CONFIG_SHEBANG_INTERPRETER_LINE_MAX 1024
 #endif /* !CONFIG_SHEBANG_INTERPRETER_LINE_MAX */

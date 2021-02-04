@@ -2768,6 +2768,7 @@ do_pointer_pointer_op:
 				lhs_value /= rhs_value;
 			}
 			break;
+
 		case '%':
 			if (!lhs_data)
 				break;
@@ -2881,7 +2882,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
  * given that symbol's `name'. For this purpose, `name' can be (in order):
  *   - A function-to-compilation-unit-scoped variable/argument/enum
- *   - An PUBLIC/INTERN variable from the module containing the current PC
+ *   - A PUBLIC/INTERN variable from the module containing the current PC
  * if (ADDR_ISUSER(CURRENT_PC)) {
  *   - A PUBLIC/INTERN variable from any loaded user-space module
  *   - A PUBLIC/INTERN variable from any loaded kernel-space module
@@ -2930,8 +2931,8 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		 * Using that entry, we can:
 		 *   - Determine if it's a function, and if it is:
 		 *     Use `void(...)' as type (i.e. void-return+varargs)
-		 *   - Figure out the symbol's size. and select an appropriate
-		 *     integer type based on that knowledge:
+		 *   - Figure out the symbol's size, and select an
+		 *     appropriate integer type based on that knowledge:
 		 *      - If the size is the same as that of a pointer, assume that it's a pointer
 		 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
 		 *      - Otherwise, interpret as an array of byte_t-s. */
