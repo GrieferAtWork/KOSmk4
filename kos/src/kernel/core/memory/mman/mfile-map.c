@@ -87,7 +87,7 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
 
 
 
-/* Go over all parts and make use of `mpart_loadsome_or_unlock()' or
+/* Go over all parts and make use of `mpart_load_or_unlock()' or
  * `mpart_unsharecow_or_unlock()' (and `mpart_split()' if necessary)
  * in order to populate+unshare (if PROT_WRITE was set) the file-range
  * that our caller is intending to map. */
@@ -122,8 +122,8 @@ _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 	struct mfile *file;
 	struct mnode *node;
 	REF struct mpart *part;
-	pos_t block_aligned_addr;
-	size_t block_aligned_size;
+	PAGEDIR_PAGEALIGNED pos_t block_aligned_addr;
+	PAGEDIR_PAGEALIGNED size_t block_aligned_size;
 	file = self->mfm_file;
 	assert(self->mfm_size != 0);
 	assert(IS_ALIGNED(self->mfm_addr, PAGESIZE));

@@ -367,7 +367,7 @@ do_insert_without_file:
 					 * >>         mpart_split(part, mnode_getfileendaddr(node)); // conditional
 					 * >>     }
 					 * >>     mpart_setcore_or_unlock(part);
-					 * >>     mpart_loadsome_or_unlock(part, mnode_getmapaddr(node), mnode_getsize(node));
+					 * >>     mpart_load_or_unlock(part, mnode_getmapaddr(node), mnode_getsize(node));
 					 * >>     if (prot & PROT_SHARED) {
 					 * >>         mpart_unsharecow_or_unlock(part);
 					 * >>     } else {

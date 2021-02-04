@@ -569,13 +569,8 @@ again:
 #ifdef CONFIG_USE_NEW_FS
 			{
 				pos_t filesize;
-#if __SIZEOF_POINTER__ >= __SIZEOF_POS_T__
-				filesize = ATOMIC_READ(file->mf_filesize);
-#else /* __SIZEOF_POINTER__ >= __SIZEOF_POS_T__ */
-				mfile_lock_read(file);
-				filesize = file->mf_filesize;
-				mfile_lock_endread(file);
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_POS_T__ */
+				filesize = (pos_t)atomic64_read(&file->mf_filesize);
+
 				/* Limit the write-back address range by the size of the file,
 				 * or do nothing if the entirety of said range lies outside of
 				 * the file's effective bounds. */

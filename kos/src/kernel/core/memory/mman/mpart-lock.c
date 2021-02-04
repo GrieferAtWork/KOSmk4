@@ -559,9 +559,11 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct mpart_setcore_data *__restrict data) {
 	size_t num_bytes, num_pages, num_blocks;
 	struct mfile *file;
+
 	/* Quick check: is the part already in the expected state? */
 	if (MPART_ST_INCORE(self->mp_state))
-		return true; /* Already done! */
+		goto done_simple; /* Already done! */
+
 	num_bytes = mpart_getsize(self);
 	assert(IS_ALIGNED(num_bytes, PAGESIZE));
 	file       = self->mp_file;
@@ -772,7 +774,7 @@ done_swap:
 
 		/* Ensure a consistent state when returning `false' */
 		mpart_setcore_data_init(data);
-		return false;
+		goto nope;
 	}	break;
 
 	default: __builtin_unreachable();
@@ -789,6 +791,9 @@ done_swap:
 	           MAX_C(sizeof(struct mchunk),
 	                 sizeof(struct mchunkvec)));
 	return true;
+done_simple:
+	mpart_setcore_data_fini(data);
+	return true;
 nope:
 	return false;
 }
@@ -802,7 +807,7 @@ nope:
  *   - ... MPART_ST_INCORE(self->mp_state)
  * If they don't, then this function will cause an assertion failure! */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
-mpart_loadsome_or_unlock(struct mpart *__restrict self,
+mpart_load_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock,
                          mpart_reladdr_t partrel_offset,
                          size_t num_bytes)
@@ -880,13 +885,8 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 #ifdef CONFIG_USE_NEW_FS
 			if (!mfile_isanon(file)) {
 				pos_t filesize;
-#if __SIZEOF_POINTER__ >= __SIZEOF_POS_T__
-				filesize = ATOMIC_READ(file->mf_filesize);
-#else /* __SIZEOF_POINTER__ >= __SIZEOF_POS_T__ */
-				mfile_lock_read(file);
-				filesize = file->mf_filesize;
-				mfile_lock_endread(file);
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_POS_T__ */
+				filesize = (pos_t)atomic64_read(&file->mf_filesize);
+
 				/* NOTE: The file size may increase in the mean time, but that's actually
 				 *       ok: We're currently holding exclusive locks to all of the blocks
 				 *       that we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
@@ -990,36 +990,6 @@ initdone:
 }
 
 
-
-/* Same as `mpart_loadall_or_unlock()', but only ensure no INIT-blocks when
- * the file used by `self' describes zero-initialized, anonymous memory. */
-PRIVATE WUNUSED NONNULL((1)) bool FCALL
-mpart_maybe_loadall_or_unlock(struct mpart *__restrict self,
-                              struct unlockinfo *unlock) {
-	/* Check for special case: Without a block-state-bitset,
-	 * there can't be any INIT or LOAD-parts. */
-	if unlikely(!mpart_hasblockstate(self))
-		return true;
-
-	/* This is where it gets complicated, since we need to create a new,
-	 * anonymous, and fully initialized (i.e. no `MPART_BLOCK_ST_NDEF'
-	 * blocks) version of our mem-part.
-	 *
-	 * As the first step, make sure that all blocks of `self' have been
-	 * loaded, as all of the unshared copies of `self' would no longer
-	 * be able to access the state of `self', as it was before.
-	 *
-	 * Note though that we make a special case out of anon files, since
-	 * those would still get the same initialization in the unshared
-	 * copies when compared to now! */
-	if (self->mp_file >= mfile_anon &&
-	    self->mp_file < COMPILER_ENDOF(mfile_anon)) {
-		/* No need to prevent `MPART_BLOCK_ST_NDEF' parts.
-		 * We only need to get rid of `MPART_BLOCK_ST_INIT' parts! */
-		return mpart_initdone_or_unlock(self, unlock);
-	}
-	return mpart_loadall_or_unlock(self, unlock);
-}
 
 
 
@@ -1155,12 +1125,16 @@ struct unsharecow_bounds {
 /* Calculate the max-size needed to represent `part'. */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restrict self,
-                                              struct mpart *__restrict part) {
+                                              struct mpart *__restrict part,
+                                              mpart_reladdr_t minaddr,
+                                              mpart_reladdr_t maxaddr) {
 	struct mnode *node;
 	self->ucb_mapmin = (mpart_reladdr_t)-1;
 	self->ucb_mapmax = 0;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
 		mpart_reladdr_t min, max;
+		if (!mnode_ismapping(node, minaddr, maxaddr))
+			continue;
 		if (wasdestroyed(node->mn_mman))
 			continue;
 		min = mnode_getmapminaddr(node);
@@ -1270,15 +1244,34 @@ unsharecow_makememdat_or_unlock(struct mpart *__restrict self,
 }
 
 
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL unsharecow_has_mapping_nodes)(struct mpart *__restrict part,
+                                            mpart_reladdr_t minaddr,
+                                            mpart_reladdr_t maxaddr) {
+	struct mnode *node;
+	LIST_FOREACH (node, &part->mp_copy, mn_link) {
+		if (mnode_ismapping(node, minaddr, maxaddr)) {
+			if (!wasdestroyed(node->mn_mman))
+				return true;
+		}
+	}
+	return false;
+}
+
+
 /* Incref all of the mmans of copy-on-write nodes.
  * Dead mmans are silently ignored (returns `false' if all mmans are dead) */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL unsharecow_incref_mmans)(struct mpart *__restrict part) {
+NOTHROW(FCALL unsharecow_incref_mmans)(struct mpart *__restrict part,
+                                       mpart_reladdr_t minaddr,
+                                       mpart_reladdr_t maxaddr) {
 	bool result = false;
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
-		if (tryincref(node->mn_mman))
-			result = true;
+		if (mnode_ismapping(node, minaddr, maxaddr)) {
+			if (tryincref(node->mn_mman))
+				result = true;
+		}
 	}
 	return result;
 }
@@ -1286,11 +1279,15 @@ NOTHROW(FCALL unsharecow_incref_mmans)(struct mpart *__restrict part) {
 /* Decref all of the mmans of copy-on-write nodes.
  * mmans that were already dead are silently ignored. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL unsharecow_decref_mmans)(struct mpart *__restrict part) {
+NOTHROW(FCALL unsharecow_decref_mmans)(struct mpart *__restrict part,
+                                       mpart_reladdr_t minaddr,
+                                       mpart_reladdr_t maxaddr) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
-		if (!wasdestroyed(node->mn_mman))
-			decref_unlikely(node->mn_mman);
+		if (mnode_ismapping(node, minaddr, maxaddr)) {
+			if (!wasdestroyed(node->mn_mman))
+				decref_unlikely(node->mn_mman);
+		}
 	}
 }
 
@@ -1305,7 +1302,23 @@ NOTHROW(FCALL unsharecow_decref_mmans_fast)(struct mpart *__restrict part) {
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL mnode_list_contains_mman_until)(struct mnode const *start_node,
                                               struct mnode const *stop_node,
-                                              struct mman const *__restrict mm) {
+                                              struct mman const *__restrict mm,
+                                              mpart_reladdr_t minaddr,
+                                              mpart_reladdr_t maxaddr) {
+	while (start_node != stop_node) {
+		if (mnode_ismapping(start_node, minaddr, maxaddr)) {
+			if (start_node->mn_mman == mm)
+				return true;
+		}
+		start_node = LIST_NEXT(start_node, mn_link);
+	}
+	return false;
+}
+
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL mnode_list_contains_mman_until_fast)(struct mnode const *start_node,
+                                                   struct mnode const *stop_node,
+                                                   struct mman const *__restrict mm) {
 	while (start_node != stop_node) {
 		if (start_node->mn_mman == mm)
 			return true;
@@ -1316,23 +1329,28 @@ NOTHROW(FCALL mnode_list_contains_mman_until)(struct mnode const *start_node,
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_unlock_unique_mmans_until)(struct mpart *__restrict part,
-                                                    struct mnode *stop_node) {
+                                                    struct mnode *stop_node,
+                                                    mpart_reladdr_t minaddr,
+                                                    mpart_reladdr_t maxaddr) {
 	struct mnode *node;
 	for (node = LIST_FIRST(&part->mp_copy); node != stop_node;
 	     node = LIST_NEXT(node, mn_link)) {
-		struct mman *mm = node->mn_mman;
+		struct mman *mm;
+		if (!mnode_ismapping(node, minaddr, maxaddr))
+			continue;
+		mm = node->mn_mman;
 		if (wasdestroyed(mm))
 			continue;
 		/* Check if we've already seen this mman */
 		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy),
-		                                   node, mm))
+		                                   node, mm, minaddr, maxaddr))
 			continue;
 		sync_endwrite(mm);
 	}
 }
 
-#define unsharecow_unlock_unique_mmans(part) \
-	unsharecow_unlock_unique_mmans_until(part, NULL)
+#define unsharecow_unlock_unique_mmans(part, minaddr, maxaddr) \
+	unsharecow_unlock_unique_mmans_until(part, NULL, minaddr, maxaddr)
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part) {
@@ -1341,8 +1359,8 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part
 		struct mman *mm = node->mn_mman;
 		assert(!wasdestroyed(mm));
 		/* Check if we've already seen this mman */
-		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy),
-		                                   node, mm))
+		if (mnode_list_contains_mman_until_fast(LIST_FIRST(&part->mp_copy),
+		                                        node, mm))
 			continue;
 		sync_endwrite(mm);
 	}
@@ -1351,20 +1369,25 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part
 /* Acquire locks to all of the memory-managers in use by copy-on-write nodes of `part' */
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
-                                       struct unlockinfo *unlock) {
+                                       struct unlockinfo *unlock,
+                                       mpart_reladdr_t minaddr,
+                                       mpart_reladdr_t maxaddr) {
 	struct mnode *node;
 	LIST_FOREACH (node, &part->mp_copy, mn_link) {
 		struct mman *mm;
+		if (!mnode_ismapping(node, minaddr, maxaddr))
+			continue;
 		mm = node->mn_mman;
 		if (wasdestroyed(mm))
 			continue;
 		/* Check if we've already seen this mman */
-		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy), node, mm))
+		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy),
+		                                   node, mm, minaddr, maxaddr))
 			continue;
 		if (!sync_trywrite(mm)) {
 			/* Found one that can't be locked immediately.
 			 * -> Unlock all others and drop already-gathered references. */
-			unsharecow_unlock_unique_mmans_until(part, node);
+			unsharecow_unlock_unique_mmans_until(part, node, minaddr, maxaddr);
 
 			/* Drop our lock to the original part. */
 			UNLOCK(part, unlock);
@@ -1380,8 +1403,12 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
-                                     struct mnode *stop_node) {
+                                     struct mnode *stop_node,
+                                     mpart_reladdr_t minaddr,
+                                     mpart_reladdr_t maxaddr) {
 	for (; start_node != stop_node; start_node = LIST_NEXT(start_node, mn_link)) {
+		if (!mnode_ismapping(start_node, minaddr, maxaddr))
+			continue;
 		if unlikely(wasdestroyed(start_node->mn_mman))
 			continue; /* Skip dead nodes. */
 		if (start_node->mn_flags & (MNODE_F_MPREPARED | MNODE_F_UNMAPPED))
@@ -1397,10 +1424,14 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
  * If this cannot be done, release all locks and throw an exception. */
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 try_prepare_mmans_or_throw(struct mpart *__restrict self,
-                           struct unlockinfo *unlock) {
+                           struct unlockinfo *unlock,
+                           mpart_reladdr_t minaddr,
+                           mpart_reladdr_t maxaddr) {
 	struct mnode *node;
 	bool result = false;
 	LIST_FOREACH (node, &self->mp_copy, mn_link) {
+		if (!mnode_ismapping(node, minaddr, maxaddr))
+			continue;
 		if unlikely(wasdestroyed(node->mn_mman))
 			continue; /* Skip dead nodes. */
 		if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
@@ -1408,8 +1439,8 @@ try_prepare_mmans_or_throw(struct mpart *__restrict self,
 		if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 			/* Prepare the page directory. */
 			if unlikely(!pagedir_prepare_p(node->mn_mman->mm_pagedir_p,
-			                                mnode_getaddr(node),
-			                                mnode_getsize(node)))
+			                               mnode_getaddr(node),
+			                               mnode_getsize(node)))
 				goto err_badalloc;
 		}
 		result = true;
@@ -1419,8 +1450,8 @@ err_badalloc:
 	/* Insufficient physical memory...
 	 * -> Unprepare everything we've already prepared thus far,
 	 *    then proceed by throwing an exception! */
-	unprepare_mmans_until(LIST_FIRST(&self->mp_copy), node);
-	unsharecow_unlock_unique_mmans(self);
+	unprepare_mmans_until(LIST_FIRST(&self->mp_copy), node, minaddr, maxaddr);
+	unsharecow_unlock_unique_mmans(self, minaddr, maxaddr);
 	mpart_lock_release_f(self);
 	unlockinfo_xunlock(unlock);
 	mpart_lockops_reap(self);
@@ -1430,7 +1461,8 @@ err_badalloc:
 
 
 
-/* Ensure that `LIST_EMPTY(&self->mp_copy)'
+/* Ensure that `LIST_EMPTY(&self->mp_copy)' (while only considering nodes
+ * which may be overlapping with the given address range)
  * NOTE: The caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
  *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
@@ -1441,50 +1473,48 @@ err_badalloc:
 PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
-                           struct mpart_unsharecow_data *__restrict data) {
-	/* TODO: Instead of unsharing _all_ copy-on-write mappings, extend this function to
-	 *       only unshare those that are mapping pages from a specific sub-region of
-	 *       the given mem-part (where copy-on-write mem-nodes overlap partially with
-	 *       the sub-region being unshared, those mem-nodes should be split)
-	 * Currently, the callers of `mpart_unsharecow_or_unlock()' works around this issue
-	 * by using `mpart_split()' to narrow down the address range actually being unshared
-	 * in this situation, but in theory, the backing mem-part wouldn't actually need to
-	 * be split at all!
-	 *
-	 * Additionally, the should-write-be-allowed checks in `mnode_getperm()' should also
-	 * be adjusted to only disallow write if only the area being mapped is also being
-	 * shared with another mapping, rather than the part itself. This would also resolve
-	 * the really-a-non-issue where a non-shared mapping with write-permissions has its
-	 * backing mem-part merged, such that more than 1 copy-on-write mapping exists
-	 * afterwards, which would normally result in the mem-node being (needlessly) mapped
-	 * w/o write, even though the old mapping (with write access) still continues to
-	 * persist.
-	 */
+                           struct mpart_unsharecow_data *__restrict data,
+                           mpart_reladdr_t partrel_offset, size_t num_bytes) {
+	/* Instead of unsharing _all_ copy-on-write mappings, extend this function to
+	 * only unshare those that are mapping pages from a specific sub-region of
+	 * the given mem-part (where copy-on-write mem-nodes overlap partially with
+	 * the sub-region being unshared, those mem-nodes should be split) */
 	struct mpart *copy;
 	struct mnode *node;
 	size_t block_count;
 	struct unsharecow_bounds bounds;
+	mpart_reladdr_t partrel_minaddr;
+	mpart_reladdr_t partrel_maxaddr;
+
 	assert(MPART_ST_INCORE(self->mp_state));
 
 	/* Quick check: If there aren't any copy-on-write mappings, then
 	 *              we don't actually need to do anything else! */
 	if (LIST_EMPTY(&self->mp_copy))
-		goto done;
+		goto done_simple;
+
+	/* Slightly slower check: Are there any copy-on-write nodes
+	 * that map at least 1 byte from the given address range? */
+	partrel_minaddr = partrel_offset;
+	partrel_maxaddr = partrel_offset + num_bytes - 1;
+	if (!unsharecow_has_mapping_nodes(self, partrel_minaddr, partrel_maxaddr))
+		goto done_simple; /* Nothing is mapping the range that should be unshared, so nothing to do! */
+
 
 	/* Make sure to load all blocks (if necessary), and also make sure
 	 * that there aren't any INIT-blocks left */
-	if (!mpart_maybe_loadall_or_unlock(self, unlock))
+	if (!mpart_load_or_unlock(self, unlock, partrel_offset, num_bytes))
 		goto nope;
 	assert(!LIST_EMPTY(&self->mp_copy));
 
 	/* Try to acquire references to all of the mmans from the copy-on-write list.
 	 * If we fail to do this for all of them, then we're already done, since there
 	 * are no (alive) copy-on-write mappings present! */
-	if (!unsharecow_incref_mmans(self))
-		goto done;
+	if (!unsharecow_incref_mmans(self, partrel_minaddr, partrel_maxaddr))
+		goto done_simple;
 
 	/* Calculate the max-address needed to represent `self' */
-	unsharecow_calculate_mapbounds(&bounds, self);
+	unsharecow_calculate_mapbounds(&bounds, self, partrel_minaddr, partrel_maxaddr);
 	TRY {
 
 		if (!unsharecow_makecopy_or_unlock(self, unlock, data))
@@ -1500,22 +1530,22 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 
 		/* (almost) lastly, acquire references & locks to all of the memory-managers
 		 * associated with nodes from the copy-on-write mappings list. */
-		if (!unsharecow_lock_unique_mmans_or_unlock(self, unlock))
+		if (!unsharecow_lock_unique_mmans_or_unlock(self, unlock, partrel_minaddr, partrel_maxaddr))
 			goto nope_decref_mmans;
 
 		/* And finally, make sure that we'll be able to re-map the backing
 		 * page directory mappings of all of the copy-on-write nodes. After
 		 * all: we _do_ intend to replace them with our new copy. */
-		if (!try_prepare_mmans_or_throw(self, unlock)) {
+		if (!try_prepare_mmans_or_throw(self, unlock, partrel_minaddr, partrel_maxaddr)) {
 			/* Special case: All nodes had been destroyed! */
-			unsharecow_unlock_unique_mmans(self);
+			unsharecow_unlock_unique_mmans(self, partrel_minaddr, partrel_maxaddr);
 			mpart_lock_release_f(self);
 			unlockinfo_xunlock(unlock);
 			mpart_lockops_reap(self);
 			goto nope_decref_mmans;
 		}
 	} EXCEPT {
-		unsharecow_decref_mmans(self);
+		unsharecow_decref_mmans(self, partrel_minaddr, partrel_maxaddr);
 		RETHROW();
 	}
 
@@ -1537,12 +1567,14 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	for (node = LIST_FIRST(&self->mp_copy); node;) {
 		struct mnode *next_node;
 		next_node = LIST_NEXT(node, mn_link);
-		if likely(!wasdestroyed(node->mn_mman)) {
-			/* Transfer this node to the new mem-part. */
-			assert(node->mn_part == self);
-			LIST_INSERT_HEAD(&copy->mp_copy, node, mn_link);
-			++copy->mp_refcnt;   /* New reference (to-be) held by `node->mn_part' */
-			decref_nokill(self); /* Old reference held by `node->mn_part' */
+		if (mnode_ismapping(node, partrel_minaddr, partrel_maxaddr)) {
+			if likely(!wasdestroyed(node->mn_mman)) {
+				/* Transfer this node to the new mem-part. */
+				assert(node->mn_part == self);
+				LIST_INSERT_HEAD(&copy->mp_copy, node, mn_link);
+				++copy->mp_refcnt;   /* New reference (to-be) held by `node->mn_part' */
+				decref_nokill(self); /* Old reference held by `node->mn_part' */
+			}
 		}
 		node = next_node;
 	}
@@ -1643,6 +1675,7 @@ free_unused_block_status:
 			STATIC_ASSERT(PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC);
 			STATIC_ASSERT(PAGEDIR_MAP_FWRITE == MNODE_F_PWRITE);
 			STATIC_ASSERT(PAGEDIR_MAP_FREAD == MNODE_F_PREAD);
+			assert(mnode_ismapping(node, partrel_minaddr, partrel_maxaddr));
 			mm = node->mn_mman;
 			assert(!wasdestroyed(mm));
 
@@ -1703,11 +1736,12 @@ free_unused_block_status:
 	 * (but keep on holding onto our lock to the original part!) */
 	mpart_lock_release(copy);
 
-done:
-	assert(LIST_EMPTY(&self->mp_copy));
+	return true;
+done_simple:
+	mpart_unsharecow_data_fini(data);
 	return true;
 nope_decref_mmans:
-	unsharecow_decref_mmans(self);
+	unsharecow_decref_mmans(self, partrel_minaddr, partrel_maxaddr);
 nope:
 	return false;
 }
@@ -1766,7 +1800,8 @@ again_try_clear_write:
 /* Lock acquisition functions                                           */
 /************************************************************************/
 
-/* Acquire a lock until `mpart_initdone_or_unlock()' */
+/* Acquire a lock until:
+ *  - mpart_initdone_or_unlock(self, ...) */
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -1775,7 +1810,9 @@ mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
 	} while (!mpart_initdone_or_unlock(self, NULL));
 }
 
-/* Acquire a lock until `mpart_initdone_or_unlock() && mpart_nodma_or_unlock()' */
+/* Acquire a lock until:
+ *  - mpart_initdone_or_unlock(self, ...)
+ *  - mpart_nodma_or_unlock(self, ...) */
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -1787,7 +1824,8 @@ mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
 
 
 
-/* Acquire a lock until `mpart_setcore_or_unlock()' */
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...) */
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -1809,34 +1847,18 @@ mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
 
 
 
-/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadall_or_unlock()' */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-again:
-	mpart_lock_acquire_and_setcore(self);
-	if unlikely(!mpart_hasblockstate(self))
-		return;
-	TRY {
-		if (!mpart_loadall_or_unlock(self, NULL))
-			goto again;
-	} EXCEPT {
-		mpart_lockops_reap(self);
-		RETHROW();
-	}
-}
-
-
-
-/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...)
+ *  - mpart_load_or_unlock(self, ...)    // Based on the given address range
+ *
  * If the given `filepos' isn't contained by `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be loaded)
  *
  * HINT: This function is used to implement `mpart_read()' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
-mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
-                                        pos_t filepos, size_t max_load_bytes)
+mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
+                                    pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	mpart_reladdr_t reladdr;
 	struct mpart_setcore_data data;
@@ -1870,7 +1892,7 @@ again:
 	if (loadbytes > max_load_bytes)
 		loadbytes = max_load_bytes;
 	/* As requested, ensure that the accessed address range is loaded. */
-	if (!mpart_loadsome_or_unlock(self, NULL, reladdr, loadbytes))
+	if (!mpart_load_or_unlock(self, NULL, reladdr, loadbytes))
 		goto again;
 	return true;
 unlock_and_fini_data_err:
@@ -1885,61 +1907,32 @@ err:
 
 
 
-/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_unsharecow_or_unlock()' */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct mpart_unsharecow_data uc_data;
-	mpart_lock_acquire_and_setcore(self);
-	/* Quick check: is the part already in the expected state? */
-	if (LIST_EMPTY(&self->mp_copy))
-		return; /* Already done! */
-	mpart_unsharecow_data_init(&uc_data);
-	TRY {
-		while (!mpart_unsharecow_or_unlock(self, NULL, &uc_data))
-			mpart_lock_acquire_and_setcore(self);
-	} EXCEPT {
-		mpart_unsharecow_data_fini(&uc_data);
-		mpart_lockops_reap(self);
-		RETHROW();
-	}
-}
 
 
-
-/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
- * and `mpart_lock_acquire_and_setcore_loadall()' */
-PUBLIC NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unsharecow_loadall(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	do {
-		mpart_lock_acquire_and_setcore_unsharecow(self);
-	} while (!mpart_loadall_or_unlock(self, NULL));
-}
-
-
-
-/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
- * and `mpart_lock_acquire_and_setcore_loadsome()'. If appropriate, this
- * function will also split the given part `self' to reduce the impact of
- * a potential copy-on-write unshare. (such that part-borders are created
- * at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + max_load_bytes)')
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...)
+ *  - mpart_load_or_unlock(self, ...)        // Based on the given address range
+ *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
+ *
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
+ * # of bytes that may need to be unshared/loaded)
  *
  * HINT: This function is used to implement `mman_startdma()' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
-mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self,
-                                                   pos_t filepos, size_t max_load_bytes)
+mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
+                                               pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	bool result;
 again:
-	result = mpart_lock_acquire_and_setcore_unsharecow_withhint(self, filepos, max_load_bytes);
+	result = mpart_lock_acquire_and_setcore_unsharecow(self, filepos, max_load_bytes);
 	if likely(result) {
 		mpart_reladdr_t reladdr, loadbytes;
 		reladdr   = (mpart_reladdr_t)(filepos - mpart_getminaddr(self));
 		loadbytes = (mpart_reladdr_t)(mpart_getendaddr(self) - reladdr);
 		if (loadbytes > max_load_bytes)
 			loadbytes = max_load_bytes;
-		if (!mpart_loadsome_or_unlock(self, NULL, reladdr, loadbytes))
+		if (!mpart_load_or_unlock(self, NULL, reladdr, loadbytes))
 			goto again;
 	}
 	return result;
@@ -1954,7 +1947,7 @@ again:
  *
  * HINT: This function is used to implement `mpart_write()' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
-mpart_lock_acquire_and_setcore_unsharecow_withhint(struct mpart *__restrict self,
+mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
                                                    pos_t filepos, size_t split_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	mpart_reladdr_t part_offs, part_size;
@@ -1972,30 +1965,7 @@ mpart_lock_acquire_and_setcore_unsharecow_withhint(struct mpart *__restrict self
 	/* Check for special case: Must also unshare copy-on-write mappings. */
 	if (!LIST_EMPTY(&self->mp_copy)) {
 		struct mpart_unsharecow_data uc_data;
-		mpart_reladdr_t loadend;
-		struct mfile *file;
-		pos_t splitaddr;
 ensure_setcore_with_unshare:
-		/* Diminish the overhead of unsharecow by truncating the mem-part. */
-		if likely(!(self->mp_flags & MPART_F_NOSPLIT)) {
-			file = self->mp_file;
-			if (part_offs > file->mf_part_amask) {
-				/* Can truncate some leading blocks. */
-				splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
-unlock_and_split_at_splitaddr_and_done:
-				mpart_lock_release(self);
-split_at_splitaddr_and_done:
-				xdecref(mpart_split(self, splitaddr));
-				/* Let the caller start over to discover the new part location. */
-				goto err;
-			}
-			loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
-			assert(loadend <= mpart_getsize(self));
-			if (loadend < mpart_getsize(self)) {
-				splitaddr = self->mp_minaddr + loadend;
-				goto unlock_and_split_at_splitaddr_and_done;
-			}
-		}
 		/* Now load the part into the core, and ensure that
 		 * copy-on-write mappings have been unshared. */
 		mpart_unsharecow_data_init(&uc_data);
@@ -2018,21 +1988,6 @@ again_ensure_incore_for_write:
 							part_size = split_hint;
 						if unlikely(LIST_EMPTY(&self->mp_copy))
 							goto ensure_setcore_without_unshare;
-						if likely(!(self->mp_flags & MPART_F_NOSPLIT)) {
-							file = self->mp_file;
-							if (part_offs > file->mf_part_amask) {
-								splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
-unlock_and_fini_setcore_and_uc_and_split_and_done:
-								mpart_lock_release(self);
-								mpart_setcore_data_fini(&data);
-								goto fini_uc_and_split_and_done;
-							}
-							loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
-							if (loadend < mpart_getsize(self)) {
-								splitaddr = self->mp_minaddr + loadend;
-								goto unlock_and_fini_setcore_and_uc_and_split_and_done;
-							}
-						}
 					}
 				} EXCEPT {
 					mpart_setcore_data_fini(&data);
@@ -2040,7 +1995,7 @@ unlock_and_fini_setcore_and_uc_and_split_and_done:
 					RETHROW();
 				}
 			}
-			if (!mpart_unsharecow_or_unlock(self, NULL, &uc_data)) {
+			if (!mpart_unsharecow_or_unlock(self, NULL, &uc_data, part_offs, part_size)) {
 				mpart_lock_acquire(self);
 				if unlikely(OVERFLOW_USUB(filepos, mpart_getminaddr(self), &part_offs) ||
 				            OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size)) {
@@ -2055,22 +2010,6 @@ fini_uc_data_and_done:
 				if unlikely(LIST_EMPTY(&self->mp_copy)) {
 					mpart_unsharecow_data_fini(&uc_data);
 					goto ensure_setcore_without_unshare;
-				}
-				if likely(!(self->mp_flags & MPART_F_NOSPLIT)) {
-					file = self->mp_file;
-					if (part_offs > file->mf_part_amask) {
-						splitaddr = (filepos + file->mf_part_amask) & ~file->mf_part_amask;
-unlock_and_fini_uc_and_split_and_done:
-						mpart_lock_release(self);
-fini_uc_and_split_and_done:
-						mpart_unsharecow_data_fini(&uc_data);
-						goto split_at_splitaddr_and_done;
-					}
-					loadend = (part_offs + part_size + file->mf_part_amask) & ~file->mf_part_amask;
-					if (loadend < mpart_getsize(self)) {
-						splitaddr = self->mp_minaddr + loadend;
-						goto unlock_and_fini_uc_and_split_and_done;
-					}
 				}
 				goto again_ensure_incore_for_write;
 			}

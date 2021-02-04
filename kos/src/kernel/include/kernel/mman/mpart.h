@@ -659,15 +659,11 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
  *   - ... MPART_ST_INCORE(self->mp_state)
  * If they don't, then this function will cause an assertion failure! */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
-mpart_loadsome_or_unlock(struct mpart *__restrict self,
-                         struct unlockinfo *unlock,
-                         mpart_reladdr_t partrel_offset,
-                         size_t num_bytes)
+mpart_load_or_unlock(struct mpart *__restrict self,
+                     struct unlockinfo *unlock,
+                     mpart_reladdr_t partrel_offset,
+                     size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* Ensure that all blocks are either `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG' */
-#define mpart_loadall_or_unlock(self, unlock) \
-	mpart_loadsome_or_unlock(self, unlock, 0, mpart_getsize(self))
 
 struct mpart_unsharecow_data {
 	struct mpart_setcore_data ucd_ucmem; /* Data for unshare. */
@@ -680,7 +676,8 @@ struct mpart_unsharecow_data {
 	(kfree((self)->ucd_copy),                     \
 	 mpart_setcore_data_fini(&(self)->ucd_ucmem))
 
-/* Ensure that `LIST_EMPTY(&self->mp_copy)'
+/* Ensure that `LIST_EMPTY(&self->mp_copy)' (while only considering nodes
+ * which may be overlapping with the given address range)
  * NOTE: The caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
  *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
@@ -691,7 +688,9 @@ struct mpart_unsharecow_data {
 FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
-                           struct mpart_unsharecow_data *__restrict data);
+                           struct mpart_unsharecow_data *__restrict data,
+                           mpart_reladdr_t partrel_offset, size_t num_bytes);
+
 
 /* Ensure that:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link)
@@ -707,69 +706,66 @@ mpart_denywrite_or_unlock(struct mpart *__restrict self,
 /************************************************************************/
 
 
-/* Acquire a lock until `mpart_initdone_or_unlock()' */
+/* Acquire a lock until:
+ *  - mpart_initdone_or_unlock(self, ...) */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock until `mpart_initdone_or_unlock() && mpart_nodma_or_unlock()' */
+/* Acquire a lock until:
+ *  - mpart_initdone_or_unlock(self, ...)
+ *  - mpart_nodma_or_unlock(self, ...) */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock until `mpart_setcore_or_unlock()' */
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...) */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadall_or_unlock()' */
-FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_loadall(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_loadsome_or_unlock()'
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...)
+ *  - mpart_load_or_unlock(self, ...)    // Based on the given address range
+ *
  * If the given `filepos' isn't contained by `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be loaded)
  *
  * HINT: This function is used to implement `mpart_read()' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
-mpart_lock_acquire_and_setcore_loadsome(struct mpart *__restrict self,
-                                        pos_t filepos, size_t max_load_bytes)
+mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
+                                    pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Acquire a lock until `mpart_setcore_or_unlock() && mpart_unsharecow_or_unlock()' */
-FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
- * and `mpart_lock_acquire_and_setcore_loadall()' */
-FUNDEF NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unsharecow_loadall(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* The combination of `mpart_lock_acquire_and_setcore_unsharecow()'
- * and `mpart_lock_acquire_and_setcore_loadsome()'. If appropriate, this
- * function will also split the given part `self' to reduce the impact of
- * a potential copy-on-write unshare. (such that part-borders are created
- * at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + max_load_bytes)')
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...)
+ *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
+ *
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
+ * # of bytes that may need to be unshared/loaded)
  *
  * HINT: This function is used to implement `mman_startdma()' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
-mpart_lock_acquire_and_setcore_unsharecow_loadsome(struct mpart *__restrict self,
-                                                   pos_t filepos, size_t max_load_bytes)
+mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
+                                          pos_t filepos, size_t split_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Same as `mpart_lock_acquire_and_setcore_unsharecow()', but validates that the
- * given address range is contained by `self', any may also split `self' into
- * smaller parts if doing so would reduce the impact of unsharing. (such that part-
- * borders are created at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + split_hint)')
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...)
+ *  - mpart_load_or_unlock(self, ...)        // Based on the given address range
+ *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
  *
- * HINT: This function is used to implement `mpart_write()' */
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
+ * # of bytes that may need to be unshared/loaded)
+ *
+ * HINT: This function is used to implement `mman_startdma()' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
-mpart_lock_acquire_and_setcore_unsharecow_withhint(struct mpart *__restrict self,
-                                                   pos_t filepos, size_t split_hint)
+mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
+                                               pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
@@ -985,14 +981,6 @@ FUNDEF NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
             PAGEDIR_PAGEALIGNED pos_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-/* Try to merge the given part with other, neighboring parts from
- * its associated file, or, in case that file is anonymous, try to
- * merge the part with parts from nodes of neighboring mappings
- * within the associated mman-s, so-long as those neighboring parts
- * make use of the same underlying (anonymous) file. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_merge)(struct mpart *__restrict self);
 
 /* Sync changes made to the given mem-part.
  * @return: * : The total # of bytes that were synced.

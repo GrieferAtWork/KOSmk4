@@ -128,7 +128,6 @@ struct mfile_ops {
 	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
 	 * @assume(mfile_addr_aligned(self, addr));
-	 * @assume(mfile_addr_aligned(self, num_bytes) || (!mfile_isanon(self) && addr + num_bytes <= self->mf_filesize));
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);
 	 * @assume(WRITABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
@@ -141,7 +140,6 @@ struct mfile_ops {
 	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
 	 * @assume(mfile_addr_aligned(self, addr));
-	 * @assume(mfile_addr_aligned(self, num_bytes) || (!mfile_isanon(self) && addr + num_bytes <= self->mf_filesize));
 	 * @assume(self->mf_trunclock != 0);
 	 * @assume(num_bytes != 0);
 	 * @assume(READABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
@@ -151,6 +149,16 @@ struct mfile_ops {
 	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self,
 	                                         pos_t addr, physaddr_t buf, size_t num_bytes);
 
+#ifdef CONFIG_USE_NEW_FS
+	/* [0..1] Called after `MFILE_F_CHANGED' and/or `MFILE_F_ATTRCHANGED' becomes set.
+	 * @param: what: Set of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED' (never zero).
+	 *               This argument specifies which of the changed-bits have been
+	 *               set (atomically), meaning that these bits weren't set before,
+	 *               but have become set just now. */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *mo_changed)(struct mfile *__restrict self,
+	                                uintptr_t what);
+#else /* CONFIG_USE_NEW_FS */
 	/* [0..1] Called the first time the `MPART_F_CHANGED' flag is set for `part'.
 	 * WARNING: This function is called while a lock to `part' is held!
 	 * NOTE: Not invoked if a new change part is created as the result
@@ -158,6 +166,7 @@ struct mfile_ops {
 	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *mo_changed)(struct mfile *__restrict self,
 	                                struct mpart *__restrict part);
+#endif /* !CONFIG_USE_NEW_FS */
 
 #ifndef CONFIG_MFILE_LEGACY_VIO_OPS
 	/* [0..1] VIO file operators. (when non-NULL, then this file is backed by VIO,
@@ -217,6 +226,8 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
                                         * This flag is set before `mo_changed()' is invoked, which also won't
                                         * be invoked again until this flag has been cleared, which is done
                                         * as part of a call to `mfile_sync()' */
+#define MFILE_F_ATTRCHANGED     0x0010 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
+                                        * Indicates that attributes of this file (its size, etc.) have changed. */
 #define MFILE_F_DELETED         0x0040 /* [lock(mf_lock && WRITE_ONCE)] The file has been marked as deleted.
                                         * When this flag is set, newly parts are created with `mfile_anon[*]'
                                         * set for their pointed-to `mp_file' field.
@@ -227,7 +238,7 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
                                         * This flag is used to implement ramfs-based filesystems, where it is
                                         * used to prevent files on such filesystem from being deleted when the
                                         * kernel tries to reclaim memory. */
-#define MFILE_F_NOTRUNCATE      0x0800 /* [const] The size of this file cannot be altered. */
+#define MFILE_F_FIXEDFILESIZE   0x0800 /* [lock(WRITE_ONCE)] The size of this file cannot be altered. */
 #endif /* CONFIG_USE_NEW_FS */
 
 struct mfile {
@@ -288,23 +299,25 @@ struct mfile {
 
 #ifdef CONFIG_USE_NEW_FS
 	uintptr_t                   mf_flags;      /* File flags (set of `MFILE_F_*') */
-	WEAK size_t                 mf_trunclock;  /* [lock(INC(mpart_lock_acquired(ANY(mf_parts))),
+	WEAK size_t                 mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
 	                                            *       DEC(ATOMIC))]
 	                                            * Non-zero if `mf_filesize' must not be lowered. Incrementing this
 	                                            * counter requires one to be holding a lock to one of the mem-
 	                                            * parts of this file, or a lock to the file itself. However,
 	                                            * decrementing it doesn't impose such a requirement. When this
 	                                            * counter hits 0, then `mf_initdone' must be broadcast. */
-	pos_t                       mf_filesize;   /* [lock(READ:      RDLOCK(mf_lock),
-	                                            *       INCREMENT: WRLOCK(mf_lock),
+	atomic64_t                  mf_filesize;   /* [lock(READ:      ATOMIC,
+	                                            *       INCREMENT: mf_trunclock != 0 && ATOMIC,  // NOTE: `mf_trunclock' was incremented while holding `mf_lock'!
+	                                            *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
+	                                            *                                                // one must be able to prevent `mf_filesize' from changing at all!
 	                                            *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
 	                                            *                  mpart_lock_acquired(ALL(mf_parts)))]
-	                                            * [const_if(MFILE_F_NOTRUNCATE)] // Cannot become lower when `mf_trunclock != 0'
+	                                            * [const_if(MFILE_F_FIXEDFILESIZE)] // Cannot become lower when `mf_trunclock != 0'
 	                                            * [valid_if(!mfile_isanon(self))] File size field.
 	                                            * Attempting to construct new mem-parts above this address
 	                                            * will fail and/or clamp the max accessible file size to
 	                                            * the given address. Note however that in the case of a file
-	                                            * that doesn't have the `MFILE_F_NOTRUNCATE' flag set, this
+	                                            * that doesn't have the `MFILE_F_FIXEDFILESIZE' flag set, this
 	                                            * values _can_ be increased by writing beyond the end of the
 	                                            * file in a call to `mfile_write()'. Also note that whenever
 	                                            * this value is increased, then the `mf_initdone' signal will
@@ -328,6 +341,12 @@ struct mfile {
 	 (sig_broadcast(&(self)->mf_initdone), 0))
 #define mfile_trunclock_dec_nosignal(self) \
 	__hybrid_atomic_decfetch((self)->mf_trunclock, __ATOMIC_RELEASE)
+
+/* Indicate that attributes of the given mem-file (may) have changed. */
+#define mfile_handle_attrchanged(self)                                                                        \
+	((__hybrid_atomic_fetchor((self)->mf_flags, MFILE_F_ATTRCHANGED, __ATOMIC_SEQ_CST) & MFILE_F_ATTRCHANGED) \
+	 ? ((self)->mf_ops->mo_changed ? (*self->mf_ops->mo_changed)(self, MFILE_F_ATTRCHANGED) : (void)0)        \
+	 : (void)0)
 #endif /* CONFIG_USE_NEW_FS */
 
 #ifdef CONFIG_MFILE_LEGACY_VIO_OPS
@@ -528,8 +547,8 @@ mfile_sync(struct mfile *__restrict self)
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED pos_t addr,
-              PAGEDIR_PAGEALIGNED size_t max_num_bytes)
-		THROWS(E_WOULDBLOCK, E_INVALID_ARGUMENT, ...);
+              PAGEDIR_PAGEALIGNED size_t hint_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT, ...);
 
 /* Same as `mfile_getpart()', but may _only_ be used when `self' is an
  * anonymous file! As such, this function is mainly used to allocate
@@ -538,8 +557,106 @@ FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_makepart(struct mfile *__restrict self,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes)
-		THROWS(E_WOULDBLOCK, ...);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
+
+struct mfile_extendpart_data {
+	PAGEDIR_PAGEALIGNED pos_t  mep_minaddr;  /* Base address of an unmapped range to fill by extending another part. */
+	pos_t                      mep_maxaddr;  /* Last byte of the gap that should be filled. */
+	int                        _placeholder; /* ... */
+};
+#define mfile_extendpart_data_init(self) ((self)->_placeholder = 0)
+#define mfile_extendpart_data_fini(self) ((self)->_placeholder = 0)
+
+/* While holding a read- or write-lock to `self', try to extend an
+ * existing mem-part that borders against the given address range
+ * in order to fill the specified gap.
+ * This function assumes that:
+ *  - @assume(mfile_lock_reading(self) || mfile_lock_writing(self));
+ *  - @assume(data->mep_minaddr <= data->mep_maxaddr);
+ *  - @assume(mfile_addr_aligned(self, data->mep_minaddr));
+ *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
+ *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
+ *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+ *  - @assume(mfile_addr_ceilalign(self, self->mf_filesize) >= data->mep_maxaddr + 1);
+ *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
+ * Locking logic:
+ *   in:                                         mfile_lock_reading(self) || mfile_lock_writing(self)
+ *   return == *:                                mfile_lock_writing(self) && undefined(out(data)) &&
+ *                                               mpart_lock_acquired(return)
+ *   return == MFILE_EXTENDPART_OR_UNLOCK_NOSIB: (mfile_lock_reading(self) || mfile_lock_writing(self)) &&
+ *                                               undefined(out(data))
+ *   return == MFILE_EXTENDPART_OR_UNLOCK_AGAIN: mfile_lock_end(self) && unlock()
+ *   EXCEPT:                                     mfile_lock_end(self) && unlock()
+ * @return: * : Success: A pointer to an extended mem-part that contains the entirety
+ *                       of the address range originally specified in `data'. Note
+ *                       that in this case, you're inheriting a lock to that part.
+ *                       Note: In this case, this function also guaranties that the
+ *                       returned part doesn't exist in SWAP, though it may still
+ *                       not be allowed (i.e. it's state may be MPART_ST_VOID)
+ * @return: MFILE_EXTENDPART_OR_UNLOCK_NOSIB: (kind-of) success; the function was unable
+ *                       to extend a pre-existing mem-part, but this is because there was
+ *                       no such part to begin with: No existing part was neighboring, or
+ *                       was even remotely close to the given address range, meaning that
+ *                       extending such a part (if one even exists at all) would be less
+ *                       efficient than just creating a new, separate part.
+ * @return: MFILE_EXTENDPART_OR_UNLOCK_AGAIN: The lock to `self' (and `unlock') was lost.
+ *                       Simply re-acquire those locks and try again. Note that in this
+ *                       case, the caller should always acquire a write-lock to `self'! */
+FUNDEF WUNUSED NONNULL((1, 2)) struct mpart *FCALL
+mfile_extendpart_or_unlock(struct mfile *__restrict self,
+                           struct mfile_extendpart_data *__restrict data,
+                           struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+#define MFILE_EXTENDPART_OR_UNLOCK_NOSIB ((REF struct mpart *)0)
+#define MFILE_EXTENDPART_OR_UNLOCK_AGAIN ((REF struct mpart *)-1)
+
+
+/* High-level wrapper for `mf_ops->mo_newpart' that automatically does
+ * the right things when `mf_ops->mo_newpart' hasn't been defined.
+ * This function doesn't do any further initialization that what is
+ * already described by `mf_ops->mo_newpart' */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *FCALL
+_mfile_newpart(struct mfile *__restrict self,
+               PAGEDIR_PAGEALIGNED pos_t addr,
+               PAGEDIR_PAGEALIGNED size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
+
+/* Look at the neighbors of `part' and try to merge them with `part'. If
+ * no neighbors exist, or if those neighbors are so far away that merging
+ * with them wouldn't be efficient, then simply insert `part' as-is into
+ * the given mem-file `self', before adding `part' to the global list of
+ * parts (but only if it has the `MPART_F_GLOBAL_REF' flag set), and finally
+ * releasing a lock to `self', as well as re-returning a pointer to the
+ * given part. - For this purpose, the caller must initialize the `part'
+ * reference counter of `part' as `MPART_F_GLOBAL_REF ? 2 : 1'
+ * If the `MPART_F_CHANGED' flag is set, the given part, or the combination
+ * of it and the to-be returned part will be added to the changed-part list.
+ * However, if this is done, the caller is responsible for updating the file,
+ * such that `MFILE_F_CHANGED' is set, and `mo_changed()' is invoked.
+ * If merging was done, returning a reference to the new part against within
+ * the given `part' was merged (i.e. the one that was left apart of the
+ * mem-part tree of `self')
+ * This function assumes that:
+ *  - @assume(mfile_lock_writing(self));
+ *  - @assume(mfile_addr_aligned(self, part->mp_minaddr));
+ *  - @assume(mfile_addr_aligned(self, part->mp_maxaddr + 1));
+ *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+ *  - @assume(LIST_EMPTY(&part->mp_copy));
+ *  - @assume(LIST_EMPTY(&part->mp_share));
+ *  - @assume(UNINITIALIZED(&part->mp_allparts));
+ *  - @assume(part->mp_refcnt == 1 + ((part->mp_flags & MPART_F_GLOBAL_REF) != 0) + ((part->mp_flags & MPART_F_CHANGED) != 0));
+ *  - @assume(part->mp_file == self);
+ *  - @assume(INITIALIZED(part->mp_*)); // All other fields...
+ * @return: NULL: A pre-existing part overlaps with the address range of `part':
+ *                mpart_tree_rlocate(self->mf_parts, part->mp_minaddr, part->mp_maxaddr) != NULL
+ * @return: * :   A reference to a part that (at one point) contained a super-set
+ *                of the address range described by the given `part'. */
+FUNDEF WUNUSED NONNULL((1)) REF struct mpart *FCALL
+mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
+                                       /*inherit(on_success)*/ struct mpart *__restrict part)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 
@@ -596,7 +713,7 @@ struct mfile_map {
 	unsigned int               mfm_flags; /* Set of `0 | MAP_POPULATE | MAP_NONBLOCK' (other flags are silently ignored)
 	                                       * MAP_POPULATE -- Ensure the following conditions when locking data parts:
 	                                       *                  - mpart_setcore_or_unlock()
-	                                       *                  - mpart_loadsome_or_unlock()   (within the range being mapped)
+	                                       *                  - mpart_load_or_unlock()   (within the range being mapped)
 	                                       *                  - mpart_unsharecow_or_unlock() (only if `mfm_prot & PROT_WRITE')
 	                                       * MAP_NONBLOCK -- The `MAP_POPULATE' flag may be ignored if page init of
 	                                       *                 previously not loaded pages would block. Currently, all
@@ -752,27 +869,40 @@ FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read(struct mfile *__restrict sel
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_readv(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_readv_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-#else /* CONFIG_USE_NEW_FS */
-FUNDEF NONNULL((1)) void KCALL mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL mfile_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_readv(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_readv_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-#endif /* !CONFIG_USE_NEW_FS */
+FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_tailread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_tailread_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_tailreadv(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_tailreadv_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1)) void KCALL mfile_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL mfile_write_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) void KCALL mfile_writev(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL mfile_writev_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_tailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_tailwrite_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_tailwritev(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_tailwritev_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
+/* Same as the above, but these use an intermediate (stack) buffer for transfer.
+ * As such, these functions are called by the above when `memcpy_nopf()' produces
+ * transfer errors that cannot be resolved by `mman_prefault()' */
+FUNDEF NONNULL((1)) size_t KCALL _mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL _mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL _mfile_buffered_tailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL _mfile_buffered_readv(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL _mfile_buffered_writev(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL _mfile_buffered_tailwritev(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+#endif /* CONFIG_USE_NEW_FS */
 
 /* Helpers for directly reading to/from VIO space. */
 #ifdef LIBVIO_CONFIG_ENABLED
-FUNDEF NONNULL((1)) void KCALL mfile_vio_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL mfile_vio_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL mfile_vio_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) void KCALL mfile_vio_write_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_vio_readv(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_vio_writev(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_vio_readv_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_vio_writev_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_vioread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_viowrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_vioread_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_viowrite_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_vioreadv(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_viowritev(struct mfile *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_vioreadv_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_viowritev_p(struct mfile *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 /* Builtin mem files */

@@ -87,8 +87,12 @@ handle_datablock_pread(struct vm_datablock *__restrict self,
 		(void)mode;
 		return inode_read((struct inode *)self, dst, num_bytes, addr);
 	}
+#ifdef CONFIG_USE_NEW_VM
+	return 0;
+#else /* CONFIG_USE_NEW_VM */
 	vm_datablock_read(self, dst, num_bytes, addr);
 	return num_bytes;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -101,8 +105,12 @@ handle_datablock_pwrite(struct vm_datablock *__restrict self,
 		inode_write((struct inode *)self, src, num_bytes, addr);
 		return num_bytes;
 	}
+#ifdef CONFIG_USE_NEW_VM
+	return 0;
+#else /* CONFIG_USE_NEW_VM */
 	vm_datablock_write(self, src, num_bytes, addr);
 	return num_bytes;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
@@ -114,8 +122,12 @@ handle_datablock_preadv(struct vm_datablock *__restrict self,
 		(void)mode;
 		return inode_readv((struct inode *)self, dst, num_bytes, addr);
 	}
+#ifdef CONFIG_USE_NEW_VM
+	return 0;
+#else /* CONFIG_USE_NEW_VM */
 	vm_datablock_readv(self, dst, num_bytes, addr);
 	return num_bytes;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -128,8 +140,12 @@ handle_datablock_pwritev(struct vm_datablock *__restrict self,
 		inode_writev((struct inode *)self, src, num_bytes, addr);
 		return num_bytes;
 	}
+#ifdef CONFIG_USE_NEW_VM
+	return 0;
+#else /* CONFIG_USE_NEW_VM */
 	vm_datablock_writev(self, src, num_bytes, addr);
 	return num_bytes;
+#endif /* !CONFIG_USE_NEW_VM */
 }
 
 

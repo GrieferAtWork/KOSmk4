@@ -148,13 +148,10 @@ struct mfault {
 	 * >> mfl_part            = mfl_node->mn_part;
 	 * >>
 	 * >> if (READ_ONLY) {
-	 * >>     mpart_lock_acquire_and_setcore_loadsome(mfl_part, partrel_addr, mfl_size);
+	 * >>     mpart_lock_acquire_and_setcore_load(mfl_part, partrel_addr, mfl_size);
 	 * >> } else {
 	 * >>     if (mfl_node->mn_flags & MNODE_F_SHARED) {
-	 * >>         // NOTE: Splitting is skipped if `mfl_part' contains no copy-on-write mappings!
-	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
-	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));
-	 * >>         mpart_lock_acquire_and_setcore_unsharecow_loadall(mfl_part);
+	 * >>         mpart_lock_acquire_and_setcore_unsharecow_load(mfl_part, partrel_addr, mfl_size);
 	 * >>     } else if (LIST_EMPTY(&mfl_part->mp_share) &&
 	 * >>                LIST_FIRST(&mfl_part->mp_copy) == mfl_node &&
 	 * >>                LIST_NEXT(mfl_node, mn_link) == NULL &&
@@ -162,7 +159,7 @@ struct mfault {
 	 * >>         // Accessed mfl_node is the only copy-on-write mfl_node in existance
 	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
 	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));
-	 * >>         mpart_lock_acquire_and_setcore_loadsome(mfl_part, partrel_addr, mfl_size);
+	 * >>         mpart_lock_acquire_and_setcore_load(mfl_part, partrel_addr, mfl_size);
 	 * >>     } else {
 	 * >>         // XXX: This part I've not fully thought through; There may be design flaws...
 	 * >>         //

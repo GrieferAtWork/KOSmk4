@@ -48,11 +48,154 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
-LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
+
+/* While holding a read- or write-lock to `self', try to extend an
+ * existing mem-part that borders against the given address range
+ * in order to fill the specified gap.
+ * This function assumes that:
+ *  - @assume(mfile_lock_reading(self) || mfile_lock_writing(self));
+ *  - @assume(data->mep_minaddr <= data->mep_maxaddr);
+ *  - @assume(mfile_addr_aligned(self, data->mep_minaddr));
+ *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
+ *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
+ *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+ *  - @assume(mfile_addr_ceilalign(self, self->mf_filesize) >= data->mep_maxaddr + 1);
+ *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
+ * Locking logic:
+ *   in:                                         mfile_lock_reading(self) || mfile_lock_writing(self)
+ *   return == *:                                mfile_lock_writing(self) && undefined(out(data)) &&
+ *                                               mpart_lock_acquired(return)
+ *   return == MFILE_EXTENDPART_OR_UNLOCK_NOSIB: (mfile_lock_reading(self) || mfile_lock_writing(self)) &&
+ *                                               undefined(out(data))
+ *   return == MFILE_EXTENDPART_OR_UNLOCK_AGAIN: mfile_lock_end(self) && unlock()
+ *   EXCEPT:                                     mfile_lock_end(self) && unlock()
+ * @return: * : Success: A pointer to an extended mem-part that contains the entirety
+ *                       of the address range originally specified in `data'. Note
+ *                       that in this case, you're inheriting a lock to that part.
+ *                       Note: In this case, this function also guaranties that the
+ *                       returned part doesn't exist in SWAP, though it may still
+ *                       not be allowed (i.e. it's state may be MPART_ST_VOID)
+ * @return: MFILE_EXTENDPART_OR_UNLOCK_NOSIB: (kind-of) success; the function was unable
+ *                       to extend a pre-existing mem-part, but this is because there was
+ *                       no such part to begin with: No existing part was neighboring, or
+ *                       was even remotely close to the given address range, meaning that
+ *                       extending such a part (if one even exists at all) would be less
+ *                       efficient than just creating a new, separate part.
+ * @return: MFILE_EXTENDPART_OR_UNLOCK_AGAIN: The lock to `self' (and `unlock') was lost.
+ *                       Simply re-acquire those locks and try again. Note that in this
+ *                       case, the caller should always acquire a write-lock to `self'! */
+PUBLIC WUNUSED NONNULL((1, 2)) struct mpart *FCALL
+mfile_extendpart_or_unlock(struct mfile *__restrict self,
+                           struct mfile_extendpart_data *__restrict data,
+                           struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	assert(mfile_lock_reading(self) || mfile_lock_writing(self));
+	assert(data->mep_minaddr <= data->mep_maxaddr);
+	assert(mfile_addr_aligned(self, data->mep_minaddr));
+	assert(mfile_addr_aligned(self, data->mep_maxaddr + 1));
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+#ifdef CONFIG_USE_NEW_FS
+	assert(mfile_addr_ceilalign(self, atomic64_read(&self->mf_filesize)) >= data->mep_maxaddr + 1);
+#endif /* CONFIG_USE_NEW_FS */
+	assert(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
+	/* TODO */
+	(void)self;
+	(void)unlock;
+	mfile_extendpart_data_fini(data);
+	return MFILE_EXTENDPART_OR_UNLOCK_NOSIB;
+}
+
+/* Look at the neighbors of `part' and try to merge them with `part'. If
+ * no neighbors exist, or if those neighbors are so far away that merging
+ * with them wouldn't be efficient, then simply insert `part' as-is into
+ * the given mem-file `self', before adding `part' to the global list of
+ * parts (but only if it has the `MPART_F_GLOBAL_REF' flag set), and finally
+ * releasing a lock to `self', as well as re-returning a pointer to the
+ * given part. - For this purpose, the caller must initialize the `part'
+ * reference counter of `part' as `MPART_F_GLOBAL_REF ? 2 : 1'
+ * If the `MPART_F_CHANGED' flag is set, the given part, or the combination
+ * of it and the to-be returned part will be added to the changed-part list.
+ * However, if this is done, the caller is responsible for updating the file,
+ * such that `MFILE_F_CHANGED' is set, and `mo_changed()' is invoked.
+ * If merging was done, returning a reference to the new part against within
+ * the given `part' was merged (i.e. the one that was left apart of the
+ * mem-part tree of `self')
+ * This function assumes that:
+ *  - @assume(mfile_lock_writing(self));
+ *  - @assume(mfile_addr_aligned(self, part->mp_minaddr));
+ *  - @assume(mfile_addr_aligned(self, part->mp_maxaddr + 1));
+ *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+ *  - @assume(LIST_EMPTY(&part->mp_copy));
+ *  - @assume(LIST_EMPTY(&part->mp_share));
+ *  - @assume(UNINITIALIZED(&part->mp_allparts));
+ *  - @assume(part->mp_refcnt == 1 + ((part->mp_flags & MPART_F_GLOBAL_REF) != 0) + ((part->mp_flags & MPART_F_CHANGED) != 0));
+ *  - @assume(part->mp_file == self);
+ *  - @assume(INITIALIZED(part->mp_*)); // All other fields...
+ * @return: NULL: A pre-existing part overlaps with the address range of `part':
+ *                mpart_tree_rlocate(self->mf_parts, part->mp_minaddr, part->mp_maxaddr) != NULL
+ * @return: * :   A reference to a part that (at one point) contained a super-set
+ *                of the address range described by the given `part'. */
+PUBLIC WUNUSED NONNULL((1)) REF struct mpart *FCALL
+mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
+                                       /*inherit(on_success)*/ struct mpart *__restrict part)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	assert(mfile_lock_writing(self));
+	assert(mfile_addr_aligned(self, part->mp_minaddr));
+	assert(mfile_addr_aligned(self, part->mp_maxaddr + 1));
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	assert(LIST_EMPTY(&part->mp_copy));
+	assert(LIST_EMPTY(&part->mp_share));
+	assert(part->mp_refcnt == ((part->mp_flags & MPART_F_GLOBAL_REF)
+	                           ? (part->mp_flags & MPART_F_CHANGED) ? 3 : 2
+	                           : (part->mp_flags & MPART_F_CHANGED) ? 2 : 1));
+	assert(part->mp_file == self);
+
+	/* TODO: Try to merge with an existing part! */
+
+	/* Try to insert the new part into the tree. */
+	if unlikely(!mpart_tree_tryinsert(&self->mf_parts, part))
+		return NULL;
+	if (part->mp_flags & MPART_F_CHANGED) {
+		/* Add the new part to the list of changed parts. */
+		struct mpart *next_changed;
+		do {
+			next_changed = ATOMIC_READ(self->mf_changed.slh_first);
+			if unlikely(next_changed == MFILE_PARTS_ANONYMOUS) {
+				--part->mp_refcnt;
+				part->mp_flags &= ~MPART_F_CHANGED;
+				break;
+			}
+			part->mp_changed.sle_next = next_changed;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
+		                             next_changed, part));
+	}
+
+	/* This is when the part will actually become visible!
+	 * With that in mind, we have to be certain that the part
+	 * is fully initialized and ready for every sub-system. */
+	COMPILER_BARRIER();
+
+	if (part->mp_flags & MPART_F_GLOBAL_REF)
+		mpart_all_list_insert(part);
+	else {
+		LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+	}
+	mfile_lock_endwrite(self);
+	return part;
+}
+
+
+
+/* High-level wrapper for `mf_ops->mo_newpart' that automatically does
+ * the right things when `mf_ops->mo_newpart' hasn't been defined.
+ * This function doesn't do any further initialization that what is
+ * already described by `mf_ops->mo_newpart' */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *FCALL
 _mfile_newpart(struct mfile *__restrict self,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes)
-		THROWS(E_WOULDBLOCK, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	REF struct mpart *result;
 	if (self->mf_ops->mo_newpart) {
 		result = (*self->mf_ops->mo_newpart)(self, addr, num_bytes);
@@ -105,7 +248,7 @@ PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_makepart(struct mfile *__restrict self,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes)
-		THROWS(E_WOULDBLOCK, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	REF struct mpart *result;
 	assert(mfile_isanon(self));
 	assert(mfile_addr_aligned(self, addr));
@@ -154,7 +297,7 @@ PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED pos_t addr,
               PAGEDIR_PAGEALIGNED size_t hint_bytes)
-		THROWS(E_WOULDBLOCK, E_INVALID_ARGUMENT, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT, ...) {
 	REF struct mpart *result;
 	size_t num_bytes;
 	pos_t loadmax;
@@ -200,7 +343,7 @@ makeanon:
 	 * aligned ceil-size of the underlying mem-part. */
 	{
 		pos_t filsiz;
-		filsiz = self->mf_filesize;
+		filsiz = (pos_t)atomic64_read(&self->mf_filesize);
 		filsiz += self->mf_part_amask;
 		filsiz &= ~self->mf_part_amask;
 		if likely(filsiz >= self->mf_part_amask) {
@@ -224,6 +367,7 @@ makeanon:
 	 * until the next already-present mem-part. */
 	{
 		struct mpart_tree_minmax mima;
+		struct mfile_extendpart_data extdat;
 		mpart_tree_minmaxlocate(self->mf_parts, addr, loadmax, &mima);
 		if (mima.mm_min != NULL) {
 			assert(addr < mpart_getminaddr(mima.mm_min));
@@ -231,11 +375,89 @@ makeanon:
 			loadmax   = mpart_getminaddr(mima.mm_min) - 1;
 			num_bytes = (size_t)(loadmax - addr) + 1;
 		}
-		/* TODO: Try to extend a successor/predecessor mem-part to include
-		 *       the address range which we're supposed to return to our
-		 *       caller! */
+
+		/* Try to extend a successor/predecessor mem-part to include
+		 * the address range which we're supposed to return to our
+		 * caller! */
+		mfile_extendpart_data_init(&extdat);
+		extdat.mep_minaddr = addr;
+		extdat.mep_maxaddr = loadmax;
+again_extend_part:
+		TRY {
+			result = mfile_extendpart_or_unlock(self, &extdat, NULL);
+		} EXCEPT {
+			mfile_extendpart_data_fini(&extdat);
+			RETHROW();
+		}
+		if (result == MFILE_EXTENDPART_OR_UNLOCK_AGAIN) {
+			TRY {
+				mfile_lock_write(self);
+			} EXCEPT {
+				mfile_extendpart_data_fini(&extdat);
+				RETHROW();
+			}
+			if unlikely(mfile_isanon(self)) {
+				mfile_lock_endwrite(self);
+				mfile_extendpart_data_fini(&extdat);
+				goto again;
+			}
+			result = mpart_tree_locate(self->mf_parts, addr);
+			if unlikely(result != NULL && tryincref(result)) {
+				/* Found a pre-existing part. */
+				mfile_lock_endwrite(self);
+				mfile_extendpart_data_fini(&extdat);
+				return result;
+			}
+			/* Figure out the max address range which we're
+			 * allowed to assign to the to-be created part. */
+			num_bytes = hint_bytes;
+			if (OVERFLOW_UADD(addr, num_bytes - 1, &loadmax)) {
+				num_bytes = (size_t)((pos_t)0 - addr);
+				loadmax   = (pos_t)-1;
+			}
+#ifdef CONFIG_USE_NEW_FS
+			/* Check if `addr' lies in-bounds of the file, and limit the max #
+			 * of bytes for the new mem-part to always stop just shy of the block-
+			 * aligned ceil-size of the underlying mem-part. */
+			{
+				pos_t filsiz;
+				filsiz = (pos_t)atomic64_read(&self->mf_filesize);
+				filsiz += self->mf_part_amask;
+				filsiz &= ~self->mf_part_amask;
+				if likely(filsiz >= self->mf_part_amask) {
+					if unlikely(addr >= filsiz) {
+						mfile_lock_endwrite(self);
+						mfile_extendpart_data_fini(&extdat);
+						THROW(E_INVALID_ARGUMENT,
+						      E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,
+						      (uintptr_t)addr);
+					}
+					if (loadmax >= (filsiz - 1)) {
+						size_t diff;
+						diff    = (size_t)(loadmax - (filsiz - 1));
+						loadmax = (filsiz - 1);
+						num_bytes -= diff;
+					}
+				}
+			}
+#endif /* CONFIG_USE_NEW_FS */
+			mpart_tree_minmaxlocate(self->mf_parts, addr, loadmax, &mima);
+			if (mima.mm_min != NULL) {
+				assert(addr < mpart_getminaddr(mima.mm_min));
+				assert(loadmax >= mpart_getminaddr(mima.mm_min));
+				loadmax   = mpart_getminaddr(mima.mm_min) - 1;
+				num_bytes = (size_t)(loadmax - addr) + 1;
+			}
+			goto again_extend_part;
+		}
+		if (result != MFILE_EXTENDPART_OR_UNLOCK_NOSIB) {
+			incref(result);
+			mpart_lock_release(result);
+			mfile_lock_endwrite(self);
+			return result;
+		}
 	}
-	mfile_lock_endread(self);
+	mfile_lock_end(self);
 
 	/* Must construct a new mem-part. */
 	result = _mfile_newpart(self, addr, num_bytes);
@@ -269,26 +491,25 @@ makeanon:
 		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 		result->mp_refcnt = 0;
 		mpart_destroy(result);
+		RETHROW();
 	}
 
 	/* Verify that nothing's changed in the mean time. */
 	if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS)
 		goto startover;
 #ifdef CONFIG_USE_NEW_FS
-	if (self->mf_filesize < (loadmax + 1) || loadmax == (pos_t)-1) {
+	{
 		pos_t filsiz;
-		filsiz = self->mf_filesize;
-		filsiz += self->mf_part_amask;
-		filsiz &= ~self->mf_part_amask;
-		--filsiz;
-		if unlikely(filsiz < loadmax)
-			goto startover;
+		filsiz = (pos_t)atomic64_read(&self->mf_filesize);
+		if (filsiz < (loadmax + 1) || loadmax == (pos_t)-1) {
+			filsiz += self->mf_part_amask;
+			filsiz &= ~self->mf_part_amask;
+			--filsiz;
+			if unlikely(filsiz < loadmax)
+				goto startover;
+		}
 	}
 #endif /* CONFIG_USE_NEW_FS */
-
-	/* Try to insert the new part into the tree. */
-	if unlikely(!mpart_tree_tryinsert(&self->mf_parts, result))
-		goto startover;
 
 	/* Add the new part to the list of all parts. (but only if it's not a VIO part) */
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -298,14 +519,13 @@ makeanon:
 		 * have their backing mem-parts be pre-allocated... */
 		result->mp_flags &= ~MPART_F_GLOBAL_REF;
 		result->mp_refcnt = 1;
-		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
-	} else
-#endif /* LIBVIO_CONFIG_ENABLED */
-	{
-		mpart_all_list_insert(result);
 	}
+#endif /* LIBVIO_CONFIG_ENABLED */
 
-	mfile_lock_endwrite(self);
+	/* Try to insert the new part into the tree. */
+	result = mfile_insert_and_merge_part_and_unlock(self, result);
+	if unlikely(!result)
+		goto startover;
 	return result;
 startover:
 	mfile_lock_endwrite(self);

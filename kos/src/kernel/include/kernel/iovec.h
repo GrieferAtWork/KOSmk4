@@ -84,6 +84,7 @@ struct aio_buffer_entry {
 };
 #endif /* !__aio_buffer_entry_defined */
 
+/* TODO: Rename to `iov_buffer' */
 struct aio_buffer {
 	size_t                         ab_entc; /* [!0] Number of entries. */
 	struct aio_buffer_entry const *ab_entv; /* [1..ab_entc] Vector of entries. */

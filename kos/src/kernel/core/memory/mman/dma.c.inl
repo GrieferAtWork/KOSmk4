@@ -196,7 +196,7 @@ again_lookup_part_locked:
 				 *      require a re-write of `AtaAIOHandleData' or an increase
 				 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'...
 				 *
-				 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow_withhint()',
+				 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow()',
 				 *                which doesn't ensure that accessed blocks have been loaded, whilst our use
 				 *                of `mfault_or_unlock()' (rightfully) does do so. */
 

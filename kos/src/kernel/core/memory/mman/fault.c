@@ -625,7 +625,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 		/* Simple case: When reading, only need to lock+load the accessed address range. */
 		if (!(self->mfl_flags & MMAN_FAULT_F_WRITE)) {
-			if (!mpart_loadsome_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
+			if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 				goto nope_reinit_scmem;
 			/* Make sure that unshare-cow data was never allocated.
 			 * Because the `mfl_flags' field is [const], we should have
@@ -640,39 +640,13 @@ mfault_or_unlock(struct mfault *__restrict self)
 		/* Deal with writes to shared memory mappings. */
 		if (node->mn_flags & MNODE_F_SHARED) {
 			if (LIST_EMPTY(&part->mp_copy)) {
-				if (!mpart_loadsome_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
+				if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 					goto nope_reinit_scmem;
 				/* Free data which may have been allocated for a previous unshare-cow attempt. */
 				mpart_unsharecow_data_fini(&self->mfl_ucdat);
 			} else {
-				size_t acc_stop;
-				/* If the part actually contains copy-on-write mappings,
-				 * split it so we don't have to unshare too many of them. */
-				if (acc_offs > 0) {
-					size_t aligned_offs;
-					aligned_offs = acc_offs & ~part->mp_file->mf_part_amask;
-					if (aligned_offs > 0) {
-						pos_t absaddr;
-						absaddr = part->mp_minaddr + aligned_offs;
-						mpart_lock_release(part);
-						xdecref(mpart_split(part, absaddr));
-						goto nope;
-					}
-				}
-				acc_stop = acc_offs + acc_size;
-				if (acc_stop < mpart_getsize(part)) {
-					size_t aligned_stop;
-					aligned_stop = (acc_stop + part->mp_file->mf_part_amask) & ~part->mp_file->mf_part_amask;
-					if (aligned_stop < mpart_getsize(part)) {
-						pos_t absaddr;
-						absaddr = part->mp_minaddr + aligned_stop;
-						mpart_lock_release(part);
-						xdecref(mpart_split(part, absaddr));
-						goto nope;
-					}
-				}
 				/* Load the part into the core, and unshare copy-on-write if necessary. */
-				if (!mpart_unsharecow_or_unlock(part, &self->mfl_unlck, &self->mfl_ucdat))
+				if (!mpart_unsharecow_or_unlock(part, &self->mfl_unlck, &self->mfl_ucdat, acc_offs, acc_size))
 					goto nope;
 			}
 			/* Free data which may have been allocated for a previous pcopy attempt. */
@@ -687,7 +661,7 @@ done_mark_changed:
 		}
 
 		/* Make sure that the accessed part is loaded. */
-		if (!mpart_loadsome_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
+		if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 			goto nope_reinit_scmem;
 
 		/* Deal with writes to copy-on-write mappings that aren't reachable from the

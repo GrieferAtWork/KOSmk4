@@ -303,6 +303,9 @@ NOTHROW(atomic64_fetchxor)(atomic64_t *__restrict self,
 #define atomic64_or(self, value)  (void)atomic64_fetchor(self, value)
 #define atomic64_xor(self, value) (void)atomic64_fetchxor(self, value)
 
+#define atomic64_cmpxch_weak     atomic64_cmpxch
+#define atomic64_cmpxch_val_weak atomic64_cmpxch_val
+
 DECL_END
 #endif /* __CC__ */
 #endif /* !__x86_64__ */

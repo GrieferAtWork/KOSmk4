@@ -50,7 +50,7 @@ DECL_BEGIN
 #define LOCAL_READING
 #define LOCAL_buffer_t           USER CHECKED void *
 #define LOCAL_ubuffer_t          uintptr_t
-#define LOCAL_mfile_vio_rw       mfile_vio_read
+#define LOCAL_mfile_vio_rw       mfile_vioread
 #define LOCAL_mpart_rw           mpart_read
 #define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_read
@@ -60,7 +60,7 @@ DECL_BEGIN
 #define LOCAL_WRITING
 #define LOCAL_buffer_t           USER CHECKED void const *
 #define LOCAL_ubuffer_t          uintptr_t
-#define LOCAL_mfile_vio_rw       mfile_vio_write
+#define LOCAL_mfile_vio_rw       mfile_viowrite
 #define LOCAL_mpart_rw           mpart_write
 #define LOCAL_mpart_rw_or_unlock mpart_write_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_write
@@ -70,7 +70,7 @@ DECL_BEGIN
 #define LOCAL_READING
 #define LOCAL_buffer_t           physaddr_t
 #define LOCAL_ubuffer_t          physaddr_t
-#define LOCAL_mfile_vio_rw       mfile_vio_read_p
+#define LOCAL_mfile_vio_rw       mfile_vioread_p
 #define LOCAL_mpart_rw           mpart_read_p
 #define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
@@ -80,7 +80,7 @@ DECL_BEGIN
 #define LOCAL_WRITING
 #define LOCAL_buffer_t           physaddr_t
 #define LOCAL_ubuffer_t          physaddr_t
-#define LOCAL_mfile_vio_rw       mfile_vio_write_p
+#define LOCAL_mfile_vio_rw       mfile_viowrite_p
 #define LOCAL_mpart_rw           mpart_write_p
 #define LOCAL_mpart_rw_or_unlock mpart_write_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
@@ -91,7 +91,7 @@ DECL_BEGIN
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_BUFFER
 #define LOCAL_buffer_t           struct aio_buffer const *__restrict
-#define LOCAL_mfile_vio_rw       mfile_vio_readv
+#define LOCAL_mfile_vio_rw       mfile_vioreadv
 #define LOCAL_mpart_rw           mpart_readv
 #define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_readv
@@ -102,7 +102,7 @@ DECL_BEGIN
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_BUFFER
 #define LOCAL_buffer_t           struct aio_buffer const *__restrict
-#define LOCAL_mfile_vio_rw       mfile_vio_writev
+#define LOCAL_mfile_vio_rw       mfile_viowritev
 #define LOCAL_mpart_rw           mpart_writev
 #define LOCAL_mpart_rw_or_unlock mpart_writev_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_writev
@@ -113,7 +113,7 @@ DECL_BEGIN
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
 #define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
-#define LOCAL_mfile_vio_rw       mfile_vio_readv_p
+#define LOCAL_mfile_vio_rw       mfile_vioreadv_p
 #define LOCAL_mpart_rw           mpart_readv_p
 #define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
@@ -124,7 +124,7 @@ DECL_BEGIN
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
 #define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
-#define LOCAL_mfile_vio_rw       mfile_vio_writev_p
+#define LOCAL_mfile_vio_rw       mfile_viowritev_p
 #define LOCAL_mpart_rw           mpart_writev_p
 #define LOCAL_mpart_rw_or_unlock mpart_writev_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
@@ -243,10 +243,10 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	/* Lock+load the part, unsharing the accessed address range if necessary. */
 again:
 #ifdef LOCAL_WRITING
-	if (!mpart_lock_acquire_and_setcore_unsharecow_withhint(self, filepos, num_bytes))
+	if (!mpart_lock_acquire_and_setcore_unsharecow(self, filepos, num_bytes))
 		goto done;
 #else /* LOCAL_WRITING */
-	if (!mpart_lock_acquire_and_setcore_loadsome(self, filepos, num_bytes))
+	if (!mpart_lock_acquire_and_setcore_load(self, filepos, num_bytes))
 		goto done;
 #endif /* !LOCAL_WRITING */
 

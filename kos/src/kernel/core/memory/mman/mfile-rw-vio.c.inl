@@ -1,0 +1,152 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __INTELLISENSE__
+#include "mfile-rw.c"
+#define DEFINE_mfile_vioreadv
+#endif /* __INTELLISENSE__ */
+
+#include <kernel/iovec.h>
+#include <kernel/mman/mfile.h>
+
+#include <assert.h>
+#include <stddef.h>
+
+#include <libvio/access.h>
+
+#ifdef LIBVIO_CONFIG_ENABLED
+DECL_BEGIN
+
+#if defined(DEFINE_mfile_vioread)
+#define LOCAL_buffer_t     USER CHECKED void *
+#define LOCAL_mfile_vio_rw mfile_vioread
+#elif defined(DEFINE_mfile_viowrite)
+#define LOCAL_buffer_t     USER CHECKED void const *
+#define LOCAL_mfile_vio_rw mfile_viowrite
+#elif defined(DEFINE_mfile_vioread_p)
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_buffer_t     physaddr_t
+#define LOCAL_mfile_vio_rw mfile_vioread_p
+#elif defined(DEFINE_mfile_viowrite_p)
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_buffer_t     physaddr_t
+#define LOCAL_mfile_vio_rw mfile_viowrite_p
+#elif defined(DEFINE_mfile_vioreadv)
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_buffer_t     struct aio_buffer const *__restrict
+#define LOCAL_mfile_vio_rw mfile_vioreadv
+#elif defined(DEFINE_mfile_viowritev)
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_buffer_t     struct aio_buffer const *__restrict
+#define LOCAL_mfile_vio_rw mfile_viowritev
+#elif defined(DEFINE_mfile_vioreadv_p)
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
+#define LOCAL_mfile_vio_rw mfile_vioreadv_p
+#elif defined(DEFINE_mfile_viowritev_p)
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
+#define LOCAL_mfile_vio_rw mfile_viowritev_p
+#else /* ... */
+#error "Bad configuration"
+#endif /* !... */
+
+PUBLIC NONNULL((1)) void KCALL
+LOCAL_mfile_vio_rw(struct mfile *__restrict self,
+                   LOCAL_buffer_t buffer,
+#ifdef LOCAL_BUFFER_IS_IOVEC
+                   size_t buf_offset,
+#endif /* LOCAL_BUFFER_IS_IOVEC */
+                   size_t num_bytes, pos_t offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	struct vioargs args;
+	args.va_ops = mfile_getvio(self);
+	assert(args.va_ops);
+	args.va_acmap_page   = NULL;
+	args.va_acmap_offset = 0;
+	args.va_state        = NULL;
+	args.va_file         = self;
+#if defined(DEFINE_mfile_vioread)
+	vio_copyfromvio(&args, (vio_addr_t)offset, buffer, num_bytes);
+#elif defined(DEFINE_mfile_viowrite)
+	vio_copytovio(&args, (vio_addr_t)offset, buffer, num_bytes);
+#elif defined(DEFINE_mfile_vioread_p)
+	vio_copyfromvio_to_phys(&args, (vio_addr_t)offset, (__physaddr_t)buffer, num_bytes);
+#elif defined(DEFINE_mfile_viowrite_p)
+	vio_copytovio_from_phys(&args, (vio_addr_t)offset, (__physaddr_t)buffer, num_bytes);
+#elif defined(LOCAL_BUFFER_IS_IOVEC)
+	{
+#ifdef LOCAL_BUFFER_IS_PHYS
+		struct aio_pbuffer_entry ent;
+		AIO_PBUFFER_FOREACH(ent, buffer)
+#else /* LOCAL_BUFFER_IS_PHYS */
+		struct aio_buffer_entry ent;
+		AIO_BUFFER_FOREACH(ent, buffer)
+#endif /* !LOCAL_BUFFER_IS_PHYS */
+		{
+			if (buf_offset) {
+				if (buf_offset >= ent.ab_size) {
+					buf_offset -= ent.ab_size;
+					continue;
+				}
+				ent.ab_base += buf_offset;
+				ent.ab_size -= buf_offset;
+				buf_offset = 0;
+			}
+			if (ent.ab_size > num_bytes)
+				ent.ab_size = num_bytes;
+#ifdef DEFINE_mfile_vioreadv
+			vio_copyfromvio(&args, (vio_addr_t)offset, ent.ab_base, ent.ab_size);
+#elif defined(DEFINE_mfile_viowritev)
+			vio_copytovio(&args, (vio_addr_t)offset, ent.ab_base, ent.ab_size);
+#elif defined(DEFINE_mfile_vioreadv_p)
+			vio_copyfromvio_to_phys(&args, (vio_addr_t)offset, (__physaddr_t)ent.ab_base, ent.ab_size);
+#elif defined(DEFINE_mfile_viowritev_p)
+			vio_copytovio_from_phys(&args, (vio_addr_t)offset, (__physaddr_t)ent.ab_base, ent.ab_size);
+#endif /* ... */
+			if (ent.ab_size >= num_bytes)
+				break;
+			num_bytes -= ent.ab_size;
+			offset += ent.ab_size;
+		}
+	}
+#else /* ... */
+#error "Bad configuration"
+#endif /* !... */
+}
+
+
+#undef LOCAL_BUFFER_IS_PHYS
+#undef LOCAL_BUFFER_IS_IOVEC
+#undef LOCAL_buffer_t
+#undef LOCAL_mfile_vio_rw
+
+DECL_END
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+#undef DEFINE_mfile_vioread
+#undef DEFINE_mfile_viowrite
+#undef DEFINE_mfile_vioread_p
+#undef DEFINE_mfile_viowrite_p
+#undef DEFINE_mfile_vioreadv
+#undef DEFINE_mfile_viowritev
+#undef DEFINE_mfile_vioreadv_p
+#undef DEFINE_mfile_viowritev_p

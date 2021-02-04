@@ -493,13 +493,8 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 #ifdef CONFIG_USE_NEW_FS
 		if (!mfile_isanon(file)) {
 			pos_t filesize;
-#if __SIZEOF_POINTER__ >= __SIZEOF_POS_T__
-			filesize = ATOMIC_READ(file->mf_filesize);
-#else /* __SIZEOF_POINTER__ >= __SIZEOF_POS_T__ */
-			mfile_lock_read(file);
-			filesize = file->mf_filesize;
-			mfile_lock_endread(file);
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_POS_T__ */
+			filesize = (pos_t)atomic64_read(&file->mf_filesize);
+
 			/* NOTE: The file size may increase in the mean time, but that's actually
 			 *       ok: We're currently holding exclusive locks to all of the blocks
 			 *       that we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
