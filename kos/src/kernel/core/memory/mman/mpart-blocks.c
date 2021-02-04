@@ -397,12 +397,14 @@ after_intermediate_blocks:
 PUBLIC NONNULL((1, 3)) void FCALL
 mpart_memload_and_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t partrel_offset,
-                         struct mpart_physloc const *__restrict loc)
+                         struct mpart_physloc const *__restrict loc,
+                         struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...) {
 	struct mfile *file;
 	size_t i, min, max, limit, block_size;
 	unsigned int st;
 	physaddr_t min_addr;
+
 	assert(partrel_offset < mpart_getsize(self));
 	assert(mpart_hasblockstate(self));
 	file = self->mp_file;
@@ -419,7 +421,9 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		bool hasinit;
 		/* Special case: We must wait for someone else to finish initialization! */
 		incref(file);
-		mpart_lock_release(self);
+		mpart_lock_release_f(self);
+		unlockinfo_xunlock(unlock);
+		mpart_lockops_reap(self);
 		{
 			FINALLY_DECREF_UNLIKELY(file);
 			task_connect(&file->mf_initdone);
@@ -465,9 +469,11 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	 * we can proceed to actually do the initialization now! */
 	incref(file);
 #ifdef CONFIG_USE_NEW_FS
-	mfile_sizelock_inc(file);
+	mfile_trunclock_inc(file);
 #endif /* CONFIG_USE_NEW_FS */
-	mpart_lock_release(self);
+	mpart_lock_release_f(self);
+	unlockinfo_xunlock(unlock);
+	mpart_lockops_reap(self);
 
 	/* Calculate the actual physical address of the first byte
 	 * of the block referenced by `min' */
@@ -485,38 +491,73 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		num_bytes = ((max - min) + 1) << file->mf_blockshift;
 
 #ifdef CONFIG_USE_NEW_FS
-		if unlikely(addr + num_bytes > file->mf_size) {
-			/* Limit the load-range by the size of the file, and zero-initialize
-			 * any memory that is being mapped beyond the end natural end of the
-			 * file. */
-			if (addr >= file->mf_size) {
-				bzerophyscc(min_addr, num_bytes);
-			} else {
-				size_t load_bytes;
-				load_bytes = (size_t)(file->mf_size - addr);
-				assert(load_bytes < num_bytes);
-				if likely(mo_loadblocks != NULL)
-					(*mo_loadblocks)(file, addr, min_addr, load_bytes);
-				bzerophyscc(min_addr + load_bytes,
-				            num_bytes - load_bytes);
+		if (!mfile_isanon(file)) {
+			pos_t filesize;
+#if __SIZEOF_POINTER__ >= __SIZEOF_POS_T__
+			filesize = ATOMIC_READ(file->mf_filesize);
+#else /* __SIZEOF_POINTER__ >= __SIZEOF_POS_T__ */
+			mfile_lock_read(file);
+			filesize = file->mf_filesize;
+			mfile_lock_endread(file);
+#endif /* __SIZEOF_POINTER__ < __SIZEOF_POS_T__ */
+			/* NOTE: The file size may increase in the mean time, but that's actually
+			 *       ok: We're currently holding exclusive locks to all of the blocks
+			 *       that we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
+			 *       As such, if the file's size increases, _has_ to include to a
+			 *       point above the region which we're trying to initialize here.
+			 * e.g.: Someone else is allowed to write data, say, +0x12000 bytes further
+			 *       into the file, and that would never affect us here. If this happens,
+			 *       there are 2 race conditions that can happen:
+			 *   - We've read the file's old size, and it has since increased.
+			 *     -> In this case, we'll be zero-initializing some data that has already
+			 *        come to be considered as part of the live file, but that's OK, since
+			 *        that data has never been accessed before, and would have been zero-
+			 *        filled in either case.
+			 *     -> Even if the `mo_loadblocks' calls fails, we'll just set those blocks
+			 *        back to ST_NDEF, which will effectively look like we didn't do anything.
+			 *   - We've read the file's new size. - that's even simpler, since then we
+			 *     won't do any that `bzerophyscc' call at all. - In this case, the call
+			 *     to `mo_loadblocks' will load in data from disk that (may have been) loaded
+			 *     when the write that increased the file's size was done. And since this
+			 *     writing somewhere further into a file automatically implies that all
+			 *     uninitialized data up until that point should be considered as ZERO,
+			 *     we'll end with the same result, where the fs-driver will just write
+			 *     zeroes to the buffer, the same way we would have! */
+			if unlikely(addr + num_bytes > filesize) {
+				/* Limit the load-range by the size of the file, and zero-initialize
+				 * any memory that is being mapped beyond the end natural end of the
+				 * file. */
+				if (addr >= filesize) {
+					bzerophyscc(min_addr, num_bytes);
+				} else {
+					size_t load_bytes;
+					load_bytes = (size_t)(filesize - addr);
+					assert(load_bytes < num_bytes);
+					if likely(mo_loadblocks != NULL)
+						(*mo_loadblocks)(file, addr, min_addr, load_bytes);
+					bzerophyscc(min_addr + load_bytes,
+					            num_bytes - load_bytes);
+				}
+				goto initdone;
 			}
-		} else
-#endif /* CONFIG_USE_NEW_FS */
-		{
-			if likely(mo_loadblocks != NULL)
-				(*mo_loadblocks)(file, addr, min_addr, num_bytes);
 		}
+#endif /* CONFIG_USE_NEW_FS */
+		if likely(mo_loadblocks != NULL)
+			(*mo_loadblocks)(file, addr, min_addr, num_bytes);
 	} EXCEPT {
 		/* Change back all INIT-parts to UNDEF */
 		for (i = min; i <= max; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
 #ifdef CONFIG_USE_NEW_FS
-		mfile_sizelock_dec_nosignal(file);
+		mfile_trunclock_dec_nosignal(file);
 #endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		RETHROW();
 	}
+#ifdef CONFIG_USE_NEW_FS
+initdone:
+#endif /* CONFIG_USE_NEW_FS */
 
 	/* Mark all INIT-pages as loaded. */
 	for (i = min; i <= max; ++i)
@@ -524,7 +565,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 
 	/* Broadcast that init has finished. */
 #ifdef CONFIG_USE_NEW_FS
-	mfile_sizelock_dec_nosignal(file);
+	mfile_trunclock_dec_nosignal(file);
 #endif /* CONFIG_USE_NEW_FS */
 	sig_broadcast(&file->mf_initdone);
 
@@ -713,7 +754,7 @@ again_read_st:
 			auto mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
 			if likely(mo_loadblocks != NULL) {
 				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW!
-				 *       We also don't have to call `mfile_sizelock_inc()', since
+				 *       We also don't have to call `mfile_trunclock_inc()', since
 				 *       doing so wouldn't make any sense for any of the valid use-
 				 *       cases of hinted memory mappings. */
 				(*mo_loadblocks)(self->mp_file,

@@ -864,7 +864,7 @@ __DECL_BEGIN
 #endif /* !EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK */
 
 
- /* Declaration visibility of `emu86_emulate()' */
+/* Declaration visibility of `emu86_emulate()' */
 #ifndef EMU86_EMULATE_DECL
 #define EMU86_EMULATE_DECL __PRIVATE
 #endif /* !EMU86_EMULATE_DECL */
@@ -1950,7 +1950,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 
 
 /* Handle the case where an unsupported instruction performs a memory access.
- * @param: addr:      [type(void *)] Base address (not translated). 
+ * @param: addr:      [type(void *)] Base address (not translated).
  * @param: num_bytes: [type(size_t)] The number of bytes being accessed.
  * @param: reading:   [type(bool)]   A read is being performed.
  * @param: writing:   [type(bool)]   A write is being performed.

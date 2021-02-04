@@ -46,8 +46,8 @@
  * directly in order to unlock all APIs that haven't been exposed, yet. */
 #ifdef __HYBRID_LIST_RESTRICT_API
 #undef __GUARD_HYBRID_SEQUENCE_LIST_H
-#endif /* __HYBRID_LIST_RESTRICT_API */
 #undef __HYBRID_LIST_RESTRICT_API
+#endif /* __HYBRID_LIST_RESTRICT_API */
 
 #endif /* !__GUARD_HYBRID_SEQUENCE_LIST_H */
 #endif /* __CC__ */

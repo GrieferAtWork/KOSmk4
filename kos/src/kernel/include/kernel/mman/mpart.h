@@ -939,7 +939,8 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 FUNDEF NONNULL((1, 3)) void FCALL
 mpart_memload_and_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t partrel_offset,
-                         struct mpart_physloc const *__restrict loc)
+                         struct mpart_physloc const *__restrict loc,
+                         struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...);
 
 /* Directly return physical backing memory containing the byte `partrel_offset',
@@ -1098,6 +1099,32 @@ FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_readv(struct mpart *__restri
 FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
+/* Perform I/O while holding a lock to `self'. If this isn't possible, then
+ * unlock all locks, try to work towards that goal, and return `0'. If a
+ * virtual buffer is given, and that buffer cannot be faulted (e.g.: it may
+ * be backed by VIO, or may even be faulty), return `(size_t)-1', after having
+ * released all locks, which is indicative that the caller should re-attempt
+ * the operation with buffered I/O.
+ * Locking logic:
+ *    IN:                   mpart_lock_acquired(self);
+ *    EXCEPT:               mpart_lock_release(self); unlock();
+ *    return == 0:          mpart_lock_release(self); unlock();
+ *    return == (size_t)-1: mpart_lock_release(self); unlock();  (never returned by *_p variants)
+ *    return == *:          mpart_lock_acquired(self);
+ * Upon success, return the (non-zero) # of transfered bytes.
+ * The caller must ensure that:
+ *    >> num_bytes != 0
+ *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'
+ *    >> mpart_unsharecow_or_unlock(...)   // Only for `mpart_write*', and only within the target address range
+ */
+FUNDEF NONNULL((1)) size_t KCALL mpart_read_or_unlock(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL mpart_write_or_unlock(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL mpart_read_or_unlock_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL mpart_write_or_unlock_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 /* Lock for `mpart_all_list' */

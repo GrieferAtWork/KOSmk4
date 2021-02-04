@@ -34,18 +34,21 @@
 DECL_BEGIN
 
 #if defined(DEFINE_mfile_read)
+#define LOCAL_READING
 #define LOCAL_buffer_t     USER CHECKED void *
 #define LOCAL_ubuffer_t    uintptr_t
 #define LOCAL_mfile_vio_rw mfile_vio_read
 #define LOCAL_mfile_rw     mfile_read
 #define LOCAL_mpart_rw     mpart_read
 #elif defined(DEFINE_mfile_write)
+#define LOCAL_WRITING
 #define LOCAL_buffer_t     USER CHECKED void const *
 #define LOCAL_ubuffer_t    uintptr_t
 #define LOCAL_mfile_vio_rw mfile_vio_write
 #define LOCAL_mfile_rw     mfile_write
 #define LOCAL_mpart_rw     mpart_write
 #elif defined(DEFINE_mfile_read_p)
+#define LOCAL_READING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_buffer_t     physaddr_t
 #define LOCAL_ubuffer_t    physaddr_t
@@ -53,6 +56,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_read_p
 #define LOCAL_mpart_rw     mpart_read_p
 #elif defined(DEFINE_mfile_write_p)
+#define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_buffer_t     physaddr_t
 #define LOCAL_ubuffer_t    physaddr_t
@@ -60,6 +64,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_write_p
 #define LOCAL_mpart_rw     mpart_write_p
 #elif defined(DEFINE_mfile_readv)
+#define LOCAL_READING
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_BUFFER
 #define LOCAL_buffer_t     struct aio_buffer const *__restrict
@@ -67,6 +72,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_readv
 #define LOCAL_mpart_rw     mpart_readv
 #elif defined(DEFINE_mfile_writev)
+#define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_BUFFER
 #define LOCAL_buffer_t     struct aio_buffer const *__restrict
@@ -74,6 +80,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_writev
 #define LOCAL_mpart_rw     mpart_writev
 #elif defined(DEFINE_mfile_readv_p)
+#define LOCAL_READING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
@@ -82,6 +89,7 @@ DECL_BEGIN
 #define LOCAL_mfile_rw     mfile_readv_p
 #define LOCAL_mpart_rw     mpart_readv_p
 #elif defined(DEFINE_mfile_writev_p)
+#define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
@@ -162,6 +170,54 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 
+#ifdef CONFIG_USE_NEW_FS
+#ifdef LOCAL_READING
+PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+LOCAL_mfile_rw(struct mfile *__restrict self,
+               LOCAL_buffer_t buffer,
+#ifdef LOCAL_BUFFER_IS_AIO
+               size_t buf_offset,
+#endif /* LOCAL_BUFFER_IS_AIO */
+               size_t num_bytes, pos_t offset)
+#else /* LOCAL_READING */
+PUBLIC NONNULL((1)) void KCALL
+LOCAL_mfile_rw(struct mfile *__restrict self,
+               LOCAL_buffer_t buffer,
+#ifdef LOCAL_BUFFER_IS_AIO
+               size_t buf_offset,
+#endif /* LOCAL_BUFFER_IS_AIO */
+               size_t num_bytes, pos_t offset)
+#endif /* !LOCAL_READING */
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+#ifdef LOCAL_READING
+	while (num_bytes) {
+		size_t count;
+		REF struct mpart *part;
+		part = mfile_getpart(self, offset, num_bytes);
+		FINALLY_DECREF_UNLIKELY(part);
+		/* Do I/O on the part. */
+		count = LOCAL_mpart_rw(part, buffer,
+#ifdef LOCAL_BUFFER_IS_AIO
+		                       buf_offset,
+#endif /* LOCAL_BUFFER_IS_AIO */
+		                       num_bytes,
+		                       offset);
+		assert(count <= num_bytes);
+		if (count >= num_bytes)
+			break;
+#ifdef LOCAL_BUFFER_IS_AIO
+		buf_offset += count;
+#else /* LOCAL_BUFFER_IS_AIO */
+		buffer = (LOCAL_buffer_t)((LOCAL_ubuffer_t)buffer + count);
+#endif /* !LOCAL_BUFFER_IS_AIO */
+		offset += count;
+		num_bytes -= count;
+	}
+#else /* LOCAL_READING */
+
+#endif /* !LOCAL_READING */
+}
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) void KCALL
 LOCAL_mfile_rw(struct mfile *__restrict self,
                LOCAL_buffer_t buffer,
@@ -170,15 +226,18 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 #endif /* LOCAL_BUFFER_IS_AIO */
                size_t num_bytes, pos_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	if (self->mf_parts == MFILE_PARTS_ANONYMOUS && mfile_getvio(self) != NULL) {
-		/* Directly read to/from VIO */
-		LOCAL_mfile_vio_rw(self, NULL, buffer,
+	if unlikely(mfile_isanon(self)) {
+		if (mfile_getvio(self) != NULL) {
+			/* Directly read to/from VIO */
+			LOCAL_mfile_vio_rw(self, NULL, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
-		                   buf_offset,
+			                   buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */
-		                   num_bytes, offset);
-		return;
+			                   num_bytes, offset);
+			return;
+		}
 	}
+
 	while (num_bytes) {
 		size_t count;
 		REF struct mpart *part;
@@ -203,6 +262,7 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 		num_bytes -= count;
 	}
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 #undef LOCAL_BUFFER_IS_PHYS
 #undef LOCAL_BUFFER_IS_AIO
@@ -213,6 +273,8 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 #undef LOCAL_mfile_vio_rw
 #undef LOCAL_mfile_rw
 #undef LOCAL_mpart_rw
+#undef LOCAL_READING
+#undef LOCAL_WRITING
 
 DECL_END
 

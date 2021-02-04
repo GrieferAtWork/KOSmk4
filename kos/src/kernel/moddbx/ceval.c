@@ -53,6 +53,8 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <hybrid/byteorder.h>
 #include <hybrid/unaligned.h>
 
+#include <sys/param.h>
+
 #include <ieee754.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -601,16 +603,30 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 	case '(': {
 		/* Check for a C-style cast expression. */
 		struct ctyperef cast_type;
+		char const *afterparen;
 		yield();
-		/* TODO: Look ahead if this really is a cast expression, because
-		 *       if it isn't, then we mustn't try to parse a type here.
-		 * Consider this:
-		 *       "(stat + 5)"
-		 * Since `struct stat' is a thing, we'd parse the type, only
-		 * to later notice that `stat', the function was supposed to
-		 * be used. */
+		afterparen = self->c_tokstart;
 		result = ctype_eval(self, &cast_type, NULL, NULL);
 		if (result == DBX_EOK) {
+			if (self->c_tok != ')' && self->c_tok != CTOKEN_TOK_EOF) {
+				/* Look ahead if this really is a cast expression, because
+				 * if it isn't, then we mustn't try to parse a type here.
+				 *
+				 * Consider this:
+				 *       "(stat + 5)"
+				 *
+				 * Since `struct stat' is a thing, we'd parse the type, only
+				 * to later notice that `stat', the function was supposed to
+				 * be used.
+				 *
+				 * We handle this by simply checking if the type-expression
+				 * is followed by a ')'. - If it isn't, then we simply re-
+				 * parse the (thought-to-be) type-expression as a regular
+				 * expression. */
+				cparser_yieldat(self, afterparen);
+				ctyperef_fini(&cast_type);
+				goto doparen_expr;
+			}
 			/* Cast-expression */
 			result = cparser_skip(self, ')');
 			if likely(result == DBX_EOK) {
@@ -627,6 +643,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		/* Handle the case where the wrapped expression isn't a type-expression */
 		if unlikely(result != DBX_ENOENT)
 			goto done;
+doparen_expr:
 		/* Simple parenthesis. */
 		result = cexpr_pushparse_inner(self);
 		if unlikely(result != DBX_EOK)
@@ -707,11 +724,11 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		if (used_type == &ctype_ieee754_double) {
 			__IEEE754_DOUBLE_TYPE__ used_value;
 			used_value = (__IEEE754_DOUBLE_TYPE__)value;
-			result      = cexpr_pushdata_simple(used_type, &used_value);
+			result     = cexpr_pushdata_simple(used_type, &used_value);
 		} else if (used_type == &ctype_ieee754_float) {
 			__IEEE754_FLOAT_TYPE__ used_value;
 			used_value = (__IEEE754_FLOAT_TYPE__)value;
-			result      = cexpr_pushdata_simple(used_type, &used_value);
+			result     = cexpr_pushdata_simple(used_type, &used_value);
 		} else {
 			result = cexpr_pushdata_simple(used_type, &value);
 		}
@@ -733,7 +750,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			value |= temp << shift;
 			if (reader >= end)
 				break;
-			shift += 8;
+			shift += NBBY;
 		}
 		/* Push as an integer. */
 		result = cexpr_pushint_simple(&ctype_int, value);
@@ -954,7 +971,7 @@ done_container_of_t_ptr:
 			/* Pure symbol lookup. */
 			kwd_str = self->c_tokstart;
 			kwd_len = cparser_toklen(self);
-			/* NOTE: Don't enable automtic symbol offsets within __identifier()! */
+			/* NOTE: Don't enable automatic symbol offsets within __identifier()! */
 			result = cexpr_pushsymbol_byname(kwd_str, kwd_len, false);
 			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
 				autocomplete_symbols(self, kwd_str, kwd_len, CMODSYM_DIP_NS_NONTYPE);
@@ -1503,7 +1520,7 @@ NOTHROW(FCALL parse_land_suffix)(struct cparser *__restrict self) {
 again:
 	switch (self->c_tok) {
 
-	case CTOKEN_TOK_PIPE_PIPE: {
+	case CTOKEN_TOK_AND_AND: {
 		yield();
 		if (cexpr_typeonly) {
 			result = parse_bitor(self);
@@ -2242,24 +2259,6 @@ NOTHROW(FCALL ctype_parse_cv)(struct cparser *__restrict self,
 			yield();
 			continue;
 		}
-#ifdef CTYPEREF_FLAG_SEG_FS
-		if (KWD_CHECK(kwd_str, kwd_len, "seg_fs")) {
-			if (*ct_flags & CTYPEREF_FLAG_SEGMASK)
-				goto syn;
-			*ct_flags |= CTYPEREF_FLAG_SEG_FS;
-			yield();
-			continue;
-		}
-#endif /* CTYPEREF_FLAG_SEG_FS */
-#ifdef CTYPEREF_FLAG_SEG_GS
-		if (KWD_CHECK(kwd_str, kwd_len, "seg_gs")) {
-			if (*ct_flags & CTYPEREF_FLAG_SEGMASK)
-				goto syn;
-			*ct_flags |= CTYPEREF_FLAG_SEG_GS;
-			yield();
-			continue;
-		}
-#endif /* CTYPEREF_FLAG_SEG_GS */
 		/* Strip leading/trailing underscores */
 		while (kwd_len && kwd_str[0] == '_') {
 			++kwd_str;
@@ -2288,6 +2287,24 @@ NOTHROW(FCALL ctype_parse_cv)(struct cparser *__restrict self,
 			yield();
 			continue;
 		}
+#ifdef CTYPEREF_FLAG_SEG_FS
+		if (KWD_CHECK(kwd_str, kwd_len, "seg_fs")) {
+			if (*ct_flags & CTYPEREF_FLAG_SEGMASK)
+				goto syn;
+			*ct_flags |= CTYPEREF_FLAG_SEG_FS;
+			yield();
+			continue;
+		}
+#endif /* CTYPEREF_FLAG_SEG_FS */
+#ifdef CTYPEREF_FLAG_SEG_GS
+		if (KWD_CHECK(kwd_str, kwd_len, "seg_gs")) {
+			if (*ct_flags & CTYPEREF_FLAG_SEGMASK)
+				goto syn;
+			*ct_flags |= CTYPEREF_FLAG_SEG_GS;
+			yield();
+			continue;
+		}
+#endif /* CTYPEREF_FLAG_SEG_GS */
 		kwd_str = self->c_tokstart;
 		result  = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
@@ -2329,21 +2346,21 @@ PRIVATE struct builtin_type const builtin_types[] = {
 	{ "s64", &ctype_s64 }, { "__s64", &ctype_s64 }, { "int64_t",  &ctype_s64 }, { "__int64_t",  &ctype_s64 }, { "__INT64_TYPE__",  &ctype_s64 },
 	{ "u64", &ctype_u64 }, { "__u64", &ctype_u64 }, { "uint64_t", &ctype_u64 }, { "__uint64_t", &ctype_u64 }, { "__UINT64_TYPE__", &ctype_u64 },
 
-	{ "size_t", &ctype_size_t }, { "__SIZE_TYPE__", &ctype_size_t },
-	{ "ssize_t", &ctype_ssize_t }, { "__SSIZE_TYPE__", &ctype_ssize_t },
-	{ "ptrdiff_t", &ctype_ptrdiff_t }, { "__PTRDIFF_TYPE__", &ctype_ptrdiff_t },
-	{ "intptr_t", &ctype_intptr_t }, { "__INTPTR_TYPE__", &ctype_intptr_t },
-	{ "uintptr_t", &ctype_uintptr_t }, { "__UINTPTR_TYPE__", &ctype_uintptr_t },
+	{ "size_t", &ctype_size_t }, { "__size_t", &ctype_size_t }, { "__SIZE_TYPE__", &ctype_size_t },
+	{ "ssize_t", &ctype_ssize_t }, { "__ssize_t", &ctype_ssize_t }, { "__SSIZE_TYPE__", &ctype_ssize_t },
+	{ "ptrdiff_t", &ctype_ptrdiff_t }, { "__ptrdiff_t", &ctype_ptrdiff_t }, { "__PTRDIFF_TYPE__", &ctype_ptrdiff_t },
+	{ "intptr_t", &ctype_intptr_t }, { "__intptr_t", &ctype_intptr_t }, { "__INTPTR_TYPE__", &ctype_intptr_t },
+	{ "uintptr_t", &ctype_uintptr_t }, { "__uintptr_t", &ctype_uintptr_t }, { "__UINTPTR_TYPE__", &ctype_uintptr_t },
 };
 
 #ifdef __ARCH_HAVE_COMPAT
 PRIVATE struct builtin_type const compat_builtin_types[] = {
 	/* Some more "known" types for convenience. */
-	{ "size_t", &ctype_compat_size_t }, { "__SIZE_TYPE__", &ctype_compat_size_t },
-	{ "ssize_t", &ctype_compat_ssize_t }, { "__SSIZE_TYPE__", &ctype_compat_ssize_t },
-	{ "ptrdiff_t", &ctype_compat_ptrdiff_t }, { "__PTRDIFF_TYPE__", &ctype_compat_ptrdiff_t },
-	{ "intptr_t", &ctype_compat_intptr_t }, { "__INTPTR_TYPE__", &ctype_compat_intptr_t },
-	{ "uintptr_t", &ctype_compat_uintptr_t }, { "__UINTPTR_TYPE__", &ctype_compat_uintptr_t },
+	{ "size_t", &ctype_compat_size_t }, { "__size_t", &ctype_compat_size_t }, { "__SIZE_TYPE__", &ctype_compat_size_t },
+	{ "ssize_t", &ctype_compat_ssize_t }, { "__ssize_t", &ctype_compat_ssize_t }, { "__SSIZE_TYPE__", &ctype_compat_ssize_t },
+	{ "ptrdiff_t", &ctype_compat_ptrdiff_t }, { "__ptrdiff_t", &ctype_compat_ptrdiff_t }, { "__PTRDIFF_TYPE__", &ctype_compat_ptrdiff_t },
+	{ "intptr_t", &ctype_compat_intptr_t }, { "__intptr_t", &ctype_compat_intptr_t }, { "__INTPTR_TYPE__", &ctype_compat_intptr_t },
+	{ "uintptr_t", &ctype_compat_uintptr_t }, { "__uintptr_t", &ctype_compat_uintptr_t }, { "__UINTPTR_TYPE__", &ctype_compat_uintptr_t },
 };
 #endif /* __ARCH_HAVE_COMPAT */
 
@@ -2397,19 +2414,19 @@ NOTHROW(FCALL ctype_parse_base)(struct cparser *__restrict self,
 	char const *kwd_str;
 	size_t kwd_len;
 	unsigned int integer_type_flags;
-#define BASETYPE_FLAG_SIGNED       0x0001 /* FLAG: `signed' was given */
-#define BASETYPE_FLAG_UNSIGNED     0x0002 /* FLAG: `unsigned' was given */
-#define BASETYPE_FLAG_SIGNMASK     0x0003 /* Mask for explicit sign prefix. */
-#define BASETYPE_FLAG_INT          0x0004 /* FLAG: Explicit `int' was given. */
-#define BASETYPE_FLAG_CHAR         0x0010 /* FLAG: `char' was given. */
-#define BASETYPE_FLAG_SHORT        0x0020 /* FLAG: `short' was given. */
-#define BASETYPE_FLAG_LONG         0x0030 /* FLAG: `long' was given. */
-#define BASETYPE_FLAG_LLONG        0x0040 /* FLAG: `long long' was given. */
-#define BASETYPE_FLAG_INT8         0x0050 /* FLAG: `__int8' was given. */
-#define BASETYPE_FLAG_INT16        0x0060 /* FLAG: `__int16' was given. */
-#define BASETYPE_FLAG_INT32        0x0070 /* FLAG: `__int32' was given. */
-#define BASETYPE_FLAG_INT64        0x0080 /* FLAG: `__int64' was given. */
-#define BASETYPE_FLAG_WIDTHMASK    0x00f0 /* MASK: Explicit width was given. */
+#define BASETYPE_FLAG_SIGNED    0x0001 /* FLAG: `signed' was given */
+#define BASETYPE_FLAG_UNSIGNED  0x0002 /* FLAG: `unsigned' was given */
+#define BASETYPE_FLAG_SIGNMASK  0x0003 /* Mask for explicit sign prefix. */
+#define BASETYPE_FLAG_INT       0x0004 /* FLAG: Explicit `int' was given. */
+#define BASETYPE_FLAG_CHAR      0x0010 /* FLAG: `char' was given. */
+#define BASETYPE_FLAG_SHORT     0x0020 /* FLAG: `short' was given. */
+#define BASETYPE_FLAG_LONG      0x0030 /* FLAG: `long' was given. */
+#define BASETYPE_FLAG_LLONG     0x0040 /* FLAG: `long long' was given. */
+#define BASETYPE_FLAG_INT8      0x0050 /* FLAG: `__int8' was given. */
+#define BASETYPE_FLAG_INT16     0x0060 /* FLAG: `__int16' was given. */
+#define BASETYPE_FLAG_INT32     0x0070 /* FLAG: `__int32' was given. */
+#define BASETYPE_FLAG_INT64     0x0080 /* FLAG: `__int64' was given. */
+#define BASETYPE_FLAG_WIDTHMASK 0x00f0 /* MASK: Explicit width was given. */
 	char const *orig_tok = self->c_tokstart;
 	if (self->c_tok != CTOKEN_TOK_KEYWORD)
 		return DBX_ENOENT;

@@ -52,6 +52,7 @@ DECL_BEGIN
 #define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_vio_rw       mfile_vio_read
 #define LOCAL_mpart_rw           mpart_read
+#define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_read
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	vm_copyfromphys_nopf((byte_t *)buffer + (buffer_offset), mpart_physaddr, num_bytes)
@@ -61,24 +62,27 @@ DECL_BEGIN
 #define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_vio_rw       mfile_vio_write
 #define LOCAL_mpart_rw           mpart_write
+#define LOCAL_mpart_rw_or_unlock mpart_write_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_write
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	vm_copytophys_nopf(mpart_physaddr, (byte_t const *)buffer + (buffer_offset), num_bytes)
 #elif defined(DEFINE_mpart_read_p)
 #define LOCAL_READING
-#define LOCAL_buffer_t     physaddr_t
-#define LOCAL_ubuffer_t    physaddr_t
-#define LOCAL_mfile_vio_rw mfile_vio_read_p
-#define LOCAL_mpart_rw     mpart_read_p
+#define LOCAL_buffer_t           physaddr_t
+#define LOCAL_ubuffer_t          physaddr_t
+#define LOCAL_mfile_vio_rw       mfile_vio_read_p
+#define LOCAL_mpart_rw           mpart_read_p
+#define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	vm_copyinphys(buffer + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_write_p)
 #define LOCAL_WRITING
-#define LOCAL_buffer_t     physaddr_t
-#define LOCAL_ubuffer_t    physaddr_t
-#define LOCAL_mfile_vio_rw mfile_vio_write_p
-#define LOCAL_mpart_rw     mpart_write_p
+#define LOCAL_buffer_t           physaddr_t
+#define LOCAL_ubuffer_t          physaddr_t
+#define LOCAL_mfile_vio_rw       mfile_vio_write_p
+#define LOCAL_mpart_rw           mpart_write_p
+#define LOCAL_mpart_rw_or_unlock mpart_write_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	vm_copyinphys(mpart_physaddr, buffer + (buffer_offset), num_bytes)
@@ -89,6 +93,7 @@ DECL_BEGIN
 #define LOCAL_buffer_t           struct aio_buffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_vio_readv
 #define LOCAL_mpart_rw           mpart_readv
+#define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_readv
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	aio_buffer_copyfromphys_nopf(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
@@ -99,6 +104,7 @@ DECL_BEGIN
 #define LOCAL_buffer_t           struct aio_buffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_vio_writev
 #define LOCAL_mpart_rw           mpart_writev
+#define LOCAL_mpart_rw_or_unlock mpart_writev_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_writev
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	aio_buffer_copytophys_nopf(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
@@ -106,9 +112,10 @@ DECL_BEGIN
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
-#define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
-#define LOCAL_mfile_vio_rw mfile_vio_readv_p
-#define LOCAL_mpart_rw     mpart_readv_p
+#define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
+#define LOCAL_mfile_vio_rw       mfile_vio_readv_p
+#define LOCAL_mpart_rw           mpart_readv_p
+#define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	aio_pbuffer_copyfromphys(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
@@ -116,9 +123,10 @@ DECL_BEGIN
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_AIO_PBUFFER
-#define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
-#define LOCAL_mfile_vio_rw mfile_vio_writev_p
-#define LOCAL_mpart_rw     mpart_writev_p
+#define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
+#define LOCAL_mfile_vio_rw       mfile_vio_writev_p
+#define LOCAL_mpart_rw           mpart_writev_p
+#define LOCAL_mpart_rw_or_unlock mpart_writev_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	aio_pbuffer_copytophys(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
@@ -264,7 +272,7 @@ again_memaddr:
 #ifdef LOCAL_WRITING
 		physloc.mppl_size = 1;
 #endif /* LOCAL_WRITING */
-		mpart_memload_and_unlock(self, part_offs, &physloc);
+		mpart_memload_and_unlock(self, part_offs, &physloc, NULL);
 		goto again;
 	}
 	assert(physloc.mppl_size != 0);
@@ -359,6 +367,145 @@ done:
 	return result;
 }
 
+
+
+/* Perform I/O while holding a lock to `self'. If this isn't possible, then
+ * unlock all locks, try to work towards that goal, and return `0'. If a
+ * virtual buffer is given, and that buffer cannot be faulted (e.g.: it may
+ * be backed by VIO, or may even be faulty), return `(size_t)-1', after having
+ * released all locks, which is indicative that the caller should re-attempt
+ * the operation with buffered I/O.
+ * Locking logic:
+ *    IN:                   mpart_lock_acquired(self);
+ *    EXCEPT:               mpart_lock_release(self); unlock();
+ *    return == 0:          mpart_lock_release(self); unlock();
+ *    return == (size_t)-1: mpart_lock_release(self); unlock();  (never returned by *_p variants)
+ *    return == *:          mpart_lock_acquired(self);
+ * Upon success, return the (non-zero) # of transfered bytes.
+ * The caller must ensure that:
+ *    >> num_bytes != 0
+ *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'
+ *    >> mpart_unsharecow_or_unlock(...)   // Only for `mpart_write*', and only within the target address range
+ */
+FUNDEF NONNULL((1)) size_t KCALL
+LOCAL_mpart_rw_or_unlock(struct mpart *__restrict self,
+                         LOCAL_buffer_t buffer,
+#ifdef LOCAL_BUFFER_IS_AIO
+                         size_t buf_offset,
+#endif /* LOCAL_BUFFER_IS_AIO */
+                         size_t num_bytes,
+                         mpart_reladdr_t offset,
+                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result;
+	struct mpart_physloc physloc;
+	assert(mpart_lock_acquired(self));
+	assert(offset + num_bytes > offset);
+	assert(offset + num_bytes <= mpart_getsize(self));
+	assert(MPART_ST_INCORE(self->mp_state));
+
+	/* Load the physical location of the requested segment. */
+again_memaddr:
+#ifdef LOCAL_WRITING
+	if (!mpart_memaddr_for_write(self, offset, num_bytes, &physloc))
+#else /* LOCAL_WRITING */
+	if (!mpart_memaddr_for_read(self, offset, num_bytes, &physloc))
+#endif /* !LOCAL_WRITING */
+	{
+		/* Must initialize more backing memory.
+		 * NOTE: When writing, we only initialize a single block,
+		 *       so-as to take advantage of the possibility of
+		 *       write whole blocks without having to load them
+		 *       first! */
+#ifdef LOCAL_WRITING
+		physloc.mppl_size = 1;
+#endif /* LOCAL_WRITING */
+		mpart_memload_and_unlock(self, offset, &physloc, unlock);
+		return 0;
+	}
+	assert(physloc.mppl_size != 0);
+	assert(physloc.mppl_size <= num_bytes);
+
+	/* Actually transfer data! */
+#ifdef LOCAL_BUFFER_TRANSFER_NOEXCEPT
+	LOCAL_buffer_transfer_nopf(result,
+	                           physloc.mppl_addr,
+	                           physloc.mppl_size);
+#else /* LOCAL_BUFFER_TRANSFER_NOEXCEPT */
+	{
+		size_t copy_error;
+		copy_error = LOCAL_buffer_transfer_nopf(result,
+		                                        physloc.mppl_addr,
+		                                        physloc.mppl_size);
+		if unlikely(copy_error != 0) {
+			assert(copy_error <= physloc.mppl_size);
+			/* Deal with the case where the copy-error isn't total. */
+			if unlikely(copy_error < physloc.mppl_size) {
+				size_t ok = physloc.mppl_size - copy_error;
+#ifdef LOCAL_WRITING
+				/* Commit the partial write success (and limit the # of
+				 * successfully written bytes to what we were actually
+				 * able to commit). */
+				ok = mpart_memaddr_for_write_commit(self, offset, ok);
+#endif /* LOCAL_WRITING */
+				result += ok;
+				/*offset += ok;*/
+				num_bytes -= ok;
+			}
+			/* Can't use memcpy_nopf() to transfer memory from the given buffer.
+			 * This can happen for 3 reasons:
+			 *  - The buffer hasn't been loaded into memory
+			 *  - The buffer is backed by VIO memory
+			 *  - The buffer is actually invalid and represents a faulty address
+			 * Assuming a well-behaved application, we can optimize performance
+			 * for the first case by attempting to pre-fault the current target
+			 * buffer. */
+			mpart_lock_release_f(self);
+			unlockinfo_xunlock(unlock);
+			mpart_lockops_reap(self);
+
+#ifdef LOCAL_WRITING
+#define LOCAL_prefault_flags MMAN_FAULT_F_NORMAL /* Writing from a buffer means we only need to read said buffer! */
+#else /* LOCAL_WRITING */
+#define LOCAL_prefault_flags MMAN_FAULT_F_WRITE /* Reading into a buffer means we must write to said buffer! */
+#endif /* !LOCAL_WRITING */
+#ifdef LOCAL_BUFFER_IS_AIO_BUFFER
+			copy_error = mman_prefaultv(buffer, result, num_bytes,
+			                            LOCAL_prefault_flags);
+#else /* LOCAL_BUFFER_IS_AIO_BUFFER */
+			copy_error = mman_prefault((byte_t *)buffer + result,
+			                           num_bytes, LOCAL_prefault_flags);
+#endif /* !LOCAL_BUFFER_IS_AIO_BUFFER */
+#undef LOCAL_prefault_flags
+			/* If we've managed to prefault memory, then re-attempt the direct transfer. */
+			if (copy_error != 0 || result != 0)
+				return result; /* Try again */
+			return (size_t)-1; /* Must use buffered I/O */
+		} /* if unlikely(copy_error != 0) */
+	}     /* scope... */
+#endif /* !LOCAL_BUFFER_TRANSFER_NOEXCEPT */
+
+#ifdef LOCAL_WRITING
+	/* Commit written data.
+	 * NOTE: In this case, `mpart_memaddr_for_write_commit()' should always
+	 *       re-return `physloc.mppl_size', but we don't actually assert this
+	 *       here! */
+	physloc.mppl_size = mpart_memaddr_for_write_commit(self, offset,
+	                                                   physloc.mppl_size);
+#endif /* LOCAL_WRITING */
+
+	result += physloc.mppl_size;
+
+	/* Check if there is more data for us to transfer. */
+	if (num_bytes > physloc.mppl_size) {
+		offset += physloc.mppl_size;
+		num_bytes -= physloc.mppl_size;
+		goto again_memaddr;
+	}
+	return result;
+}
+
+
 #undef LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #undef LOCAL_buffer_transfer_nopf
 #undef LOCAL_BUFFER_IS_AIO
@@ -368,6 +515,7 @@ done:
 #undef LOCAL_buffer_t
 #undef LOCAL_mfile_vio_rw
 #undef LOCAL__mpart_buffered_rw
+#undef LOCAL_mpart_rw_or_unlock
 #undef LOCAL_mpart_rw
 #undef LOCAL_READING
 #undef LOCAL_WRITING

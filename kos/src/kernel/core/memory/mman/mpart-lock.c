@@ -862,7 +862,7 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 		incref(self);
 		incref(file);
 #ifdef CONFIG_USE_NEW_FS
-		mfile_sizelock_inc(file);
+		mfile_trunclock_inc(file);
 #endif /* CONFIG_USE_NEW_FS */
 		/* Release the lock from the part, so we can load
 		 * blocks without holding that non-recursive, and
@@ -878,44 +878,77 @@ mpart_loadsome_or_unlock(struct mpart *__restrict self,
 			num_bytes = (end - start) << file->mf_blockshift;
 
 #ifdef CONFIG_USE_NEW_FS
-			if unlikely(addr + num_bytes > file->mf_size) {
-				/* Limit the load-range by the size of the file, and zero-initialize
-				 * any memory that is being mapped beyond the end natural end of the
-				 * file. */
-				if (addr >= file->mf_size) {
-					bzerophyscc(loc.mppl_addr, num_bytes);
-				} else {
-					size_t load_bytes;
-					load_bytes = (size_t)(file->mf_size - addr);
-					assert(load_bytes < num_bytes);
-					if likely(mo_loadblocks != NULL)
-						(*mo_loadblocks)(file, addr, loc.mppl_addr, load_bytes);
-					bzerophyscc(loc.mppl_addr + load_bytes,
-					            num_bytes - load_bytes);
+			if (!mfile_isanon(file)) {
+				pos_t filesize;
+#if __SIZEOF_POINTER__ >= __SIZEOF_POS_T__
+				filesize = ATOMIC_READ(file->mf_filesize);
+#else /* __SIZEOF_POINTER__ >= __SIZEOF_POS_T__ */
+				mfile_lock_read(file);
+				filesize = file->mf_filesize;
+				mfile_lock_endread(file);
+#endif /* __SIZEOF_POINTER__ < __SIZEOF_POS_T__ */
+				/* NOTE: The file size may increase in the mean time, but that's actually
+				 *       ok: We're currently holding exclusive locks to all of the blocks
+				 *       that we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
+				 *       As such, if the file's size increases, _has_ to include to a
+				 *       point above the region which we're trying to initialize here.
+				 * e.g.: Someone else is allowed to write data, say, +0x12000 bytes further
+				 *       into the file, and that would never affect us here. If this happens,
+				 *       there are 2 race conditions that can happen:
+				 *   - We've read the file's old size, and it has since increased.
+				 *     -> In this case, we'll be zero-initializing some data that has already
+				 *        come to be considered as part of the live file, but that's OK, since
+				 *        that data has never been accessed before, and would have been zero-
+				 *        filled in either case.
+				 *     -> Even if the `mo_loadblocks' calls fails, we'll just set those blocks
+				 *        back to ST_NDEF, which will effectively look like we didn't do anything.
+				 *   - We've read the file's new size. - that's even simpler, since then we
+				 *     won't do any that `bzerophyscc' call at all. - In this case, the call
+				 *     to `mo_loadblocks' will load in data from disk that (may have been) loaded
+				 *     when the write that increased the file's size was done. And since this
+				 *     writing somewhere further into a file automatically implies that all
+				 *     uninitialized data up until that point should be considered as ZERO,
+				 *     we'll end with the same result, where the fs-driver will just write
+				 *     zeroes to the buffer, the same way we would have! */
+				if unlikely(addr + num_bytes > filesize) {
+					if (addr >= filesize) {
+						bzerophyscc(loc.mppl_addr, num_bytes);
+					} else {
+						size_t load_bytes;
+						load_bytes = (size_t)(filesize - addr);
+						assert(load_bytes < num_bytes);
+						if likely(mo_loadblocks != NULL)
+							(*mo_loadblocks)(file, addr, loc.mppl_addr, load_bytes);
+						bzerophyscc(loc.mppl_addr + load_bytes,
+						            num_bytes - load_bytes);
+					}
+					goto initdone;
 				}
-			} else
-#endif /* CONFIG_USE_NEW_FS */
-			{
-				if likely(mo_loadblocks != NULL)
-					(*mo_loadblocks)(file, addr, loc.mppl_addr, num_bytes);
 			}
+#endif /* CONFIG_USE_NEW_FS */
+			if likely(mo_loadblocks != NULL)
+				(*mo_loadblocks)(file, addr, loc.mppl_addr, num_bytes);
 		} EXCEPT {
 			/* Set block states back to NDEF */
 			for (i = start; i < end; ++i)
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
 #ifdef CONFIG_USE_NEW_FS
-			mfile_sizelock_dec_nosignal(file);
+			mfile_trunclock_dec_nosignal(file);
 #endif /* CONFIG_USE_NEW_FS */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
 			decref_unlikely(self);
 			RETHROW();
 		}
+#ifdef CONFIG_USE_NEW_FS
+initdone:
+#endif /* CONFIG_USE_NEW_FS */
+
 		/* Set loaded states back to LOAD */
 		for (i = start; i < end; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
 #ifdef CONFIG_USE_NEW_FS
-		mfile_sizelock_dec_nosignal(file);
+		mfile_trunclock_dec_nosignal(file);
 #endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);

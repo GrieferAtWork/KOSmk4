@@ -141,7 +141,7 @@ mfile_makepart(struct mfile *__restrict self,
  * mapping above the requested location, and more may be returned
  * if a pre-existing part was spans beyond `addr +hint_bytes -1')
  *
- * See also the effect that `mf_size' and `MFILE_F_DELETED' have
+ * See also the effect that `mf_filesize' and `MFILE_F_DELETED' have
  * on the behavior of this function.
  *
  * Note that the caller must ensure that:
@@ -200,7 +200,7 @@ makeanon:
 	 * aligned ceil-size of the underlying mem-part. */
 	{
 		pos_t filsiz;
-		filsiz = self->mf_size;
+		filsiz = self->mf_filesize;
 		filsiz += self->mf_part_amask;
 		filsiz &= ~self->mf_part_amask;
 		if likely(filsiz >= self->mf_part_amask) {
@@ -275,9 +275,9 @@ makeanon:
 	if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS)
 		goto startover;
 #ifdef CONFIG_USE_NEW_FS
-	if (self->mf_size < (loadmax + 1) || loadmax == (pos_t)-1) {
+	if (self->mf_filesize < (loadmax + 1) || loadmax == (pos_t)-1) {
 		pos_t filsiz;
-		filsiz = self->mf_size;
+		filsiz = self->mf_filesize;
 		filsiz += self->mf_part_amask;
 		filsiz &= ~self->mf_part_amask;
 		--filsiz;

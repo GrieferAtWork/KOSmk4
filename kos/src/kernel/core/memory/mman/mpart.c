@@ -554,7 +554,7 @@ again:
 		/* Now to do the actual work: */
 		incref(file);
 #ifdef CONFIG_USE_NEW_FS
-		mfile_sizelock_inc(file);
+		mfile_trunclock_inc(file);
 #endif /* CONFIG_USE_NEW_FS */
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		mpart_lock_release_f(self);
@@ -567,13 +567,23 @@ again:
 			num_bytes = (end - start) << file->mf_blockshift;
 
 #ifdef CONFIG_USE_NEW_FS
-			if unlikely(addr + num_bytes > file->mf_size) {
+			{
+				pos_t filesize;
+#if __SIZEOF_POINTER__ >= __SIZEOF_POS_T__
+				filesize = ATOMIC_READ(file->mf_filesize);
+#else /* __SIZEOF_POINTER__ >= __SIZEOF_POS_T__ */
+				mfile_lock_read(file);
+				filesize = file->mf_filesize;
+				mfile_lock_endread(file);
+#endif /* __SIZEOF_POINTER__ < __SIZEOF_POS_T__ */
 				/* Limit the write-back address range by the size of the file,
 				 * or do nothing if the entirety of said range lies outside of
 				 * the file's effective bounds. */
-				if (addr >= file->mf_size)
-					goto done_writeback;
-				num_bytes = (size_t)(file->mf_size - addr);
+				if unlikely(addr + num_bytes > filesize) {
+					if (addr >= filesize)
+						goto done_writeback;
+					num_bytes = (size_t)(filesize - addr);
+				}
 			}
 #endif /* CONFIG_USE_NEW_FS */
 
@@ -587,7 +597,7 @@ again:
 			for (i = start; i < end; ++i)
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
 #ifdef CONFIG_USE_NEW_FS
-			mfile_sizelock_dec_nosignal(file);
+			mfile_trunclock_dec_nosignal(file);
 #endif /* CONFIG_USE_NEW_FS */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
@@ -602,7 +612,7 @@ done_writeback:
 		for (i = start; i < end; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
 #ifdef CONFIG_USE_NEW_FS
-		mfile_sizelock_dec_nosignal(file);
+		mfile_trunclock_dec_nosignal(file);
 #endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
