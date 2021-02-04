@@ -277,13 +277,6 @@ typedef unsigned int gfp_t;
 
 
 
-/* Use red-black trees for heap internals. */
-#undef CONFIG_HEAP_USE_RBTREE
-#if 1
-#define CONFIG_HEAP_USE_RBTREE
-#endif
-
-
 #ifdef CONFIG_DEBUG_HEAP
 #define SIZEOF_MFREE (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(2))
 #else /* CONFIG_DEBUG_HEAP */

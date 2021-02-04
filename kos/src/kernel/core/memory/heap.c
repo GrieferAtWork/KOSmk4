@@ -52,7 +52,7 @@
 #include <string.h>
 
 /* Define the ABI for the address tree used by heaps. */
-#ifdef CONFIG_HEAP_USE_RBTREE
+
 /* NOTE: Use left-leaning trees so we only have to keep track of 2 pointers
  *       relating within the tree-portion of `struct mfree', rather than the
  *       3 pointers that would be required for normal RB-Trees.
@@ -75,17 +75,7 @@
 #define RBTREE_SETRED(self)    ((self)->mf_flags |= MFREE_FRED)
 #define RBTREE_SETBLACK(self)  ((self)->mf_flags &= ~MFREE_FRED)
 #include <hybrid/sequence/rbtree-abi.h>
-#else /* CONFIG_HEAP_USE_RBTREE */
-#define ATREE(x)       mfree_tree_##x
-#define ATREE_CALL     KCALL
-#define ATREE_NOTHROW  NOTHROW
-#define ATREE_NODE_MIN MFREE_MIN
-#define ATREE_NODE_MAX MFREE_MAX
-#define Tkey           VIRT uintptr_t
-#define T              struct mfree
-#define N_NODEPATH     mf_laddr
-#include <hybrid/sequence/atree-abi.h>
-#endif /* !CONFIG_HEAP_USE_RBTREE */
+
 
 #if 0 /* Quick toggle to disable all debugging aids. */
 #undef CONFIG_DEBUG_HEAP
@@ -407,7 +397,6 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        "Free node at %p...%p contains invalid flags %#x",
 			        &iter->mf_flags, MFREE_MIN(iter),
 			        MFREE_MAX(iter), iter->mf_flags);
-#ifdef CONFIG_HEAP_USE_RBTREE
 			assertf(!iter->mf_laddr.rb_lhs || quick_verify_mfree(iter->mf_laddr.rb_lhs),
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
 			        "Free node at %p...%p has broken lhs-pointer to invalid node at %p",
@@ -420,20 +409,6 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        (uintptr_t)&iter->mf_laddr.rb_rhs,
 			        (uintptr_t)&iter->mf_laddr.rb_rhs + sizeof(void *) - 1,
 			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_laddr.rb_rhs);
-#else /* CONFIG_HEAP_USE_RBTREE */
-			assertf(!iter->mf_laddr.a_min || quick_verify_mfree(iter->mf_laddr.a_min),
-			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p...%p has broken min-pointer to invalid node at %p",
-			        (uintptr_t)&iter->mf_laddr.a_min,
-			        (uintptr_t)&iter->mf_laddr.a_min + sizeof(void *) - 1,
-			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_laddr.a_min);
-			assertf(!iter->mf_laddr.a_max || quick_verify_mfree(iter->mf_laddr.a_max),
-			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p...%p has broken max-pointer to invalid node at %p",
-			        (uintptr_t)&iter->mf_laddr.a_max,
-			        (uintptr_t)&iter->mf_laddr.a_max + sizeof(void *) - 1,
-			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_laddr.a_max);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 			assertf(iter->mf_lsize.ln_pself == piter,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
 			        "Expected self pointer of free node %p...%p at %p, but is actually at %p",
@@ -738,11 +713,6 @@ PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
                                              VIRT void *ptr, size_t num_bytes,
                                              gfp_t flags) {
-#ifndef CONFIG_HEAP_USE_RBTREE
-	ATREE_SEMI_T(uintptr_t) addr_semi;
-	ATREE_LEVEL_T addr_level;
-	struct mfree **pslot;
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 	struct mfree *slot, *new_slot;
 #ifdef CONFIG_DEBUG_HEAP
 #ifdef CONFIG_HEAP_TRACE_DANGLE
@@ -763,22 +733,9 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 	             ptr, (uintptr_t)ptr + num_bytes - 1);
 
 	/* Search for a node below, which could then be extended above. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 	slot = mfree_tree_remove(&self->h_addr, (uintptr_t)ptr - 1);
-	if (slot)
-#else /* CONFIG_HEAP_USE_RBTREE */
-	addr_semi  = ATREE_SEMI0(uintptr_t);
-	addr_level = ATREE_LEVEL0(uintptr_t);
-	pslot = mfree_tree_plocate_at(&self->h_addr, (uintptr_t)ptr - 1,
-	                              &addr_semi, &addr_level);
-	if (pslot)
-#endif /* !CONFIG_HEAP_USE_RBTREE */
-	{
+	if (slot) {
 		struct mfree *high_slot;
-#ifndef CONFIG_HEAP_USE_RBTREE
-		slot = *pslot;
-		HEAP_ASSERTE(mfree_tree_pop_at(pslot, addr_semi, addr_level) == slot);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(slot, mf_lsize);
 
 		/* Extend this node above. */
@@ -821,21 +778,8 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 #endif /* CONFIG_DEBUG_HEAP */
 
 		/* Check if there is another node above that we must now merge with. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 		high_slot = mfree_tree_remove(&self->h_addr, (uintptr_t)ptr + num_bytes);
-		if unlikely(high_slot)
-#else /* CONFIG_HEAP_USE_RBTREE */
-		addr_semi  = ATREE_SEMI0(uintptr_t);
-		addr_level = ATREE_LEVEL0(uintptr_t);
-		pslot = mfree_tree_plocate_at(&self->h_addr, (uintptr_t)ptr + num_bytes,
-		                              &addr_semi, &addr_level);
-		if unlikely(pslot)
-#endif /* !CONFIG_HEAP_USE_RBTREE */
-		{
-#ifndef CONFIG_HEAP_USE_RBTREE
-			high_slot = *pslot;
-			HEAP_ASSERTE(mfree_tree_pop_at(pslot, addr_semi, addr_level) == high_slot);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
+		if unlikely(high_slot) {
 			/* Include this high-slot in the union that will be freed. */
 			LLIST_REMOVE(high_slot, mf_lsize);
 #ifndef CONFIG_DEBUG_HEAP
@@ -890,23 +834,10 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 	}
 
 	/* Search for a node above, which could then be extended below. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 	slot = mfree_tree_remove(&self->h_addr, (uintptr_t)ptr + num_bytes);
-	if (slot)
-#else /* CONFIG_HEAP_USE_RBTREE */
-	addr_semi  = ATREE_SEMI0(uintptr_t);
-	addr_level = ATREE_LEVEL0(uintptr_t);
-	pslot = mfree_tree_plocate_at(&self->h_addr, (uintptr_t)ptr + num_bytes,
-	                              &addr_semi, &addr_level);
-	if (pslot)
-#endif /* !CONFIG_HEAP_USE_RBTREE */
-	{
+	if (slot) {
 		gfp_t slot_flags;
 		size_t slot_size;
-#ifndef CONFIG_HEAP_USE_RBTREE
-		slot = *pslot;
-		HEAP_ASSERTE(mfree_tree_pop_at(pslot, addr_semi, addr_level) == slot);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(slot, mf_lsize);
 		/* Extend this node below. */
 
@@ -1186,11 +1117,7 @@ again:
 		if (tail_keep && tail_keep < HEAP_MINSIZE)
 			continue;
 		/* Remove this chain entry. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 		mfree_tree_removenode(&self->h_addr, chain);
-#else /* CONFIG_HEAP_USE_RBTREE */
-		HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(chain, mf_lsize);
 		sync_endwrite(&self->h_lock);
 

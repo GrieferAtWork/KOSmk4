@@ -693,11 +693,7 @@ search_heap:
 		}
 		if (!chain)
 			continue;
-#ifdef CONFIG_HEAP_USE_RBTREE
 		mfree_tree_removenode(&self->h_addr, chain);
-#else /* CONFIG_HEAP_USE_RBTREE */
-		HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		/* Track the potentially unused data size as dangling data. */
@@ -942,35 +938,19 @@ PRIVATE WUNUSED NONNULL((1)) size_t
 NOTHROW_NX(KCALL FUNC(heap_allat_partial))(struct heap *__restrict self,
                                            VIRT void *__restrict ptr,
                                            gfp_t flags) {
-#ifndef CONFIG_HEAP_USE_RBTREE
-	ATREE_SEMI_T(uintptr_t) addr_semi;
-	ATREE_LEVEL_T addr_level;
-	struct mfree **pslot;
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 	gfp_t slot_flags;
 	size_t result;
 	struct mfree *slot;
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	TRACE(PP_STR(FUNC(heap_allat_partial)) "(%p, %p, %#x)\n", self, ptr, flags);
 again:
-#ifndef CONFIG_HEAP_USE_RBTREE
-	addr_semi  = ATREE_SEMI0(uintptr_t);
-	addr_level = ATREE_LEVEL0(uintptr_t);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 
 	if (!FUNC(heap_acquirelock)(self, flags))
 		IFELSE_NX(return 0, THROW(E_WOULDBLOCK_PREEMPTED));
 
 	/* Check if the requested address is in cache. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 	slot = mfree_tree_locate(self->h_addr, (uintptr_t)ptr);
-	if (!slot)
-#else /* CONFIG_HEAP_USE_RBTREE */
-	pslot = mfree_tree_plocate_at(&self->h_addr, (uintptr_t)ptr,
-	                              &addr_semi, &addr_level);
-	if (!pslot)
-#endif /* !CONFIG_HEAP_USE_RBTREE */
-	{
+	if (!slot) {
 		PAGEDIR_PAGEALIGNED void *pageaddr;
 		sync_endwrite(&self->h_lock);
 		/* Not in cache. Try to allocate associated core memory. */
@@ -993,17 +973,10 @@ again:
 		heap_free_raw(self, pageaddr, PAGESIZE, flags | GFP_NOTRIM);
 		goto again;
 	}
-#ifndef CONFIG_HEAP_USE_RBTREE
-	slot = *pslot;
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 	HEAP_ASSERT(ptr >= (void *)MFREE_BEGIN(slot));
 	if (ptr == (void *)MFREE_BEGIN(slot)) {
 		/* Allocate this entire slot, then remove unused memory from the end. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 		mfree_tree_removenode(&self->h_addr, slot);
-#else /* CONFIG_HEAP_USE_RBTREE */
-		HEAP_ASSERTE(mfree_tree_pop_at(pslot, addr_semi, addr_level) == slot);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(slot, mf_lsize);
 		sync_endwrite(&self->h_lock);
 		result     = slot->mf_size;
@@ -1078,11 +1051,7 @@ again:
 			              GFP_NOTRIM);
 			goto again;
 		}
-#ifdef CONFIG_HEAP_USE_RBTREE
 		mfree_tree_removenode(&self->h_addr, slot);
-#else /* CONFIG_HEAP_USE_RBTREE */
-		HEAP_ASSERTE(mfree_tree_pop_at(pslot, addr_semi, addr_level) == slot);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 		LLIST_REMOVE(slot, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		/* Trace leading free data as dangling. */
@@ -1247,11 +1216,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			/* Check if the node still contains enough memory for the requested allocation. */
 			if ((alignment_base + alloc_bytes) > (byte_t *)MFREE_END(chain))
 				continue; /* The chain entry is too small once alignment was taken into consideration. */
-#ifdef CONFIG_HEAP_USE_RBTREE
 			mfree_tree_removenode(&self->h_addr, chain);
-#else /* CONFIG_HEAP_USE_RBTREE */
-			HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 			LLIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 			/* Trace potentially unused data as dangling. */
