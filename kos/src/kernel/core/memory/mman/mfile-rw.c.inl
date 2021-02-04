@@ -104,7 +104,6 @@ DECL_BEGIN
 #ifdef LIBVIO_CONFIG_ENABLED
 PUBLIC NONNULL((1)) void KCALL
 LOCAL_mfile_vio_rw(struct mfile *__restrict self,
-                   struct mpart *part,
                    LOCAL_buffer_t buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
                    size_t buf_offset,
@@ -118,7 +117,6 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
 	args.va_acmap_offset = 0;
 	args.va_state        = NULL;
 	args.va_file         = self;
-	args.va_part         = part;
 #if defined(DEFINE_mfile_read)
 	vio_copyfromvio(&args, (vio_addr_t)offset, buffer, num_bytes);
 #elif defined(DEFINE_mfile_write)
@@ -229,7 +227,7 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
 	if unlikely(mfile_isanon(self)) {
 		if (mfile_getvio(self) != NULL) {
 			/* Directly read to/from VIO */
-			LOCAL_mfile_vio_rw(self, NULL, buffer,
+			LOCAL_mfile_vio_rw(self, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
 			                   buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */

@@ -782,6 +782,7 @@ do_handle_iob_node_access:
 		if (mf.mfl_part->mp_state == MPART_ST_VIO) {
 			struct vio_emulate_args args;
 			uintptr_t node_flags;
+			REF struct mpart *part;
 
 #ifdef CONFIG_HAVE_DEBUGGER
 			/* Don't dispatch VIO while in debugger-mode. */
@@ -798,27 +799,27 @@ do_handle_iob_node_access:
 			args.vea_args.va_acmap_offset = (vio_addr_t)(mf.mfl_node->mn_partoff +
 			                                             (size_t)((byte_t *)mf.mfl_addr -
 			                                                      (byte_t *)mnode_getaddr(mf.mfl_node)));
-			args.vea_args.va_part         = incref(mf.mfl_part);
 			args.vea_ptrlo                = mnode_getminaddr(mf.mfl_node);
 			args.vea_ptrhi                = mnode_getmaxaddr(mf.mfl_node);
 			args.vea_addr                 = vioargs_vioaddr(&args.vea_args, args.vea_ptrlo);
+			part                          = incref(mf.mfl_part);
 			mman_lock_release(mf.mfl_mman);
 			mfault_fini(&mf);
 
 			TRY {
-				mpart_lock_acquire(args.vea_args.va_part);
+				mpart_lock_acquire(part);
 			} EXCEPT {
-				decref(args.vea_args.va_part);
+				decref(part);
 				RETHROW();
 			}
-			args.vea_args.va_file = incref(args.vea_args.va_part->mp_file);
+			args.vea_args.va_file = incref(part->mp_file);
 			args.vea_args.va_ops  = mfile_getvio(args.vea_args.va_file);
-			mpart_lock_release(args.vea_args.va_part);
+			mpart_lock_release(part);
 
 			/* Ensure that VIO operators are present. */
 			if unlikely(!args.vea_args.va_ops) {
 				decref_unlikely(args.vea_args.va_file);
-				decref_unlikely(args.vea_args.va_part);
+				decref_unlikely(part);
 				goto pop_connections_and_throw_segfault;
 			}
 
@@ -832,7 +833,7 @@ do_handle_iob_node_access:
 					                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
 cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					decref_unlikely(args.vea_args.va_file);
-					decref_unlikely(args.vea_args.va_part);
+					decref_unlikely(part);
 					goto pop_connections_and_set_exception_pointers2;
 #define NEED_pop_connections_and_set_exception_pointers2
 				}
@@ -904,7 +905,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					 * If we did a normal RETHROW() here, then the (currently correct) return PC
 					 * would get overwritten with the VIO function address. */
 					decref_unlikely(args.vea_args.va_file);
-					decref_unlikely(args.vea_args.va_part);
+					decref_unlikely(part);
 					task_popconnections();
 					if (FAULT_IS_USER)
 						PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
@@ -916,7 +917,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					x86_userexcept_unwind_interrupt(state);
 				}
 				decref_unlikely(args.vea_args.va_file);
-				decref_unlikely(args.vea_args.va_part);
+				decref_unlikely(part);
 				goto pop_connections_and_return;
 			}
 do_normal_vio:
@@ -938,12 +939,12 @@ do_normal_vio:
 				viocore_emulate(&args);
 			} EXCEPT {
 				decref_unlikely(args.vea_args.va_file);
-				decref_unlikely(args.vea_args.va_part);
+				decref_unlikely(part);
 				/*task_popconnections();*/ /* Handled by outer EXCEPT */
 				RETHROW();
 			}
 			decref_unlikely(args.vea_args.va_file);
-			decref_unlikely(args.vea_args.va_part);
+			decref_unlikely(part);
 			task_popconnections();
 #ifndef __x86_64__
 			/* Check if the kernel %esp or %ss was modified */
@@ -1583,7 +1584,6 @@ decref_part_and_pop_connections_and_throw_segfault:
 						decref_unlikely(part);
 						goto pop_connections_and_throw_segfault;
 					}
-					args.vea_args.va_part       = part; /* Inherit reference */
 					args.vea_args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 					/* Check for special case: call into VIO memory */
 					if (args.vea_args.va_ops->vo_call && (uintptr_t)addr == pc) {
@@ -1595,8 +1595,7 @@ decref_part_and_pop_connections_and_throw_segfault:
 							                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
 cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							decref_unlikely(args.vea_args.va_file);
-							assert(args.vea_args.va_part == part);
-							decref_unlikely(args.vea_args.va_part);
+							decref_unlikely(part);
 							goto pop_connections_and_set_exception_pointers2;
 						}
 						/* Special case: call into VIO memory */
@@ -1670,11 +1669,10 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 								}
 							}
 							decref_unlikely(args.vea_args.va_file);
-							assert(args.vea_args.va_part == part);
 							/* Directly unwind the exception, since we've got a custom return-pc set-up.
 							 * If we did a normal RETHROW() here, then the (currently correct) return PC
 							 * would get overwritten with the VIO function address. */
-							decref_unlikely(args.vea_args.va_part);
+							decref_unlikely(part);
 							task_popconnections();
 							if (FAULT_IS_USER)
 								PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
@@ -1685,9 +1683,8 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
 							x86_userexcept_unwind_interrupt(state);
 						}
-						assert(args.vea_args.va_part == part);
 						decref_unlikely(args.vea_args.va_file);
-						decref_unlikely(args.vea_args.va_part);
+						decref_unlikely(part);
 						task_popconnections();
 						return state;
 					}
@@ -1716,14 +1713,12 @@ do_normal_vio:
 						viocore_emulate(&args);
 					} EXCEPT {
 						decref_unlikely(args.vea_args.va_file);
-						assert(args.vea_args.va_part == part);
-						/*decref_unlikely(args.vea_args.va_part);*/ /* Handled by outer EXCEPT */
+						/*decref_unlikely(part);*/ /* Handled by outer EXCEPT */
 						/*task_popconnections();*/ /* Handled by outer EXCEPT */
 						RETHROW();
 					}
 					decref_unlikely(args.vea_args.va_file);
-					assert(args.vea_args.va_part == part);
-					decref_unlikely(args.vea_args.va_part);
+					decref_unlikely(part);
 					task_popconnections();
 #ifndef __x86_64__
 					/* Check if the kernel %esp or %ss was modified */

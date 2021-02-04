@@ -236,7 +236,6 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			        self->db_vio,
 			        self->i_type);
 			args.va_file         = self;
-			args.va_part         = NULL;
 			args.va_acmap_page   = 0;
 			args.va_acmap_offset = 0;
 			args.va_state        = NULL;

@@ -77,10 +77,8 @@ struct vioargs {
 #ifdef __KERNEL__
 #ifdef CONFIG_USE_NEW_VM
 	struct mfile               *va_file;         /* [1..1] The mem-file that is being accessed. */
-	struct mpart               *va_part;         /* [0..1] The mem-part that is being accessed. */
 #else /* CONFIG_USE_NEW_VM */
 	struct vm_datablock        *va_file;         /* [1..1] The data block that is being accessed. */
-	struct vm_datapart         *va_part;         /* [0..1] The part that is being accessed. */
 #endif /* !CONFIG_USE_NEW_VM */
 #else /* __KERNEL__ */
 	void                       *va_cookie;       /* [?..?] The cookie registered alongside the VIO mapping. */

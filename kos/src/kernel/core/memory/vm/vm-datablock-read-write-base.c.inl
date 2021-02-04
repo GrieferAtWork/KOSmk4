@@ -345,8 +345,7 @@ KCALL vm_datablock_vio_write
 #else
 	struct vioargs args;
 	args.va_ops          = self->db_vio;
-	args.va_file        = self;
-	args.va_part         = NULL;
+	args.va_file         = self;
 	args.va_acmap_page   = 0;
 	args.va_acmap_offset = 0;
 	args.va_state        = NULL;

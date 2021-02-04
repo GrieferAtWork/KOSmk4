@@ -268,7 +268,6 @@ handle_vio_or_not_faulted:
 				vio_addr_t vio_addr;
 				args.va_ops             = block->db_vio;
 				args.va_file            = block;
-				args.va_part            = part;
 				args.va_acmap_offset    = vm_datapart_minbyte(part);
 				args.va_acmap_page      = node_minaddr;
 				args.va_state           = *pstate;

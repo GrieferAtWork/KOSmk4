@@ -966,11 +966,7 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 
 	/* Load VM component pointers. */
 	args.vea_args.va_file = vm_get_kernreserve_node(myvm)->vn_block;
-	args.vea_args.va_part = vm_get_kernreserve_node(myvm)->vn_part;
 	assert(args.vea_args.va_file);
-	assert(args.vea_args.va_part);
-	assert(args.vea_args.va_part->dp_block == args.vea_args.va_file);
-	assert(args.vea_args.va_part->dp_state == VM_DATAPART_STATE_VIOPRT);
 	assert(args.vea_args.va_file->db_vio);
 
 	/* Load the VIO dispatch table */

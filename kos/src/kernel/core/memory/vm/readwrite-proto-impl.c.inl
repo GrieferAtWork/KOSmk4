@@ -158,7 +158,6 @@ throw_segfault:
 				decref_unlikely(part);
 				goto throw_segfault;
 			}
-			args.va_part       = part; /* Inherit reference */
 			args.va_acmap_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 			args.va_state      = NULL;
 			/* Make sure that the segment was mapped with the proper protection */

@@ -229,7 +229,7 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		/* Technically, we're supposed to check that `filepos' is still in-bounds
 		 * of our mem-part, but doing so is kind-of redundant, which is why we
 		 * don't actually do that check! */
-		LOCAL_mfile_vio_rw(file, self, buffer,
+		LOCAL_mfile_vio_rw(file, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
 		                   buf_offset,
 #endif /* LOCAL_BUFFER_IS_AIO */
