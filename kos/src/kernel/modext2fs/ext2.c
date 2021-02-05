@@ -690,7 +690,7 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	if unlikely(!num_block_groups)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
-	mfile_init_blockshift(self, 10 + LETOH32(super.e_log2_blocksz));
+	_mfile_init_blockshift(self, 10 + LETOH32(super.e_log2_blocksz));
 	if unlikely(self->sd_block_shift >= PAGESHIFT)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 	self->sd_ind_blocksize = ((size_t)1 << self->sd_block_shift) / 4;

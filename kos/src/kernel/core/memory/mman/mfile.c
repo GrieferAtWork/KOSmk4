@@ -118,6 +118,11 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	        "Any remaining part should have kept us alive!\n"
 	        "self->db_parts = %p\n",
 	        self->mf_parts);
+	assertf(self->mf_changed.slh_first == NULL ||
+	        self->mf_changed.slh_first == MFILE_PARTS_ANONYMOUS,
+	        "Any remaining part should have kept us alive!\n"
+	        "self->mf_changed.slh_first = %p\n",
+	        self->mf_changed.slh_first);
 	sig_broadcast_for_fini(&self->mf_initdone);
 	if (self->mf_ops->mo_destroy) {
 		(*self->mf_ops->mo_destroy)(self);

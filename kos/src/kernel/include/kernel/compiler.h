@@ -86,6 +86,32 @@
 #define mbuilder  vmb
 #endif /* !CONFIG_USE_NEW_VM */
 
+#ifdef CONFIG_USE_NEW_FS
+/* Backward-compatibility */
+#define inode            fnode
+#define regular_node     fregnode
+#define directory_node   fdirnode
+#define superblock       fsuper
+#define symlink_node     flnknode
+#define fifo_node        ffifonode
+#define socket_node      fsocknode
+#define block_device     blkdev
+#define character_device chrdev
+#define directory_entry  fdirent
+#else /* CONFIG_USE_NEW_FS */
+/* Forward-compatibility */
+#define fnode       inode
+#define fregnode    regular_node
+#define fdirnode    directory_node
+#define fsuper      superblock
+#define flnknode    symlink_node
+#define ffifonode   fifo_node
+#define fsocknode   socket_node
+#define blkdev      block_device
+#define chrdev      character_device
+#define fdirent     directory_entry
+#endif /* !CONFIG_USE_NEW_FS */
+
 
 
 

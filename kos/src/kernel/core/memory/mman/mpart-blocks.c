@@ -257,9 +257,12 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 
 		/* If defined, invoke the part-changed callback of the file. */
 #ifdef CONFIG_USE_NEW_FS
-		if (!(ATOMIC_FETCHOR(self->mf_flags, MFILE_F_CHANGED) & MFILE_F_CHANGED)) {
-			if (self->mf_ops->mo_changed != NULL)
-				(*self->mf_ops->mo_changed)(self, part);
+		{
+			uintptr_t old_flags, new_flags;
+			old_flags = ATOMIC_FETCHOR(self->mf_flags, MFILE_F_CHANGED);
+			new_flags = old_flags | MFILE_F_CHANGED;
+			if (old_flags != new_flags && self->mf_ops->mo_changed)
+				(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
 		}
 #else /* CONFIG_USE_NEW_FS */
 		if (self->mf_ops->mo_changed != NULL)

@@ -22,6 +22,13 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/fdirnode.h>
+#include <kernel/fs/fnode.h>
+#include <kernel/fs/fregnode.h>
+
+
+#else /* CONFIG_USE_NEW_FS */
 #include <dev/block.h>
 #include <kernel/driver.h>
 #include <kernel/types.h>
@@ -61,7 +68,10 @@ struct handle;
 struct stat;
 struct vfs;
 
+#ifndef __fsmode_t_defined
+#define __fsmode_t_defined 1
 typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
+#endif /* !__fsmode_t_defined */
 
 /* The callback invoked by directory enumerators. */
 typedef NONNULL((1)) void
@@ -2405,5 +2415,6 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct super
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_FS_NODE_H */

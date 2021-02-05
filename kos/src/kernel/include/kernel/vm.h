@@ -650,7 +650,7 @@ DECL_END
 #define DEFINE_PERMMAN_CLONE  DEFINE_PERVM_CLONE
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 /* NOTE: The new block_shift is the same as the old `db_addrshift'! */
-#define mfile_init_blockshift(self, block_shift)               \
+#define _mfile_init_blockshift(self, block_shift)              \
 	((self)->db_addrshift = (block_shift),                     \
 	 (self)->db_pageshift = PAGESHIFT - (self)->db_addrshift,  \
 	 (self)->db_pagealign = (size_t)1 << (self)->db_pageshift, \
@@ -662,14 +662,14 @@ DECL_END
 	 (self)->db_type  = (ops),             \
 	 (self)->db_vio   = __NULLPTR,         \
 	 (self)->db_parts = __NULLPTR,         \
-	 mfile_init_blockshift(self, block_shift))
+	 _mfile_init_blockshift(self, block_shift))
 #define mfile_cinit(self, ops, block_shift)          \
 	((self)->db_refcnt = 1,                          \
 	 rwlock_cinit(&(self)->db_lock),                 \
 	 (self)->db_type = (ops),                        \
 	 __hybrid_assert((self)->db_vio == __NULLPTR),   \
 	 __hybrid_assert((self)->db_parts == __NULLPTR), \
-	 mfile_init_blockshift(self, block_shift))
+	 _mfile_init_blockshift(self, block_shift))
 #define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift) \
 	{                                                          \
 		/* .db_refcnt = */ refcnt,                             \

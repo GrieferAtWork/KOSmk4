@@ -392,7 +392,7 @@ ramfs_open(struct superblock *__restrict self,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	self->s_features.sf_magic = RAMFS_MAGIC;
 	self->i_type              = &ramfs_directory_type;
-	mfile_init_blockshift(self, PAGESHIFT);
+	_mfile_init_blockshift(self, PAGESHIFT);
 	self->i_fileino   = (ino_t)(uintptr_t)self;
 	self->i_filesize  = 0;
 	self->i_filemode  = S_IFDIR | 0755;

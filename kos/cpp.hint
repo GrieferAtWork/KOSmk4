@@ -1391,6 +1391,23 @@
 #define __USERKERN_PAD_GID(x)
 
 
+#define MFILE_OPS_FIELDS(prefix, T)\
+	void (*prefix##destroy)(T *self);\
+	struct mpart *(*prefix##newpart)(T *self, pos_t minaddr, size_t num_bytes);\
+	void (*prefix##loadblocks)(T *self, pos_t addr, physaddr_t buf, size_t num_bytes);\
+	void (*prefix##saveblocks)(T *self, pos_t addr, physaddr_t buf, size_t num_bytes);\
+	void (*prefix##changed)(T *self, uintptr_t oldflags, uintptr_t newflags);\
+	struct mfile_stream_ops const *prefix##stream;\
+	struct vio_operators const *prefix##vio
+#define FNODE_OPS_FIELDS(prefix, T) MFILE_OPS_FIELDS(prefix, T)
+#define FDIRNODE_OPS_FIELDS(prefix, T)\
+	FNODE_OPS_FIELDS(prefix, T);\
+	struct fdirent *(*prefix##lookup)(T *self, struct flookup_info *info);\
+	void (*prefix##enum)(T *self, struct fdirenum *result);\
+	void (*prefix##mkfile)(T *self, struct fmkfile_info *info);\
+	void (*prefix##unlink)(T *self, struct fdirent *entry, struct fnode *file);\
+	void (*prefix##rename)(T *self, struct frename_info *info)
+
 #define BZ_EXTERN
 #define BZ_API(f) f
 #define PIXMAN_API

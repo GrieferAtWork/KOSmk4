@@ -687,7 +687,12 @@ part_setcore:
 				                                          (u64)filesize,
 				                                          (u64)newsize);
 				if (oldsize == filesize) {
-					mfile_handle_attrchanged(self);
+					/* Successfully altered the file's size. */
+					uintptr_t old_flags, new_flags;
+					old_flags = ATOMIC_FETCHOR(self->mf_flags, MFILE_F_ATTRCHANGED);
+					new_flags = old_flags | MFILE_F_ATTRCHANGED;
+					if (old_flags != new_flags && self->mf_ops->mo_changed)
+						(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
 					break;
 				}
 				filesize = oldsize;
@@ -1074,11 +1079,13 @@ handle_part_insert_failure:
 		/* Always broadcast because we've just increased the file's size! */
 		sig_broadcast(&self->mf_initdone);
 		if (changes != 0) {
+			uintptr_t old_flags, new_flags;
 			/* Atomically mark `self' as changed, and check which (if
 			 * any) of the changed-bits hadn't already been set. */
-			changes = ~ATOMIC_FETCHOR(self->mf_flags, changes) & changes;
-			if (changes != 0 && self->mf_ops->mo_changed)
-				(*self->mf_ops->mo_changed)(self, changes);
+			old_flags = ATOMIC_FETCHOR(self->mf_flags, changes);
+			new_flags = old_flags | changes;
+			if (old_flags != new_flags && self->mf_ops->mo_changed)
+				(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
 		}
 	} /* Scope.... */
 

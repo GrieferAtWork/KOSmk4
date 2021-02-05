@@ -331,7 +331,7 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 		case 4096: block_shift = 12; break;
 		default: THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		}
-		mfile_init_blockshift(self, block_shift);
+		_mfile_init_blockshift(self, block_shift);
 	}
 	{
 		DirectoryEntry *root;

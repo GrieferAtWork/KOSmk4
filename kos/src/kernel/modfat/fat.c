@@ -2612,7 +2612,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		if unlikely(!IS_POWER_OF_TWO(sector_size))
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		self->f_sectorsize = sector_size;
-		mfile_init_blockshift(self, CTZ(sector_size));
+		_mfile_init_blockshift(self, CTZ(sector_size));
 #else /* CONFIG_USE_NEW_VM */
 #if PAGESIZE < 512
 #error "System page size is too small to support any FAT variation"
