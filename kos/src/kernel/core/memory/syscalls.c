@@ -64,26 +64,27 @@ STATIC_ASSERT(PROT_LOOSE  == VM_PROT_LOOSE);
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-LOCAL REF struct vm_datablock *KCALL
+LOCAL void KCALL
 getdatablock_from_handle(unsigned int fd,
-                         pos_t *__restrict pminoffset,
-                         pos_t *__restrict pnumbytes,
-                         REF struct path **__restrict pdatablock_fspath,
-                         REF struct directory_entry **__restrict pdatablock_fsname) {
-	REF struct vm_datablock *result;
+                         struct handle_mmap_info *__restrict info) {
 	struct handle hnd = handle_lookup(fd);
 	TRY {
-		result = handle_mmap(hnd,
-		                     pminoffset,
-		                     pnumbytes,
-		                     pdatablock_fspath,
-		                     pdatablock_fsname);
+#ifndef NDEBUG
+		info->hmi_file = NULL;
+#endif /* !NDEBUG */
+		info->hmi_minaddr = (pos_t)0;
+		info->hmi_maxaddr = (pos_t)-1;
+		info->hmi_fspath  = NULL;
+		info->hmi_fsname  = NULL;
+		handle_mmap(hnd, info);
+#ifndef NDEBUG
+		assert(info->hmi_file != NULL);
+#endif /* !NDEBUG */
 	} EXCEPT {
 		decref(hnd);
 		RETHROW();
 	}
 	decref(hnd);
-	return result;
 }
 
 
@@ -227,12 +228,14 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 	datablock_fspath = NULL;
 	datablock_fsname = NULL;
 	if (!(flags & MAP_ANONYMOUS)) {
+		struct handle_mmap_info info;
 		/* File mapping */
-		datablock = getdatablock_from_handle(fd,
-		                                     &file_minoffset,
-		                                     &file_maxnumbytes,
-		                                     &datablock_fspath,
-		                                     &datablock_fsname);
+		getdatablock_from_handle((unsigned int)fd, &info);
+		datablock        = info.hmi_file;
+		file_minoffset   = info.hmi_minaddr;
+		file_maxnumbytes = (info.hmi_maxaddr - info.hmi_minaddr) + 1;
+		datablock_fspath = info.hmi_fspath;
+		datablock_fsname = info.hmi_fsname;
 	} else if (!(flags & MAP_UNINITIALIZED) ||
 	           !capable(CAP_MMAP_UNINITIALIZED)) {
 		/* Zero-initialized, anonymous memory */

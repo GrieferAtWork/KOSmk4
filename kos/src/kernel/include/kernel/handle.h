@@ -73,6 +73,31 @@ struct handle_weakref_ops {
 };
 
 
+struct handle_mmap_info {
+	/* mmap information to-be filled in by implementations of the `h_mmap' operator.
+	 * Note that the caller will have already filled in fields as:
+	 *   - hmi_minaddr = 0;
+	 *   - hmi_maxaddr = (pos_t)-1;
+	 *   - hmi_fspath  = NULL;
+	 *   - hmi_fsname  = NULL;
+	 * Meaning that in order to comply with requirements, the `h_mmap' implementation
+	 * only needs to fill in `hmi_file' in order to be able to indicate success. */
+	REF struct mfile           *hmi_file;    /* [1..1][out] The file that should be mapped. */
+	pos_t                       hmi_minaddr; /* [in|out] Lowest mmap-able address from `hmi_file'. This value will also
+	                                          * be used as an addend to the offset-argument of `mmap(2)', meaning that
+	                                          * any file-map operation will be relative to this. */
+	pos_t                       hmi_maxaddr; /* [in|out] Similar to `hmi_minaddr': The max address that may be mapped
+	                                          * by user-space. Note that this field slightly differs from an mmap
+	                                          * limit which may be imposed by `hmi_file->mf_filesize': Whereas
+	                                          * the later will throw `E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE'
+	                                          * when trying to mmap beyond the end of a file, attempting to mmap
+	                                          * memory beyond this address will simply result in mfile_zero to be
+	                                          * mapped within that area, rather than the intended file being mapped.
+	                                          * s.a. `mman_map_subrange()' and `mfile_getpart()' */
+	REF struct path            *hmi_fspath;  /* [0..1][in|out] Filesystem path of `hmi_file' */
+	REF struct directory_entry *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */
+};
+
 #ifdef __INTELLISENSE__
 DATDEF
 #endif /* __INTELLISENSE__ */
@@ -151,26 +176,9 @@ struct handle_types {
 	void (NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, pos_t new_size)
 			/*THROWS(...)*/;
 
-	/* @param: pminoffset: Set to a base offset to-be added to the mmap file-offset when mapping memory.
-	 *                     Handle operators are not required to set this value.
-	 *                     It is default initialized to `(pos_t)0'
-	 * @param: pnumbytes:  Set to the max number of bytes which may be mapped, starting at `*pminoffset'.
-	 *                     Handle operators are not required to set this value.
-	 *                     It is default initialized to `(pos_t)-1'
-	 * @param: pdatablock_fspath: [0..1][1..1] Optional:
-	 *                     May be filled in the filesystem path to the mapped object.
-	 *                     It is default initialized to `NULL'
-	 * @param: pdatablock_fsname: [0..1][1..1] Optional:
-	 *                     May be filled in the filesystem name of the mapped object.
-	 *                     It is default initialized to `NULL'
-	 * @return: * :        The datablock to-be used for mapping this handle into memory (never NULL). */
-	REF struct vm_datablock *
-	(ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) KCALL *
-	 h_mmap[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
-	                            pos_t *__restrict pminoffset,
-	                            pos_t *__restrict pnumbytes,
-	                            REF struct path **__restrict pdatablock_fspath,
-	                            REF struct directory_entry **__restrict pdatablock_fsname)
+	/* Return information on how this handle might be used in a call to `mmap(2)' */
+	void (NONNULL((1, 2)) KCALL *h_mmap[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
+	                                                        struct handle_mmap_info *__restrict info)
 			/*THROWS(...)*/;
 
 	/* @return: * : The amount of newly allocated bytes. */
@@ -281,7 +289,7 @@ FUNDEF NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict
 #define handle_ioctl(self, cmd, arg)                             HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, (self).h_mode)
 #define handle_ioctlf(self, cmd, arg, flags)                     HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, flags)
 #define handle_truncate(self, new_size)                          HANDLE_FUNC(self, h_truncate)((self).h_data, new_size)
-#define handle_mmap(self, pminoffset, pnumbytes, pdatablock_fspath, pdatablock_fsname) HANDLE_FUNC(self, h_mmap)((self).h_data, pminoffset, pnumbytes, pdatablock_fspath, pdatablock_fsname)
+#define handle_mmap(self, info)                                  HANDLE_FUNC(self, h_mmap)((self).h_data, info)
 #define handle_allocate(self, mode, start, length)               HANDLE_FUNC(self, h_allocate)((self).h_data, mode, start, length)
 #define handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
 #define handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)

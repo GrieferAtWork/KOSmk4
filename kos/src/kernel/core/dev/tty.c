@@ -297,24 +297,15 @@ predict_output_device_command:
 }
 
 
-INTERN NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 tty_device_mmap(struct character_device *__restrict self,
-                pos_t *__restrict pminoffset,
-                pos_t *__restrict pnumbytes,
-                REF struct path **__restrict pdatablock_fspath,
-                REF struct directory_entry **__restrict pdatablock_fsname)
+                struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	struct tty_device *me;
-	REF struct vm_datablock *result;
 	me = (struct tty_device *)self;
 	/* mmap() may be implemented by the display handle (e.g. for direct framebuffer access),
 	 * so forward any request for mapping data into memory to it, and it alone. */
-	result = (*handle_type_db.h_mmap[me->t_ohandle_typ])(me->t_ohandle_ptr,
-	                                                     pminoffset,
-	                                                     pnumbytes,
-	                                                     pdatablock_fspath,
-	                                                     pdatablock_fsname);
-	return result;
+	(*handle_type_db.h_mmap[me->t_ohandle_typ])(me->t_ohandle_ptr, info);
 }
 
 

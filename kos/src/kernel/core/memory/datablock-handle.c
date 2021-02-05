@@ -1355,14 +1355,11 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 	}
 }
 
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+INTERN NONNULL((1, 2)) void KCALL
 handle_datablock_mmap(struct vm_datablock *__restrict self,
-                      pos_t *__restrict UNUSED(pminoffset),
-                      pos_t *__restrict UNUSED(pnumbytes),
-                      REF struct path **__restrict UNUSED(pdatablock_fspath),
-                      REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+                      struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	return incref(self);
+	info->hmi_file = incref(self);
 }
 
 

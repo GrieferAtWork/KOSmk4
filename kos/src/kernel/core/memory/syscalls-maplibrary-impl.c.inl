@@ -434,11 +434,15 @@ unmap_check_overlap_and_find_new_candidate:
 					      addr_page_offset);
 				}
 				if (!file) {
-					file = getdatablock_from_handle((unsigned int)fd,
-					                                &file_minoffset,
-					                                &file_maxnumbytes,
-					                                &file_fspath,
-					                                &file_fsname);
+					struct handle_mmap_info info;
+					/* File mapping */
+					getdatablock_from_handle((unsigned int)fd, &info);
+					file             = info.hmi_file;
+					file_minoffset   = info.hmi_minaddr;
+					file_maxnumbytes = (info.hmi_maxaddr - info.hmi_minaddr) + 1;
+					file_fspath      = info.hmi_fspath;
+					file_fsname      = info.hmi_fsname;
+
 					/* Make sure that the offset and byte counts are aligned by the pagesize. */
 					file_maxnumbytes += file_minoffset & PAGEMASK;
 					file_minoffset &= ~PAGEMASK;

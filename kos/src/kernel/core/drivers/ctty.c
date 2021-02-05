@@ -102,23 +102,12 @@ ctty_ioctl(struct character_device *__restrict UNUSED(self),
 	return result;
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 ctty_mmap(struct character_device *__restrict UNUSED(self),
-          pos_t *__restrict pminoffset,
-          pos_t *__restrict pnumbytes,
-          REF struct path **__restrict pdatablock_fspath,
-          REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...) {
-	REF struct vm_datablock *result;
+          struct handle_mmap_info *__restrict info) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_mmap(ctty,
-	                               pminoffset,
-	                               pnumbytes,
-	                               pdatablock_fspath,
-	                               pdatablock_fsname);
-
-
-	return result;
+	character_device_mmap(ctty, info);
 }
 
 PRIVATE NONNULL((1)) void KCALL

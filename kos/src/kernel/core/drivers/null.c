@@ -25,6 +25,7 @@
 #include <dev/char.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle.h>
 #include <kernel/rand.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
@@ -87,24 +88,18 @@ null_polltest(struct character_device *__restrict UNUSED(self),
 	return what & (POLLINMASK | POLLOUTMASK);
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 phys_mmap(struct character_device *__restrict UNUSED(self),
-          pos_t *__restrict UNUSED(pminoffset),
-          pos_t *__restrict UNUSED(pnumbytes),
-          REF struct path **__restrict UNUSED(pdatablock_fspath),
-          REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+          struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	return incref(&vm_datablock_physical);
+	info->hmi_file = incref(&vm_datablock_physical);
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 zero_mmap(struct character_device *__restrict UNUSED(self),
-          pos_t *__restrict UNUSED(pminoffset),
-          pos_t *__restrict UNUSED(pnumbytes),
-          REF struct path **__restrict UNUSED(pdatablock_fspath),
-          REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+          struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	return incref(&vm_datablock_anonymous_zero);
+	info->hmi_file = incref(&vm_datablock_anonymous_zero);
 }
 
 
@@ -356,15 +351,13 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&port_rdb, &port_rdw, &port_rdl, NULL)
 PRIVATE struct vm_datablock port_datablock = VM_DATABLOCK_INIT_VIO(&port_vio);
 
 #define PORT_MMAP_POINTER (&port_mmap)
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 port_mmap(struct character_device *__restrict UNUSED(self),
-          pos_t *__restrict UNUSED(pminoffset),
-          pos_t *__restrict pnumbytes,
-          REF struct path **__restrict UNUSED(pdatablock_fspath),
-          REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+          struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	*pnumbytes = (pos_t)((port_t)-1) + 1;
-	return incref(&port_datablock);
+	info->hmi_file = incref(&port_datablock);
+	/* TODO: Don't limit `hmi_maxaddr' here, but pureply rely on the file's size instead! */
+	info->hmi_maxaddr = (pos_t)((port_t)-1);
 }
 
 
@@ -404,14 +397,11 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb,
 PRIVATE struct vm_datablock random_datablock = VM_DATABLOCK_INIT_VIO(&random_vio);
 
 #define RANDOM_MMAP_POINTER (&random_mmap)
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 random_mmap(struct character_device *__restrict UNUSED(self),
-            pos_t *__restrict UNUSED(pminoffset),
-            pos_t *__restrict UNUSED(pnumbytes),
-            REF struct path **__restrict UNUSED(pdatablock_fspath),
-            REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+            struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	return incref(&random_datablock);
+	info->hmi_file = incref(&random_datablock);
 }
 
 PRIVATE u8 KCALL
@@ -442,14 +432,11 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&urandom_rdb, &urandom_rdw, &urandom_r
 PRIVATE struct vm_datablock urandom_datablock = VM_DATABLOCK_INIT_VIO(&urandom_vio);
 
 #define URANDOM_MMAP_POINTER (&urandom_mmap)
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 urandom_mmap(struct character_device *__restrict UNUSED(self),
-             pos_t *__restrict UNUSED(pminoffset),
-             pos_t *__restrict UNUSED(pnumbytes),
-             REF struct path **__restrict UNUSED(pdatablock_fspath),
-             REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+             struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	return incref(&urandom_datablock);
+	info->hmi_file = incref(&urandom_datablock);
 }
 
 #else /* LIBVIO_CONFIG_ENABLED */

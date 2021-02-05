@@ -35,6 +35,7 @@ struct character_device;
 struct character_device_type;
 struct aio_multihandle;
 struct handle;
+struct handle_mmap_info;
 
 struct character_device_type {
 	REF struct driver *ct_driver; /* [1..1] The associated, implementing driver. */
@@ -70,12 +71,9 @@ struct character_device_type {
 	                  USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
-	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *
+	NONNULL((1, 2)) void
 	(KCALL *ct_mmap)(struct character_device *__restrict self,
-	                 pos_t *__restrict pminoffset,
-	                 pos_t *__restrict pnumbytes,
-	                 REF struct path **__restrict pdatablock_fspath,
-	                 REF struct directory_entry **__restrict pdatablock_fsname)
+	                 struct handle_mmap_info *__restrict info)
 			THROWS(...);
 
 	NONNULL((1)) void
@@ -252,12 +250,9 @@ character_device_ioctl(struct character_device *__restrict self,
  * and/or `*pdatablock_fsname', then this function will automatically
  * make fill in these pointers through use of `self->cd_devfs_entry',
  * as well as `superblock_find_mount_from_vfs(&devfs, THIS_VFS)' */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+FUNDEF NONNULL((1, 2)) void KCALL
 character_device_mmap(struct character_device *__restrict self,
-                      pos_t *__restrict pminoffset,
-                      pos_t *__restrict pnumbytes,
-                      REF struct path **__restrict pdatablock_fspath,
-                      REF struct directory_entry **__restrict pdatablock_fsname)
+                      struct handle_mmap_info *__restrict info)
 		THROWS(...);
 
 FUNDEF NONNULL((1)) void KCALL

@@ -168,23 +168,18 @@ handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 #endif /* __SIZEOF_POINTER__ < 8 */
 	xdecref(vm_datapart_split(self, (size_t)(new_size / PAGESIZE)));
 }
-#endif /* !CONFIG_USE_NEW_VM */
 
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+INTERN NONNULL((1, 2)) void KCALL
 handle_datapart_mmap(struct vm_datapart *__restrict self,
-                     pos_t *__restrict pminoffset,
-                     pos_t *__restrict pnumbytes,
-                     REF struct path **__restrict UNUSED(pdatablock_fspath),
-                     REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+                     struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	REF struct vm_datablock *result;
 	sync_read(self);
-	result      = incref(self->dp_block);
-	*pminoffset = vm_datapart_minbyte(self);
-	*pnumbytes  = (pos_t)vm_datapart_numbytes(self);
+	info->hmi_file    = incref(self->dp_block);
+	info->hmi_minaddr = vm_datapart_minbyte(self);
+	info->hmi_maxaddr = vm_datapart_maxbyte(self);
 	sync_endread(self);
-	return result;
 }
+#endif /* !CONFIG_USE_NEW_VM */
 
 //INTERN pos_t KCALL /* TODO: Pre-initialize specified reanges. */
 //handle_datapart_allocate(struct vm_datapart *__restrict self,

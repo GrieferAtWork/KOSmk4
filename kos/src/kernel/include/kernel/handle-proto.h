@@ -29,165 +29,162 @@
 DECL_BEGIN
 
 #ifdef __DEEMON__
-#define HANDLE_OPERATOR_PROTOTYPES                                                                             \
-	{                                                                                                          \
-		("refcnt", "NOBLOCK WUNUSED NONNULL((1))", "refcnt_t", "NOTHROW", "FCALL",                             \
-		 { ("T const *__restrict", "self") },                                                                  \
-		 "", "return 0;"),                                                                                     \
-		("incref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                         \
-		 { ("T *__restrict", "self") },                                                                        \
-		 "", ""),                                                                                              \
-		("decref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                         \
-		 { ("REF T *__restrict", "self") },                                                                    \
-		 "", ""),                                                                                              \
-		("tryincref", "NOBLOCK WUNUSED NONNULL((1))", "__BOOL", "NOTHROW", "FCALL",                            \
-		 { ("T *__restrict", "self") },                                                                        \
-		 "", "return 1;"),                                                                                     \
-		("weakgetref", "NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1))", "WEAK REF void *", "NOTHROW", "FCALL",  \
-		 { ("T *__restrict", "self") },                                                                        \
-		 "", "return self;"),                                                                                  \
-		("weaklckref", "NOBLOCK WUNUSED NONNULL((1))", "REF T *", "NOTHROW", "FCALL",                          \
-		 { ("void *__restrict", "weakref_ptr") },                                                              \
-		 "", "return NULL;"),                                                                                  \
-		("weakdecref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                     \
-		 { ("WEAK REF void *__restrict", "weakref_ptr") },                                                     \
-		 "", ""),                                                                                              \
-		("read", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                                \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("USER CHECKED void *", "dst"),                                                                     \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
-		("write", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                               \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("USER CHECKED void const *", "src"),                                                               \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
-		("pread", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                               \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("USER CHECKED void *", "dst"),                                                                     \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("pos_t", "addr"),                                                                                  \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
-		("pwrite", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                              \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("USER CHECKED void const *", "src"),                                                               \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("pos_t", "addr"),                                                                                  \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
-		("readv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                            \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("struct aio_buffer *__restrict", "dst"),                                                           \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
-		("writev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                           \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("struct aio_buffer *__restrict", "src"),                                                           \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
-		("preadv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                           \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("struct aio_buffer *__restrict", "dst"),                                                           \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("pos_t", "addr"),                                                                                  \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
-		("pwritev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                          \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("struct aio_buffer *__restrict", "src"),                                                           \
-		   ("size_t", "num_bytes"),                                                                            \
-		   ("pos_t", "addr"),                                                                                  \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
-		("readdir", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                             \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("USER CHECKED struct dirent *", "buf"),                                                            \
-		   ("size_t", "bufsize"),                                                                              \
-		   ("readdir_mode_t", "readdir_mode"),                                                                 \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READDIR);"),                           \
-		("seek", "NONNULL((1))", "pos_t", "", "KCALL",                                                         \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("off_t", "offset"),                                                                                \
-		   ("unsigned int", "whence") },                                                                       \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SEEK);"),                              \
-		("ioctl", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                              \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("syscall_ulong_t", "cmd"),                                                                         \
-		   ("USER UNCHECKED void *", "arg"),                                                                   \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND, cmd);"),         \
-		("truncate", "NONNULL((1))", "void", "", "KCALL",                                                      \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("pos_t", "new_size") },                                                                            \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC);"),                             \
-		("mmap", "ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5))", "REF struct vm_datablock *", "", "KCALL", \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("pos_t *__restrict", "pminoffset"),                                                                \
-		   ("pos_t *__restrict", "pnumbytes"),                                                                 \
-		   ("REF struct path **__restrict ", "pdatablock_fspath"),                                             \
-		   ("REF struct directory_entry **__restrict", "pdatablock_fsname") },                                 \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP);"),                              \
-		("allocate", "NONNULL((1))", "pos_t", "", "KCALL",                                                     \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("fallocate_mode_t", "mode"),                                                                       \
-		   ("pos_t", "start"),                                                                                 \
-		   ("pos_t", "length") },                                                                              \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE);"),                          \
-		("sync", "NONNULL((1))", "void", "", "KCALL",                                                          \
-		 { ("T *__restrict", "self") },                                                                        \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYNC);"),                              \
-		("datasync", "NONNULL((1))", "void", "", "KCALL",                                                      \
-		 { ("T *__restrict", "self") },                                                                        \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_DATASYNC);"),                          \
-		("stat", "NONNULL((1))", "void", "", "KCALL",                                                          \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("USER CHECKED struct stat *", "result") },                                                         \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT);"),                              \
-		("pollconnect", "NONNULL((1))", "void", "", "KCALL",                                                   \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("poll_mode_t", "what") },                                                                          \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                              \
-		("polltest", "WUNUSED NONNULL((1))", "poll_mode_t", "", "KCALL",                                       \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("poll_mode_t", "what") },                                                                          \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                              \
-		("hop", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                                \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("syscall_ulong_t", "cmd"),                                                                         \
-		   ("USER UNCHECKED void *", "arg"),                                                                   \
-		   ("iomode_t", "mode") },                                                                             \
-		 "THROWS(...)",                                                                                        \
-		 "THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd);"),           \
-		("tryas", "NONNULL((1))", "REF void *", "", "KCALL",                                                   \
-		 { ("T *__restrict", "self"),                                                                          \
-		   ("uintptr_half_t", "wanted_type") },                                                                \
-		 "THROWS(E_WOULDBLOCK)",                                                                               \
-		 "return NULL;"),                                                                                      \
+#define HANDLE_OPERATOR_PROTOTYPES                                                                            \
+	{                                                                                                         \
+		("refcnt", "NOBLOCK WUNUSED NONNULL((1))", "refcnt_t", "NOTHROW", "FCALL",                            \
+		 { ("T const *__restrict", "self") },                                                                 \
+		 "", "return 0;"),                                                                                    \
+		("incref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                        \
+		 { ("T *__restrict", "self") },                                                                       \
+		 "", ""),                                                                                             \
+		("decref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                        \
+		 { ("REF T *__restrict", "self") },                                                                   \
+		 "", ""),                                                                                             \
+		("tryincref", "NOBLOCK WUNUSED NONNULL((1))", "__BOOL", "NOTHROW", "FCALL",                           \
+		 { ("T *__restrict", "self") },                                                                       \
+		 "", "return 1;"),                                                                                    \
+		("weakgetref", "NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1))", "WEAK REF void *", "NOTHROW", "FCALL", \
+		 { ("T *__restrict", "self") },                                                                       \
+		 "", "return self;"),                                                                                 \
+		("weaklckref", "NOBLOCK WUNUSED NONNULL((1))", "REF T *", "NOTHROW", "FCALL",                         \
+		 { ("void *__restrict", "weakref_ptr") },                                                             \
+		 "", "return NULL;"),                                                                                 \
+		("weakdecref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                    \
+		 { ("WEAK REF void *__restrict", "weakref_ptr") },                                                    \
+		 "", ""),                                                                                             \
+		("read", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                               \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("USER CHECKED void *", "dst"),                                                                    \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                             \
+		("write", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                              \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("USER CHECKED void const *", "src"),                                                              \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                            \
+		("pread", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                              \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("USER CHECKED void *", "dst"),                                                                    \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("pos_t", "addr"),                                                                                 \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                             \
+		("pwrite", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                             \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("USER CHECKED void const *", "src"),                                                              \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("pos_t", "addr"),                                                                                 \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                            \
+		("readv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                           \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("struct aio_buffer *__restrict", "dst"),                                                          \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                             \
+		("writev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                          \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("struct aio_buffer *__restrict", "src"),                                                          \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                            \
+		("preadv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                          \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("struct aio_buffer *__restrict", "dst"),                                                          \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("pos_t", "addr"),                                                                                 \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                             \
+		("pwritev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                         \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("struct aio_buffer *__restrict", "src"),                                                          \
+		   ("size_t", "num_bytes"),                                                                           \
+		   ("pos_t", "addr"),                                                                                 \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                            \
+		("readdir", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                            \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("USER CHECKED struct dirent *", "buf"),                                                           \
+		   ("size_t", "bufsize"),                                                                             \
+		   ("readdir_mode_t", "readdir_mode"),                                                                \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READDIR);"),                          \
+		("seek", "NONNULL((1))", "pos_t", "", "KCALL",                                                        \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("off_t", "offset"),                                                                               \
+		   ("unsigned int", "whence") },                                                                      \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SEEK);"),                             \
+		("ioctl", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                             \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("syscall_ulong_t", "cmd"),                                                                        \
+		   ("USER UNCHECKED void *", "arg"),                                                                  \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND, cmd);"),        \
+		("truncate", "NONNULL((1))", "void", "", "KCALL",                                                     \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("pos_t", "new_size") },                                                                           \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC);"),                            \
+		("mmap", "NONNULL((1, 2))", "void", "", "KCALL",                                                      \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("struct handle_mmap_info *__restrict", "info") },                                                 \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP);"),                             \
+		("allocate", "NONNULL((1))", "pos_t", "", "KCALL",                                                    \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("fallocate_mode_t", "mode"),                                                                      \
+		   ("pos_t", "start"),                                                                                \
+		   ("pos_t", "length") },                                                                             \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE);"),                         \
+		("sync", "NONNULL((1))", "void", "", "KCALL",                                                         \
+		 { ("T *__restrict", "self") },                                                                       \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYNC);"),                             \
+		("datasync", "NONNULL((1))", "void", "", "KCALL",                                                     \
+		 { ("T *__restrict", "self") },                                                                       \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_DATASYNC);"),                         \
+		("stat", "NONNULL((1))", "void", "", "KCALL",                                                         \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("USER CHECKED struct stat *", "result") },                                                        \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT);"),                             \
+		("pollconnect", "NONNULL((1))", "void", "", "KCALL",                                                  \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("poll_mode_t", "what") },                                                                         \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                             \
+		("polltest", "WUNUSED NONNULL((1))", "poll_mode_t", "", "KCALL",                                      \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("poll_mode_t", "what") },                                                                         \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                             \
+		("hop", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                               \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("syscall_ulong_t", "cmd"),                                                                        \
+		   ("USER UNCHECKED void *", "arg"),                                                                  \
+		   ("iomode_t", "mode") },                                                                            \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd);"),          \
+		("tryas", "NONNULL((1))", "REF void *", "", "KCALL",                                                  \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("uintptr_half_t", "wanted_type") },                                                               \
+		 "THROWS(E_WOULDBLOCK)",                                                                              \
+		 "return NULL;"),                                                                                     \
 	}
 #endif /* __DEEMON__ */
 
@@ -357,7 +354,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_readdir(struct vm_data
 INTDEF NONNULL((1)) pos_t KCALL handle_datablock_seek(struct vm_datablock *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datablock_ioctl(struct vm_datablock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datablock_truncate(struct vm_datablock *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_datablock_mmap(struct vm_datablock *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_dataQblock_mmap(struct vm_datablock *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_datablock_allocate(struct vm_datablock *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datablock_sync(struct vm_datablock *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datablock_datasync(struct vm_datablock *__restrict self) THROWS(...);
@@ -387,7 +384,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_readdir(struct basic
 INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_seek(struct basic_block_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_ioctl(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_blockdevice_truncate(struct basic_block_device *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_blockdevice_mmap(struct basic_block_device *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_blockdevice_mmap(struct basic_block_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_allocate(struct basic_block_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_blockdevice_sync(struct basic_block_device *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_blockdevice_datasync(struct basic_block_device *__restrict self) THROWS(...);
@@ -417,7 +414,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_readdir(struct di
 INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_seek(struct directory_entry *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_ioctl(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_directoryentry_truncate(struct directory_entry *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_directoryentry_mmap(struct directory_entry *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_directoryentry_mmap(struct directory_entry *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_allocate(struct directory_entry *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_directoryentry_sync(struct directory_entry *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_directoryentry_datasync(struct directory_entry *__restrict self) THROWS(...);
@@ -447,7 +444,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_file_readdir(struct file *__rest
 INTDEF NONNULL((1)) pos_t KCALL handle_file_seek(struct file *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_file_ioctl(struct file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_file_truncate(struct file *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_file_mmap(struct file *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_file_mmap(struct file *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_file_allocate(struct file *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_file_sync(struct file *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_file_datasync(struct file *__restrict self) THROWS(...);
@@ -477,7 +474,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_readdir(s
 INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_seek(struct oneshot_directory_file *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_ioctl(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_truncate(struct oneshot_directory_file *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_oneshot_directory_file_mmap(struct oneshot_directory_file *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_oneshot_directory_file_mmap(struct oneshot_directory_file *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_allocate(struct oneshot_directory_file *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_sync(struct oneshot_directory_file *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_datasync(struct oneshot_directory_file *__restrict self) THROWS(...);
@@ -507,7 +504,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_readdir(struct path *__rest
 INTDEF NONNULL((1)) pos_t KCALL handle_path_seek(struct path *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_ioctl(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_path_truncate(struct path *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_path_mmap(struct path *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_path_mmap(struct path *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_path_allocate(struct path *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_path_sync(struct path *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_path_datasync(struct path *__restrict self) THROWS(...);
@@ -537,7 +534,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_readdir(struct fs *__restrict
 INTDEF NONNULL((1)) pos_t KCALL handle_fs_seek(struct fs *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_ioctl(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fs_truncate(struct fs *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_fs_mmap(struct fs *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_fs_mmap(struct fs *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_fs_allocate(struct fs *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fs_sync(struct fs *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fs_datasync(struct fs *__restrict self) THROWS(...);
@@ -567,7 +564,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_readdir(struct vm *__restrict
 INTDEF NONNULL((1)) pos_t KCALL handle_vm_seek(struct vm *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_vm_ioctl(struct vm *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_vm_truncate(struct vm *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_vm_mmap(struct vm *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_vm_mmap(struct vm *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_vm_allocate(struct vm *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_vm_sync(struct vm *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_vm_datasync(struct vm *__restrict self) THROWS(...);
@@ -597,7 +594,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_readdir(struct taskpid *__r
 INTDEF NONNULL((1)) pos_t KCALL handle_task_seek(struct taskpid *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_ioctl(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_task_truncate(struct taskpid *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_task_mmap(struct taskpid *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_task_mmap(struct taskpid *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_task_allocate(struct taskpid *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_task_sync(struct taskpid *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_task_datasync(struct taskpid *__restrict self) THROWS(...);
@@ -627,7 +624,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_epoll_readdir(struct epoll_contr
 INTDEF NONNULL((1)) pos_t KCALL handle_epoll_seek(struct epoll_controller *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_epoll_ioctl(struct epoll_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_epoll_truncate(struct epoll_controller *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_epoll_mmap(struct epoll_controller *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_epoll_mmap(struct epoll_controller *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_epoll_allocate(struct epoll_controller *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_epoll_sync(struct epoll_controller *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_epoll_datasync(struct epoll_controller *__restrict self) THROWS(...);
@@ -657,7 +654,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_readdir(struct driver *__
 INTDEF NONNULL((1)) pos_t KCALL handle_driver_seek(struct driver *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_ioctl(struct driver *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_truncate(struct driver *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_driver_mmap(struct driver *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_driver_mmap(struct driver *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_driver_allocate(struct driver *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_sync(struct driver *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_datasync(struct driver *__restrict self) THROWS(...);
@@ -687,7 +684,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_readdir(struct pipe *__rest
 INTDEF NONNULL((1)) pos_t KCALL handle_pipe_seek(struct pipe *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_ioctl(struct pipe *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_truncate(struct pipe *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_pipe_mmap(struct pipe *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_pipe_mmap(struct pipe *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_pipe_allocate(struct pipe *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_sync(struct pipe *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_datasync(struct pipe *__restrict self) THROWS(...);
@@ -717,7 +714,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_reader_readdir(struct pipe_
 INTDEF NONNULL((1)) pos_t KCALL handle_pipe_reader_seek(struct pipe_reader *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_reader_ioctl(struct pipe_reader *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_reader_truncate(struct pipe_reader *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_pipe_reader_mmap(struct pipe_reader *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_pipe_reader_mmap(struct pipe_reader *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_pipe_reader_allocate(struct pipe_reader *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_reader_sync(struct pipe_reader *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_reader_datasync(struct pipe_reader *__restrict self) THROWS(...);
@@ -747,7 +744,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_writer_readdir(struct pipe_
 INTDEF NONNULL((1)) pos_t KCALL handle_pipe_writer_seek(struct pipe_writer *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_ioctl(struct pipe_writer *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_writer_truncate(struct pipe_writer *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_pipe_writer_mmap(struct pipe_writer *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_pipe_writer_mmap(struct pipe_writer *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_pipe_writer_allocate(struct pipe_writer *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_writer_sync(struct pipe_writer *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_writer_datasync(struct pipe_writer *__restrict self) THROWS(...);
@@ -777,7 +774,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_readdir(struct pidns *__re
 INTDEF NONNULL((1)) pos_t KCALL handle_pidns_seek(struct pidns *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_ioctl(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pidns_truncate(struct pidns *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_pidns_mmap(struct pidns *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_pidns_mmap(struct pidns *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_pidns_allocate(struct pidns *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pidns_sync(struct pidns *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pidns_datasync(struct pidns *__restrict self) THROWS(...);
@@ -807,7 +804,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_readdir(struct driv
 INTDEF NONNULL((1)) pos_t KCALL handle_driver_state_seek(struct driver_state *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_state_ioctl(struct driver_state *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_state_truncate(struct driver_state *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_driver_state_mmap(struct driver_state *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_driver_state_mmap(struct driver_state *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_driver_state_allocate(struct driver_state *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_state_sync(struct driver_state *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_state_datasync(struct driver_state *__restrict self) THROWS(...);
@@ -837,7 +834,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_readdir(struct c
 INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_seek(struct character_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_characterdevice_truncate(struct character_device *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_characterdevice_mmap(struct character_device *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_characterdevice_mmap(struct character_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_allocate(struct character_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_characterdevice_sync(struct character_device *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_characterdevice_datasync(struct character_device *__restrict self) THROWS(...);
@@ -867,7 +864,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_fence_readdir(struct eve
 INTDEF NONNULL((1)) pos_t KCALL handle_eventfd_fence_seek(struct eventfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_fence_ioctl(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_truncate(struct eventfd *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_eventfd_fence_mmap(struct eventfd *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_eventfd_fence_mmap(struct eventfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_eventfd_fence_allocate(struct eventfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_sync(struct eventfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_datasync(struct eventfd *__restrict self) THROWS(...);
@@ -897,7 +894,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_sema_readdir(struct even
 INTDEF NONNULL((1)) pos_t KCALL handle_eventfd_sema_seek(struct eventfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_sema_ioctl(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_truncate(struct eventfd *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_eventfd_sema_mmap(struct eventfd *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_eventfd_sema_mmap(struct eventfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_eventfd_sema_allocate(struct eventfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_sync(struct eventfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_datasync(struct eventfd *__restrict self) THROWS(...);
@@ -927,7 +924,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_signalfd_readdir(struct signalfd
 INTDEF NONNULL((1)) pos_t KCALL handle_signalfd_seek(struct signalfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_ioctl(struct signalfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_signalfd_truncate(struct signalfd *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_signalfd_mmap(struct signalfd *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_signalfd_mmap(struct signalfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_signalfd_allocate(struct signalfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_signalfd_sync(struct signalfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_signalfd_datasync(struct signalfd *__restrict self) THROWS(...);
@@ -957,7 +954,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_readdir(struct vm_datap
 INTDEF NONNULL((1)) pos_t KCALL handle_datapart_seek(struct vm_datapart *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datapart_ioctl(struct vm_datapart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_datapart_mmap(struct vm_datapart *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_datapart_mmap(struct vm_datapart *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_datapart_allocate(struct vm_datapart *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datapart_sync(struct vm_datapart *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datapart_datasync(struct vm_datapart *__restrict self) THROWS(...);
@@ -987,7 +984,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_readdir(struct vm_futex *_
 INTDEF NONNULL((1)) pos_t KCALL handle_futex_seek(struct vm_futex *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_ioctl(struct vm_futex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futex_truncate(struct vm_futex *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_futex_mmap(struct vm_futex *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_futex_mmap(struct vm_futex *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_futex_allocate(struct vm_futex *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futex_sync(struct vm_futex *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futex_datasync(struct vm_futex *__restrict self) THROWS(...);
@@ -1017,7 +1014,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_readdir(struct vm_futexf
 INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_seek(struct vm_futexfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_ioctl(struct vm_futexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futexfd_truncate(struct vm_futexfd *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_futexfd_mmap(struct vm_futexfd *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_futexfd_mmap(struct vm_futexfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_allocate(struct vm_futexfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futexfd_sync(struct vm_futexfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futexfd_datasync(struct vm_futexfd *__restrict self) THROWS(...);
@@ -1047,7 +1044,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_readdir(struct dr
 INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_seek(struct driver_section *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_ioctl(struct driver_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_section_truncate(struct driver_section *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_driver_section_mmap(struct driver_section *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_driver_section_mmap(struct driver_section *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_allocate(struct driver_section *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_section_sync(struct driver_section *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_section_datasync(struct driver_section *__restrict self) THROWS(...);
@@ -1077,7 +1074,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_readdir(struct socket *__
 INTDEF NONNULL((1)) pos_t KCALL handle_socket_seek(struct socket *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_socket_truncate(struct socket *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_socket_mmap(struct socket *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_socket_mmap(struct socket *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_socket_allocate(struct socket *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_socket_sync(struct socket *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_socket_datasync(struct socket *__restrict self) THROWS(...);
@@ -1107,7 +1104,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_readdir(struct uaio_control
 INTDEF NONNULL((1)) pos_t KCALL handle_uaio_seek(struct uaio_controller *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_ioctl(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_uaio_truncate(struct uaio_controller *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_uaio_mmap(struct uaio_controller *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_uaio_mmap(struct uaio_controller *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_uaio_allocate(struct uaio_controller *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_uaio_sync(struct uaio_controller *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_uaio_datasync(struct uaio_controller *__restrict self) THROWS(...);
@@ -1137,7 +1134,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_readdir(struct fifo_us
 INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_seek(struct fifo_user *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_ioctl(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fifo_user_truncate(struct fifo_user *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_fifo_user_mmap(struct fifo_user *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_fifo_user_mmap(struct fifo_user *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_allocate(struct fifo_user *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fifo_user_sync(struct fifo_user *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fifo_user_datasync(struct fifo_user *__restrict self) THROWS(...);
@@ -1273,7 +1270,7 @@ INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_readdir(struct mfile *__re
 INTDEF NONNULL((1)) pos_t KCALL handle_mfile_seek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_mfile_truncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct mfile *KCALL handle_mfile_mmap(struct mfile *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pmfile_fspath, REF struct directory_entry **__restrict pmfile_fsname) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_mfile_mmap(struct mfile *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF NONNULL((1)) pos_t KCALL handle_mfile_allocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_mfile_sync(struct mfile *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_mfile_datasync(struct mfile *__restrict self) THROWS(...);

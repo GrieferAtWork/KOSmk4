@@ -28,6 +28,7 @@
 #include <dev/char.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
@@ -1628,15 +1629,13 @@ VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 	return 0;
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 VGA_MMap(struct character_device *__restrict self,
-         pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes,
-         REF struct path **__restrict UNUSED(pdatablock_fspath),
-         REF struct directory_entry **__restrict UNUSED(pdatablock_fsname)) THROWS(...) {
+         struct handle_mmap_info *__restrict info) THROWS(...) {
 	VGA *me = (VGA *)self;
-	*pminoffset = (pos_t)me->v_vram_addr;
-	*pnumbytes  = (pos_t)me->v_vram_size;
-	return incref(&mfile_phys);
+	info->hmi_file    = incref(&mfile_phys);
+	info->hmi_minaddr = (pos_t)me->v_vram_addr;
+	info->hmi_maxaddr = (pos_t)me->v_vram_addr + me->v_vram_size - 1;
 }
 
 PRIVATE bool KCALL

@@ -97,6 +97,9 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  *    - mfile_tailwrite()  (THROW(E_FSERROR_DISK_FULL))
  *    - mfile_read()       (for offsets >= mf_filesize: returns `0')
  *    - mfile_write()      (for offsets >= mf_filesize: THROW(E_FSERROR_DISK_FULL))
+ *    - Combine with `mf_filesize = 0' to disable all conventional file access.
+ *      If this is done, note that you can still override the file's size-value,
+ *      as returned by `stat(2)' by implementing `mf_ops->mo_stream->mso_stat'!
  *
  * - MFILE_F_READONLY:
  *    - mfile_tailwrite()  (THROW(E_FSERROR_READONLY))
@@ -104,17 +107,80 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  *    - mmap(SHARED|WRITE) (THROW(E_FSERROR_READONLY))
  *    - Note that `mfile_truncate()' is _not_ affected!
  *
- * - MFILE_F_DELETED
+ * - MFILE_F_DELETED:
+ *    - Implies: MFILE_F_FIXEDFILESIZE                              (indirect; flag isn't actually set)
+ *    - Implies: MFILE_F_READONLY                                   (indirect; flag isn't actually set)
+ *    - Implies: @CTL.AF(mf_filesize == 0)                          (Sooner or later, mf_filesize will eventually become 0)
+ *    - Implies: @CTL.AF(ALL(mf_parts)->mp_file == &mfile_anon[*])  (Sooner or later, ...)
+ *    - Implies: @CTL.AF(mpart_isanon(ALL(mf_parts)))               (Sooner or later, ...)
+ *    - Implies: @CTL.AF(mf_parts == MFILE_PARTS_ANONYMOUS)         (Sooner or later, ...)
+ *    - Implies: @CTL.AF(mf_changed == MFILE_PARTS_ANONYMOUS)       (Sooner or later, ...)
+ *    - Parts returned by `mfile_makepart(file)' point at `&mfile_anon[file->mf_blockshift]'
+ *    - Note @CTL.AF here means that the actual effects of deleting a file might only become
+ *      visible at random points in the future. This is because file deletion actually happens
+ *      asynchronously (s.a. `mfile_delete()')
  *
  */
 
 
 #ifdef CONFIG_USE_NEW_FS
-/* Optional operators used when  */
+/* Extended operators used for implementing stream interface
+ * functions and/or overriding the behavior of certain user-
+ * exposed functions. */
 struct mfile_stream_ops {
+
+	/* [0..1] Hooks for `read(2)' and `readv(2)': stream-oriented file reading.
+	 * Note that for consistency, anything that implements these operators should
+	 * either document that read(2) returns different data than pread(2)/mmap(2),
+	 * or disallow use of the later with `mf_filesize = 0, MFILE_F_FIXEDFILESIZE' */
+	WUNUSED NONNULL((1)) size_t
+	(KCALL *mso_read)(struct mfile *__restrict self, USER CHECKED void *dst,
+	                  size_t num_bytes, iomode_t mode) THROWS(...);
+	WUNUSED NONNULL((1, 2)) size_t
+	(KCALL *mso_readv)(struct mfile *__restrict self, struct aio_buffer *__restrict dst,
+	                   size_t num_bytes, iomode_t mode) THROWS(...);
+
+	/* [0..1] Hooks for `write(2)' and `writev(2)': stream-oriented file writing.
+	 * Note that for consistency, anything that implements these operators should
+	 * either document that write(2) affects different data than pwrite(2)/mmap(2),
+	 * or disallow use of the later with `mf_filesize = 0, MFILE_F_FIXEDFILESIZE' */
+	WUNUSED NONNULL((1)) size_t
+	(KCALL *mso_write)(struct mfile *__restrict self, USER CHECKED void const *src,
+	                   size_t num_bytes, iomode_t mode) THROWS(...);
+	WUNUSED NONNULL((1, 2)) size_t
+	(KCALL *mso_writev)(struct mfile *__restrict self, struct aio_buffer *__restrict src,
+	                    size_t num_bytes, iomode_t mode) THROWS(...);
+
+	/* [0..1] Hook for `lseek(2)': stream-oriented file seeking. */
+	NONNULL((1)) pos_t
+	(KCALL *mso_seek)(struct mfile *__restrict self, off_t offset,
+	                  unsigned int whence) THROWS(...);
+
+	/* [0..1] Hook for `ioctl(2)': Extended file I/O control.
+	 * Note that no standard ioctl commands are defined for mem-files, meaning that
+	 * this callback has completely unfiltered control over the `ioctl(2)' syscall. */
+	NONNULL((1)) syscall_slong_t
+	(KCALL *mso_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	                   USER UNCHECKED void *arg, iomode_t mode)
+			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+
+	/* [0..1] Hook for `ftruncate(2)': File length setting.
+	 * If defined, this callback will only be called by `handle_mfile_truncate()',
+	 * where it will take the place of the usual call to `mfile_truncate()'.
+	 * Note that this callback will _not_ be called by `mfile_truncate()' itself,
+	 * and that `handle_mfile_truncate()' will not call the later if this one was
+	 * called first, meaning that this callback itself must call `mfile_truncate()'
+	 * when conventional file-truncation behavior is wanted. */
+	NONNULL((1)) void
+	(KCALL *mso_truncate)(struct mfile *__restrict self, pos_t new_size)
+			THROWS(...);
+
+	/* TODO: mmap */
+	/* TODO: More? (s.a. handle operators....) */
 
 };
 #endif /* CONFIG_USE_NEW_FS */
+
 
 struct mfile_ops {
 	/* [0..1] Finalize + free the given mem-file. */

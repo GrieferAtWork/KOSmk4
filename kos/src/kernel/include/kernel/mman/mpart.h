@@ -1072,6 +1072,13 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 
 
 
+/* TODO: =============== BEGIN_DEPRECATED ===============
+ *
+ * Mem-part read/write functions don't include file-size/read-only/etc. checks.
+ * Instead, all code should make use of `mfile_read' and `mfile_write' (etc...).
+ * But note that these functions should only be removed from the public interface,
+ * as they're actually used in the implementation of `mfile_read' and `mfile_write'! */
+
 /* Read/write raw data to/from a given mem-part.
  * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
  *              is too small, or if the given `filepos' lies outside of the part's bounds. */
@@ -1119,6 +1126,8 @@ FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock(struct mpart *__restri
 FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+/* TODO: =============== END_DEPRECATED =============== */
+
 
 
 /* Lock for `mpart_all_list' */
