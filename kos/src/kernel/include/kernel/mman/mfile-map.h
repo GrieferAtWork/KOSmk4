@@ -135,7 +135,7 @@ mfile_map_init_and_acquire(struct mfile_map *__restrict self,
                            PAGEDIR_PAGEALIGNED pos_t addr,
                            PAGEDIR_PAGEALIGNED size_t num_bytes,
                            unsigned int prot, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 
 /* Same as `mfile_map_init_and_acquire()', but don't acquire an initial lock. */
 FUNDEF NONNULL((1, 2)) void FCALL
@@ -144,7 +144,7 @@ mfile_map_init(struct mfile_map *__restrict self,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes,
                unsigned int prot, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 #else /* __INTELLISENSE__ */
 #define mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags) \
 	((self)->mfm_file = (file), (self)->mfm_addr = (addr),                   \
@@ -157,7 +157,7 @@ mfile_map_init(struct mfile_map *__restrict self,
 #endif /* !__INTELLISENSE__ */
 FUNDEF NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 #define _mfile_map_init(self) \
 	(_mfile_map_init_and_acquire(self), mfile_map_release(self))
 
@@ -189,7 +189,7 @@ NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
                             struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 
 /* Essentially does the same as `mfile_map_acquire_or_unlock()', however the
  * caller must already be holding locks to every mem-part mapped by `self'
@@ -198,7 +198,7 @@ mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
                            struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 
 /* Finalize a given mem-node-allocator.
  * This function will free (and only free; the caller is responsible to release

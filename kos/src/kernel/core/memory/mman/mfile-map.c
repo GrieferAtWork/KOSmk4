@@ -52,6 +52,11 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
+#ifdef CONFIG_USE_NEW_FS
+#define IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)        \
+	(((file)->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) && \
+	 ((self)->mfm_prot & (PROT_WRITE | PROT_SHARED)) == (PROT_WRITE | PROT_SHARED))
+#endif /* CONFIG_USE_NEW_FS */
 
 
 
@@ -226,7 +231,7 @@ fail:
  *  - Release locks to all of the parts */
 PUBLIC NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
 	struct mfile *file;
 	struct mnode *node;
 	REF struct mpart *part;
@@ -265,6 +270,12 @@ again_getpart:
 				decref(part);
 				goto again_getpart;
 			}
+#ifdef CONFIG_USE_NEW_FS
+			if unlikely(IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)) {
+				mpart_lock_release(part);
+				THROW(E_FSERROR_READONLY);
+			}
+#endif /* CONFIG_USE_NEW_FS */
 		} EXCEPT {
 			decref(part);
 			RETHROW();
@@ -311,11 +322,6 @@ again_getpart:
 again_acquire:
 	TRY {
 		mfile_map_acquire(self);
-		/* Populate the mapping if the callers wants this. */
-		if (self->mfm_flags & MAP_POPULATE) {
-			if (!mfile_map_populate_or_unlock(self))
-				goto again_acquire;
-		}
 	} EXCEPT {
 		mfile_map_fini(self);
 		DBG_memset(self, 0xcc, sizeof(*self));
@@ -707,7 +713,7 @@ continue_with_pnode:
 PUBLIC NONNULL((1)) bool FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
                             struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
 	struct mfile *file;
 	pos_t block_aligned_addr;
 	size_t block_aligned_size;
@@ -772,11 +778,20 @@ again:
 		goto again;
 	}
 
+#ifdef CONFIG_USE_NEW_FS
+	/* Make sure that the file isn't read-only if we're mapping as SHARED|WRITE */
+	if unlikely(IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)) {
+		mfile_map_release(self);
+		THROW(E_FSERROR_READONLY);
+	}
+#endif /* CONFIG_USE_NEW_FS */
+
 	/* Populate the mapping if the callers wants this. */
 	if (self->mfm_flags & MAP_POPULATE) {
 		if (!mfile_map_populate_or_unlock(self))
 			goto fail;
 	}
+
 	return true;
 fail:
 	return false;
@@ -790,7 +805,7 @@ fail:
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
                            struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
 	struct mfile *file;
 	pos_t block_aligned_addr;
 	size_t block_aligned_size;
@@ -821,6 +836,14 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 			assert(mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size));
 		goto fail;
 	}
+
+#ifdef CONFIG_USE_NEW_FS
+	/* Make sure that the file isn't read-only if we're mapping as SHARED|WRITE */
+	if unlikely(IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)) {
+		mfile_map_release(self);
+		THROW(E_FSERROR_READONLY);
+	}
+#endif /* CONFIG_USE_NEW_FS */
 
 	/* Populate the mapping if the callers wants this. */
 	if (self->mfm_flags & MAP_POPULATE) {

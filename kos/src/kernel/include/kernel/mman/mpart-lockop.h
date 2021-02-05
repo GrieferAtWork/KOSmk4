@@ -33,6 +33,7 @@
 DECL_BEGIN
 
 struct mman;
+struct mpart;
 struct mpart_lockop;
 struct mpart_postlockop;
 

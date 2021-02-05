@@ -36,15 +36,19 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <bits/os/timespec.h>
+
 #include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
 
 #undef CONFIG_MFILE_LEGACY_VIO_OPS
+#ifndef CONFIG_USE_NEW_FS
 #if 1 /* TODO: Currently required for backwards compatibility to the old mman.
        * The plan is to eventually disable this option, and merge `inode_type'
        * with `mfile_ops', which should then contain a pointer for VIO operators.
        * With this option enabled, the old behavior is used, instead. */
 #define CONFIG_MFILE_LEGACY_VIO_OPS
 #endif
+#endif /* !CONFIG_USE_NEW_FS */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -84,8 +88,33 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !poll_mode_t_defined */
 #endif /* CONFIG_USE_NEW_VM */
 
+/*
+ * HINTS: Disallowing certain operations for `struct mfile' users:
+ *
+ * - MFILE_F_FIXEDFILESIZE:
+ *    - mfile_truncate()   (throws: E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE)
+ *    - mfile_tailread()   (for offsets >= mf_filesize: blocks forever)
+ *    - mfile_tailwrite()  (THROW(E_FSERROR_DISK_FULL))
+ *    - mfile_read()       (for offsets >= mf_filesize: returns `0')
+ *    - mfile_write()      (for offsets >= mf_filesize: THROW(E_FSERROR_DISK_FULL))
+ *
+ * - MFILE_F_READONLY:
+ *    - mfile_tailwrite()  (THROW(E_FSERROR_READONLY))
+ *    - mfile_write()      (THROW(E_FSERROR_READONLY))
+ *    - mmap(SHARED|WRITE) (THROW(E_FSERROR_READONLY))
+ *    - Note that `mfile_truncate()' is _not_ affected!
+ *
+ * - MFILE_F_DELETED
+ *
+ */
+
+
+#ifdef CONFIG_USE_NEW_FS
+/* Optional operators used when  */
 struct mfile_stream_ops {
+
 };
+#endif /* CONFIG_USE_NEW_FS */
 
 struct mfile_ops {
 	/* [0..1] Finalize + free the given mem-file. */
@@ -127,27 +156,29 @@ struct mfile_ops {
 
 	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
-	 * @assume(mfile_addr_aligned(self, addr));
-	 * @assume(num_bytes != 0);
+	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
+	 * @assume(addr + num_bytes <= self->mf_filesize);
 	 * @assume(self->mf_trunclock != 0);
+	 * @assume(num_bytes != 0);
 	 * @assume(WRITABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
 	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned
 	 *       end of the last file-block when `num_bytes' isn't aligned by whole blocks, where
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	NONNULL((1)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self,
-	                                         pos_t addr, physaddr_t buf, size_t num_bytes);
+	NONNULL((1)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
+	                                         physaddr_t buf, size_t num_bytes);
 
 	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
-	 * @assume(mfile_addr_aligned(self, addr));
+	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
+	 * @assume(addr + num_bytes <= self->mf_filesize);
 	 * @assume(self->mf_trunclock != 0);
 	 * @assume(num_bytes != 0);
 	 * @assume(READABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
 	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned
 	 *       end of the last file-block when `num_bytes' isn't aligned by whole blocks, where
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self,
-	                                         pos_t addr, physaddr_t buf, size_t num_bytes);
+	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
+	                                         physaddr_t buf, size_t num_bytes);
 
 #ifdef CONFIG_USE_NEW_FS
 	/* [0..1] Called after `MFILE_F_CHANGED' and/or `MFILE_F_ATTRCHANGED' becomes set.
@@ -200,9 +231,6 @@ struct mfile_ops {
 	                            poll_mode_t what) THROWS(...);
 #endif /* CONFIG_USE_NEW_VM */
 
-	/* TODO: Operator `mo_changed': Called when the backing memory of a part is modified. */
-	/* TODO: Operator `mo_attr_changed': Called when one of the file's attribute fields changed. */
-
 	/* TODO: Additional operator callbacks for handle integration:
 	 *  - read   (note: pread() is implemented via `mfile_read()')
 	 *  - write  (note: pwrite() is implemented via `mfile_write()')
@@ -222,23 +250,51 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
 
 #ifdef CONFIG_USE_NEW_FS
 #define MFILE_F_NORMAL          0x0000 /* Normal flags. */
+#ifndef CONFIG_NO_SMP
+#define _MFILE_F_SMP_TSLOCK     0x0001 /* [lock(ATOMIC)] SMP-lock for TimeStamps (`mf_atime', `mf_mtime'). */
+#endif /* !CONFIG_NO_SMP */
+/*efine MFILE_F_                0x0002  * ... */
+/*efine MFILE_F_                0x0004  * ... */
 #define MFILE_F_CHANGED         0x0008 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
                                         * This flag is set before `mo_changed()' is invoked, which also won't
                                         * be invoked again until this flag has been cleared, which is done
                                         * as part of a call to `mfile_sync()' */
 #define MFILE_F_ATTRCHANGED     0x0010 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
                                         * Indicates that attributes of this file (its size, etc.) have changed. */
-#define MFILE_F_DELETED         0x0040 /* [lock(mf_lock && WRITE_ONCE)] The file has been marked as deleted.
-                                        * When this flag is set, newly parts are created with `mfile_anon[*]'
-                                        * set for their pointed-to `mp_file' field.
-                                        * This flag implies that `mfile_isanon(self)' */
+#define MFILE_F_READONLY        0x0020 /* [lock(WRITE_ONCE)] Disallow `mfile_write()', as well as `PROT_WRITE|PROT_SHARED'
+                                        * mappings. Attempting to do either will result in `E_FSERROR_READONLY' being thrown. */
+#define MFILE_F_DELETED         0x0040 /* [lock(WRITE_ONCE)][const_if(MFILE_F_READONLY)] The file has been marked as
+                                        * deleted. When this flag is set, new parts may be created with `mfile_anon[*]'
+                                        * set for their pointed-to `mp_file' field. This flag also means that
+                                        * `mfile_isanon(self)' and `mf_filesize == 0' will be the same sooner or later,
+                                        * though this may not be the case yet, since file anonymization & all of that
+                                        * jazz happens asynchronously through use of lockops!
+                                        * Note that this flag implies `MFILE_F_READONLY|MFILE_F_FIXEDFILESIZE', except
+                                        * that the delete-operation itself will eventually be allowed to set the file's
+                                        * size to `0'. Once async deletion is complete, the file's part-tree and changed-
+                                        * list will be set to MFILE_PARTS_ANONYMOUS, the file will have a zero of `0',
+                                        * and all of its used-to-be parts will be anon, too. */
 #define MFILE_F_PERSISTENT      0x0080 /* [const] Parts of this file should not be unloaded to free up memory.
                                         * When this flag is set, then newly created parts (if non-anonymous)
                                         * will be created with the `MPART_F_PERSISTENT' flag set.
                                         * This flag is used to implement ramfs-based filesystems, where it is
                                         * used to prevent files on such filesystem from being deleted when the
                                         * kernel tries to reclaim memory. */
-#define MFILE_F_FIXEDFILESIZE   0x0800 /* [lock(WRITE_ONCE)] The size of this file cannot be altered. */
+#define MFILE_F_FIXEDFILESIZE   0x0100 /* [lock(WRITE_ONCE)] The size of this file cannot be altered.
+                                        * Note that when using `mfile_write()' on a VIO-file, the call will
+                                        * act as though this flag was always set, since it's impossible to
+                                        * atomically modify the file's size while also invoking (possibly
+                                        * blocking) VIO callbacks, without locking all other write-past-end
+                                        * operations on the same file. Note however that you can still use
+                                        * `mfile_truncate()' to change the size of a VIO-file, so-long as
+                                        * it doesn't have this flag set! */
+#define MFILE_F_NOATIME         0x0200 /* [lock(WRITE_ONCE && _MFILE_F_SMP_TSLOCK)] Don't modify the value of `mf_atime' */
+#define MFILE_F_NOMTIME         0x0400 /* [lock(WRITE_ONCE && _MFILE_F_SMP_TSLOCK)] Don't modify the value of `mf_mtime' */
+/*efine MFILE_F_                0x0800  * ... */
+/*efine MFILE_F_                0x1000  * ... */
+/*efine MFILE_F_                0x2000  * ... */
+/*efine MFILE_F_                0x4000  * ... */
+/*efine MFILE_F_                0x8000  * ... */
 #endif /* CONFIG_USE_NEW_FS */
 
 struct mfile {
@@ -251,13 +307,13 @@ struct mfile {
 	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
 	                                            * contained parts changes state from INIT to LOAD. */
-	struct mfile_lockop_slist   mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of dead parts (that still have
-	                                            * to be removed from `mf_parts'). */
-	struct REF mpart_slist      mf_changed;    /* [0..n][lock(ATOMIC)]
+	struct mfile_lockop_slist   mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
+	struct REF mpart_slist      mf_changed;    /* [0..n][lock(APPEND: ATOMIC,
+	                                            *             CLEAR:  ATOMIC && mf_lock)]
 	                                            * Chain of references to parts that contain unsaved changes.
 	                                            * NOTE: Set to `MFILE_PARTS_ANONYMOUS' if changed parts should
-	                                            *       always be ignored unconditionally. This should also be
-	                                            *       done when `mf_ops->mo_saveblocks' is `NULL'! */
+	                                            *       always be ignored unconditionally, the same way they
+	                                            *       would be when `mf_ops->mo_saveblocks' is `NULL'. */
 	size_t                      mf_part_amask; /* [const] == MAX(PAGESIZE, 1 << mf_blockshift) - 1
 	                                            * This field describes the minimum alignment of file positions
 	                                            * described by parts, minus one (meaning it can be used as a
@@ -266,36 +322,6 @@ struct mfile {
 
 	/* TODO: Change `mfile_makeanon_subrange()' to `mfile_truncate()' (which can
 	 *       be used to dynamically alter the `mf_filesize' value of a given mem-file) */
-
-	/* TODO: Change `mfile_write()' to include special handling when writing beyond
-	 *       the end of a mem-file, such that it will automatically increase the
-	 *       size of the given mem-file in this scenario. For this purpose, the write
-	 *       must happen without releasing any locks that may be required in order to
-	 *       undo the operation, and `mf_filesize' must then (somehow) be increased atomically.
-	 *       Note that since it's a 64-bit number, doing this atomically doesn't normally
-	 *       work in 32-bit mode... */
-
-	/* TODO: When the size of a file is changed, a flag `MFILE_F_ATTRCHANGED' should
-	 *       be set, followed by `mo_changed()' being called. The flag should behave
-	 *       the same as `MFILE_F_CHANGED', meaning that it can be used to enqueue the
-	 *       mem-file for containing modified attributes. */
-
-	/* TODO: Change `mo_changed()' to not take a mem-part, but instead a set of flags
-	 *       of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED' that describe in which way the
-	 *       file should be marked as having changed. */
-
-	/* TODO: Change `mfile_read()' to not read beyond the end of a file, and instead
-	 *       return the actual # of bytes read. (Trying to read all data from beyond
-	 *       the end of a file should return `0', thus indicating end-of-file) */
-
-	/* TODO: Add a new function `mfile_tailread()' that behaves just like `mfile_read()',
-	 *       but when an attempt is made to read from a location beyond the natural end
-	 *       of the associated file, then the function will block until the file's size
-	 *       has increased to allow for at least one byte to be read at the specified
-	 *       location */
-
-	/* TODO: Add a new function `mfile_tailwrite()' that always writes data at the
-	 *       allocated end of the file (O_APPEND-style) */
 
 #ifdef CONFIG_USE_NEW_FS
 	uintptr_t                   mf_flags;      /* File flags (set of `MFILE_F_*') */
@@ -312,7 +338,7 @@ struct mfile {
 	                                            *                                                // one must be able to prevent `mf_filesize' from changing at all!
 	                                            *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
 	                                            *                  mpart_lock_acquired(ALL(mf_parts)))]
-	                                            * [const_if(MFILE_F_FIXEDFILESIZE)] // Cannot become lower when `mf_trunclock != 0'
+	                                            * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)] // Also cannot be lowered when `mf_trunclock != 0'
 	                                            * [valid_if(!mfile_isanon(self))] File size field.
 	                                            * Attempting to construct new mem-parts above this address
 	                                            * will fail and/or clamp the max accessible file size to
@@ -322,8 +348,18 @@ struct mfile {
 	                                            * file in a call to `mfile_write()'. Also note that whenever
 	                                            * this value is increased, then the `mf_initdone' signal will
 	                                            * be broadcast. */
-	/* TODO: Integrate access/modified timestamps right here.
-	 *       That way, they can be updated at the appropriate spots! */
+	struct timespec             mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
+	                                            * Last-accessed timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
+	                                            * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
+	                                            *      before proceeding to use the data you've just read! */
+	struct timespec             mf_mtime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOMTIME)][valid_if(!MFILE_F_DELETED)]
+	                                            * Last-modified timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
+	                                            * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
+	                                            *      before proceeding to use the data you've just read! */
+	struct timespec             mf_ctime;      /* [const][valid_if(!MFILE_F_DELETED)]
+	                                            * Creation timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
+	                                            * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
+	                                            *      before proceeding to use the data you've just read! */
 #endif /* CONFIG_USE_NEW_FS */
 };
 
@@ -347,6 +383,32 @@ struct mfile {
 	((__hybrid_atomic_fetchor((self)->mf_flags, MFILE_F_ATTRCHANGED, __ATOMIC_SEQ_CST) & MFILE_F_ATTRCHANGED) \
 	 ? ((self)->mf_ops->mo_changed ? (*self->mf_ops->mo_changed)(self, MFILE_F_ATTRCHANGED) : (void)0)        \
 	 : (void)0)
+
+#ifdef CONFIG_NO_SMP
+#define mfile_tslock_tryacquire(self)   1
+#define mfile_tslock_acquire_nopr(self) (void)0
+#define mfile_tslock_release_nopr(self) (void)0
+#else /* CONFIG_NO_SMP */
+#define mfile_tslock_tryacquire(self)               \
+	(!(__hybrid_atomic_fetchor((self)->mf_flags,    \
+	                           _MFILE_F_SMP_TSLOCK, \
+	                           __ATOMIC_ACQUIRE) &  \
+	   _MFILE_F_SMP_TSLOCK))
+#define mfile_tslock_acquire_nopr(self)        \
+	do {                                       \
+		while (!mfile_tslock_tryacquire(self)) \
+			task_pause();                      \
+	}	__WHILE0
+#define mfile_tslock_release_nopr(self) \
+	__hybrid_atomic_and((self)->mf_flags, ~_MFILE_F_SMP_TSLOCK, __ATOMIC_RELEASE)
+#endif /* !CONFIG_NO_SMP */
+#define mfile_tslock_acquire(self)                \
+	do {                                          \
+		pflag_t _mtsl_was = PREEMPTION_PUSHOFF(); \
+		mfile_tslock_acquire_nopr(self)
+#define mfile_tslock_release(self)       \
+		mfile_tslock_release_nopr(self); \
+	} __WHILE0
 #endif /* CONFIG_USE_NEW_FS */
 
 #ifdef CONFIG_MFILE_LEGACY_VIO_OPS
@@ -485,13 +547,34 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_lockops_reap)(struct mfile
 #define mfile_lock_canwrite(self)   atomic_rwlock_canwrite(&(self)->mf_lock)
 
 
+#ifdef CONFIG_USE_NEW_FS
+/* Make the given file anonymous+deleted. What this means is that (in order):
+ *  - The `MFILE_F_DELETED' flag is set for the file.
+ *  - The file-fields of all mem-parts are altered to point
+ *    at anonymous memory files. (s.a. `mfile_anon')
+ *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
+ *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
+ *  - The `mf_filesize' field is set to `0'.
+ * The result of all of this is that it is no longer possible to
+ * trace back mappings of parts of `self' to that file.
+ *
+ * This function is called when the given file `self' should be deleted,
+ * or has become unavailable for some other reason (e.g. the backing
+ * filesystem has been unmounted)
+ *
+ * Note that (with the exception of `MFILE_F_DELETED' being set, which is
+ * always done synchronously), this function operates entirely asynchronously,
+ * meaning that it uses lockops in order to wait for any locks it may need to
+ * become available. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self);
+#else /* CONFIG_USE_NEW_FS */
 /* Make the given file anonymous+deleted. What this means is that:
  *  - Existing mappings of all mem-parts are altered to point
  *    at anonymous memory files. For this purpose, the nodes of
  *    all existing mappings are altered. (s.a. `mfile_anon')
  *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' are set to `MFILE_PARTS_ANONYMOUS'
- *  - The `MFILE_F_DELETED' flag is set for the file.
  * The result of all of this is that it is no longer possible to
  * trace back mappings of parts of `self' to that file.
  *
@@ -501,6 +584,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_lockops_reap)(struct mfile
 FUNDEF NONNULL((1)) void FCALL
 mfile_delete(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK);
+#endif /* !CONFIG_USE_NEW_FS */
+
 
 /* Split a potential part at `minaddr' and `maxaddr', and make
  * it so that all parts between that range are removed from the
@@ -534,9 +619,6 @@ mfile_sync(struct mfile *__restrict self)
  * be returned if another part already exists that describes the
  * mapping above the requested location, and more may be returned
  * if a pre-existing part was spans beyond `addr +hint_bytes -1')
- *
- * See also the effect that `mf_filesize' and `MFILE_F_DELETED' have
- * on the behavior of this function.
  *
  * Note that the caller must ensure that:
  * >> mfile_addr_aligned(addr) && mfile_addr_aligned(hint_bytes)

@@ -1468,9 +1468,8 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
 
 /* Sever all (still-alive) connections that are active for `self'. Note that this function may
  * not be called from inside of signal-completion-callbacks, or any other callback that may be
- * executed in the context of holding an SMP-lock.
- * WARNING: This callback (if used) can only be invoked from `sig_postcompletion_t()'.
- *          Attempting to invoke it from `sig_completion_t()' will result in a dead-lock! */
+ * executed in the context of holding an SMP-lock. (though you area allowed to call this
+ * function from a `sig_postcompletion_t' calback) */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self) {
 	struct _sig_multicompletion_set *set;
@@ -1489,9 +1488,9 @@ NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__r
 }
 
 /* Check if the given signal multi-completion controller `self' was connected. */
-PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion *__restrict self) {
-	struct _sig_multicompletion_set *set;
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion const *__restrict self) {
+	struct _sig_multicompletion_set const *set;
 	set = &self->sm_set;
 	do {
 		unsigned int i;

@@ -188,22 +188,22 @@ SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
 #endif /* __SIZEOF_POINTER__ != ... */
 
 #if 0 /* Static initializer template: */
-	MPART_INIT_mp_refcnt(FILLME),
-	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
-	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
-	MPART_INIT_mp_state(MPART_ST_MEM),
-	MPART_INIT_mp_file(&mfile_ndef),
-	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(FILLME.mp_copy)),
-	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(FILLME.mp_share)),
-	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(FILLME.mp_lockops)),
-	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MPART_INIT_mp_minaddr(0),
-	MPART_INIT_mp_maxaddr(FILLME - 1),
-	MPART_INIT_mp_changed({}),
-	MPART_INIT_mp_filent({}),
-	MPART_INIT_mp_blkst_ptr(NULL),
-	MPART_INIT_mp_mem(FILLME, CEILDIV(FILLME, PAGESIZE)),
-	MPART_INIT_mp_meta(NULL)
+//	MPART_INIT_mp_refcnt(FILLME),
+//	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
+//	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
+//	MPART_INIT_mp_state(MPART_ST_MEM),
+//	MPART_INIT_mp_file(&mfile_ndef),
+//	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(FILLME.mp_copy)),
+//	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(FILLME.mp_share)),
+//	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(FILLME.mp_lockops)),
+//	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+//	MPART_INIT_mp_minaddr(0),
+//	MPART_INIT_mp_maxaddr(FILLME - 1),
+//	MPART_INIT_mp_changed({}),
+//	MPART_INIT_mp_filent({}),
+//	MPART_INIT_mp_blkst_ptr(NULL),
+//	MPART_INIT_mp_mem(FILLME, CEILDIV(FILLME, PAGESIZE)),
+//	MPART_INIT_mp_meta(NULL)
 #endif
 
 struct mpart {

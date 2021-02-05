@@ -991,9 +991,11 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		/* Must insert into the list of changed parts. */
 		struct mfile *file = hipart->mp_file;
 		struct mpart *next;
+		hipart->mp_refcnt = 2;
 		do {
 			next = ATOMIC_READ(file->mf_changed.slh_first);
 			if unlikely(next == MFILE_PARTS_ANONYMOUS) {
+				hipart->mp_refcnt = 1;
 				hipart->mp_flags &= ~MPART_F_CHANGED;
 				break;
 			}

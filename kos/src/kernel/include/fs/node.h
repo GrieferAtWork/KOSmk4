@@ -58,6 +58,7 @@ struct wall_clock;
 struct aio_buffer;
 struct aio_pbuffer;
 struct handle;
+struct stat;
 struct vfs;
 
 typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */

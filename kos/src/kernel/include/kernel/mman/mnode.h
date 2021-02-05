@@ -143,21 +143,21 @@ typedef size_t mpart_reladdr_t;
 #endif /* __SIZEOF_POINTER__ != ... */
 
 #if 0 /* Static initializer template: */
-	MNODE_INIT_mn_mement({}),
-	MNODE_INIT_mn_minaddr(FILL_ME),
-	MNODE_INIT_mn_maxaddr(FILL_ME - 1),
-	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
-	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
-	MNODE_INIT_mn_part(FILL_ME),
-	MNODE_INIT_mn_fspath(NULL),
-	MNODE_INIT_mn_fsname(NULL),
-	MNODE_INIT_mn_mman(&mman_kernel),
-	MNODE_INIT_mn_partoff(0),
-	MNODE_INIT_mn_link({ NULL, FILL_ME }),
-	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MNODE_INIT__mn_module(NULL)
+//	MNODE_INIT_mn_mement({}),
+//	MNODE_INIT_mn_minaddr(FILL_ME),
+//	MNODE_INIT_mn_maxaddr(FILL_ME - 1),
+//	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
+//	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
+//	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
+//	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
+//	MNODE_INIT_mn_part(FILL_ME),
+//	MNODE_INIT_mn_fspath(NULL),
+//	MNODE_INIT_mn_fsname(NULL),
+//	MNODE_INIT_mn_mman(&mman_kernel),
+//	MNODE_INIT_mn_partoff(0),
+//	MNODE_INIT_mn_link({ NULL, FILL_ME }),
+//	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
+//	MNODE_INIT__mn_module(NULL)
 #endif
 
 struct mnode {

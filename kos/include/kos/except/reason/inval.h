@@ -199,6 +199,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,                   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
+	E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/

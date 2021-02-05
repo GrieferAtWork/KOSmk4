@@ -38,9 +38,8 @@ struct sig_completion_context;
 
 /* Signal post-completion callback (to-be registered from `sig_completion_t()')
  * NOTE: `context->scc_post' is unused and its value is undefined when this
- *       callback is invoked. The only reason that this one's here is so this
- *       function can make use of `scc_destroy_later' to prevent the dead-lock
- *       scenario described in `sig_broadcast_destroylater_nopr()' */
+ *       callback is invoked. However, `scc_sender' and `scc_caller' are still
+ *       valid when this function is invoked. */
 typedef NOBLOCK NONNULL((1)) void
 /*NOTHROW*/ (FCALL *sig_postcompletion_t)(struct sig_completion_context *__restrict context,
                                           void *buf);
@@ -56,7 +55,7 @@ struct sig_completion_context {
 	                                         * this callback will be enqueued to-be executed the buffer given
 	                                         * to `sig_completion_t()' once all SMP-locks have been released.
 	                                         * Using this mechanism, a signal completion callback can schedule
-	                                         * further operations which may not necessarily be SMP-lock friendly
+	                                         * further operations, which may not necessarily be SMP-lock friendly,
 	                                         * to-be performed at a later point, once all SMP-locks have been
 	                                         * released.
 	                                         * Note that even NOBLOCK functions may not always be SMP-lock-safe,
@@ -65,7 +64,7 @@ struct sig_completion_context {
 	                                         * for the possibility that either the associated signal and/or
 	                                         * used sig_completion descriptor get destroyed before/while this
 	                                         * callback will eventually be executed. As such it is recommended
-	                                         * to have use the normal signal completion function as a first-stage
+	                                         * to use the normal signal completion function as a first-stage
 	                                         * callback to construct references to objects which are then written
 	                                         * back to the shared buffer and eventually inherited by a second
 	                                         * stage callback pointed to by this field. For an example of this,
@@ -246,15 +245,14 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
 
 /* Sever all (still-alive) connections that are active for `self'. Note that this function may
  * not be called from inside of signal-completion-callbacks, or any other callback that may be
- * executed in the context of holding an SMP-lock.
- * WARNING: This callback (if used) can only be invoked from `sig_postcompletion_t()'.
- *          Attempting to invoke it from `sig_completion_t()' will result in a dead-lock! */
+ * executed in the context of holding an SMP-lock. (though you area allowed to call this
+ * function from a `sig_postcompletion_t' calback) */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self);
 
 /* Check if the given signal multi-completion controller `self' was connected. */
-FUNDEF NOBLOCK NONNULL((1)) __BOOL
-NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion *__restrict self);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion const *__restrict self);
 
 /* Allocate and return a new signal completion descriptor that is attached to the
  * signal multi-completion controller `self', and will invoke `cb' when triggered.
@@ -348,11 +346,11 @@ NOTHROW(FCALL rising_edge_detector_destroy)(struct rising_edge_detector *__restr
 DEFINE_REFCOUNT_FUNCTIONS(struct rising_edge_detector, red_refcnt, rising_edge_detector_destroy)
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL red_phase2)(struct sig_completion_context *__restrict context,
+NOTHROW(FCALL red_phase2)(struct sig_completion_context *__restrict UNUSED(context),
                           void *buf) {
 	REF struct rising_edge_detector *me;
 	me = *(REF struct rising_edge_detector **)buf;
-	sig_broadcast_destroylater(&me->red_ondetect, &context->scc_destroy_later);
+	sig_broadcast(&me->red_ondetect);
 	decref_unlikely(me);
 }
 
@@ -361,7 +359,7 @@ NOTHROW(FCALL red_phase1)(struct sig_completion *__restrict self,
                           struct sig_completion_context *__restrict context,
                           void *buf, size_t bufsize) {
 	struct rising_edge_detector *me;
-	me = (struct rising_edge_detector *)self;
+	me = container_of(self, struct rising_edge_detector, red_compl);
 	/* Automatic re-prime. Could also be implemented by counting the # of
 	 * detected raising edges, rather than keeping a boolean flag, and re-
 	 * connecting `me' to its signal prior to decrementing the edge-counter

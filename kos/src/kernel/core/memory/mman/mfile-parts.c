@@ -287,9 +287,6 @@ mfile_makepart(struct mfile *__restrict self,
  * mapping above the requested location, and more may be returned
  * if a pre-existing part was spans beyond `addr +hint_bytes -1')
  *
- * See also the effect that `mf_filesize' and `MFILE_F_DELETED' have
- * on the behavior of this function.
- *
  * Note that the caller must ensure that:
  * >> mfile_addr_aligned(addr) && mfile_addr_aligned(hint_bytes)
  * @return: * : A reference to a part that (at some point in the past) contained
@@ -322,9 +319,6 @@ makeanon:
 		mfile_lock_endread(self);
 		goto makeanon;
 	}
-#ifdef CONFIG_USE_NEW_FS
-	assert(!(self->mf_flags & MFILE_F_DELETED));
-#endif /* CONFIG_USE_NEW_FS */
 	result = mpart_tree_locate(self->mf_parts, addr);
 	if (result != NULL && tryincref(result)) {
 		/* Found a pre-existing part. */

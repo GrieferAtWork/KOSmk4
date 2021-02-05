@@ -43,7 +43,39 @@ struct fnode
 
 };
 
-
+/*
+ * TODO: Type-tree:
+ *
+ *   mfile                                          (replacement for `struct vm_datablock')
+ *     |
+ *     +-- -> fnode                                 (replacement for `struct inode')
+ *              |
+ *              +----> fregnode  (S_IFREG)          (replacement for `struct regular_node')
+ *              |
+ *              +----> fdirnode  (S_IFDIR)          (replacement for `struct directory_node')
+ *              |
+ *              +----> flnknode  (S_IFLNK)          (replacement for `struct symlink_node')
+ *              |
+ *              +----> fsocknode (S_IFSOCK)         (replacement for `struct socket_node')
+ *              |
+ *              +----> fdevnode
+ *                       |
+ *                       +-----> blkdev  (S_IFBLK)  (replacement for `struct block_device')
+ *                       |
+ *                       +-----> chrdev  (S_IFCHR)  (replacement for `struct character_device')
+ *
+ * XXX: should blkdev be mmap-able? Should it behave as expected,
+ *      meaning that drivers should simply be able to mmap relevant
+ *      parts of disk images into memory? How would sync(2)-ing work?
+ *   -> Testing on linux, it seems you're able to mmap(2) block
+ *      devices, such as disks. So it stands to reason that kos
+ *      should allow you to do the same...
+ * Only problem is: The absolute on-disk address of a page-aligned
+ *                  file position (e.g. `0'), may itself not be page-
+ *                  aligned itself.
+ *             iow: File I/O _has_ to by-pass the mem-part tree of
+ *                  the underlying block-device.
+ */
 
 DECL_END
 #endif /* __CC__ */

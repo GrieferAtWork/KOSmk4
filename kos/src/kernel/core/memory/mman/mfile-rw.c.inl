@@ -255,6 +255,7 @@ again:
 #endif /* !__INTELLISENSE__ */
 #endif /* LOCAL_TAILIO */
 	REF struct mpart *part;
+	/* TODO: Handling for VIO */
 again:
 	if (!num_bytes)
 		goto done;
@@ -263,7 +264,12 @@ again:
 		mfile_lock_endread(self);
 		goto done;
 	}
-	assert(!(self->mf_flags & MFILE_F_DELETED));
+#ifdef LOCAL_WRITING
+	if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) {
+		mfile_lock_endread(self);
+		THROW(E_FSERROR_READONLY);
+	}
+#endif /* LOCAL_WRITING */
 
 	/* Load the current file size. */
 	filesize = (pos_t)atomic64_read(&self->mf_filesize);
@@ -350,6 +356,13 @@ again_extend_part:
 					mfile_extendpart_data_fini(&extdat);
 					goto done;
 				}
+#ifdef LOCAL_WRITING
+				if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) {
+					mfile_lock_endwrite(self);
+					mfile_extendpart_data_fini(&extdat);
+					THROW(E_FSERROR_READONLY);
+				}
+#endif /* LOCAL_WRITING */
 				/* Make sure that there's still nothing within the accessed range. */
 				part = mpart_tree_rlocate(self->mf_parts,
 				                          newpart_minaddr,
@@ -421,6 +434,10 @@ destroy_new_part_and_try_again:
 			mpart_destroy(part);
 			goto again;
 		}
+#ifdef LOCAL_WRITING
+		if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED))
+			goto destroy_new_part_and_try_again;
+#endif /* LOCAL_WRITING */
 		if unlikely(mpart_tree_rlocate(self->mf_parts,
 		                               newpart_minaddr,
 		                               newpart_maxaddr) != NULL)
@@ -547,7 +564,7 @@ part_setcore:
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
 						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) ||
-						    mfile_isanon(self) || (self->mf_flags & MFILE_F_FIXEDFILESIZE) ||
+						    mfile_isanon(self) || (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
 							mpart_setcore_data_fini(&sc_data);
@@ -575,7 +592,7 @@ part_setcore:
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
 						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) ||
-						    mfile_isanon(self) || (self->mf_flags & MFILE_F_FIXEDFILESIZE) ||
+						    mfile_isanon(self) || (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
 							mpart_unsharecow_data_fini(&uc_data);
@@ -725,7 +742,7 @@ restart_after_extendpart_tail:
 				mfile_extendpart_data_fini(&extdat);
 				goto again;
 			}
-			if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE)
+			if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
 				goto restart_after_extendpart_tail;
 			if unlikely((pos_t)atomic64_read(&self->mf_filesize) != filesize)
 				goto restart_after_extendpart_tail;
@@ -988,7 +1005,7 @@ extend_failed:
 		goto handle_part_insert_failure;
 
 	/* Make sure that the file's size can still be altered. */
-	if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE)
+	if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
 		goto handle_part_insert_failure;
 
 	/* Try to insert the new part into the file, as
