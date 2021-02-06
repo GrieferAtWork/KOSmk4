@@ -108,7 +108,7 @@ extern "C++" {
 	}                                                                             \
 	LOCAL NONNULL((1, 2)) __BOOL                                                  \
 	NOTHROW(FCALL syscall_trace_stop)(_SYSCALL_TRACE_CALLBACK_T(cb, T),           \
-	                                  T * __restrict ob_pointer) {                \
+	                                  T *__restrict ob_pointer) {                 \
 		return syscall_trace_stop((syscall_trace_callback_t)cb, ob_pointer, HT);  \
 	}
 HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)

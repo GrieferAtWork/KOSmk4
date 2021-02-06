@@ -56,7 +56,7 @@
  * (and breaking the visibility of us exporting that variable for real) */
 #define ____peb_defined 1
 
-/* Commit our custom configuration by using it to setup-CRT definitions. */
+/* Commit our custom configuration by using it to setup CRT definitions. */
 #include <__crt.h>
 
 #ifdef __CRT_HAVE_memcpy
@@ -132,8 +132,12 @@
 #define __LIBC __INTDEF
 
 #include <hybrid/compiler.h>
+
 #include <hybrid/host.h>
+
+#include <kos/anno.h>
 #include <kos/types.h>
+
 #include <libdl/api.h>
 
 #define CC  LIBDL_CC
@@ -143,15 +147,19 @@
 #define FCALL __FCALL
 #endif /* FCALL */
 #ifndef WEAK
-#define WEAK /* nothing */
+#define WEAK __WEAK
 #endif /* !WEAK */
-#define REF       /* nothing */
-#define REF_IF(x) /* nothing */
+#ifndef REF
+#define REF __REF
+#endif /* !REF */
+#ifndef REF_IF
+#define REF_IF __REF_IF
+#endif /* !REF_IF */
 #ifndef LIBCCALL
-#define LIBCCALL  __LIBCCALL
+#define LIBCCALL __LIBCCALL
 #endif /* !LIBCCALL */
 #ifndef LIBDCALL
-#define LIBDCALL  __LIBDCALL
+#define LIBDCALL __LIBDCALL
 #endif /* !LIBDCALL */
 #ifndef VLIBCCALL
 #define VLIBCCALL __VLIBCCALL

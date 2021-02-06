@@ -29,75 +29,75 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#define EMU86_DEFINE_TZCNT(bwlq, Nbits)                                                       \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) unsigned int                                   \
-	__NOTHROW(LIBEMU86_CC emu86_tzcnt##bwlq)(__uint##Nbits##_t i,                             \
-	                                         /*out:CF|ZF*/ __uint32_t * __restrict peflags) { \
-		unsigned int result    = 0;                                                           \
-		__uint##Nbits##_t mask = 1;                                                           \
-		*peflags               = 0;                                                           \
-		if (!i)                                                                               \
-			*peflags |= EFLAGS_CF;                                                            \
-		for (; !((__uint##Nbits##_t)(i)&mask) && result < Nbits;                              \
-		     mask <<= 1, ++result)                                                            \
-			;                                                                                 \
-		if (!result)                                                                          \
-			*peflags |= EFLAGS_ZF;                                                            \
-		return result;                                                                        \
+#define EMU86_DEFINE_TZCNT(bwlq, Nbits)                                                      \
+	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) unsigned int                                  \
+	__NOTHROW(LIBEMU86_CC emu86_tzcnt##bwlq)(__uint##Nbits##_t i,                            \
+	                                         /*out:CF|ZF*/ __uint32_t *__restrict peflags) { \
+		unsigned int result    = 0;                                                          \
+		__uint##Nbits##_t mask = 1;                                                          \
+		*peflags               = 0;                                                          \
+		if (!i)                                                                              \
+			*peflags |= EFLAGS_CF;                                                           \
+		for (; !((__uint##Nbits##_t)(i)&mask) && result < Nbits;                             \
+		     mask <<= 1, ++result)                                                           \
+			;                                                                                \
+		if (!result)                                                                         \
+			*peflags |= EFLAGS_ZF;                                                           \
+		return result;                                                                       \
 	}
 
-#define EMU86_DEFINE_LZCNT(bwlq, Nbits)                                                       \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) unsigned int                                   \
-	__NOTHROW(LIBEMU86_CC emu86_lzcnt##bwlq)(__uint##Nbits##_t i,                             \
-	                                         /*out:CF|ZF*/ __uint32_t * __restrict peflags) { \
-		unsigned int result    = 0;                                                           \
-		__uint##Nbits##_t mask = (__uint##Nbits##_t)1 << (Nbits - 1);                         \
-		*peflags               = 0;                                                           \
-		if (!i)                                                                               \
-			*peflags |= EFLAGS_CF;                                                            \
-		for (; !((__uint##Nbits##_t)(i)&mask) && mask;                                        \
-		     mask >>= 1, ++result)                                                            \
-			;                                                                                 \
-		if (!result)                                                                          \
-			*peflags |= EFLAGS_ZF;                                                            \
-		return result;                                                                        \
+#define EMU86_DEFINE_LZCNT(bwlq, Nbits)                                                      \
+	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) unsigned int                                  \
+	__NOTHROW(LIBEMU86_CC emu86_lzcnt##bwlq)(__uint##Nbits##_t i,                            \
+	                                         /*out:CF|ZF*/ __uint32_t *__restrict peflags) { \
+		unsigned int result    = 0;                                                          \
+		__uint##Nbits##_t mask = (__uint##Nbits##_t)1 << (Nbits - 1);                        \
+		*peflags               = 0;                                                          \
+		if (!i)                                                                              \
+			*peflags |= EFLAGS_CF;                                                           \
+		for (; !((__uint##Nbits##_t)(i)&mask) && mask;                                       \
+		     mask >>= 1, ++result)                                                           \
+			;                                                                                \
+		if (!result)                                                                         \
+			*peflags |= EFLAGS_ZF;                                                           \
+		return result;                                                                       \
 	}
 
-#define EMU86_DEFINE_RCL(bwlq, Nbits, msb_bit_set)                                          \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __uint##Nbits##_t                            \
-	__NOTHROW(LIBEMU86_CC emu86_rcl##bwlq)(__uint##Nbits##_t i, __uint8_t num_bits,         \
-	                                       /*in|out:CF*/ __uint32_t * __restrict peflags) { \
-		bool cf = (*peflags & EFLAGS_CF) != 0;                                              \
-		for (; num_bits; --num_bits) {                                                      \
-			bool new_cf;                                                                    \
-			new_cf = (i & msb_bit_set) != 0;                                                \
-			i <<= 1;                                                                        \
-			if (cf)                                                                         \
-				i |= 1;                                                                     \
-			cf = new_cf;                                                                    \
-		}                                                                                   \
-		*peflags &= ~EFLAGS_CF;                                                             \
-		if (cf)                                                                             \
-			*peflags |= EFLAGS_CF;                                                          \
-		return i;                                                                           \
+#define EMU86_DEFINE_RCL(bwlq, Nbits, msb_bit_set)                                         \
+	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __uint##Nbits##_t                           \
+	__NOTHROW(LIBEMU86_CC emu86_rcl##bwlq)(__uint##Nbits##_t i, __uint8_t num_bits,        \
+	                                       /*in|out:CF*/ __uint32_t *__restrict peflags) { \
+		bool cf = (*peflags & EFLAGS_CF) != 0;                                             \
+		for (; num_bits; --num_bits) {                                                     \
+			bool new_cf;                                                                   \
+			new_cf = (i & msb_bit_set) != 0;                                               \
+			i <<= 1;                                                                       \
+			if (cf)                                                                        \
+				i |= 1;                                                                    \
+			cf = new_cf;                                                                   \
+		}                                                                                  \
+		*peflags &= ~EFLAGS_CF;                                                            \
+		if (cf)                                                                            \
+			*peflags |= EFLAGS_CF;                                                         \
+		return i;                                                                          \
 	}
-#define EMU86_DEFINE_RCR(bwlq, Nbits, msb_bit_set)                                          \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __uint##Nbits##_t                            \
-	__NOTHROW(LIBEMU86_CC emu86_rcr##bwlq)(__uint##Nbits##_t i, __uint8_t num_bits,         \
-	                                       /*in|out:CF*/ __uint32_t * __restrict peflags) { \
-		bool cf = (*peflags & EFLAGS_CF) != 0;                                              \
-		for (; num_bits; --num_bits) {                                                      \
-			bool new_cf;                                                                    \
-			new_cf = (i & 1) != 0;                                                          \
-			i >>= 1;                                                                        \
-			if (cf)                                                                         \
-				i |= msb_bit_set;                                                           \
-			cf = new_cf;                                                                    \
-		}                                                                                   \
-		*peflags &= ~EFLAGS_CF;                                                             \
-		if (cf)                                                                             \
-			*peflags |= EFLAGS_CF;                                                          \
-		return i;                                                                           \
+#define EMU86_DEFINE_RCR(bwlq, Nbits, msb_bit_set)                                         \
+	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __uint##Nbits##_t                           \
+	__NOTHROW(LIBEMU86_CC emu86_rcr##bwlq)(__uint##Nbits##_t i, __uint8_t num_bits,        \
+	                                       /*in|out:CF*/ __uint32_t *__restrict peflags) { \
+		bool cf = (*peflags & EFLAGS_CF) != 0;                                             \
+		for (; num_bits; --num_bits) {                                                     \
+			bool new_cf;                                                                   \
+			new_cf = (i & 1) != 0;                                                         \
+			i >>= 1;                                                                       \
+			if (cf)                                                                        \
+				i |= msb_bit_set;                                                          \
+			cf = new_cf;                                                                   \
+		}                                                                                  \
+		*peflags &= ~EFLAGS_CF;                                                            \
+		if (cf)                                                                            \
+			*peflags |= EFLAGS_CF;                                                         \
+		return i;                                                                          \
 	}
 
 EMU86_DEFINE_TZCNT(b, 8)

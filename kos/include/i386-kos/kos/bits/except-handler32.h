@@ -42,7 +42,7 @@ struct __exception_data32;
 #define __EXCEPT_HANDLER32_CC /*__ATTR_FASTCALL*/
 typedef /*__ATTR_NORETURN*/
 __HYBRID_FUNCPTR32(void, /*__ATTR_FASTCALL*/, __except_handler32_t,
-                   (struct kcpustate32 * __restrict state,
+                   (struct kcpustate32 *__restrict state,
                     struct __exception_data32 *__restrict error));
 __SYSDECL_END
 #endif /* !__x86_64__ */
