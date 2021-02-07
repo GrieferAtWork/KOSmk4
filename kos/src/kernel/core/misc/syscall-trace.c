@@ -30,9 +30,10 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
-#include <misc/atomic-ref.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/aref.h>
 
 #include <assert.h>
 #include <format-printer.h>
@@ -126,9 +127,11 @@ PRIVATE struct sct_table_struct empty_sct_table = {
 	/* .tt_count  = */ 0
 };
 
+ARREF(sct_table_struct_arref, sct_table_struct);
+
 /* [1..1] The global SCT callback table. */
-PRIVATE ATOMIC_REF(struct sct_table_struct)
-sct_table = ATOMIC_REF_INIT(&empty_sct_table);
+PRIVATE struct sct_table_struct_arref
+sct_table = ARREF_INIT(&empty_sct_table);
 
 
 
@@ -171,7 +174,7 @@ syscall_trace_start(syscall_trace_callback_t cb,
 		REF struct sct_table_struct *new_table;
 		/* Insert the entry into the SCT table. */
 again_insert:
-		old_table = sct_table.get();
+		old_table = arref_get(&sct_table);
 		/* Check for an existing match for `entry' */
 		for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
 			struct sct_entry *old_entry;
@@ -221,7 +224,7 @@ again_insert:
 			new_table->tt_count = new_count;
 		}
 		/* Try to replace the existing table with our new one. */
-		if unlikely(!sct_table.cmpxch_inherit_new(old_table, new_table)) {
+		if unlikely(!arref_cmpxch_inherit_new(&sct_table, old_table, new_table)) {
 			/* The global SCT table has changed.
 			 * -> Must load the new table and try again! */
 			assert(new_table->tt_table[new_count - 1] == entry);
@@ -304,12 +307,12 @@ again:
 		new_table->tt_count = new_count;
 	}
 set_new_table:
-	if (!sct_table.cmpxch_inherit_new(old_table, new_table)) {
+	if (!arref_cmpxch_inherit_new(&sct_table, old_table, new_table)) {
 		/* The table has changed in the meantime.
 		 * -> Try again! */
 		if (has_old_table_ref)
 			decref(old_table);
-		old_table = sct_table.get();
+		old_table = arref_get(&sct_table);
 		has_old_table_ref = true;
 		goto again;
 	}
@@ -330,7 +333,7 @@ NOTHROW(FCALL syscall_trace_stop)(syscall_trace_callback_t cb,
 	size_t i;
 	REF struct sct_table_struct *table;
 again:
-	table = sct_table.get();
+	table = arref_get(&sct_table);
 	/* Find the entry in question. */
 	for (i = 0; i < table->tt_count; ++i) {
 		struct sct_entry *entry;
@@ -371,7 +374,7 @@ PUBLIC void FCALL
 syscall_trace(struct rpc_syscall_info const *__restrict info) {
 	size_t i;
 	REF struct sct_table_struct *table;
-	table = sct_table.get();
+	table = arref_get(&sct_table);
 	FINALLY_DECREF_UNLIKELY(table);
 	if unlikely(!table->tt_count) {
 		/* Try to disable system call tracing.
