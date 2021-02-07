@@ -136,7 +136,7 @@ arp_routepacket(struct nic_device *__restrict dev,
 				return; /* IPv4 addresses are 4-byte long */
 			hdr = (struct arphdr_ether_in *)packet_data;
 			/* Check if we've asked who this is in the past. */
-			peers = dev->nd_net.n_peers.get();
+			peers = arref_get(&dev->nd_net.n_peers);
 			peer  = net_peeraddrs_lookup_ip(peers, hdr->ar_sip.s_addr);
 			if (peer) {
 				/* Fill in peer information. */

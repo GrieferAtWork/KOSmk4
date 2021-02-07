@@ -76,7 +76,7 @@ nic_device_requireip(struct nic_device *__restrict self, be32 ip)
 	REF struct net_peeraddrs *old_peers;
 	REF struct net_peeraddrs *new_peers;
 again:
-	old_peers = self->nd_net.n_peers.get();
+	old_peers = arref_get(&self->nd_net.n_peers);
 	BSEARCH_EX(i, lo, hi, old_peers->nps_addrs, old_peers->nps_count, ->_npa_hip, (u32)ip) {
 		/* Already exists. */
 		result = incref(old_peers->nps_addrs[i]);
@@ -118,7 +118,7 @@ again:
 
 	new_peers->nps_addrs[lo] = result; /* Inherit reference */
 	/* Try to install the new peers vector. */
-	if unlikely(!self->nd_net.n_peers.cmpxch_inherit_new(old_peers, new_peers)) {
+	if unlikely(!arref_cmpxch_inherit_new(&self->nd_net.n_peers, old_peers, new_peers)) {
 		assert(!wasdestroyed(new_peers));
 		assert(!isshared(new_peers));
 		assert(!wasdestroyed(new_peers));

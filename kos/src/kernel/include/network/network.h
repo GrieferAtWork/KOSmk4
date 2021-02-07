@@ -24,12 +24,12 @@
 
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/signal.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/sync/atomic-lock.h>
 
+#include <kos/aref.h>
 #include <linux/if_ether.h>
 
 DECL_BEGIN
@@ -108,12 +108,17 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL network_ip_datagrams_fini)(struct network_ip_datagrams *__restrict self);
 
 
+#ifndef __net_peeraddrs_arref_defined
+#define __net_peeraddrs_arref_defined
+ARREF(net_peeraddrs_arref, net_peeraddrs);
+#endif /* !__net_peeraddrs_arref_defined */
+
 struct network {
 	/* Generic network descriptor. */
-	ATOMIC_REF(struct net_peeraddrs) n_peers;   /* [1..1] Known network peers, and their addresses. */
-	struct sig                       n_addravl; /* Signal broadcast once a peer mac address becomes available. */
-	struct network_ip_datagrams      n_ipgrams; /* IP datagrams. */
-	u16                              n_ipsize;  /* Max IP fragment size (default initialize to `IP_MSS'; must be divisible by `8'). */
+	struct net_peeraddrs_arref  n_peers;   /* [1..1] Known network peers, and their addresses. */
+	struct sig                  n_addravl; /* Signal broadcast once a peer mac address becomes available. */
+	struct network_ip_datagrams n_ipgrams; /* IP datagrams. */
+	u16                         n_ipsize;  /* Max IP fragment size (default initialize to `IP_MSS'; must be divisible by `8'). */
 };
 
 /* Ensure that a peer entry exists for `ip', returning its descriptor. */
@@ -124,22 +129,22 @@ nic_device_requireip(struct nic_device *__restrict self, be32 ip)
 /* Initialize a given network descriptor */
 #define __network_init_common(self) \
 	((self)->n_ipsize = 576 /*IP_MSS*/)
-#define network_init(self)                                    \
-	(incref(&net_peeraddrs_empty),                            \
-	 atomic_ref_init(&(self)->n_peers, &net_peeraddrs_empty), \
-	 sig_init(&(self)->n_addravl),                            \
-	 network_ip_datagrams_init(&(self)->n_ipgrams),           \
+#define network_init(self)                               \
+	(incref(&net_peeraddrs_empty),                       \
+	 arref_init(&(self)->n_peers, &net_peeraddrs_empty), \
+	 sig_init(&(self)->n_addravl),                       \
+	 network_ip_datagrams_init(&(self)->n_ipgrams),      \
 	 __network_init_common(self))
-#define network_cinit(self)                                    \
-	(incref(&net_peeraddrs_empty),                             \
-	 atomic_ref_cinit(&(self)->n_peers, &net_peeraddrs_empty), \
-	 sig_cinit(&(self)->n_addravl),                            \
-	 network_ip_datagrams_cinit(&(self)->n_ipgrams),           \
+#define network_cinit(self)                               \
+	(incref(&net_peeraddrs_empty),                        \
+	 arref_cinit(&(self)->n_peers, &net_peeraddrs_empty), \
+	 sig_cinit(&(self)->n_addravl),                       \
+	 network_ip_datagrams_cinit(&(self)->n_ipgrams),      \
 	 __network_init_common(self))
 
 /* Finalize a given network descriptor */
-#define network_fini(self)              \
-	(atomic_ref_fini(&(self)->n_peers), \
+#define network_fini(self)         \
+	(arref_fini(&(self)->n_peers), \
 	 network_ip_datagrams_fini(&(self)->n_ipgrams))
 
 

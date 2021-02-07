@@ -30,6 +30,7 @@
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <misc/atomic-ref.h>
 
 #include <linux/if_ether.h>
 #include <netinet/in.h>
@@ -43,10 +44,10 @@
 
 DECL_BEGIN
 
-#define nic_packet_alloc(nic, num_payloads, ht_size)                                      \
-	((REF struct nic_packet *)kmalloc(offsetof(struct nic_packet, np_payloadv) +          \
+#define nic_packet_alloc(nic, num_payloads, ht_size)                                       \
+	((REF struct nic_packet *)kmalloc(offsetof(struct nic_packet, np_payloadv) +           \
 	                                  ((num_payloads) * sizeof(struct aio_buffer_entry)) + \
-	                                  (ht_size),                                          \
+	                                  (ht_size),                                           \
 	                                  (nic)->nd_hdgfp))
 
 /* Allocate a new NIC packet which may be used to send the given payload.
