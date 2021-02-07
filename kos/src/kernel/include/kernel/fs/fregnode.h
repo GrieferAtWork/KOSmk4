@@ -61,7 +61,7 @@ struct fregnode
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - mf_filesize, mf_atime, mf_mtime, mf_ctime
- *  - fn_nlink, fn_ino, fn_mode (with something or'd with S_IFREG)
+ *  - fn_allnodes, fn_supent, fn_nlink, fn_ino, fn_mode (with something or'd with S_IFREG)
  * @param: struct fregnode     *self:   Regular node to initialize.
  * @param: struct fregnode_ops *ops:    Regular file operators.
  * @param: struct fsuper       *super:  Filesystem superblock. */

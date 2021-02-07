@@ -341,6 +341,7 @@ struct mfile_ops {
 	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned            \
 	 *       end of the last file-block when `num_bytes' isn't aligned by whole blocks, where               \
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */                               \
+	/* TODO: Change this function to add support for iov-based I/O  */                                      \
 	NONNULL((1)) void (KCALL *prefix##loadblocks)(T *__restrict self, pos_t addr,                           \
 	                                              physaddr_t buf, size_t num_bytes);                        \
 	                                                                                                        \
@@ -354,6 +355,7 @@ struct mfile_ops {
 	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned             \
 	 *       end of the last file-block when `num_bytes' isn't aligned by whole blocks, where               \
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */                               \
+	/* TODO: Change this function to add support for iov-based I/O  */                                      \
 	NONNULL((1)) void (KCALL *prefix##saveblocks)(T *__restrict self, pos_t addr,                           \
 	                                              physaddr_t buf, size_t num_bytes);                        \
 	                                                                                                        \
@@ -480,79 +482,91 @@ struct mfile_lockop; /* from "mfile-lockop.h" */
 SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
 
 #ifdef CONFIG_USE_NEW_FS
-/* HINT: Flags defined here also map to:
- *        - `ST_*' from <sys/statvfs.h>
- *        - `MS_*' from <sys/mount.h>
- *
- *  0x0001  MFILE_F_READONLY       ST_RDONLY           MS_RDONLY
- *  0x0002                         ST_NOSUID           MS_NOSUID
- *  0x0004                         ST_NODEV            MS_NODEV
- *  0x0008                         ST_NOEXEC           MS_NOEXEC
- *  0x0010                         ST_SYNCHRONOUS      MS_SYNCHRONOUS
- *  0x0020
- *  0x0040                         ST_MANDLOCK         MS_MANDLOCK
- *  0x0080
- *  0x0100
- *  0x0200
- *  0x0400  MFILE_F_NOATIME        ST_NOATIME          MS_NOATIME
- *  0x0800                         ST_NODIRATIME       MS_NODIRATIME
- *
- * TODO: Adjust flags accordingly! (also look at ST_* and MS_* flag
- *       bits to select best-fitting flag values for other flags,
- *       based on usage)
- *
- * TODO: Certain bits (like ST_NOSUID and ST_NOEXEC) should be reserved
- *       for exclusive use by `struct fsuper'! */
+/* Flags defined here also map to:
+ *  - `ST_*' from <sys/statvfs.h>
+ *  - `MS_*' from <sys/mount.h>
+ *  0x00000001  MFILE_F_READONLY       ST_RDONLY           MS_RDONLY
+ *  0x00000002  MFILE_FS_NOSUID        ST_NOSUID           MS_NOSUID
+ *  0x00000004                         ST_NODEV            MS_NODEV
+ *  0x00000008  MFILE_FS_NOEXEC        ST_NOEXEC           MS_NOEXEC
+ *  0x00000010                         ST_SYNCHRONOUS      MS_SYNCHRONOUS
+ *  0x00000040                         ST_MANDLOCK         MS_MANDLOCK
+ *  0x00000080                                             MS_DIRSYNC
+ *  0x00000400  MFILE_F_NOATIME        ST_NOATIME          MS_NOATIME
+ *  0x00000800                         ST_NODIRATIME       MS_NODIRATIME
+ *  0x00010000                                             MS_POSIXACL
+ *  0x00020000                                             MS_UNBINDABLE
+ *  0x00200000                                             MS_RELATIME
+ *  0x01000000                                             MS_STRICTATIME
+ *  0x02000000                                             MS_LAZYTIME */
 
-
-#define MFILE_F_NORMAL          0x0000 /* Normal flags. */
+/* Flags for `struct mfile::mf_flags' */
+#define MFILE_F_NORMAL          0x00000000 /* Normal flags. */
+#define MFILE_F_READONLY        0x00000001 /* [lock(READ:  mf_lock || mpart_lock_acquired(ANY(mf_parts)),
+                                            *       WRITE: mf_lock && mpart_lock_acquired(ALL(mf_parts)))]
+                                            * Disallow `mfile_write()', as well as `PROT_WRITE|PROT_SHARED' mappings.
+                                            * Attempting to do either will result in `E_FSERROR_READONLY' being thrown. */
+#define MFILE_FS_NOSUID         0x00000002 /* [lock(ATOMIC)] fsuper-specific: Ignore `S_ISGID' and `S_ISUID' bits. */
+#define MFILE_FN_GLOBAL_REF     0x00000004 /* [lock(CLEAR_ONCE)] fnode-specific: The global list of fnode-s holds a reference to this one. */
+#define MFILE_FS_NOEXEC         0x00000008 /* [lock(ATOMIC)] fsuper-specific: Disallow execution of files. */
+/*      MFILE_F_                0x00000010  * ... Reserved: MS_SYNCHRONOUS */
+#define MFILE_F_DELETED         0x00000020 /* [lock(WRITE_ONCE)][const_if(MFILE_F_READONLY)] The file has been marked as
+                                            * deleted. When this flag is set, new parts may be created with `mfile_anon[*]'
+                                            * set for their pointed-to `mp_file' field. This flag also means that
+                                            * `mfile_isanon(self)' and `mf_filesize == 0' will be the same sooner or later,
+                                            * though this may not be the case yet, since file anonymization & all of that
+                                            * jazz happens asynchronously through use of lockops!
+                                            * Note that this flag implies `MFILE_F_READONLY|MFILE_F_FIXEDFILESIZE', except
+                                            * that the delete-operation itself will eventually be allowed to set the file's
+                                            * size to `0'. Once async deletion is complete, the file's part-tree and changed-
+                                            * list will be set to MFILE_PARTS_ANONYMOUS, the file will have a zero of `0',
+                                            * and all of its used-to-be parts will be anon, too. */
+/*      MFILE_F_                0x00000040  * ... Reserved: MS_MANDLOCK */
+/*      MFILE_F_                0x00000080  * ... Reserved: MS_DIRSYNC */
+#define MFILE_F_ATTRCHANGED     0x00000100 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
+                                            * Indicates that attributes of this file (its size, etc.) have changed. */
+#define MFILE_F_CHANGED         0x00000200 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
+                                            * This flag is set before `mo_changed()' is invoked, which also won't
+                                            * be invoked again until this flag has been cleared, which is done
+                                            * as part of a call to `mfile_sync()' */
+#define MFILE_F_NOATIME         0x00000400 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_atime' */
+/*      MFILE_F_                0x00000800  * ... Reserved: MS_NODIRATIME */
+#define MFILE_F_NOUSRMMAP       0x00001000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. */
+#define MFILE_F_NOUSRIO         0x00002000 /* [lock(ATOMIC)] Disallow user-space from read(2)-ing or write(2)-ing this file. */
+#define MFILE_F_NOMTIME         0x00004000 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */
+/*efine MFILE_F_                0x00008000  * ... */
+/*      MFILE_F_                0x00010000  * ... Reserved: MS_POSIXACL */
+/*      MFILE_F_                0x00020000  * ... Reserved: MS_UNBINDABLE */
+#define MFILE_F_PERSISTENT      0x00040000 /* [lock(CLEAR_ONCE)] Parts of this file should not be unloaded to free up memory.
+                                            * When this flag is set, then newly created parts (if non-anonymous)
+                                            * will be created with the `MPART_F_PERSISTENT' flag set.
+                                            * This flag is used to implement ramfs-based filesystems, where it is
+                                            * used to prevent files on such filesystem from being deleted when the
+                                            * kernel tries to reclaim memory.
+                                            * This flag is cleared when such a file is (intentionally) unlink(2)'d,
+                                            * or when the backing superblock is unmounted. */
+#define MFILE_F_FIXEDFILESIZE   0x00080000 /* [lock(WRITE_ONCE)] The size of this file cannot be altered.
+                                            * Note that when using `mfile_write()' on a VIO-file, the call will
+                                            * act as though this flag was always set, since it's impossible to
+                                            * atomically modify the file's size while also invoking (possibly
+                                            * blocking) VIO callbacks, without locking all other write-past-end
+                                            * operations on the same file. Note however that you can still use
+                                            * `mfile_truncate()' to change the size of a VIO-file, so-long as
+                                            * it doesn't have this flag set! */
+/*efine MFILE_F_                0x00100000  * ... */
+/*      MFILE_F_                0x00200000  * ... Reserved: MS_RELATIME */
+/*efine MFILE_F_                0x00400000  * ... */
+/*efine MFILE_F_                0x00800000  * ... */
+/*      MFILE_F_                0x01000000  * ... Reserved: MS_STRICTATIME */
+/*      MFILE_F_                0x02000000  * ... Reserved: MS_LAZYTIME */
+/*efine MFILE_F_                0x04000000  * ... */
+/*efine MFILE_F_                0x08000000  * ... */
+/*efine MFILE_F_                0x10000000  * ... */
+/*efine MFILE_F_                0x20000000  * ... */
+/*efine MFILE_F_                0x40000000  * ... */
 #ifndef CONFIG_NO_SMP
-#define _MFILE_F_SMP_TSLOCK     0x0001 /* [lock(ATOMIC)] SMP-lock for TimeStamps (`mf_atime', `mf_mtime'). */
+#define _MFILE_F_SMP_TSLOCK     0x80000000 /* [lock(ATOMIC)] SMP-lock for TimeStamps (`mf_atime', `mf_mtime'). */
 #endif /* !CONFIG_NO_SMP */
-/*efine MFILE_F_                0x0002  * ... */
-/*efine MFILE_F_                0x0004  * ... */
-#define MFILE_F_CHANGED         0x0008 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
-                                        * This flag is set before `mo_changed()' is invoked, which also won't
-                                        * be invoked again until this flag has been cleared, which is done
-                                        * as part of a call to `mfile_sync()' */
-#define MFILE_F_ATTRCHANGED     0x0010 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
-                                        * Indicates that attributes of this file (its size, etc.) have changed. */
-#define MFILE_F_READONLY        0x0020 /* [lock(READ:  mf_lock || mpart_lock_acquired(ANY(mf_parts)),
-                                        *       WRITE: mf_lock && mpart_lock_acquired(ALL(mf_parts)))]
-                                        * Disallow `mfile_write()', as well as `PROT_WRITE|PROT_SHARED' mappings.
-                                        * Attempting to do either will result in `E_FSERROR_READONLY' being thrown. */
-#define MFILE_F_DELETED         0x0040 /* [lock(WRITE_ONCE)][const_if(MFILE_F_READONLY)] The file has been marked as
-                                        * deleted. When this flag is set, new parts may be created with `mfile_anon[*]'
-                                        * set for their pointed-to `mp_file' field. This flag also means that
-                                        * `mfile_isanon(self)' and `mf_filesize == 0' will be the same sooner or later,
-                                        * though this may not be the case yet, since file anonymization & all of that
-                                        * jazz happens asynchronously through use of lockops!
-                                        * Note that this flag implies `MFILE_F_READONLY|MFILE_F_FIXEDFILESIZE', except
-                                        * that the delete-operation itself will eventually be allowed to set the file's
-                                        * size to `0'. Once async deletion is complete, the file's part-tree and changed-
-                                        * list will be set to MFILE_PARTS_ANONYMOUS, the file will have a zero of `0',
-                                        * and all of its used-to-be parts will be anon, too. */
-#define MFILE_F_PERSISTENT      0x0080 /* [const] Parts of this file should not be unloaded to free up memory.
-                                        * When this flag is set, then newly created parts (if non-anonymous)
-                                        * will be created with the `MPART_F_PERSISTENT' flag set.
-                                        * This flag is used to implement ramfs-based filesystems, where it is
-                                        * used to prevent files on such filesystem from being deleted when the
-                                        * kernel tries to reclaim memory. */
-#define MFILE_F_FIXEDFILESIZE   0x0100 /* [lock(WRITE_ONCE)] The size of this file cannot be altered.
-                                        * Note that when using `mfile_write()' on a VIO-file, the call will
-                                        * act as though this flag was always set, since it's impossible to
-                                        * atomically modify the file's size while also invoking (possibly
-                                        * blocking) VIO callbacks, without locking all other write-past-end
-                                        * operations on the same file. Note however that you can still use
-                                        * `mfile_truncate()' to change the size of a VIO-file, so-long as
-                                        * it doesn't have this flag set! */
-#define MFILE_F_NOATIME         0x0200 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_atime' */
-#define MFILE_F_NOMTIME         0x0400 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */
-/*efine MFILE_F_                0x0800  * ... */
-#define MFILE_F_NOUSRMMAP       0x1000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. */
-#define MFILE_F_NOUSRIO         0x2000 /* [lock(ATOMIC)] Disallow user-space from read(2)-ing or write(2)-ing this file. */
-/*efine MFILE_F_                0x4000  * ... */
-/*efine MFILE_F_                0x8000  * ... */
 #endif /* CONFIG_USE_NEW_FS */
 
 struct mfile {

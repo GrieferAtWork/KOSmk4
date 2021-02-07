@@ -69,12 +69,7 @@
                                        * memory parts, it will clear this flag for all parts there are.
                                        * Also note that this flag is cleared by default when the associated
                                        * file's `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
-#define MPART_F_CHANGED        0x0008 /* [lock(SET(MPART_F_LOCKBIT),
-                                       *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
-                                       *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
-                                       * [valid_if(:mfile::mf_changed != MFILE_PARTS_ANONYMOUS)]
-                                       * Blocks of this part (may) have changed. This flag must be cleared by the
-                                       * associated file after changes have been synced, or the file becomes anonymous. */
+/*efine MPART_F_               0x0008  * ... */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The backing block-state bitset exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
@@ -87,7 +82,12 @@
                                        * reference. - This flag is set by default for parts of files that have the
                                        * `MFILE_F_PERSISTENT' flag set. */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
-/*efine MPART_F_               0x0200  * ... */
+#define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
+                                       *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
+                                       *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
+                                       * [valid_if(:mfile::mf_changed != MFILE_PARTS_ANONYMOUS)]
+                                       * Blocks of this part (may) have changed. This flag must be cleared by the
+                                       * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_NOSPLIT        0x0400 /* [const] This mem-part cannot be split, and if doing so would be necessary,
                                        *         then the attempt will instead result in kernel panic. Similarly,
                                        *         this flag also prevents the part from being merged. */
@@ -252,7 +252,7 @@ struct mpart {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) mp_allparts
 #endif /* __WANT_MPART_INIT */
-	LIST_ENTRY(mpart)             mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
+	LIST_ENTRY(mpart)             mp_allparts;  /* [0..1][lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
 	                                             * Chain of all mem-parts in existence. (may be unbound for certain parts)
 	                                             * NOTE: For VIO parts, this list entry is initialized as unbound! */
 #endif /* !__WANT_MPART__mp_newglobl */
@@ -1145,6 +1145,8 @@ DATDEF struct atomic_lock mpart_all_lock;
  *       destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
 DATDEF struct mpart_list mpart_all_list;
 
+/* TODO: Instead of having a dead- and pending- list, use a single, common lockop list! */
+
 /* [0..n][CHAIN(_mp_dead)][lock(ATOMIC)]
  * List of dead parts that have yet to be removed from `mpart_all_list'.
  * This list must be cleared whenever the caller has released a lock to `mpart_all_lock'.
@@ -1169,7 +1171,7 @@ NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self);
 /* Try to reap all dead memory-parts from `mpart_all_dead'.
  * This function must be called after releasing a lock from `mpart_all_lock' */
 FUNDEF NOBLOCK void NOTHROW(FCALL _mpart_all_reap)(void);
-#define mpart_all_mustreap(self)                                                      \
+#define mpart_all_mustreap()                                                          \
 	(__hybrid_atomic_load(mpart_all_dead.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR || \
 	 __hybrid_atomic_load(mpart_all_pending.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__

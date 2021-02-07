@@ -1407,6 +1407,12 @@
 	void (*prefix##mkfile)(T *self, struct fmkfile_info *info);\
 	void (*prefix##unlink)(T *self, struct fdirent *entry, struct fnode *file);\
 	void (*prefix##rename)(T *self, struct frename_info *info)
+#define FLINDIRNODE_OPS_FIELDS(prefix, T)\
+	FDIRNODE_OPS_FIELDS(prefix, T);\
+	struct flindirent *(*prefix##readdir)(T *self, pos_t *pentry_pos)
+#define FDYNDIRNODE_OPS_FIELDS(prefix, T)\
+	FDIRNODE_OPS_FIELDS(prefix, T);\
+	void (*prefix##enumdir)(T *self, fdyndir_enum_callback_t cb, void *cookie)
 
 #define BZ_EXTERN
 #define BZ_API(f) f

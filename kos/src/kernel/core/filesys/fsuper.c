@@ -17,50 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MPART_LOCKOP_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MPART_LOCKOP_H 1
+#ifndef GUARD_KERNEL_CORE_FILESYS_FSUPER_C
+#define GUARD_KERNEL_CORE_FILESYS_FSUPER_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
-#include <kernel/types.h>
+#include <kernel/fs/fsuper.h>
 
-#include <hybrid/sequence/list.h>
+#include <kos/except.h>
 
-#ifdef __CC__
+#include <assert.h>
+#include <stddef.h>
+
 DECL_BEGIN
 
-struct mpart;
-struct mpart_lockop;
-struct mpart_postlockop;
-
-typedef NOBLOCK NONNULL((1, 2)) void
-/*NOTHROW*/ (FCALL *mpart_postlockop_callback_t)(struct mpart_postlockop *__restrict self,
-                                                 struct mpart *__restrict part);
-
-struct mpart_postlockop {
-	SLIST_ENTRY(mpart_postlockop) mpplo_link; /* [0..1] Next post-lock operation. */
-	mpart_postlockop_callback_t   mpplo_func; /* [1..1][const] Callback to invoke. */
-};
-
-
-/* Callback prototype for mpart pending locked operations.
- * @return: NULL: Completed.
- * @return: * :   A descriptor for an operation to perform
- *                after the mpart-lock has been released. */
-typedef NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
-/*NOTHROW*/ (FCALL *mpart_lockop_callback_t)(struct mpart_lockop *__restrict self,
-                                             struct mpart *__restrict part);
-
-struct mpart_lockop {
-	SLIST_ENTRY(mpart_lockop) mplo_link; /* [0..1] Next lock operation. */
-	mpart_lockop_callback_t   mplo_func; /* [1..1][const] Operation to perform. */
-};
 
 DECL_END
-#endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MPART_LOCKOP_H */
+#endif /* !GUARD_KERNEL_CORE_FILESYS_FSUPER_C */

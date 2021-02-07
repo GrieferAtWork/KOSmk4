@@ -599,7 +599,8 @@ template<class T> struct xatomic_weaklyref {
 #define xatomic_ref_fini(self)     xdecref((self)->m_pointer)
 
 /* A weakly held reference (must be cleared by the associated object once that object gets destroyed) */
-#define XATOMIC_WEAKLYREF   ATOMIC_REF
+#define XATOMIC_WEAKLYREF          ATOMIC_REF
+#define XATOMIC_WEAKLYREF_STRUCT   ATOMIC_REF
 #ifndef CONFIG_NO_SMP
 #define xatomic_weaklyref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
 #define xatomic_weaklyref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))

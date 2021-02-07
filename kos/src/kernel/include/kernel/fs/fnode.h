@@ -27,8 +27,10 @@
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/mman/mfile.h>
 #include <kernel/types.h>
+#include <misc/atomic-ref.h>
 
 #include <hybrid/sequence/list.h>
+#include <hybrid/sequence/rbtree.h>
 
 #include <kos/io.h>
 
@@ -153,23 +155,41 @@ struct fnode_ops {
 /* Filesystem node. */
 struct fnode
 #ifdef __cplusplus
-    : mfile                            /* Underlying mem-file */
+    : mfile                             /* Underlying mem-file */
 #endif /* __cplusplus */
 {
+	/* NOTE: `fn_file.mf_flags' may also contain `MFILE_FN_*' flags! */
 #ifndef __cplusplus
-	struct mfile           fn_file;    /* Underlying mem-file */
+	struct mfile                fn_file;     /* Underlying mem-file */
 #endif /* !__cplusplus */
-	nlink_t                fn_nlink;   /* [lock(ATOMIC)] INode link counter. */
-	mode_t                 fn_mode;    /* [lock(ATOMIC)] INode access mode (but note that file-type bits are [const]). */
-	ino_t                  fn_ino;     /* [lock(_MFILE_F_SMP_TSLOCK)] INode number.
-	                                    * On some filesystems, this number may change when the file is renamed (e.g. FAT)
-	                                    * As such, a lock is required when reading/writing the INode number! */
-	REF struct fsuper     *fn_super;   /* [1..1][const] Associated super-block. */
-	SLIST_ENTRY(REF fnode) fn_changed; /* [lock(ATOMIC)][LIST(fn_super->fsp_changed)]
-	                                    * [valid_if(!fsuper_datachanged_isanon(fn_super) &&
-	                                    *           !mfile_isanon(self) && (MFILE_F_CHANGED | MFILE_F_ATTRCHANGED)]
-	                                    * Link entry in the list of changed file-nodes. */
+	nlink_t                     fn_nlink;    /* [lock(ATOMIC)] INode link counter. */
+	mode_t                      fn_mode;     /* [lock(ATOMIC)] INode access mode (but note that file-type bits are [const]). */
+	ino_t                       fn_ino;      /* [lock(_MFILE_F_SMP_TSLOCK)] INode number.
+	                                          * On some filesystems, this number may change when the file is renamed (e.g. FAT)
+	                                          * As such, a lock is required when reading/writing the INode number! */
+	REF struct fsuper          *fn_super;    /* [1..1][const] Associated super-block. */
+	SLIST_ENTRY(REF fnode)      fn_changed;  /* [lock(ATOMIC)][LIST(fn_super->fsp_changed)]
+	                                          * [valid_if(!fsuper_datachanged_isanon(fn_super) &&
+	                                          *           !mfile_isanon(self) && (MFILE_F_CHANGED | MFILE_F_ATTRCHANGED)]
+	                                          * Link entry in the list of changed file-nodes. */
+	LLRBTREE_NODE(struct fnode) fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]
+	                                          * Tree entry within the super block's tree of file-nodes.
+	                                          * When `rb_lhs' is set to `FSUPER_NODES_DELETED', then the
+	                                          * file-node is no longer apart of the super's tree of file
+	                                          * nodes. In this case, the `MFILE_F_PERSISTENT' flag may be
+	                                          * assumed to have already been cleared. */
+	union {
+		LIST_ENTRY(fnode)       fn_allnodes; /* [0..1][lock(:fnode_all_lock)][valid_if(!fnode_issuper(self))]
+		                                      * Link entry within the global list of all file nodes. When
+		                                      * `MFILE_FN_GLOBAL_REF' is set, then the global list holds a
+		                                      * reference to this node. */
+		LIST_ENTRY(fsuper)      fn_allsuper; /* [0..1][lock(:fsuper_all_lock)][valid_if(fnode_issuper(self))]
+		                                      * Link entry within the global list of all super blocks. When
+		                                      * `MFILE_FN_GLOBAL_REF' is set, then the global list holds a
+		                                      * reference to this node. */
+	};
 };
+
 
 /* Helper functions that must be invoked after `fn_nlink' or `fn_mode' was changed. */
 #define fnode_nlink_changed(self) mfile_changed(self, MFILE_F_ATTRCHANGED)
@@ -181,7 +201,7 @@ struct fnode
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - mf_parts, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime
- *  - fn_nlink, fn_ino, fn_mode
+ *  - fn_nlink, fn_ino, fn_mode, fn_allnodes, fn_supent
  * @param: struct fnode     *self:  File-node to initialize.
  * @param: struct fnode_ops *ops:   File-node operators.
  * @param: struct fsuper    *super: Filesystem superblock. */
@@ -201,9 +221,19 @@ struct fnode
 #define _fnode_fini(self) decref_nokill((self)->fn_super)
 
 /* Mandatory callback for all types derived from `struct fnode',
- * for use with `mf_ops->mo_changed' */
+ * for use with `mf_ops->mo_changed'. MUST NOT BE OVERWRITTEN! */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_changed)(struct mfile *__restrict self, uintptr_t what);
+NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
+                               uintptr_t old_flags, uintptr_t new_flags);
+
+/* File-node destroy callback. Must be set in `mo_destroy',
+ * but may be overwritten by sub-classes, in which case this
+ * function must be called as the last thing done within the
+ * sub-class destroy-operator. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self);
+
+
 
 /* Check if a given `struct fnode *self' is one of its many sub-classes. */
 #define fnode_isreg(self)    S_ISREG((self)->fn_mode)
@@ -245,6 +275,8 @@ NOTHROW(FCALL fnode_changed)(struct mfile *__restrict self, uintptr_t what);
 #define mfile_asdev(self)     ((struct fdevnode *)(self))
 #define mfile_asblkdev(self)  ((struct blkdev *)(self))
 #define mfile_aschrdev(self)  ((struct chrdev *)(self))
+
+
 
 DECL_END
 #endif /* __CC__ */
