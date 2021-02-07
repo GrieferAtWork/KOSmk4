@@ -54,6 +54,7 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
 
+#include <kos/aref.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <sys/param.h>
@@ -1148,7 +1149,12 @@ INTDEF byte_t __debug_malloc_tracked_start[];
 INTDEF byte_t __debug_malloc_tracked_end[];
 INTDEF byte_t __debug_malloc_tracked_size[];
 
-INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
+#ifndef __driver_state_arref_defined
+#define __driver_state_arref_defined
+ARREF(driver_state_arref, driver_state);
+#endif /* !__driver_state_arref_defined */
+
+INTDEF struct driver_state_arref current_driver_state;
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_corepage_chain)(struct mcorepage *chain) {
@@ -1248,7 +1254,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	{
 		struct driver_state *drivers;
 		size_t i;
-		drivers = arref_ptr(&current_driver_state.m_me);
+		drivers = arref_ptr(&current_driver_state);
 		for (i = 0; i < drivers->ds_count; ++i) {
 			uint16_t j;
 			struct driver *drv = drivers->ds_drivers[i];

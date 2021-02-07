@@ -41,7 +41,6 @@
 #include <kernel/vboxgdb.h>
 #include <kernel/vm.h>
 #include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
-#include <misc/atomic-ref.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -51,6 +50,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <kos/aref.h>
 #include <kos/debugtrap.h>
 #include <kos/except/reason/noexec.h>
 #include <kos/exec/elf-rel.h> /* ELF_ARCH_*_R_* */
@@ -403,13 +403,16 @@ PUBLIC struct callback_list_struct callback_list_empty = {
 };
 
 
+#ifndef __driver_state_arref_defined
+#define __driver_state_arref_defined
+ARREF(driver_state_arref, driver_state);
+#endif /* !__driver_state_arref_defined */
 
 /* The current state of loaded drivers.
- * This needs to be implemented as an atomic_ref pointer, so-as to allow for NOBLOCK+NOEXCEPT
+ * This needs to be implemented as an ARREF pointer, so-as to allow for NOBLOCK+NOEXCEPT
  * enumeration of loaded drivers for the purpose of both discovering, as well as locking of
  * the driver associated with some given static data pointer. */
-INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
-INTERN atomic_ref<struct driver_state> current_driver_state = ATOMIC_REF_INIT(&empty_driver_state);
+INTERN struct driver_state_arref current_driver_state = ARREF_INIT(&empty_driver_state);
 #ifdef CONFIG_VBOXGDB
 DEFINE_PUBLIC_ALIAS(_vboxgdb_kos_driver_state, current_driver_state);
 #endif /* CONFIG_VBOXGDB */
@@ -425,7 +428,7 @@ NOTHROW(KCALL driver_state_destroy)(struct driver_state *__restrict self) {
 /* Return a snapshot for the current state of loaded drivers. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED
 REF struct driver_state *NOTHROW(KCALL driver_get_state)(void) {
-	return current_driver_state.get();
+	return arref_get(&current_driver_state);
 }
 
 
@@ -438,7 +441,7 @@ add_global_driver(struct driver *__restrict self) THROWS(E_BADALLOC) {
 	REF struct driver_state *old_state;
 	REF struct driver_state *new_state;
 again:
-	old_state = current_driver_state.get();
+	old_state = arref_get(&current_driver_state);
 	for (i = 0; i < old_state->ds_count; ++i) {
 		struct driver *other_driver;
 		other_driver = old_state->ds_drivers[i];
@@ -460,7 +463,7 @@ again:
 	                                               (old_state->ds_count + 1) *
 	                                               sizeof(REF struct driver *),
 	                                               GFP_LOCKED | GFP_PREFLT);
-	new_state->ds_refcnt = 1; /* Inherited by `current_driver_state.cmpxch_inherit_new()' */
+	new_state->ds_refcnt = 1; /* Inherited by `arref_cmpxch_inherit_new(&current_driver_state, ...)' */
 	new_state->ds_count  = old_state->ds_count + 1;
 	/* Copy existing drivers. */
 	for (i = j = 0; j < old_state->ds_count; ++j) {
@@ -475,8 +478,8 @@ again:
 	new_state->ds_drivers[i] = weakincref(self);
 	new_state->ds_count      = i + 1;
 	/* Try to set the new state via an atomic compare-exchange */
-	if unlikely(!current_driver_state.cmpxch_inherit_new(old_state,
-	                                                     new_state)) {
+	if unlikely(!arref_cmpxch_inherit_new(&current_driver_state,
+	                                      old_state, new_state)) {
 		destroy(new_state);
 		goto again;
 	}
@@ -494,7 +497,7 @@ NOTHROW(KCALL try_remove_driver_from_global_set)(struct driver *__restrict self)
 	REF struct driver_state *old_state;
 	REF struct driver_state *new_state;
 again:
-	old_state = current_driver_state.get();
+	old_state = arref_get(&current_driver_state);
 	for (i = 0; i < old_state->ds_count; ++i) {
 		if (old_state->ds_drivers[i] == self) {
 			/* Found it! */
@@ -515,7 +518,7 @@ again:
 					decref_unlikely(old_state);
 					return false;
 				}
-				new_state->ds_refcnt = 1; /* Inherited by `current_driver_state.cmpxch_inherit_new()' */
+				new_state->ds_refcnt = 1; /* Inherited by `arref_cmpxch_inherit_new(&current_driver_state, ...)' */
 				/* Copy existing drivers (but skip the driver at `i'). */
 				dst = 0;
 				for (j = 0; j < i; ++j) {
@@ -532,8 +535,8 @@ again:
 				new_state->ds_count = dst;
 			}
 			/* Try to set the new state via an atomic compare-exchange */
-			if unlikely(!current_driver_state.cmpxch_inherit_new(old_state,
-			                                                     new_state)) {
+			if unlikely(!arref_cmpxch_inherit_new(&current_driver_state,
+			                                      old_state, new_state)) {
 				decref_likely(new_state);
 				goto again;
 			}
@@ -557,7 +560,7 @@ NOTHROW(KCALL driver_clear_fde_caches)(void) {
 	size_t i, result;
 	REF struct driver_state *ds;
 	result = driver_clear_fde_cache(&kernel_driver);
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	for (i = 0; i < ds->ds_count; ++i) {
 		REF struct driver *drv;
 		drv = ds->ds_drivers[i];
@@ -696,7 +699,7 @@ NOTHROW(KCALL system_clearcaches)(void) {
 	{
 		REF struct driver_state *state;
 		/* Invoke the `drv_clearcache()' function of every loaded driver. */
-		state = current_driver_state.get();
+		state = arref_get(&current_driver_state);
 		for (i = 0; i < state->ds_count; ++i) {
 			kernel_system_clearcache_t func;
 			REF struct driver *drv;
@@ -1977,7 +1980,7 @@ driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict s
 			size_t j;
 			REF struct driver_state *ds;
 again_search_for_depending_drivers:
-			ds = current_driver_state.get();
+			ds = arref_get(&current_driver_state);
 			for (j = 0; j < ds->ds_count; ++j) {
 				struct driver *d;
 				size_t i;
@@ -2010,7 +2013,7 @@ find_next_dependent_driver:
 			}
 			/* If the set of loaded drivers has changed, then
 			 * we have to check for more depending drivers. */
-			if (arref_ptr(&current_driver_state.m_me) != ds) {
+			if (arref_ptr(&current_driver_state) != ds) {
 				decref_unlikely(ds);
 				goto again_search_for_depending_drivers;
 			}
@@ -2110,7 +2113,7 @@ driver_delmod(USER CHECKED char const *driver_name,
 	char first_char;
 	first_char = ATOMIC_READ(driver_name[0]);
 	COMPILER_BARRIER();
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	for (i = 0; i < ds->ds_count; ++i) {
 		int compare;
 		struct driver *d;
@@ -2151,7 +2154,7 @@ driver_delmod_inode(struct inode *__restrict driver_node,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	REF struct driver_state *ds;
 	size_t i;
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	for (i = 0; i < ds->ds_count; ++i) {
 		bool success;
 		struct driver *d;
@@ -2956,7 +2959,7 @@ NOTHROW(FCALL driver_at_address)(void const *static_pointer) {
 	/* Check for special case: The pointer isn't located in kernel-space. */
 	if (!ADDR_ISKERN((uintptr_t)static_pointer))
 		return NULL;
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	for (i = 0; i < ds->ds_count; ++i) {
 		size_t j;
 		result = ds->ds_drivers[i];
@@ -2998,7 +3001,7 @@ PUBLIC WUNUSED REF struct driver *
 	/* Check for special case: The kernel core driver. */
 	if (strcmp(kernel_driver.d_name, driver_name) == 0)
 		return incref(&kernel_driver);
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	FINALLY_DECREF_UNLIKELY(ds);
 	for (i = 0; i < ds->ds_count; ++i) {
 		bool is_a_match;
@@ -3030,7 +3033,7 @@ PUBLIC WUNUSED REF struct driver *
 	if (memcmp(kernel_driver.d_name, driver_name, driver_name_len * sizeof(char)) == 0 &&
 	    kernel_driver.d_name[driver_name_len] == '\0')
 		return incref(&kernel_driver);
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	FINALLY_DECREF_UNLIKELY(ds);
 	for (i = 0; i < ds->ds_count; ++i) {
 		bool is_a_match;
@@ -3061,7 +3064,7 @@ PUBLIC WUNUSED REF struct driver *
 	/* Check for special case: The kernel core driver. */
 	if (strcmp(kernel_driver.d_filename, driver_filename) == 0)
 		return incref(&kernel_driver);
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	FINALLY_DECREF_UNLIKELY(ds);
 	for (i = 0; i < ds->ds_count; ++i) {
 		bool is_a_match;
@@ -3098,7 +3101,7 @@ NOTHROW(FCALL driver_with_file)(struct regular_node *__restrict driver_file) {
 	/* Check for special case: The kernel core driver. */
 	if (kernel_driver.d_file == driver_file)
 		return incref(&kernel_driver);
-	ds = current_driver_state.get();
+	ds = arref_get(&current_driver_state);
 	for (i = 0; i < ds->ds_count; ++i) {
 		result = ds->ds_drivers[i];
 		if unlikely(!tryincref(result))
@@ -4777,7 +4780,7 @@ NOTHROW(KCALL initdrivers)(size_t buflen) {
 	buf = (REF struct driver **)malloca(buflen * sizeof(REF struct driver *));
 	/*TRY*/ {
 		REF struct driver_state *state;
-		state        = current_driver_state.get();
+		state        = arref_get(&current_driver_state);
 		driver_count = state->ds_count;
 		if (!driver_count || unlikely(driver_count > buflen)) {
 			decref_unlikely(state);
@@ -4933,7 +4936,7 @@ NOTHROW(KCALL kernel_initialize_loaded_drivers)(void) {
 	size_t new_driver_count;
 	size_t driver_count;
 	REF struct driver_state *state;
-	state        = current_driver_state.get();
+	state        = arref_get(&current_driver_state);
 	driver_count = state->ds_count;
 	decref_unlikely(state);
 again_init_drivers:

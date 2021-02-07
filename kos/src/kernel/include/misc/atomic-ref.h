@@ -38,25 +38,6 @@ extern "C++" {
 
 /* TODO: Everything in here is deprecated! (use <kos/aref.h> instead!) */
 
-#define ATOMIC_REF(...)  atomic_ref< __VA_ARGS__ >
-template<class T> struct atomic_ref {
-
-#define ATOMIC_REF_INIT(p)        { ARREF_INIT(p) }
-#define atomic_ref_init(self, p)  arref_init(&(self)->m_me, p)
-#define atomic_ref_cinit(self, p) arref_cinit(&(self)->m_me, p)
-#define atomic_ref_fini(self)     arref_fini(&(self)->m_me)
-	ARREF(T) m_me;
-
-	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF ATTR_RETNONNULL WUNUSED REF T *KCALL get() __CXX_NOEXCEPT { return arref_get(&m_me); }
-	__CXX_CLASSMEMBER NOBLOCK NOPREEMPT ATTR_LEAF ATTR_RETNONNULL WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT { return arref_get_nopr(&m_me); }
-	__CXX_CLASSMEMBER NOBLOCK NONNULL_CXX((1)) void KCALL set(T *__restrict new_pointer) __CXX_NOEXCEPT { arref_set(&m_me, new_pointer); }
-	__CXX_CLASSMEMBER NOBLOCK NONNULL_CXX((1)) void KCALL set_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT { arref_set_inherit(&m_me, new_pointer); }
-	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF ATTR_RETNONNULL WUNUSED NONNULL_CXX((1)) REF T *KCALL exchange(T *__restrict new_pointer) __CXX_NOEXCEPT { return arref_xch(&m_me, new_pointer); }
-	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF ATTR_RETNONNULL WUNUSED NONNULL_CXX((1)) REF T *KCALL exchange_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT { return arref_xch_inherit(&m_me, new_pointer); }
-	__CXX_CLASSMEMBER NOBLOCK NONNULL_CXX((1, 2)) bool KCALL cmpxch(T *__restrict old_pointer, T *__restrict new_pointer) __CXX_NOEXCEPT { return arref_cmpxch(&m_me, old_pointer, new_pointer); }
-	__CXX_CLASSMEMBER NOBLOCK NONNULL_CXX((1, 2)) bool KCALL cmpxch_inherit_new(T *__restrict old_pointer, /*inherit(on_success)*/ REF T *__restrict new_pointer) __CXX_NOEXCEPT { return arref_cmpxch_inherit_new(&m_me, old_pointer, new_pointer); }
-};
-
 #define XATOMIC_REF_STRUCT(...) xatomic_ref_struct< __VA_ARGS__ >
 #define XATOMIC_REF(...)        xatomic_ref< __VA_ARGS__ >
 template<class T> struct xatomic_ref_struct { AXREF(T) m_me; };
@@ -105,9 +86,6 @@ template<class T> struct xatomic_weaklyref {
 #else /* __cplusplus */
 
 #define ATOMIC_REF(...)           struct { ARREF(__VA_ARGS__) m_me; }
-#define atomic_ref_init(self, p)  arref_init(&(self)->m_me, p)
-#define atomic_ref_cinit(self, p) arref_cinit(&(self)->m_me, p)
-#define atomic_ref_fini(self)     arref_fini(&(self)->m_me)
 #define XATOMIC_REF_STRUCT        ATOMIC_REF
 #define XATOMIC_REF               ATOMIC_REF
 #ifndef CONFIG_NO_SMP

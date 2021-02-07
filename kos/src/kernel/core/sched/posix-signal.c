@@ -598,7 +598,7 @@ inherit_parent_userprocmask:
 			FORTASK(new_thread, this_userprocmask_address) = um;
 			new_thread->t_flags |= TASK_FUSERPROCMASK;
 			/* The static initialization for the kernel-space `this_sigmask' is sufficient in this case! */
-			/*FORTASK(new_thread, this_sigmask) = ATOMIC_REF_INIT(&kernel_sigmask_empty);*/
+			/*FORTASK(new_thread, this_sigmask) = ARREF_INIT(&kernel_sigmask_empty);*/
 		} else if (flags & CLONE_VFORK) {
 			/* Special case:
 			 * ```

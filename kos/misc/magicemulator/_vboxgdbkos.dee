@@ -212,7 +212,7 @@ doRead:
 @@Enumerate the addresses of the `struct driver` of loaded drivers
 function enumerateDriverAddresses(): {int...} {
 	local data = vmReadMemoryAt(KERNEL_ADDROF["_vboxgdb_kos_driver_state"][0]);
-	/* dataAddr = atomic_ref<struct driver_state>::m_pointer */
+	/* dataAddr = ARREF(driver_state)::rb_obj */
 	local dataAddr = extractWordLeFromBytes(data, 0, SIZEOF_POINTER);
 	data = vmReadMemoryAt(dataAddr);
 	local count, scale, offset;
