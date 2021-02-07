@@ -281,7 +281,7 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 			PRINTF("<library name=\"%#q\">", drv->d_filename);
 		} else {
 			REF struct driver_library_path_string *libpath;
-			libpath = driver_library_path.get();
+			libpath = arref_get(&driver_library_path);
 			if (!strrchr(libpath->dlp_path, ':')) {
 				/* Only a single library path was defined.
 				 * In this case, we can pretty much assume where the driver originates from. */

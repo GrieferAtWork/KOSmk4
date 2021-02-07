@@ -28,12 +28,12 @@
 #include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <kos/aref.h>
 #include <kos/exec/elf.h> /* ElfW */
 
 #include <elf.h>
@@ -81,7 +81,7 @@ DECL_BEGIN
  *        of all drivers already loaded.
  *        If the name matches one of them, that driver is used as the dependency
  *      - If no drivers were found during this step, the `DT_NEEDED' name is appended
- *        to each of the driver library paths (s.a. `driver_library_path.get()')
+ *        to each of the driver library paths (s.a. `arref_get(&driver_library_path)')
  *        The resulting string is then used again to search the set of currently
  *        loaded drivers (this time comparing against the filenames of loaded drivers).
  *      - Lastly, the same set of filesystem strings is used once again, only this
@@ -471,11 +471,17 @@ DEFINE_REFCOUNT_FUNCTIONS(struct driver_library_path_string, dlp_refcnt, kfree);
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 
 
+#ifndef __driver_library_path_string_arref_defined
+#define __driver_library_path_string_arref_defined
+ARREF(driver_library_path_string_arref, driver_library_path_string);
+#endif /* !__driver_library_path_string_arref_defined */
+
+
 /* [1..1] The current driver library path.
  * This path is a ':'-separated list of UNIX-style pathnames
  * that are used to resolve dependencies of kernel driver modules.
  * By default, this string is KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
-DATDEF ATOMIC_REF(struct driver_library_path_string) driver_library_path;
+DATDEF struct driver_library_path_string_arref driver_library_path;
 
 
 #define DRIVER_INSMOD_FLAG_NORMAL 0x0000 /* Normal insmod flags. */

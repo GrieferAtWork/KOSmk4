@@ -4646,8 +4646,8 @@ INTERN struct driver_library_path_string default_library_path = {
  * This path is a ':'-separated list of UNIX-style pathnames
  * that are used to resolve dependencies of kernel driver modules.
  * By default, this string is simply set to "/os/drivers" */
-PUBLIC ATOMIC_REF(struct driver_library_path_string)
-driver_library_path = ATOMIC_REF_INIT(&default_library_path);
+PUBLIC struct driver_library_path_string_arref
+driver_library_path = ARREF_INIT(&default_library_path);
 
 
 PRIVATE WUNUSED NONNULL((1)) /*ATTR_RETNONNULL_IF(second_phase)*/ REF struct driver *KCALL
@@ -4748,7 +4748,7 @@ driver_insmod(USER CHECKED char const *driver_name,
 			goto done;
 		}
 		/* Load the driver library path and search for the driver. */
-		libpath = driver_library_path.get();
+		libpath = arref_get(&driver_library_path);
 		FINALLY_DECREF_UNLIKELY(libpath);
 		result = driver_insmod_loadlib(libpath,
 		                               driver_name,

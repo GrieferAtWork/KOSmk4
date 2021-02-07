@@ -420,7 +420,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		COMPILER_READ_BARRIER();
 
 		/* Load the library path. */
-		libpath = driver_library_path.get();
+		libpath = arref_get(&driver_library_path);
 		FINALLY_DECREF_UNLIKELY(libpath);
 
 		/* Figure out the required buffer size. */
@@ -486,7 +486,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			size_t oldpath_len;
 			REF struct driver_library_path_string *oldpath_string;
 again_get_oldpath:
-			oldpath_string = driver_library_path.get();
+			oldpath_string = arref_get(&driver_library_path);
 			oldpath_len = (strlen(oldpath_string->dlp_path) + 1) * sizeof(char);
 			TRY {
 				oldpath_is_correct = memcmp(oldpath_string->dlp_path,
@@ -502,12 +502,14 @@ again_get_oldpath:
 				return -EPERM;
 			}
 			/* Compare-exchange the old path for the new one. */
-			if (!driver_library_path.cmpxch_inherit_new(oldpath_string, newpath_string))
+			if (!arref_cmpxch_inherit_new(&driver_library_path,
+			                              oldpath_string,
+			                              newpath_string))
 				goto again_get_oldpath;
 			decref_likely(oldpath_string);
 		} else {
 			/* Simply set the new library path without comparing it to the old. */
-			driver_library_path.set_inherit_new(newpath_string);
+			arref_set_inherit(&driver_library_path, newpath_string);
 		}
 	}	break;
 
