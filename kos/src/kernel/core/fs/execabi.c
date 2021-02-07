@@ -70,8 +70,7 @@ PRIVATE struct execabis_struct default_execabis = {
 };
 
 /* [1..1] Currently registered exec-ABIs */
-PUBLIC ATOMIC_REF(struct execabis_struct)
-execabis = ATOMIC_REF_INIT(&default_execabis);
+PUBLIC struct execabis_arref execabis = ARREF_INIT(&default_execabis);
 
 /* Destroy a given exec-ABIs listing. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -111,7 +110,7 @@ execabis_register(struct execabi const *__restrict abi)
 	REF struct execabis_struct *old_abis;
 	REF struct execabis_struct *new_abis;
 again:
-	old_abis = execabis.get();
+	old_abis = arref_get(&execabis);
 	/* Check if this ABI has already been defined. */
 	for (i = 0; i < old_abis->eas_count; ++i) {
 		struct execabi *other_abi;
@@ -150,7 +149,7 @@ again:
 	weakincref(abi->ea_driver);
 
 	/* Atomically load the new ABI descriptor. */
-	if (!execabis.cmpxch_inherit_new(old_abis, new_abis)) {
+	if (!arref_cmpxch_inherit_new(&execabis, old_abis, new_abis)) {
 		decref_unlikely(old_abis);
 		destroy(new_abis);
 		goto again;
@@ -167,7 +166,7 @@ driver_clear_execabis(struct driver *__restrict self)
 	size_t i, j, abi_count;
 again:
 	abi_count = 0;
-	old_abis  = execabis.get();
+	old_abis  = arref_get(&execabis);
 	/* Search for ABIs defined by the given driver. */
 	for (i = 0; i < old_abis->eas_count; ++i) {
 		if (old_abis->eas_abis[i].ea_driver == self)
@@ -209,7 +208,7 @@ again:
 	}
 
 	/* Atomically load the new ABI descriptor. */
-	if (!execabis.cmpxch_inherit_new(old_abis, new_abis)) {
+	if (!arref_cmpxch_inherit_new(&execabis, old_abis, new_abis)) {
 		decref_unlikely(old_abis);
 		destroy(new_abis);
 		goto again;

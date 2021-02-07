@@ -66,7 +66,7 @@ mman_exec(/*in|out*/ struct execargs *__restrict args)
 	REF struct execabis_struct *abis;
 	size_t i;
 again_getabis:
-	abis = execabis.get();
+	abis = arref_get(&execabis);
 again_loadheader:
 	TRY {
 		size_t read_bytes;
@@ -118,7 +118,7 @@ again_loadheader:
 		}
 	}
 	decref_unlikely(abis);
-	if unlikely(abis != arref_ptr(&execabis.m_me)) {
+	if unlikely(abis != arref_ptr(&execabis)) {
 		/* The available set of ABIs has changed. - Try again. */
 		goto again_getabis;
 	}

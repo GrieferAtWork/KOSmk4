@@ -24,9 +24,9 @@
 
 #include <kernel/arch/execabi.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 
 #include <compat/config.h>
+#include <kos/aref.h>
 
 /* Executable format ABI definition hook (for drivers
  * that wish to provide extended support for exec formats) */
@@ -200,8 +200,13 @@ struct execabis_struct {
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL execabis_destroy)(struct execabis_struct *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct execabis_struct, eas_refcnt, execabis_destroy)
 
+#ifndef __execabis_arref_defined
+#define __execabis_arref_defined
+ARREF(execabis_arref, execabis_struct);
+#endif /* !__execabis_arref_defined */
+
 /* [1..1] Currently registered exec-ABIs */
-DATDEF ATOMIC_REF(struct execabis_struct) execabis;
+DATDEF struct execabis_arref execabis;
 
 /* Register a given exec-ABI. Note that the only way to unregister
  * an ABI is to unload the associated driver (in which case the ABI
