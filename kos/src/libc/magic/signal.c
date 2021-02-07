@@ -64,6 +64,10 @@
 #endif /* __SIGRTMAX */
 }
 
+%(auto_source){
+#include "../libc/globals.h"
+}
+
 %[insert:prefix(
 #include <features.h>
 )]%{

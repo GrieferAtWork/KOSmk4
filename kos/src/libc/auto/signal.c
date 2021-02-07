@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9019b089 */
+/* HASH CRC-32:0xede1f5a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 #include <asm/os/signal.h>
 #include <bits/os/sigset.h>
