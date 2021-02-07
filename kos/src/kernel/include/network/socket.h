@@ -25,12 +25,12 @@
 #include <kernel/aio.h>
 #include <kernel/iovec.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/os/cmsghdr.h>
 #include <compat/config.h>
+#include <kos/aref.h>
 #include <kos/io.h>
 #include <sys/socket.h>
 
@@ -617,24 +617,29 @@ DEFINE_REFCOUNT_FUNCTIONS(struct socket_connect_aio, sca_refcnt, socket_connect_
 	(MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE | \
 	 MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL)
 
+#ifndef __socket_connect_aio_axref_defined
+#define __socket_connect_aio_axref_defined 1
+AXREF(socket_connect_aio_axref, socket_connect_aio);
+#endif /* !__socket_connect_aio_axref_defined */
+
 struct socket {
 	/* NOTE: Sockets must support weak referencing so-as to allow AIO
 	 *       handles for `connect()' to be references from within the
 	 *       socket structure itself, simply by having the AIO handles
 	 *       only reference the socket object weakly (thus resolving
 	 *       the potential reference loop) */
-	WEAK refcnt_t                          sk_refcnt;     /* Reference counter. */
-	WEAK refcnt_t                          sk_weakrefcnt; /* Weak reference counter. */
-	struct socket_ops const               *sk_ops;        /* [1..1][const] Socket operation callbacks. */
-	uintptr_half_t                         sk_type;       /* [const] Socket type (one of `SOCK_*'). */
-	uintptr_half_t                         sk_prot;       /* [const] Socket protocol (depends on `s_family' and `s_type'; e.g. `IPPROTO_*'). */
-	XATOMIC_REF(struct socket_connect_aio) sk_ncon;       /* [0..1] Non-blocking connect controller.
-	                                                       * This one's used for `socket_connect()' when called as a non-blocking operation.
-	                                                       * NOTE: Socket implementation should not touch this field!
-	                                                       * HINT: `POLLOUTMASK' is indicated when this is `NULL', or when contained AIO has completed! */
-	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
-	WEAK ktime_t                           sk_rcvtimeo;   /* Default (relative) receive timeout (for `SO_RCVTIMEO') */
-	WEAK ktime_t                           sk_sndtimeo;   /* Default (relative) send timeout (for `SO_SNDTIMEO') */
+	WEAK refcnt_t                   sk_refcnt;     /* Reference counter. */
+	WEAK refcnt_t                   sk_weakrefcnt; /* Weak reference counter. */
+	struct socket_ops const        *sk_ops;        /* [1..1][const] Socket operation callbacks. */
+	uintptr_half_t                  sk_type;       /* [const] Socket type (one of `SOCK_*'). */
+	uintptr_half_t                  sk_prot;       /* [const] Socket protocol (depends on `s_family' and `s_type'; e.g. `IPPROTO_*'). */
+	struct socket_connect_aio_axref sk_ncon;       /* [0..1] Non-blocking connect controller.
+	                                                * This one's used for `socket_connect()' when called as a non-blocking operation.
+	                                                * NOTE: Socket implementation should not touch this field!
+	                                                * HINT: `POLLOUTMASK' is indicated when this is `NULL', or when contained AIO has completed! */
+	WEAK uintptr_t                  sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
+	WEAK ktime_t                    sk_rcvtimeo;   /* Default (relative) receive timeout (for `SO_RCVTIMEO') */
+	WEAK ktime_t                    sk_sndtimeo;   /* Default (relative) send timeout (for `SO_SNDTIMEO') */
 	/* Socket-specific data goes here... */
 };
 
@@ -648,11 +653,11 @@ struct socket {
 	 (self)->sk_sndtimeo   = KTIME_INFINITE)
 #define socket_init(self, ops, type, protocol)        \
 	(__socket_init_common(self, ops, type, protocol), \
-	 xatomic_ref_init(&(self)->sk_ncon),              \
+	 axref_init(&(self)->sk_ncon),                    \
 	 (self)->sk_msgflags = 0)
 #define socket_cinit(self, ops, type, protocol)       \
 	(__socket_init_common(self, ops, type, protocol), \
-	 xatomic_ref_cinit(&(self)->sk_ncon, __NULLPTR),  \
+	 axref_cinit(&(self)->sk_ncon, __NULLPTR),        \
 	 __hybrid_assert((self)->sk_msgflags == 0))
 
 

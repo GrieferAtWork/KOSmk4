@@ -310,7 +310,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
  * as may be the result of decref()-ing woken threads (which may end up being destroyed,
  * and consequently destroying a whole bunch of other things, including open handles)
  *
- * On example of a race condition prevented by this is:
+ * An example of a race condition prevented by this is:
  *      _asyncjob_main()
  *      aio_handle_complete_nopr()          // The connect() operation has completed
  *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
@@ -321,7 +321,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
  *      handle_manager_destroy()
  *      handle_socket_decref()
  *      socket_destroy()
- *          decref_likely(self->sk_ncon.m_pointer)
+ *          decref_likely(self->sk_ncon.axr_obj)
  *      socket_connect_aio_destroy()
  *          aio_handle_generic_fini()
  *              aio_handle_fini()

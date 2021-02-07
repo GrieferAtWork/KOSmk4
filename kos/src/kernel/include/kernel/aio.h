@@ -331,7 +331,7 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
  *      handle_manager_destroy()
  *      handle_socket_decref()
  *      socket_destroy()
- *          decref_likely(self->sk_ncon.m_pointer)
+ *          decref_likely(self->sk_ncon.axr_obj)
  *      socket_connect_aio_destroy()
  *          aio_handle_generic_fini()
  *              aio_handle_fini()

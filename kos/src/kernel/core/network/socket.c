@@ -107,12 +107,12 @@ NOTHROW(KCALL socket_destroy)(struct socket *__restrict self) {
 	/* First step: Call the optional socket family finalizer. */
 	if (self->sk_ops->so_fini)
 		(*self->sk_ops->so_fini)(self);
-	if (self->sk_ncon.m_me.axr_obj) {
+	if unlikely(self->sk_ncon.axr_obj) {
 		/* Drop a reference from the non-blocking connect() controller.
 		 * If this ends up killing it, then `socket_connect_aio_destroy()'
 		 * will cancel the connect() operation if it hadn't been canceled
 		 * already! */
-		decref_likely(self->sk_ncon.m_me.axr_obj);
+		decref_likely(self->sk_ncon.axr_obj);
 	}
 
 	/* Drop a weak reference from the given socket. */
@@ -175,7 +175,7 @@ socket_pollconnect(struct socket *__restrict self, poll_mode_t what) {
 	if (what & POLLOUTMASK) {
 		/* Check if there is a background connect() operation in progress... */
 		REF struct socket_connect_aio *nc;
-		nc = self->sk_ncon.get();
+		nc = axref_get(&self->sk_ncon);
 		if (nc) {
 			/* Connection is being established right _now_! */
 			FINALLY_DECREF_UNLIKELY(nc);
@@ -198,7 +198,7 @@ socket_polltest(struct socket *__restrict self, poll_mode_t what) {
 	if (what & POLLOUTMASK) {
 		/* Check if there is a background connect() operation in progress... */
 		REF struct socket_connect_aio *nc;
-		nc = self->sk_ncon.get();
+		nc = axref_get(&self->sk_ncon);
 		if (!nc) {
 			/* Not connected, or sync-connected. */
 			if (socket_isconnected(self))
@@ -238,7 +238,7 @@ socket_connect(struct socket *__restrict self,
 	REF struct socket_connect_aio *nc;
 again:
 	assert(!task_wasconnected());
-	nc = self->sk_ncon.get();
+	nc = axref_get(&self->sk_ncon);
 	if unlikely(nc) {
 		/* A previous connect() is still in progress... */
 		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
@@ -304,7 +304,7 @@ again:
 			return SOCKET_CONNECT_COMPLETED;
 		}
 		/* Try to set the new connection controller. */
-		if unlikely(!self->sk_ncon.cmpxch_inherit_new(NULL, nc)) {
+		if unlikely(!axref_cmpxch_inherit_new(&self->sk_ncon, NULL, nc)) {
 			/* Someone else already did this... */
 			assert(getrefcnt(nc) == 1);
 			destroy(nc); /* This will also cancel the AIO we've just started. */
@@ -1486,7 +1486,7 @@ socket_getsockopt(struct socket *__restrict self,
 			REF struct socket_connect_aio *ah;
 			intval = EPERM;
 again_read_ncon:
-			ah = self->sk_ncon.get();
+			ah = axref_get(&self->sk_ncon);
 			if (ah) {
 				bool xch_ok;
 				if (!aio_handle_generic_hascompleted(&ah->sca_aio)) {
@@ -1503,7 +1503,7 @@ again_read_ncon:
 						intval = EOK;
 					}
 					/* Consume the completion status. */
-					xch_ok = self->sk_ncon.cmpxch_inherit_new(ah, NULL);
+					xch_ok = axref_cmpxch_inherit_new(&self->sk_ncon, ah, NULL);
 					decref_unlikely(ah);
 					if (!xch_ok)
 						goto again_read_ncon;
