@@ -618,7 +618,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 		struct ansitty *atty;
 done:
 		atty = NULL;
-		tty  = self->kd_tty.get();
+		tty  = awref_get(&self->kd_tty);
 		if (tty && tty->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
 			struct ansitty_device *ttydev;
 			ttydev = (struct ansitty_device *)tty->t_ohandle_ptr;
@@ -645,7 +645,7 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	char const *reader, *end;
 	char newbuf[COMPILER_LENOF(self->kd_pend)];
 	size_t newlen;
-	tty = self->kd_tty.get();
+	tty = awref_get(&self->kd_tty);
 	if (!tty)
 		goto done;
 	if (tty->t_ohandle_typ != HANDLE_TYPE_CHARACTERDEVICE)
