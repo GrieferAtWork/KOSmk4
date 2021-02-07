@@ -42,15 +42,14 @@
 DECL_BEGIN
 
 /* [0..1] The currently installed RTM driver hooks. */
-PUBLIC XATOMIC_WEAKLYREF(struct mrtm_driver_hooks)
-mrtm_hooks = XATOMIC_WEAKLYREF_INIT(NULL);
+PUBLIC struct mrtm_driver_hooks_awref mrtm_hooks = AWREF_INIT(NULL);
 
 #ifdef __ARCH_WANT_SYSCALL_RTM_BEGIN
 INTERN struct icpustate *FCALL
 sys_rtm_begin_impl(struct icpustate *__restrict state) {
 	REF struct mrtm_driver_hooks *hooks;
 	/* Lookup RTM hooks. */
-	hooks = mrtm_hooks.get();
+	hooks = awref_get(&mrtm_hooks);
 	if unlikely(!hooks) {
 		REF struct driver *rtm_driver;
 		/* Lazily load the RTM driver. */
@@ -62,7 +61,7 @@ sys_rtm_begin_impl(struct icpustate *__restrict state) {
 		/* Check if hooks have become available now. */
 		{
 			FINALLY_DECREF_UNLIKELY(rtm_driver);
-			hooks = mrtm_hooks.get();
+			hooks = awref_get(&mrtm_hooks);
 		}
 		if unlikely(!hooks)
 			goto throw_illegal_op;
@@ -87,7 +86,7 @@ syscall_rtm_begin_rpc(void *UNUSED(arg),
 	if (reason != TASK_RPC_REASON_SYSCALL)
 		return state;
 	/* Lookup RTM hooks. */
-	hooks = mrtm_hooks.get();
+	hooks = awref_get(&mrtm_hooks);
 	if unlikely(!hooks) {
 		REF struct driver *rtm_driver;
 		/* Lazily load the RTM driver. */
@@ -99,7 +98,7 @@ syscall_rtm_begin_rpc(void *UNUSED(arg),
 		/* Check if hooks have become available now. */
 		{
 			FINALLY_DECREF_UNLIKELY(rtm_driver);
-			hooks = mrtm_hooks.get();
+			hooks = awref_get(&mrtm_hooks);
 		}
 		if unlikely(!hooks)
 			goto throw_illegal_op;

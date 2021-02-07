@@ -26,7 +26,8 @@
 
 #ifdef ARCH_HAVE_RTM
 #include <kernel/driver.h>
-#include <misc/atomic-ref.h>
+
+#include <kos/aref.h>
 
 DECL_BEGIN
 
@@ -65,8 +66,13 @@ struct mrtm_driver_hooks {
 #define mrtm_driver_hooks_destroy(self) driver_destroy((self)->rdh_driver)
 DEFINE_REFCOUNT_FUNCTIONS(struct mrtm_driver_hooks, rdh_driver->d_refcnt, mrtm_driver_hooks_destroy)
 
+#ifndef __mrtm_driver_hooks_awref_defined
+#define __mrtm_driver_hooks_awref_defined
+AWREF(mrtm_driver_hooks_awref, mrtm_driver_hooks);
+#endif /* !__mrtm_driver_hooks_awref_defined */
+
 /* [0..1] The currently installed RTM driver hooks. */
-DATDEF XATOMIC_WEAKLYREF(struct mrtm_driver_hooks) mrtm_hooks;
+DATDEF struct mrtm_driver_hooks_awref mrtm_hooks;
 
 #endif /* __CC__ */
 

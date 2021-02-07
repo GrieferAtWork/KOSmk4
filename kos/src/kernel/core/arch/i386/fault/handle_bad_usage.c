@@ -1694,7 +1694,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
                    uintptr_t fallback_ip) {
 	REF struct mrtm_driver_hooks *hooks;
 	/* Lookup RTM hooks. */
-	hooks = mrtm_hooks.get();
+	hooks = awref_get(&mrtm_hooks);
 	if unlikely(!hooks) {
 		REF struct driver *rtm_driver;
 		/* Lazily load the RTM driver. */
@@ -1706,7 +1706,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 		/* Check if hooks have become available now. */
 		{
 			FINALLY_DECREF_UNLIKELY(rtm_driver);
-			hooks = mrtm_hooks.get();
+			hooks = awref_get(&mrtm_hooks);
 		}
 		if unlikely(!hooks)
 			goto throw_illegal_op;

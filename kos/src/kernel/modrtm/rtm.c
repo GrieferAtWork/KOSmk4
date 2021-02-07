@@ -36,13 +36,13 @@ DECL_BEGIN
 PRIVATE DRIVER_INIT void KCALL rtm_init(void) {
 	/* Install our RTM hooks.
 	 * If RTM hooks had already been installed, throw an exception */
-	if (!mrtm_hooks.cmpxch(NULL, &rtm_hooks))
+	if (!awref_cmpxch(&mrtm_hooks, NULL, &rtm_hooks))
 		THROW(E_ILLEGAL_OPERATION);
 }
 
 PRIVATE DRIVER_FINI void KCALL rtm_fini(void) {
 	/* Uninstall our RTM hooks */
-	mrtm_hooks.cmpxch(&rtm_hooks, NULL);
+	awref_cmpxch(&mrtm_hooks, &rtm_hooks, NULL);
 }
 
 DECL_END
