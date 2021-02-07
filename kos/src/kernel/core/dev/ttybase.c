@@ -80,7 +80,7 @@ NOTHROW(KCALL ttybase_log_delsession)(struct ttybase_device *__restrict self,
 PUBLIC NOBLOCK void
 NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
                                     pterminal_oprinter_t oprinter) {
-	awref_cinit(&self->t_cproc.m_me, NULL);
+	awref_cinit(&self->t_cproc, NULL);
 	axref_cinit(&self->t_fproc, NULL);
 	self->cd_type.ct_fini        = &ttybase_device_fini;
 	self->cd_type.ct_read        = &ttybase_device_iread;
@@ -280,7 +280,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self) {
 	struct ttybase_device *me;
 	me = (struct ttybase_device *)self;
-	assertf(!awref_ptr(&me->t_cproc.m_me),
+	assertf(!awref_ptr(&me->t_cproc),
 	        "An session leader should be holding a reference to their CTTY, "
 	        "meaning that if we truely were supposed to be a CTTY, the associated "
 	        "session should have kept us from being destroyed");
@@ -554,7 +554,7 @@ do_TCSETA: {
 		REF struct taskpid *tpid;
 		validate_writable(arg, sizeof(upid_t));
 		respid = (upid_t)-ENOTTY;
-		tpid = me->t_cproc.get();
+		tpid = awref_get(&me->t_cproc);
 		if (tpid) {
 			respid = taskpid_getpid(tpid);
 			decref_unlikely(tpid);
@@ -970,9 +970,9 @@ again_check_tg_ctty:
 			if (!override_different_ctty)
 				return TTYBASE_DEVICE_SETCTTY_DIFFERENT;
 again_check_t_cproc_inner:
-			if unlikely(awref_ptr(&self->t_cproc.m_me) != NULL) {
+			if unlikely(awref_ptr(&self->t_cproc) != NULL) {
 				REF struct taskpid *old_cproc;
-				old_cproc = self->t_cproc.get();
+				old_cproc = awref_get(&self->t_cproc);
 				if (old_cproc) {
 					FINALLY_DECREF_UNLIKELY(old_cproc);
 					if unlikely(old_cproc == session_pid)
@@ -980,11 +980,11 @@ again_check_t_cproc_inner:
 					if (!steal_from_other_session)
 						return TTYBASE_DEVICE_SETCTTY_INUSE;
 					/* Change the TTY's session pointer to the new session. */
-					if unlikely(!self->t_cproc.cmpxch(old_cproc, session_pid))
+					if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
 						goto again_check_t_cproc_inner;
 					/* Set the TTY link of the new session task descriptor. */
 					if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
-						self->t_cproc.cmpxch(session_pid, old_cproc);
+						awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
 						goto again_check_tg_ctty;
 					}
 					{
@@ -1001,25 +1001,25 @@ again_check_t_cproc_inner:
 				}
 			}
 			/* Change the TTY's session pointer to the new session. */
-			if unlikely(!self->t_cproc.cmpxch(NULL, session_pid))
+			if unlikely(!awref_cmpxch(&self->t_cproc, NULL, session_pid))
 				goto again_check_t_cproc_inner;
 			/* Change the calling session's CTTY link to the new TTY */
 			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
-				self->t_cproc.cmpxch(session_pid, NULL);
+				awref_cmpxch(&self->t_cproc, session_pid, NULL);
 				goto again_check_tg_ctty;
 			}
 remove_from_old_ctty_and_succeed:
 			/* Remove the calling session from the old TTY's session link */
-			if (old_ctty->t_cproc.cmpxch(session_pid, NULL))
+			if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
 				ttybase_log_delsession(old_ctty, session, session_pid);
 			ttybase_log_setsession(self, session, session_pid);
 			return TTYBASE_DEVICE_SETCTTY_SUCCESS;
 		}
 	}
 again_check_t_cproc:
-	if unlikely(awref_ptr(&self->t_cproc.m_me) != NULL) {
+	if unlikely(awref_ptr(&self->t_cproc) != NULL) {
 		REF struct taskpid *old_cproc;
-		old_cproc = self->t_cproc.get();
+		old_cproc = awref_get(&self->t_cproc);
 		if (old_cproc) {
 			REF struct task *old_cproc_task;
 			FINALLY_DECREF_UNLIKELY(old_cproc);
@@ -1028,11 +1028,11 @@ again_check_t_cproc:
 			if (!steal_from_other_session)
 				return TTYBASE_DEVICE_SETCTTY_INUSE;
 			/* Change the TTY's session pointer to the new session. */
-			if unlikely(!self->t_cproc.cmpxch(old_cproc, session_pid))
+			if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
 				goto again_check_t_cproc;
 				/* Set the TTY link of the new session task descriptor. */
 			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
-				self->t_cproc.cmpxch(session_pid, old_cproc);
+				awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
 				goto again_check_tg_ctty;
 			}
 			/* Delete the TTY link from the old session task descriptor */
@@ -1047,11 +1047,11 @@ again_check_t_cproc:
 		}
 	}
 	/* Set the TTY's session pointer to the calling session. */
-	if (!self->t_cproc.cmpxch(NULL, session_pid))
+	if (!awref_cmpxch(&self->t_cproc, NULL, session_pid))
 		goto again_check_t_cproc;
 	/* Set the TTY link of the session task descriptor. */
 	if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
-		self->t_cproc.cmpxch(FORTASK(session, this_taskpid), NULL);
+		awref_cmpxch(&self->t_cproc, FORTASK(session, this_taskpid), NULL);
 		goto again_check_tg_ctty;
 	}
 	ttybase_log_setsession(self, session, session_pid);
@@ -1088,7 +1088,7 @@ again_my_ctty_pointer_cmpxch:
 				goto again_my_ctty_pointer_cmpxch;
 			return TTYBASE_DEVICE_HUPCTTY_DIFFERENT;
 		}
-		if (required_old_ctty->t_cproc.cmpxch(session_pid, NULL))
+		if (awref_cmpxch(&required_old_ctty->t_cproc, session_pid, NULL))
 			ttybase_log_delsession(required_old_ctty, session, session_pid);
 		if (pold_ctty) {
 			incref(required_old_ctty);
@@ -1099,7 +1099,7 @@ again_my_ctty_pointer_cmpxch:
 		old_ctty = axref_steal(&FORTASK(session, this_taskgroup).tg_ctty);
 		if (!old_ctty)
 			return TTYBASE_DEVICE_HUPCTTY_ALREADY;
-		if (old_ctty->t_cproc.cmpxch(session_pid, NULL))
+		if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
 			ttybase_log_delsession(old_ctty, session, session_pid);
 		if (pold_ctty) {
 			*pold_ctty = old_ctty;

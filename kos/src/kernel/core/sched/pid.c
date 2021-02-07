@@ -438,7 +438,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 					/* Unbind the CTTY pointer.
 					 * Reminder: The CTTY (Controlling TTY) is
 					 *           the file found under `/dev/tty' */
-					mytty->t_cproc.cmpxch(mypid, NULL);
+					awref_cmpxch(&mytty->t_cproc, mypid, NULL);
 					decref(mytty);
 				}
 				decref_nokill(mypid); /* Reference stored in `mygroup.tg_pgrp_session' */

@@ -41,21 +41,26 @@ struct taskpid;
 AXREF(taskpid_axref, taskpid);
 #endif /* !__taskpid_axref_defined */
 
+#ifndef __taskpid_awref_defined
+#define __taskpid_awref_defined
+AWREF(taskpid_awref, taskpid);
+#endif /* !__taskpid_awref_defined */
+
 struct ttybase_device
 #ifdef __cplusplus
 	: character_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device           t_cdev;  /* The underling character-device */
+	struct character_device t_cdev;  /* The underling character-device */
 #endif /* !__cplusplus */
-	struct terminal                   t_term;  /* The associated terminal driver controller. */
-	XATOMIC_WEAKLYREF(struct taskpid) t_cproc; /* [0..1] Controlling terminal support.
-	                                            * When non-NULL, points to a session leader thread, such that
-	                                            * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
-	                                            * is the case. */
-	struct taskpid_axref              t_fproc; /* [0..1] PID of the foreground process group leader.
-	                                            * This process is usually apart of the same session as `t_cproc' */
+	struct terminal         t_term;  /* The associated terminal driver controller. */
+	struct taskpid_awref    t_cproc; /* [0..1] Controlling terminal support.
+	                                  * When non-NULL, points to a session leader thread, such that
+	                                  * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
+	                                  * is the case. */
+	struct taskpid_axref    t_fproc; /* [0..1] PID of the foreground process group leader.
+	                                  * This process is usually apart of the same session as `t_cproc' */
 };
 
 
@@ -142,15 +147,8 @@ NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self);
 
 /* Returns a reference to the controlling- or foreground process's
  * PID descriptor, or NULL if the specified field hasn't been set. */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL ttybase_device_getcproc)(struct ttybase_device *__restrict self) {
-	return self->t_cproc.get();
-}
-
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL ttybase_device_getfproc)(struct ttybase_device *__restrict self) {
-	return axref_get(&self->t_fproc);
-}
+#define ttybase_device_getcproc(self) awref_get(&(self)->t_cproc)
+#define ttybase_device_getfproc(self) axref_get(&(self)->t_fproc)
 
 #endif /* __CC__ */
 
