@@ -2246,7 +2246,7 @@ superblock_getmountloc(struct superblock *__restrict self,
 
 
 struct filesystem_types {
-	/* TODO: Replace with a reference counted vector using `ATOMIC_REF()' */
+	/* TODO: Replace with a reference counted vector using `ARREF()' */
 	struct atomic_rwlock          ft_typelock; /* Lock for the chain of known filesystem types. */
 	OLD_SLIST(struct superblock_type) ft_types;    /* [lock(ft_typelock)][CHAIN(->st_chain)] Chain of known filesystem types. */
 };

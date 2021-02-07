@@ -306,7 +306,7 @@ PUBLIC bool
 	REF struct callback_list_struct *state;
 	REF struct callback_list_struct *new_state;
 again:
-	state = self->get();
+	state = arref_get(self);
 	for (i = 0; i < state->cl_count; ++i) {
 		if likely(state->cl_list[i].cn_func != func)
 			continue;
@@ -334,8 +334,7 @@ again:
 	new_state->cl_list[i].cn_func = func;
 	new_state->cl_list[i].cn_orig = incref(orig);
 	/* Try to set the new state. */
-	success = self->cmpxch_inherit_new(state,
-	                                   new_state);
+	success = arref_cmpxch_inherit_new(self, state, new_state);
 	if likely(state != &__callback_list_empty)
 		decref_likely(state);
 	if likely(success)
@@ -352,7 +351,7 @@ PUBLIC bool
 	REF struct callback_list_struct *state;
 	REF struct callback_list_struct *new_state;
 again:
-	state = self->get();
+	state = arref_get(self);
 	for (i = 0; i < state->cl_count; ++i) {
 		bool success;
 		if (state->cl_list[i].cn_func != func)
@@ -382,8 +381,7 @@ again:
 				incref(new_state->cl_list[j - 1].cn_orig);
 			}
 		}
-		success = self->cmpxch_inherit_new(state,
-		                                   new_state);
+		success = arref_cmpxch_inherit_new(self, state, new_state);
 		if likely(state != &__callback_list_empty)
 			decref_likely(state);
 		if likely(success)

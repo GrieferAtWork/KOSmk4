@@ -477,7 +477,7 @@ DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
 
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
- * This counter behaves similar to the in-use counter found in ATOMIC_REF, and is needed in order
+ * This counter behaves similar to the in-use counter found in <kos/aref.h>, and is needed in order
  * to allow for syncing of internal re-trace operations in `mman_unmap_kram_locked()' with
  * other CPUs having previously started initializing hinted pages.
  *

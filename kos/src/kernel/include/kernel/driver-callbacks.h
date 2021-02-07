@@ -21,9 +21,12 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_CALLBACKS_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
 #include <hybrid/host.h>
-#include <misc/atomic-ref.h>
+
+#include <kos/aref.h>
 
 DECL_BEGIN
 
@@ -58,14 +61,14 @@ struct callback_list_struct {
 FUNDEF NOBLOCK void NOTHROW(KCALL callback_list_detroy)(struct callback_list_struct *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct callback_list_struct,cl_refcnt,callback_list_detroy);
 
-typedef ATOMIC_REF(struct callback_list_struct) __callback_list_t;
+typedef ARREF(__callback_list, callback_list_struct) __callback_list_t;
 FUNDEF __BOOL KCALL __callback_list_insert(__callback_list_t *__restrict self, void (*func)(), struct driver *__restrict orig) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("callback_list_insert");
 FUNDEF __BOOL KCALL __callback_list_remove(__callback_list_t *__restrict self, void (*func)()) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("callback_list_remove");
 DATDEF struct callback_list_struct __callback_list_empty ASMNAME("callback_list_empty");
 
 #if defined(__cplusplus) && defined(__COMPILER_HAVE_CXX_VARIABLE_TEMPLATES)
-#define CALLBACK_LIST(PROTOTYPE)          callback_list< PROTOTYPE >
-#define CALLBACK_LIST_INIT              { ATOMIC_REF_INIT(&__callback_list_empty) }
+#define CALLBACK_LIST(PROTOTYPE)        callback_list< PROTOTYPE >
+#define CALLBACK_LIST_INIT              { ARREF_INIT(&__callback_list_empty) }
 #define callback_list_insert(self, ...) ((self)->insert(__VA_ARGS__))
 #define callback_list_remove(self, ...) ((self)->remove(__VA_ARGS__))
 
@@ -80,7 +83,7 @@ struct callback_list<ReturnType KCALL(ArgumenTypes...)> {
 	__CXX_CLASSMEMBER void KCALL operator()(ArgumenTypes... args) {
 		size_t i;
 		REF struct callback_list_struct *state;
-		state = this->__m_list.get();
+		state = arref_get(&this->__m_list);
 		FINALLY_DECREF_UNLIKELY(state);
 		for (i = 0; i < state->cl_count; ++i) {
 			(*(__function_pointer)state->cl_list[i].cn_func)(args...);
@@ -107,7 +110,7 @@ struct callback_list<ReturnType FCALL(ArgumenTypes...)> {
 	__CXX_CLASSMEMBER void FCALL operator()(ArgumenTypes... args) {
 		size_t i;
 		REF struct callback_list_struct *state;
-		state = this->__m_list.get();
+		state = arref_get(&this->__m_list);
 		FINALLY_DECREF_UNLIKELY(state);
 		for (i = 0; i < state->cl_count; ++i) {
 			(*(__function_pointer)state->cl_list[i].cn_func)(args...);
@@ -127,14 +130,14 @@ struct callback_list<ReturnType FCALL(ArgumenTypes...)> {
 
 }
 #else /* __cplusplus */
-#define CALLBACK_LIST(PROTOTYPE)        __callback_list_t
-#define CALLBACK_LIST_INIT              ATOMIC_REF_INIT(&__callback_list_empty)
-#define __PRIVATE_callback_list_insert_2(self, func)        __callback_list_insert(self, (void(*)())(func), &drv_self)
-#define __PRIVATE_callback_list_insert_3(self, func, orig)  __callback_list_insert(self, (void(*)())(func), orig)
-#define __PRIVATE_callback_list_remove_2(self, func)        __callback_list_remove(self, (void(*)())(func), &drv_self)
-#define __PRIVATE_callback_list_remove_3(self, func, orig)  __callback_list_remove(self, (void(*)())(func))
-#define callback_list_insert(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_callback_list_insert_, __VA_ARGS__)(__VA_ARGS__)
-#define callback_list_remove(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_callback_list_remove_, __VA_ARGS__)(__VA_ARGS__)
+#define CALLBACK_LIST(PROTOTYPE)                           __callback_list_t
+#define CALLBACK_LIST_INIT                                 ARREF_INIT(&__callback_list_empty)
+#define __PRIVATE_callback_list_insert_2(self, func)       __callback_list_insert(self, (void (*)())(func), &drv_self)
+#define __PRIVATE_callback_list_insert_3(self, func, orig) __callback_list_insert(self, (void (*)())(func), orig)
+#define __PRIVATE_callback_list_remove_2(self, func)       __callback_list_remove(self, (void (*)())(func), &drv_self)
+#define __PRIVATE_callback_list_remove_3(self, func, orig) __callback_list_remove(self, (void (*)())(func))
+#define callback_list_insert(...)                          __HYBRID_PP_VA_OVERLOAD(__PRIVATE_callback_list_insert_, __VA_ARGS__)(__VA_ARGS__)
+#define callback_list_remove(...)                          __HYBRID_PP_VA_OVERLOAD(__PRIVATE_callback_list_remove_, __VA_ARGS__)(__VA_ARGS__)
 #endif /* !__cplusplus */
 
 
