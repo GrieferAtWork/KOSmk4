@@ -141,7 +141,7 @@ do_try_override_fproc:
 		/* 11.1.4 -- Terminal Access Control */
 		if (is_SIGTTOU) {
 			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
-			       term->cd_name, awref_ptr(&my_leader_pid->tp_thread.m_me),
+			       term->cd_name, awref_ptr(&my_leader_pid->tp_thread),
 			       taskpid_getrootpid(my_leader_pid));
 			/* ... Attempts by a process in a background process group to write to its controlling
 			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the

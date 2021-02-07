@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/pertask.h>
 #include <sched/signal.h>
 
@@ -46,6 +45,11 @@ DECL_BEGIN
 struct task;
 struct pidns;
 
+#ifndef __task_awref_defined
+#define __task_awref_defined
+AWREF(task_awref, task);
+#endif /* !__task_awref_defined */
+
 struct taskpid {
 	/* The `struct taskpid' acts as a sort-of weak
 	 * reference to a task, using a binding:
@@ -56,7 +60,7 @@ struct taskpid {
 	 *                                  - Cleared when the task gets destroyed.
 	 *                                    WARNING: May point to a `wasdestroyed()' task! */
 	WEAK refcnt_t                   tp_refcnt;   /* Reference counter. */
-	XATOMIC_WEAKLYREF(struct task)  tp_thread;   /* [0..1] The pointed-to task */
+	struct task_awref               tp_thread;   /* [0..1] The pointed-to task */
 	union wait                      tp_status;   /* [const_if(!tp_thread || wasdestroyed(tp_thread) || tp_thread->t_flags & TASK_FTERMINATING)]
 	                                              * Current thread status / thread exit status. */
 	struct sig                      tp_changed;  /* Signal broadcast when the thread changes state (WSTOPPED, WCONTINUED, WEXITED) */
@@ -81,9 +85,9 @@ DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
 /* Return a reference to the task associated with the given PID.
  * If that task has already terminated and has already been destroyed, return `NULL' instead. */
 #ifdef __INTELLISENSE__
-WUNUSED REF struct task *NOTHROW(KCALL taskpid_gettask)(struct taskpid *__restrict self);
+NOBLOCK WUNUSED REF struct task *NOTHROW(taskpid_gettask)(struct taskpid *__restrict self);
 #else /* __INTELLISENSE__ */
-#define taskpid_gettask(self) (self)->tp_thread.get()
+#define taskpid_gettask(self) awref_get(&(self)->tp_thread)
 #endif /* !__INTELLISENSE__ */
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */

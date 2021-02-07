@@ -130,7 +130,7 @@ NOTHROW(KCALL pidns_remove)(struct pidns *__restrict self,
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self) {
 	struct pidns *ns = self->tp_pidns;
-	assert(!self->tp_thread.is_nonnull());
+	assert(awref_ptr(&self->tp_thread) == NULL);
 	sig_broadcast_for_fini(&self->tp_changed);
 	/* shouldn't be NULL, but may be in case of incomplete initialization... */
 	if unlikely(!ns) {
@@ -295,7 +295,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 			next = LIST_NEXT(threads, tp_siblings);
 			ATOMIC_WRITE(threads->tp_siblings.le_prev, NULL);
 			__HYBRID_Q_BADPTR(threads->tp_siblings.le_next);
-			child_thread = threads->tp_thread.get();
+			child_thread = awref_get(&threads->tp_thread);
 			if (child_thread) {
 				/* Must differentiate:
 				 *   - A child thread that is apart of our process (to which we must propagate the exit status)
@@ -381,7 +381,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #define mygroup FORTASK(self, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
 	assert(wasdestroyed(self));
-	assert(!mypid || awref_ptr(&mypid->tp_thread.m_me) == self);
+	assert(!mypid || awref_ptr(&mypid->tp_thread) == self);
 	sigqueue_fini(&FORTASK(self, this_sigqueue));
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
@@ -449,7 +449,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		sigqueue_fini(&mygroup.tg_proc_signals.psq_queue);
 	}
 	if (mypid) {
-		mypid->tp_thread.clear();
+		awref_clear(&mypid->tp_thread);
 		decref_likely(mypid);
 	}
 	/* Finalizer per-task pending signals */
@@ -1579,7 +1579,7 @@ next_pid:
 
 	/* Install the `struct taskpid' to be apart of the given thread. */
 	pid->tp_refcnt = 1;
-	xatomic_weaklyref_init(&pid->tp_thread, self);
+	awref_init(&pid->tp_thread, self);
 	sig_init(&pid->tp_changed);
 	LIST_ENTRY_UNBOUND_INIT(&pid->tp_siblings);
 	pid->tp_pidns = incref(ns);
@@ -1854,10 +1854,10 @@ continue_with_iter:
 			break;
 	}
 	if (iter) {
-		if (iter->tp_thread.is_nonnull()) {
+		if (awref_ptr(&iter->tp_thread) != NULL) {
 			/* Must unlink the parent-link of child processes. */
 			REF struct task *child_thread;
-			child_thread = iter->tp_thread.get();
+			child_thread = awref_get(&iter->tp_thread);
 			if likely(child_thread) {
 				if (FORTASK(child_thread, this_taskgroup).tg_process != child_thread) {
 					/* Child thread! */
@@ -1963,7 +1963,7 @@ again:
 			if (iter != tpid)
 				continue;
 			/* Found it! */
-			tpid_thread = tpid->tp_thread.get();
+			tpid_thread = awref_get(&tpid->tp_thread);
 			if (tpid_thread) {
 				FINALLY_DECREF_UNLIKELY(tpid_thread);
 				if (!task_isprocessleader_p(tpid_thread)) {
@@ -2033,7 +2033,7 @@ LOCAL NOBLOCK bool
 NOTHROW(KCALL is_taskpid_terminating)(struct taskpid *__restrict self) {
 	bool result = true;
 	REF struct task *thread;
-	thread = self->tp_thread.get();
+	thread = awref_get(&self->tp_thread);
 	if likely(thread) {
 		result = (thread->t_flags & (TASK_FTERMINATING |
 		                             TASK_FTERMINATED)) != 0;
@@ -2138,7 +2138,7 @@ again_enum_children_locked:
 						continue;
 				}
 				if (which == P_PGID) {
-					child_thread = child->tp_thread.get();
+					child_thread = awref_get(&child->tp_thread);
 					/* XXX: We're not tracking the PGID in the PID descriptor,
 					 *      but apparently POSIX wants us to remember a thread's
 					 *      process group, even after the thread has died...

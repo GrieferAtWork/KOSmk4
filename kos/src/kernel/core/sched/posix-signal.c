@@ -2144,7 +2144,7 @@ find_thread_in_process_with_unmasked_signal(struct task *__restrict process_lead
 	sync_read(&group->tg_proc_threads_lock);
 	FOREACH_taskgroup__proc_threads(cpid, group) {
 		REF struct task *child;
-		child = cpid->tp_thread.get();
+		child = awref_get(&cpid->tp_thread);
 		if (!child)
 			continue;
 		/* Only consider child _threads_ (not child processes) */
@@ -2187,7 +2187,7 @@ find_thread_in_process_with_unmasked_signal_and_gather_maybe_maskers(struct task
 	sync_read(&group->tg_proc_threads_lock);
 	FOREACH_taskgroup__proc_threads(cpid, group) {
 		REF struct task *child;
-		child = cpid->tp_thread.get();
+		child = awref_get(&cpid->tp_thread);
 		if (!child)
 			continue;
 		/* Only consider child _threads_ (not child processes) */
@@ -2233,7 +2233,7 @@ again_search_for_maybe_maskers:
 			REF struct task *child;
 			int is_masked;
 			int insert_error;
-			child = cpid->tp_thread.get();
+			child = awref_get(&cpid->tp_thread);
 			if (!child)
 				continue;
 			/* Only consider child _threads_ (not child processes) */
