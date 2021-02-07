@@ -81,7 +81,7 @@ PUBLIC NOBLOCK void
 NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
                                     pterminal_oprinter_t oprinter) {
 	awref_cinit(&self->t_cproc.m_me, NULL);
-	axref_cinit(&self->t_fproc.m_me, NULL);
+	axref_cinit(&self->t_fproc, NULL);
 	self->cd_type.ct_fini        = &ttybase_device_fini;
 	self->cd_type.ct_read        = &ttybase_device_iread;
 	self->cd_type.ct_write       = &ttybase_device_owrite;
@@ -108,23 +108,23 @@ kernel_terminal_check_sigtty(struct terminal *__restrict self,
 	assert(character_device_isattybase(term));
 	my_leader_pid = task_getprocessgroupleaderpid();
 	FINALLY_DECREF_UNLIKELY(my_leader_pid);
-	if unlikely(my_leader_pid != axref_ptr(&term->t_fproc.m_me)) {
+	if unlikely(my_leader_pid != axref_ptr(&term->t_fproc)) {
 		REF struct task *my_leader;
 		REF struct task *oldproc;
 		REF struct taskpid *oldpid;
 again_set_myleader_as_fproc:
-		if (term->t_fproc.cmpxch(NULL, my_leader_pid))
+		if (axref_cmpxch(&term->t_fproc, NULL, my_leader_pid))
 			return; /* Lazily set the caller as the initial foreground process */
 		/* Check if the old foreground process has already
 		 * terminated, but hasn't been cleaned up, yet. */
-		oldpid = term->t_fproc.get();
+		oldpid = axref_get(&term->t_fproc);
 		if unlikely(!oldpid)
 			goto again_set_myleader_as_fproc;
 		oldproc = taskpid_gettask(oldpid);
 		if unlikely(!oldproc) {
 			bool xch_ok;
 do_try_override_fproc:
-			xch_ok = term->t_fproc.cmpxch(oldpid, my_leader_pid);
+			xch_ok = axref_cmpxch(&term->t_fproc, oldpid, my_leader_pid);
 			decref_likely(oldpid);
 			if unlikely(!xch_ok)
 				goto again_set_myleader_as_fproc;
@@ -285,7 +285,7 @@ NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self) {
 	        "meaning that if we truely were supposed to be a CTTY, the associated "
 	        "session should have kept us from being destroyed");
 	terminal_fini(&me->t_term);
-	xatomic_ref_fini(&me->t_fproc);
+	axref_fini(&me->t_fproc);
 }
 
 
@@ -529,7 +529,7 @@ do_TCSETA: {
 		}
 		printk(KERN_TRACE "[tty:%q] Set foreground process group to [pgid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 		       me->cd_name, taskpid_getrootpid(newpid));
-		oldpid = me->t_fproc.exchange_inherit_new(newpid);
+		oldpid = axref_xch_inherit(&me->t_fproc, newpid);
 		xdecref(oldpid);
 	}	break;
 
@@ -539,7 +539,7 @@ do_TCSETA: {
 		REF struct taskpid *tpid;
 		validate_writable(arg, sizeof(upid_t));
 		respid = (upid_t)-ESRCH;
-		tpid = me->t_fproc.get();
+		tpid   = axref_get(&me->t_fproc);
 		if (tpid) {
 			respid = taskpid_getpid(tpid);
 			decref_unlikely(tpid);

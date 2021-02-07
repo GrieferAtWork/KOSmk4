@@ -24,16 +24,23 @@
 
 #include <dev/char.h>
 #include <kernel/types.h>
-#include <sched/pid.h>
-#include <libterm/termio.h>
 #include <misc/atomic-ref.h>
+#include <sched/pid.h>
 
 #include <kos/dev.h>
+
+#include <libterm/termio.h>
 
 DECL_BEGIN
 
 /* The base type for PTY and TTY devices */
 #ifdef __CC__
+struct taskpid;
+#ifndef __taskpid_axref_defined
+#define __taskpid_axref_defined
+AXREF(taskpid_axref, taskpid);
+#endif /* !__taskpid_axref_defined */
+
 struct ttybase_device
 #ifdef __cplusplus
 	: character_device
@@ -47,7 +54,7 @@ struct ttybase_device
 	                                            * When non-NULL, points to a session leader thread, such that
 	                                            * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
 	                                            * is the case. */
-	XATOMIC_REF(struct taskpid)       t_fproc; /* [0..1] PID of the foreground process group leader.
+	struct taskpid_axref              t_fproc; /* [0..1] PID of the foreground process group leader.
 	                                            * This process is usually apart of the same session as `t_cproc' */
 };
 
@@ -142,7 +149,7 @@ NOTHROW(KCALL ttybase_device_getcproc)(struct ttybase_device *__restrict self) {
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(KCALL ttybase_device_getfproc)(struct ttybase_device *__restrict self) {
-	return self->t_fproc.get();
+	return axref_get(&self->t_fproc);
 }
 
 #endif /* __CC__ */

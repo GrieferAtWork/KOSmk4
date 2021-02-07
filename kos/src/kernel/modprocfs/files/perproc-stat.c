@@ -262,7 +262,7 @@ nogroup:
 		if (format_printf(printer, arg, "%" PRIu32 " ",
 		                  tty_devno_encoded) < 0)
 			goto done;
-		fproc = ctty->t_fproc.get();
+		fproc = axref_get(&ctty->t_fproc);
 		if (!fproc)
 			goto nofproc;
 		FINALLY_DECREF_UNLIKELY(fproc);
