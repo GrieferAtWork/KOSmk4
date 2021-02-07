@@ -829,14 +829,18 @@ unlock_and_nope:
 	return result;
 }
 
+#ifndef __usermod_axref_defined
+#define __usermod_axref_defined
+AXREF(usermod_axref, usermod);
+#endif /* !__usermod_axref_defined */
 
 struct vm_usermod_cache {
-	XATOMIC_REF(struct usermod) uc_first; /* [0..1][lock(THIS_MMAN)]
-	                                       * Sorted (via `um_loadstart') chain of
-	                                       * cached user-space modules. */
+	struct usermod_axref uc_first; /* [0..1][lock(THIS_MMAN)]
+	                                * Sorted (via `um_loadstart') chain of
+	                                * cached user-space modules. */
 };
 
-PRIVATE ATTR_PERMMAN struct vm_usermod_cache usermod_cache = { XATOMIC_REF_INIT(NULL) };
+PRIVATE ATTR_PERMMAN struct vm_usermod_cache usermod_cache = { AXREF_INIT(NULL) };
 
 /* Clear out all unused usermod objects from `self' and
  * return non-zero if the cache wasn't already empty. */
@@ -845,7 +849,7 @@ NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 	REF struct usermod *chain;
 	/* TODO: Run this function for every VM in existence
 	 *       when `system_clearcaches()' is called. */
-	chain = FORMMAN(self, usermod_cache).uc_first.exchange_inherit_new(NULL);
+	chain = axref_steal(&FORMMAN(self, usermod_cache).uc_first);
 	if (!chain)
 		return 0;
 	/* This will recursively delete usermod objects that aren't in use anymore. */
@@ -884,16 +888,16 @@ NOTHROW(FCALL vm_usermod_cache_insert_and_unify_and_unlock)(struct vm *__restric
 	assert(sync_writing(self));
 	uc = (struct vm_usermod_cache *)&FORMMAN(self, usermod_cache);
 again:
-	head = uc->uc_first.get();
+	head = axref_get(&uc->uc_first);
 	if (!head) {
 		um->um_next = NULL;
-		if (!uc->uc_first.cmpxch(NULL, um))
+		if (!axref_cmpxch(&uc->uc_first, NULL, um))
 			goto again;
 		sync_endwrite(self);
 	} else if (um->um_loadstart < head->um_loadstart) {
 		/* Must insert before `head' */
 		um->um_next = head; /* Inherit reference */
-		if (!uc->uc_first.cmpxch(head, um)) {
+		if (!axref_cmpxch(&uc->uc_first, head, um)) {
 			decref(head);
 			goto again;
 		}
@@ -963,7 +967,7 @@ vm_getusermod(struct vm *__restrict self,
 		REF struct usermod *chain;
 		result = NULL;
 		sync_read(self);
-		chain = FORMMAN(self, usermod_cache).uc_first.get();
+		chain = axref_get(&FORMMAN(self, usermod_cache).uc_first);
 		if (chain) {
 			result = chain;
 			do {
@@ -1058,7 +1062,7 @@ again:
 	/* Search the cache of `self'. */
 	{
 		REF struct usermod *chain;
-		chain = FORMMAN(self, usermod_cache).uc_first.get();
+		chain = axref_get(&FORMMAN(self, usermod_cache).uc_first);
 		if (chain) {
 			result = chain;
 			do {

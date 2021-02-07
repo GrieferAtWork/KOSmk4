@@ -346,6 +346,10 @@
  * >> void   axref_xch_nopr                (AXREF(T) *self, T *newobj, REF T **p_oldobj);
  * >> void   axref_xch                     (AXREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
  * >> void   axref_xch_nopr                (AXREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
+ * >> REF T *axref_steal                   (AXREF(T) *self);
+ * >> REF T *axref_steal_nopr              (AXREF(T) *self);
+ * >> void   axref_steal                   (AXREF(T) *self, REF T **p_oldobj);
+ * >> void   axref_steal_nopr              (AXREF(T) *self, REF T **p_oldobj);
  * >> void   axref_set_inherit             (AXREF(T) *self, REF T *newobj);
  * >> void   axref_set_inherit_nopr        (AXREF(T) *self, REF T *newobj);
  * >> void   axref_set_inherit             (AXREF(T) *self, REF T *newobj, typename T);
@@ -1036,11 +1040,11 @@
 	                                  __ATOMIC_SEQ_CST);       \
 	__PRIVATE_axref_waitfor(self)                              \
 	__PRIVATE_AR_INTR_POP()
-#define __PRIVATE_axref_xch_inherit_nopr_3(self, newobj, p_oldobj)  \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                               \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, newobj,      \
-	                                  __ATOMIC_SEQ_CST);            \
-	__PRIVATE_axref_waitfor(self)                                   \
+#define __PRIVATE_axref_xch_inherit_nopr_3(self, newobj, p_oldobj) \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                              \
+	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, newobj,     \
+	                                  __ATOMIC_SEQ_CST);           \
+	__PRIVATE_axref_waitfor(self)                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_axref_xch_inherit_2(self, newobj)                  \
@@ -1073,6 +1077,52 @@
 #define axref_xch_inherit __PRIVATE_axref_xch_inherit_3
 /* >> void axref_xch_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
 #define axref_xch_inherit_nopr __PRIVATE_axref_xch_inherit_nopr_3
+#endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
+
+/* ========== axref_steal ========== */
+#define __PRIVATE_axref_steal_2(self, p_oldobj)                   \
+	__PRIVATE_AR_INTR_PUSHOFF();                                  \
+	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, __NULLPTR, \
+	                                  __ATOMIC_SEQ_CST);          \
+	__PRIVATE_axref_waitfor(self)                                 \
+	__PRIVATE_AR_INTR_POP()
+#define __PRIVATE_axref_steal_nopr_2(self, p_oldobj)              \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                             \
+	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, __NULLPTR, \
+	                                  __ATOMIC_SEQ_CST);          \
+	__PRIVATE_axref_waitfor(self)                                 \
+	__PRIVATE_AR_INTR_POP_NOPR()
+#if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
+#define __PRIVATE_axref_steal_1(self)                  \
+	__XBLOCK({                                         \
+		__typeof__((self)->axr_obj) __arxi_oldobj;     \
+		__PRIVATE_axref_steal_2(self, &__arxi_oldobj); \
+		__XRETURN __arxi_oldobj;                       \
+	})
+#define __PRIVATE_axref_steal_nopr_1(self)                  \
+	__XBLOCK({                                              \
+		__typeof__((self)->axr_obj) __arxi_oldobj;          \
+		__PRIVATE_axref_steal_nopr_2(self, &__arxi_oldobj); \
+		__XRETURN __arxi_oldobj;                            \
+	})
+#ifdef __HYBRID_PP_VA_OVERLOAD
+/* >> REF T *axref_steal(AXREF(T) *self);
+ * >> void   axref_steal(AXREF(T) *self, [[out]] REF T **p_oldobj); */
+#define axref_steal(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_steal_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> REF T *axref_steal_nopr(AXREF(T) *self);
+ * >> void   axref_steal_nopr(AXREF(T) *self, [[out]] REF T **p_oldobj); */
+#define axref_steal_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_steal_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __HYBRID_PP_VA_OVERLOAD */
+/* >> void axref_steal(AXREF(T) *self, [[out]] REF T **p_oldobj); */
+#define axref_steal __PRIVATE_axref_steal_2
+/* >> void axref_steal_nopr(AXREF(T) *self, [[out]] REF T **p_oldobj); */
+#define axref_steal_nopr __PRIVATE_axref_steal_nopr_2
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#else  /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+/* >> void axref_steal(AXREF(T) *self, [[out]] REF T **p_oldobj); */
+#define axref_steal __PRIVATE_axref_steal_2
+/* >> void axref_steal_nopr(AXREF(T) *self, [[out]] REF T **p_oldobj); */
+#define axref_steal_nopr __PRIVATE_axref_steal_nopr_2
 #endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 
 #ifdef __COMPILER_HAVE_TYPEOF

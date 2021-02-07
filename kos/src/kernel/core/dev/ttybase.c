@@ -1096,7 +1096,7 @@ again_my_ctty_pointer_cmpxch:
 		}
 	} else {
 		REF struct ttybase_device *old_ctty;
-		old_ctty = axref_xch_inherit(&FORTASK(session, this_taskgroup).tg_ctty, NULL);
+		old_ctty = axref_steal(&FORTASK(session, this_taskgroup).tg_ctty);
 		if (!old_ctty)
 			return TTYBASE_DEVICE_HUPCTTY_ALREADY;
 		if (old_ctty->t_cproc.cmpxch(session_pid, NULL))
