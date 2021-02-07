@@ -411,8 +411,8 @@ again_lock_vm:
 		/* Deal with vfork() */
 		if (clone_flags & CLONE_VFORK) {
 			REF struct kernel_sigmask *old_sigmask;
-			ATOMIC_REF(struct kernel_sigmask) *mymask;
-			mymask = &PERTASK(this_sigmask);
+			struct kernel_sigmask_arref *maskref;
+			maskref = &PERTASK(this_sigmask);
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 			/* Special case for when the parent thread was using USERPROCMASK.
@@ -433,7 +433,7 @@ again_lock_vm:
 				memcpy(&saved_user_sigset, user_sigmask, sizeof(sigset_t));
 				/* Switch over to a completely filled, kernel-space
 				 * signal mask to-be used by the calling thread. */
-				old_sigmask = mymask->exchange(&kernel_sigmask_full);
+				old_sigmask = arref_xch(maskref, &kernel_sigmask_full);
 				ATOMIC_AND(caller->t_flags, ~TASK_FUSERPROCMASK);
 				TRY {
 					/* Actually start execution of the newly created thread. */
@@ -441,7 +441,7 @@ again_lock_vm:
 					/* Wait for the thread to clear its VFORK flag. */
 					waitfor_vfork_completion(result);
 				} EXCEPT {
-					mymask->set_inherit_new(old_sigmask);
+					arref_set_inherit(maskref, old_sigmask);
 					ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 					memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
 					ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
@@ -449,7 +449,7 @@ again_lock_vm:
 					RETHROW();
 				}
 				/* Restore our old kernel-space signal mask. */
-				mymask->set_inherit_new(old_sigmask);
+				arref_set_inherit(maskref, old_sigmask);
 				/* Re-enable userprocmask-mode. */
 				ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 
@@ -469,16 +469,16 @@ again_lock_vm:
 	
 				/* The specs say that we should ignore (mask) all POSIX
 				 * signals until the child indicate VFORK completion. */
-				old_sigmask = mymask->exchange(&kernel_sigmask_full);
+				old_sigmask = arref_xch(maskref, &kernel_sigmask_full);
 				TRY {
 					/* Wait for the thread to clear its VFORK flag. */
 					waitfor_vfork_completion(result);
 				} EXCEPT {
-					mymask->set_inherit_new(old_sigmask);
+					arref_set_inherit(maskref, old_sigmask);
 					sigmask_check_after_except();
 					RETHROW();
 				}
-				mymask->set_inherit_new(old_sigmask);
+				arref_set_inherit(maskref, old_sigmask);
 			}
 			/* With the original signal mask restored, we must check if
 			 * we (the parent) have received any signals while we were

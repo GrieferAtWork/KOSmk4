@@ -24,7 +24,6 @@
 
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/arch/posix-signal.h>
 #include <sched/except-handler.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <sched/pertask.h>
@@ -35,6 +34,7 @@
 
 #include <bits/os/siginfo.h> /* struct __siginfo_struct */
 #include <bits/os/sigset.h>  /* struct __sigset_struct */
+#include <kos/aref.h>
 #include <sys/wait.h>
 
 #include <signal.h>  /* SIG* */
@@ -107,13 +107,18 @@ DATDEF struct kernel_sigmask kernel_sigmask_empty;
 /* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
 DATDEF struct kernel_sigmask kernel_sigmask_full;
 
+#ifndef __kernel_sigmask_arref_defined
+#define __kernel_sigmask_arref_defined
+ARREF(kernel_sigmask_arref, kernel_sigmask);
+#endif /* !__kernel_sigmask_arref_defined */
+
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the current thread.
  * NOTE: Only ever NULL for kernel-space threads! */
-DATDEF ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask;
+DATDEF ATTR_PERTASK struct kernel_sigmask_arref this_sigmask;
 
 /* Return a pointer to the kernel signal mask of the calling thread. */
-#define sigmask_kernel_getrd() PERTASK_GET(this_sigmask.m_me.arr_obj)
+#define sigmask_kernel_getrd() PERTASK_GET(this_sigmask.arr_obj)
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */

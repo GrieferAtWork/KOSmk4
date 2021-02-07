@@ -35,7 +35,6 @@
 #include <kernel/user.h>
 #include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
 #include <kernel/mman/nopf.h>
-#include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/except-handler.h>
@@ -184,8 +183,8 @@ print("#endif /" "* ... *" "/");
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the current thread. */
-PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask)
-this_sigmask = ATOMIC_REF_INIT(&kernel_sigmask_empty);
+PUBLIC ATTR_PERTASK struct kernel_sigmask_arref
+this_sigmask = ARREF_INIT(&kernel_sigmask_empty);
 
 
 #ifdef CONFIG_HAVE_USERPROCMASK
@@ -471,7 +470,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 		return result;
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
-	sm     = FORTASK(self, this_sigmask).get();
+	sm     = arref_get(&FORTASK(self, this_sigmask));
 	result = (int)!!sigismember(&sm->sm_mask, signo);
 	decref_unlikely(sm);
 	if (result != SIGMASK_ISMASKED_NO &&
@@ -641,7 +640,7 @@ inherit_parent_userprocmask:
 			new_thread_mask->sm_share  = 1;
 			/* Initialize the new thread's signal mask with
 			 * the copy of the parent's current userprocmask. */
-			atomic_ref_init(&FORTASK(new_thread, this_sigmask), new_thread_mask);
+			arref_init(&FORTASK(new_thread, this_sigmask), new_thread_mask);
 		}
 	} else
 #endif /* CONFIG_HAVE_USERPROCMASK */
@@ -650,11 +649,13 @@ inherit_parent_userprocmask:
 			/* Nothing to do here! */
 		} else {
 			REF struct kernel_sigmask *mask;
-			mask = PERTASK(this_sigmask).get();
+			struct kernel_sigmask_arref *maskref;
+			maskref = &PERTASK(this_sigmask);
+			mask    = arref_get(maskref);
 			assert(mask != &kernel_sigmask_empty);
 			ATOMIC_INC(mask->sm_share);
 			COMPILER_WRITE_BARRIER();
-			FORTASK(new_thread, this_sigmask).m_me.arr_obj = mask; /* Inherit reference. */
+			arref_init(&FORTASK(new_thread, this_sigmask), mask); /* Inherit reference. */
 			COMPILER_WRITE_BARRIER();
 		}
 	}
@@ -726,7 +727,7 @@ DEFINE_PERTASK_FINI(fini_posix_signals);
 PRIVATE NOBLOCK ATTR_USED void
 NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 	struct kernel_sigmask *mask;
-	mask = FORTASK(thread, this_sigmask).m_me.arr_obj;
+	mask = arref_ptr(&FORTASK(thread, this_sigmask));
 	if (mask != &kernel_sigmask_empty)
 		decref(mask);
 	xdecref(FORTASK(thread, this_sighand_ptr));
@@ -757,12 +758,15 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 	if (ATOMIC_READ(mymask->sm_share) > 1) {
 		/* Unshare. */
 		struct kernel_sigmask *copy;
+		struct kernel_sigmask_arref *maskref;
 		copy = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
 		                                        GFP_CALLOC);
 		memcpy(&copy->sm_mask, &mymask->sm_mask, sizeof(copy->sm_mask));
 		copy->sm_refcnt = 1;
 		copy->sm_share  = 1;
-		mymask = PERTASK(this_sigmask).exchange_inherit_new(copy);
+
+		maskref = &PERTASK(this_sigmask);
+		mymask  = arref_xch_inherit(maskref, copy);
 		if (mymask != &kernel_sigmask_empty) {
 			ATOMIC_DEC(mymask->sm_share);
 			decref_unlikely(mymask);

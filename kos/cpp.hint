@@ -913,11 +913,10 @@
 	T *handle_##name##_weaklckref(void *restrict weakref_ptr) {} \
 	void handle_##name##_weakdecref(void *restrict self) {}
 
-#define ATOMIC_REF(...)               atomic_ref< __VA_ARGS__ >
-#define XATOMIC_REF_STRUCT(...)       xatomic_ref_struct< __VA_ARGS__ >
-#define XATOMIC_REF(...)              xatomic_ref< __VA_ARGS__ >
-#define XATOMIC_WEAKLYREF(...)        xatomic_weaklyref< __VA_ARGS__ >
-#define XATOMIC_WEAKLYREF_STRUCT(...) xatomic_weaklyref_struct< __VA_ARGS__ >
+#define ARREF(name,type) struct name{struct type*arr_obj;uintptr_t arr_cnt;}
+#define AXREF(name,type) struct name{struct type*axr_obj;uintptr_t axr_cnt;}
+#define AWREF(name,type) struct name{struct type*awr_obj;uintptr_t awr_cnt;}
+
 #define CALLBACK_LIST(P)              callback_list< P >
 
 #define __HOP_SIZE64_FIELD(name) __size_t name;
