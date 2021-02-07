@@ -31,14 +31,14 @@
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
-#include <sched/tsc.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <hw/usb/usb.h>
+#include <kos/aref.h>
 #include <kos/except/reason/io.h>
 
 #include <assert.h>
@@ -72,11 +72,12 @@ struct usb_probe_vector {
 	COMPILER_FLEXIBLE_ARRAY(struct usb_probe_entry, upv_elem);  /* [0..upv_count] Vector of elements. */
 };
 DEFINE_REFCOUNT_FUNCTIONS(struct usb_probe_vector, upv_refcnt, kfree)
-typedef ATOMIC_REF(struct usb_probe_vector) usb_probe_vector_ref;
+
+ARREF(usb_probe_vector_arref, usb_probe_vector);
 
 PRIVATE struct usb_probe_vector empty_probe_vector = { 3, 0 };
-PRIVATE usb_probe_vector_ref probe_device    = ATOMIC_REF_INIT(&empty_probe_vector);
-PRIVATE usb_probe_vector_ref probe_interface = ATOMIC_REF_INIT(&empty_probe_vector);
+PRIVATE struct usb_probe_vector_arref probe_device    = ARREF_INIT(&empty_probe_vector);
+PRIVATE struct usb_probe_vector_arref probe_interface = ARREF_INIT(&empty_probe_vector);
 
 
 
@@ -201,7 +202,7 @@ PRIVATE void KCALL usb_probe_identify_unknown(PUSB_INTERFACE_PROBE func) {
 	if (!usb_probe_unknown_acquire())
 		return; /* Recursion within the same thread. */
 	if (!func)
-		probes = probe_interface.get();
+		probes = arref_get(&probe_interface);
 	TRY {
 		for (;;) {
 			chain = ATOMIC_READ(usb_unknowns);
@@ -276,12 +277,12 @@ NOTHROW(KCALL vector_contains)(struct usb_probe_vector const *__restrict self,
 }
 
 PRIVATE bool KCALL
-probe_add(usb_probe_vector_ref *__restrict self, void *func) {
+probe_add(struct usb_probe_vector_arref *__restrict self, void *func) {
 	REF struct usb_probe_vector *ovec, *nvec;
 	REF struct driver *func_driver;
 	size_t i;
 again:
-	ovec = self->get();
+	ovec = arref_get(self);
 	if unlikely(vector_contains(ovec, func)) {
 		decref_unlikely(ovec);
 		return false;
@@ -310,7 +311,7 @@ again:
 	nvec->upv_elem[ovec->upv_count].c_driver = incref(func_driver);
 	nvec->upv_count = ovec->upv_count + 1;
 
-	if (!self->cmpxch_inherit_new(ovec, nvec)) {
+	if (!arref_cmpxch_inherit_new(self, ovec, nvec)) {
 		destroy(nvec);
 		decref_unlikely(ovec);
 		decref_unlikely(func_driver);
@@ -325,12 +326,12 @@ again:
 }
 
 PRIVATE bool KCALL
-probe_del(usb_probe_vector_ref *__restrict self, void *func) {
+probe_del(struct usb_probe_vector_arref *__restrict self, void *func) {
 	REF struct usb_probe_vector *ovec, *nvec;
 	REF struct driver *func_driver;
 	size_t i, del_index;
 again:
-	ovec = self->get();
+	ovec = arref_get(self);
 	for (del_index = 0; del_index < ovec->upv_count; ++del_index) {
 		if (ovec->upv_elem[del_index].c_func == func)
 			goto found_index;
@@ -360,7 +361,7 @@ found_index:
 	for (i = 0; i < nvec->upv_count; ++i)
 		incref(nvec->upv_elem[i].c_driver);
 	func_driver = ovec->upv_elem[del_index].c_driver; /* Inherit reference */
-	if (!self->cmpxch_inherit_new(ovec, nvec)) {
+	if (!arref_cmpxch_inherit_new(self, ovec, nvec)) {
 		destroy(nvec);
 		decref_unlikely(ovec);
 		goto again;
@@ -470,7 +471,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	}
 
 	/* Go through loaded drivers and try to have drivers bind the interface. */
-	probes = probe_interface.get();
+	probes = arref_get(&probe_interface);
 	TRY {
 		REF struct usb_unknown_interface *unknown;
 		/* Try to probe the device for matching one of the builtin interfaces (e.g. a HUB) */
@@ -531,10 +532,10 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	 * ensuring that every probe has had a chance to identify our
 	 * new unknown interface. */
 	for (;;) {
-		new_probes = arref_ptr(&probe_interface.m_me);
+		new_probes = arref_ptr(&probe_interface);
 		if likely(new_probes == probes)
 			break;
-		new_probes = probe_interface.get();
+		new_probes = arref_get(&probe_interface);
 		decref_unlikely(probes);
 		probes = new_probes;
 		usb_probe_identify_unknown(NULL);
@@ -1125,7 +1126,7 @@ strange_device_without_configs:
 		if (dev->ud_dev_class != 0) {
 			size_t i;
 			REF struct usb_probe_vector *probes;
-			probes = probe_device.get();
+			probes = arref_get(&probe_device);
 			FINALLY_DECREF_UNLIKELY(probes);
 			/* Pass the device as a whole to loaded drivers and see if they can
 			 * identify what's the deal with it, and select the configuration
