@@ -49,12 +49,7 @@ LOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_of_nx)(struc
  * to the TTY character device addressable through `task_getctty()' */
 DATDEF struct character_device dev_tty;
 
-#define __TASK_CTTY_FIELD(thread) \
-	((XATOMIC_WEAKLYREF(struct ttybase_device) &)FORTASK(thread, this_taskgroup).tg_ctty)
-
 #ifndef __INTELLISENSE__
-
-
 LOCAL WUNUSED REF struct ttybase_device *KCALL
 task_getctty(void) THROWS(E_WOULDBLOCK) {
 	REF struct ttybase_device *result;
@@ -62,7 +57,7 @@ task_getctty(void) THROWS(E_WOULDBLOCK) {
 	session_leader = task_getsessionleader();
 	if unlikely(!session_leader)
 		return __NULLPTR;
-	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
+	result = axref_get(&FORTASK(session_leader, this_taskgroup).tg_ctty);
 	decref_unlikely(session_leader);
 	return result;
 }
@@ -74,7 +69,7 @@ NOTHROW(KCALL task_getctty_nx)(void) {
 	session_leader = task_getsessionleader_nx();
 	if unlikely(!session_leader)
 		return __NULLPTR;
-	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
+	result = axref_get(&FORTASK(session_leader, this_taskgroup).tg_ctty);
 	decref_unlikely(session_leader);
 	return result;
 }
@@ -86,7 +81,7 @@ task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	session_leader = task_getsessionleader_of(thread);
 	if unlikely(!session_leader)
 		return __NULLPTR;
-	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
+	result = axref_get(&FORTASK(session_leader, this_taskgroup).tg_ctty);
 	decref_unlikely(session_leader);
 	return result;
 }
@@ -98,7 +93,7 @@ NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
 	session_leader = task_getsessionleader_of_nx(thread);
 	if unlikely(!session_leader)
 		return __NULLPTR;
-	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
+	result = axref_get(&FORTASK(session_leader, this_taskgroup).tg_ctty);
 	decref_unlikely(session_leader);
 	return result;
 }

@@ -30,6 +30,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <kos/aref.h>
 #include <sys/wait.h>
 
 #ifndef __INTELLISENSE__
@@ -37,7 +38,7 @@
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
-#endif
+#endif /* !__INTELLISENSE__ */
 
 DECL_BEGIN
 
@@ -153,9 +154,15 @@ struct rpc_entry;
 
 LIST_HEAD(taskpid_list, REF taskpid);
 #ifndef __task_list_defined
-#define __task_list_defined 1
+#define __task_list_defined
 LIST_HEAD(task_list, WEAK task);
 #endif /* !__task_list_defined */
+
+#ifndef __ttybase_device_axref_defined
+#define __ttybase_device_axref_defined
+AXREF(ttybase_device_axref, ttybase_device);
+#endif /* !__ttybase_device_axref_defined */
+
 
 struct taskgroup {
 	/* Controller structure for tracing task association within/between
@@ -234,7 +241,7 @@ struct taskgroup {
 	                                                      * The session leader of the this process group.
 	                                                      * When set to `THIS_TASKPID', then the calling thread is that leader. */
 	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
-	XATOMIC_REF_STRUCT(struct ttybase_device) tg_ctty;   /* [0..1] The controlling terminal (/dev/tty) associated with this session
+	struct ttybase_device_axref  tg_ctty;                /* [0..1] The controlling terminal (/dev/tty) associated with this session
 	                                                      * When non-NULL, `tg_ctty->t_cproc == THIS_TASKPID' (for the session leader) */
 };
 

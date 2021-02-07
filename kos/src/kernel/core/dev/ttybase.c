@@ -960,10 +960,9 @@ NOTHROW(KCALL ttybase_device_setctty)(struct ttybase_device *__restrict self,
 		return TTYBASE_DEVICE_SETCTTY_NOTLEADER;
 	session_pid = FORTASK(session, this_taskpid);
 again_check_tg_ctty:
-	if (axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty.m_me) != NULL) {
-		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
+	if (axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty) != NULL) {
 		REF struct ttybase_device *old_ctty;
-		old_ctty = my_ctty_pointer.get();
+		old_ctty = axref_get(&FORTASK(session, this_taskgroup).tg_ctty);
 		if likely(old_ctty) {
 			FINALLY_DECREF_UNLIKELY(old_ctty);
 			if (old_ctty == self)
@@ -984,7 +983,7 @@ again_check_t_cproc_inner:
 					if unlikely(!self->t_cproc.cmpxch(old_cproc, session_pid))
 						goto again_check_t_cproc_inner;
 					/* Set the TTY link of the new session task descriptor. */
-					if unlikely(!my_ctty_pointer.cmpxch(old_ctty, self)) {
+					if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
 						self->t_cproc.cmpxch(session_pid, old_cproc);
 						goto again_check_tg_ctty;
 					}
@@ -993,8 +992,7 @@ again_check_t_cproc_inner:
 						REF struct task *old_cproc_task;
 						old_cproc_task = taskpid_gettask(old_cproc);
 						if likely(old_cproc_task) {
-							auto &old_ctty_pointer = __TASK_CTTY_FIELD(old_cproc_task);
-							if (old_ctty_pointer.cmpxch(self, NULL))
+							if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
 								ttybase_log_delsession(self, old_cproc_task, old_cproc);
 							decref_unlikely(old_cproc_task);
 						}
@@ -1006,7 +1004,7 @@ again_check_t_cproc_inner:
 			if unlikely(!self->t_cproc.cmpxch(NULL, session_pid))
 				goto again_check_t_cproc_inner;
 			/* Change the calling session's CTTY link to the new TTY */
-			if unlikely(!my_ctty_pointer.cmpxch(old_ctty, self)) {
+			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
 				self->t_cproc.cmpxch(session_pid, NULL);
 				goto again_check_tg_ctty;
 			}
@@ -1023,6 +1021,7 @@ again_check_t_cproc:
 		REF struct taskpid *old_cproc;
 		old_cproc = self->t_cproc.get();
 		if (old_cproc) {
+			REF struct task *old_cproc_task;
 			FINALLY_DECREF_UNLIKELY(old_cproc);
 			if unlikely(old_cproc == session_pid)
 				return TTYBASE_DEVICE_SETCTTY_ALREADY;
@@ -1031,24 +1030,17 @@ again_check_t_cproc:
 			/* Change the TTY's session pointer to the new session. */
 			if unlikely(!self->t_cproc.cmpxch(old_cproc, session_pid))
 				goto again_check_t_cproc;
-			{
 				/* Set the TTY link of the new session task descriptor. */
-				auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
-				if unlikely(!my_ctty_pointer.cmpxch(NULL, self)) {
-					self->t_cproc.cmpxch(session_pid, old_cproc);
-					goto again_check_tg_ctty;
-				}
+			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
+				self->t_cproc.cmpxch(session_pid, old_cproc);
+				goto again_check_tg_ctty;
 			}
-			{
-				/* Delete the TTY link from the old session task descriptor */
-				REF struct task *old_cproc_task;
-				old_cproc_task = taskpid_gettask(old_cproc);
-				if likely(old_cproc_task) {
-					auto &old_ctty_pointer = __TASK_CTTY_FIELD(old_cproc_task);
-					if (old_ctty_pointer.cmpxch(self, NULL))
-						ttybase_log_delsession(self, old_cproc_task, old_cproc);
-					decref_unlikely(old_cproc_task);
-				}
+			/* Delete the TTY link from the old session task descriptor */
+			old_cproc_task = taskpid_gettask(old_cproc);
+			if likely(old_cproc_task) {
+				if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
+					ttybase_log_delsession(self, old_cproc_task, old_cproc);
+				decref_unlikely(old_cproc_task);
 			}
 			ttybase_log_setsession(self, session, session_pid);
 			return TTYBASE_DEVICE_SETCTTY_SUCCESS;
@@ -1057,15 +1049,12 @@ again_check_t_cproc:
 	/* Set the TTY's session pointer to the calling session. */
 	if (!self->t_cproc.cmpxch(NULL, session_pid))
 		goto again_check_t_cproc;
-	{
-		/* Set the TTY link of the session task descriptor. */
-		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
-		if unlikely(!my_ctty_pointer.cmpxch(NULL, self)) {
-			self->t_cproc.cmpxch(FORTASK(session, this_taskpid), NULL);
-			goto again_check_tg_ctty;
-		}
-		ttybase_log_setsession(self, session, session_pid);
+	/* Set the TTY link of the session task descriptor. */
+	if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
+		self->t_cproc.cmpxch(FORTASK(session, this_taskpid), NULL);
+		goto again_check_tg_ctty;
 	}
+	ttybase_log_setsession(self, session, session_pid);
 	return TTYBASE_DEVICE_SETCTTY_SUCCESS;
 }
 
@@ -1088,11 +1077,11 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty,
 		return TTYBASE_DEVICE_HUPCTTY_NOTLEADER;
 	session_pid = FORTASK(session, this_taskpid);
 	if (required_old_ctty) {
-		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
 again_my_ctty_pointer_cmpxch:
-		if (!my_ctty_pointer.cmpxch(required_old_ctty, NULL)) {
+		if (!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty,
+		                  required_old_ctty, NULL)) {
 			struct ttybase_device *old_ctty;
-			old_ctty = awref_ptr(&my_ctty_pointer.m_me);
+			old_ctty = axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty);
 			if (old_ctty == NULL)
 				return TTYBASE_DEVICE_HUPCTTY_ALREADY;
 			if (old_ctty == required_old_ctty)
@@ -1107,8 +1096,7 @@ again_my_ctty_pointer_cmpxch:
 		}
 	} else {
 		REF struct ttybase_device *old_ctty;
-		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
-		old_ctty = my_ctty_pointer.exchange(NULL);
+		old_ctty = axref_xch_inherit(&FORTASK(session, this_taskgroup).tg_ctty, NULL);
 		if (!old_ctty)
 			return TTYBASE_DEVICE_HUPCTTY_ALREADY;
 		if (old_ctty->t_cproc.cmpxch(session_pid, NULL))

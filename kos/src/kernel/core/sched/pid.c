@@ -433,7 +433,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 			} else {
 				/* Session leader */
 				REF struct ttybase_device *mytty;
-				mytty = axref_ptr(&mygroup.tg_ctty.m_me);
+				mytty = mygroup.tg_ctty.axr_obj;
 				if (mytty) {
 					/* Unbind the CTTY pointer.
 					 * Reminder: The CTTY (Controlling TTY) is
@@ -483,7 +483,7 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 	/* .tg_pgrp_processes      = */ LIST_HEAD_INITIALIZER(this_taskgroup.tg_pgrp_processes),
 	/* .tg_pgrp_session_lock   = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_pgrp_session        = */ NULL,                /* Initialized by `task_setprocess()' */
-	/* .tg_ctty                = */ XATOMIC_REF_INIT(NULL)
+	/* .tg_ctty                = */ AXREF_INIT(NULL)
 };
 
 

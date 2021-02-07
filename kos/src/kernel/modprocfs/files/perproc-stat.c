@@ -251,7 +251,7 @@ nogroup:
 		if (format_printf(printer, arg, "%" PRIuN(__SIZEOF_PID_T__) " ",
 		                  task_gettid_of_s(session)) < 0)
 			goto done;
-		ctty = __TASK_CTTY_FIELD(session).get();
+		ctty = axref_get(&FORTASK(thread, this_taskgroup).tg_ctty);
 		if (!ctty)
 			goto noctty;
 		FINALLY_DECREF_UNLIKELY(ctty);
