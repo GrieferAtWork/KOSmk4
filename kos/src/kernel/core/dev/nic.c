@@ -30,8 +30,8 @@
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 
+#include <kos/aref.h>
 #include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <network/ethernet.h>
@@ -282,21 +282,23 @@ nic_device_routepacket(struct nic_device *__restrict self,
 }
 
 
+#ifndef __nic_device_axref_defined
+#define __nic_device_axref_defined
+AXREF(nic_device_axref, nic_device);
+#endif /* !__nic_device_axref_defined */
 
 /* [0..1] The default NIC device. */
-PRIVATE XATOMIC_REF(struct nic_device) default_nic_device = XATOMIC_REF_INIT(NULL);
+PRIVATE struct nic_device_axref default_nic_device = AXREF_INIT(NULL);
 
 /* Get/set the the default NIC device. */
 PUBLIC WUNUSED REF struct nic_device *
 NOTHROW(KCALL nic_device_getdefault)(void) {
-	return default_nic_device.get();
+	return axref_get(&default_nic_device);
 }
 
 PUBLIC NONNULL((1)) void
 NOTHROW(KCALL nic_device_setdefault)(struct nic_device *__restrict dev) {
-	REF struct nic_device *old_device;
-	old_device = default_nic_device.exchange(dev);
-	xdecref(old_device);
+	axref_set(&default_nic_device, dev);
 }
 
 

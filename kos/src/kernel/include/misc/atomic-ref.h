@@ -38,8 +38,7 @@ extern "C++" {
 
 /* TODO: Everything in here is deprecated! (use <kos/aref.h> instead!) */
 
-#define XATOMIC_REF(...)        xatomic_ref< __VA_ARGS__ >
-template<class T> struct xatomic_ref_struct { AXREF(T) m_me; };
+#define XATOMIC_REF(...) xatomic_ref<__VA_ARGS__>
 
 template<class T> struct xatomic_ref {
 
@@ -60,7 +59,6 @@ template<class T> struct xatomic_ref {
 	__CXX_CLASSMEMBER NOBLOCK bool KCALL cmpxch_inherit_new(T *old_pointer, /*inherit(on_success)*/ REF T *new_pointer) __CXX_NOEXCEPT { return axref_cmpxch_inherit_new(&m_me, old_pointer, new_pointer); }
 };
 
-#define XATOMIC_WEAKLYREF_STRUCT(...)  xatomic_weaklyref_struct< __VA_ARGS__ >
 #define XATOMIC_WEAKLYREF(...)         xatomic_weaklyref<__VA_ARGS__>
 #define xatomic_weaklyref_set(self, v) awref_set(&(self)->m_me, v)
 #define xatomic_weaklyref_clear(self)  xatomic_weaklyref_set(self, __NULLPTR)
@@ -84,7 +82,7 @@ template<class T> struct xatomic_weaklyref {
 } /* extern "c++" */
 #else /* __cplusplus */
 
-#define XATOMIC_REF               struct { ARREF(__VA_ARGS__) m_me; }
+#define XATOMIC_REF(...)           struct { ARREF(__VA_ARGS__) m_me; }
 #ifndef CONFIG_NO_SMP
 #define xatomic_ref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
 #define xatomic_ref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
@@ -97,8 +95,7 @@ template<class T> struct xatomic_weaklyref {
 #define xatomic_ref_fini(self)     xdecref((self)->m_pointer)
 
 /* A weakly held reference (must be cleared by the associated object once that object gets destroyed) */
-#define XATOMIC_WEAKLYREF          struct { ARREF(__VA_ARGS__) m_me; }
-#define XATOMIC_WEAKLYREF_STRUCT   struct { ARREF(__VA_ARGS__) m_me; }
+#define XATOMIC_WEAKLYREF(...)           struct { ARREF(__VA_ARGS__) m_me; }
 #ifndef CONFIG_NO_SMP
 #define xatomic_weaklyref_init(self, p)  ((self)->m_pointer = (p), (self)->m_inuse = 0)
 #define xatomic_weaklyref_cinit(self, p) ((self)->m_pointer = (p), __hybrid_assert((self)->m_inuse == 0))
