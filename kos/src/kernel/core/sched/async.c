@@ -31,13 +31,14 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/async.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+
+#include <kos/aref.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -177,8 +178,10 @@ PRIVATE struct awork_vector empty_awork = {
 	/* .awc_workc  = */ 0  /* No workers defined by default... */
 };
 
+ARREF(awork_vector_arref, awork_vector);
+
 /* Registered async work. */
-PRIVATE ATOMIC_REF(struct awork_vector) awork = ATOMIC_REF_INIT(&empty_awork);
+PRIVATE struct awork_vector_arref awork = ARREF_INIT(&empty_awork);
 
 /* Signal broadcast when `awork' has changed. */
 PRIVATE struct sig awork_changed = SIG_INIT;
@@ -223,7 +226,7 @@ NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_worke
 			incref(new_workers->av_workv[i]);
 	}
 	/* Try to exchange the global async workers vector. */
-	if (awork.cmpxch_inherit_new(old_workers, new_workers))
+	if (arref_cmpxch_inherit_new(&awork, old_workers, new_workers))
 		return TRY_DELETE_ASYNC_WORKER_SUCCESS; /* success! */
 	/* The async workers vector was changed in the mean time. */
 	decref_likely(new_workers);
@@ -283,7 +286,7 @@ again:
 		assert(PREEMPTION_ENABLED());
 		assert(!task_wasconnected());
 		PREEMPTION_DISABLE();
-		workers = awork.get_nopr();
+		workers = arref_get_nopr(&awork);
 		PREEMPTION_ENABLE();
 		/* First pass: test() for work and service immediately if present. */
 		for (i = 0; i < workers->av_testc; ++i) {
@@ -448,7 +451,7 @@ register_async_worker(struct async_worker_callbacks const *__restrict cb,
 	assert(ob_pointer);
 	assert(ob_type < HANDLE_TYPE_COUNT);
 again:
-	old_workers = awork.get();
+	old_workers = arref_get(&awork);
 	/* Check if this worker has already been defined. */
 	{
 		size_t c;
@@ -517,7 +520,7 @@ again:
 		incref(old_workers->av_workv[i]);
 
 	/* Try to install the new async workers vector. */
-	if (awork.cmpxch_inherit_new(old_workers, new_workers)) {
+	if (arref_cmpxch_inherit_new(&awork, old_workers, new_workers)) {
 		decref_likely(old_workers);
 		/* Indicate that workers have changed. */
 		sig_broadcast(&awork_changed);
@@ -550,7 +553,7 @@ NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__re
 	assert(cb->awc_work);
 	assert(ob_pointer);
 	assert(ob_type < HANDLE_TYPE_COUNT);
-	workers = awork.get();
+	workers = arref_get(&awork);
 	/* Figure out which parts of the worker-vector we need to search. */
 	i     = 0;
 	count = workers->av_testc;

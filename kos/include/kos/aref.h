@@ -30,7 +30,13 @@
 #include <kos/anno.h>
 
 #ifdef __CC__
-#if defined(__KERNEL__) && defined(__KOS__)
+#ifdef __INTELLISENSE__
+#define __PRIVATE_AR_YIELD()        (void)0
+#define __PRIVATE_AR_INTR_PUSHOFF() do {
+#define __PRIVATE_AR_INTR_BREAK()   (void)0
+#define __PRIVATE_AR_INTR_POP()     } __WHILE0
+#define __PRIVATE_AR_INTR_END()     } __WHILE0
+#elif defined(__KERNEL__) && defined(__KOS__)
 /* Kernel-space version */
 #include <sched/task.h>
 #define __PRIVATE_AR_YIELD() task_tryyield_or_pause()
