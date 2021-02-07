@@ -41,12 +41,13 @@
 #include <kernel/panic.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/aref.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -131,9 +132,11 @@ PRIVATE struct syslog_sink_array default_syslog_sink_array = {
 #endif /* !ARCH_DEFAULT_SYSLOG_SINK */
 };
 
+ARREF(syslog_sink_array_arref, syslog_sink_array);
+
 /* [1..1] Array of currently registered syslog sinks. */
-PRIVATE ATOMIC_REF(struct syslog_sink_array) syslog_sinks =
-ATOMIC_REF_INIT(&default_syslog_sink_array);
+PRIVATE struct syslog_sink_array_arref syslog_sinks =
+ARREF_INIT(&default_syslog_sink_array);
 
 
 PRIVATE NOBLOCK WUNUSED ATTR_PURE bool
@@ -202,12 +205,12 @@ syslog_sink_register(struct syslog_sink *__restrict self)
 	REF struct syslog_sink_array *old_array;
 	REF struct syslog_sink_array *new_array;
 again:
-	old_array = syslog_sinks.get();
+	old_array = arref_get(&syslog_sinks);
 	new_array = syslog_sink_array_with(old_array, self);
 	decref_unlikely(old_array);
 	if unlikely(!new_array)
 		return false; /* already registered. */
-	if (!syslog_sinks.cmpxch_inherit_new(old_array, new_array)) {
+	if (!arref_cmpxch_inherit_new(&syslog_sinks, old_array, new_array)) {
 		assert(!isshared(new_array));
 		destroy(new_array);
 		goto again;
@@ -221,12 +224,12 @@ syslog_sink_unregister(struct syslog_sink *__restrict self)
 	REF struct syslog_sink_array *old_array;
 	REF struct syslog_sink_array *new_array;
 again:
-	old_array = syslog_sinks.get();
+	old_array = arref_get(&syslog_sinks);
 	new_array = syslog_sink_array_without(old_array, self);
 	decref_unlikely(old_array);
 	if unlikely(!new_array)
 		return false; /* already registered. */
-	if (!syslog_sinks.cmpxch_inherit_new(old_array, new_array)) {
+	if (!arref_cmpxch_inherit_new(&syslog_sinks, old_array, new_array)) {
 		assert(!isshared(new_array));
 		destroy(new_array);
 		goto again;
@@ -406,7 +409,7 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
 	mask = syslog_levels & ((uintptr_t)1 << level);
 #ifndef __OPTIMIZE_SIZE__
 	/* Check for simple case: No custom sinks defined. */
-	if likely(arref_ptr(&syslog_sinks.m_me) == &default_syslog_sink_array) {
+	if likely(arref_ptr(&syslog_sinks) == &default_syslog_sink_array) {
 		if (dmesg_sink.ss_levels & mask)
 			dmesg_post(self, level);
 #ifdef ARCH_DEFAULT_SYSLOG_SINK
@@ -418,7 +421,7 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
 	{
 		size_t i;
 		REF struct syslog_sink_array *sinks;
-		sinks = syslog_sinks.get();
+		sinks = arref_get(&syslog_sinks);
 		for (i = 0; i < sinks->ssa_count; ++i) {
 			struct syslog_sink *sink;
 			sink = sinks->ssa_sinks[i];
