@@ -35,8 +35,15 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
 
 /* Destroy the given mem-futex. */
@@ -99,9 +106,33 @@ DECL_END
 DECL_BEGIN
 
 
+/* Clear the `mfu_part' field of all futex objects reachable from `root' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfutex_tree_clear_all_parts)(struct mfutex *__restrict root) {
+	struct mfutex *lhs, *rhs;
+again:
+	awref_clear(&root->mfu_part);
+	lhs = root->mfu_mtaent.rb_lhs;
+	rhs = root->mfu_mtaent.rb_rhs;
+	DBG_memset(&root->mfu_mtaent, 0xcc, sizeof(root->mfu_mtaent));
+	if (lhs) {
+		if (rhs)
+			mfutex_tree_clear_all_parts(rhs);
+		root = lhs;
+		goto again;
+	}
+	if (rhs) {
+		root = rhs;
+		goto again;
+	}
+}
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self) {
-	/* TODO: For every futex apart of `mpm_ftx', clear the `mfu_part' pointer. */
+
+	/* For every futex apart of `mpm_ftx', clear the `mfu_part' pointer. */
+	if (self->mpm_ftx != NULL)
+		mfutex_tree_clear_all_parts(self->mpm_ftx);
 
 	/* Make sure to free all still-pending dead futex objects. */
 	while (!SLIST_EMPTY(&self->mpm_ftx_dead)) {
