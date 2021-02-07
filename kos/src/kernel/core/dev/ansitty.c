@@ -114,7 +114,7 @@ ansitty_device_output(struct ansitty *__restrict self,
 	REF struct tty_device *output;
 	struct ansitty_device *me;
 	me = container_of(self, struct ansitty_device, at_ansi);
-	output = me->at_tty.get();
+	output = awref_get(&me->at_tty);
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
 #if 1
@@ -142,7 +142,7 @@ ansitty_device_setled(struct ansitty *__restrict self,
 	REF struct tty_device *output;
 	struct ansitty_device *me;
 	me = container_of(self, struct ansitty_device, at_ansi);
-	output = me->at_tty.get();
+	output = awref_get(&me->at_tty);
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
 		if (output->t_ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
@@ -176,7 +176,7 @@ ansitty_device_termios(struct ansitty *__restrict self,
 	REF struct tty_device *output;
 	struct ansitty_device *me;
 	me = container_of(self, struct ansitty_device, at_ansi);
-	output = me->at_tty.get();
+	output = awref_get(&me->at_tty);
 	if (!output) {
 		memset(oldios, 0, sizeof(*oldios));
 	} else {

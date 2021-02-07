@@ -31,6 +31,10 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef __tty_device_awref_defined
+#define __tty_device_awref_defined
+AWREF(tty_device_awref, tty_device);
+#endif /* !__tty_device_awref_defined */
 
 struct ansitty_device
 #ifdef __cplusplus
@@ -38,10 +42,10 @@ struct ansitty_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device              at_cdev; /* The underling character-device */
+	struct character_device at_cdev; /* The underling character-device */
 #endif /* !__cplusplus */
-	struct ansitty                       at_ansi; /* Ansi TTY support. */
-	XATOMIC_WEAKLYREF(struct tty_device) at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
+	struct ansitty          at_ansi; /* Ansi TTY support. */
+	struct tty_device_awref at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
 };
 
 #define character_device_isanansitty(self)                   \

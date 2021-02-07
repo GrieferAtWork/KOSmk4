@@ -84,7 +84,7 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 		struct ansitty_device *odev;
 		odev = (struct ansitty_device *)me->t_ohandle_ptr;
 		/* Try to unbind this TTY from an ansi tty output device. */
-		odev->at_tty.cmpxch(me, NULL);
+		awref_cmpxch(&odev->at_tty, me, NULL);
 	}
 	/* Drop references from input/output handles. */
 	(*handle_type_db.h_decref[me->t_ohandle_typ])(me->t_ohandle_ptr);
@@ -396,7 +396,7 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	    character_device_isanansitty((struct character_device *)ohandle_ptr)) {
 		struct ansitty_device *odev;
 		odev = (struct ansitty_device *)ohandle_ptr;
-		odev->at_tty.cmpxch(NULL, result);
+		awref_cmpxch(&odev->at_tty, NULL, result);
 	}
 	return result;
 }
