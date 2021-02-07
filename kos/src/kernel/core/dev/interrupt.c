@@ -30,9 +30,10 @@
 #include <kernel/isr.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/aref.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -207,11 +208,12 @@ PRIVATE struct isr_vector_state empty_vector_state = {
 	/* .ivs_handv      = */ { }
 };
 
+ARREF(isr_vector_state_arref, isr_vector_state);
 
 /* The main ISR vector table. */
 PRIVATE ATTR_SECTION(".data.hot.read_mostly.tail")
-ATOMIC_REF(struct isr_vector_state) isr_vectors[ISR_COUNT] = {
-#define ENUM_EMPTY_VECTOR_STATE(idx) ATOMIC_REF_INIT(&empty_vector_state),
+struct isr_vector_state_arref isr_vectors[ISR_COUNT] = {
+#define ENUM_EMPTY_VECTOR_STATE(idx) ARREF_INIT(&empty_vector_state),
 	ISR_GENERIC_VECTOR_ENUM(ENUM_EMPTY_VECTOR_STATE)
 	ISR_SPECIFIC_VECTOR_ENUM(ENUM_EMPTY_VECTOR_STATE)
 #undef ENUM_EMPTY_VECTOR_STATE
@@ -414,7 +416,7 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 	new_state = isr_vector_state_remove_noop_hisr(new_state, ignored_hisr_arg);
 	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
 	/* With the new state now fully initialized, try to install it (atomically). */
-	if (isr_vectors[index].cmpxch(old_state, new_state)) {
+	if (arref_cmpxch(&isr_vectors[index], old_state, new_state)) {
 		void *real_func = func, *real_arg = arg;
 		if (hisr_iswrapper(func)) {
 			struct hisr *hi;
@@ -460,13 +462,13 @@ again_check_finalizing:
 		return ISR_VECTOR_INVALID;
 	}
 again_determine_winner:
-	winner = isr_vectors[winner_index].get();
+	winner = arref_get(&isr_vectors[winner_index]);
 	if (winner->ivs_handc || winner->ivs_greedy_drv) {
 		/* Search for the vector with the least amount of handlers,
 		 * preferring those without greedy handlers over those with. */
 		for (i = 1; i < ISR_COUNT; ++i) {
 			REF struct isr_vector_state *temp;
-			temp = isr_vectors[i].get();
+			temp = arref_get(&isr_vectors[i]);
 			if ((!is_greedy || !temp->ivs_greedy_drv) &&
 			    (temp->ivs_handc < winner->ivs_handc ||
 			    (temp->ivs_handc == winner->ivs_handc &&
@@ -538,7 +540,7 @@ again_check_finalizing:
 	}
 	index = ISR_VECTOR_TO_INDEX(vector);
 again_get_old_state:
-	old_state = isr_vectors[index].get();
+	old_state = arref_get(&isr_vectors[index]);
 	if (is_greedy && old_state->ivs_greedy_drv &&
 	    !hisr_callback_mayoverride(old_state->ivs_greedy_drv,
 	                               old_state->ivs_greedy_fun,
@@ -600,7 +602,7 @@ isr_unregister_impl(size_t index, void *func, void *arg, bool ignore_arg)
 	struct driver *declaring_driver;
 	assert(index < ISR_COUNT);
 again:
-	old_state = isr_vectors[index].get();
+	old_state = arref_get(&isr_vectors[index]);
 	if ((old_state->ivs_greedy_fun == func) &&
 		(old_state->ivs_greedy_arg == arg || ignore_arg)) {
 		/* Delete the greedy handler of this ISR */
@@ -624,7 +626,7 @@ again:
 assign_new_state:
 		new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
 		new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
-		success = isr_vectors[index].cmpxch(old_state, new_state);
+		success = arref_cmpxch(&isr_vectors[index], old_state, new_state);
 		if unlikely(!success) {
 			decref(old_state);
 			decref(new_state); /* Not inherited on failure */
@@ -871,7 +873,7 @@ NOTHROW(KCALL hisr_unregister_impl)(size_t index, void *func,
 	bool success;
 	assert(index < ISR_COUNT);
 again:
-	old_state = isr_vectors[index].get();
+	old_state = arref_get(&isr_vectors[index]);
 	if (old_state->ivs_greedy_fun == &hisr_greedy_wrapper) {
 		struct hisr *hi;
 		hi = (struct hisr *)old_state->ivs_greedy_arg;
@@ -910,7 +912,7 @@ again:
 assign_new_state:
 			new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
 			new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
-			success = isr_vectors[index].cmpxch(old_state, new_state);
+			success = arref_cmpxch(&isr_vectors[index], old_state, new_state);
 			if unlikely(!success) {
 				decref(old_state);
 				decref(new_state); /* Not inherited on failure */
@@ -1026,7 +1028,7 @@ PUBLIC NOBLOCK ATTR_RETNONNULL REF struct isr_vector_state *
 NOTHROW(KCALL isr_usage_of)(isr_vector_t vector) {
 	if unlikely(!ISR_VECTOR_IS_VALID(vector))
 		return incref(&empty_vector_state);
-	return isr_vectors[ISR_VECTOR_TO_INDEX(vector)].get();
+	return arref_get(&isr_vectors[ISR_VECTOR_TO_INDEX(vector)]);
 }
 
 LOCAL ATTR_CONST NOBLOCK bool
@@ -1119,7 +1121,7 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	}
 	new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
 	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
-	if (isr_vectors[i].cmpxch(old_state, new_state)) {
+	if (arref_cmpxch(&isr_vectors[i], old_state, new_state)) {
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
 		destroy(new_state);
 		printk(KERN_INFO "[isr] Reorder handlers for vector "
@@ -1136,8 +1138,8 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 LOCAL NOBLOCK bool
 NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 	size_t i;
-	struct isr_vector_state *self;
-	self = isr_vectors[index].get();
+	REF struct isr_vector_state *self;
+	self = arref_get(&isr_vectors[index]);
 	assert(self);
 	for (i = 0; i < self->ivs_handc; ++i) {
 		if (!(*self->ivs_handv[i].ivh_fun)(self->ivs_handv[i].ivh_arg)) {
