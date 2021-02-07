@@ -62,10 +62,10 @@ NOTHROW(KCALL pty_slave_fini)(struct character_device *__restrict self) {
 	REF struct pty_master *master;
 	me = (struct pty_slave *)self;
 	/* Try to clear the master's back-link to our structure. */
-	master = me->ps_master.get();
+	master = awref_get(&me->ps_master);
 	if (master) {
-		assert(awref_ptr(&master->pm_slave.m_me) == me);
-		master->pm_slave.clear();
+		assert(awref_ptr(&master->pm_slave) == me);
+		awref_clear(&master->pm_slave);
 		/* Unlikely, since the controlling application is probably
 		 * still holding a reference to the master side of the PTY. */
 		decref_unlikely(master);
@@ -102,10 +102,10 @@ NOTHROW(KCALL pty_master_fini)(struct character_device *__restrict self) {
 	struct pty_master *me;
 	REF struct pty_slave *slave;
 	me    = (struct pty_master *)self;
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if (slave) {
-		assert(awref_ptr(&slave->ps_master.m_me) == self);
-		slave->ps_master.clear();
+		assert(awref_ptr(&slave->ps_master) == self);
+		awref_clear(&slave->ps_master);
 		/* Close buffers of the PTY. */
 		ringbuffer_close(&slave->ps_obuf);
 		ringbuffer_close(&slave->t_term.t_ibuf);
@@ -126,7 +126,7 @@ pty_master_read(struct character_device *__restrict self,
 	REF struct pty_slave *slave;
 	me = (struct pty_master *)self;
 again_getslave:
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave)
 		return 0; /* EOF */
 	/* Read from the PTY output buffer (allowing the master application to process TTY output) */
@@ -172,7 +172,7 @@ pty_master_write(struct character_device *__restrict self,
 	REF struct pty_slave *slave;
 	me = (struct pty_master *)self;
 again_getslave:
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave)
 		return 0; /* EOF */
 	/* Write to the input buffer, allowing the master application to provide keyboard input. */
@@ -225,7 +225,7 @@ pty_master_ioctl(struct character_device *__restrict self,
 	REF struct pty_slave *slave;
 	syscall_slong_t result;
 	me    = (struct pty_master *)self;
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave) {
 		THROW(E_NO_DEVICE,
 		      E_NO_DEVICE_KIND_CHARACTER_DEVICE,
@@ -245,7 +245,7 @@ pty_master_stat(struct character_device *__restrict self,
 	struct pty_master *me;
 	REF struct pty_slave *slave;
 	me    = (struct pty_master *)self;
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if (slave) {
 		FINALLY_DECREF_UNLIKELY(slave);
 		result->st_size = ATOMIC_READ(slave->ps_obuf.rb_avail);
@@ -261,7 +261,7 @@ pty_master_pollconnect(struct character_device *__restrict self,
 	struct pty_master *me;
 	REF struct pty_slave *slave;
 	me    = (struct pty_master *)self;
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if (!slave)
 		;
 	else {
@@ -285,7 +285,7 @@ pty_master_polltest(struct character_device *__restrict self,
 	REF struct pty_slave *slave;
 	poll_mode_t result = 0;
 	me    = (struct pty_master *)self;
-	slave = me->pm_slave.get();
+	slave = awref_get(&me->pm_slave);
 	if (!slave)
 		result = what;
 	else {
@@ -349,8 +349,8 @@ pty_alloc(REF struct pty_master **__restrict pmaster,
 		master = pty_master_alloc();
 		TRY {
 			/* Link the slave and master against each other. */
-			xatomic_weaklyref_cinit(&slave->ps_master, master);
-			xatomic_weaklyref_cinit(&master->pm_slave, slave);
+			awref_cinit(&slave->ps_master, master);
+			awref_cinit(&master->pm_slave, slave);
 			/* Load user-space provided initializers. */
 			if (termp)
 				memcpy(&slave->t_term.t_ios, termp, sizeof(struct termios));

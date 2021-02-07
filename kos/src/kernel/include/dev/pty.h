@@ -25,10 +25,10 @@
 #include <dev/char.h>
 #include <dev/ttybase.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 
 #include <bits/os/termio.h>  /* struct winsize */
 #include <bits/os/termios.h> /* struct termios */
+#include <kos/aref.h>
 #include <kos/dev.h>
 
 #include <libbuffer/ringbuffer.h>
@@ -52,17 +52,27 @@ DECL_BEGIN
 struct pty_master;
 struct pty_slave;
 
+#ifndef __pty_master_awref_defined
+#define __pty_master_awref_defined
+AWREF(pty_master_awref, pty_master);
+#endif /* !__pty_master_awref_defined */
+
+#ifndef __pty_slave_awref_defined
+#define __pty_slave_awref_defined
+AWREF(pty_slave_awref, pty_slave);
+#endif /* !__pty_slave_awref_defined */
+
 struct pty_slave
 #ifdef __cplusplus
     : ttybase_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct ttybase_device                ps_base;   /* The underlying base-tty */
+	struct ttybase_device   ps_base;   /* The underlying base-tty */
 #endif /* !__cplusplus */
-	struct ringbuffer                    ps_obuf;   /* Output buffer (use the PTY master to read from this) */
-	WEAK struct winsize                  ps_wsize;  /* Terminal window size. */
-	XATOMIC_WEAKLYREF(struct pty_master) ps_master; /* [0..1] The terminal's master side (cleared when destroyed) */
+	struct ringbuffer       ps_obuf;   /* Output buffer (use the PTY master to read from this) */
+	WEAK struct winsize     ps_wsize;  /* Terminal window size. */
+	struct pty_master_awref ps_master; /* [0..1] The terminal's master side (cleared when destroyed) */
 };
 
 struct pty_master
@@ -71,9 +81,9 @@ struct pty_master
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device             pm_base;  /* The underlying base-tty */
+	struct character_device pm_base;  /* The underlying base-tty */
 #endif /* !__cplusplus */
-	XATOMIC_WEAKLYREF(struct pty_slave) pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
+	struct pty_slave_awref  pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
 };
 
 /* Check if a given TTY/character device is a `struct pty_slave'. */
