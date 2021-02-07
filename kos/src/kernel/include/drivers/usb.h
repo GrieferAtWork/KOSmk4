@@ -32,6 +32,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/crt/format-printer.h>
+#include <kos/aref.h>
 #include <kos/kernel/memory.h>
 
 #include <stdbool.h>
@@ -198,6 +199,15 @@ typedef NOBLOCK NONNULL((1)) unsigned int
                                                 void const *data, size_t datalen);
 
 
+#ifndef __character_device_awref_defined
+#define __character_device_awref_defined
+AWREF(character_device_awref, character_device);
+#endif /* !__character_device_awref_defined */
+
+#ifndef __block_device_awref_defined
+#define __block_device_awref_defined
+AWREF(block_device_awref, block_device);
+#endif /* !__block_device_awref_defined */
 
 struct usb_interrupt {
 	/* Descriptor for interrupt handlers for isochronous (e.g. a microphone),
@@ -220,13 +230,11 @@ struct usb_interrupt {
 	REF struct usb_endpoint *ui_endp;    /* [const][1..1] The endpoint that is being polled. */
 	PUSB_INTERRUPT_HANDLER   ui_handler; /* [const][1..1] Interrupt handler callback. */
 	union {
-		XATOMIC_WEAKLYREF_STRUCT(struct character_device)   ui_chr; /* [0..1] The pointed-to device. */
-		XATOMIC_WEAKLYREF_STRUCT(struct basic_block_device) ui_blk; /* [0..1] The pointed-to device. */
+		struct character_device_awref   ui_chr; /* [0..1] The pointed-to device. */
+		struct block_device_awref       ui_blk; /* [0..1] The pointed-to device. */
 	}                        ui_bind;   /* The bound interrupt handler callback. */
 	/* Controller-specific data goes here. */
 };
-#define USB_INTERRUPT_BINDCHR(self) ((XATOMIC_WEAKLYREF(struct character_device) &)(self)->ui_bind.ui_chr)
-#define USB_INTERRUPT_BINDBLK(self) ((XATOMIC_WEAKLYREF(struct basic_block_device) &)(self)->ui_bind.ui_blk)
 
 
 /* Destroy the given USB interrupt descriptor. */
@@ -264,7 +272,7 @@ NOTHROW(KCALL usb_interrupt_delete)(REF struct usb_interrupt *__restrict self) {
  * destroyed), as well as drop the reference previously held by the bound device. */
 LOCAL NOBLOCK void
 NOTHROW(KCALL usb_interrupt_clear)(REF struct usb_interrupt *__restrict self) {
-	xatomic_weaklyref_clear(&self->ui_bind.ui_blk);
+	awref_clear(&self->ui_bind.ui_blk);
 	decref(self);
 }
 

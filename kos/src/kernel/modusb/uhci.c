@@ -900,14 +900,14 @@ do_stop:
 		result = USB_INTERRUPT_HANDLER_RETURN_STOP;
 	} else if (intflags & USB_INTERRUPT_FLAG_ISABLK) {
 		REF struct basic_block_device *dev;
-		dev = USB_INTERRUPT_BINDBLK(ui).get();
+		dev = awref_get(&ui->ui_bind.ui_blk);
 		if unlikely(!dev)
 			goto do_stop;
 		result = (*ui->ui_handler)(dev, status, data, datalen);
 		decref_unlikely(dev);
 	} else {
 		REF struct character_device *dev;
-		dev = USB_INTERRUPT_BINDCHR(ui).get();
+		dev = awref_get(&ui->ui_bind.ui_chr);
 		if unlikely(!dev)
 			goto do_stop;
 		result = (*ui->ui_handler)(dev, status, data, datalen);
@@ -2477,8 +2477,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 	result->ui_flags   = flags;
 	result->ui_endp    = incref(endp);
 	result->ui_handler = handler;
-	xatomic_weaklyref_cinit(&result->ui_bind.ui_blk,
-	                        (struct block_device *)character_or_block_device);
+	awref_cinit(&result->ui_bind.ui_blk, (struct block_device *)character_or_block_device);
 	TRY {
 		u32 tok, orig_tok, cs;
 		u16 maxpck;
