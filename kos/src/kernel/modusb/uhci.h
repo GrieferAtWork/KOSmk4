@@ -27,8 +27,6 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/dma.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
-#include <sched/atomic64.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 

@@ -27,10 +27,9 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/mman/phys.h>
-#include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
 #include <sched/task.h>

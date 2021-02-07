@@ -23,12 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <dev/ttybase.h>
-#include <misc/atomic-ref.h>
 #include <sched/mutex.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 DECL_BEGIN
 

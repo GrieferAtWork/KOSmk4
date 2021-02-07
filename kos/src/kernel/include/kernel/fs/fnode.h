@@ -27,7 +27,6 @@
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/mman/mfile.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>

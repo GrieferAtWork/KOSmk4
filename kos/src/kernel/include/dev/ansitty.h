@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/tty.h>
 #include <dev/char.h>
+#include <dev/tty.h>
+
 #include <libansitty/ansitty.h>
-#include <misc/atomic-ref.h>
 
 DECL_BEGIN
 

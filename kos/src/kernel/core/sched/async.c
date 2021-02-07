@@ -31,7 +31,6 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/async.h>
 #include <sched/signal.h>
 #include <sched/task.h>

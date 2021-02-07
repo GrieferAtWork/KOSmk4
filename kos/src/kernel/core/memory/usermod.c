@@ -37,7 +37,6 @@
 #include <kernel/panic.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <misc/atomic-ref.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

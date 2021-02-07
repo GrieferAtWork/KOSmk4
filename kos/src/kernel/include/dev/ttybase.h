@@ -24,7 +24,6 @@
 
 #include <dev/char.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/pid.h>
 
 #include <kos/dev.h>
@@ -48,7 +47,7 @@ AWREF(taskpid_awref, taskpid);
 
 struct ttybase_device
 #ifdef __cplusplus
-	: character_device
+    : character_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus

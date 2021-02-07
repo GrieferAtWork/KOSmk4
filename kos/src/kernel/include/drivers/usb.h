@@ -24,7 +24,6 @@
 
 #include <dev/char.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/mutex.h>
 
 #include <hybrid/__assert.h>
