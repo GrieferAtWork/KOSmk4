@@ -1817,14 +1817,14 @@ done:
  * name starts with "foo"
  */
 
-#define DEFINE_INTERPOS_PARSER(name, inner_name)                                \
-	PRIVATE WUNUSED NONNULL((1)) dbx_errno_t                                    \
-	NOTHROW(FCALL parse_##name)(struct cparser *__restrict self) {              \
-		dbx_errno_t result;                                                     \
-		result = parse_##inner_name(self);                                      \
-		if (likely(result == DBX_EOK) && parse_unary_suffix_check(self->c_tok)) \
-			result = parse_##name##_suffix(self);                               \
-		return result;                                                          \
+#define DEFINE_INTERPOS_PARSER(name, inner_name)                                   \
+	PRIVATE WUNUSED NONNULL((1)) dbx_errno_t                                       \
+	NOTHROW(FCALL parse_##name)(struct cparser *__restrict self) {                 \
+		dbx_errno_t result;                                                        \
+		result = parse_##inner_name(self);                                         \
+		if (likely(result == DBX_EOK) && parse_##name##_suffix_check(self->c_tok)) \
+			result = parse_##name##_suffix(self);                                  \
+		return result;                                                             \
 	}
 DEFINE_INTERPOS_PARSER(prod, unary)
 DEFINE_INTERPOS_PARSER(sum, prod)
