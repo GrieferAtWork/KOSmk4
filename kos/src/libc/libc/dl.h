@@ -38,6 +38,9 @@ DECL_BEGIN
 
 #ifdef HAVE_LAZY_LIBDL_RELOCATIONS
 
+#ifndef __DLFCN_DLTLSADDR_CC
+#define __DLFCN_DLTLSADDR_CC __DLFCN_CC
+#endif /* !__DLFCN_DLTLSADDR_CC */
 #ifndef __DLFCN_DLTLSADDR2_CC
 #define __DLFCN_DLTLSADDR2_CC __DLFCN_CC
 #endif /* !__DLFCN_DLTLSADDR2_CC */
@@ -84,7 +87,10 @@ DECL_BEGIN
 #define LIBC_DLERROR_SECTION       ".crt.heap.utility"  /* Used by `sbrk()' */
 #define LIBC_DLMODULEBASE_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
 #define LIBC_DLEXCEPTAWARE_SECTION ".crt.except"        /* Used by `except_handler4()' */
+#define LIBC_DLTLSADDR_SECTION     ".crt.sched.pthread" /* Used by pthread */
 #define LIBC_DLTLSADDR2_SECTION    ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLTLSALLOC_SECTION    ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLTLSFREE_SECTION     ".crt.sched.pthread" /* Used by pthread */
 
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLOPEN)(char const *filename, int mode);
 typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLCLOSE)(void *handle);
@@ -97,7 +103,16 @@ typedef void * /*NOTHROW_NCX*/ (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned 
 typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLERROR)(void);
 typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEBASE)(void *handle);
 typedef WUNUSED NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
+typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_handle);
 typedef WUNUSED NONNULL((1, 2)) void * /*NOTHROW_NCX*/ (__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment);
+typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
+                                                                 void const *template_data, size_t template_size,
+                                                                 void (LIBCCALL *perthread_init)(void *arg, void *base),
+                                                                 void (LIBCCALL *perthread_fini)(void *arg, void *base),
+                                                                 void *perthread_callback_arg);
+typedef NONNULL((1)) int /*__NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSFREE)(void *__tls_handle);
+
+
 
 INTDEF ATTR_RETNONNULL WUNUSED PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLCLOSE NOTHROW_NCX(LIBCCALL libc_get_dlclose)(void);
@@ -110,7 +125,10 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLAUXCTRL NOTHROW_NCX(LIBCCALL libc_get_dlauxctr
 INTDEF ATTR_RETNONNULL WUNUSED PDLERROR NOTHROW_NCX(LIBCCALL libc_get_dlerror)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLMODULEBASE NOTHROW_NCX(LIBCCALL libc_get_dlmodulebase)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLEXCEPTAWARE NOTHROW_NCX(LIBCCALL libc_get_dlexceptaware)(void);
+INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR2 NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr2)(void);
+INTDEF ATTR_RETNONNULL WUNUSED PDLTLSALLOC NOTHROW_NCX(LIBCCALL libc_get_dltlsalloc)(void);
+INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREE NOTHROW_NCX(LIBCCALL libc_get_dltlsfree)(void);
 
 #define dlopen(filename, mode)              (*libc_get_dlopen())(filename, mode)
 #define dlclose(handle)                     (*libc_get_dlclose())(handle)
@@ -123,7 +141,10 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR2 NOTHROW_NCX(LIBCCALL libc_get_dltlsad
 #define dlerror()                           (*libc_get_dlerror())()
 #define dlmodulebase(handle)                (*libc_get_dlmodulebase())(handle)
 #define dlexceptaware(handle)               (*libc_get_dlexceptaware())(handle)
+#define dltlsaddr(tls_handle)               (*libc_get_dltlsaddr())(tls_handle)
 #define dltlsaddr2(tls_handle, tls_segment) (*libc_get_dltlsaddr2())(tls_handle, tls_segment)
+#define dltlsalloc(...)                     (*libc_get_dltlsalloc())(__VA_ARGS__)
+#define dltlsfree(tls_handle)               (*libc_get_dltlsfree())(tls_handle)
 #endif /* HAVE_LAZY_LIBDL_RELOCATIONS */
 
 #endif /* __CC__ */
