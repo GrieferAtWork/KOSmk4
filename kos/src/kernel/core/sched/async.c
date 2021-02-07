@@ -235,6 +235,10 @@ NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_worke
 }
 
 
+#ifndef __aworker_axref_defined
+#define __aworker_axref_defined
+AXREF(aworker_axref, aworker);
+#endif /* !__aworker_axref_defined */
 
 /* [lock(PRIVATE(_asyncwork))] The timeout argument
  * for the async worker main `task_waitfor()' function */
@@ -242,7 +246,7 @@ PRIVATE ktime_t asyncmain_timeout_p = KTIME_INFINITE;
 
 /* [0..1] The worker who's timeout callback should
  * be invoked when `asyncmain_timeout_p' expires. */
-PRIVATE XATOMIC_REF(struct aworker) asyncmain_timeout_worker = XATOMIC_REF_INIT(NULL);
+PRIVATE struct aworker_axref asyncmain_timeout_worker = AXREF_INIT(NULL);
 
 /* [lock(PRIVATE(_asyncwork))][1..1]
  * [valid_if(asyncmain_timeout_worker != NULL)]
@@ -270,7 +274,7 @@ NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(ktime_t abs_timeout,
 	asyncmain_timeout_p  = abs_timeout;
 	asyncmain_timeout_cb = on_timeout;
 	/* Set the associated worker as the one that will receive the timeout. */
-	asyncmain_timeout_worker.set(w);
+	axref_set(&asyncmain_timeout_worker, w);
 }
 
 
@@ -393,7 +397,7 @@ again:
 				REF struct aworker *receiver;
 				/* A timeout expired. (invoke the associated worker's time-callback) */
 				asyncmain_timeout_p = KTIME_INFINITE;
-				receiver = asyncmain_timeout_worker.exchange(NULL);
+				receiver = axref_steal(&asyncmain_timeout_worker);
 				if likely(receiver) {
 					REF void *obj;
 					obj = aworker_getref(receiver);
@@ -412,7 +416,7 @@ again:
 			} else if (received_signal == &awork_changed) {
 				/* If workers have changed, clear any defined timeout. */
 				asyncmain_timeout_p = KTIME_INFINITE;
-				asyncmain_timeout_worker.clear();
+				axref_clear(&asyncmain_timeout_worker);
 			}
 		}
 	}
@@ -573,7 +577,7 @@ NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__re
 
 			/* If this worker is currently set as the timeout
 			 * receiver, then remove it from that position. */
-			asyncmain_timeout_worker.cmpxch_inherit_new(w, NULL);
+			axref_cmpxch_inherit_new(&asyncmain_timeout_worker, w, NULL);
 
 			/* Always try to remove the worker. */
 			try_delete_async_worker(workers, i, GFP_ATOMIC);
@@ -865,7 +869,7 @@ do_delete_job:
 				 *       `async_jobs' chain. */
 				async_job_current_timeout = job;
 				/* Set the associated worker as the one that will receive the timeout. */
-				asyncmain_timeout_worker.set(&asyncjob_timeout_worker);
+				axref_set(&asyncmain_timeout_worker, &asyncjob_timeout_worker);
 			}	break;
 
 			case ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT:

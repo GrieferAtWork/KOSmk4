@@ -43,6 +43,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <kos/aref.h>
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
