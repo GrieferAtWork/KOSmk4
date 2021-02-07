@@ -101,6 +101,8 @@ DECL_BEGIN
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self) {
+	/* TODO: For every futex apart of `mpm_ftx', clear the `mfu_part' pointer. */
+
 	/* Make sure to free all still-pending dead futex objects. */
 	while (!SLIST_EMPTY(&self->mpm_ftx_dead)) {
 		struct mfutex *dead_futex;

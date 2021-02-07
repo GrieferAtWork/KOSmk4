@@ -115,7 +115,7 @@ NOTHROW(KCALL vm_datapart_free)(struct vm_datapart *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_futextree_clear_part_pointers)(struct vm_futex *__restrict self) {
 again:
-	self->vmf_part.clear();
+	awref_clear(&self->vmf_part);
 	if (self->vmf_tree.a_min) {
 		if (self->vmf_tree.a_max)
 			vm_futextree_clear_part_pointers(self->vmf_tree.a_max);

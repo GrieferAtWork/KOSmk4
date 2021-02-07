@@ -52,7 +52,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		struct handle hnd;
 		REF struct vm_datapart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		part = self->vmf_part.get();
+		part = awref_get(&self->vmf_part);
 		if (!part)
 			return -EOWNERDEAD;
 		FINALLY_DECREF_UNLIKELY(part);
@@ -67,7 +67,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		REF struct vm_datablock *block;
 		REF struct vm_datapart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		part = self->vmf_part.get();
+		part = awref_get(&self->vmf_part);
 		if (!part)
 			return -EOWNERDEAD;
 		{

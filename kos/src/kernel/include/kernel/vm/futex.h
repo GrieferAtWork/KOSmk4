@@ -71,9 +71,10 @@
 #include <kernel/arch/mman/rtm.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <misc/atomic-ref.h>
 
 #include <hybrid/sequence/atree.h>
+
+#include <kos/aref.h>
 
 #ifdef ARCH_HAVE_RTM
 #include <hybrid/sync/atomic-rwlock.h>
@@ -83,10 +84,11 @@ DECL_BEGIN
 
 struct vm_futex;
 struct vm_datapart;
+AWREF(vm_datapart_awref, vm_datapart);
 
 struct vm_futex {
 	WEAK refcnt_t        vmf_refcnt; /* Futex reference counter. */
-	XATOMIC_WEAKLYREF(struct vm_datapart)
+	struct vm_datapart_awref
 	                     vmf_part;   /* [0..1] The data part associated with this futex.
 	                                * Note that this part may change at any time in order to deal
 	                                * with the part being split. Additionally, if the part is destroyed,

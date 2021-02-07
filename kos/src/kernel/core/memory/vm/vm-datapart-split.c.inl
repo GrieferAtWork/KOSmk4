@@ -121,7 +121,7 @@ NOTHROW(KCALL vm_futextree_tryincref_all_and_collect_minmax)(struct vm_futex *__
 	bool result = true;
 again:
 #ifndef NDEBUG
-	assert(tree->vmf_part.m_pointer == expected_part);
+	assert(awref_ptr(&tree->vmf_part) == expected_part);
 #endif /* !NDEBUG */
 	/* Try to acquire a reference (Only update min/max or alive futex objects) */
 	if (tryincref(tree)) {
@@ -210,7 +210,7 @@ NOTHROW(KCALL vm_futextree_decref_all_if_not_destroyed)(struct vm_futex *__restr
 	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
 again:
 #ifndef NDEBUG
-	assert(tree->vmf_part.m_pointer == expected_part);
+	assert(awref_ptr(&tree->vmf_part) == expected_part);
 #endif /* !NDEBUG */
 	if (!wasdestroyed(tree))
 		decref_unlikely(tree);
@@ -246,11 +246,11 @@ NOTHROW(KCALL vm_futextree_set_part_pointer_and_decref_all)(struct vm_futex *__r
 	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
 again:
 #ifndef NDEBUG
-	assert(tree->vmf_part.m_pointer == expected_part);
+	assert(awref_ptr(&tree->vmf_part) == expected_part);
 #endif /* !NDEBUG */
 	assert(!wasdestroyed(tree));
 	/* Set the new part pointer (such that it now points to the upper-half datapart) */
-	tree->vmf_part.set(new_part_pointer);
+	awref_set(&tree->vmf_part, new_part_pointer);
 	decref_unlikely(tree);
 	if (tree->vmf_tree.a_min) {
 		if (tree->vmf_tree.a_max) {

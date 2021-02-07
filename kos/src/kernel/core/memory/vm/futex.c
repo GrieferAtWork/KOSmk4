@@ -92,7 +92,7 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	sig_broadcast_for_fini(&self->vmf_signal);
 
 	/* Try to lock the associated data part. */
-	part = self->vmf_part.get();
+	part = awref_get(&self->vmf_part);
 	if (!part) {
 		/* No associated part
 		 * -> Our atree-leaf was already invalid to begin with,
@@ -349,7 +349,7 @@ do_recheck_existing_futex_and_controller:
 	 *  ... are holding a lock to `self'
 	 * In other words, this is the part where we initialize a new futex. */
 	result->vmf_refcnt = 1; /* The reference we'll eventually return */
-	xatomic_weaklyref_init(&result->vmf_part, self);
+	awref_init(&result->vmf_part, self);
 	result->vmf_tree.a_vaddr = datapart_offset;
 	sig_init(&result->vmf_signal);
 	/* Insert the new futex into the tree. */
