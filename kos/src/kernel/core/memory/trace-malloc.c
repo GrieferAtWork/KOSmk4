@@ -1248,7 +1248,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	{
 		struct driver_state *drivers;
 		size_t i;
-		drivers = current_driver_state.m_pointer;
+		drivers = arref_ptr(&current_driver_state.m_me);
 		for (i = 0; i < drivers->ds_count; ++i) {
 			uint16_t j;
 			struct driver *drv = drivers->ds_drivers[i];

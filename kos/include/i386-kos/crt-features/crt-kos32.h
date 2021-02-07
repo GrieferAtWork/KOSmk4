@@ -3077,6 +3077,7 @@
 #define __CRT_HAVE_setrpcent
 #define __CRT_HAVE_setservent
 #define __CRT_HAVE_setsid
+#define __CRT_HAVE_setsigmaskfullptr
 #define __CRT_HAVE_setsigmaskptr
 #define __CRT_HAVE_setsockopt
 #define __CRT_HAVE_setsourcefilter

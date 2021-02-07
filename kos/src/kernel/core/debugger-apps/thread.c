@@ -238,11 +238,11 @@ evalthreadexpr(char *expr, struct task **presult) {
 		if (*p != 0)
 			break;
 		pid = lookup_taskpid(pidno);
-		if (!pid || !pid->tp_thread.m_pointer) {
+		if (!pid || !awref_ptr(&pid->tp_thread.m_me)) {
 			dbg_printf(DBGSTR("Error: Invalid PID %lu\n"), pidno);
 			break;
 		}
-		*presult = pid->tp_thread.m_pointer;
+		*presult = awref_ptr(&pid->tp_thread.m_me);
 	}	return true;
 
 	/* TODO: Allow selecting by path:

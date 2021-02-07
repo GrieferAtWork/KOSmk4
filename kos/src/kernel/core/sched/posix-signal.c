@@ -654,7 +654,7 @@ inherit_parent_userprocmask:
 			assert(mask != &kernel_sigmask_empty);
 			ATOMIC_INC(mask->sm_share);
 			COMPILER_WRITE_BARRIER();
-			FORTASK(new_thread, this_sigmask).m_pointer = mask; /* Inherit reference. */
+			FORTASK(new_thread, this_sigmask).m_me.arr_obj = mask; /* Inherit reference. */
 			COMPILER_WRITE_BARRIER();
 		}
 	}
@@ -726,7 +726,7 @@ DEFINE_PERTASK_FINI(fini_posix_signals);
 PRIVATE NOBLOCK ATTR_USED void
 NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 	struct kernel_sigmask *mask;
-	mask = FORTASK(thread, this_sigmask).m_pointer;
+	mask = FORTASK(thread, this_sigmask).m_me.arr_obj;
 	if (mask != &kernel_sigmask_empty)
 		decref(mask);
 	xdecref(FORTASK(thread, this_sighand_ptr));

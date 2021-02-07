@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b322ee6 */
+/* HASH CRC-32:0x9019b089 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,6 +195,25 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
 	word = __sigset_word(signo);
 	return (set->__val[word] & mask) __PRIVATE_SIGSET_ISMEMBER_EXT;
 }
+#ifndef __KERNEL__
+/* >> setsigmaskfullptr(3)
+ * Same as `setsigmaskptr()', but set a statically allocated, fully
+ * filled signal mask as the calling thread's current signal mask.
+ * This essentially means that this function can be used to temporarily
+ * disable the reception of all signals within the calling thread, thus
+ * allowing the thread to run without being interrupted (by another but
+ * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
+ * mask is restored.
+ * >> sigset_t *os;
+ * >> os = setsigmaskfullptr();
+ * >> ...
+ * >> setsigmaskptr(os); */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_RETNONNULL sigset_t *
+NOTHROW_NCX(LIBCCALL libc_setsigmaskfullptr)(void) {
+	static sigset_t const ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
+	return libc_setsigmaskptr((sigset_t *)&ss_full);
+}
+#endif /* !__KERNEL__ */
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
  * @return: != 0: The given `set' is non-empty
@@ -935,6 +954,9 @@ DEFINE_PUBLIC_ALIAS(sigdelset, libc_sigdelset);
 DEFINE_PUBLIC_ALIAS(__sigismember, libc_sigismember);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigismember, libc_sigismember);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(setsigmaskfullptr, libc_setsigmaskfullptr);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigisemptyset, libc_sigisemptyset);
 DEFINE_PUBLIC_ALIAS(sigandset, libc_sigandset);
 DEFINE_PUBLIC_ALIAS(sigorset, libc_sigorset);

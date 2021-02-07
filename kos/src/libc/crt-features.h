@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc98ab444 */
+/* HASH CRC-32:0xda9433b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5310,6 +5310,7 @@
 #define __CRT_HAVE_setrpcent
 #define __CRT_HAVE_setservent
 #define __CRT_HAVE_setsid
+#define __CRT_HAVE_setsigmaskfullptr
 #define __CRT_HAVE_setsigmaskptr
 #define __CRT_HAVE_setsockopt
 #define __CRT_HAVE_setsourcefilter

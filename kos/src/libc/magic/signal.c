@@ -1473,7 +1473,7 @@ int sigemptyset([[nonnull]] $sigset_t *set) {
 @@though these would be ignored by the kernel) to the given signal set
 @@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
-[[impl_include("<bits/os/sigset.h>")]]
+[[libc, impl_include("<bits/os/sigset.h>")]]
 int sigfillset([[nonnull]] $sigset_t *set) {
 @@pp_if __SIZEOF_POINTER__ == 8@@
 	memsetq(set->__val, __UINT64_C(0xffffffffffffffff), COMPILER_LENOF(set->__val));
@@ -1558,7 +1558,7 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 @@@return: 0:  Success
 @@@return: -1: [errno=EINVAL] Invalid `how'
 [[decl_include("<features.h>"), export_alias("pthread_sigmask")]]
-[[decl_prefix(struct __sigset_struct;)]]
+[[libc, decl_prefix(struct __sigset_struct;)]]
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
 %#ifdef __USE_KOS
@@ -1567,7 +1567,7 @@ int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 @@See the documentation of `setsigmaskptr(3)' for
 @@what this function is all about. 
 @@@return: * : A pointer to the calling thread's current signal mask
-[[nonnull, wunused, decl_include("<bits/os/sigset.h>")]]
+[[libc, nonnull, wunused, decl_include("<bits/os/sigset.h>")]]
 sigset_t *getsigmaskptr(void);
 
 @@>> setsigmaskptr(3)
@@ -1592,8 +1592,28 @@ sigset_t *getsigmaskptr(void);
 @@>> sigprocmask(SIG_SETMASK, &oldset, NULL);
 @@@param: sigmaskptr: Address of the signal mask to use from now on.
 @@@return: * : Address of the previously used signal mask.
-[[nonnull, decl_include("<bits/os/sigset.h>")]]
+[[libc, nonnull, decl_include("<bits/os/sigset.h>")]]
 sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
+
+@@>> setsigmaskfullptr(3)
+@@Same as `setsigmaskptr()', but set a statically allocated, fully
+@@filled signal mask as the calling thread's current signal mask.
+@@This essentially means that this function can be used to temporarily
+@@disable the reception of all signals within the calling thread, thus
+@@allowing the thread to run without being interrupted (by another but
+@@SIGKILL and SIGSTOP, which can't be masked), until the returned signal
+@@mask is restored.
+@@>> sigset_t *os;
+@@>> os = setsigmaskfullptr();
+@@>> ...
+@@>> setsigmaskptr(os);
+[[libc, requires_function(setsigmaskptr)]]
+[[decl_include("<bits/os/sigset.h>")]]
+[[impl_include("<bits/os/sigset.h>")]]
+[[nonnull]] sigset_t *setsigmaskfullptr(void) {
+	static sigset_t const ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
+	return setsigmaskptr((sigset_t *)&ss_full);
+}
 %#endif /* __USE_KOS */
 
 @@>> sigsuspend(2)

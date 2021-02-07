@@ -2012,7 +2012,7 @@ find_next_dependent_driver:
 			}
 			/* If the set of loaded drivers has changed, then
 			 * we have to check for more depending drivers. */
-			if (ATOMIC_READ(current_driver_state.m_pointer) != ds) {
+			if (arref_ptr(&current_driver_state.m_me) != ds) {
 				decref_unlikely(ds);
 				goto again_search_for_depending_drivers;
 			}

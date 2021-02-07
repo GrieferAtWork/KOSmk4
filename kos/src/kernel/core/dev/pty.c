@@ -64,7 +64,7 @@ NOTHROW(KCALL pty_slave_fini)(struct character_device *__restrict self) {
 	/* Try to clear the master's back-link to our structure. */
 	master = me->ps_master.get();
 	if (master) {
-		assert(master->pm_slave.m_pointer == me);
+		assert(awref_ptr(&master->pm_slave.m_me) == me);
 		master->pm_slave.clear();
 		/* Unlikely, since the controlling application is probably
 		 * still holding a reference to the master side of the PTY. */
@@ -104,7 +104,7 @@ NOTHROW(KCALL pty_master_fini)(struct character_device *__restrict self) {
 	me    = (struct pty_master *)self;
 	slave = me->pm_slave.get();
 	if (slave) {
-		assert(slave->ps_master.m_pointer == self);
+		assert(awref_ptr(&slave->ps_master.m_me) == self);
 		slave->ps_master.clear();
 		/* Close buffers of the PTY. */
 		ringbuffer_close(&slave->ps_obuf);

@@ -74,29 +74,6 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 	mfutex_free(self);
 }
 
-/* Same as `mfutex_destroy()', but _always_ enqueue the futex to-be reaped
- * lazily once `mpartmeta_deadftx_reap()' is called with the associated controller. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfutex_destroy_later)(struct mfutex *__restrict self) {
-	REF struct mpart *part;
-	struct mpartmeta *meta;
-
-	/* Broadcast the mem-futex one last time. */
-	sig_broadcast_for_fini(&self->mfu_signal);
-
-	part = self->mfu_part.m_pointer; /* Inherit reference */
-	meta = part->mp_meta;
-	assert(meta != NULL);
-
-	/* Enqueue the futex for lazy removal. */
-	SLIST_ATOMIC_INSERT(&meta->mpm_ftx_dead, self, _mfu_dead);
-
-	/* Reap dead futex objects associated with the meta-controller. */
-	mpartmeta_deadftx_reap(meta);
-	decref_unlikely(part);
-}
-
-
 /* Mem-futex tree API. All of these functions require that the caller
  * be holding a lock to the associated `struct mpartmeta::mpm_ftxlock'. */
 DECL_END

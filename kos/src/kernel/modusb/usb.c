@@ -531,7 +531,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	 * ensuring that every probe has had a chance to identify our
 	 * new unknown interface. */
 	for (;;) {
-		new_probes = ATOMIC_READ(probe_interface.m_pointer);
+		new_probes = arref_ptr(&probe_interface.m_me);
 		if likely(new_probes == probes)
 			break;
 		new_probes = probe_interface.get();

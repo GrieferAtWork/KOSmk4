@@ -118,7 +118,7 @@ again_loadheader:
 		}
 	}
 	decref_unlikely(abis);
-	if unlikely(abis != execabis.m_pointer) {
+	if unlikely(abis != arref_ptr(&execabis.m_me)) {
 		/* The available set of ABIs has changed. - Try again. */
 		goto again_getabis;
 	}

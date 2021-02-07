@@ -406,7 +406,7 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
 	mask = syslog_levels & ((uintptr_t)1 << level);
 #ifndef __OPTIMIZE_SIZE__
 	/* Check for simple case: No custom sinks defined. */
-	if likely(syslog_sinks.m_pointer == &default_syslog_sink_array) {
+	if likely(arref_ptr(&syslog_sinks.m_me) == &default_syslog_sink_array) {
 		if (dmesg_sink.ss_levels & mask)
 			dmesg_post(self, level);
 #ifdef ARCH_DEFAULT_SYSLOG_SINK

@@ -381,7 +381,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #define mygroup FORTASK(self, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
 	assert(wasdestroyed(self));
-	assert(!mypid || mypid->tp_thread.m_pointer == self);
+	assert(!mypid || awref_ptr(&mypid->tp_thread.m_me) == self);
 	sigqueue_fini(&FORTASK(self, this_sigqueue));
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
@@ -433,7 +433,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 			} else {
 				/* Session leader */
 				REF struct ttybase_device *mytty;
-				mytty = mygroup.tg_ctty.m_pointer;
+				mytty = axref_ptr(&mygroup.tg_ctty.m_me);
 				if (mytty) {
 					/* Unbind the CTTY pointer.
 					 * Reminder: The CTTY (Controlling TTY) is

@@ -557,6 +557,7 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_setsigmaskptr]]]*/
 
+
 /*[[[head:libc_sigsuspend,hash:CRC-32=0xc9c070c8]]]*/
 /* >> sigsuspend(2)
  * Atomically save and set the caller's signal mask to `set', then wait for

@@ -436,7 +436,7 @@ check_result_inode_for_symlink:
 				if (!(oflags & O_NOCTTY) &&
 				    result.h_type == HANDLE_TYPE_CHARACTERDEVICE &&
 				    character_device_isattybase((struct character_device *)result.h_data) &&
-				    ((struct ttybase_device *)result.h_data)->t_cproc.m_pointer == NULL) {
+				    awref_ptr(&((struct ttybase_device *)result.h_data)->t_cproc.m_me) == NULL) {
 					/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
 					ttybase_device_setctty((struct ttybase_device *)result.h_data);
 				}
@@ -501,7 +501,7 @@ check_result_inode_for_symlink:
 					}
 					/* Assign a controlling terminal to the calling process. */
 					if (!(oflags & O_NOCTTY) && character_device_isattybase(cdev) &&
-					    ((struct ttybase_device *)cdev)->t_cproc.m_pointer == NULL) {
+					    awref_ptr(&((struct ttybase_device *)cdev)->t_cproc.m_me) == NULL) {
 						/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
 						ttybase_device_setctty((struct ttybase_device *)cdev);
 					}

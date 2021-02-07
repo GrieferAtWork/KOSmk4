@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x911db3b6 */
+/* HASH CRC-32:0xcca6d44f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1658,6 +1658,36 @@ __CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_WUNUSED,sigset_t *,__NOTHROW_NCX,getsigm
  * @param: sigmaskptr: Address of the signal mask to use from now on.
  * @return: * : Address of the previously used signal mask. */
 __CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),sigset_t *,__NOTHROW_NCX,setsigmaskptr,(sigset_t *__sigmaskptr),(__sigmaskptr))
+#ifdef __CRT_HAVE_setsigmaskfullptr
+/* >> setsigmaskfullptr(3)
+ * Same as `setsigmaskptr()', but set a statically allocated, fully
+ * filled signal mask as the calling thread's current signal mask.
+ * This essentially means that this function can be used to temporarily
+ * disable the reception of all signals within the calling thread, thus
+ * allowing the thread to run without being interrupted (by another but
+ * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
+ * mask is restored.
+ * >> sigset_t *os;
+ * >> os = setsigmaskfullptr();
+ * >> ...
+ * >> setsigmaskptr(os); */
+__CDECLARE(__ATTR_RETNONNULL,sigset_t *,__NOTHROW_NCX,setsigmaskfullptr,(void),())
+#elif defined(__CRT_HAVE_setsigmaskptr)
+#include <libc/local/signal/setsigmaskfullptr.h>
+/* >> setsigmaskfullptr(3)
+ * Same as `setsigmaskptr()', but set a statically allocated, fully
+ * filled signal mask as the calling thread's current signal mask.
+ * This essentially means that this function can be used to temporarily
+ * disable the reception of all signals within the calling thread, thus
+ * allowing the thread to run without being interrupted (by another but
+ * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
+ * mask is restored.
+ * >> sigset_t *os;
+ * >> os = setsigmaskfullptr();
+ * >> ...
+ * >> setsigmaskptr(os); */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setsigmaskfullptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL sigset_t *__NOTHROW_NCX(__LIBCCALL setsigmaskfullptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setsigmaskfullptr))(); })
+#endif /* ... */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_sigsuspend
 /* >> sigsuspend(2)

@@ -166,7 +166,7 @@ NOTHROW(KCALL note_taskpid)(pformatprinter printer, void *arg,
 		struct pidns *ns;
 		if (thread->tp_refcnt == 0)
 			goto badobj;
-		referenced_thread = thread->tp_thread.m_pointer;
+		referenced_thread = thread->tp_thread.m_me.awr_obj;
 		if (referenced_thread && !ADDR_ISKERN(referenced_thread))
 			goto badobj;
 		ns = thread->tp_pidns;

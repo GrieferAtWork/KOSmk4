@@ -101,9 +101,6 @@ struct mfutex {
 /* Destroy the given mem-futex. */
 #define mfutex_free(self) kfree(self)
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self);
-/* Same as `mfutex_destroy()', but _always_ enqueue the futex to-be reaped
- * lazily once `mpartmeta_deadftx_reap()' is called with the associated controller. */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutex_destroy_later)(struct mfutex *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct mfutex, mfu_refcnt, mfutex_destroy)
 
 

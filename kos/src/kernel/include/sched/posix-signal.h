@@ -113,7 +113,7 @@ DATDEF struct kernel_sigmask kernel_sigmask_full;
 DATDEF ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask;
 
 /* Return a pointer to the kernel signal mask of the calling thread. */
-#define sigmask_kernel_getrd() PERTASK_GET(this_sigmask.m_pointer)
+#define sigmask_kernel_getrd() PERTASK_GET(this_sigmask.m_me.arr_obj)
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */

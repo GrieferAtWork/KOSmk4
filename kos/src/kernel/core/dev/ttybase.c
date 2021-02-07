@@ -80,8 +80,8 @@ NOTHROW(KCALL ttybase_log_delsession)(struct ttybase_device *__restrict self,
 PUBLIC NOBLOCK void
 NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
                                     pterminal_oprinter_t oprinter) {
-	assert(self->t_cproc.m_pointer == NULL);
-	assert(self->t_fproc.m_pointer == NULL);
+	awref_cinit(&self->t_cproc.m_me, NULL);
+	axref_cinit(&self->t_fproc.m_me, NULL);
 	self->cd_type.ct_fini        = &ttybase_device_fini;
 	self->cd_type.ct_read        = &ttybase_device_iread;
 	self->cd_type.ct_write       = &ttybase_device_owrite;
@@ -108,7 +108,7 @@ kernel_terminal_check_sigtty(struct terminal *__restrict self,
 	assert(character_device_isattybase(term));
 	my_leader_pid = task_getprocessgroupleaderpid();
 	FINALLY_DECREF_UNLIKELY(my_leader_pid);
-	if unlikely(my_leader_pid != ATOMIC_READ(term->t_fproc.m_pointer)) {
+	if unlikely(my_leader_pid != axref_ptr(&term->t_fproc.m_me)) {
 		REF struct task *my_leader;
 		REF struct task *oldproc;
 		REF struct taskpid *oldpid;
@@ -141,7 +141,7 @@ do_try_override_fproc:
 		/* 11.1.4 -- Terminal Access Control */
 		if (is_SIGTTOU) {
 			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
-			       term->cd_name, my_leader_pid->tp_thread.m_pointer,
+			       term->cd_name, awref_ptr(&my_leader_pid->tp_thread.m_me),
 			       taskpid_getrootpid(my_leader_pid));
 			/* ... Attempts by a process in a background process group to write to its controlling
 			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
@@ -280,7 +280,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self) {
 	struct ttybase_device *me;
 	me = (struct ttybase_device *)self;
-	assertf(!me->t_cproc.m_pointer,
+	assertf(!awref_ptr(&me->t_cproc.m_me),
 	        "An session leader should be holding a reference to their CTTY, "
 	        "meaning that if we truely were supposed to be a CTTY, the associated "
 	        "session should have kept us from being destroyed");
@@ -960,7 +960,7 @@ NOTHROW(KCALL ttybase_device_setctty)(struct ttybase_device *__restrict self,
 		return TTYBASE_DEVICE_SETCTTY_NOTLEADER;
 	session_pid = FORTASK(session, this_taskpid);
 again_check_tg_ctty:
-	if (ATOMIC_READ(FORTASK(session, this_taskgroup).tg_ctty.m_pointer) != NULL) {
+	if (axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty.m_me) != NULL) {
 		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
 		REF struct ttybase_device *old_ctty;
 		old_ctty = my_ctty_pointer.get();
@@ -971,7 +971,7 @@ again_check_tg_ctty:
 			if (!override_different_ctty)
 				return TTYBASE_DEVICE_SETCTTY_DIFFERENT;
 again_check_t_cproc_inner:
-			if unlikely(ATOMIC_READ(self->t_cproc.m_pointer) != NULL) {
+			if unlikely(awref_ptr(&self->t_cproc.m_me) != NULL) {
 				REF struct taskpid *old_cproc;
 				old_cproc = self->t_cproc.get();
 				if (old_cproc) {
@@ -1019,7 +1019,7 @@ remove_from_old_ctty_and_succeed:
 		}
 	}
 again_check_t_cproc:
-	if unlikely(ATOMIC_READ(self->t_cproc.m_pointer) != NULL) {
+	if unlikely(awref_ptr(&self->t_cproc.m_me) != NULL) {
 		REF struct taskpid *old_cproc;
 		old_cproc = self->t_cproc.get();
 		if (old_cproc) {
@@ -1092,7 +1092,7 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty,
 again_my_ctty_pointer_cmpxch:
 		if (!my_ctty_pointer.cmpxch(required_old_ctty, NULL)) {
 			struct ttybase_device *old_ctty;
-			old_ctty = ATOMIC_READ(my_ctty_pointer.m_pointer);
+			old_ctty = awref_ptr(&my_ctty_pointer.m_me);
 			if (old_ctty == NULL)
 				return TTYBASE_DEVICE_HUPCTTY_ALREADY;
 			if (old_ctty == required_old_ctty)

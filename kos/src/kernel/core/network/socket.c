@@ -107,12 +107,12 @@ NOTHROW(KCALL socket_destroy)(struct socket *__restrict self) {
 	/* First step: Call the optional socket family finalizer. */
 	if (self->sk_ops->so_fini)
 		(*self->sk_ops->so_fini)(self);
-	if (self->sk_ncon.m_pointer) {
+	if (self->sk_ncon.m_me.axr_obj) {
 		/* Drop a reference from the non-blocking connect() controller.
 		 * If this ends up killing it, then `socket_connect_aio_destroy()'
 		 * will cancel the connect() operation if it hadn't been canceled
 		 * already! */
-		decref_likely(self->sk_ncon.m_pointer);
+		decref_likely(self->sk_ncon.m_me.axr_obj);
 	}
 
 	/* Drop a weak reference from the given socket. */

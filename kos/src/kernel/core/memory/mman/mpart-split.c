@@ -696,9 +696,7 @@ do_split_many_chunks_after_lo_pages:
 
 
 
-/* Drop 1 reference to every futex from the given tree, however
- * mutex objects that end up dead as a result of this will be
- * destroyed using `mfutex_destroy_later()'
+/* Drop 1 reference to every futex from the given tree.
  * NOTE: The caller must be holding a lock to the associated
  *       mem-part-meta controller. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -707,8 +705,7 @@ NOTHROW(FCALL mfutex_tree_foreach_decref_or_destroy_later)(struct mfutex *__rest
 again:
 	lhs = self->mfu_mtaent.rb_lhs;
 	rhs = self->mfu_mtaent.rb_rhs;
-	if unlikely(ATOMIC_DECFETCH(self->mfu_refcnt) == 0)
-		mfutex_destroy_later(self);
+	decref_unlikely(self);
 	if (lhs != NULL) {
 		if (rhs != NULL)
 			mfutex_tree_foreach_decref_or_destroy_later(rhs);
