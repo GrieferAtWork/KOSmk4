@@ -48,7 +48,7 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 	/* Broadcast the mem-futex one last time. */
 	sig_broadcast_for_fini(&self->mfu_signal);
 
-	part = self->mfu_part.get();
+	part = awref_get(&self->mfu_part);
 	if (part) {
 		meta = part->mp_meta;
 		assert(meta != NULL);

@@ -28,12 +28,13 @@
 #include <kernel/arch/mman/rtm.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
-#include <misc/atomic-ref.h>
 #include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
+
+#include <kos/aref.h>
 
 /* NOTE: Unlike `mpart' and its other fields, `mpartmeta', as well
  *       `mfutex' objects may be allocated without `GFP_LOCKED'!
@@ -51,19 +52,27 @@ struct mpart;     /* Memory file part. */
 struct mpartmeta; /* Memory file part meta-data. */
 struct mfutex;    /* Memory-Fast-Userspace-mUTEX */
 
+#ifndef __mfutex_slist_defined
+#define __mfutex_slist_defined
 SLIST_HEAD(mfutex_slist, mfutex);
+#endif /* !__mfutex_slist_defined */
 
 #ifndef __mpart_reladdr_t_defined
-#define __mpart_reladdr_t_defined 1
+#define __mpart_reladdr_t_defined
 typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 
 #define MFUTEX_ADDR_ALIGNMENT 2 /* Minimum alignment for mem-futex addresses. */
 
+#ifndef __mpart_awref_defined
+#define __mpart_awref_defined
+AWREF(mpart_awref, mpart);
+#endif /* !__mpart_awref_defined */
+
 struct mfutex {
 	/* Memory-Fast-Userspace-mUTEX */
 	WEAK refcnt_t                    mfu_refcnt; /* Reference counter. */
-	XATOMIC_WEAKLYREF(struct mpart)  mfu_part;   /* [1..1] The (currently) associated mem-part.
+	struct mpart_awref               mfu_part;   /* [1..1] The (currently) associated mem-part.
 	                                              * Note that this part may change arbitrarily as the result of calls to
 	                                              * `mpart_split()'. To prevent this, read out this field, acquire a lock
 	                                              * to the mem-part, or the futex-tree-lock, then read out this field again
@@ -85,15 +94,15 @@ struct mfutex {
 	};
 };
 
-#define mfutex_init(self, part, addr)                 \
-	((self)->mfu_refcnt = 1,                          \
-	 xatomic_weaklyref_init(&(self)->mfu_part, part), \
-	 (self)->mfu_addr = (addr),                       \
+#define mfutex_init(self, part, addr)     \
+	((self)->mfu_refcnt = 1,              \
+	 awref_init(&(self)->mfu_part, part), \
+	 (self)->mfu_addr = (addr),           \
 	 sig_init(&(self)->mfu_signal))
-#define mfutex_cinit(self, part, addr)                 \
-	((self)->mfu_refcnt = 1,                           \
-	 xatomic_weaklyref_cinit(&(self)->mfu_part, part), \
-	 (self)->mfu_addr = (addr),                        \
+#define mfutex_cinit(self, part, addr)     \
+	((self)->mfu_refcnt = 1,               \
+	 awref_cinit(&(self)->mfu_part, part), \
+	 (self)->mfu_addr = (addr),            \
 	 sig_cinit(&(self)->mfu_signal))
 #define mfutex_addr(self) ((self)->mfu_addr & ~1)
 

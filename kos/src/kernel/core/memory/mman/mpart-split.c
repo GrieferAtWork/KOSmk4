@@ -1216,7 +1216,7 @@ clear_hipart_changed_bit:
 				/* Futex is still alive. */
 				ftx->mfu_addr -= data.msd_offset;
 				COMPILER_WRITE_BARRIER();
-				ftx->mfu_part.set(hipart);
+				awref_set(&ftx->mfu_part, hipart);
 				mfutex_tree_insert(&himeta->mpm_ftx, ftx);
 			} else {
 				/* Futex is already dead... */
