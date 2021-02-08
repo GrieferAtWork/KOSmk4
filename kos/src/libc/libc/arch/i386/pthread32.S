@@ -70,8 +70,8 @@ INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
 
 	/* Perform the system call with `lcall', since `int $0x80' would clobber all registers
-	 * except for %ebp, however we need 2 registers to pass both `fn' and `arg' to the child
-	 * thread. */
+	 * except for %ebp, however we need 2 registers to pass both `start' and `thread' to the
+	 * child thread. */
 #if __OFFSET_PTHREAD_TID == 0
 	movl   %ecx, %eax                       /* pid_t *ctid */
 #else /* __OFFSET_PTHREAD_TID == 0 */
@@ -90,8 +90,8 @@ INTERN_FUNCTION(libc_pthread_clone)
 	            CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED)
 	lcall  $(7), $(SYS_clone)
 
-	/* Check if we're inside of the child thread
-	 * If so, just to pthread's thread entry point.
+	/* Check if we're inside of the child thread.
+	 * If so, jump to pthread's thread entry point.
 	 * Note that `%ecx' and `%edx' weren't clobbered, so the new
 	 * thread will have automatically inherited them from us! */
 	testl  %eax, %eax

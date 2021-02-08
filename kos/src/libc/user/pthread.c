@@ -2683,9 +2683,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock)
 }
 /*[[[end:libc_pthread_rwlock_tryrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0x8204e160]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0xea427782]]]*/
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2701,12 +2701,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restri
 }
 /*[[[end:libc_pthread_rwlock_timedrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0x802a88bc]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0x37e0e555]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock);
 #else /* MAGIC:alias */
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2753,9 +2753,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock)
 }
 /*[[[end:libc_pthread_rwlock_trywrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x9d22c61f]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x3ec44845]]]*/
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2771,12 +2771,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restri
 }
 /*[[[end:libc_pthread_rwlock_timedwrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0xa699655b]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x22f45c12]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock);
 #else /* MAGIC:alias */
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */

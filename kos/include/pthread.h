@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2cdc7fc */
+/* HASH CRC-32:0xf332e0a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1527,14 +1527,14 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthrea
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && !defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1542,7 +1542,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <libc/local/pthread/pthread_rwlock_timedrdlock.h>
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1551,14 +1551,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock64
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1566,7 +1566,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <libc/local/pthread/pthread_rwlock_timedrdlock64.h>
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1587,14 +1587,14 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthrea
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && !defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1602,7 +1602,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1611,14 +1611,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock64
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1626,7 +1626,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock64.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */

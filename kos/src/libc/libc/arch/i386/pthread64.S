@@ -90,8 +90,8 @@ INTERN_FUNCTION(libc_pthread_clone)
 	movq   $(SYS_clone), %rax
 	syscall
 
-	/* Check if we're inside of the child thread
-	 * If so, just to pthread's thread entry point. */
+	/* Check if we're inside of the child thread.
+	 * If so, jump to pthread's thread entry point. */
 	testq  %rax, %rax
 	jnz    1f
 	movq   %r14, %rdi /* struct pthread *__restrict thread */

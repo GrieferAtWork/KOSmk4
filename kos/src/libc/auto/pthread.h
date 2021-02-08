@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ea63e5f */
+/* HASH CRC-32:0x439c22e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -443,13 +443,13 @@ INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_rdlock)(pth
  *                 because a write-lock is already being held. */
 INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
 /* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specfied time
+ * Try to acquire read lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -465,13 +465,13 @@ INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_wrlock)(pth
  *                 because read-locks are already being held. */
 INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specfied time
+ * Try to acquire write lock for RWLOCK or return after specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */

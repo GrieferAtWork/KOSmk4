@@ -1673,7 +1673,7 @@ $errno_t pthread_rwlock_tryrdlock([[nonnull]] pthread_rwlock_t *rwlock);
 %#ifdef __USE_XOPEN2K
 
 @@>> pthread_rwlock_timedrdlock(3)
-@@Try to acquire read lock for RWLOCK or return after specfied time
+@@Try to acquire read lock for RWLOCK or return after specified time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
@@ -1743,7 +1743,7 @@ $errno_t pthread_rwlock_trywrlock([[nonnull]] pthread_rwlock_t *rwlock);
 %#ifdef __USE_XOPEN2K
 
 @@>> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
-@@Try to acquire write lock for RWLOCK or return after specfied time
+@@Try to acquire write lock for RWLOCK or return after specified time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
