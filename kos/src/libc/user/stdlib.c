@@ -177,10 +177,8 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 		 * As such, we can make use of `dlgethandle()' in order to look-up the associated
 		 * shared object, which which we can then register the given callback. */
 		dl_handle = dlgethandle(dso_handle, DLGETHANDLE_FINCREF);
-		if unlikely(!dl_handle) {
-			libc_seterrno(EFAULT); /* `dso_handle' doesn't map to any known module. */
-			return -1;
-		}
+		if unlikely(!dl_handle)
+			return libc_seterrno(EFAULT); /* `dso_handle' doesn't map to any known module. */
 	}
 	/* Call into libdl to register the finalizer with the associated shared object. */
 	error = dlauxctrl(dl_handle, DLAUXCTRL_ADD_FINALIZER, func, arg);
@@ -322,10 +320,8 @@ NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
 	char **envp, **new_envp, **old_heap_envp;
 	struct environ_heapstr *line;
 	size_t namelen, vallen, envc, new_enva;
-	if unlikely(!varname || !*varname || strchr(varname, '=')) {
-		libc_seterrno(EINVAL);
-		return -1;
-	}
+	if unlikely(!varname || !*varname || strchr(varname, '='))
+		return libc_seterrno(EINVAL);
 	/* Quick check: if we're not supported to replace variables, and if
 	 *              the variable already exists, then there is no need
 	 *              to allocate a new environment line for it, only to
@@ -365,9 +361,9 @@ again_searchenv:
 				return 0;
 			}
 			/* Check if the existing line was already allocated on the heap. */
-			existing_heapline = COMPILER_CONTAINER_OF(existing_line,
-			                                          struct environ_heapstr,
-			                                          ehs_text);
+			existing_heapline = container_of(existing_line,
+			                                 struct environ_heapstr,
+			                                 ehs_text[0]);
 			if (!environ_remove_heapstring_locked(existing_heapline))
 				existing_heapline = NULL;
 			/* Override the existing line. */
@@ -398,7 +394,7 @@ again_searchenv:
 		atomic_rwlock_endwrite(&libc_environ_lock);
 		new_enva     = envc + 1;
 		new_new_envp = (char **)realloc(new_envp,
-		                                (new_enva + 1) *
+		                                new_enva + 1,
 		                                sizeof(char *));
 		if unlikely(!new_new_envp) {
 			free(new_envp);
@@ -410,7 +406,7 @@ again_searchenv:
 
 do_fill_environ:
 	/* Fill in the new environment table. */
-	memmove(new_envp, envp, envc * sizeof(char *));
+	memmove(new_envp, envp, envc, sizeof(char *));
 	new_envp[envc]     = line->ehs_text;
 	new_envp[envc + 1] = NULL; /* Keep the table NULL-terminated */
 
@@ -440,10 +436,8 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 {
 	char **envp;
 	size_t namelen;
-	if unlikely(!varname || !*varname || strchr(varname, '=')) {
-		libc_seterrno(EINVAL);
-		return -1;
-	}
+	if unlikely(!varname || !*varname || strchr(varname, '='))
+		return libc_seterrno(EINVAL);
 	namelen = strlen(varname);
 	atomic_rwlock_write(&libc_environ_lock);
 	envp = environ;
@@ -467,9 +461,9 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 				++envp_fwd;
 			}
 			/* Check if the existing line was allocated on the heap. */
-			existing_heapline = COMPILER_CONTAINER_OF(existing_line,
-			                                          struct environ_heapstr,
-			                                          ehs_text);
+			existing_heapline = container_of(existing_line,
+			                                 struct environ_heapstr,
+			                                 ehs_text[0]);
 			if (environ_remove_heapstring_locked(existing_heapline)) {
 				existing_heapline->ehs_next = existing_heaplines;
 				existing_heaplines = existing_heapline;
@@ -533,8 +527,7 @@ NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
 	namelen = (size_t)(eq - string);
 	if unlikely(!namelen) {
 		/* Empty name is not allowed */
-		libc_seterrno(EINVAL);
-		return -1;
+		return libc_seterrno(EINVAL);
 	}
 	new_envp = NULL;
 	new_enva = 0;
@@ -550,9 +543,9 @@ again_searchenv:
 			if (memcmp(existing_line, string, (namelen + 1) * sizeof(char)) != 0)
 				continue;
 			/* Check if the existing line was allocated on the heap. */
-			existing_heapline = COMPILER_CONTAINER_OF(existing_line,
-			                                          struct environ_heapstr,
-			                                          ehs_text);
+			existing_heapline = container_of(existing_line,
+			                                 struct environ_heapstr,
+			                                 ehs_text[0]);
 			if (!environ_remove_heapstring_locked(existing_heapline))
 				existing_heapline = NULL;
 			/* Override the existing line. */
@@ -580,7 +573,9 @@ again_searchenv:
 		}
 		atomic_rwlock_endwrite(&libc_environ_lock);
 		new_enva = envc + 1;
-		new_new_envp = (char **)realloc(new_envp, (new_enva + 1) * sizeof(char *));
+		new_new_envp = (char **)realloc(new_envp,
+		                                new_enva + 1,
+		                                sizeof(char *));
 		if unlikely(!new_new_envp) {
 			free(new_envp);
 			return -1;
@@ -591,7 +586,7 @@ again_searchenv:
 
 do_fill_environ:
 	/* Fill in the new environment table. */
-	memmove(new_envp, envp, envc * sizeof(char *));
+	memmove(new_envp, envp, envc, sizeof(char *));
 	new_envp[envc]     = string;
 	new_envp[envc + 1] = NULL; /* Keep the table NULL-terminated */
 
@@ -722,7 +717,7 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
 		sched_yield();
 	}
 	new_vector = (struct atexit_callback *)realloc(atexit_vector.av_vect,
-	                                               (atexit_vector.av_size + 1) *
+	                                               atexit_vector.av_size + 1,
 	                                               sizeof(struct atexit_callback));
 	if unlikely(!new_vector) {
 		atomic_rwlock_endwrite(&atexit_vector.av_lock);
@@ -801,7 +796,7 @@ NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
 		sched_yield();
 	}
 	new_vector = (struct at_quick_exit_callback *)realloc(at_quick_exit_vector.aqv_vect,
-	                                                      (at_quick_exit_vector.aqv_size + 1) *
+	                                                      at_quick_exit_vector.aqv_size + 1,
 	                                                      sizeof(struct at_quick_exit_callback));
 	if unlikely(!new_vector) {
 		atomic_rwlock_endwrite(&atexit_vector.av_lock);

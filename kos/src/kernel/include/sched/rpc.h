@@ -441,7 +441,7 @@ FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
  * >> PRIVATE void *NOTHROW(FCALL blocking_mydata_destroy)(void *pfun, unsigned int action) {
  * >>     void *result;
  * >>     struct mydata *self;
- * >>     self = COMPILER_CONTAINER_OF((void **)pfun,struct mydata,MYDATA_FUN_FIELD);
+ * >>     self = container_of((void **)pfun, struct mydata, MYDATA_FUN_FIELD);
  * >>     if (action == BLOCKING_CLEANUP_ACTION_GETNEXT)
  * >>         return &self->MYDATA_NXT_FIELD;
  * >>     do_blocking_destory(self); // Something that may block, but is nothrow and eventually frees `self'
@@ -452,7 +452,7 @@ FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
  * >>     // Set the function to-be called during cleanup.
  * >>     self->MYDATA_FUN_FIELD = (void *)&blocking_mydata_destroy;
  * >>     // Schedule the function for execution.
- * >>     BLOCKING_CLEANUP_SCHEDULE(self,MYDATA_FUN_FIELD,MYDATA_NXT_FIELD);
+ * >>     BLOCKING_CLEANUP_SCHEDULE(self, MYDATA_FUN_FIELD, MYDATA_NXT_FIELD);
  * >> } */
 typedef void * /*NOTHROW*/ (FCALL *blocking_cleanup_t)(void *pfun, unsigned int action);
 #define BLOCKING_CLEANUP_ACTION_SERVICE 0x0000 /* Service the operation. */

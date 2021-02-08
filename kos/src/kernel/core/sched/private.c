@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_PRIVATE_C
 #define GUARD_KERNEL_SRC_SCHED_PRIVATE_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -192,7 +193,7 @@ NOTHROW(FCALL cpu_private_function_do_finibuf_ex)(void *used_buf) {
 	kernel_panic("Should not get here without SMP");
 #else /* CONFIG_NO_SMP */
 	struct cpf_rtdata *rt;
-	rt = COMPILER_CONTAINER_OF(used_buf, struct cpf_rtdata, cpf_data);
+	rt = container_of((byte_t *)used_buf, struct cpf_rtdata, cpf_data[0]);
 	decref_likely(rt);
 #endif /* !CONFIG_NO_SMP */
 }

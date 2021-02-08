@@ -1312,7 +1312,7 @@ Fat_LoadINodeAttributes(struct inode *__restrict self)
 	block_device_read(self->i_super->s_device, buf, sizeof(buf),
 	                  (pos_t)self->i_fileino + offsetof(FatFile, f_attr));
 	/* Load Node data from the file. */
-	Fat_LoadINodeFromFatFile(self, COMPILER_CONTAINER_OF((u8 *)buf, FatFile, f_attr));
+	Fat_LoadINodeFromFatFile(self, container_of((u8 *)buf, FatFile, f_attr));
 }
 
 PRIVATE NONNULL((1)) void KCALL
@@ -1320,7 +1320,7 @@ Fat_SaveINodeAttributes(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	byte_t buf[sizeof(FatFile) - offsetof(FatFile, f_attr)];
 	/* Save Node data to a fat-file. */
-	Fat_SaveINodeToFatFile(self, COMPILER_CONTAINER_OF((u8 *)buf, FatFile, f_attr));
+	Fat_SaveINodeToFatFile(self, container_of((u8 *)buf, FatFile, f_attr));
 	/* Write the FAT-FILE to disk. */
 	block_device_write(self->i_super->s_device, buf, sizeof(buf),
 	                   (pos_t)self->i_fileino + offsetof(FatFile, f_attr));

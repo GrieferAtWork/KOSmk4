@@ -62,7 +62,7 @@
 #else /* !__KERNEL__ */
 #include <debugger/rt.h> /* dbg_active, dbg_current */
 #include <sched/task.h>  /* get_stack_avail() */
-#endif /* !__KERNEL__ */
+#endif /* __KERNEL__ */
 
 
 /* In kernel-space, memory accesses can also cause E_WOULDBLOCK to be thrown
@@ -886,7 +886,7 @@ do_make_top_const:
 			++stacksz;                                            \
 			break;
 		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)*(uint8_t *)pc, 1)
-		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t) * (int8_t *)pc, 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)*(int8_t *)pc, 1)
 		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16((uint16_t *)pc), 2)
 		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16((uint16_t *)pc), 2)
 		DEFINE_PUSH_CONSTANT(DW_OP_const4u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t *)pc), 4)

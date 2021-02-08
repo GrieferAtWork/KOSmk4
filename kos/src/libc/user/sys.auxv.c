@@ -88,6 +88,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 {
 	ulongptr_t result;
 	switch (type) {
+
 	case AT_IGNORE:
 		result = 0;
 		break;

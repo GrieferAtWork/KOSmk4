@@ -211,8 +211,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 #undef EFFECTIVE_SIZEOF_SIGINFO_T
 	} else {
 		/* Only push the bare minimum */
-		user_ucontext = COMPILER_CONTAINER_OF((struct NAME(ucpustate) *)(usp - sizeof(struct NAME(ucpustate))),
-		                                      struct NAME(__ucontextx), uc_mcontext.mc_context);
+		user_ucontext = container_of((struct NAME(ucpustate) *)(usp - sizeof(struct NAME(ucpustate))),
+		                             struct NAME(__ucontextx), uc_mcontext.mc_context);
 		validate_writable(user_ucontext, sizeof(struct NAME(ucpustate)));
 		COMPILER_WRITE_BARRIER();
 		usp -= sizeof(struct NAME(ucpustate));
