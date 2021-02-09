@@ -1,16 +1,16 @@
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
- * This software is provided 'as-is', without any express or implied          *
- * warranty. In no event will the authors be held liable for any damages      *
+ * This  software  is  provided  'as-is',  without  any  express  or  implied *
+ * warranty. In no  event will  the authors be  held liable  for any  damages *
  * arising from the use of this software.                                     *
  *                                                                            *
- * Permission is granted to anyone to use this software for any purpose,      *
- * including commercial applications, and to alter it and redistribute it     *
+ * Permission is granted  to anyone  to use  this software  for any  purpose, *
+ * including  commercial applications,  and to  alter it  and redistribute it *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The origin of this software must not be misrepresented; you must not    *
- *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement (see the following) in the product     *
+ * 1. The  origin of this  software must not be  misrepresented; you must not *
+ *    claim  that you wrote  the original software. If  you use this software *
+ *    in a product,  an acknowledgement  (see the following)  in the  product *
  *    documentation is required:                                              *
  *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
@@ -35,7 +35,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG,                         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MAP_*' flag
-	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_MASK: (flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]
+	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_MASK:         `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
 	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MAP_GROWSDOWN' and `MAP_GROWSUP' were specified in `flags' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR,                          /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `MAP_FIXED' was specified when `MAP_ANONYMOUS' wasn't, but the `(file_offset & (getpagesize() - 1)) != ((uintptr_t)addr & (getpagesize() - 1))' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,                        /* E_INVALID_ARGUMENT_BAD_VALUE: The specified `length' is either `0' or is larger than the entirety of the designated address space. */
@@ -140,12 +140,12 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,               /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER,                        /* E_INVALID_ARGUMENT_BAD_VALUE: [int intval] Attempted to write an invalid integer to a system configuration file */
 	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
-	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,                    /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,                    /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
 	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,                          /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
 	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
-	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags. 
-	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
+	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
+	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 	E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 	E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
@@ -187,7 +187,7 @@ enum {
 	                                                                *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
-	E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
+	E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
 	                                                                * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
 	                                                                *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 	E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE,                          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
@@ -210,7 +210,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG                          E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MAP_*' flag
-                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_MASK: (flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]
+                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_MASK:         `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
                                                                                                                                      * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MAP_GROWSDOWN' and `MAP_GROWSUP' were specified in `flags' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR                          E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR                          /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `MAP_FIXED' was specified when `MAP_ANONYMOUS' wasn't, but the `(file_offset & (getpagesize() - 1)) != ((uintptr_t)addr & (getpagesize() - 1))' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH                        E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH                        /* E_INVALID_ARGUMENT_BAD_VALUE: The specified `length' is either `0' or is larger than the entirety of the designated address space. */
@@ -315,12 +315,12 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        /* E_INVALID_ARGUMENT_BAD_VALUE: [int intval] Attempted to write an invalid integer to a system configuration file */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                                                                                      * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
                                                                                                                                      * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
-                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
+                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
@@ -362,7 +362,7 @@ enum {
                                                                                                                                      *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 #define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
-#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
+#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                                                                                      * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                                                                                      *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 #define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
@@ -374,6 +374,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
+#define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -381,7 +382,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         3   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          4   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG                          5   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MAP_*' flag
-                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_MASK: (flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]
+                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_MASK:         `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MAP_GROWSDOWN' and `MAP_GROWSUP' were specified in `flags' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR                          6   /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `MAP_FIXED' was specified when `MAP_ANONYMOUS' wasn't, but the `(file_offset & (getpagesize() - 1)) != ((uintptr_t)addr & (getpagesize() - 1))' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH                        7   /* E_INVALID_ARGUMENT_BAD_VALUE: The specified `length' is either `0' or is larger than the entirety of the designated address space. */
@@ -486,12 +487,12 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               99  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        100 /* E_INVALID_ARGUMENT_BAD_VALUE: [int intval] Attempted to write an invalid integer to a system configuration file */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       101 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    102 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    102 /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          103 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
-                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
+                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         104 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       105 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
@@ -533,7 +534,7 @@ enum {
                                                                            *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 #define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    141 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         142 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
-#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       143 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
+#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       143 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                            * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                            *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 #define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          144 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
@@ -545,6 +546,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   150 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  151 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            152 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
+#define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  153 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

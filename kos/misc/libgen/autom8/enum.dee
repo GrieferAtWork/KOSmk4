@@ -1,0 +1,311 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..autom8;
+import fs;
+
+function main(parser: Autom8Parser, none) {
+	local enumAuto = parser.text.find("/*[[[AUTO]]]*/", parser.commentEnd);
+	local enumEnd;
+	if (enumAuto < 0) {
+		enumEnd  = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
+		enumAuto = enumEnd;
+	} else {
+		enumEnd = parser.text.find("/*[[[end]]]*/", enumAuto);
+	}
+	if (enumEnd < 0)
+		parser.errAt(parser.commentStart, "Missing /*[[[end]]]*/ tag");
+	/* Flush everything up until after the "[[AUTO]]" */
+	parser.newText << parser.text[parser.flushStart:parser.commentEnd+2];
+	local enumDeclsText = reflowCommentsInString(parser, enumAuto,
+		parser.text[parser.commentEnd+2:enumAuto]);
+	parser.newText << enumDeclsText << "/*[[[AUTO]]]*/\n";
+	parser.flushStart = enumEnd + 13;
+	/* Parse enum declarations. */
+	local i = 0;
+	local len = #enumDeclsText;
+	for (;;) {
+		if (i >= len)
+			return;
+		if (enumDeclsText.isspace(i)) {
+			++i;
+			continue;
+		}
+		if (enumDeclsText.startswith("#if", i)) {
+			local eol = enumDeclsText.find("\n", i);
+			if (eol < 0)
+				return;
+			i = eol + 1;
+			continue;
+		}
+		break;
+	}
+	if (!enumDeclsText.startswith("enum", i))
+		return;
+	i += 4;
+	while (i < len && enumDeclsText.isspace(i))
+		++i;
+	if (i >= len || enumDeclsText[i] != "{")
+		return;
+	++i;
+	while (i < len && enumDeclsText.isspace(i))
+		++i;
+	@@Triples of custom-text, (name, value, doc)
+	local enumValues: {string | (string, string, string)...} = [];
+	local knownIntegerEnumValues: {string: int} = Dict();
+	local nextEnumValue = 0;
+	local flushStart = i;
+	function evalIntegerStringExpression(expr: int | string): int | string {
+		if (expr is int)
+			return expr;
+		expr = expr.strip();
+		try {
+			return int(expr);
+		} catch (...) {
+		}
+		if (expr.startswith("(") && expr.endswith(")") &&
+		    expr.findmatch("(", ")", 1) == #expr - 1)
+			return evalIntegerStringExpression(expr[1:-1]);
+		if (expr && expr.last.isdecimal()) {
+			local decimalStart = #expr - 1;
+			while (decimalStart > 0 && expr.isdecimal(decimalStart - 1))
+				--decimalStart;
+			if (decimalStart >= 2 && expr[decimalStart-2:decimalStart] == "+ ") {
+				try {
+					local trailingDecimal = int(expr[decimalStart:]);
+					local base = evalIntegerStringExpression(expr[:decimalStart-2]);
+					if (base is int)
+						return base + trailingDecimal;
+				} catch (...) {
+				}
+			}
+		}
+		return knownIntegerEnumValues.get(expr, expr);
+	}
+	function incrementIntegerStringExpression(expr: int | string): int | string {
+		if (expr is int)
+			return expr + 1;
+		expr = expr.strip();
+		try {
+			return int(expr) + 1;
+		} catch (...) {
+		}
+		if (expr && expr.last.isdecimal()) {
+			local decimalStart = #expr - 1;
+			while (decimalStart > 0 && expr.isdecimal(decimalStart - 1))
+				--decimalStart;
+			if (decimalStart >= 2 && expr[decimalStart-2:decimalStart] == "+ ") {
+				try {
+					local trailingDecimal = int(expr[decimalStart:]);
+					local base = evalIntegerStringExpression(expr[:decimalStart-2]);
+					if (base is int)
+						return base + trailingDecimal + 1;
+					return base + " + " + str(trailingDecimal + 1);
+				} catch (...) {
+				}
+			}
+		}
+		expr = knownIntegerEnumValues.get(expr, expr);
+		if (expr is int)
+			return expr + 1;
+		return expr + " + 1";
+	}
+	while (i < len) {
+		local ch = enumDeclsText[i];
+		if (ch == "#") {
+			i = enumDeclsText.find("\n", i);
+			if (i < 0)
+				break;
+			++i;
+			continue;
+		}
+		if (ch.isspace() || ch == ",") {
+			if (i == flushStart)
+				++flushStart;
+			++i;
+			continue;
+		}
+		if (ch == "}") {
+			len = i;
+			break;
+		}
+		if (ch == "/" && (i + 1 < len)) {
+			local nxch = enumDeclsText[i + 1];
+			if (nxch == "/") {
+				i = enumDeclsText.find("\n", i + 2);
+				if (i < 0)
+					break;
+				++i;
+				continue;
+			}
+			if (nxch == "*") {
+				i = enumDeclsText.find("*/", i + 2);
+				if (i < 0)
+					break;
+				i += 2;
+				continue;
+			}
+		}
+		if (!ch.issymstrt()) {
+			++i;
+			continue;
+		}
+		/* Start of enum identifier. */
+		if (flushStart < i)
+			enumValues.append(enumDeclsText[flushStart:i]);
+		local nameEnd = i + 1;
+		while (nameEnd < len && enumDeclsText.issymcont(nameEnd))
+			++nameEnd;
+		local enumName = enumDeclsText[i:nameEnd];
+		i = nameEnd;
+		while (i < len && enumDeclsText.isspace(i))
+			++i;
+		local enumValue = nextEnumValue;
+		if (i < len && enumDeclsText[i] == "=") {
+			++i;
+			while (i < len && enumDeclsText.isspace(i))
+				++i;
+			local enumValueEnd = i;
+			while (enumValueEnd < len) {
+				ch = enumDeclsText[enumValueEnd];
+				if (ch == ",")
+					break;
+				++enumValueEnd;
+				if (ch in "([{") {
+					enumValueEnd = enumDeclsText.findmatch(
+						ch, {"(": ")", "[": "]", "{": "}"}[ch],
+						enumValueEnd, len);
+					if (enumValueEnd < 0) {
+						enumValueEnd = len;
+						break;
+					}
+				}
+			}
+			enumValue = enumDeclsText[i:enumValueEnd];
+			i = enumValueEnd;
+			while (i < len && enumDeclsText.isspace(i))
+				++i;
+		}
+		enumValue = evalIntegerStringExpression(enumValue);
+		if (enumValue is int)
+			knownIntegerEnumValues[enumName] = enumValue;
+		if (i < len && enumDeclsText[i] == ",")
+			++i;
+		while (i < len && enumDeclsText.isspace(i))
+			++i;
+		local enumDoc = "";
+		if (i < len && enumDeclsText.startswith("/*", i)) {
+			i += 2;
+			local enumDocEnd = enumDeclsText.find("*/", i);
+			if (enumDocEnd < 0)
+				enumDocEnd = len;
+			enumDoc = enumDeclsText[i:enumDocEnd];
+			if ("\n" in enumDoc) {
+				local commentIndent = (i - (enumDeclsText.rfind("\n", 0, i) + 1)) - 1;
+				local enumDocText = File.Writer();
+				local isFirst = true;
+				for (local line: enumDoc.splitlines(true)) {
+					if (isFirst) {
+						enumDocText << line;
+						isFirst = false;
+						continue;
+					}
+					if (line.isspace(0, commentIndent)) {
+						local strippedLine = line[commentIndent:];
+						if (strippedLine.startswith("*")) {
+							enumDocText << strippedLine[1:];
+						} else {
+							enumDocText << line;
+						}
+					} else {
+						enumDocText << line;
+					}
+				}
+				enumDoc = enumDocText.string;
+			}
+			i = enumDocEnd + 2;
+		}
+		enumValues.append((enumName, str(enumValue), enumDoc.rstrip()));
+		nextEnumValue = incrementIntegerStringExpression(enumValue);
+		flushStart = i;
+	}
+	if (flushStart < len)
+		enumValues.append(enumDeclsText[flushStart:len]);
+	local longestNameLen = 0;
+	local longestValLen = 0;
+	for (local e: enumValues) {
+		if (e is Tuple) {
+			local len = #e[0];
+			if (longestNameLen < len)
+				longestNameLen = len;
+			local len = #e[1];
+			if (longestValLen < len)
+				longestValLen = len;
+		}
+	}
+	function printEnumMacros(useValue: bool) {
+		local isAtStartOfLine = true;
+		local usedLongestValLen = longestValLen;
+		if (!useValue)
+			usedLongestValLen = longestNameLen;
+		for (local e: enumValues) {
+			if (e !is Tuple) {
+				parser.newText << e.rstrip();
+				isAtStartOfLine = false;
+			} else {
+				if (!isAtStartOfLine)
+					parser.newText << "\n";
+				local name, val, doc = e...;
+				if (!useValue)
+					val = name;
+				parser.newText << "#define "
+					<< name << (" " * (longestNameLen - #name)) << " "
+					<< val;
+				if (doc) {
+					parser.newText
+						<< (" " * (usedLongestValLen - #val))
+						<< " /*";
+					local indent = " " * (9 + longestNameLen + usedLongestValLen);
+					local isFirst = true;
+					for (local l: doc.splitlines(true)) {
+						if (!isFirst)
+							parser.newText << indent << "  *";
+						isFirst = false;
+						parser.newText << l;
+					}
+					parser.newText << " */";
+				}
+				parser.newText << "\n";
+				isAtStartOfLine = true;
+			}
+		}
+		if (!isAtStartOfLine)
+			parser.newText << "\n";
+	}
+	parser.newText << "#ifdef __COMPILER_PREFERR_ENUMS\n";
+	printEnumMacros(false);
+	parser.newText << "#else /* __COMPILER_PREFERR_ENUMS */\n";
+	printEnumMacros(true);
+	parser.newText <<
+		"#endif /* !__COMPILER_PREFERR_ENUMS */\n"
+		"/*[[[end]]]*/";
+}
+

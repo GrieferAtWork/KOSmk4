@@ -1,16 +1,16 @@
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
- * This software is provided 'as-is', without any express or implied          *
- * warranty. In no event will the authors be held liable for any damages      *
+ * This  software  is  provided  'as-is',  without  any  express  or  implied *
+ * warranty. In no  event will  the authors be  held liable  for any  damages *
  * arising from the use of this software.                                     *
  *                                                                            *
- * Permission is granted to anyone to use this software for any purpose,      *
- * including commercial applications, and to alter it and redistribute it     *
+ * Permission is granted  to anyone  to use  this software  for any  purpose, *
+ * including  commercial applications,  and to  alter it  and redistribute it *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The origin of this software must not be misrepresented; you must not    *
- *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement (see the following) in the product     *
+ * 1. The  origin of this  software must not be  misrepresented; you must not *
+ *    claim  that you wrote  the original software. If  you use this software *
+ *    in a product,  an acknowledgement  (see the following)  in the  product *
  *    documentation is required:                                              *
  *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
@@ -106,10 +106,10 @@
 #endif /* !ERRORCLASS_HARDWARE_MAX */
 
 
-/* Check if the given error is low- (may get overwritten
- * by !LOW || HIGH), or high- (doesn't get overwritten) priority.
- * This mechanism is used for dealing with exceptions thrown by
- * RPC function callbacks executed prior to returning to user-space
+/* Check   if  the   given  error   is  low-   (may  get  overwritten
+ * by  !LOW ||  HIGH), or  high- (doesn't  get overwritten) priority.
+ * This  mechanism  is used  for  dealing with  exceptions  thrown by
+ * RPC function callbacks executed  prior to returning to  user-space
  * when checking how an exception should be propagated to user-space. */
 #ifndef ERRORCLASS_ISLOWPRIORITY
 #define ERRORCLASS_ISLOWPRIORITY(x)  ((x) >= ERRORCLASS_STDSIGNAL_MIN && (x) <= ERRORCLASS_USERSIGNAL_MAX)
@@ -118,12 +118,12 @@
 #define ERRORCLASS_ISHIGHPRIORITY(x) ((x) >= ERRORCLASS_RTL_MIN && (x) <= ERRORCLASS_UNHANDLED_MAX)
 #endif /* !ERRORCLASS_ISHIGHPRIORITY */
 
-/* Check for RTL-priority exceptions. Exceptions matching this
+/* Check for  RTL-priority exceptions.  Exceptions matching  this
  * check are always propagated between the kernel and user-space,
- * irregardless of whether or not a system call was invoked with
+ * irregardless  of whether or not a system call was invoked with
  * or without exceptions enabled.
  * This is only meant for exceptions like `E_EXIT_THREAD', who's
- * sole purpose is to unwind the stack and safely terminate a
+ * sole  purpose is to  unwind the stack  and safely terminate a
  * thread. */
 #ifndef ERRORCLASS_ISRTLPRIORITY
 #define ERRORCLASS_ISRTLPRIORITY(x) ((x) >= ERRORCLASS_RTL_MIN && (x) <= ERRORCLASS_RTL_MAX)
@@ -362,8 +362,8 @@
 #endif /* !E_INVALID_HANDLE_OPERATION_TRUNC */
 #ifndef E_INVALID_HANDLE_OPERATION_GETPROPERTY
 #define E_INVALID_HANDLE_OPERATION_GETPROPERTY 0x0011 /* Attempted to get some abstract property of a handle opened
-                                                       * as IO_WRONLY. Note however that this depends on what type
-                                                       * of handle and property was accessed. - If, and when this
+                                                       * as IO_WRONLY. Note however that this depends on what  type
+                                                       * of handle and property was  accessed. - If, and when  this
                                                        * context has meaning, that fact is explicitly documented. */
 #endif /* !E_INVALID_HANDLE_OPERATION_GETPROPERTY */
 #ifndef E_INVALID_HANDLE_OPERATION_SETPROPERTY
@@ -399,7 +399,7 @@
 #define E_PROCESS_EXITED                          (0x0006) /* [errno(ESRCH), msg("Process no longer exists")]
                                                             * [fld(pid: pid_t, "The pid of the exited process")]
                                                             * The task controller for the specified process has already been deallocated.
-                                                            * This implies that the process has exited. However, it doesn't imply that
+                                                            * This  implies that the  process has exited. However,  it doesn't imply that
                                                             * the task controller is immediately deallocated when a process exists. */
 #endif /* !E_PROCESS_EXITED */
 
@@ -521,7 +521,7 @@
 #endif /* !E_FSERROR_NOT_A_DIRECTORY */
 /*[[[end]]]*/
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_WALK
-#define E_FILESYSTEM_NOT_A_DIRECTORY_WALK    0x0001 /* Thrown as the result of attempting to traverse a non-directory
+#define E_FILESYSTEM_NOT_A_DIRECTORY_WALK    0x0001 /* Thrown as the  result of attempting  to traverse a  non-directory
                                                      * item as though it was one (e.g. `open("/opt/readme.txt/foobar")') */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_WALK */
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_OPEN
@@ -534,7 +534,7 @@
 #define E_FILESYSTEM_NOT_A_DIRECTORY_READDIR 0x0004 /* Thrown as the result of `readdir(path)', where `path' isn't a directory */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_READDIR */
 
-/* SPLIT: All error codes above should be interpreted as FILE-NOT-FOUND
+/* SPLIT: All error codes above should be interpreted as  FILE-NOT-FOUND
  *        in situations where a list of paths is searched for a specific
  *        file. */
 #ifndef E_FSERROR_IS_FILE_NOT_FOUND
@@ -832,21 +832,21 @@
 #define E_INTERRUPT                               (0xf000)              /* [errno(EINTR), msg("Interrupt")]
                                                                          * The thread has been interrupted by a RPC function,
                                                                          * causing a premature return to user-space.
-                                                                         * NOTE: If the system communication facility that was used for the interrupt
-                                                                         *       supports restarting (e.g. loadcore() following a #PF on X86), or if the
-                                                                         *       interrupt happened during a restartable system call (e.g. `sys_close()'),
-                                                                         *       and either wasn't caused by a posix_signal, or that posix_signal had
+                                                                         * NOTE: If  the  system  communication facility  that  was used  for  the interrupt
+                                                                         *       supports  restarting (e.g.  loadcore() following a  #PF on X86),  or if the
+                                                                         *       interrupt happened during a  restartable system call (e.g.  `sys_close()'),
+                                                                         *       and  either  wasn't  caused by  a  posix_signal, or  that  posix_signal had
                                                                          *       the `SA_RESTART' flag set, this exception isn't propagated into user-space,
                                                                          *       but rather causes the underlying interrupt to be restarted.
                                                                          * KOS Implements 3 distinct system call interrupt-restart behaviors:
-                                                                         *  #1: The system call is always restarted (this behavior is also used when
-                                                                         *      some other type of interrupt handler is interrupted, such as loadcore()
-                                                                         *      during an ALOA operation, or when loading a file into memory)
-                                                                         *      This mainly includes system calls where interrupts are undesired,
-                                                                         *      or would otherwise be unexpected, most notably ~cleanup~ system calls,
+                                                                         *  #1: The system call  is always  restarted (this  behavior is  also used  when
+                                                                         *      some other type of interrupt  handler is interrupted, such as  loadcore()
+                                                                         *      during  an  ALOA  operation,  or   when  loading  a  file  into   memory)
+                                                                         *      This  mainly  includes  system  calls  where  interrupts  are  undesired,
+                                                                         *      or would otherwise  be unexpected, most  notably ~cleanup~ system  calls,
                                                                          *      as also mentioned by the documentation of `_EXCEPT_API' in `<features.h>'
                                                                          *     (e.g. `close()' or `munmap()')
-                                                                         *  #2: The system call is never restarted (required for some system calls
+                                                                         *  #2: The system call  is never  restarted (required for  some system  calls
                                                                          *      that are meant to wait for events internally delivered by an interrupt
                                                                          *      mechanism, such as `sigtimedwait()'; the behavior here mirrors what is
                                                                          *      also done by linux, as described on this page:
@@ -855,7 +855,7 @@
                                                                          *      or if it was caused by a posix_signal with the `SA_RESTART' flag set. */
 #endif /* !E_INTERRUPT */
 #ifndef E_INTERRUPT_USER_RPC
-#define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind in order to
+#define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind  in  order  to
                                                                          * execute an RPC callback before returning to user-space */
 #endif /* !E_INTERRUPT_USER_RPC */
 

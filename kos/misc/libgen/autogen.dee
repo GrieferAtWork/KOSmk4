@@ -21,6 +21,7 @@ import fs;
 import util;
 import * from .optiexpr;
 import * from deemon;
+/* TODO: Deprecated!!! -- Re-implemented as an autom8 applet! */
 
 global FILENAME: string;
 global FILETEXT: string;

@@ -5,17 +5,17 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 ]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
- * This software is provided 'as-is', without any express or implied          *
- * warranty. In no event will the authors be held liable for any damages      *
+ * This  software  is  provided  'as-is',  without  any  express  or  implied *
+ * warranty. In no  event will  the authors be  held liable  for any  damages *
  * arising from the use of this software.                                     *
  *                                                                            *
- * Permission is granted to anyone to use this software for any purpose,      *
- * including commercial applications, and to alter it and redistribute it     *
+ * Permission is granted  to anyone  to use  this software  for any  purpose, *
+ * including  commercial applications,  and to  alter it  and redistribute it *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The origin of this software must not be misrepresented; you must not    *
- *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement (see the following) in the product     *
+ * 1. The  origin of this  software must not be  misrepresented; you must not *
+ *    claim  that you wrote  the original software. If  you use this software *
+ *    in a product,  an acknowledgement  (see the following)  in the  product *
  *    documentation is required:                                              *
  *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
@@ -111,7 +111,7 @@ PRIVATE void dump_debuginfo() {
 INTERN ATTR_FREETEXT struct icpustate *
 NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Figure out how we can output data to an emulator's STDOUT (if we're being hosted by one)
-	 * NOTE: QEMU can consistently be detected via `CPUID[0x80000002].EAX',
+	 * NOTE: QEMU can  consistently  be  detected  via  `CPUID[0x80000002].EAX',
 	 *       but in order to allow KOS to properly detect BOCHS, you must change
 	 *      <cpuid: brand_string="BOCHS         Intel(R) Pentium(R) 4 CPU        ">
 	 *       in your .bxrc file
@@ -152,18 +152,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Load default memory banks. */
 	x86_initialize_default_memory_banks();
 
-	/* Run task initialization callbacks on the boot task, initializing
+	/* Run task initialization callbacks on the boot task,  initializing
 	 * important structures such as the r/w-lock descriptor and the task
 	 * signal connection manager.
-	 * NOTE: We do this now since r/w-locks and signal connections are
-	 *       required by the Unwind-FDE cache sub-system, meaning that
+	 * NOTE: We do  this now  since r/w-locks  and signal  connections  are
+	 *       required  by  the  Unwind-FDE cache  sub-system,  meaning that
 	 *       they are also required for us to be able to handle exceptions.
 	 * In other words: Only once this function has been called can we
 	 *                 start making use of exceptions safely. */
 	kernel_initialize_scheduler_callbacks();
 
 	/* Load multiboot information.
-	 * NOTE: All information provided by the bootloader is assumed
+	 * NOTE: All  information provided by the bootloader is assumed
 	 *       to be located within the first 1Gb of physical memory! */
 	{
 		size_t total_pages;
@@ -206,12 +206,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	x86_initialize_sysenter();
 
 	/* Initialize SMP.
-	 * NOTE: This must be done while the physical identity mapping is still
-	 *       in effect (aka: before `x86_initialize_mman_kernel()' is called)
-	 *       Additionally, do this before memory zones have been finalized,
-	 *       so we can manually add SMP descriptor memory regions as available
+	 * NOTE: This must  be done  while the  physical identity  mapping is  still
+	 *       in effect  (aka: before  `x86_initialize_mman_kernel()' is  called)
+	 *       Additionally, do  this before  memory  zones have  been  finalized,
+	 *       so we can manually add  SMP descriptor memory regions as  available
 	 *       physical memory, while still preventing them from being overwritten
-	 *       by zone initialization, regardless of what the bootloader/BIOS did
+	 *       by zone initialization, regardless of what the bootloader/BIOS  did
 	 *       about them in terms of telling. */
 	x86_initialize_smp();
 
@@ -235,10 +235,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Generate physical memory zones from collected memory information. */
 	kernel_initialize_minfo_makezones();
 
-	/* Since we're about to evaluate the kernel commandline
+	/* Since  we're about to  evaluate the kernel commandline
 	 * for the first time (which parses the seed=... option),
-	 * we have to fill in the initial PRNG seed before then,
-	 * so that when not receiving that option, we'll end up
+	 * we  have to fill in the initial PRNG seed before then,
+	 * so that when not receiving  that option, we'll end  up
 	 * truly random initial seed.
 	 * So we're just going to read the CMOS RTC state and use
 	 * it to set the initial kernel seed. */
@@ -247,37 +247,37 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Evaluate commandline options defined as `DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_early();
 
-	/* Since `kernel_initialize_commandline_options_early()' may have overwritten
-	 * the initial seed set by `x86_initialize_rand_entropy()', only log the actually
+	/* Since   `kernel_initialize_commandline_options_early()'    may   have    overwritten
+	 * the  initial  seed set  by  `x86_initialize_rand_entropy()', only  log  the actually
 	 * used seed now so that the system logs remain consistent with the user's expectation. */
 	krand_seed = 0x2d3c9801;
 	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#.8" PRIx32 "\n"), krand_seed);
 
-	/* Initialize the x86_64 physical memory identity memory mapping.
+	/* Initialize  the x86_64 physical memory identity memory mapping.
 	 * This can only be done _after_ we've loaded available RAM, since
 	 * this function may need to allocate some of that memory... */
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 	x86_initialize_phys2virt64();
 #endif /* !ONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 
-	/* Initialize the kernel VM, and instigate strict memory protection,
+	/* Initialize the kernel VM,  and instigate strict memory  protection,
 	 * unmapping virtual memory that isn't being used by the kernel, while
-	 * also removing write permissions for .text and .rodata, as well as
-	 * (if supported) setting the NOEXECUTE bit for anything but `.text'
+	 * also removing write permissions for  .text and .rodata, as well  as
+	 * (if supported) setting the NOEXECUTE  bit for anything but  `.text'
 	 * and `.xdata' / `.xbss'
 	 * NOTE: This also unmaps the physical identity mapping found surrounding
-	 *       the kernel, which was left in tact until this point in order to
-	 *       simplify initialization of SMP control structures (or anything
+	 *       the kernel, which was left in tact until this point in order  to
+	 *       simplify  initialization of SMP  control structures (or anything
 	 *       left in physical memory below the 1GiB mark). */
 	x86_initialize_mman_kernel();
 
 	/* Load generic text alternatives.
-	 * Must happen after `x86_initialize_mman_kernel', since this one checks for
+	 * Must happen after  `x86_initialize_mman_kernel', since this  one checks  for
 	 * the presence of a LAPIC, which gets mapped in `x86_initialize_mman_kernel()' */
 	x86_initialize_alternatives();
 
 	/* Relocate memory information into higher memory, moving it away from
-	 * being somewhere where it could cause problems, or be accidentally
+	 * being somewhere where it could  cause problems, or be  accidentally
 	 * corrupted. */
 	kernel_initialize_minfo_relocate();
 
@@ -414,13 +414,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *        Behavior #2: Unsigned divide (iow. the same as the unsigned >>-operator)
 	 */
 
-	/* TODO: Add a user-space interface for reading the dmesg backlog, as well
-	 *       as establishing custom, pre-allocated buffers for syslog messages,
+	/* TODO: Add  a user-space interface  for reading the  dmesg backlog, as well
+	 *       as  establishing custom, pre-allocated  buffers for syslog messages,
 	 *       essentially allowing user-space to register additional syslog sinks.
-	 * Once added, make use of this API to pipe syslog messages written by
+	 * Once added, make  use of  this API to  pipe syslog  messages written  by
 	 * insmod(1) and rmmod(1) to stdout and stderr (based on message severity). */
 
-	/* TODO: Alter all instances where the kernel currently uses <hybrid/sequence/atree.h> to
+	/* TODO: Alter all instances  where the kernel  currently uses <hybrid/sequence/atree.h>  to
 	 *       instead make use of <hybrid/sequence/rbtree.h>. Doing this consistently may greatly
 	 *       improve performance throughout the kernel:
 	 *        - block_device_tree
@@ -434,57 +434,57 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add `__USE_ISOC2X' to <features.h> */
 	/* TODO: Add FLT_NORM_MAX, DBL_NORM_MAX and LDBL_NORM_MAX to <float.h> under #ifdef __USE_ISOC2X
-	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything from
-	 *       `__STDC_WANT_DEC_FP__' under `__USE_ISOC2X' (for this purpose, <hybrid/floatcore.h>
+	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything  from
+	 *       `__STDC_WANT_DEC_FP__'  under  `__USE_ISOC2X' (for  this  purpose, <hybrid/floatcore.h>
 	 *       will also have to be adjusted) */
 
 	/* TODO: The kernel->user-space exception/posix-signal system needs a re-write.
-	 *       Right now, way too much of it resides in arch-specific code, and it's
+	 *       Right now, way too much of it resides in arch-specific code, and  it's
 	 *       way too hard to understand the actual control-flow! */
 
-	/* TODO: User-space VIO callback functions should only be allowed to
-	 *       throw a white-listed sub-set of exceptions. Or better yet:
-	 *       user-space VIO exceptions should be encapsulated differently
+	/* TODO: User-space VIO  callback  functions  should  only  be  allowed  to
+	 *       throw  a  white-listed  sub-set  of  exceptions.  Or  better  yet:
+	 *       user-space  VIO  exceptions  should  be  encapsulated  differently
 	 *       whilst in kernel-space, such that they always appear as E_SEGFAULT
-	 *       for as long as a thread is in kernel-space, but will be changed
-	 *       to the original error code prior to returning back to user-space. */
+	 *       for as long as  a thread is in  kernel-space, but will be  changed
+	 *       to  the original error code prior to returning back to user-space. */
 
-	/* TODO: Update poll(2) and select(2) to only use `handle_polltest()' during the
-	 *       initial scan for ready files. Afterwards, scan all monitored files again,
-	 *       but this time do `connect+test' on each one of them. The second test
-	 *       must be done immediately following the connect not due to race conditions,
-	 *       but due to malicious user-space programs that might otherwise change the
-	 *       underlying files in the mean time. This can still happen between the first
-	 *       test and the intermediate connect, but won't introduce any races. In fact:
-	 *       the initial test itself is completely optional and only done to quickly
-	 *       chatch files that have become ready without having to do any connect()s
+	/* TODO: Update poll(2)  and select(2)  to only  use `handle_polltest()'  during  the
+	 *       initial  scan for ready  files. Afterwards, scan  all monitored files again,
+	 *       but  this  time do  `connect+test'  on each  one  of them.  The  second test
+	 *       must be done immediately following the  connect not due to race  conditions,
+	 *       but due to  malicious user-space  programs that might  otherwise change  the
+	 *       underlying  files in the mean time. This  can still happen between the first
+	 *       test and the intermediate connect, but  won't introduce any races. In  fact:
+	 *       the initial test  itself is  completely optional  and only  done to  quickly
+	 *       chatch files that  have become  ready without  having to  do any  connect()s
 	 *       before noticing them. (only the second test is integral for synchronization,
-	 *       as it is the one that happens interlocked with the associated connect()) */
+	 *       as  it is  the one that  happens interlocked with  the associated connect()) */
 
-	/* TODO: Now that we've got signal completion callbacks, it's also possible to
-	 *       implement `SIGIO' and `O_ASYNC'. Note that linux documentation states
-	 *       that O_ASYNC should work for ttys, ptys, sockets, pipes and fifos, all
+	/* TODO: Now that we've got signal  completion callbacks, it's also possible  to
+	 *       implement `SIGIO' and `O_ASYNC'.  Note that linux documentation  states
+	 *       that O_ASYNC should work for ttys, ptys, sockets, pipes and fifos,  all
 	 *       of which KOS is already implementing, but currently does so w/o support
 	 *       for SIGIO.
-	 *       Note that in all of these cases, we an make the jump from the NOBLOCK
-	 *       world that `sig_postcompletion_t' would still be stuck in by posting an
-	 *       event to an async worker that is registered using `register_async_worker()'
+	 *       Note that  in all  of these  cases, we  an make  the jump  from the  NOBLOCK
+	 *       world that  `sig_postcompletion_t' would  still be  stuck in  by posting  an
+	 *       event to an async worker that is registered using  `register_async_worker()'
 	 *       on a per-object basis. (and gets enabled/disabled as O_ASYNC is set/cleared)
-	 *       Essentially, SIGIO should be send whenever there's a rising-edge event for
+	 *       Essentially, SIGIO should be send  whenever there's a rising-edge event  for
 	 *       either readable or writable in the associated object. */
 
-	/* TODO: Using signal completion functions, we can also simplify the implementation
-	 *       of polling an async worker/job to where we don't have to re-poll all defined
-	 *       workers every time that one of them becomes triggered. - Instead, we could
-	 *       use one `struct sig_multicompletion' for every worker/job, which then carry
-	 *       a per-worker is-ready flag, alongside sig_send()ing a single, common signal
-	 *       whenever one of them becomes ready. Further still, we can also implement a
-	 *       singly linked list of ready workers/jobs, such that the async worker main
-	 *       thread essentially only has to `ATOMIC_XCH(ready_jobs, NULL)', followed by
-	 *       iterating that chain and servicing each job individually before re-creating
-	 *       the `struct sig_multicompletion' of all jobs that should remain registered.
-	 *       This system could then be extended to allow use of more than a single async
-	 *       worker thread by having the async-thread-main function re-insert all but the
+	/* TODO: Using  signal completion  functions, we  can also  simplify the implementation
+	 *       of polling an async worker/job to where  we don't have to re-poll all  defined
+	 *       workers every time  that one of  them becomes triggered.  - Instead, we  could
+	 *       use one `struct sig_multicompletion'  for every worker/job,  which then  carry
+	 *       a per-worker is-ready  flag, alongside sig_send()ing  a single, common  signal
+	 *       whenever one of  them becomes ready.  Further still, we  can also implement  a
+	 *       singly linked list  of ready  workers/jobs, such  that the  async worker  main
+	 *       thread  essentially  only has  to `ATOMIC_XCH(ready_jobs, NULL)',  followed by
+	 *       iterating that chain  and servicing each  job individually before  re-creating
+	 *       the `struct sig_multicompletion' of  all jobs that  should remain  registered.
+	 *       This system could then be  extended to allow use of  more than a single  async
+	 *       worker thread by having the  async-thread-main function re-insert all but  the
 	 *       first (or better yet: last, thus following first-in-last-out) ready async job,
 	 *       and if there were any, doing a `sig_send()' on the internal ready-jobs signal,
 	 *       thus waking up a variable number of secondary async workers threads. */
@@ -495,53 +495,53 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *                   s.a. linux:/proc/sys/fs/binfmt_misc
 	 *   - a.out
 	 *   - PE            maybe even implement this one as a user-space interpreter using
-	 *                   `binfmt_misc'. - That way it would be much safer to implement,
-	 *                   as well as greatly reduce future maintenance when kernel APIs
-	 *                   change (since it would use the syscall apis, which are _much_
+	 *                   `binfmt_misc'.  - That way it would be much safer to implement,
+	 *                   as well as greatly reduce  future maintenance when kernel  APIs
+	 *                   change (since it would use  the syscall apis, which are  _much_
 	 *                   more stable in comparison)
-	 *                   Also: portability, and would make it easier to pre-configure
-	 *                   other aspects of the process state to enable windows emulation,
-	 *                   such as changing the fsmode, binding DOS drives, and the direct
+	 *                   Also: portability,  and would  make it  easier to  pre-configure
+	 *                   other aspects of the process state to enable windows  emulation,
+	 *                   such  as changing the fsmode, binding DOS drives, and the direct
 	 *                   integration of both the regular libdl.so, as well as a secondary
 	 *                   program loader for dlls.
 	 *                #1: /bin/peloader MyPeProgram
-	 *                #2: Load /bin/peloader as an ELF binary like normal,
-	 *                    including mapping of libdl.so into the address space.
+	 *                #2: Load    /bin/peloader   as   an   ELF   binary   like   normal,
+	 *                    including  mapping  of   libdl.so  into   the  address   space.
 	 *                    Note that /bin/peloader depends on libdl.so, but _NOT_ libc.so!
 	 *                #3: In /bin/peloader, figure out what address ranges need to be
 	 *                    preserved in order to be able to load the given PE binary.
-	 *                #4: If the load-address of libdl overlaps with this range, make use
+	 *                #4: If  the load-address of libdl overlaps with this range, make use
 	 *                    of `DLAUXCTRL_RELOC_LIBDL' to move libdl to a different location
-	 *                #5: Load both libc.so and a helper library libpe.so using a custom
-	 *                    dlauxctrl() command code that allows one to load libraries at
-	 *                    custom addresses. (the load addresses used get calculated such
+	 *                #5: Load  both libc.so and a helper library libpe.so using a custom
+	 *                    dlauxctrl() command code that allows  one to load libraries  at
+	 *                    custom addresses. (the load addresses used get calculated  such
 	 *                    that they don't overlap with where the ranges used by the given
 	 *                    PE binary)
 	 *                #6: Jump to the primary entry point in libpe.so, and load the PE
 	 *                    binary from there.
 	 *             ... Thinking this over, I think it's better to just write a driver to
 	 *                 load the PE binary in-place, and have a user-space shared library
-	 *                 libpe.so that does all of the user-space initialization/dynamic
+	 *                 libpe.so  that does all  of the user-space initialization/dynamic
 	 *                 linking (libpe.so would then depend on libdl.so and libc.so)
 	 *
 	 */
 
-	/* TODO: Add a way for user-space to manually mmap() the kernel's libdl.so into their
+	/* TODO: Add a way for user-space to manually mmap() the kernel's libdl.so into  their
 	 *       address space. Using this functionality, add `DLAUXCTRL_RELOC_LIBDL' to libdl
-	 *       which can be used to relocate libdl itself within one's own address space.
+	 *       which can be used  to relocate libdl itself  within one's own address  space.
 	 *       This control function would then do the following:
-	 *        - Map a new copy of libdl.so at the specified location (if that location
+	 *        - Map a  new copy  of libdl.so  at the  specified location  (if that  location
 	 *          overlaps with the current location, recursively call `DLAUXCTRL_RELOC_LIBDL'
-	 *          with yet another location that doesn't overlap, thus essentially relocating
+	 *          with yet another location that doesn't overlap, thus essentially  relocating
 	 *          the library twice in order to prevent overlaps every time)
-	 *        - Go through the relocations of all loaded libraries and recalculate them if
+	 *        - Go  through the relocations  of all loaded libraries  and recalculate them if
 	 *          those relocations reference symbols from / point into the old libdl's address
 	 *          space.
-	 *        - Directly jump into the secondary copy of libdl (aside from changing the
+	 *        - Directly jump into the secondary copy  of libdl (aside from changing  the
 	 *          absolute program counter position, this jump should be entirely seamless)
 	 *        - munmap() the old instance of libdl
 	 * XXX: This seems like a rather large function (at least the part about having to re-do
-	 *      all of the relocations does). - Maybe not implement this as part of the libdl
+	 *      all of the relocations does).  - Maybe not implement this  as part of the  libdl
 	 *      core, but rather within some auxiliary helper library? */
 
 	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during a VM switch.
@@ -552,33 +552,33 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       $ deemon --help /deemon/string
 	 *
 	 *       >> IllegalInstruction: Illegal instruction at <anonymous>+001A
-	 *       /usr/lib/deemon/doctext.dee(148,1) : <anonymous>+001A
-	 *       /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
-	 *       /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
+	 *       >> /usr/lib/deemon/doctext.dee(148,1) : <anonymous>+001A
+	 *       >> /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
+	 *       >> /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
 	 *       Also: In certain cases, this causes both the doc and doctext module's dec
-	 *             files to constantly get re-compiled (though in other cases, these
+	 *             files to constantly get re-compiled  (though in other cases,  these
 	 *             exact dec files also get accepted as valid, possibly related to how
 	 *             they've been imported, implying a problem within the deemon core)
 	 *       NOTE: I'm assuming that the IllegalInstruction is caused by some discrepancy
 	 *             between the hand-written assembly RT engine, and the one written in C
 	 *
 	 *       >> UnicodeDecodeError: Invalid utf-8 character byte 0x85
-	 *       /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
-	 *       /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
+	 *       >> /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
+	 *       >> /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
 	 *       When the dec files already exist, this error is thrown instead.
 	 *
-	 * TODO: Deemon's SystemFile.size() function always uses lseek64()
+	 * TODO: Deemon's   SystemFile.size()   function   always   uses    lseek64()
 	 *       Change this to where it first attempts to use fstat() (if available)
-	 * TODO: Deemon's main() function should try to re-configure mallopt() during
-	 *       init in order to optimize itself for using large amounts of memory.
-	 *       Currently, running deemon causes the system log to be spammed with
+	 * TODO: Deemon's main() function should try to re-configure mallopt()  during
+	 *       init in order to optimize itself  for using large amounts of  memory.
+	 *       Currently,  running deemon causes  the system log  to be spammed with
 	 *       calls to mmap() (an overallocation of 32768 bytes might work well...)
 	 * TODO: When opening a dec file, use mmap() (if available) and malloc()+read()
 	 *       as fall-back, rather than always using malloc()+read() */
 
 	/* TODO: HOP_HANDLE_CREATE_STREAM
-	 *       Constructs a wrapper for another handle object that includes a `pos_t'
-	 *       file offset to implement read(), write() and lseek() by dispatching these
+	 *       Constructs a wrapper  for another  handle object that  includes a  `pos_t'
+	 *       file  offset to implement read(), write() and lseek() by dispatching these
 	 *       operators through pread(), pwrite() and fstat() (fstat for `stat::st_size'
 	 *       with lseek(SEEK_END))
 	 *       -> Useful for turning UVIO objects into file-like objects.
@@ -586,7 +586,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Play around with `no_caller_saved_registers'
 	 *       It may be possible to cut down on boiler-plate assembly needed to wrap
-	 *       simple C-level interrupt handlers and/or system calls, by not needing
+	 *       simple C-level interrupt handlers and/or system calls, by not  needing
 	 *       to save registers that wouldn't be used in any case! */
 
 	/* TODO: renameat2() is missing from <stdio.h> */
@@ -598,7 +598,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */
 
 	/* TODO: Now that there's once again a packet-buffer controller,
-	 *       add support for pipe2(O_DIRECT) (aka. packet-mode)
+	 *       add  support  for  pipe2(O_DIRECT)  (aka.  packet-mode)
 	 *       Do this via new handle types:
 	 *        - HANDLE_TYPE_PACKET_PIPE
 	 *        - HANDLE_TYPE_PACKET_PIPE_READER
@@ -609,12 +609,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       wasn't built with support for -mno-red-zone.
 	 * >> https://wiki.osdev.org/Libgcc_without_red_zone */
 
-	/* TODO: The builtin debugger's disassembler should show the values of
+	/* TODO: The builtin  debugger's disassembler  should  show the  values  of
 	 *       registers used in the current instruction, as well as the contents
 	 *       of memory operands. */
 
 	/* TODO: The builtin debugger should contain a graphical applet that combines
-	 *       the functionality of the `lsthread', `thread', `trace', `l' and `r'
+	 *       the functionality of the `lsthread', `thread', `trace', `l' and  `r'
 	 *       commands. */
 
 	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
@@ -625,8 +625,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       having their own routing function each.
 	 *       Furthermore, these system calls should not be exported by-name from libc */
 
-	/* TODO: System calls that are called extremely rarely (e.g. sethostname(2))
-	 *       should not have a fast-pass function each. Instead, only a single
+	/* TODO: System calls that are called extremely rarely (e.g.  sethostname(2))
+	 *       should  not have a  fast-pass function each.  Instead, only a single
 	 *       wrapper should exist for them, and that wrapper should then dispatch
 	 *       the system call via`x86_sysrouteN_c[32|64]'
 	 *       This way, we may be able to reduce the kernel's binary size. */
@@ -645,24 +645,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Alternatively (and arguably even better), make /dev a dynamic file system, similar to /proc */
 
 	/* XXX: Add a smart, arch-specific unwinder to libdebuginfo that will inspect
-	 *      the instruction stream to figure out how to unwind the stack.
-	 *      This unwinder should assume the default calling convention for every
-	 *      possible case, and should indicate unwind success once a ret-like
+	 *      the instruction  stream  to  figure  out how  to  unwind  the  stack.
+	 *      This unwinder should assume the default calling convention for  every
+	 *      possible  case, and  should indicate  unwind success  once a ret-like
 	 *      instruction is encountered: `ret', `lret' or `iret'
 	 *
-	 *      Conditional branch instruction should be unwound by remembering the
-	 *      current CPU state, and recursively unwinding on both ends of the
-	 *      jump. Only if both ends end up with a successful unwind, and only
-	 *      if both ends result in all-identical callee-preserve registers is
+	 *      Conditional branch instruction should be unwound by remembering  the
+	 *      current CPU state,  and recursively  unwinding on both  ends of  the
+	 *      jump. Only if both  ends end up with  a successful unwind, and  only
+	 *      if both ends  result in all-identical  callee-preserve registers  is
 	 *      the unwind to-be considered successful. If a jump ends up going back
-	 *      on itself, its branch should simply be ignored (but if all branches
+	 *      on itself, its branch should simply be ignored (but if all  branches
 	 *      end up being ignored, unwinding also fails) */
-
-	/* TODO: Implement a deemon script that parses the mult-line c-comments from
-	 *       source files in an attempt to detect paragraphs. Once detected, re-
-	 *       flow the text from those paragraphs by repeating existing spaces to
-	 *       evenly spread out the text.
-	 * It's purely cosmetic, but I think it'd look really nice :) */
 
 	/* Xorg X-Window server support roadmap.
 	 *

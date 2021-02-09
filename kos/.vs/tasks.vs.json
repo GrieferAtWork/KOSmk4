@@ -174,25 +174,25 @@
 		},
 
 		{
-			"taskName": "autoformat enums",
+			"taskName": "autom8",
 			"appliesTo": "*.h",
 			"type": "launch",
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
 			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
-			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
+			"args": [ "${workspaceRoot}\\misc\\libgen\\autom8.dee", "${file}" ]
 		},
 
 		{
-			"taskName": "autoformat enums",
+			"taskName": "autom8",
 			"appliesTo": "*.c",
 			"type": "launch",
 			"contextType": "custom",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"workingDirectory": "${fileDirname}",
 			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
-			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
+			"args": [ "${workspaceRoot}\\misc\\libgen\\autom8.dee", "${file}" ]
 		},
 
 		{

@@ -1,16 +1,16 @@
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
- * This software is provided 'as-is', without any express or implied          *
- * warranty. In no event will the authors be held liable for any damages      *
+ * This  software  is  provided  'as-is',  without  any  express  or  implied *
+ * warranty. In no  event will  the authors be  held liable  for any  damages *
  * arising from the use of this software.                                     *
  *                                                                            *
- * Permission is granted to anyone to use this software for any purpose,      *
- * including commercial applications, and to alter it and redistribute it     *
+ * Permission is granted  to anyone  to use  this software  for any  purpose, *
+ * including  commercial applications,  and to  alter it  and redistribute it *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The origin of this software must not be misrepresented; you must not    *
- *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement (see the following) in the product     *
+ * 1. The  origin of this  software must not be  misrepresented; you must not *
+ *    claim  that you wrote  the original software. If  you use this software *
+ *    in a product,  an acknowledgement  (see the following)  in the  product *
  *    documentation is required:                                              *
  *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
@@ -38,8 +38,8 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF     E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF     /* ELF Binary */
 #define E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG /* #!-script file */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF     0x0001 /* ELF Binary */
-#define E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG 0x0002 /* #!-script file */
+#define E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF     1 /* ELF Binary */
+#define E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG 2 /* #!-script file */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

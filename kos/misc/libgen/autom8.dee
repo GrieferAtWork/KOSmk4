@@ -1,0 +1,685 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This  software  is  provided  'as-is',  without  any  express  or  implied *
+ * warranty. In no  event will  the authors be  held liable  for any  damages *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted  to anyone  to use  this software  for any  purpose, *
+ * including  commercial applications,  and to  alter it  and redistribute it *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The  origin of this  software must not be  misrepresented; you must not *
+ *    claim  that you wrote  the original software. If  you use this software *
+ *    in a product,  an acknowledgement  (see the following)  in the  product *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Combination of various utilities that parse [[[foo]]]-tags from source files
+ * and will automatically generate code accordingly. Additionally, this  script
+ * will re-flow block comments to form them into paragraphs.
+ *
+ *  - [[[enum]]] Automatically generate  assembly-compatible  enum  macro
+ *               definitions. You may look for usage examples in headers!
+ *
+ */
+// The following special comments are recognized to enabled/disable features:
+// >> /* autom8 reflow-comments off */
+//    Disable comment reflow
+//
+// >> /* autom8 reflow-comments on */
+//    Enable comment reflow (default)
+//
+// >> /* clang-format off */
+//    Alias for: "/* autom8 reflow-comments off */"
+//
+// >> /* clang-format on */
+//    Alias for: "/* autom8 reflow-comments on */"
+
+
+import * from deemon;
+import fs;
+
+global Autom8Parser;
+
+/* A couple of built-in commands. */
+global BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, string)} = {
+	"begin" : none,
+	"end" : none,
+	"magic" : none,
+	"deemon" : none, /* Intentionally ignored: You should still use `deemon -F' for these! */
+};
+
+function getAutom8Command(name: string): none | Callable with (Autom8Parser, string) {
+	if (name.startswith("opt."))
+		return try getAutom8Command(name[4:]) catch (...) none;
+	local result = BUILTIN_COMMANDS.get(name, false);
+	if (result === false)
+		result = import(".autom8." + name).main;
+	return result;
+}
+
+class Autom8Parser {
+	this = default;
+
+	public member filename: string;
+	public member _firstLineOffset: int = 0;
+	public member _firstLineColOffset: int = 0;
+
+	public member text: string;
+	public member newText: File;
+	public member flushStart: int;
+
+	@@Points after the "/*" of the comment.
+	public member commentStart: int;
+
+	@@Points before the "*/" of the comment.
+	public member commentEnd: int;
+
+	@@> == #text
+	public member len: int;
+
+	@@Set to @true if comment-reflow is currently enabled.
+	public member commentReflowEnabled: bool = true;
+
+	function lcAt(offset: int): (int, int) {
+		local numLines = text.count("\n", 0, offset);
+		if (numLines == 0)
+			return (_firstLineOffset + 1, _firstLineColOffset + 1 + offset);
+		local startOfLine = text.rindex("\n", 0, offset);
+		return (_firstLineOffset + 1 + numLines, offset - startOfLine);
+	}
+
+	function errAt(offset: int, message: string) {
+		local l, c = lcAt(offset)...;
+		print(filename, "(", l, ",", c, ") : Error : ", message);
+		throw Error(message);
+	}
+}
+
+global autom8Worker;
+function reflowCommentsInString(
+		parser: Autom8Parser, startOffset: int, text: string): string {
+	if (!parser.commentReflowEnabled)
+		return text;
+	local inner = copy parser;
+	inner.text       = text;
+	inner.newText    = File.Writer();
+	inner.flushStart = 0;
+	inner.len        = #text;
+	inner._firstLineOffset, inner._firstLineColOffset = parser.lcAt(startOffset)...;
+	autom8Worker(inner, none);
+	return inner.newText.string;
+}
+
+
+
+
+
+
+
+function countLeadingSpaces(line: string): int {
+	local result = 0;
+	while (result < #line && line.isspace(result))
+		++result;
+	return result;
+}
+
+function containsUnevenSpaces(l: string): bool {
+	local minSpaceCount = int.SIZE_MAX;
+	local maxSpaceCount = 0;
+	l = l.strip();
+	local i = 0, len = #l;
+	while (i < len) {
+		if (l.isspace(i)) {
+			local n = 1;
+			for (;;) {
+				++i;
+				if (i >= len)
+					break;
+				if (!l.isspace(i))
+					break;
+				++n;
+			}
+			if (minSpaceCount > n)
+				minSpaceCount = n;
+			if (maxSpaceCount < n)
+				maxSpaceCount = n;
+		} else if (l[i] == "`") {
+			/* Special case: Don't re-flow spaces within inline code comments. */
+			local e = l.find("'", i);
+			if (e < 0)
+				e = l.find("`", i);
+			if (e >= 0) {
+				i = e + 1;
+			} else {
+				++i;
+			}
+		} else if (l[i] == '"') {
+			/* Special case: Don't re-flow quoted text. */
+			local e = l.find('"', i + 1);
+			if (e >= 0) {
+				i = e + 1;
+			} else {
+				++i;
+			}
+		} else if (l[i] == "[") {
+			/* Special case: Don't re-flow syntax annotatinos. */
+			local e = l.findmatch("[", "]", i + 1);
+			if (e >= 0)
+				i = e + 1;
+			else {
+				++i;
+			}
+		} else {
+			++i;
+		}
+	}
+	return (maxSpaceCount - minSpaceCount) >= 2;
+}
+
+function splitWords(l: string): {string...} {
+	local lineLen = #l;
+	local i = 0, flushStart = 0;
+	while (i < lineLen) {
+		if (l.isspace(i)) {
+			if (i > flushStart)
+				yield l[flushStart:i];
+			++i;
+			flushStart = i;
+		} else if (l[i] == "`") {
+			/* Special case: Don't re-flow spaces within inline code comments. */
+			local e = l.find("'", i);
+			if (e < 0)
+				e = l.find("`", i);
+			if (e >= 0) {
+				i = e + 1;
+			} else {
+				++i;
+			}
+		} else if (l[i] == '"') {
+			/* Special case: Don't re-flow quoted text. */
+			local e = l.find('"', i + 1);
+			if (e >= 0) {
+				i = e + 1;
+			} else {
+				++i;
+			}
+		} else if (l[i] == "[") {
+			/* Special case: Don't re-flow syntax annotatinos. */
+			local e = l.findmatch("[", "]", i + 1);
+			if (e >= 0)
+				i = e + 1;
+			else {
+				++i;
+			}
+		} else {
+			++i;
+		}
+	}
+	if (flushStart < lineLen)
+		yield l[flushStart:];
+}
+
+function shortestPossibleLightLength(l: string): int {
+	local result = -1;
+	for (local w: splitWords(l))
+		result += 1 + #w;
+	return result;
+}
+
+function reflowTextLine(l: string, width: int): string {
+	l = l.strip();
+	if (#l == width && !containsUnevenSpaces(l))
+		return l;
+	local words = List(splitWords(l));
+	if (#words <= 1)
+		return l;
+	local textLength = words.each.length + ...;
+	local numSpaces = width - textLength;
+	local spaceLocations = #words - 1;
+	local baseSpacesPerLocation = numSpaces / spaceLocations;
+	if (baseSpacesPerLocation < 1)
+		baseSpacesPerLocation = 1;
+	local spaces = [" " * baseSpacesPerLocation] * spaceLocations;
+	numSpaces -= baseSpacesPerLocation * spaceLocations;
+	local spacesPerLocation = (float)numSpaces / spaceLocations;
+	local count = 0.0;
+	local i = 0;
+	while (numSpaces > 0) {
+		count += spacesPerLocation;
+		if (count >= 1.0) {
+			local index = i % spaceLocations;
+			spaces[index] += " ";
+			--numSpaces;
+			count -= 1.0;
+		}
+		++i;
+	}
+	File.Writer result;
+	for (local w: words) {
+		result << w;
+		if (spaces)
+			result << spaces.popfront();
+	}
+	assert !spaces;
+	return result.string;
+}
+
+function reflowSimpleText(lines: {string...}, lineLength: int): {string...} {
+	for (local l: lines)
+		yield reflowTextLine(l, lineLength);
+}
+
+function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string...} {
+	if (#lines <= 1)
+		return lines;
+//	print("reflowBlockComment:", lineLength);
+//	for (local l: lines)
+//		print("\t", repr l);
+	local commonPrefix = none;
+	local commonTail = none;
+	local commonLineLength = -1;
+	for (local l: lines) {
+		l = l.rstrip();
+		commonPrefix = commonPrefix is none
+			? l : commonPrefix[:commonPrefix.common(l)];
+		if (commonTail is none) {
+			commonTail = l;
+		} else {
+			local n = commonTail.reversed().common(l.reversed());
+			commonTail = commonTail[#commonTail-n:];
+		}
+		if (commonLineLength !is none) {
+			local lineLen = #l;
+			if (commonLineLength < 0)
+				commonLineLength = lineLen;
+			else if (commonLineLength != lineLen) {
+				commonLineLength = none;
+			}
+		}
+	}
+	if (commonPrefix == commonTail && commonPrefix) {
+		for (local l: lines) {
+			if (l == commonPrefix)
+				return lines;
+		}
+	}
+	if ("'" in commonTail)
+		commonTail = commonTail[commonTail.rindex("'")+1:];
+	if (commonPrefix || commonTail) {
+		/* Don't reflow if the common prefix indicates a code-block! */
+		local baseCommonPrefix = commonPrefix.lstrip();
+		if (baseCommonPrefix && baseCommonPrefix.first in ">$&%`[]{}")
+			return lines;
+		local commonPrefixLen = #commonPrefix;
+		local commonTailLen   = #commonTail;
+		local innerText;
+		if (commonTailLen) {
+			innerText = List(for (local l: lines) l.rstrip()[commonPrefixLen:-commonTailLen]);
+		} else {
+			innerText = List(for (local l: lines) l[commonPrefixLen:]);
+		}
+		if (lineLength >= 0) {
+			innerText = reflowBlockComment(innerText, lineLength);
+			innerText = for (local l: innerText) l.ljust(lineLength);
+		} else if (commonLineLength !is none) {
+			local adjCommonLength = commonLineLength - (commonPrefixLen + commonTailLen);
+			innerText = reflowBlockComment(innerText, adjCommonLength);
+			innerText = for (local l: innerText) l.ljust(adjCommonLength);
+		} else {
+			innerText = reflowBlockComment(innerText);
+		}
+		innerText = List(for (local l: innerText) commonPrefix + l + commonTail);
+		return innerText;
+	}
+	/* Check for leading comment annotations ([foo]-style) */
+	if (lines.first.startswith("[")) {
+		local prefixLines = [];
+		local recursion = 0;
+		local n = #lines;
+		local i = 0;
+		local j = 0;
+		while (i < n) {
+			local l = lines[i];
+			while (j < #l) {
+				local ch = l[j];
+				if (ch == "[") {
+					++recursion;
+				} else if (ch == "]") {
+					--recursion;
+					if (recursion == 0) {
+						++j;
+						break;
+					}
+				}
+				++j;
+			}
+			if (recursion == 0 && i < n - 1 && !lines[i+1].startswith("["))
+				break;
+			j = 0;
+			++i;
+		}
+		if (i >= n)
+			return lines;
+		local result = List(lines[:i]);
+		local lastLine = lines[i];
+		local lastLinePrefix = lastLine[:j];
+		local fakeLastLineOffset = j;
+		if (fakeLastLineOffset < #lastLine && lastLine.isspace(fakeLastLineOffset))
+			++fakeLastLineOffset;
+		local fakeLastLineSuffix = lastLine[fakeLastLineOffset:];
+		if (fakeLastLineSuffix.strip()) {
+			local fakeLastLine = ("X" * fakeLastLineOffset) + fakeLastLineSuffix;
+			local postLines = [fakeLastLine];
+			postLines.extend(lines[i+1:]);
+			postLines = reflowBlockComment(postLines, lineLength);
+			lastLine = lastLinePrefix.ljust(fakeLastLineOffset) +
+				postLines.first[fakeLastLineOffset:];
+			result.append(lastLine);
+			result.extend(postLines[1:]);
+		} else {
+			result.append(lines[i]);
+			result.extend(reflowBlockComment(lines[i+1:], lineLength));
+		}
+		return result;
+	}
+	/* Split paragraphs that are separated by empty lines. */
+	local result = [];
+	local paragraphBlock = [];
+	for (local l: lines) {
+		l = l.rstrip();
+		if (!l) {
+			if (paragraphBlock) {
+				result.extend(reflowBlockComment(paragraphBlock, lineLength));
+				paragraphBlock = [];
+			}
+			result.append(l);
+		} else {
+			paragraphBlock.append(l);
+		}
+	}
+	/* Check for sub-paragraphs */
+	local currentBlock = none;
+	local prevIndent = none;
+	local numLines = #paragraphBlock;
+	for (local i = 0; i < numLines;) {
+		local l = paragraphBlock[i];
+		local nspc = countLeadingSpaces(l);
+		if (currentBlock is none) {
+			currentBlock = [l];
+			prevIndent = nspc;
+			++i;
+			continue;
+		}
+		/* Check if the new line is may shorter than the previous.
+		 * If so, then this line marks the end of a paragraph */
+		local lineLen = #l;
+		local prevLineLen = #currentBlock.last;
+		if (lineLen <= (prevLineLen * 3) / 4) {
+			if (i < numLines-1) {
+				currentBlock.append(l);
+				result.extend(reflowBlockComment(currentBlock, lineLength));
+				currentBlock = none;
+				prevIndent = none;
+				++i;
+				continue;
+			}
+		}
+		if (prevIndent == nspc) {
+			/* If the next line is much longer than the
+			 * previous, then begin another paragraph. */
+			if (lineLen >= (prevLineLen * 5) / 4)
+				goto reflow_normal_block;
+			currentBlock.append(l);
+			++i;
+			continue;
+		}
+		if (nspc <= prevIndent) {
+reflow_normal_block:
+			result.extend(reflowBlockComment(currentBlock, lineLength));
+			currentBlock = [l];
+			prevIndent = nspc;
+			++i;
+			continue;
+		}
+		/* Check for something like this:
+		 * >> NOTE: foo
+		 * >>       bar
+		 * Here, there is a sub-paragraphs "foo\nbar" */
+		local prevLine = currentBlock.last;
+		if ((nspc - 1) >= #prevLine)
+			goto reflow_normal_block;
+		if (!prevLine.isspace(nspc - 1))
+			goto reflow_normal_block;
+		/* Yes: It's a NOTE:-style sub-paragraph */
+		local subParagraphIndent = nspc;
+		currentBlock.popback();
+		result.extend(reflowBlockComment(currentBlock, lineLength));
+		local firstLinePrefix = prevLine[:subParagraphIndent];
+		local secondLinePrefix = l[:subParagraphIndent];
+		currentBlock = [prevLine[subParagraphIndent:], l[subParagraphIndent:]];
+		for (;;) {
+			++i;
+			if (i >= numLines)
+				break;
+			l = paragraphBlock[i];
+			nspc = countLeadingSpaces(l);
+			if (nspc != subParagraphIndent)
+				break;
+			currentBlock.append(l[subParagraphIndent:]);
+		}
+		local isFirst = true;
+		local subParagraphLineLength = lineLength;
+		if (subParagraphLineLength >= subParagraphIndent)
+			subParagraphLineLength -= subParagraphIndent;
+		for (local reflowLine: reflowBlockComment(currentBlock, subParagraphLineLength)) {
+			if (isFirst) {
+				reflowLine = firstLinePrefix + reflowLine;
+				isFirst = false;
+			} else {
+				reflowLine = secondLinePrefix + reflowLine;
+			}
+			result.append(reflowLine);
+		}
+		if (i >= numLines)
+			return result;
+		currentBlock = [l];
+		prevIndent = nspc;
+		++i;
+	}
+	/* Actually reflow simple text. */
+	if (currentBlock) {
+		/* Don't reflow if the  text contains uneven space  locations.
+		 * e.g. "foo   bar baz" is uneven, but "foo   bar  baz" isn't! */
+		if ((for (local l: currentBlock) containsUnevenSpaces(l)) || ...) {
+			result.extend(currentBlock);
+		} else if (currentBlock != lines) {
+			result.extend(reflowBlockComment(currentBlock, lineLength));
+		} else {
+//			print("reflowBlock:", lineLength);
+//			for (local l: currentBlock)
+//				print("\t", repr l);
+			local lineLenMin = int.SIZE_MAX;
+			local lineLenMax = 0;
+			for (local l: currentBlock) {
+				l = shortestPossibleLightLength(l);
+				if (lineLenMin > l)
+					lineLenMin = l;
+				if (lineLenMax < l)
+					lineLenMax = l;
+			}
+			if (lineLength < 0)
+				lineLength = lineLenMax;
+			local lastLine = currentBlock.last;
+			local lastLineLen = #lastLine;
+			if (lastLineLen == lineLenMin ||
+			   (lastLineLen <= (lineLength * 3) / 4)) {
+				/* Don't reflow the last line. */
+				currentBlock.popback();
+				result.extend(reflowSimpleText(currentBlock, lineLength));
+				result.append(lastLine);
+			} else {
+				result.extend(reflowSimpleText(currentBlock, lineLength));
+			}
+		}
+	}
+	return result;
+}
+
+
+function autom8Worker(parser: Autom8Parser,
+		getCommandByName: Callable with string): bool {
+	for (;;) {
+		parser.commentStart = parser.text.find("/*", parser.flushStart);
+		if (parser.commentStart < 0)
+			break;
+		parser.commentStart += 2;
+		parser.commentEnd = parser.text.find("*/", parser.commentStart);
+		if (parser.commentEnd < 0)
+			break;
+		parser.newText << parser.text[parser.flushStart:parser.commentStart];
+		parser.flushStart = parser.commentStart;
+		local commentBody = parser.text[parser.commentStart:parser.commentEnd];
+		if (commentBody.startswith("[[[") && commentBody.endswith("]]]")) {
+			/* Special control comment. */
+			commentBody = commentBody[3:-3];
+			if (commentBody.issymstrt(0)) {
+				local cmdNameEnd = 1;
+				while (cmdNameEnd < #commentBody &&
+				       (commentBody.issymcont(cmdNameEnd) ||
+				        commentBody[cmdNameEnd] in ".:-$_"))
+					++cmdNameEnd;
+				local cmd;
+				try {
+					cmd = getCommandByName(commentBody[:cmdNameEnd]);
+				} catch (Error as e) {
+					parser.errAt(parser.commentStart + 3, e.message);
+				}
+				if (cmd !is none) {
+					commentBody = commentBody[cmdNameEnd:];
+					if (!commentBody || commentBody.isspace(0))
+						cmd(parser, commentBody.lstrip());
+				}
+			}
+		} else if ("\n" in commentBody && parser.commentReflowEnabled) {
+			/* Reflow comment paragraphs. */
+			local commentLineStart = parser.text.rfind("\n", 0, parser.commentStart) + 1;
+			local numLeadingTabs = 0;
+			while ((commentLineStart + numLeadingTabs) < parser.commentStart &&
+			       (parser.text[commentLineStart + numLeadingTabs] == "\t"))
+				++numLeadingTabs;
+			local numLeadingSpaces = (parser.commentStart - 2) -
+				(commentLineStart + numLeadingTabs);
+			local leadingTabs = "\t" * numLeadingTabs;
+			local leadingSpaces = " " * numLeadingSpaces;
+			local commentLines: {string...} = [];
+			local hasTrailingNewline: bool = false;
+			for (local l: commentBody.splitlines(false)) {
+				if (!commentLines)
+					commentLines.append(l);
+				else {
+					if (hasTrailingNewline)
+						goto done_comment;
+					if (l[:numLeadingTabs] != leadingTabs)
+						goto done_comment;
+					l = l[numLeadingTabs:];
+					if (l[:numLeadingSpaces] != leadingSpaces)
+						goto done_comment;
+					l = l[numLeadingSpaces:];
+					if (!l.startswith(" *")) {
+						if (l == " ") {
+							hasTrailingNewline = true;
+							continue;
+						}
+						goto done_comment;
+					}
+					l = l[2:];
+					commentLines.append(l);
+				}
+			}
+			commentLines = reflowBlockComment(commentLines);
+			commentBody = ("\n" + leadingTabs + leadingSpaces + " *").join(commentLines);
+			parser.newText << commentBody.rstrip();
+			if (hasTrailingNewline)
+				parser.newText << "\n" << leadingTabs << leadingSpaces;
+				parser.newText << " ";
+			parser.flushStart = parser.commentEnd;
+		} else {
+			commentBody = commentBody.strip();
+			if (commentBody.startswith("clang-format ")) {
+				commentBody = commentBody[13:].strip();
+				if (commentBody == "off") {
+					parser.commentReflowEnabled = false;
+				} else if (commentBody == "on") {
+					parser.commentReflowEnabled = true;
+				}
+			} else if (commentBody.startswith("autom8 ")) {
+				commentBody = commentBody[7:].strip();
+				if (commentBody.startswith("reflow-comments ")) {
+					commentBody = commentBody[16:].strip();
+					if (commentBody == "off") {
+						parser.commentReflowEnabled = false;
+					} else if (commentBody == "on") {
+						parser.commentReflowEnabled = true;
+					}
+				}
+			} else if (commentBody.startswith("HASH ")) {
+				/* Disallow autom8 within auto-generated (hashed) files */
+				if (parser.commentStart == 2)
+					return false;
+			}
+		}
+done_comment:
+		if (parser.flushStart < parser.commentEnd) {
+			parser.newText << parser.text[parser.flushStart:parser.commentEnd];
+			parser.flushStart = parser.commentEnd;
+		}
+	}
+	parser.newText << parser.text[parser.flushStart:parser.len];
+	return true;
+}
+
+function trimTrailingSpaces(text: string): string {
+	File.Writer result;
+	for (local l: text.rstrip().splitlines())
+		result << l.rstrip() << "\n";
+	return result.string;
+}
+
+function autom8File(filename: string) {
+	local parser = Autom8Parser();
+	local oldBytes = File.open(filename, "r").read();
+	parser.text = trimTrailingSpaces(oldBytes.decode("utf-8"));
+	parser.newText = File.Writer();
+	parser.flushStart = 0;
+	parser.len = #parser.text;
+	parser.filename = filename;
+	if (!autom8Worker(parser, getAutom8Command))
+		return;
+	local newBytes = parser.newText.string.encode("utf-8");
+	if (newBytes != oldBytes) {
+		print("Updating file: ", repr filename);
+		local backupFilename = fs.headof(filename) + "." + fs.tailof(filename) + ".old";
+		fs.rename(filename, backupFilename);
+		try {
+			with (local fp = File.open(filename, "w"))
+				fp.write(newBytes);
+		} @[interrupt] catch (...) {
+			try {
+				fs.unlink(filename);
+			} catch (...) {
+			}
+			fs.rename(backupFilename, filename);
+			throw;
+		}
+		fs.unlink(backupFilename);
+	}
+}
+
+
+for (local x: [...][1:])
+	autom8File(x);
