@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc31bf79b */
+/* HASH CRC-32:0x5d3a4c4c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,31 +18,69 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_SYSINFO_H
-#define GUARD_LIBC_AUTO_SYS_SYSINFO_H 1
+#ifndef GUARD_LIBC_AUTO_SYS_SYSINFO_C
+#define GUARD_LIBC_AUTO_SYS_SYSINFO_C 1
 
 #include "../api.h"
-
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <sys/sysinfo.h>
+#include "../user/sys.sysinfo.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> sysinfo(2)
- * Return current system information */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sysinfo)(struct sysinfo *info);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#include <linux/sysinfo.h>
 /* >> get_phys_pages(3)
  * Return the total # of pages of physical memory */
-INTDEF WUNUSED intptr_t NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void);
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
+NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void) {
+	struct sysinfo info;
+	uintptr_t result;
+	size_t ps;
+	if (libc_sysinfo(&info))
+		return -1;
+	ps = libc_getpagesize();
+	while (info.mem_unit > 1 && ps > 1) {
+		info.mem_unit >>= 1;
+		ps >>= 1;
+	}
+	result = info.totalram * info.mem_unit;
+	while (ps > 1) {
+		result >>= 1;
+		ps >>= 1;
+	}
+	return result;
+}
+#include <linux/sysinfo.h>
 /* >> get_avphys_pages(3)
  * Return the total # of free pages of physical memory */
-INTDEF WUNUSED intptr_t NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void);
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
+NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void) {
+	struct sysinfo info;
+	uintptr_t result;
+	size_t ps;
+	if (libc_sysinfo(&info))
+		return -1;
+	ps = libc_getpagesize();
+	while (info.mem_unit > 1 && ps > 1) {
+		info.mem_unit >>= 1;
+		ps >>= 1;
+	}
+	result = info.freeram * info.mem_unit;
+	while (ps > 1) {
+		result >>= 1;
+		ps >>= 1;
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_SYS_SYSINFO_H */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(get_phys_pages, libc_get_phys_pages);
+DEFINE_PUBLIC_ALIAS(get_avphys_pages, libc_get_avphys_pages);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_SYS_SYSINFO_C */

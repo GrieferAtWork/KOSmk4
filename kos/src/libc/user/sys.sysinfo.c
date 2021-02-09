@@ -21,19 +21,17 @@
 #define GUARD_LIBC_USER_SYS_SYSINFO_C 1
 
 #include "../api.h"
+/**/
+
 #include "sys.sysinfo.h"
 
 #include <kos/syscalls.h>
 
 DECL_BEGIN
 
-
-
-
-
-/*[[[start:implementation]]]*/
-
-/*[[[head:libc_sysinfo,hash:CRC-32=0x8a97e059]]]*/
+/*[[[head:libc_sysinfo,hash:CRC-32=0x1d46f7ad]]]*/
+/* >> sysinfo(2)
+ * Return current system information */
 INTERN ATTR_SECTION(".text.crt.system.info") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
 /*[[[body:libc_sysinfo]]]*/
@@ -44,7 +42,9 @@ NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
 }
 /*[[[end:libc_sysinfo]]]*/
 
-/*[[[head:libc_get_nprocs_conf,hash:CRC-32=0x53f971d4]]]*/
+/*[[[head:libc_get_nprocs_conf,hash:CRC-32=0xd58bda27]]]*/
+/* >> get_nprocs_conf(3)
+ * Return the # of configured online processors */
 INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED int
 NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
 /*[[[body:libc_get_nprocs_conf]]]*/
@@ -56,52 +56,26 @@ NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
 }
 /*[[[end:libc_get_nprocs_conf]]]*/
 
-/*[[[head:libc_get_nprocs,hash:CRC-32=0xfaee0d0a]]]*/
+/*[[[head:libc_get_nprocs,hash:CRC-32=0x473c54f0]]]*/
+/* >> get_nprocs(3)
+ * Return the # of currently online processors */
 INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED int
 NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void)
 /*[[[body:libc_get_nprocs]]]*/
 {
-	struct sysinfo info;
-	if (libc_sysinfo(&info))
-		return -1;
-	return info.procs;
+	/* TODO: Active processor count (aka: The kernel's `cpu_online_count' global) */
+	CRT_UNIMPLEMENTED("get_nprocs_conf"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
 }
 /*[[[end:libc_get_nprocs]]]*/
 
-/*[[[head:libc_get_phys_pages,hash:CRC-32=0x168dd9bc]]]*/
-INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
-NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void)
-/*[[[body:libc_get_phys_pages]]]*/
-{
-	struct sysinfo info;
-	if (libc_sysinfo(&info))
-		return -1;
-	return info.totalram / info.mem_unit;
-}
-/*[[[end:libc_get_phys_pages]]]*/
-
-/*[[[head:libc_get_avphys_pages,hash:CRC-32=0xce963906]]]*/
-INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
-NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void)
-/*[[[body:libc_get_avphys_pages]]]*/
-{
-	struct sysinfo info;
-	if (libc_sysinfo(&info))
-		return -1;
-	return info.freeram / info.mem_unit;
-}
-/*[[[end:libc_get_avphys_pages]]]*/
-
-/*[[[end:implementation]]]*/
 
 
-
-/*[[[start:exports,hash:CRC-32=0xb9ffe000]]]*/
+/*[[[start:exports,hash:CRC-32=0xc2535805]]]*/
 DEFINE_PUBLIC_ALIAS(sysinfo, libc_sysinfo);
 DEFINE_PUBLIC_ALIAS(get_nprocs_conf, libc_get_nprocs_conf);
 DEFINE_PUBLIC_ALIAS(get_nprocs, libc_get_nprocs);
-DEFINE_PUBLIC_ALIAS(get_phys_pages, libc_get_phys_pages);
-DEFINE_PUBLIC_ALIAS(get_avphys_pages, libc_get_avphys_pages);
 /*[[[end:exports]]]*/
 
 DECL_END

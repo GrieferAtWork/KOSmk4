@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd66192eb */
+/* HASH CRC-32:0xc7213ae6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,11 +42,47 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/* >> sysinfo(2)
+ * Return current system information */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sysinfo,(struct sysinfo *__info),(__info))
+/* >> get_nprocs_conf(3)
+ * Return the # of configured online processors */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_RPC,get_nprocs_conf,(void),())
+/* >> get_nprocs(3)
+ * Return the # of currently online processors */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_RPC,get_nprocs,(void),())
-__CDECLARE_OPT(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_phys_pages,(void),())
-__CDECLARE_OPT(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_avphys_pages,(void),())
+#ifdef __CRT_HAVE_get_phys_pages
+/* >> get_phys_pages(3)
+ * Return the total # of pages of physical memory */
+__CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_phys_pages,(void),())
+#else /* __CRT_HAVE_get_phys_pages */
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
+#include <asm/pagesize.h>
+#if defined(__CRT_HAVE_sysinfo) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
+#include <libc/local/sys.sysinfo/get_phys_pages.h>
+/* >> get_phys_pages(3)
+ * Return the total # of pages of physical memory */
+__NAMESPACE_LOCAL_USING_OR_IMPL(get_phys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL get_phys_pages)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_phys_pages))(); })
+#endif /* __CRT_HAVE_sysinfo && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
+#endif /* !__CRT_HAVE_get_phys_pages */
+#ifdef __CRT_HAVE_get_avphys_pages
+/* >> get_avphys_pages(3)
+ * Return the total # of free pages of physical memory */
+__CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_avphys_pages,(void),())
+#else /* __CRT_HAVE_get_avphys_pages */
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
+#include <asm/pagesize.h>
+#if defined(__CRT_HAVE_sysinfo) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
+#include <libc/local/sys.sysinfo/get_avphys_pages.h>
+/* >> get_avphys_pages(3)
+ * Return the total # of free pages of physical memory */
+__NAMESPACE_LOCAL_USING_OR_IMPL(get_avphys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL get_avphys_pages)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_avphys_pages))(); })
+#endif /* __CRT_HAVE_sysinfo && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
+#endif /* !__CRT_HAVE_get_avphys_pages */
 __SYSDECL_END
 #endif /* __CC__ */
 

@@ -43,20 +43,69 @@ __SYSDECL_BEGIN
 
 }
 
+@@>> sysinfo(2)
+@@Return current system information
 [[cp, decl_include("<linux/sysinfo.h>")]]
 int sysinfo([[nonnull]] struct sysinfo *info);
 
+@@>> get_nprocs_conf(3)
+@@Return the # of configured online processors
 [[cp, wunused]]
 int get_nprocs_conf();
 
+@@>> get_nprocs(3)
+@@Return the # of currently online processors
 [[cp, wunused]]
 int get_nprocs();
 
-[[cp, wunused]]
-$intptr_t get_phys_pages();
+@@>> get_phys_pages(3)
+@@Return the total # of pages of physical memory
+[[cp, wunused, decl_include("<bits/types.h>")]]
+[[impl_include("<linux/sysinfo.h>")]]
+[[requires_function(sysinfo, getpagesize)]]
+$intptr_t get_phys_pages() {
+	struct @sysinfo@ info;
+	uintptr_t result;
+	size_t ps;
+	if (sysinfo(&info))
+		return -1;
+	ps = getpagesize();
+	while (info.@mem_unit@ > 1 && ps > 1) {
+		info.@mem_unit@ >>= 1;
+		ps >>= 1;
+	}
+	result = info.@totalram@ * info.@mem_unit@;
+	while (ps > 1) {
+		result >>= 1;
+		ps >>= 1;
+	}
+	return result;
+}
 
-[[cp, wunused]]
-$intptr_t get_avphys_pages();
+
+@@>> get_avphys_pages(3)
+@@Return the total # of free pages of physical memory
+[[cp, wunused, decl_include("<bits/types.h>")]]
+[[impl_include("<linux/sysinfo.h>")]]
+[[requires_function(sysinfo, getpagesize)]]
+$intptr_t get_avphys_pages() {
+	struct @sysinfo@ info;
+	uintptr_t result;
+	size_t ps;
+	if (sysinfo(&info))
+		return -1;
+	ps = getpagesize();
+	while (info.@mem_unit@ > 1 && ps > 1) {
+		info.@mem_unit@ >>= 1;
+		ps >>= 1;
+	}
+	result = info.@freeram@ * info.@mem_unit@;
+	while (ps > 1) {
+		result >>= 1;
+		ps >>= 1;
+	}
+	return result;
+}
 
 
 %{
