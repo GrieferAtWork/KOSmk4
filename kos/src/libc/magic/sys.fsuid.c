@@ -38,35 +38,24 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/fsuid.c */
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 
 }
 
-@@Change uid used for file access control to UID, without affecting
-@@other privileges (such as who can send signals at the process)
+@@>> setfsuid(2)
+@@Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+@@calling thread. The calling thread needs the `CAP_SETUID' privilege.
+@@@return: 0:  Success.
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
 int setfsuid($uid_t uid);
 
-@@Same as `setfsuid()', but for group id
+@@>> setfsgid(2)
+@@Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+@@calling thread. The calling thread needs the `CAP_SETGID' privilege.
+@@@return: 0:  Success.
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
 int setfsgid($gid_t gid);
 

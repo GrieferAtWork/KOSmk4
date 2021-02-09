@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e5ed9f8 */
+/* HASH CRC-32:0x90c8459c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_unicode_readutf16_swap_rev_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU */
+/* >> unicode_readutf16_swap_rev(3)
+ * Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU */
 __LOCAL_LIBC(unicode_readutf16_swap_rev) __ATTR_NONNULL((1)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev))(__CHAR16_TYPE__ const **__restrict __ptext) {
 	__CHAR32_TYPE__ __result;

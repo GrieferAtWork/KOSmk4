@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86ab0f4e */
+/* HASH CRC-32:0x1dce8d9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,30 +110,30 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #ifndef __local___localdep_ftruncate_defined
 #define __local___localdep_ftruncate_defined 1
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/ftruncate.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 #define __localdep_ftruncate __LIBC_LOCAL_NAME(ftruncate)
 #else /* ... */

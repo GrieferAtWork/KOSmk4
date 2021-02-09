@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c14286f */
+/* HASH CRC-32:0x31488f88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,8 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 #undef __local___localdep_dup2_defined
 #endif /* !... */
 #endif /* !__local___localdep_dup2_defined */
-/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */

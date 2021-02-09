@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbee34008 */
+/* HASH CRC-32:0x5c301b50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: FTruncate32 from kos.unistd */
 #if !defined(__local___localdep_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
 #define __local___localdep_FTruncate32_defined 1
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #endif /* !__local___localdep_FTruncate32_defined && __CRT_HAVE_FTruncate */
@@ -36,25 +36,25 @@ __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __len
 #ifndef __local___localdep_FTruncate64_defined
 #define __local___localdep_FTruncate64_defined 1
 #ifdef __CRT_HAVE_FTruncate64
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/FTruncate64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 #define __localdep_FTruncate64 __LIBC_LOCAL_NAME(FTruncate64)
 #else /* ... */
 #undef __local___localdep_FTruncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_FTruncate64_defined */
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __LOCAL_LIBC(FTruncate) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd, __FS_TYPE(pos) __length) __THROWS(...) {

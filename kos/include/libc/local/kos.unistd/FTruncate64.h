@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bb5518c */
+/* HASH CRC-32:0xcb21487e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: FTruncate32 from kos.unistd */
 #ifndef __local___localdep_FTruncate32_defined
 #define __local___localdep_FTruncate32_defined 1
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #endif /* !__local___localdep_FTruncate32_defined */
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __LOCAL_LIBC(FTruncate64) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FTruncate64))(__fd_t __fd, __pos64_t __length) __THROWS(...) {

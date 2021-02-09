@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1385b052 */
+/* HASH CRC-32:0x878ca848 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,8 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 #undef __local___localdep_fcntl_defined
 #endif /* !... */
 #endif /* !__local___localdep_fcntl_defined */
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __LOCAL_LIBC(closefrom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(closefrom))(__fd_t __lowfd) {
 	__localdep_fcntl(__lowfd, __F_CLOSEM);

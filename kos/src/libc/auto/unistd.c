@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3849c43 */
+/* HASH CRC-32:0xab594b6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,8 +152,8 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 }
 __NAMESPACE_LOCAL_END
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
                                    __TARGV,
@@ -241,6 +241,7 @@ INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_
 NOTHROW_NCX(LIBCCALL libc_getpagesize)(void) {
 	return __ARCH_PAGESIZE;
 }
+/* >> getdtablesize(3) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
 #if defined(__KOS__)
@@ -286,7 +287,8 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 	}
 	return 0;
 }
-/* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
+/* >> swab(3)
+ * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 2)) void
@@ -334,13 +336,15 @@ NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
 	return libc_getlogin_r(s, 9) ? NULL : s;
 #endif /* !__L_cuserid */
 }
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
 NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
 	libc_fcntl(lowfd, __F_CLOSEM);
 }
 #include <asm/os/fcntl.h>
-/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
@@ -353,7 +357,8 @@ NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 	return result;
 }
 #include <libc/errno.h>
-/* Similar to `frealpathat(2)' (though use the later for more options)
+/* >> resolvepath(3)
+ * Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
@@ -380,13 +385,15 @@ NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
 	return retval;
 }
 #include <asm/os/stdio.h>
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off_t
 NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd) {
 	return libc_lseek(fd, 0, SEEK_CUR);
 }
 #include <asm/os/stdio.h>
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off64_t
 NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {
 	return libc_lseek64(fd, 0, __SEEK_CUR);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bc5aae3 */
+/* HASH CRC-32:0x7efad765 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -919,6 +919,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount)
 	.cfi_endproc
 END(__x86_asm32_int80_umount)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid(uint16_t uid) */
 .section .text.x86.asm32_syscall_int80.setuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
@@ -956,6 +960,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
 	.cfi_endproc
 END(__x86_asm32_int80_setuid)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint16_t getuid(void) */
 .section .text.x86.asm32_syscall_int80.getuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid)
@@ -1763,6 +1769,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_brk)
 	.cfi_endproc
 END(__x86_asm32_int80_brk)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid(uint16_t gid) */
 .section .text.x86.asm32_syscall_int80.setgid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
@@ -1800,6 +1810,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
 	.cfi_endproc
 END(__x86_asm32_int80_setgid)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint16_t getgid(void) */
 .section .text.x86.asm32_syscall_int80.getgid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid)
@@ -1872,6 +1884,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signal)
 	.cfi_endproc
 END(__x86_asm32_int80_signal)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t geteuid(void) */
 .section .text.x86.asm32_syscall_int80.geteuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid)
@@ -1907,6 +1922,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid)
 	.cfi_endproc
 END(__x86_asm32_int80_geteuid)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t getegid(void) */
 .section .text.x86.asm32_syscall_int80.getegid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid)
@@ -2631,6 +2649,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	.cfi_endproc
 END(__x86_asm32_int80_ssetmask)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
 .section .text.x86.asm32_syscall_int80.setreuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
@@ -2668,6 +2690,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
 	.cfi_endproc
 END(__x86_asm32_int80_setreuid)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid(uint16_t rgid, uint16_t egid) */
 .section .text.x86.asm32_syscall_int80.setregid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
@@ -5214,6 +5240,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	.cfi_endproc
 END(__x86_asm32_int80_afs_syscall)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid(uint16_t uid) */
 .section .text.x86.asm32_syscall_int80.setfsuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
@@ -5251,6 +5282,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
 	.cfi_endproc
 END(__x86_asm32_int80_setfsuid)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid(uint16_t gid) */
 .section .text.x86.asm32_syscall_int80.setfsgid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid)
@@ -6208,6 +6244,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	.cfi_endproc
 END(__x86_asm32_int80_mremap)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
 .section .text.x86.asm32_syscall_int80.setresuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
@@ -6245,6 +6285,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
 	.cfi_endproc
 END(__x86_asm32_int80_setresuid)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
 .section .text.x86.asm32_syscall_int80.getresuid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid)
@@ -6428,6 +6471,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nfsservctl)
 	.cfi_endproc
 END(__x86_asm32_int80_nfsservctl)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
 .section .text.x86.asm32_syscall_int80.setresgid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
@@ -6465,6 +6512,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
 	.cfi_endproc
 END(__x86_asm32_int80_setresgid)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 .section .text.x86.asm32_syscall_int80.getresgid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid)
@@ -7561,6 +7611,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown32)
 	.cfi_endproc
 END(__x86_asm32_int80_lchown32)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint32_t getuid32(void) */
 .section .text.x86.asm32_syscall_int80.getuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid32)
@@ -7596,6 +7648,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_getuid32)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint32_t getgid32(void) */
 .section .text.x86.asm32_syscall_int80.getgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid32)
@@ -7631,6 +7685,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid32)
 	.cfi_endproc
 END(__x86_asm32_int80_getgid32)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t geteuid32(void) */
 .section .text.x86.asm32_syscall_int80.geteuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid32)
@@ -7666,6 +7723,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_geteuid32)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t getegid32(void) */
 .section .text.x86.asm32_syscall_int80.getegid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid32)
@@ -7701,6 +7761,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid32)
 	.cfi_endproc
 END(__x86_asm32_int80_getegid32)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 .section .text.x86.asm32_syscall_int80.setreuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid32)
@@ -7738,6 +7802,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setreuid32)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
 .section .text.x86.asm32_syscall_int80.setregid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
@@ -7889,6 +7957,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown32)
 	.cfi_endproc
 END(__x86_asm32_int80_fchown32)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
 .section .text.x86.asm32_syscall_int80.setresuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid32)
@@ -7926,6 +7998,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setresuid32)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
 .section .text.x86.asm32_syscall_int80.getresuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid32)
@@ -7963,6 +8038,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_getresuid32)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid) */
 .section .text.x86.asm32_syscall_int80.setresgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid32)
@@ -8000,6 +8079,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setresgid32)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) */
 .section .text.x86.asm32_syscall_int80.getresgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid32)
@@ -8074,6 +8156,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown32)
 	.cfi_endproc
 END(__x86_asm32_int80_chown32)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid32(uint32_t uid) */
 .section .text.x86.asm32_syscall_int80.setuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid32)
@@ -8111,6 +8197,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setuid32)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid32(uint32_t gid) */
 .section .text.x86.asm32_syscall_int80.setgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid32)
@@ -8148,6 +8238,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setgid32)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid32(uint32_t uid) */
 .section .text.x86.asm32_syscall_int80.setfsuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid32)
@@ -8185,6 +8280,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setfsuid32)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid32(uint32_t gid) */
 .section .text.x86.asm32_syscall_int80.setfsgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid32)
@@ -20447,6 +20547,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_umount)
 	.cfi_endproc
 END(__x86_asm32_sysenter_umount)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid(uint16_t uid) */
 .section .text.x86.asm32_syscall_sysenter.setuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setuid)
@@ -20484,6 +20588,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setuid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setuid)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint16_t getuid(void) */
 .section .text.x86.asm32_syscall_sysenter.getuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getuid)
@@ -21291,6 +21397,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_brk)
 	.cfi_endproc
 END(__x86_asm32_sysenter_brk)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid(uint16_t gid) */
 .section .text.x86.asm32_syscall_sysenter.setgid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgid)
@@ -21328,6 +21438,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setgid)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint16_t getgid(void) */
 .section .text.x86.asm32_syscall_sysenter.getgid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgid)
@@ -21400,6 +21512,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_signal)
 	.cfi_endproc
 END(__x86_asm32_sysenter_signal)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t geteuid(void) */
 .section .text.x86.asm32_syscall_sysenter.geteuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_geteuid)
@@ -21435,6 +21550,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_geteuid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_geteuid)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t getegid(void) */
 .section .text.x86.asm32_syscall_sysenter.getegid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getegid)
@@ -22159,6 +22277,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ssetmask)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ssetmask)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
 .section .text.x86.asm32_syscall_sysenter.setreuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setreuid)
@@ -22196,6 +22318,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setreuid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setreuid)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid(uint16_t rgid, uint16_t egid) */
 .section .text.x86.asm32_syscall_sysenter.setregid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setregid)
@@ -24748,6 +24874,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_afs_syscall)
 	.cfi_endproc
 END(__x86_asm32_sysenter_afs_syscall)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid(uint16_t uid) */
 .section .text.x86.asm32_syscall_sysenter.setfsuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsuid)
@@ -24785,6 +24916,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsuid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setfsuid)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid(uint16_t gid) */
 .section .text.x86.asm32_syscall_sysenter.setfsgid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsgid)
@@ -25748,6 +25884,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mremap)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
 .section .text.x86.asm32_syscall_sysenter.setresuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresuid)
@@ -25785,6 +25925,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresuid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setresuid)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
 .section .text.x86.asm32_syscall_sysenter.getresuid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresuid)
@@ -25968,6 +26111,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nfsservctl)
 	.cfi_endproc
 END(__x86_asm32_sysenter_nfsservctl)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
 .section .text.x86.asm32_syscall_sysenter.setresgid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresgid)
@@ -26005,6 +26152,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresgid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setresgid)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 .section .text.x86.asm32_syscall_sysenter.getresgid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresgid)
@@ -27109,6 +27259,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lchown32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_lchown32)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint32_t getuid32(void) */
 .section .text.x86.asm32_syscall_sysenter.getuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getuid32)
@@ -27144,6 +27296,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getuid32)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint32_t getgid32(void) */
 .section .text.x86.asm32_syscall_sysenter.getgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgid32)
@@ -27179,6 +27333,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getgid32)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t geteuid32(void) */
 .section .text.x86.asm32_syscall_sysenter.geteuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_geteuid32)
@@ -27214,6 +27371,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_geteuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_geteuid32)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t getegid32(void) */
 .section .text.x86.asm32_syscall_sysenter.getegid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getegid32)
@@ -27249,6 +27409,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getegid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getegid32)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 .section .text.x86.asm32_syscall_sysenter.setreuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setreuid32)
@@ -27286,6 +27450,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setreuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setreuid32)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
 .section .text.x86.asm32_syscall_sysenter.setregid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setregid32)
@@ -27437,6 +27605,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchown32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchown32)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
 .section .text.x86.asm32_syscall_sysenter.setresuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresuid32)
@@ -27474,6 +27646,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setresuid32)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
 .section .text.x86.asm32_syscall_sysenter.getresuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresuid32)
@@ -27511,6 +27686,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getresuid32)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid) */
 .section .text.x86.asm32_syscall_sysenter.setresgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresgid32)
@@ -27548,6 +27727,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresgid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setresgid32)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) */
 .section .text.x86.asm32_syscall_sysenter.getresgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresgid32)
@@ -27622,6 +27804,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chown32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_chown32)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid32(uint32_t uid) */
 .section .text.x86.asm32_syscall_sysenter.setuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setuid32)
@@ -27659,6 +27845,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setuid32)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid32(uint32_t gid) */
 .section .text.x86.asm32_syscall_sysenter.setgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgid32)
@@ -27696,6 +27886,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setgid32)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid32(uint32_t uid) */
 .section .text.x86.asm32_syscall_sysenter.setfsuid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsuid32)
@@ -27733,6 +27928,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsuid32)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setfsuid32)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid32(uint32_t gid) */
 .section .text.x86.asm32_syscall_sysenter.setfsgid32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsgid32)

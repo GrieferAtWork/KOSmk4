@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9c9f4e9 */
+/* HASH CRC-32:0xc71a3d56 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,15 +56,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__lib
 #if !defined(____libc_core_syscall_defined) && defined(__CRT_HAVE_syscall)
 #define ____libc_core_syscall_defined 1
 #include <bits/types.h>
+/* >> syscall(2), syscall64(2) */
 __CVREDIRECT(,__LONGPTR_TYPE__,__NOTHROW_RPC,__libc_core_syscall,(__LONGPTR_TYPE__ __sysno),syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #endif /* !____libc_core_syscall_defined && __CRT_HAVE_syscall */
 #ifndef ____libc_core_syscall64_defined
 #define ____libc_core_syscall64_defined 1
 #ifdef __CRT_HAVE_syscall
 #include <bits/types.h>
+/* >> syscall(2), syscall64(2) */
 __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,__libc_core_syscall64,(__syscall_ulong_t __sysno),syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #elif defined(__CRT_HAVE_syscall64)
 #include <bits/types.h>
+/* >> syscall(2), syscall64(2) */
 __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,__libc_core_syscall64,(__syscall_ulong_t __sysno),syscall64,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #else /* ... */
 #undef ____libc_core_syscall64_defined

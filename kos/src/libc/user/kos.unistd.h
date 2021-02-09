@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4311342 */
+/* HASH CRC-32:0x7a96aa5e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -308,15 +308,23 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_Truncate64)(char const *file, pos64_t le
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF ATTR_NORETURN NONNULL((2, 3)) void (LIBCCALL libc_FExecve)(fd_t fd, __TARGV, __TENVP) THROWS(...);
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF ATTR_NORETURN NONNULL((1, 2, 3)) void (LIBCCALL libc_Execvpe)(char const *__restrict file, __TARGV, __TENVP) THROWS(...);
 INTDEF int (LIBCCALL libc_Nice)(int inc) THROWS(...);
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
 INTDEF void (LIBCCALL libc_SetPGrp)(void) THROWS(...);
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF void (LIBCCALL libc_SetReUid)(uid_t ruid, uid_t euid) THROWS(...);
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF void (LIBCCALL libc_SetReGid)(gid_t rgid, gid_t egid) THROWS(...);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
@@ -363,10 +371,10 @@ INTDEF __LONG64_TYPE__ (VLIBCCALL libc_Syscall64)(syscall_ulong_t sysno, ...) TH
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_ChRoot)(char const *__restrict path) THROWS(...);
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTDEF void (LIBCCALL libc_FTruncate)(fd_t fd, pos_t length) THROWS(...);
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTDEF void (LIBCCALL libc_FTruncate64)(fd_t fd, pos64_t length) THROWS(...);
 /* >> fdatasync(2)

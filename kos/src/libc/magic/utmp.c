@@ -73,9 +73,9 @@ __SYSDECL_BEGIN
 int login_tty($fd_t fd) {
 	if unlikely(setsid() < 0)
 		goto err;
-	if unlikely(ioctl(fd, @__TIOCSCTTY@) < 0)
+	if unlikely(ioctl(fd, @__TIOCSCTTY@, 1) < 0)
 		goto err;
-@@pp_if STDIN_FILENO == 0 && STDOUT_FILENO == 1 && STDERR_FILENO == 2@@
+@@pp_if STDIN_FILENO <= 2 && STDOUT_FILENO <= 2 && STDERR_FILENO <= 2@@
 	{
 		fd_t i;
 		for (i = 0; i <= 2; ++i) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e411fa9 */
+/* HASH CRC-32:0xc4cf5351 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,8 @@
 #include <__crt.h>
 #include <libc/local/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Read a single Unicode character from a given UTF-8 string */
+/* >> unicode_readutf8(3)
+ * Read a single Unicode character from a given UTF-8 string */
 __LOCAL_LIBC(unicode_readutf8) __ATTR_NONNULL((1)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(char const **__restrict __ptext) {
 	__CHAR32_TYPE__ __result;

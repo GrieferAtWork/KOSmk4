@@ -162,6 +162,7 @@ struct fdirnode_ops {
 #define _fdirnode_ops_firstfield(prefix) _fnode_ops_firstfield(prefix)
 #define fdirnode_ops_as_fnode_ops(ops)   ((struct fnode_ops const *)&(ops)->_fnode_ops_firstfield(dno_))
 #define fdirnode_ops_as_mfile_ops(ops)   ((struct mfile_ops const *)&(ops)->_mfile_ops_firstfield(dno_))
+	/* TODO: REF struct fnode *opennode(fdirnode *, fdirent *) -- Should be a fdirnode_ops operator! */
 #define FDIRNODE_OPS_FIELDS(prefix, T)                                                  \
 	FNODE_OPS_FIELDS(prefix, T);                                                        \
 	                                                                                    \

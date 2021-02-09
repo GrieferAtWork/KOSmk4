@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27cf5900 */
+/* HASH CRC-32:0x14b3e82c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -386,30 +386,80 @@
 #define SYS_sysinfo                  __NR_sysinfo                  /* errno_t sysinfo(struct sysinfo *info) */
 #define SYS_times                    __NR_times                    /* clock_t times(struct tmsx64 *buf) */
 #define SYS_ptrace                   __NR_ptrace                   /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 #define SYS_getuid                   __NR_getuid                   /* uid_t getuid(void) */
 #define SYS_syslog                   __NR_syslog                   /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 #define SYS_getgid                   __NR_getgid                   /* gid_t getgid(void) */
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 #define SYS_setuid                   __NR_setuid                   /* errno_t setuid(uid_t uid) */
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 #define SYS_setgid                   __NR_setgid                   /* errno_t setgid(gid_t gid) */
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 #define SYS_geteuid                  __NR_geteuid                  /* uid_t geteuid(void) */
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 #define SYS_getegid                  __NR_getegid                  /* gid_t getegid(void) */
 #define SYS_setpgid                  __NR_setpgid                  /* errno_t setpgid(pid_t pid, pid_t pgid) */
 #define SYS_getppid                  __NR_getppid                  /* pid_t getppid(void) */
 #define SYS_getpgrp                  __NR_getpgrp                  /* pid_t getpgrp(void) */
 #define SYS_setsid                   __NR_setsid                   /* pid_t setsid(void) */
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 #define SYS_setreuid                 __NR_setreuid                 /* errno_t setreuid(uid_t ruid, uid_t euid) */
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 #define SYS_setregid                 __NR_setregid                 /* errno_t setregid(gid_t rgid, gid_t egid) */
 /* @return: * :     [count == 0] The required number of groups
  * @return: * :     [count != 0] The number of groups that were actually returned
  * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
 #define SYS_getgroups                __NR_getgroups                /* ssize_t getgroups(size_t count, gid_t[] list) */
 #define SYS_setgroups                __NR_setgroups                /* errno_t setgroups(size_t count, gid_t const *groups) */
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 #define SYS_setresuid                __NR_setresuid                /* errno_t setresuid(uid_t ruid, uid_t euid, uid_t suid) */
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 #define SYS_getresuid                __NR_getresuid                /* errno_t getresuid(uid_t *ruid, uid_t *euid, uid_t *suid) */
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 #define SYS_setresgid                __NR_setresgid                /* errno_t setresgid(gid_t rgid, gid_t egid, gid_t sgid) */
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 #define SYS_getresgid                __NR_getresgid                /* errno_t getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid) */
 #define SYS_getpgid                  __NR_getpgid                  /* pid_t getpgid(pid_t pid) */
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 #define SYS_setfsuid                 __NR_setfsuid                 /* errno_t setfsuid(uid_t uid) */
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 #define SYS_setfsgid                 __NR_setfsgid                 /* errno_t setfsgid(gid_t gid) */
 #define SYS_getsid                   __NR_getsid                   /* pid_t getsid(pid_t pid) */
 #define SYS_capget                   __NR_capget                   /* errno_t capget(int TODO_PROTOTYPE) */

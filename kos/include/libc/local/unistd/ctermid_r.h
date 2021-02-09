@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29a48eea */
+/* HASH CRC-32:0x3603ecc7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_ctermid __LIBC_LOCAL_NAME(ctermid)
 #endif /* !__CRT_HAVE_ctermid */
 #endif /* !__local___localdep_ctermid_defined */
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __LOCAL_LIBC(ctermid_r) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctermid_r))(char *__s) {
 	return __s ? __localdep_ctermid(__s) : __NULLPTR;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4fb6240 */
+/* HASH CRC-32:0x8dfb18ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,9 +42,9 @@ INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 	if unlikely(libc_setsid() < 0)
 		goto err;
-	if unlikely(libc_ioctl(fd, __TIOCSCTTY) < 0)
+	if unlikely(libc_ioctl(fd, __TIOCSCTTY, 1) < 0)
 		goto err;
-#if !STDIN_FILENO && STDOUT_FILENO == 1 && STDERR_FILENO == 2
+#if STDIN_FILENO <= 2 && STDOUT_FILENO <= 2 && STDERR_FILENO <= 2
 	{
 		fd_t i;
 		for (i = 0; i <= 2; ++i) {
@@ -56,7 +56,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 	}
 	if likely(fd >= 3)
 		libc_close(fd);
-#else /* !STDIN_FILENO && STDOUT_FILENO == 1 && STDERR_FILENO == 2 */
+#else /* STDIN_FILENO <= 2 && STDOUT_FILENO <= 2 && STDERR_FILENO <= 2 */
 	if (likely(fd != STDIN_FILENO) && unlikely(libc_dup2(fd, STDIN_FILENO)))
 		goto err;
 	if (likely(fd != STDOUT_FILENO) && unlikely(libc_dup2(fd, STDOUT_FILENO)))
@@ -65,7 +65,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 		goto err;
 	if likely(fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
 		libc_close(fd);
-#endif /* STDIN_FILENO || STDOUT_FILENO != 1 || STDERR_FILENO != 2 */
+#endif /* STDIN_FILENO > 2 || STDOUT_FILENO > 2 || STDERR_FILENO > 2 */
 	return 0;
 err:
 	return -1;

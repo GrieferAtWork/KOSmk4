@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee12f1ca */
+/* HASH CRC-32:0x7c2c24b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,14 +97,14 @@ INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlp)(char co
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_execvpe)(char const *__restrict file, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -137,6 +137,10 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_fsync)(fd_t fd);
  * When `PID' is ZERO(0), use `gettid()' for it instead.
  * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setpgid)(pid_t pid, pid_t pgid);
+/* >> getgroups(2)
+ * @return: * : [count == 0] The required number of groups
+ * @return: * : [count != 0] The number of groups that were actually returned
+ * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_getgroups)(int size, gid_t list[]);
 /* >> setuid(2)
  * Set the effective user ID of the calling process
@@ -327,9 +331,26 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF int NOTHROW_RPC(LIBDCALL libd_syncfs)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_group_member)(gid_t gid);
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_getresuid)(uid_t *ruid, uid_t *euid, uid_t *suid);
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setresuid)(uid_t ruid, uid_t euid, uid_t suid);
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setresgid)(gid_t rgid, gid_t egid, gid_t sgid);
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_usleep)(useconds_t useconds);
@@ -374,13 +395,22 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTDEF size_t NOTHROW_NCX(LIBDCALL libd_confstr)(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setreuid)(uid_t ruid, uid_t euid);
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setregid)(gid_t rgid, gid_t egid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
+/* >> getdtablesize(3) */
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -426,10 +456,12 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, size_t
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_gethostname)(char *name, size_t buflen);
+/* >> setlogin(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sethostname)(char const *name, size_t len);
+/* >> sethostid(3) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sethostid)(longptr_t id);
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
@@ -437,38 +469,49 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_getdomainname)(char *name, siz
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setdomainname)(char const *name, size_t len);
+/* >> profil(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_profil)(uint16_t *sample_buffer, size_t size, size_t offset, unsigned int scale);
+/* >> daemon(3) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_daemon)(__STDC_INT_AS_UINT_T nochdir, __STDC_INT_AS_UINT_T noclose);
+/* >> revoke(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_revoke)(char const *file);
+/* >> syscall(2), syscall64(2) */
 INTDEF longptr_t NOTHROW_RPC(VLIBDCALL libd_syscall)(longptr_t sysno, ...);
+/* >> syscall(2), syscall64(2) */
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBDCALL libd_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path);
+/* >> getpass(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_getpass)(char const *__restrict prompt);
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_ftruncate)(fd_t fd, __PIO_OFFSET length);
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
  * Change the program break, allowing for a rudimentary implementation of a heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_brk)(void *addr);
+/* >> brk(2), sbrk(2)
+ * Change the program break, allowing for a rudimentary implementation of a heap.
+ * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF void *NOTHROW_NCX(LIBDCALL libd_sbrk)(intptr_t delta);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps, and its size), meaning that changes are written to disk */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fdatasync)(fd_t fd);
-/* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
+/* >> swab(3)
+ * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_swab)(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
+/* >> swab(3)
+ * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes);
@@ -506,7 +549,8 @@ INTDEF char *NOTHROW_NCX(LIBDCALL libd_cuserid)(char *s);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
@@ -516,29 +560,34 @@ INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid_r)(char *s);
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBDCALL libd_sysconf)(__STDC_INT_AS_UINT_T name);
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_closefrom)(fd_t lowfd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Similar to `frealpathat(2)' (though use the later for more options)
+/* >> resolvepath(3)
+ * Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
@@ -551,7 +600,8 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_resolvepath)(char const *filename, char *resolved, size_t buflen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Similar to `frealpathat(2)' (though use the later for more options)
+/* >> resolvepath(3)
+ * Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
@@ -564,19 +614,23 @@ INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_resolvepath)
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename, char *resolved, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTDEF WUNUSED off_t NOTHROW_NCX(LIBDCALL libd_tell)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTDEF WUNUSED off_t NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTDEF WUNUSED off64_t NOTHROW_NCX(LIBDCALL libd_tell64)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTDEF WUNUSED off64_t NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd);
 #endif /* !__KERNEL__ */
 

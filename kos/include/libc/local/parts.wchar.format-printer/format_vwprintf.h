@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4004c93e */
+/* HASH CRC-32:0xbd959710 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,25 +28,29 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_16to32_defined
 #define __local___localdep_format_16to32_defined 1
 #if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-/* Format printer (compatible with `pc16formatprinter') for
+/* >> format_16to32(3)
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto32)
-/* Format printer (compatible with `pc16formatprinter') for
+/* >> format_16to32(3)
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_wto32.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `pc16formatprinter') for
+/* >> format_16to32(3)
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 #define __localdep_format_16to32 (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto32))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_16to32.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `pc16formatprinter') for
+/* >> format_16to32(3)
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 #define __localdep_format_16to32 __LIBC_LOCAL_NAME(format_16to32)
 #endif /* !... */
@@ -55,25 +59,29 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_32to16_defined
 #define __local___localdep_format_32to16_defined 1
 #if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* Format printer (compatible with `__pc32formatprinter') for
+/* >> format_32to16(3)
+ * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wto16)
-/* Format printer (compatible with `__pc32formatprinter') for
+/* >> format_32to16(3)
+ * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_wto16.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc32formatprinter') for
+/* >> format_32to16(3)
+ * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 #define __localdep_format_32to16 (*(__SSIZE_TYPE__(__LIBKCALL *)(void *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto16))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_32to16.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc32formatprinter') for
+/* >> format_32to16(3)
+ * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 #define __localdep_format_32to16 __LIBC_LOCAL_NAME(format_32to16)
 #endif /* !... */
@@ -82,14 +90,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_8to16_defined
 #define __local___localdep_format_8to16_defined 1
 #ifdef __CRT_HAVE_format_8to16
-/* Format printer (compatible with `__pformatprinter') for
+/* >> format_8to16(3)
+ * Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-16 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8to16,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_8to16 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_8to16.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pformatprinter') for
+/* >> format_8to16(3)
+ * Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-16 output */
 #define __localdep_format_8to16 __LIBC_LOCAL_NAME(format_8to16)
 #endif /* !__CRT_HAVE_format_8to16 */
@@ -98,14 +108,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_8to32_defined
 #define __local___localdep_format_8to32_defined 1
 #ifdef __CRT_HAVE_format_8to32
-/* Format printer (compatible with `__pformatprinter') for
+/* >> format_8to32(3)
+ * Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-32 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8to32,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_8to32 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_8to32.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pformatprinter') for
+/* >> format_8to32(3)
+ * Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-32 output */
 #define __localdep_format_8to32 __LIBC_LOCAL_NAME(format_8to32)
 #endif /* !__CRT_HAVE_format_8to32 */
@@ -625,14 +637,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf16_defined
 #define __local___localdep_unicode_writeutf16_defined 1
 #ifdef __CRT_HAVE_unicode_writeutf16
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf16(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_writeutf16.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf16(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 #define __localdep_unicode_writeutf16 __LIBC_LOCAL_NAME(unicode_writeutf16)
 #endif /* !__CRT_HAVE_unicode_writeutf16 */

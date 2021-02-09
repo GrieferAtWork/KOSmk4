@@ -49,6 +49,7 @@ __SYSDECL_BEGIN
 }
 
 %
+@@>> getcontext(3)
 @@Save the caller's current register state into the given `UCP'
 @@Usually, this function will never fail and always return `0'.
 @@However on architectures where this function isn't implemented,
@@ -65,6 +66,7 @@ __SYSDECL_BEGIN
 int getcontext([[nonnull]] ucontext_t *__restrict ucp);
 
 %
+@@>> setcontext(3)
 @@Populate the current machine register state with values from `UCP',
 @@that that this function will not return to the caller, but will instead
 @@return to the machine context that is described by `UCP'
@@ -91,6 +93,7 @@ int getcontext([[nonnull]] ucontext_t *__restrict ucp);
 int setcontext([[nonnull]] ucontext_t const *__restrict ucp);
 
 %
+@@>> swapcontext(3)
 @@Atomically perform both a `getcontext(oucp)', as well as a `setcontext(ucp)',
 @@such that execution will continue at `ucp', but code that is hosted by that
 @@control path will be able to resume execution with the caller's control path
@@ -114,6 +117,7 @@ int swapcontext([[nonnull]] ucontext_t *__restrict oucp,
 %typedef void (*__makecontext_func_t)(void);
 
 %
+@@>> makecontext(3)
 @@Initialize a user-context `UCP' to perform a call to `FUNC', which
 @@should take exactly `argc' arguments of integer or pointer type (floating-
 @@point, or by-value struct-arguments cannot be accepted by `FUNC').

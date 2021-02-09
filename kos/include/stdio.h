@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1246a1c3 */
+/* HASH CRC-32:0x1dff4ee9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2315,11 +2315,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 #ifndef __ctermid_r_defined
 #define __ctermid_r_defined 1
 #ifdef __CRT_HAVE_ctermid_r
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
 #else /* __CRT_HAVE_ctermid_r */
 #include <libc/local/unistd/ctermid_r.h>
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
 #endif /* !__CRT_HAVE_ctermid_r */
 #endif /* !__ctermid_r_defined */

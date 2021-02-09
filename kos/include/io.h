@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d6949b */
+/* HASH CRC-32:0x51894ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -595,46 +595,46 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename,
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, int __type),(__filename,__type))
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate.h>
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _chsize)(__fd_t __fd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, __length); }
 #endif /* ... */
 #ifdef __CRT_HAVE_ftruncate64
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate64.h>
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _chsize_s)(__fd_t __fd, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate64))(__fd, __length); }
 #endif /* ... */
@@ -1038,36 +1038,44 @@ __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_filelength,(__fd_t __fd
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); }
 #endif /* ... */
 #if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),_telli64,(__fd))
 #elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell,(__fd))
 #elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
 #endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
 #endif /* !... */
 #ifdef __CRT_HAVE_tell64
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,_telli64,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64)
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CDECLARE(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,_telli64,(__fd_t __fd),(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell64.h>
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off64_t __NOTHROW_NCX(__LIBCCALL _telli64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell64))(__fd); }
 #endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
 #endif /* !... */
@@ -1126,28 +1134,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag_
 #endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
 #endif /* !... */
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate.h>
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL chsize)(__fd_t __fd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, __length); }
 #endif /* ... */
@@ -1185,22 +1193,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(filelength, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifndef __tell_defined
 #define __tell_defined 1
 #if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
 #elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
 #else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
 #undef __tell_defined

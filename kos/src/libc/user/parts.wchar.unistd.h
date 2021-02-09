@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa561b55e */
+/* HASH CRC-32:0x65f7e1d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -226,7 +226,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name, 
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name, size_t buflen);
+/* >> setlogin(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name);
+/* >> setlogin(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */

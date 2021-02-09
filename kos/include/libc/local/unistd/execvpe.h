@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78e9ff3e */
+/* HASH CRC-32:0xa971cd03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,8 +169,8 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __LOCAL_LIBC(execvpe) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvpe))(char const *__restrict __file, __TARGV, __TENVP) {
 	char *__env_path;

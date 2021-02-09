@@ -71,10 +71,10 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 }
 /*[[[end:libc_Execvp]]]*/
 
-/*[[[head:libc_Execvpe,hash:CRC-32=0xc71178b5]]]*/
+/*[[[head:libc_Execvpe,hash:CRC-32=0x259d81a7]]]*/
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2, 3)) void
 (LIBCCALL libc_Execvpe)(char const *__restrict file,
                         __TARGV,

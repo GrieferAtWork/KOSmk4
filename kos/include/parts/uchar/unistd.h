@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fa61255 */
+/* HASH CRC-32:0xfc1ecb24 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1140,13 +1140,17 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32gethostname,(char32_t *
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_wsetlogin) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> setlogin(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16setlogin,(char16_t const *__name),wsetlogin,(__name))
 #elif defined(__CRT_HAVE_DOS$wsetlogin)
+/* >> setlogin(3) */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16setlogin,(char16_t const *__name),wsetlogin,(__name))
 #endif /* ... */
 #if defined(__CRT_HAVE_wsetlogin) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> setlogin(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setlogin,(char32_t const *__name),wsetlogin,(__name))
 #elif defined(__CRT_HAVE_KOS$wsetlogin)
+/* >> setlogin(3) */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setlogin,(char32_t const *__name),wsetlogin,(__name))
 #endif /* ... */
 #if defined(__CRT_HAVE_wsethostname) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

@@ -34,10 +34,16 @@ DECL_BEGIN
 /*[[[start:implementation]]]*/
 
 
-/*[[[head:libc_ioctl,hash:CRC-32=0x7c152c2e]]]*/
-/* Perform the I/O control operation specified by REQUEST on FD.
- * One argument may follow; its presence and type depend on REQUEST.
- * Return value depends on REQUEST. Usually -1 indicates error */
+/*[[[head:libc_ioctl,hash:CRC-32=0x8ef74f26]]]*/
+/* >> ioctl(2)
+ * Perform the I/O control operation specified by `request' on `fd'.
+ * Many I/O control operations except an additional argument, though
+ * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
                                   ulongptr_t request,

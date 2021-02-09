@@ -398,10 +398,11 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
 
+%
 %#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU)
 @@>> execvpe(3)
-@@Replace the calling process with the application image referred to by `FILE'
-@@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `FILE' and
+@@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
 [[cp, guard, export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
 [[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -475,6 +476,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 
 %#endif /* __USE_KOS || __USE_DOS || __USE_GNU */
 
+%
 %#if defined(__USE_KOS) || defined(__USE_DOS)
 @@>> execlpe(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -488,7 +490,6 @@ int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (
 
 %[default:section(".text.crt{|.dos}.sched.process")]
 
-%
 @@>> getpid(2)
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
@@ -496,7 +497,6 @@ int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (
 [[export_alias("_getpid", "__getpid")]]
 $pid_t getpid();
 
-%
 %#ifdef __USE_KOS
 @@>> gettid(2)
 @@Return the TID of the calling thread
@@ -511,7 +511,6 @@ $pid_t gettid();
 int dos_pipe([[nonnull]] $fd_t pipedes[2],
              $uint32_t pipesize, $oflag_t textmode);
 
-%
 @@>> pipe(2)
 @@Create a new pair of connected pipes ([0] = reader, [1] = writer)
 [[section(".text.crt{|.dos}.io.access"), export_alias("__pipe")]]
@@ -521,7 +520,6 @@ int pipe([[nonnull]] $fd_t pipedes[2]) {
 	return dos_pipe(pipedes, 4096, 0x8000); /* O_BINARY */
 }
 
-%
 @@>> sleep(3)
 @@Sleep for up to `SECONDS' seconds
 [[cp, guard, section(".text.crt{|.dos}.system.utility")]]
@@ -531,7 +529,6 @@ unsigned int sleep(unsigned int seconds) {
 	return 0;
 }
 
-%
 @@>> fsync(2)
 @@Synchronize a file (including its descriptor which contains timestamps, and its size),
 @@meaning that changes to its data and/or descriptor are written to disk
@@ -545,7 +542,6 @@ int fsync($fd_t fd) {
 }
 
 
-%
 @@>> getppid(2)
 @@Return the PID of the calling process's parent.
 @@(That is the TID of the leader of the parent of the calling thread's leader)
@@ -555,7 +551,6 @@ int fsync($fd_t fd) {
 $pid_t getppid();
 
 
-%
 @@>> getpgrp(2)
 @@Return the ID of the calling process's process group.
 @@(That is the TID of the leader of the process group of the calling thread's leader)
@@ -564,10 +559,8 @@ $pid_t getppid();
 [[decl_include("<bits/types.h>")]]
 $pid_t getpgrp();
 
-%
 %[insert:function(__getpgid = getpgid)]
 
-%
 @@>> setpgid(2)
 @@Change the ID of the process group associated with `PID's process.
 @@(That is the TID of the leader of the process group of `PID's leader)
@@ -578,7 +571,6 @@ $pid_t getpgrp();
 [[decl_include("<bits/types.h>")]]
 int setpgid($pid_t pid, $pid_t pgid);
 
-%
 @@>> setsid(2)
 @@Make the calling thread's process the leader of its associated
 @@process group, before also making it its own session leader.
@@ -591,36 +583,33 @@ $pid_t setsid();
 
 %[default:section(".text.crt{|.dos}.sched.user")]
 
-%
 @@>> getuid(2)
 @@Return the real user ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 $uid_t getuid();
 
-%
 @@>> geteuid(2)
 @@Return the effective user ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 $uid_t geteuid();
 
-%
 @@>> getgid(2)
 @@Return the real group ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 $gid_t getgid();
 
-%
 @@>> getegid(2)
 @@Return the effective group ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 $gid_t getegid();
 
-%
-%/* ... */
+@@>> getgroups(2)
+@@@return: * : [count == 0] The required number of groups
+@@@return: * : [count != 0] The number of groups that were actually returned
+@@@return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups
 [[decl_include("<bits/types.h>")]]
 int getgroups(int size, $gid_t list[]);
 
-%
 @@>> setuid(2)
 @@Set the effective user ID of the calling process
 @@@return: 0 : Success
@@ -629,7 +618,6 @@ int getgroups(int size, $gid_t list[]);
 [[decl_include("<bits/types.h>")]]
 int setuid($uid_t uid);
 
-%
 @@>> setgid(2)
 @@Set the effective group ID of the calling process
 @@@return: 0 : Success
@@ -787,7 +775,6 @@ ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 [[cp, guard, export_alias(_write, __write), section(".text.crt{|.dos}.io.write")]]
 ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 
-%
 %#ifdef __USE_KOS
 @@>> readall(3)
 @@Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -915,14 +902,12 @@ int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 	return faccessat(__AT_FDCWD, file, type, 0);
 }
 
-%
 @@>> chdir(2)
 @@Change the current working directory to `PATH'
 [[cp, guard, export_alias("_chdir")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 int chdir([[nonnull]] char const *path);
 
-%
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
 [[cp, guard, export_alias("_getcwd"), section(".text.crt{|.dos}.fs.basic_property")]]
@@ -930,7 +915,6 @@ char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
-%
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `FILE'
 [[cp, guard, export_alias("_unlink")]]
@@ -940,7 +924,6 @@ int unlink([[nonnull]] char const *file) {
 	return unlinkat(__AT_FDCWD, file, 0);
 }
 
-%
 @@>> rmdir(2)
 @@Remove a directory referred to by `PATH'
 [[cp, guard, export_alias("_rmdir")]]
@@ -952,7 +935,6 @@ int rmdir([[nonnull]] char const *path) {
 
 %[default:section(".text.crt{|.dos}.fs.property")];
 
-%
 %#ifdef __USE_GNU
 @@>> euidaccess(2)
 @@@param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -966,7 +948,6 @@ int euidaccess([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 	return faccessat(__AT_FDCWD, file, type, __AT_EACCESS);
 }
 
-%
 @@>> eaccess(2)
 @@@param: TYPE: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
@@ -985,21 +966,18 @@ int faccessat($fd_t dfd, [[nonnull]] char const *file,
 
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
-%
 @@>> fchownat(2)
 @@Change the ownership of a given `DFD:FILE' to `GROUP:OWNER'
 [[cp, decl_include("<bits/types.h>")]]
 int fchownat($fd_t dfd, [[nonnull]] char const *file,
              $uid_t owner, $gid_t group, $atflag_t flags);
 
-%
 @@>> linkat(2)
 @@Create a hard link from `FROMFD:FROM', leading to `TOFD:TO'
 [[cp, decl_include("<bits/types.h>")]]
 int linkat($fd_t fromfd, [[nonnull]] char const *from,
            $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
-%
 @@>> symlinkat(3)
 @@Create a new symbolic link loaded with `LINK_TEXT' as link
 @@text, at the filesystem location referred to by `TOFD:TARGET_PATH'
@@ -1009,7 +987,6 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 
 %[default:section(".text.crt{|.dos}.fs.property")];
 
-%
 @@>> readlinkat(2)
 @@Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
 @@WARNING: This function is badly designed and will neither append a trailing
@@ -1022,7 +999,6 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
                    [[outp(buflen)]] char *buf, size_t buflen);
 
-%
 %#ifdef __USE_KOS
 @@>> freadlinkat(2)
 @@Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -1035,14 +1011,12 @@ ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
 
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
-%
 @@>> unlinkat(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME'
 [[cp, decl_include("<bits/types.h>")]]
 int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
-%
 %
 %#ifdef __USE_LARGEFILE64
 @@>> lseek64(2)
@@ -1055,7 +1029,6 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 }
 %#endif /* __USE_LARGEFILE64 */
 
-%
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 %{
@@ -1311,7 +1284,6 @@ ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, __PIO_
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 %
-%
 %#ifdef __USE_GNU
 %{
 #ifndef __environ_defined
@@ -1389,21 +1361,37 @@ int syncfs($fd_t fd) {
 [[decl_include("<bits/types.h>")]]
 int group_member($gid_t gid);
 
+@@>> getresuid(2)
+@@Get the real, effective, and saved UID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
 int getresuid($uid_t *ruid, $uid_t *euid, $uid_t *suid);
 
+@@>> getresgid(2)
+@@Get the real, effective, and saved GID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
 int getresgid($gid_t *rgid, $gid_t *egid, $gid_t *sgid);
 
+@@>> setresuid(2)
+@@@return: 0 : Success
+@@Set the real, effective, and saved UID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
 int setresuid($uid_t ruid, $uid_t euid, $uid_t suid);
 
+@@>> setresgid(2)
+@@Set the real, effective, and saved GID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
 int setresgid($gid_t rgid, $gid_t egid, $gid_t sgid);
 %#endif /* __USE_GNU */
 
-%#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
-%     defined(__USE_MISC)
+%#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || defined(__USE_MISC)
 
 @@Hidden function exported by DOS that allows for millisecond precision
 [[cp, ignore, nocrt, alias("__crtSleep", "delay")]]
@@ -1430,7 +1418,6 @@ char *getwd([[nonnull]] char *buf) {
 [[decl_include("<bits/types.h>")]]
 $useconds_t ualarm($useconds_t value, $useconds_t interval);
 
-%
 @@>> vfork(2)
 @@Same as `fork(2)', but the child process may be executed within in the same VM
 @@as the parent process, with the parent process remaining suspended until the
@@ -1462,21 +1449,18 @@ $useconds_t ualarm($useconds_t value, $useconds_t interval);
 $pid_t vfork();
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
-%
 @@>> fchown(2)
 @@Change the ownership of a given `FD' to `GROUP:OWNER'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
 [[decl_include("<bits/types.h>")]]
 int fchown($fd_t fd, $uid_t owner, $gid_t group);
 
-%
 @@>> chdir(2)
 @@Change the current working directory to `PATH'
 [[cp, section(".text.crt{|.dos}.fs.basic_property")]]
 [[decl_include("<bits/types.h>")]]
 int fchdir($fd_t fd);
 
-%
 @@>> getpgid(2)
 @@Return the ID of the process group associated with `PID's process.
 @@(That is the TID of the leader of the process group of `PID's leader)
@@ -1486,7 +1470,6 @@ int fchdir($fd_t fd);
 [[decl_include("<bits/types.h>")]]
 $pid_t getpgid($pid_t pid);
 
-%
 @@>> getsid(2)
 @@Return the ID of the session which a process `PID' is apart of.
 @@return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
@@ -1494,7 +1477,6 @@ $pid_t getpgid($pid_t pid);
 [[decl_include("<bits/types.h>")]]
 $pid_t getsid($pid_t pid);
 
-%
 @@>> lchown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER',
 @@but don't reference it if that file is a symbolic link
@@ -1525,7 +1507,6 @@ int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 int truncate32([[nonnull]] char const *file, $pos32_t length);
 
 
-%
 @@>> truncate(2)
 @@Truncate the given file `FILE' to a length of `LENGTH'
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
@@ -1581,7 +1562,6 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 %
 %#ifdef __USE_XOPEN2K8
 
-%
 @@>> fexecve(2)
 @@Replace the calling process with the application image referred to by `FD' and
 @@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
@@ -1648,7 +1628,6 @@ int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 
-%
 @@>> sync(2)
 @@Synchronize all disk operations of all mounted file systems and flush
 @@unwritten buffers down to the hardware layer, ensuring that modifications
@@ -1658,27 +1637,29 @@ void sync() {
 	/* NO-OP */
 }
 
-%
 @@>> setpgrp(3)
 @@Move the calling process into its own process group.
 @@Equivalent to `setpgid(0, 0)'
 [[section(".text.crt{|.dos}.sched.process")]]
 int setpgrp();
 
-%
-%/* ... */
+@@>> setreuid(2)
+@@Set the real and effective UID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[section(".text.crt{|.dos}.sched.user")]]
 [[decl_include("<bits/types.h>")]]
 int setreuid($uid_t ruid, $uid_t euid);
 
-%
-%/* ... */
+@@>> setregid(2)
+@@Set the real and effective GID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[section(".text.crt{|.dos}.sched.user")]]
 [[decl_include("<bits/types.h>")]]
 int setregid($gid_t rgid, $gid_t egid);
 
-%
-%/* ... */
+@@>> gethostid(3)
 [[section(".text.crt{|.dos}.system.configuration")]]
 [[wunused]] $longptr_t gethostid();
 
@@ -1705,8 +1686,7 @@ __STDC_INT_AS_SIZE_T getpagesize() {
 	return __ARCH_PAGESIZE;
 }
 
-%
-%/* ... */
+@@>> getdtablesize(3)
 [[ATTR_CONST, wunused, section(".text.crt{|.dos}.system.configuration")]]
 [[decl_include("<features.h>")]]
 __STDC_INT_AS_SIZE_T getdtablesize() {
@@ -1734,7 +1714,6 @@ __STDC_INT_AS_SIZE_T getdtablesize() {
 [[decl_include("<bits/types.h>")]]
 int seteuid($uid_t euid);
 
-%
 @@>> setegid(2)
 @@Set the effective group ID of the calling process
 @@@return: 0 : Success
@@ -1746,15 +1725,13 @@ int setegid($gid_t egid);
 
 %#endif /* __USE_XOPEN2K */
 
-%
-%#if defined(__USE_MISC) || \
-%   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
+%#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 
-%/* ... */
+@@>> ttyslot(3)
 [[wunused, section(".text.crt{|.dos}.io.tty")]]
 int ttyslot();
 
-%#endif
+%#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_UNIX98) */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -1772,7 +1749,6 @@ int symlink([[nonnull]] char const *link_text,
 	return symlinkat(link_text, __AT_FDCWD, target_path);
 }
 
-%
 @@>> readlink(3)
 @@Read the text of a symbolic link under `PATH' into the provided buffer.
 @@Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -1842,76 +1818,64 @@ int gethostname([[outp(buflen)]] char *name, size_t buflen);
 
 %
 %#ifdef __USE_MISC
-%/* ... */
+@@>> setlogin(3)
 [[section(".text.crt{|.dos}.io.tty")]]
 int setlogin([[nonnull]] char const *name);
 
-%
 @@>> sethostname(2)
 @@Set the name of the hosting machine
 [[section(".text.crt{|.dos}.system.configuration")]]
 int sethostname([[inp(len)]] char const *name, size_t len);
 
-
-%
-%/* ... */
+@@>> sethostid(3)
 [[section(".text.crt{|.dos}.system.configuration")]]
 int sethostid($longptr_t id);
 
-%
 @@>> getdomainname(3)
 @@Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)'
 [[section(".text.crt{|.dos}.system.configuration")]]
 int getdomainname([[outp(buflen)]] char *name, size_t buflen);
 
-%
 @@>> setdomainname(2)
 @@Set the name of the hosting machine's domain
 [[section(".text.crt{|.dos}.system.configuration")]]
 int setdomainname([[inp(len)]] char const *name, size_t len);
 
-%
-%/* ... */
+@@>> vhangup(3)
 [[section(".text.crt{|.dos}.io.tty")]]
 int vhangup();
 
-%
-%/* ... */
+@@>> profil(3)
 [[section(".text.crt{|.dos}.system.utility")]]
 int profil([[nonnull]] $uint16_t *sample_buffer,
            size_t size, size_t offset,
            unsigned int scale);
 
-%
-%/* ... */
+@@>> getusershell(3)
 [[cp, wunused, section(".text.crt{|.dos}.database.shell")]]
 char *getusershell();
 
-%
-%/* ... */
+@@>> endusershell(3)
 [[section(".text.crt{|.dos}.database.shell")]]
 void endusershell();
 
-%
-%/* ... */
+@@>> setusershell(3)
 [[cp, section(".text.crt{|.dos}.database.shell")]]
 void setusershell();
 
-%
-%/* ... */
+@@>> daemon(3)
 [[cp, section(".text.crt{|.dos}.system.utility")]]
 [[decl_include("<features.h>")]]
 int daemon(__STDC_INT_AS_UINT_T nochdir,
            __STDC_INT_AS_UINT_T noclose);
 
-%
-%/* ... */
+@@>> revoke(3)
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
 int revoke([[nonnull]] char const *file);
 
-%
 %[insert:extern(acct)]
 
+@@>> syscall(2), syscall64(2)
 [[cp, libc, section(".text.crt{|.dos}.system.utility")]]
 [[decl_include("<bits/types.h>")]]
 [[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
@@ -1920,7 +1884,7 @@ $longptr_t syscall($longptr_t sysno, ...);
 
 %
 %#ifdef __USE_KOS
-[[cp, libc, section(".text.crt{|.dos}.system.utility")]]
+[[cp, libc, section(".text.crt{|.dos}.system.utility"), doc_alias(syscall)]]
 [[preferred_alias("syscall"), decl_include("<bits/types.h>")]]
 [[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
            $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
@@ -1932,16 +1896,14 @@ __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 %#endif /* __USE_MISC */
 
 %
-%#if (defined(__USE_MISC) || \
-%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+%#if (defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 @@>> chroot(2)
 @@Change the root directory of the calling `CLONE_FS' group of threads
 @@(usually the process) to a path that was previously address by `PATH'
 [[cp, section(".text.crt{|.dos}.fs.utility")]]
 int chroot([[nonnull]] char const *__restrict path);
 
-%
-%/* ... */
+@@>> getpass(3)
 [[guard, cp, wunused, section(".text.crt{|.dos}.io.tty")]]
 char *getpass([[nonnull]] char const *__restrict prompt);
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
@@ -1953,7 +1915,7 @@ char *getpass([[nonnull]] char const *__restrict prompt);
 [[decl_include("<bits/types.h>")]]
 int ftruncate32($fd_t fd, $pos32_t length);
 
-@@>> ftruncate(2)
+@@>> ftruncate(2), ftruncate64(2)
 @@Truncate the given file `FD' to a length of `LENGTH'
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[no_crt_self_import, decl_include("<bits/types.h>")]]
@@ -1971,9 +1933,8 @@ int ftruncate($fd_t fd, __PIO_OFFSET length) {
 
 %
 %#ifdef __USE_LARGEFILE64
-@@>> ftruncate64(2)
-@@Truncate the given file `FD' to a length of `LENGTH'
-[[off64_variant_of(ftruncate), decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[off64_variant_of(ftruncate), doc_alias(ftruncate)]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[export_alias("_chsize_s"), section(".text.crt{|.dos}.io.large.write")]]
 [[userimpl, requires_function(ftruncate32), decl_include("<bits/types.h>")]]
 int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
@@ -1990,7 +1951,8 @@ int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 [[section(".text.crt{|.dos}.heap.utility")]]
 int brk(void *addr);
 
-[[section(".text.crt{|.dos}.heap.utility"), export_alias("__sbrk")]]
+[[section(".text.crt{|.dos}.heap.utility")]]
+[[export_alias("__sbrk"), doc_alias(brk)]]
 void *sbrk(intptr_t delta);
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) || __USE_MISC */
 
@@ -2014,6 +1976,7 @@ int fdatasync($fd_t fd) {
 %[insert:extern(encrypt)]
 
 %
+@@>> swab(3)
 @@Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
 @@exchanging the order of even and odd bytes ("123456" --> "214365")
 @@When `n_bytes <= 1', don't do anything and return immediately
@@ -2036,8 +1999,7 @@ void swab([[nonnull]] void const *__restrict from,
 
 %
 %
-%#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
-%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+%#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 @@>> ctermid(3)
 @@Writes the string "/dev/tty" to `s', or returns a pointer to
 @@a writable data location that contains that same string.
@@ -2077,8 +2039,7 @@ char *cuserid(char *s) {
 
 %
 %
-%#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
-%     (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
+%#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K))
 %#ifndef ____pthread_atfork_func_t_defined
 %#define ____pthread_atfork_func_t_defined 1
 %typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
@@ -2091,6 +2052,7 @@ char *cuserid(char *s) {
 %
 %
 %#if defined(__USE_REENTRANT) || defined(__USE_SOLARIS)
+@@>> ctermid_r(3)
 @@Same as `ctermid', but return `NULL' when `S' is `NULL'
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 [[userimpl, requires($has_function(ctermid))]]
@@ -2098,9 +2060,9 @@ char *ctermid_r([[nullable]] char *s) {
 	return s ? ctermid(s) : NULL;
 }
 %#endif /* __USE_REENTRANT || __USE_SOLARIS */
+%
+%
 
-%
-%
 @@>> sysconf(2)
 @@@param: NAME: One of `_SC_*' from <asm/crt/confname.h>
 @@Return a system configuration value `NAME'
@@ -2175,6 +2137,7 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 #ifdef __USE_BSD
 }
 
+@@>> closefrom(2)
 @@Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)')
 [[guard, requires_include("<asm/os/fcntl.h>")]]
 [[section(".text.crt{|.dos}.bsd.io.access")]]
@@ -2206,6 +2169,7 @@ void closefrom($fd_t lowfd) {
 // TODO: offset_t llseek($fd_t fd, offset_t offset, __STDC_INT_AS_UINT_T whence);
 
 
+@@>> fchroot(2)
 @@Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
 @@and referrs to a directory, then this function can be used to escape a chroot() jail.
 @@No special permissions are required to use this function, since a malicious application
@@ -2220,6 +2184,7 @@ int fchroot($fd_t fd) {
 	return result;
 }
 
+@@>> resolvepath(3)
 @@Similar to `frealpathat(2)' (though use the later for more options)
 @@Also note that this function appears to have a weird rule (which KOS simply
 @@ignores) that is related to this function not writing more than `PATH_MAX'
@@ -2249,6 +2214,7 @@ __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
 }
 
 
+@@>> tell(3), tell64(3)
 @@Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)')
 [[wunused, guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("tell64", "_telli64")]]
@@ -2261,9 +2227,8 @@ $off_t tell($fd_t fd) {
 }
 
 %#ifdef __USE_LARGEFILE64
-@@Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)')
 [[wunused, guard, decl_include("<bits/types.h>")]]
-[[requires_include("<asm/os/stdio.h>")]]
+[[requires_include("<asm/os/stdio.h>"), doc_alias(tell)]]
 [[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/os/stdio.h>"), export_alias("_telli64")]]
 $off64_t tell64($fd_t fd) {

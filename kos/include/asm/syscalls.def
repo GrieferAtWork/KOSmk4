@@ -1338,75 +1338,115 @@ open_by_handle_at:(fd_t mountdirfd, [tostr(STRUCT_FILE_HANDLE)] struct file_hand
 /* UID/GID                                                              */
 /************************************************************************/
 %[startgroup]
+@@>> getuid(2)
+@@@return: * : The UID of the calling thread (this is the so-called ~real~ UID)
 [restart(must)] getuid:() -> uid_t;
-[restart(must)] getuid16:() -> [tostr(UID_T)] uint16_t;
-[restart(must)] getuid32:() -> [tostr(UID_T)] uint32_t;
+[doc_alias(getuid)][restart(must)] getuid16:() -> [tostr(UID_T)] uint16_t;
+[doc_alias(getuid)][restart(must)] getuid32:() -> [tostr(UID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setuid(2)
+@@Set the UID of the calling thread (this is the so-called ~real~ UID)
+@@@return: 0 : Success
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...]
 [restart(must)] setuid:(uid_t uid) -> errno_t;
-[restart(must)] setuid16:([tostr(UID_T)] uint16_t uid) -> errno_t;
-[restart(must)] setuid32:([tostr(UID_T)] uint32_t uid) -> errno_t;
+[doc_alias(setuid)][restart(must)] setuid16:([tostr(UID_T)] uint16_t uid) -> errno_t;
+[doc_alias(setuid)][restart(must)] setuid32:([tostr(UID_T)] uint32_t uid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> getgid(2)
+@@@return: * : The GID of the calling thread (this is the so-called ~real~ GID)
 [restart(must)] getgid:() -> gid_t;
-[restart(must)] getgid16:() -> [tostr(GID_T)] uint16_t;
-[restart(must)] getgid32:() -> [tostr(GID_T)] uint32_t;
+[doc_alias(getgid)][restart(must)] getgid16:() -> [tostr(GID_T)] uint16_t;
+[doc_alias(getgid)][restart(must)] getgid32:() -> [tostr(GID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setgid(2)
+@@Set the GID of the calling thread (this is the so-called ~real~ GID)
+@@@return: 0 : Success
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...]
 [restart(must)] setgid:(gid_t gid) -> errno_t;
-[restart(must)] setgid16:([tostr(GID_T)] uint16_t gid) -> errno_t;
-[restart(must)] setgid32:([tostr(GID_T)] uint32_t gid) -> errno_t;
+[doc_alias(setgid)][restart(must)] setgid16:([tostr(GID_T)] uint16_t gid) -> errno_t;
+[doc_alias(setgid)][restart(must)] setgid32:([tostr(GID_T)] uint32_t gid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> geteuid(2)
+@@@return: * : The effective UID of the calling thread.
+@@             This is the one used for most permission checks
 [restart(must)] geteuid:() -> uid_t;
-[restart(must)] geteuid16:() -> [tostr(UID_T)] uint16_t;
-[restart(must)] geteuid32:() -> [tostr(UID_T)] uint32_t;
+[doc_alias(geteuid)][restart(must)] geteuid16:() -> [tostr(UID_T)] uint16_t;
+[doc_alias(geteuid)][restart(must)] geteuid32:() -> [tostr(UID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setreuid(2)
+@@Set the real and effective UID of the calling thread.
+@@@return: 0 : Success
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...]
 [restart(must)] setreuid:(uid_t ruid, uid_t euid) -> errno_t;
-[restart(must)] setreuid16:([tostr(UID_T)] uint16_t ruid, [tostr(UID_T)] uint16_t euid) -> errno_t;
-[restart(must)] setreuid32:([tostr(UID_T)] uint32_t ruid, [tostr(UID_T)] uint32_t euid) -> errno_t;
+[doc_alias(setreuid)][restart(must)] setreuid16:([tostr(UID_T)] uint16_t ruid, [tostr(UID_T)] uint16_t euid) -> errno_t;
+[doc_alias(setreuid)][restart(must)] setreuid32:([tostr(UID_T)] uint32_t ruid, [tostr(UID_T)] uint32_t euid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> getegid(2)
+@@@return: * : The effective GID of the calling thread.
+@@             This is the one used for most permission checks
 [restart(must)] getegid:() -> gid_t;
-[restart(must)] getegid16:() -> [tostr(GID_T)] uint16_t;
-[restart(must)] getegid32:() -> [tostr(GID_T)] uint32_t;
+[doc_alias(getegid)][restart(must)] getegid16:() -> [tostr(GID_T)] uint16_t;
+[doc_alias(getegid)][restart(must)] getegid32:() -> [tostr(GID_T)] uint32_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setregid(2)
+@@Set the real and effective GID of the calling thread.
+@@@return: 0 : Success
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...]
 [restart(must)] setregid:(gid_t rgid, gid_t egid) -> errno_t;
-[restart(must)] setregid16:([tostr(GID_T)] uint16_t rgid, [tostr(GID_T)] uint16_t egid) -> errno_t;
-[restart(must)] setregid32:([tostr(GID_T)] uint32_t rgid, [tostr(GID_T)] uint32_t egid) -> errno_t;
+[doc_alias(setregid)][restart(must)] setregid16:([tostr(GID_T)] uint16_t rgid, [tostr(GID_T)] uint16_t egid) -> errno_t;
+[doc_alias(setregid)][restart(must)] setregid32:([tostr(GID_T)] uint32_t rgid, [tostr(GID_T)] uint32_t egid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> getresuid(2)
+@@Get the real, effective, and saved UID of the calling thread.
+@@@return: 0 : Success
 [restart(must)] getresuid:([tostr(out:UID_T)] uid_t *ruid, [tostr(out:UID_T)] uid_t *euid, [tostr(out:UID_T)] uid_t *suid) -> errno_t;
-[restart(must)] getresuid16:([tostr(out:UID16_T)] uint16_t *ruid, [tostr(out:UID16_T)] uint16_t *euid, [tostr(out:UID16_T)] uint16_t *suid) -> errno_t;
-[restart(must)] getresuid32:([tostr(out:UID32_T)] uint32_t *ruid, [tostr(out:UID32_T)] uint32_t *euid, [tostr(out:UID32_T)] uint32_t *suid) -> errno_t;
+[doc_alias(getresuid)][restart(must)] getresuid16:([tostr(out:UID16_T)] uint16_t *ruid, [tostr(out:UID16_T)] uint16_t *euid, [tostr(out:UID16_T)] uint16_t *suid) -> errno_t;
+[doc_alias(getresuid)][restart(must)] getresuid32:([tostr(out:UID32_T)] uint32_t *ruid, [tostr(out:UID32_T)] uint32_t *euid, [tostr(out:UID32_T)] uint32_t *suid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setresuid(2)
+@@@return: 0 : Success
+@@Set the real, effective, and saved UID of the calling thread.
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...]
 [restart(must)] setresuid:(uid_t ruid, uid_t euid, uid_t suid) -> errno_t;
-[restart(must)] setresuid16:([tostr(UID_T)] uint16_t ruid, [tostr(UID_T)] uint16_t euid, [tostr(UID_T)] uint16_t suid) -> errno_t;
-[restart(must)] setresuid32:([tostr(UID_T)] uint32_t ruid, [tostr(UID_T)] uint32_t euid, [tostr(UID_T)] uint32_t suid) -> errno_t;
+[doc_alias(setresuid)][restart(must)] setresuid16:([tostr(UID_T)] uint16_t ruid, [tostr(UID_T)] uint16_t euid, [tostr(UID_T)] uint16_t suid) -> errno_t;
+[doc_alias(setresuid)][restart(must)] setresuid32:([tostr(UID_T)] uint32_t ruid, [tostr(UID_T)] uint32_t euid, [tostr(UID_T)] uint32_t suid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> getresgid(2)
+@@Get the real, effective, and saved GID of the calling thread.
+@@@return: 0 : Success
 [restart(must)] getresgid:([tostr(out:GID_T)] gid_t *rgid, [tostr(out:GID_T)] gid_t *egid, [tostr(out:GID_T)] gid_t *sgid) -> errno_t;
-[restart(must)] getresgid16:([tostr(out:GID16_T)] uint16_t *rgid, [tostr(out:GID16_T)] uint16_t *egid, [tostr(out:GID16_T)] uint16_t *sgid) -> errno_t;
-[restart(must)] getresgid32:([tostr(out:GID32_T)] uint32_t *rgid, [tostr(out:GID32_T)] uint32_t *egid, [tostr(out:GID32_T)] uint32_t *sgid) -> errno_t;
+[doc_alias(getresgid)][restart(must)] getresgid16:([tostr(out:GID16_T)] uint16_t *rgid, [tostr(out:GID16_T)] uint16_t *egid, [tostr(out:GID16_T)] uint16_t *sgid) -> errno_t;
+[doc_alias(getresgid)][restart(must)] getresgid32:([tostr(out:GID32_T)] uint32_t *rgid, [tostr(out:GID32_T)] uint32_t *egid, [tostr(out:GID32_T)] uint32_t *sgid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setresgid(2)
+@@Set the real, effective, and saved GID of the calling thread.
+@@@return: 0 : Success
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...]
 [restart(must)] setresgid:(gid_t rgid, gid_t egid, gid_t sgid) -> errno_t;
-[restart(must)] setresgid16:([tostr(GID_T)] uint16_t rgid, [tostr(GID_T)] uint16_t egid, [tostr(GID_T)] uint16_t sgid) -> errno_t;
-[restart(must)] setresgid32:([tostr(GID_T)] uint32_t rgid, [tostr(GID_T)] uint32_t egid, [tostr(GID_T)] uint32_t sgid) -> errno_t;
+[doc_alias(setresgid)][restart(must)] setresgid16:([tostr(GID_T)] uint16_t rgid, [tostr(GID_T)] uint16_t egid, [tostr(GID_T)] uint16_t sgid) -> errno_t;
+[doc_alias(setresgid)][restart(must)] setresgid32:([tostr(GID_T)] uint32_t rgid, [tostr(GID_T)] uint32_t egid, [tostr(GID_T)] uint32_t sgid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -1425,15 +1465,25 @@ open_by_handle_at:(fd_t mountdirfd, [tostr(STRUCT_FILE_HANDLE)] struct file_hand
 %[endgroup]
 
 %[startgroup]
+@@>> setfsuid(2)
+@@Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+@@calling thread. The calling thread needs the `CAP_SETUID' privilege.
+@@@return: 0:  Success.
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...]
 [restart(must)] setfsuid:(uid_t uid) -> errno_t;
-[restart(must)] setfsuid16:([tostr(UID_T)] uint16_t uid) -> errno_t;
-[restart(must)] setfsuid32:([tostr(UID_T)] uint32_t uid) -> errno_t;
+[doc_alias(setfsuid)][restart(must)] setfsuid16:([tostr(UID_T)] uint16_t uid) -> errno_t;
+[doc_alias(setfsuid)][restart(must)] setfsuid32:([tostr(UID_T)] uint32_t uid) -> errno_t;
 %[endgroup]
 
 %[startgroup]
+@@>> setfsgid(2)
+@@Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+@@calling thread. The calling thread needs the `CAP_SETGID' privilege.
+@@@return: 0:  Success.
+@@@throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...]
 [restart(must)] setfsgid:(gid_t gid) -> errno_t;
-[restart(must)] setfsgid16:([tostr(GID_T)] uint16_t gid) -> errno_t;
-[restart(must)] setfsgid32:([tostr(GID_T)] uint32_t gid) -> errno_t;
+[doc_alias(setfsgid)][restart(must)] setfsgid16:([tostr(GID_T)] uint16_t gid) -> errno_t;
+[doc_alias(setfsgid)][restart(must)] setfsgid32:([tostr(GID_T)] uint32_t gid) -> errno_t;
 %[endgroup]
 
 

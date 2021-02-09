@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1501e2f4 */
+/* HASH CRC-32:0xf3333da0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,14 +26,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf16_defined
 #define __local___localdep_unicode_writeutf16_defined 1
 #ifdef __CRT_HAVE_unicode_writeutf16
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf16(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_writeutf16.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf16(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 #define __localdep_unicode_writeutf16 __LIBC_LOCAL_NAME(unicode_writeutf16)
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
@@ -42,7 +44,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `pwformatprinter') for
+/* >> format_wto16(3)
+ * Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 __LOCAL_LIBC(format_32to16) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_32to16))(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {

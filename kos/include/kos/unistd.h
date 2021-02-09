@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb196c78d */
+/* HASH CRC-32:0x666408f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -581,8 +581,8 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #endif /* __USE_GNU */
 
@@ -600,7 +600,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Nice, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBC
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
 __CDECLARE_VOID_OPT(,__THROWING,SetPGrp,(void),())
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID_OPT(,__THROWING,SetReUid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID_OPT(,__THROWING,SetReGid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -704,31 +712,31 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,ChRoot,(char const *__restric
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_FTruncate64) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate.h>
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate)(__fd_t __fd, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate))(__fd, __length); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_FTruncate64
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate64.h>
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate64)(__fd_t __fd, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate64))(__fd, __length); })
 #endif /* ... */

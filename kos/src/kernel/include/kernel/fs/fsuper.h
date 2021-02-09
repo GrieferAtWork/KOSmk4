@@ -220,13 +220,6 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self);
 
 
-/* Open a file-node, given its containing directory and directory entry */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
-fsuper_opennode(struct fsuper *__restrict self,
-                struct fdirnode *__restrict dir,
-                struct fdirent *__restrict name)
-		THROWS(E_IOERROR, E_BADALLOC, ...);
-
 
 
 DECL_END

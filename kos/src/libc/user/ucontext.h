@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58345eb1 */
+/* HASH CRC-32:0xe989dcaf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Save the caller's current register state into the given `UCP'
+/* >> getcontext(3)
+ * Save the caller's current register state into the given `UCP'
  * Usually, this function will never fail and always return `0'.
  * However on architectures where this function isn't implemented,
  * it will always returns `-1' with `errno=ENOSYS'
@@ -42,7 +43,8 @@ DECL_BEGIN
  * WARNING: If the context returned by this function is loaded after the
  *          calling function has returned, then the behavior is undefined. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp);
-/* Populate the current machine register state with values from `UCP',
+/* >> setcontext(3)
+ * Populate the current machine register state with values from `UCP',
  * that that this function will not return to the caller, but will instead
  * return to the machine context that is described by `UCP'
  * The caller must have previously initialized `UCP' by either:
@@ -64,7 +66,8 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__rest
  *       may test for, and which allows you to omit error-checks for this
  *       function. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp);
-/* Atomically perform both a `getcontext(oucp)', as well as a `setcontext(ucp)',
+/* >> swapcontext(3)
+ * Atomically perform both a `getcontext(oucp)', as well as a `setcontext(ucp)',
  * such that execution will continue at `ucp', but code that is hosted by that
  * control path will be able to resume execution with the caller's control path
  * by a call to one of `setcontext(OUCP)' or `swapcontext(..., OUCP)'
@@ -79,7 +82,8 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *
  *       may test for, and which allows you to omit error-checks for this
  *       function. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp, ucontext_t const *__restrict ucp);
-/* Initialize a user-context `UCP' to perform a call to `FUNC', which
+/* >> makecontext(3)
+ * Initialize a user-context `UCP' to perform a call to `FUNC', which
  * should take exactly `argc' arguments of integer or pointer type (floating-
  * point, or by-value struct-arguments cannot be accepted by `FUNC').
  * Note that officially, arguments taken by `FUNC' must be of type `int',

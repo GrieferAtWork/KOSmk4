@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21e5b866 */
+/* HASH CRC-32:0xedd938d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -507,18 +507,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #endif /* !__CRT_HAVE_execvp && !__CRT_HAVE__execvp && ((!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca)) || !__LOCAL_environ) */
 #endif /* !... */
 #endif /* !__execlp_defined */
+
 #if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU)
 #ifndef __execvpe_defined
 #define __execvpe_defined 1
 #ifdef __CRT_HAVE_execvpe
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
@@ -526,8 +527,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__r
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <libc/local/unistd/execvpe.h>
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
 #undef __execvpe_defined
@@ -535,6 +536,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !... */
 #endif /* !__execvpe_defined */
 #endif /* __USE_KOS || __USE_DOS || __USE_GNU */
+
 #if defined(__USE_KOS) || defined(__USE_DOS)
 #ifndef __execlpe_defined
 #define __execlpe_defined 1
@@ -567,7 +569,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_S
 #endif /* !... */
 #endif /* !__execlpe_defined */
 #endif /* __USE_KOS || __USE_DOS */
-
 #ifndef __getpid_defined
 #define __getpid_defined 1
 #ifdef __CRT_HAVE_getpid
@@ -589,7 +590,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,getpid,(void),__getpid
 #undef __getpid_defined
 #endif /* !... */
 #endif /* !__getpid_defined */
-
 #ifdef __USE_KOS
 #if !defined(__gettid_defined) && defined(__CRT_HAVE_gettid)
 #define __gettid_defined 1
@@ -599,7 +599,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,getpid,(void),__getpid
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),())
 #endif /* !__gettid_defined && __CRT_HAVE_gettid */
 #endif /* __USE_KOS */
-
 #ifdef __CRT_HAVE_pipe
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
@@ -614,7 +613,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__p
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pipe)(__fd_t __pipedes[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe))(__pipedes); })
 #endif /* ... */
-
 #ifndef __sleep_defined
 #define __sleep_defined 1
 #ifdef __CRT_HAVE_sleep
@@ -630,7 +628,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sleep, __FORCELOCAL __ATTR_ARTIFICIAL unsigned i
 #undef __sleep_defined
 #endif /* !... */
 #endif /* !__sleep_defined */
-
 #ifdef __CRT_HAVE_fsync
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
@@ -653,19 +650,16 @@ __CREDIRECT(,int,__NOTHROW_RPC,fsync,(__fd_t __fd),fdatasync,(__fd))
  * meaning that changes to its data and/or descriptor are written to disk */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fsync, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL fsync)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsync))(__fd); })
 #endif /* !... */
-
 /* >> getppid(2)
  * Return the PID of the calling process's parent.
  * (That is the TID of the leader of the parent of the calling thread's leader)
  * THIS_THREAD->LEADER->PARENT->LEADER->PID */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getppid,(void),())
-
 /* >> getpgrp(2)
  * Return the ID of the calling process's process group.
  * (That is the TID of the leader of the process group of the calling thread's leader)
  * THIS_THREAD->LEADER->GROUP_LEADER->PID */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgrp,(void),())
-
 #ifdef __CRT_HAVE_getpgid
 /* >> getpgid(2)
  * Return the ID of the process group associated with `PID's process.
@@ -681,7 +675,6 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),getpg
  * When `PID' is ZERO(0), use `gettid()' for it instead */
 __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),(__pid))
 #endif /* ... */
-
 #ifdef __CRT_HAVE_setpgid
 /* >> setpgid(2)
  * Change the ID of the process group associated with `PID's process.
@@ -699,7 +692,6 @@ __CDECLARE(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),(__pid,__p
  * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
 __CREDIRECT(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid,(__pid,__pgid))
 #endif /* ... */
-
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
@@ -708,33 +700,29 @@ __CREDIRECT(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
  *  - return THIS_THREAD->LEADER->PID; */
 __CDECLARE_OPT(,__pid_t,__NOTHROW_NCX,setsid,(void),())
-
 /* >> getuid(2)
  * Return the real user ID of the calling process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,getuid,(void),())
-
 /* >> geteuid(2)
  * Return the effective user ID of the calling process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,geteuid,(void),())
-
 /* >> getgid(2)
  * Return the real group ID of the calling process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getgid,(void),())
-
 /* >> getegid(2)
  * Return the effective group ID of the calling process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getegid,(void),())
-
-/* ... */
+/* >> getgroups(2)
+ * @return: * : [count == 0] The required number of groups
+ * @return: * : [count != 0] The number of groups that were actually returned
+ * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),(__size,__list))
-
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `UID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setuid,(__uid_t __uid),(__uid))
-
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
@@ -960,7 +948,6 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
 #undef __write_defined
 #endif /* !... */
 #endif /* !__write_defined */
-
 #ifdef __USE_KOS
 #ifndef __readall_defined
 #define __readall_defined 1
@@ -1137,7 +1124,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !__AT_FDCWD || !__CRT_HAVE_faccessat */
 #endif /* !... */
 #endif /* !__access_defined */
-
 #ifndef __chdir_defined
 #define __chdir_defined 1
 #ifdef __CRT_HAVE_chdir
@@ -1152,7 +1138,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chdir,(char const *__path),_ch
 #undef __chdir_defined
 #endif /* !... */
 #endif /* !__chdir_defined */
-
 #ifndef __getcwd_defined
 #define __getcwd_defined 1
 #ifdef __CRT_HAVE_getcwd
@@ -1167,7 +1152,6 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #undef __getcwd_defined
 #endif /* !... */
 #endif /* !__getcwd_defined */
-
 #ifndef __unlink_defined
 #define __unlink_defined 1
 #ifdef __CRT_HAVE_unlink
@@ -1190,7 +1174,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__unlink_defined */
-
 #ifndef __rmdir_defined
 #define __rmdir_defined 1
 #ifdef __CRT_HAVE_rmdir
@@ -1213,7 +1196,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__rmdir_defined */
-
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_euidaccess
 /* >> euidaccess(2)
@@ -1240,7 +1222,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,euidaccess,(cha
 __NAMESPACE_LOCAL_USING_OR_IMPL(euidaccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL euidaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); })
 #endif /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #endif /* !... */
-
 #ifdef __CRT_HAVE_euidaccess
 /* >> eaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -1273,20 +1254,16 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
-
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
-
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
-
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
-
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -1296,19 +1273,16 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *_
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
-
 #ifdef __USE_KOS
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,freadlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
-
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
 #endif /* __USE_ATFILE */
-
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_lseek64
@@ -1330,7 +1304,6 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek64,(__fd_t __fd, __off64_t __offset, _
 __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __ATTR_ARTIFICIAL __off64_t __NOTHROW_NCX(__LIBCCALL lseek64)(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek64))(__fd, __offset, __whence); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
-
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
@@ -1480,7 +1453,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
-
 #ifdef __USE_GNU
 #ifndef __environ_defined
 #define __environ_defined 1
@@ -1543,13 +1515,29 @@ __CDECLARE(,int,__NOTHROW_RPC,syncfs,(__fd_t __fd),(__fd))
 __NAMESPACE_LOCAL_USING_OR_IMPL(syncfs, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL syncfs)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syncfs))(__fd); })
 #endif /* !__CRT_HAVE_syncfs */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,group_member,(__gid_t __gid),(__gid))
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setresgid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __USE_GNU */
-#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
-     defined(__USE_MISC)
+#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || defined(__USE_MISC)
 #ifdef __CRT_HAVE_usleep
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __CDECLARE(,int,__NOTHROW_RPC,usleep,(__useconds_t __useconds),(__useconds))
@@ -1565,7 +1553,6 @@ __CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)),char *,__NOTHRO
 __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* ... */
 __CDECLARE_OPT(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
-
 #ifndef __vfork_defined
 #define __vfork_defined 1
 #ifdef __CRT_HAVE_vfork
@@ -1629,15 +1616,12 @@ __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(voi
 #endif /* !... */
 #endif /* !__vfork_defined */
 #endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
-
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
-
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),(__fd))
-
 #ifdef __CRT_HAVE_getpgid
 /* >> getpgid(2)
  * Return the ID of the process group associated with `PID's process.
@@ -1653,12 +1637,10 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),(__pid))
  * When `PID' is ZERO(0), use `gettid()' for it instead */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__getpgid,(__pid))
 #endif /* ... */
-
 /* >> getsid(2)
  * Return the ID of the session which a process `PID' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),(__pid))
-
 #ifdef __CRT_HAVE_lchown
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
@@ -1685,7 +1667,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
-
 #if defined(__CRT_HAVE_truncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -1723,7 +1704,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN2K8
-
 #if !defined(__fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __fexecve_defined 1
 /* >> fexecve(2)
@@ -1813,7 +1793,6 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___
 #endif /* __USE_POSIX2 */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-
 #ifdef __CRT_HAVE_sync
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush
@@ -1828,19 +1807,21 @@ __CDECLARE_VOID(,__NOTHROW_RPC,sync,(void),())
  * made become visible on the underlying, persistent media */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sync, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL sync)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync))(); })
 #endif /* !__CRT_HAVE_sync */
-
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setpgrp,(void),())
-
-/* ... */
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
-
-/* ... */
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
-
-/* ... */
+/* >> gethostid(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 #if defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
@@ -1868,12 +1849,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpa
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
 #endif /* __ARCH_PAGESIZE */
 #endif /* !... */
-
-/* ... */
 #ifdef __CRT_HAVE_getdtablesize
+/* >> getdtablesize(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getdtablesize,(void),())
 #else /* __CRT_HAVE_getdtablesize */
 #include <libc/local/unistd/getdtablesize.h>
+/* >> getdtablesize(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdtablesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL getdtablesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdtablesize))(); })
 #endif /* !__CRT_HAVE_getdtablesize */
 #endif /* __USE_MISC || !__USE_XOPEN2K */
@@ -1886,7 +1867,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getdtablesize, __FORCELOCAL __ATTR_ARTIFICIAL __
  * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
-
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
@@ -1894,12 +1874,10 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setegid,(__gid_t __egid),(__egid))
 #endif /* __USE_XOPEN2K */
-
-#if defined(__USE_MISC) || \
-   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
-/* ... */
+#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
+/* >> ttyslot(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
-#endif
+#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_UNIX98) */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_symlink
@@ -1919,7 +1897,6 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,symlink,(char const *__link_
 __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL symlink)(char const *__link_text, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlink))(__link_text, __target_path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_symlinkat */
 #endif /* !__CRT_HAVE_symlink */
-
 #ifdef __CRT_HAVE_readlink
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -1974,58 +1951,49 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gethostname,(char *__name, 
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
-/* ... */
+/* >> setlogin(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setlogin,(char const *__name),(__name))
-
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),(__name,__len))
-
-/* ... */
+/* >> sethostid(3) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sethostid,(__LONGPTR_TYPE__ __id),(__id))
-
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
-
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),(__name,__len))
-
-/* ... */
+/* >> vhangup(3) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,vhangup,(void),())
-
-/* ... */
+/* >> profil(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,profil,(__UINT16_TYPE__ *__sample_buffer, size_t __size, size_t __offset, unsigned int __scale),(__sample_buffer,__size,__offset,__scale))
-
-/* ... */
+/* >> getusershell(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getusershell,(void),())
-
-/* ... */
+/* >> endusershell(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endusershell,(void),())
-
-/* ... */
+/* >> setusershell(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setusershell,(void),())
-
-/* ... */
+/* >> daemon(3) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
-
-/* ... */
+/* >> revoke(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,revoke,(char const *__file),(__file))
-
 #if !defined(__acct_defined) && defined(__CRT_HAVE_acct)
 #define __acct_defined 1
 /* Switch process accounting on and off */
 __CDECLARE(,int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
 #endif /* !__acct_defined && __CRT_HAVE_acct */
 #ifdef __CRT_HAVE_syscall
+/* >> syscall(2), syscall64(2) */
 __LIBC __LONGPTR_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall)(__LONGPTR_TYPE__ __sysno, ...) __CASMNAME_SAME("syscall");
 #endif /* __CRT_HAVE_syscall */
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_syscall
+/* >> syscall(2), syscall64(2) */
 __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,syscall64,(__syscall_ulong_t __sysno),syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #elif defined(__CRT_HAVE_syscall64)
+/* >> syscall(2), syscall64(2) */
 __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __sysno, ...) __CASMNAME_SAME("syscall64");
 #endif /* ... */
 #endif /* __USE_KOS */
@@ -2066,64 +2034,62 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__getentropy_defined */
 #endif /* __USE_MISC */
 
-#if (defined(__USE_MISC) || \
-     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+#if (defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
-
-/* ... */
 #if !defined(__getpass_defined) && defined(__CRT_HAVE_getpass)
 #define __getpass_defined 1
+/* >> getpass(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
 #endif /* !__getpass_defined && __CRT_HAVE_getpass */
 #endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate.h>
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftruncate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL ftruncate)(__fd_t __fd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, __length); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_ftruncate64
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate64.h>
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftruncate64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL ftruncate64)(__fd_t __fd, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate64))(__fd, __length); })
 #endif /* ... */
@@ -2136,8 +2102,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftruncate64, __FORCELOCAL __ATTR_ARTIFICIAL int 
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,brk,(void *__addr),(__addr))
 #ifdef __CRT_HAVE_sbrk
+/* >> brk(2), sbrk(2)
+ * Change the program break, allowing for a rudimentary implementation of a heap.
+ * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 __CDECLARE(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),(__delta))
 #elif defined(__CRT_HAVE___sbrk)
+/* >> brk(2), sbrk(2)
+ * Change the program break, allowing for a rudimentary implementation of a heap.
+ * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 __CREDIRECT(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),__sbrk,(__delta))
 #endif /* ... */
 #endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) || __USE_MISC */
@@ -2180,18 +2152,21 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, 
 #ifndef __swab_defined
 #define __swab_defined 1
 #ifdef __CRT_HAVE_swab
-/* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
+/* >> swab(3)
+ * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,swab,(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes),(__from,__to,__n_bytes))
 #elif defined(__CRT_HAVE__swab)
-/* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
+/* >> swab(3)
+ * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,swab,(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes),_swab,(__from,__to,__n_bytes))
 #else /* ... */
 #include <libc/local/unistd/swab.h>
-/* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
+/* >> swab(3)
+ * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); })
@@ -2200,8 +2175,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #endif /* __USE_XOPEN */
 
 
-#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
-     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 #ifndef __ctermid_defined
 #define __ctermid_defined 1
 #ifdef __CRT_HAVE_ctermid
@@ -2248,8 +2222,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL char *__
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
-#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
-     (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
+#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K))
 #ifndef ____pthread_atfork_func_t_defined
 #define ____pthread_atfork_func_t_defined 1
 typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
@@ -2279,11 +2252,13 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __pr
 #ifndef __ctermid_r_defined
 #define __ctermid_r_defined 1
 #ifdef __CRT_HAVE_ctermid_r
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
 #else /* __CRT_HAVE_ctermid_r */
 #include <libc/local/unistd/ctermid_r.h>
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
 #endif /* !__CRT_HAVE_ctermid_r */
 #endif /* !__ctermid_r_defined */
@@ -2404,13 +2379,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 #ifndef __closefrom_defined
 #define __closefrom_defined 1
 #ifdef __CRT_HAVE_closefrom
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
 #else /* __CRT_HAVE_closefrom */
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
 #include <libc/local/unistd/closefrom.h>
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom))(__lowfd); })
 #else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
 #undef __closefrom_defined
@@ -2430,9 +2407,15 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__rest
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
 #define __ioctl_defined 1
-/* Perform the I/O control operation specified by REQUEST on FD.
- * One argument may follow; its presence and type depend on REQUEST.
- * Return value depends on REQUEST. Usually -1 indicates error */
+/* >> ioctl(2)
+ * Perform the I/O control operation specified by `request' on `fd'.
+ * Many I/O control operations except an additional argument, though
+ * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
 #endif /* !__ioctl_defined && __CRT_HAVE_ioctl */
 #if !defined(__rexec_af_defined) && defined(__CRT_HAVE_rexec_af)
@@ -2470,20 +2453,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #ifndef __tell_defined
 #define __tell_defined 1
 #if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
 #elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
 #elif (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
 #else /* ... */
 #undef __tell_defined
@@ -2511,7 +2499,8 @@ __CREDIRECT_VOID(,__NOTHROW,yield,(void),__sched_yield,())
 __CDECLARE_VOID(,__NOTHROW,yield,(void),())
 #endif /* ... */
 #ifdef __CRT_HAVE_fchroot
-/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
@@ -2520,7 +2509,8 @@ __CDECLARE(,int,__NOTHROW_NCX,fchroot,(__fd_t __fd),(__fd))
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && defined(__AT_FDROOT)
 #include <libc/local/unistd/fchroot.h>
-/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
@@ -2528,7 +2518,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fchroot, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 #endif /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && __AT_FDROOT */
 #endif /* !__CRT_HAVE_fchroot */
 #ifdef __CRT_HAVE_resolvepath
-/* Similar to `frealpathat(2)' (though use the later for more options)
+/* >> resolvepath(3)
+ * Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
@@ -2543,7 +2534,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,resolvepath,(
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_frealpathat) && defined(__AT_FDCWD)
 #include <libc/local/unistd/resolvepath.h>
-/* Similar to `frealpathat(2)' (though use the later for more options)
+/* >> resolvepath(3)
+ * Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
@@ -2559,20 +2551,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(resolvepath, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifndef __tell_defined
 #define __tell_defined 1
 #if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
 #elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
 #elif (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
 #else /* ... */
 #undef __tell_defined
@@ -2582,14 +2579,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #ifndef __tell64_defined
 #define __tell64_defined 1
 #ifdef __CRT_HAVE_tell64
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CDECLARE(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,tell64,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__telli64)
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __CREDIRECT(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,tell64,(__fd_t __fd),_telli64,(__fd))
 #elif (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell64.h>
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tell64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off64_t __NOTHROW_NCX(__LIBCCALL tell64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell64))(__fd); })
 #else /* ... */
 #undef __tell64_defined

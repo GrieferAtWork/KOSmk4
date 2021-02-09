@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe853fc1c */
+/* HASH CRC-32:0x986ac9ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,8 @@
 DECL_BEGIN
 
 #include <libc/local/unicode_utf8seqlen.h>
-/* Read a single Unicode character from a given UTF-8 string */
+/* >> unicode_readutf8(3)
+ * Read a single Unicode character from a given UTF-8 string */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext) {
 	char32_t result;
@@ -110,7 +111,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext) {
 	*ptext = iter;
 	return result;
 }
-/* Same as `unicode_readutf8', but read backwards, with `*ptext'
+/* >> unicode_readutf8_rev(3)
+ * Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
@@ -194,7 +196,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(char const **__restrict ptext) {
 	*ptext = iter;
 	return result;
 }
-/* Same as `unicode_readutf8()', but don't read past `text_end' */
+/* >> unicode_readutf8_n(3)
+ * Same as `unicode_readutf8()', but don't read past `text_end' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext,
                                               char const *text_end) {
@@ -282,7 +285,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext,
 	*ptext = iter;
 	return result;
 }
-/* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
+/* >> unicode_readutf8_rev_n(3)
+ * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext,
                                                   char const *text_start) {
@@ -369,7 +373,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext,
 	*ptext = iter;
 	return result;
 }
-/* Read a single Unicode character from a given UTF-16 string */
+/* >> unicode_readutf16(3)
+ * Read a single Unicode character from a given UTF-16 string */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(char16_t const **__restrict ptext) {
 	char32_t result;
@@ -385,7 +390,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(char16_t const **__restrict ptext) 
 	*ptext = text;
 	return result;
 }
-/* Same as `unicode_readutf16()', but don't read past `text_end' */
+/* >> unicode_readutf16_n(3)
+ * Same as `unicode_readutf16()', but don't read past `text_end' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(char16_t const **__restrict ptext,
                                                char16_t const *text_end) {
@@ -406,7 +412,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(char16_t const **__restrict ptext
 	return result;
 }
 #include <hybrid/__byteswap.h>
-/* Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU */
+/* >> unicode_readutf16_swap(3)
+ * Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(char16_t const **__restrict ptext) {
 	char32_t result;
@@ -424,7 +431,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(char16_t const **__restrict pt
 	*ptext = text;
 	return result;
 }
-/* Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU */
+/* >> unicode_readutf16_swap_n(3)
+ * Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(char16_t const **__restrict ptext,
                                                     char16_t const *text_end) {
@@ -446,7 +454,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(char16_t const **__restrict 
 	*ptext = text;
 	return result;
 }
-/* Same as `unicode_readutf16', but read backwards, with `*ptext'
+/* >> unicode_readutf16_rev(3)
+ * Same as `unicode_readutf16', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
@@ -465,7 +474,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(char16_t const **__restrict pte
 	*ptext = text;
 	return result;
 }
-/* Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU */
+/* >> unicode_readutf16_swap_rev(3)
+ * Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(char16_t const **__restrict ptext) {
 	char32_t result;
@@ -483,7 +493,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(char16_t const **__restric
 	*ptext = text;
 	return result;
 }
-/* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
+/* >> unicode_readutf16_rev_n(3)
+ * Same as `unicode_readutf16_rev()', but don't read ahead of `text_start' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict ptext,
                                                    char16_t const *text_start) {
@@ -503,7 +514,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict p
 	*ptext = text;
 	return result;
 }
-/* Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
+/* >> unicode_readutf16_swap_rev_n(3)
+ * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext,
                                                         char16_t const *text_start) {
@@ -524,7 +536,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restr
 	*ptext = text;
 	return result;
 }
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf8(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
@@ -567,7 +580,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
 	}
 	return dst;
 }
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf16(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst,
@@ -581,7 +595,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst,
 	}
 	return dst;
 }
-/* Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
+/* >> unicode_writeutf16_chk(3)
+ * Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst,
                                                   char32_t ch) {
@@ -596,7 +611,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst,
 	}
 	return dst;
 }
-/* Convert a given utf-8 string to utf-16.
+/* >> unicode_8to16(3)
+ * Convert a given utf-8 string to utf-16.
  * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
  * @param: utf8_text: The input UTF-8 string to convert
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
@@ -614,7 +630,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst,
 	return utf16_dst;
 }
 #ifndef __KERNEL__
-/* Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
+/* >> unicode_8to16_chk(3)
+ * Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
  * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
  * @param: utf8_text: The input UTF-8 string to convert
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
@@ -635,7 +652,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst,
 	return utf16_dst;
 }
 #endif /* !__KERNEL__ */
-/* Convert a given utf-8 string to utf-32.
+/* >> unicode_8to32(3)
+ * Convert a given utf-8 string to utf-32.
  * @param: utf32_dst: A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_characters)' dwords, or `*4' bytes
  * @param: utf8_text: The input UTF-8 string to convert
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
@@ -649,7 +667,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst,
 		*utf32_dst++ = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
 	return utf32_dst;
 }
-/* Convert a given utf-16 string to utf-8.
+/* >> unicode_16to8(3)
+ * Convert a given utf-16 string to utf-8.
  * @param: utf8_dst: A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_characters)' bytes
  * @param: utf16_text: The input UTF-16 string to convert
  * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
@@ -675,7 +694,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst,
 	}
 	return utf8_dst;
 }
-/* Convert a given utf-16 string to utf-32.
+/* >> unicode_16to32(3)
+ * Convert a given utf-16 string to utf-32.
  * @param: utf32_dst: A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_characters)' dwords, or *4 bytes
  * @param: utf16_text: The input UTF-16 string to convert
  * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
@@ -689,7 +709,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst,
 		*utf32_dst++ = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
 	return utf32_dst;
 }
-/* Convert a given utf-32 string to utf-8.
+/* >> unicode_32to8(3)
+ * Convert a given utf-32 string to utf-8.
  * @param: utf8_dst: A buffer of at least `UNICODE_32TO8_MAXBUF(utf16_characters)' bytes
  * @param: utf32_text: The input UTF-32 string to convert
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
@@ -702,7 +723,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(char *__restrict utf8_dst,
 		utf8_dst = libc_unicode_writeutf8(utf8_dst, *utf32_text++);
 	return utf8_dst;
 }
-/* Convert a given utf-32 string to utf-16.
+/* >> unicode_32to16(3)
+ * Convert a given utf-32 string to utf-16.
  * @param: utf16_dst: A buffer of at least `UNICODE_32TO16_MAXBUF(utf16_characters)' words, or *2 bytes
  * @param: utf32_text: The input UTF-32 string to convert
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
@@ -716,7 +738,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst,
 	return utf16_dst;
 }
 #ifndef __KERNEL__
-/* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
+/* >> unicode_c8toc16(3)
+ * @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
@@ -850,7 +873,8 @@ done_empty:
 done:
 	return i + 1;
 }
-/* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
+/* >> unicode_c8toc32(3)
+ * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
@@ -969,7 +993,8 @@ done:
 #include <bits/crt/mbstate.h>
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
-/* Format printer (compatible with `__pformatprinter') for
+/* >> format_8to16(3)
+ * Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-16 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg,
@@ -1012,7 +1037,8 @@ err:
 #include <bits/crt/mbstate.h>
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
-/* Format printer (compatible with `__pformatprinter') for
+/* >> format_8to32(3)
+ * Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg,
@@ -1053,7 +1079,8 @@ err:
 	return temp;
 }
 #include <bits/crt/format-printer.h>
-/* Format printer (compatible with `__pc16formatprinter') for
+/* >> format_wto8(3)
+ * Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
@@ -1135,7 +1162,8 @@ err:
 
 }
 #include <bits/crt/format-printer.h>
-/* Format printer (compatible with `__pc16formatprinter') for
+/* >> format_wto8(3)
+ * Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg,
@@ -1217,7 +1245,8 @@ err:
 
 }
 #include <bits/crt/uformat-printer.h>
-/* Format printer (compatible with `__pc16formatprinter') for
+/* >> format_wto32(3)
+ * Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg,
@@ -1284,7 +1313,8 @@ err:
 
 }
 #include <bits/crt/uformat-printer.h>
-/* Format printer (compatible with `__pc16formatprinter') for
+/* >> format_wto32(3)
+ * Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg,
@@ -1352,7 +1382,8 @@ NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg,
 }
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
-/* Format printer (compatible with `pwformatprinter') for
+/* >> format_wto16(3)
+ * Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
@@ -1393,7 +1424,8 @@ NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
 }
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
-/* Format printer (compatible with `pwformatprinter') for
+/* >> format_wto16(3)
+ * Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,

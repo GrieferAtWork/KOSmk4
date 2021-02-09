@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc613b4f3 */
+/* HASH CRC-32:0x67eb36bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -499,12 +499,20 @@ __CDECLARE_SC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__buf, __si
 __CDECLARE_SC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(getdents64) */
 #if __CRT_HAVE_SC(getegid)
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 __CDECLARE_SC(,__gid_t,getegid,(void),())
 #endif /* __CRT_HAVE_SC(getegid) */
 #if __CRT_HAVE_SC(geteuid)
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 __CDECLARE_SC(,__uid_t,geteuid,(void),())
 #endif /* __CRT_HAVE_SC(geteuid) */
 #if __CRT_HAVE_SC(getgid)
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 __CDECLARE_SC(,__gid_t,getgid,(void),())
 #endif /* __CRT_HAVE_SC(getgid) */
 #if __CRT_HAVE_SC(getgroups)
@@ -549,9 +557,15 @@ __CDECLARE_SC(,__syscall_slong_t,getpriority,(__syscall_ulong_t __which, __id_t 
 __CDECLARE_SC(,__ssize_t,getrandom,(void *__buf, __size_t __num_bytes, __syscall_ulong_t __flags),(__buf,__num_bytes,__flags))
 #endif /* __CRT_HAVE_SC(getrandom) */
 #if __CRT_HAVE_SC(getresgid)
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
 #endif /* __CRT_HAVE_SC(getresgid) */
 #if __CRT_HAVE_SC(getresuid)
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_SC(getresuid) */
 #if __CRT_HAVE_SC(getrlimit)
@@ -599,6 +613,8 @@ __CDECLARE_SC(,__pid_t,gettid,(void),())
 __CDECLARE_SC(,__errno_t,gettimeofday,(struct timeval *__tv, struct timezone *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_SC(gettimeofday) */
 #if __CRT_HAVE_SC(getuid)
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 __CDECLARE_SC(,__uid_t,getuid,(void),())
 #endif /* __CRT_HAVE_SC(getuid) */
 #if __CRT_HAVE_SC(getxattr)
@@ -1206,12 +1222,26 @@ __CDECLARE_SC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 __CDECLARE_SC(,__errno_t,setdomainname,(char const *__name, __size_t __len),(__name,__len))
 #endif /* __CRT_HAVE_SC(setdomainname) */
 #if __CRT_HAVE_SC(setfsgid)
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_SC(,__errno_t,setfsgid,(__gid_t __gid),(__gid))
 #endif /* __CRT_HAVE_SC(setfsgid) */
 #if __CRT_HAVE_SC(setfsuid)
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_SC(,__errno_t,setfsuid,(__uid_t __uid),(__uid))
 #endif /* __CRT_HAVE_SC(setfsuid) */
 #if __CRT_HAVE_SC(setgid)
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_SC(,__errno_t,setgid,(__gid_t __gid),(__gid))
 #endif /* __CRT_HAVE_SC(setgid) */
 #if __CRT_HAVE_SC(setgroups)
@@ -1235,15 +1265,31 @@ __CDECLARE_SC(,__errno_t,setpgid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
 __CDECLARE_SC(,__errno_t,setpriority,(__syscall_ulong_t __which, __id_t __who, __syscall_ulong_t __value),(__which,__who,__value))
 #endif /* __CRT_HAVE_SC(setpriority) */
 #if __CRT_HAVE_SC(setregid)
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_SC(,__errno_t,setregid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
 #endif /* __CRT_HAVE_SC(setregid) */
 #if __CRT_HAVE_SC(setresgid)
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_SC(,__errno_t,setresgid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __CRT_HAVE_SC(setresgid) */
 #if __CRT_HAVE_SC(setresuid)
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_SC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_SC(setresuid) */
 #if __CRT_HAVE_SC(setreuid)
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_SC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_SC(setreuid) */
 #if __CRT_HAVE_SC(setrlimit)
@@ -1268,6 +1314,10 @@ __CDECLARE_SC(,__errno_t,setsockopt,(__fd_t __sockfd, __syscall_ulong_t __level,
 __CDECLARE_SC(,__errno_t,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_SC(settimeofday) */
 #if __CRT_HAVE_SC(setuid)
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_SC(,__errno_t,setuid,(__uid_t __uid),(__uid))
 #endif /* __CRT_HAVE_SC(setuid) */
 #if __CRT_HAVE_SC(setxattr)
@@ -1910,12 +1960,20 @@ __CDECLARE_XSC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__buf, __s
 __CDECLARE_XSC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(getdents64) */
 #if __CRT_HAVE_XSC(getegid)
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 __CDECLARE_XSC(,__gid_t,getegid,(void),())
 #endif /* __CRT_HAVE_XSC(getegid) */
 #if __CRT_HAVE_XSC(geteuid)
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 __CDECLARE_XSC(,__uid_t,geteuid,(void),())
 #endif /* __CRT_HAVE_XSC(geteuid) */
 #if __CRT_HAVE_XSC(getgid)
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 __CDECLARE_XSC(,__gid_t,getgid,(void),())
 #endif /* __CRT_HAVE_XSC(getgid) */
 #if __CRT_HAVE_XSC(getgroups)
@@ -1960,9 +2018,15 @@ __CDECLARE_XSC(,__syscall_slong_t,getpriority,(__syscall_ulong_t __which, __id_t
 __CDECLARE_XSC(,__ssize_t,getrandom,(void *__buf, __size_t __num_bytes, __syscall_ulong_t __flags),(__buf,__num_bytes,__flags))
 #endif /* __CRT_HAVE_XSC(getrandom) */
 #if __CRT_HAVE_XSC(getresgid)
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
 #endif /* __CRT_HAVE_XSC(getresgid) */
 #if __CRT_HAVE_XSC(getresuid)
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_XSC(getresuid) */
 #if __CRT_HAVE_XSC(getrlimit)
@@ -2010,6 +2074,8 @@ __CDECLARE_XSC(,__pid_t,gettid,(void),())
 __CDECLARE_XSC(,__errno_t,gettimeofday,(struct timeval *__tv, struct timezone *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_XSC(gettimeofday) */
 #if __CRT_HAVE_XSC(getuid)
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 __CDECLARE_XSC(,__uid_t,getuid,(void),())
 #endif /* __CRT_HAVE_XSC(getuid) */
 #if __CRT_HAVE_XSC(getxattr)
@@ -2614,12 +2680,26 @@ __CDECLARE_XSC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 __CDECLARE_XSC(,__errno_t,setdomainname,(char const *__name, __size_t __len),(__name,__len))
 #endif /* __CRT_HAVE_XSC(setdomainname) */
 #if __CRT_HAVE_XSC(setfsgid)
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_XSC(,__errno_t,setfsgid,(__gid_t __gid),(__gid))
 #endif /* __CRT_HAVE_XSC(setfsgid) */
 #if __CRT_HAVE_XSC(setfsuid)
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_XSC(,__errno_t,setfsuid,(__uid_t __uid),(__uid))
 #endif /* __CRT_HAVE_XSC(setfsuid) */
 #if __CRT_HAVE_XSC(setgid)
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_XSC(,__errno_t,setgid,(__gid_t __gid),(__gid))
 #endif /* __CRT_HAVE_XSC(setgid) */
 #if __CRT_HAVE_XSC(setgroups)
@@ -2643,15 +2723,31 @@ __CDECLARE_XSC(,__errno_t,setpgid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid)
 __CDECLARE_XSC(,__errno_t,setpriority,(__syscall_ulong_t __which, __id_t __who, __syscall_ulong_t __value),(__which,__who,__value))
 #endif /* __CRT_HAVE_XSC(setpriority) */
 #if __CRT_HAVE_XSC(setregid)
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_XSC(,__errno_t,setregid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
 #endif /* __CRT_HAVE_XSC(setregid) */
 #if __CRT_HAVE_XSC(setresgid)
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 __CDECLARE_XSC(,__errno_t,setresgid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __CRT_HAVE_XSC(setresgid) */
 #if __CRT_HAVE_XSC(setresuid)
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_XSC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_XSC(setresuid) */
 #if __CRT_HAVE_XSC(setreuid)
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_XSC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_XSC(setreuid) */
 #if __CRT_HAVE_XSC(setrlimit)
@@ -2676,6 +2772,10 @@ __CDECLARE_XSC(,__errno_t,setsockopt,(__fd_t __sockfd, __syscall_ulong_t __level
 __CDECLARE_XSC(,__errno_t,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_XSC(settimeofday) */
 #if __CRT_HAVE_XSC(setuid)
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 __CDECLARE_XSC(,__errno_t,setuid,(__uid_t __uid),(__uid))
 #endif /* __CRT_HAVE_XSC(setuid) */
 #if __CRT_HAVE_XSC(setxattr)

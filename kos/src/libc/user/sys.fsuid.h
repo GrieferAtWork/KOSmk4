@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92abd1b3 */
+/* HASH CRC-32:0x9268f655 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,17 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Change uid used for file access control to UID, without affecting
- * other privileges (such as who can send signals at the process) */
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid);
-/* Same as `setfsuid()', but for group id */
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid);
 #endif /* !__KERNEL__ */
 

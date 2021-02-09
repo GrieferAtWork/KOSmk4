@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbad6ae44 */
+/* HASH CRC-32:0xe0684e15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,8 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __LOCAL_LIBC(tell64) __ATTR_WUNUSED __off64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tell64))(__fd_t __fd) {
 	return __localdep_lseek64(__fd, 0, __SEEK_CUR);

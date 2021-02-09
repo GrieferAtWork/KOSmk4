@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6502994 */
+/* HASH CRC-32:0x59da0096 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,10 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/* Put information about the system in NAME */
+/* >> uname(2)
+ * Put information about the system in NAME
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
 
 __SYSDECL_END

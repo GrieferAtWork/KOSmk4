@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28a2c4af */
+/* HASH CRC-32:0xf0f03236 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Similar to `frealpathat(2)' (though use the later for more options)
+/* >> resolvepath(3)
+ * Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument

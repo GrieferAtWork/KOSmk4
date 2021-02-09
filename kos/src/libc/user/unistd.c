@@ -272,7 +272,11 @@ NOTHROW_NCX(LIBCCALL libc_getegid)(void)
 }
 /*[[[end:libc_getegid]]]*/
 
-/*[[[head:libc_getgroups,hash:CRC-32=0x31b8a826]]]*/
+/*[[[head:libc_getgroups,hash:CRC-32=0x1550b567]]]*/
+/* >> getgroups(2)
+ * @return: * : [count == 0] The required number of groups
+ * @return: * : [count != 0] The number of groups that were actually returned
+ * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
                                      gid_t list[])
@@ -524,7 +528,8 @@ NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
 
 
 
-/*[[[head:libc_setlogin,hash:CRC-32=0x9d72f9a]]]*/
+/*[[[head:libc_setlogin,hash:CRC-32=0x6accf5bf]]]*/
+/* >> setlogin(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 /*[[[body:libc_setlogin]]]*/
@@ -1125,7 +1130,11 @@ NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid)
 }
 /*[[[end:libc_group_member]]]*/
 
-/*[[[head:libc_getresuid,hash:CRC-32=0x806e2ee8]]]*/
+/*[[[head:libc_getresuid,hash:CRC-32=0x5ba5736d]]]*/
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
                                      uid_t *euid,
@@ -1144,7 +1153,11 @@ NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
 }
 /*[[[end:libc_getresuid]]]*/
 
-/*[[[head:libc_getresgid,hash:CRC-32=0xf1a2dfa2]]]*/
+/*[[[head:libc_getresgid,hash:CRC-32=0xa6a58713]]]*/
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
                                      gid_t *egid,
@@ -1163,7 +1176,12 @@ NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
 }
 /*[[[end:libc_getresgid]]]*/
 
-/*[[[head:libc_setresuid,hash:CRC-32=0x9f09ac68]]]*/
+/*[[[head:libc_setresuid,hash:CRC-32=0x3482425f]]]*/
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid,
                                      uid_t euid,
@@ -1182,7 +1200,11 @@ NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid,
 }
 /*[[[end:libc_setresuid]]]*/
 
-/*[[[head:libc_setresgid,hash:CRC-32=0xdf303ae7]]]*/
+/*[[[head:libc_setresgid,hash:CRC-32=0xddb24490]]]*/
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid,
                                      gid_t egid,
@@ -1401,7 +1423,11 @@ NOTHROW_NCX(LIBCCALL libc_setpgrp)(void)
 }
 /*[[[end:libc_setpgrp]]]*/
 
-/*[[[head:libc_setreuid,hash:CRC-32=0xe0eef986]]]*/
+/*[[[head:libc_setreuid,hash:CRC-32=0xb1ea64ca]]]*/
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid,
                                     uid_t euid)
@@ -1418,7 +1444,11 @@ NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid,
 }
 /*[[[end:libc_setreuid]]]*/
 
-/*[[[head:libc_setregid,hash:CRC-32=0x8bdb5855]]]*/
+/*[[[head:libc_setregid,hash:CRC-32=0xd668752]]]*/
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
                                     gid_t egid)
@@ -1438,7 +1468,8 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_pathname") char const hostid_pathname[] = "/etc";
 PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_filename") char const hostid_filename[] = "/etc/hostid";
 
-/*[[[head:libc_gethostid,hash:CRC-32=0x309164ac]]]*/
+/*[[[head:libc_gethostid,hash:CRC-32=0xd6c89d9b]]]*/
+/* >> gethostid(3) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
 NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
 /*[[[body:libc_gethostid]]]*/
@@ -1458,7 +1489,8 @@ NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
 }
 /*[[[end:libc_gethostid]]]*/
 
-/*[[[head:libc_sethostid,hash:CRC-32=0x804d684b]]]*/
+/*[[[head:libc_sethostid,hash:CRC-32=0xb3db0ff1]]]*/
+/* >> sethostid(3) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") int
 NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id)
 /*[[[body:libc_sethostid]]]*/
@@ -1554,7 +1586,8 @@ NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
 }
 /*[[[end:libc_setegid]]]*/
 
-/*[[[head:libc_ttyslot,hash:CRC-32=0xfed7d754]]]*/
+/*[[[head:libc_ttyslot,hash:CRC-32=0xed7869b6]]]*/
+/* >> ttyslot(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 /*[[[body:libc_ttyslot]]]*/
@@ -1677,7 +1710,8 @@ NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name,
 }
 /*[[[end:libc_setdomainname]]]*/
 
-/*[[[head:libc_vhangup,hash:CRC-32=0x3044b4c0]]]*/
+/*[[[head:libc_vhangup,hash:CRC-32=0x30a39db6]]]*/
+/* >> vhangup(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_vhangup)(void)
 /*[[[body:libc_vhangup]]]*/
@@ -1688,7 +1722,8 @@ NOTHROW_NCX(LIBCCALL libc_vhangup)(void)
 }
 /*[[[end:libc_vhangup]]]*/
 
-/*[[[head:libc_profil,hash:CRC-32=0x994cbdf3]]]*/
+/*[[[head:libc_profil,hash:CRC-32=0x48b90317]]]*/
+/* >> profil(3) */
 INTERN ATTR_SECTION(".text.crt.system.utility") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer,
                                   size_t size,
@@ -1713,7 +1748,8 @@ NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer,
 }
 /*[[[end:libc_profil]]]*/
 
-/*[[[head:libc_getusershell,hash:CRC-32=0x89f58eb4]]]*/
+/*[[[head:libc_getusershell,hash:CRC-32=0x620a6b9c]]]*/
+/* >> getusershell(3) */
 INTERN ATTR_SECTION(".text.crt.database.shell") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
 /*[[[body:libc_getusershell]]]*/
@@ -1724,7 +1760,8 @@ NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
 }
 /*[[[end:libc_getusershell]]]*/
 
-/*[[[head:libc_endusershell,hash:CRC-32=0xddd668fc]]]*/
+/*[[[head:libc_endusershell,hash:CRC-32=0xd5d53e38]]]*/
+/* >> endusershell(3) */
 INTERN ATTR_SECTION(".text.crt.database.shell") void
 NOTHROW_NCX(LIBCCALL libc_endusershell)(void)
 /*[[[body:libc_endusershell]]]*/
@@ -1734,7 +1771,8 @@ NOTHROW_NCX(LIBCCALL libc_endusershell)(void)
 }
 /*[[[end:libc_endusershell]]]*/
 
-/*[[[head:libc_setusershell,hash:CRC-32=0xa958a6d9]]]*/
+/*[[[head:libc_setusershell,hash:CRC-32=0xdab349fb]]]*/
+/* >> setusershell(3) */
 INTERN ATTR_SECTION(".text.crt.database.shell") void
 NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 /*[[[body:libc_setusershell]]]*/
@@ -1747,7 +1785,8 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 PRIVATE ATTR_SECTION(".rodata.crt.system.utility.root") char const root[] = "/";
 PRIVATE ATTR_SECTION(".rodata.crt.system.utility.dev_null") char const dev_null[] = "/dev/null";
 
-/*[[[head:libc_daemon,hash:CRC-32=0xae3ecb6]]]*/
+/*[[[head:libc_daemon,hash:CRC-32=0xbc774599]]]*/
+/* >> daemon(3) */
 INTERN ATTR_SECTION(".text.crt.system.utility") int
 NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir,
                                   __STDC_INT_AS_UINT_T noclose)
@@ -1783,7 +1822,8 @@ NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir,
 }
 /*[[[end:libc_daemon]]]*/
 
-/*[[[head:libc_revoke,hash:CRC-32=0x78e6ad8b]]]*/
+/*[[[head:libc_revoke,hash:CRC-32=0x96b7f405]]]*/
+/* >> revoke(3) */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:libc_revoke]]]*/
@@ -1816,7 +1856,8 @@ NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 }
 /*[[[end:libc_chroot]]]*/
 
-/*[[[head:libc_getpass,hash:CRC-32=0x3bec8ea3]]]*/
+/*[[[head:libc_getpass,hash:CRC-32=0xce218dd2]]]*/
+/* >> getpass(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
 /*[[[body:libc_getpass]]]*/
@@ -1828,8 +1869,8 @@ NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
 }
 /*[[[end:libc_getpass]]]*/
 
-/*[[[head:libc_ftruncate,hash:CRC-32=0xe79ad65f]]]*/
-/* >> ftruncate(2)
+/*[[[head:libc_ftruncate,hash:CRC-32=0xb64cac17]]]*/
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTERN ATTR_SECTION(".text.crt.io.write") int
 NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
@@ -1842,11 +1883,11 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
 }
 /*[[[end:libc_ftruncate]]]*/
 
-/*[[[head:libc_ftruncate64,hash:CRC-32=0x5703b896]]]*/
+/*[[[head:libc_ftruncate64,hash:CRC-32=0x2aad9505]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_ftruncate64, libc_ftruncate);
 #else /* MAGIC:alias */
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTERN ATTR_SECTION(".text.crt.io.large.write") int
 NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
@@ -1922,7 +1963,10 @@ NOTHROW_NCX(LIBCCALL libc_brk)(void *addr)
 }
 /*[[[end:libc_brk]]]*/
 
-/*[[[head:libc_sbrk,hash:CRC-32=0x4e0ccd70]]]*/
+/*[[[head:libc_sbrk,hash:CRC-32=0x89be8296]]]*/
+/* >> brk(2), sbrk(2)
+ * Change the program break, allowing for a rudimentary implementation of a heap.
+ * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTERN ATTR_SECTION(".text.crt.heap.utility") void *
 NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta)
 /*[[[body:libc_sbrk]]]*/
@@ -3557,8 +3601,9 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 }
 /*[[[end:libc_fdatasync]]]*/
 
-/*[[[head:libc_ctermid_r,hash:CRC-32=0xf415d72d]]]*/
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/*[[[head:libc_ctermid_r,hash:CRC-32=0x56be854b]]]*/
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 INTERN ATTR_SECTION(".text.crt.io.tty") char *
 NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 /*[[[body:libc_ctermid_r]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d7724ac */
+/* HASH CRC-32:0x510d881a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
-/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+/* >> tell(3), tell64(3)
+ * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __LOCAL_LIBC(tell) __ATTR_WUNUSED __FS_TYPE(off)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tell))(__fd_t __fd) {
 	return __localdep_lseek(__fd, 0, __SEEK_CUR);

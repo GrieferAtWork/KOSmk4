@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x384ac492 */
+/* HASH CRC-32:0x7cfdfd6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,15 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Perform the I/O control operation specified by REQUEST on FD.
- * One argument may follow; its presence and type depend on REQUEST.
- * Return value depends on REQUEST. Usually -1 indicates error */
+/* >> ioctl(2)
+ * Perform the I/O control operation specified by `request' on `fd'.
+ * Many I/O control operations except an additional argument, though
+ * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
 #endif /* !__local___localdep_ioctl_defined */
 /* >> tcgetattr(3)

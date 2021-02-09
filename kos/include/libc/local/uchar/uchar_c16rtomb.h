@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4462c1be */
+/* HASH CRC-32:0xa28e82be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf8_defined
 #define __local___localdep_unicode_writeutf8_defined 1
 #ifdef __CRT_HAVE_unicode_writeutf8
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf8(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_writeutf8.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+/* >> unicode_writeutf8(3)
+ * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 #define __localdep_unicode_writeutf8 __LIBC_LOCAL_NAME(unicode_writeutf8)
 #endif /* !__CRT_HAVE_unicode_writeutf8 */

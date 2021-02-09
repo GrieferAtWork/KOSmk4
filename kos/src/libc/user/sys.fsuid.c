@@ -32,9 +32,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_setfsuid,hash:CRC-32=0x102f7477]]]*/
-/* Change uid used for file access control to UID, without affecting
- * other privileges (such as who can send signals at the process) */
+/*[[[head:libc_setfsuid,hash:CRC-32=0xa159ce79]]]*/
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 /*[[[body:libc_setfsuid]]]*/
@@ -49,8 +52,12 @@ NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 }
 /*[[[end:libc_setfsuid]]]*/
 
-/*[[[head:libc_setfsgid,hash:CRC-32=0xae141683]]]*/
-/* Same as `setfsuid()', but for group id */
+/*[[[head:libc_setfsgid,hash:CRC-32=0x7fa8c2a3]]]*/
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 /*[[[body:libc_setfsgid]]]*/

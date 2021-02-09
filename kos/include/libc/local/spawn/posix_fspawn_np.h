@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce25eba0 */
+/* HASH CRC-32:0xfffb9d87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,7 +97,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #ifndef __local___localdep_closefrom_defined
 #define __local___localdep_closefrom_defined 1
 #ifdef __CRT_HAVE_closefrom
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_closefrom,(__fd_t __lowfd),closefrom,(__lowfd))
 #else /* __CRT_HAVE_closefrom */
 __NAMESPACE_LOCAL_END
@@ -107,7 +108,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/closefrom.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+/* >> closefrom(2)
+ * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 #define __localdep_closefrom __LIBC_LOCAL_NAME(closefrom)
 #else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
 #undef __local___localdep_closefrom_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9825dcc1 */
+/* HASH CRC-32:0xbf8f1330 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,8 +42,8 @@ __NAMESPACE_LOCAL_END
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execvpe,(char const *__restrict __file, __TARGV, __TENVP),execvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
 __NAMESPACE_LOCAL_END
@@ -59,16 +59,16 @@ __NAMESPACE_LOCAL_END
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/execvpe.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `FILE' and
+ * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 #define __localdep_execvpe __LIBC_LOCAL_NAME(execvpe)
 #else /* ... */
 #undef __local___localdep_execvpe_defined

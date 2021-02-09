@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x239271c7 */
+/* HASH CRC-32:0x30ded5b5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -733,6 +733,10 @@ INTERN_FUNCTION(libc_sys_umount)
 END(libc_sys_umount)
 DEFINE_PUBLIC_ALIAS(sys_umount, libc_sys_umount)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid(uint16_t uid) */
 INTERN_FUNCTION(libc_sys_setuid)
 	movl   $(0x17), %eax
@@ -740,6 +744,8 @@ INTERN_FUNCTION(libc_sys_setuid)
 END(libc_sys_setuid)
 DEFINE_PUBLIC_ALIAS(sys_setuid, libc_sys_setuid)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint16_t getuid(void) */
 INTERN_FUNCTION(libc_sys_getuid)
 	movl   $(0x18), %eax
@@ -897,6 +903,10 @@ INTERN_FUNCTION(libc_sys_brk)
 END(libc_sys_brk)
 DEFINE_PUBLIC_ALIAS(sys_brk, libc_sys_brk)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid(uint16_t gid) */
 INTERN_FUNCTION(libc_sys_setgid)
 	movl   $(0x2e), %eax
@@ -904,6 +914,8 @@ INTERN_FUNCTION(libc_sys_setgid)
 END(libc_sys_setgid)
 DEFINE_PUBLIC_ALIAS(sys_setgid, libc_sys_setgid)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint16_t getgid(void) */
 INTERN_FUNCTION(libc_sys_getgid)
 	movl   $(0x2f), %eax
@@ -918,6 +930,9 @@ INTERN_FUNCTION(libc_sys_signal)
 END(libc_sys_signal)
 DEFINE_PUBLIC_ALIAS(sys_signal, libc_sys_signal)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t geteuid(void) */
 INTERN_FUNCTION(libc_sys_geteuid)
 	movl   $(0x31), %eax
@@ -925,6 +940,9 @@ INTERN_FUNCTION(libc_sys_geteuid)
 END(libc_sys_geteuid)
 DEFINE_PUBLIC_ALIAS(sys_geteuid, libc_sys_geteuid)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t getegid(void) */
 INTERN_FUNCTION(libc_sys_getegid)
 	movl   $(0x32), %eax
@@ -1065,6 +1083,10 @@ INTERN_FUNCTION(libc_sys_ssetmask)
 END(libc_sys_ssetmask)
 DEFINE_PUBLIC_ALIAS(sys_ssetmask, libc_sys_ssetmask)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
 INTERN_FUNCTION(libc_sys_setreuid)
 	movl   $(0x46), %eax
@@ -1072,6 +1094,10 @@ INTERN_FUNCTION(libc_sys_setreuid)
 END(libc_sys_setreuid)
 DEFINE_PUBLIC_ALIAS(sys_setreuid, libc_sys_setreuid)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid(uint16_t rgid, uint16_t egid) */
 INTERN_FUNCTION(libc_sys_setregid)
 	movl   $(0x47), %eax
@@ -1598,6 +1624,11 @@ INTERN_FUNCTION(libc_sys_afs_syscall)
 END(libc_sys_afs_syscall)
 DEFINE_PUBLIC_ALIAS(sys_afs_syscall, libc_sys_afs_syscall)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid(uint16_t uid) */
 INTERN_FUNCTION(libc_sys_setfsuid)
 	movl   $(0x8a), %eax
@@ -1605,6 +1636,11 @@ INTERN_FUNCTION(libc_sys_setfsuid)
 END(libc_sys_setfsuid)
 DEFINE_PUBLIC_ALIAS(sys_setfsuid, libc_sys_setfsuid)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid(uint16_t gid) */
 INTERN_FUNCTION(libc_sys_setfsgid)
 	movl   $(0x8b), %eax
@@ -1804,6 +1840,10 @@ INTERN_FUNCTION(libc_sys_mremap)
 END(libc_sys_mremap)
 DEFINE_PUBLIC_ALIAS(sys_mremap, libc_sys_mremap)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
 INTERN_FUNCTION(libc_sys_setresuid)
 	movl   $(0xa4), %eax
@@ -1811,6 +1851,9 @@ INTERN_FUNCTION(libc_sys_setresuid)
 END(libc_sys_setresuid)
 DEFINE_PUBLIC_ALIAS(sys_setresuid, libc_sys_setresuid)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
 INTERN_FUNCTION(libc_sys_getresuid)
 	movl   $(0xa5), %eax
@@ -1846,6 +1889,10 @@ INTERN_FUNCTION(libc_sys_nfsservctl)
 END(libc_sys_nfsservctl)
 DEFINE_PUBLIC_ALIAS(sys_nfsservctl, libc_sys_nfsservctl)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
 INTERN_FUNCTION(libc_sys_setresgid)
 	movl   $(0xaa), %eax
@@ -1853,6 +1900,9 @@ INTERN_FUNCTION(libc_sys_setresgid)
 END(libc_sys_setresgid)
 DEFINE_PUBLIC_ALIAS(sys_setresgid, libc_sys_setresgid)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 INTERN_FUNCTION(libc_sys_getresgid)
 	movl   $(0xab), %eax
@@ -2085,6 +2135,8 @@ INTERN_FUNCTION(libc_sys_lchown32)
 END(libc_sys_lchown32)
 DEFINE_PUBLIC_ALIAS(sys_lchown32, libc_sys_lchown32)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint32_t getuid32(void) */
 INTERN_FUNCTION(libc_sys_getuid32)
 	movl   $(0xc7), %eax
@@ -2092,6 +2144,8 @@ INTERN_FUNCTION(libc_sys_getuid32)
 END(libc_sys_getuid32)
 DEFINE_PUBLIC_ALIAS(sys_getuid32, libc_sys_getuid32)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint32_t getgid32(void) */
 INTERN_FUNCTION(libc_sys_getgid32)
 	movl   $(0xc8), %eax
@@ -2099,6 +2153,9 @@ INTERN_FUNCTION(libc_sys_getgid32)
 END(libc_sys_getgid32)
 DEFINE_PUBLIC_ALIAS(sys_getgid32, libc_sys_getgid32)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t geteuid32(void) */
 INTERN_FUNCTION(libc_sys_geteuid32)
 	movl   $(0xc9), %eax
@@ -2106,6 +2163,9 @@ INTERN_FUNCTION(libc_sys_geteuid32)
 END(libc_sys_geteuid32)
 DEFINE_PUBLIC_ALIAS(sys_geteuid32, libc_sys_geteuid32)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t getegid32(void) */
 INTERN_FUNCTION(libc_sys_getegid32)
 	movl   $(0xca), %eax
@@ -2113,6 +2173,10 @@ INTERN_FUNCTION(libc_sys_getegid32)
 END(libc_sys_getegid32)
 DEFINE_PUBLIC_ALIAS(sys_getegid32, libc_sys_getegid32)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 INTERN_FUNCTION(libc_sys_setreuid32)
 	movl   $(0xcb), %eax
@@ -2120,6 +2184,10 @@ INTERN_FUNCTION(libc_sys_setreuid32)
 END(libc_sys_setreuid32)
 DEFINE_PUBLIC_ALIAS(sys_setreuid32, libc_sys_setreuid32)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
 INTERN_FUNCTION(libc_sys_setregid32)
 	movl   $(0xcc), %eax
@@ -2151,6 +2219,10 @@ INTERN_FUNCTION(libc_sys_fchown32)
 END(libc_sys_fchown32)
 DEFINE_PUBLIC_ALIAS(sys_fchown32, libc_sys_fchown32)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
 INTERN_FUNCTION(libc_sys_setresuid32)
 	movl   $(0xd0), %eax
@@ -2158,6 +2230,9 @@ INTERN_FUNCTION(libc_sys_setresuid32)
 END(libc_sys_setresuid32)
 DEFINE_PUBLIC_ALIAS(sys_setresuid32, libc_sys_setresuid32)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
 INTERN_FUNCTION(libc_sys_getresuid32)
 	movl   $(0xd1), %eax
@@ -2165,6 +2240,10 @@ INTERN_FUNCTION(libc_sys_getresuid32)
 END(libc_sys_getresuid32)
 DEFINE_PUBLIC_ALIAS(sys_getresuid32, libc_sys_getresuid32)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid) */
 INTERN_FUNCTION(libc_sys_setresgid32)
 	movl   $(0xd2), %eax
@@ -2172,6 +2251,9 @@ INTERN_FUNCTION(libc_sys_setresgid32)
 END(libc_sys_setresgid32)
 DEFINE_PUBLIC_ALIAS(sys_setresgid32, libc_sys_setresgid32)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) */
 INTERN_FUNCTION(libc_sys_getresgid32)
 	movl   $(0xd3), %eax
@@ -2186,6 +2268,10 @@ INTERN_FUNCTION(libc_sys_chown32)
 END(libc_sys_chown32)
 DEFINE_PUBLIC_ALIAS(sys_chown32, libc_sys_chown32)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid32(uint32_t uid) */
 INTERN_FUNCTION(libc_sys_setuid32)
 	movl   $(0xd5), %eax
@@ -2193,6 +2279,10 @@ INTERN_FUNCTION(libc_sys_setuid32)
 END(libc_sys_setuid32)
 DEFINE_PUBLIC_ALIAS(sys_setuid32, libc_sys_setuid32)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid32(uint32_t gid) */
 INTERN_FUNCTION(libc_sys_setgid32)
 	movl   $(0xd6), %eax
@@ -2200,6 +2290,11 @@ INTERN_FUNCTION(libc_sys_setgid32)
 END(libc_sys_setgid32)
 DEFINE_PUBLIC_ALIAS(sys_setgid32, libc_sys_setgid32)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid32(uint32_t uid) */
 INTERN_FUNCTION(libc_sys_setfsuid32)
 	movl   $(0xd7), %eax
@@ -2207,6 +2302,11 @@ INTERN_FUNCTION(libc_sys_setfsuid32)
 END(libc_sys_setfsuid32)
 DEFINE_PUBLIC_ALIAS(sys_setfsuid32, libc_sys_setfsuid32)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid32(uint32_t gid) */
 INTERN_FUNCTION(libc_sys_setfsgid32)
 	movl   $(0xd8), %eax
@@ -5120,6 +5220,10 @@ INTERN_FUNCTION(libc_sys_Xumount)
 END(libc_sys_Xumount)
 DEFINE_PUBLIC_ALIAS(sys_Xumount, libc_sys_Xumount)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid(uint16_t uid) */
 INTERN_FUNCTION(libc_sys_Xsetuid)
 	movl   $(0x17), %eax
@@ -5127,6 +5231,8 @@ INTERN_FUNCTION(libc_sys_Xsetuid)
 END(libc_sys_Xsetuid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetuid, libc_sys_Xsetuid)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint16_t getuid(void) */
 INTERN_FUNCTION(libc_sys_Xgetuid)
 	movl   $(0x18), %eax
@@ -5284,6 +5390,10 @@ INTERN_FUNCTION(libc_sys_Xbrk)
 END(libc_sys_Xbrk)
 DEFINE_PUBLIC_ALIAS(sys_Xbrk, libc_sys_Xbrk)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid(uint16_t gid) */
 INTERN_FUNCTION(libc_sys_Xsetgid)
 	movl   $(0x2e), %eax
@@ -5291,6 +5401,8 @@ INTERN_FUNCTION(libc_sys_Xsetgid)
 END(libc_sys_Xsetgid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetgid, libc_sys_Xsetgid)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint16_t getgid(void) */
 INTERN_FUNCTION(libc_sys_Xgetgid)
 	movl   $(0x2f), %eax
@@ -5305,6 +5417,9 @@ INTERN_FUNCTION(libc_sys_Xsignal)
 END(libc_sys_Xsignal)
 DEFINE_PUBLIC_ALIAS(sys_Xsignal, libc_sys_Xsignal)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t geteuid(void) */
 INTERN_FUNCTION(libc_sys_Xgeteuid)
 	movl   $(0x31), %eax
@@ -5312,6 +5427,9 @@ INTERN_FUNCTION(libc_sys_Xgeteuid)
 END(libc_sys_Xgeteuid)
 DEFINE_PUBLIC_ALIAS(sys_Xgeteuid, libc_sys_Xgeteuid)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint16_t getegid(void) */
 INTERN_FUNCTION(libc_sys_Xgetegid)
 	movl   $(0x32), %eax
@@ -5452,6 +5570,10 @@ INTERN_FUNCTION(libc_sys_Xssetmask)
 END(libc_sys_Xssetmask)
 DEFINE_PUBLIC_ALIAS(sys_Xssetmask, libc_sys_Xssetmask)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
 INTERN_FUNCTION(libc_sys_Xsetreuid)
 	movl   $(0x46), %eax
@@ -5459,6 +5581,10 @@ INTERN_FUNCTION(libc_sys_Xsetreuid)
 END(libc_sys_Xsetreuid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetreuid, libc_sys_Xsetreuid)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid(uint16_t rgid, uint16_t egid) */
 INTERN_FUNCTION(libc_sys_Xsetregid)
 	movl   $(0x47), %eax
@@ -5972,6 +6098,11 @@ INTERN_FUNCTION(libc_sys_Xafs_syscall)
 END(libc_sys_Xafs_syscall)
 DEFINE_PUBLIC_ALIAS(sys_Xafs_syscall, libc_sys_Xafs_syscall)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid(uint16_t uid) */
 INTERN_FUNCTION(libc_sys_Xsetfsuid)
 	movl   $(0x8a), %eax
@@ -5979,6 +6110,11 @@ INTERN_FUNCTION(libc_sys_Xsetfsuid)
 END(libc_sys_Xsetfsuid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetfsuid, libc_sys_Xsetfsuid)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid(uint16_t gid) */
 INTERN_FUNCTION(libc_sys_Xsetfsgid)
 	movl   $(0x8b), %eax
@@ -6178,6 +6314,10 @@ INTERN_FUNCTION(libc_sys_Xmremap)
 END(libc_sys_Xmremap)
 DEFINE_PUBLIC_ALIAS(sys_Xmremap, libc_sys_Xmremap)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
 INTERN_FUNCTION(libc_sys_Xsetresuid)
 	movl   $(0xa4), %eax
@@ -6185,6 +6325,9 @@ INTERN_FUNCTION(libc_sys_Xsetresuid)
 END(libc_sys_Xsetresuid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetresuid, libc_sys_Xsetresuid)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
 INTERN_FUNCTION(libc_sys_Xgetresuid)
 	movl   $(0xa5), %eax
@@ -6220,6 +6363,10 @@ INTERN_FUNCTION(libc_sys_Xnfsservctl)
 END(libc_sys_Xnfsservctl)
 DEFINE_PUBLIC_ALIAS(sys_Xnfsservctl, libc_sys_Xnfsservctl)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
 INTERN_FUNCTION(libc_sys_Xsetresgid)
 	movl   $(0xaa), %eax
@@ -6227,6 +6374,9 @@ INTERN_FUNCTION(libc_sys_Xsetresgid)
 END(libc_sys_Xsetresgid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetresgid, libc_sys_Xsetresgid)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 INTERN_FUNCTION(libc_sys_Xgetresgid)
 	movl   $(0xab), %eax
@@ -6446,6 +6596,8 @@ INTERN_FUNCTION(libc_sys_Xlchown32)
 END(libc_sys_Xlchown32)
 DEFINE_PUBLIC_ALIAS(sys_Xlchown32, libc_sys_Xlchown32)
 
+/* >> getuid(2)
+ * @return: * : The UID of the calling thread (this is the so-called ~real~ UID) */
 /* uint32_t getuid32(void) */
 INTERN_FUNCTION(libc_sys_Xgetuid32)
 	movl   $(0xc7), %eax
@@ -6453,6 +6605,8 @@ INTERN_FUNCTION(libc_sys_Xgetuid32)
 END(libc_sys_Xgetuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xgetuid32, libc_sys_Xgetuid32)
 
+/* >> getgid(2)
+ * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 /* uint32_t getgid32(void) */
 INTERN_FUNCTION(libc_sys_Xgetgid32)
 	movl   $(0xc8), %eax
@@ -6460,6 +6614,9 @@ INTERN_FUNCTION(libc_sys_Xgetgid32)
 END(libc_sys_Xgetgid32)
 DEFINE_PUBLIC_ALIAS(sys_Xgetgid32, libc_sys_Xgetgid32)
 
+/* >> geteuid(2)
+ * @return: * : The effective UID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t geteuid32(void) */
 INTERN_FUNCTION(libc_sys_Xgeteuid32)
 	movl   $(0xc9), %eax
@@ -6467,6 +6624,9 @@ INTERN_FUNCTION(libc_sys_Xgeteuid32)
 END(libc_sys_Xgeteuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xgeteuid32, libc_sys_Xgeteuid32)
 
+/* >> getegid(2)
+ * @return: * : The effective GID of the calling thread.
+ *              This is the one used for most permission checks */
 /* uint32_t getegid32(void) */
 INTERN_FUNCTION(libc_sys_Xgetegid32)
 	movl   $(0xca), %eax
@@ -6474,6 +6634,10 @@ INTERN_FUNCTION(libc_sys_Xgetegid32)
 END(libc_sys_Xgetegid32)
 DEFINE_PUBLIC_ALIAS(sys_Xgetegid32, libc_sys_Xgetegid32)
 
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 INTERN_FUNCTION(libc_sys_Xsetreuid32)
 	movl   $(0xcb), %eax
@@ -6481,6 +6645,10 @@ INTERN_FUNCTION(libc_sys_Xsetreuid32)
 END(libc_sys_Xsetreuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetreuid32, libc_sys_Xsetreuid32)
 
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
 INTERN_FUNCTION(libc_sys_Xsetregid32)
 	movl   $(0xcc), %eax
@@ -6512,6 +6680,10 @@ INTERN_FUNCTION(libc_sys_Xfchown32)
 END(libc_sys_Xfchown32)
 DEFINE_PUBLIC_ALIAS(sys_Xfchown32, libc_sys_Xfchown32)
 
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
 INTERN_FUNCTION(libc_sys_Xsetresuid32)
 	movl   $(0xd0), %eax
@@ -6519,6 +6691,9 @@ INTERN_FUNCTION(libc_sys_Xsetresuid32)
 END(libc_sys_Xsetresuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetresuid32, libc_sys_Xsetresuid32)
 
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
 INTERN_FUNCTION(libc_sys_Xgetresuid32)
 	movl   $(0xd1), %eax
@@ -6526,6 +6701,10 @@ INTERN_FUNCTION(libc_sys_Xgetresuid32)
 END(libc_sys_Xgetresuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xgetresuid32, libc_sys_Xgetresuid32)
 
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid) */
 INTERN_FUNCTION(libc_sys_Xsetresgid32)
 	movl   $(0xd2), %eax
@@ -6533,6 +6712,9 @@ INTERN_FUNCTION(libc_sys_Xsetresgid32)
 END(libc_sys_Xsetresgid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetresgid32, libc_sys_Xsetresgid32)
 
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success */
 /* errno_t getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) */
 INTERN_FUNCTION(libc_sys_Xgetresgid32)
 	movl   $(0xd3), %eax
@@ -6547,6 +6729,10 @@ INTERN_FUNCTION(libc_sys_Xchown32)
 END(libc_sys_Xchown32)
 DEFINE_PUBLIC_ALIAS(sys_Xchown32, libc_sys_Xchown32)
 
+/* >> setuid(2)
+ * Set the UID of the calling thread (this is the so-called ~real~ UID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setuid32(uint32_t uid) */
 INTERN_FUNCTION(libc_sys_Xsetuid32)
 	movl   $(0xd5), %eax
@@ -6554,6 +6740,10 @@ INTERN_FUNCTION(libc_sys_Xsetuid32)
 END(libc_sys_Xsetuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetuid32, libc_sys_Xsetuid32)
 
+/* >> setgid(2)
+ * Set the GID of the calling thread (this is the so-called ~real~ GID)
+ * @return: 0 : Success
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setgid32(uint32_t gid) */
 INTERN_FUNCTION(libc_sys_Xsetgid32)
 	movl   $(0xd6), %eax
@@ -6561,6 +6751,11 @@ INTERN_FUNCTION(libc_sys_Xsetgid32)
 END(libc_sys_Xsetgid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetgid32, libc_sys_Xsetgid32)
 
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
 /* errno_t setfsuid32(uint32_t uid) */
 INTERN_FUNCTION(libc_sys_Xsetfsuid32)
 	movl   $(0xd7), %eax
@@ -6568,6 +6763,11 @@ INTERN_FUNCTION(libc_sys_Xsetfsuid32)
 END(libc_sys_Xsetfsuid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetfsuid32, libc_sys_Xsetfsuid32)
 
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 /* errno_t setfsgid32(uint32_t gid) */
 INTERN_FUNCTION(libc_sys_Xsetfsgid32)
 	movl   $(0xd8), %eax

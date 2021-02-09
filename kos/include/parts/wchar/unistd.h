@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2dc2705 */
+/* HASH CRC-32:0xce65045a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -348,6 +348,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgethostname,(wchar_t *__na
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
+/* >> setlogin(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetlogin,(wchar_t const *__name),(__name))
 /* >> sethostname(2)
  * Set the name of the hosting machine */

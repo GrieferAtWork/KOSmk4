@@ -674,7 +674,8 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 }
 /*[[[end:libd_wgethostname]]]*/
 
-/*[[[head:libc_wsetlogin,hash:CRC-32=0xd58b641]]]*/
+/*[[[head:libc_wsetlogin,hash:CRC-32=0x1ddb614d]]]*/
+/* >> setlogin(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name)
 /*[[[body:libc_wsetlogin]]]*/
@@ -690,7 +691,8 @@ NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name)
 }
 /*[[[end:libc_wsetlogin]]]*/
 
-/*[[[head:libd_wsetlogin,hash:CRC-32=0x92e3b95b]]]*/
+/*[[[head:libd_wsetlogin,hash:CRC-32=0x5deafeba]]]*/
+/* >> setlogin(3) */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name)
 /*[[[body:libd_wsetlogin]]]*/

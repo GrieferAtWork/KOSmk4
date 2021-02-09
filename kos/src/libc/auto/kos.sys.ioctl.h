@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbddfd65 */
+/* HASH CRC-32:0x3f323fa9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,15 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Perform the I/O control operation specified by REQUEST on FD.
- * One argument may follow; its presence and type depend on REQUEST.
- * Return value depends on REQUEST. Usually -1 indicates error */
+/* >> ioctl(2)
+ * Perform the I/O control operation specified by `request' on `fd'.
+ * Many I/O control operations except an additional argument, though
+ * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 INTDEF ssize_t (VLIBDCALL libd_Ioctl)(fd_t fd, unsigned long int request, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x365894fc */
+/* HASH CRC-32:0xc18a58e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,8 @@
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
+/* >> unicode_c8toc16(3)
+ * @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */

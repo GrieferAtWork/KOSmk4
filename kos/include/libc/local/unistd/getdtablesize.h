@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0404061 */
+/* HASH CRC-32:0xe7c7cfa1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> getdtablesize(3) */
 __LOCAL_LIBC(getdtablesize) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdtablesize))(void) {
 #if defined(__KOS__)

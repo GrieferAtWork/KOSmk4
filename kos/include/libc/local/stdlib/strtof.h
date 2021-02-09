@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb276a7e3 */
+/* HASH CRC-32:0x9fd01135 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,13 +91,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_defined
 #define __local___localdep_unicode_readutf8_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8
-/* Read a single Unicode character from a given UTF-8 string */
+/* >> unicode_readutf8(3)
+ * Read a single Unicode character from a given UTF-8 string */
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Read a single Unicode character from a given UTF-8 string */
+/* >> unicode_readutf8(3)
+ * Read a single Unicode character from a given UTF-8 string */
 #define __localdep_unicode_readutf8 __LIBC_LOCAL_NAME(unicode_readutf8)
 #endif /* !__CRT_HAVE_unicode_readutf8 */
 #endif /* !__local___localdep_unicode_readutf8_defined */
@@ -105,7 +107,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_rev_defined
 #define __local___localdep_unicode_readutf8_rev_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_rev
-/* Same as `unicode_readutf8', but read backwards, with `*ptext'
+/* >> unicode_readutf8_rev(3)
+ * Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
@@ -113,7 +116,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8_rev.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `unicode_readutf8', but read backwards, with `*ptext'
+/* >> unicode_readutf8_rev(3)
+ * Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
 #define __localdep_unicode_readutf8_rev __LIBC_LOCAL_NAME(unicode_readutf8_rev)

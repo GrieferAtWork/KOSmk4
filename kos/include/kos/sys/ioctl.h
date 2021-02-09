@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeae6a7dd */
+/* HASH CRC-32:0x7ed6941c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,15 @@ __SYSDECL_BEGIN
 
 #if !defined(__Ioctl_defined) && defined(__CRT_HAVE_Ioctl)
 #define __Ioctl_defined 1
-/* Perform the I/O control operation specified by REQUEST on FD.
- * One argument may follow; its presence and type depend on REQUEST.
- * Return value depends on REQUEST. Usually -1 indicates error */
+/* >> ioctl(2)
+ * Perform the I/O control operation specified by `request' on `fd'.
+ * Many I/O control operations except an additional argument, though
+ * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __LIBC __SSIZE_TYPE__ (__VLIBCCALL Ioctl)(__fd_t __fd, unsigned long int __request, ...) __THROWS(...) __CASMNAME_SAME("Ioctl");
 #endif /* !__Ioctl_defined && __CRT_HAVE_Ioctl */
 

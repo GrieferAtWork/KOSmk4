@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4119b76 */
+/* HASH CRC-32:0x91045149 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,6 +91,10 @@ INTDEF WUNUSED gid_t NOTHROW_NCX(LIBCCALL libc_getgid)(void);
 /* >> getegid(2)
  * Return the effective group ID of the calling process */
 INTDEF WUNUSED gid_t NOTHROW_NCX(LIBCCALL libc_getegid)(void);
+/* >> getgroups(2)
+ * @return: * : [count == 0] The required number of groups
+ * @return: * : [count != 0] The number of groups that were actually returned
+ * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getgroups)(int size, gid_t list[]);
 /* >> setuid(2)
  * Set the effective user ID of the calling process
@@ -288,9 +292,26 @@ INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flag
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid);
+/* >> getresuid(2)
+ * Get the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid, uid_t *euid, uid_t *suid);
+/* >> getresgid(2)
+ * Get the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
+/* >> setresuid(2)
+ * @return: 0 : Success
+ * Set the real, effective, and saved UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid, uid_t euid, uid_t suid);
+/* >> setresgid(2)
+ * Set the real, effective, and saved GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid, gid_t egid, gid_t sgid);
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
@@ -371,8 +392,17 @@ INTDEF void NOTHROW_RPC(LIBCCALL libc_sync)(void);
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgrp)(void);
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid, uid_t euid);
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid, gid_t egid);
+/* >> gethostid(3) */
 INTDEF WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
@@ -386,6 +416,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid);
  * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
+/* >> ttyslot(3) */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
@@ -405,10 +436,12 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *p
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
+/* >> setlogin(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name, size_t len);
+/* >> sethostid(3) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id);
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
@@ -416,36 +449,50 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, siz
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name, size_t len);
+/* >> vhangup(3) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_vhangup)(void);
+/* >> profil(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer, size_t size, size_t offset, unsigned int scale);
+/* >> getusershell(3) */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getusershell)(void);
+/* >> endusershell(3) */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_endusershell)(void);
+/* >> setusershell(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setusershell)(void);
+/* >> daemon(3) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir, __STDC_INT_AS_UINT_T noclose);
+/* >> revoke(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
+/* >> syscall(2), syscall64(2) */
 INTDEF longptr_t NOTHROW_RPC(VLIBCCALL libc_syscall)(longptr_t sysno, ...);
+/* >> syscall(2), syscall64(2) */
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path);
+/* >> getpass(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt);
-/* >> ftruncate(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd, __PIO_OFFSET length);
-/* >> ftruncate64(2)
+/* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
  * Change the program break, allowing for a rudimentary implementation of a heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_brk)(void *addr);
+/* >> brk(2), sbrk(2)
+ * Change the program break, allowing for a rudimentary implementation of a heap.
+ * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps, and its size), meaning that changes are written to disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
-/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `S' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>

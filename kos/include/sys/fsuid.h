@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2369d7cf */
+/* HASH CRC-32:0x8486f763 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,31 +39,20 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/fsuid.c */
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/* Change uid used for file access control to UID, without affecting
- * other privileges (such as who can send signals at the process) */
+/* >> setfsuid(2)
+ * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
-/* Same as `setfsuid()', but for group id */
+/* >> setfsgid(2)
+ * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
 
 __SYSDECL_END
