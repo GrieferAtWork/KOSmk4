@@ -35,7 +35,7 @@
 #define __SA_SIGINFO   0x00000004 /* Invoke signal-catching function with three arguments instead of one. */
 #define __SA_RESTORER  0x04000000 /* A custom signal restore function (`sa_restorer') was given.
                                    * This flag is set by libc, after having filled in the `sa_restorer' field.
-                                   * NOTE: On x86, the kernel assumes that this points to a function:
+                                   * NOTE: On  x86,  the  kernel  assumes that  this  points  to  a  function:
                                    * >> sa_restorer:
                                    * >>     movl   $SYS_sigreturn, %eax
                                    * >>     int    $0x80 */

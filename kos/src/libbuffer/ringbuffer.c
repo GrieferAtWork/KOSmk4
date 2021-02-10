@@ -87,7 +87,7 @@ NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 			 *  <hi---><lo--->
 			 */
 			/* TODO: This could be done more efficiently by using the ????-area as a temporary buffer.
-			 *       Because we're eventually trying to get rid of that area, we can assume that it
+			 *       Because we're eventually trying to  get rid of that area,  we can assume that  it
 			 *       is non-empty (and has quite the significant size) */
 			if (hi <= lo) {
 				/* Shift the entire buffer upwards `hi' times */
@@ -155,13 +155,13 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 				return;
 			} else {
 				/* Defragment buffer memory, so that all unread data is located at the start.
-				 * This is required so we can trim the back to release unused memory. */
+				 * This  is  required so  we  can trim  the  back to  release  unused memory. */
 				ringbuffer_defragment(self);
 				assert(self->rb_rptr == 0);
 #ifdef __KERNEL__
 				/* Try to trim the buffer.
 				 * NOTE: We use the NX-variant + GFP_ATOMIC so that we're allowed
-				 *       to use heap functions while holding an atomic lock. */
+				 *       to use  heap functions  while  holding an  atomic  lock. */
 				ptr = heap_realloc_nx(&kernel_default_heap,
 				                      self->rb_data,
 				                      self->rb_size,
@@ -186,8 +186,8 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 
 /* Read data from the given ring buffer.
  * When `ringbuffer_read()' is called, and no data is available, the function
- * will block until data becomes available, or the ringbuffer is closed.
- * NOTE: `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
+ * will block  until data  becomes available,  or the  ringbuffer is  closed.
+ * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()' when trying to acquire `self->rb_lock'
  * @return: * : The number of bytes read. */
 INTERN __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
@@ -319,10 +319,10 @@ copy_faulting_byte:
 				if unlikely(self->rb_rptr >= self->rb_size)
 					self->rb_rptr = 0;
 			} else {
-				/* Race condition: Some other thread read the byte we were trying
-				 * to copy to the user-buffer while we didn't have the lock.
+				/* Race  condition: Some other thread read the byte we were trying
+				 * to  copy  to the  user-buffer while  we  didn't have  the lock.
 				 * To prevent that byte from being read twice, we mustn't indicate
-				 * that the byte in question never got copied in the first place! */
+				 * that the byte in question never got copied in the first  place! */
 			}
 			goto again_locked;
 		}
@@ -393,8 +393,8 @@ copy_faulting_byte:
 	self->rb_rdtot += temp;
 	result += temp;
 	/* Don't trim the buffer if we didn't read anything.
-	 * If we'd trim it in that scenario, too, then we might accidentally
-	 * deallocate a freshly allocated buffer before a writer can write to
+	 * If we'd trim it in that  scenario, too, then we might  accidentally
+	 * deallocate  a freshly allocated buffer before a writer can write to
 	 * it. - And while that wouldn't actually be a problem, it would cause
 	 * extra work that would be unnecessary otherwise. */
 	if (result) {
@@ -411,15 +411,15 @@ done:
 }
 
 
-/* Same as the read functions above, however `ringbuffer_write()' will block
- * when the ring buffer's size limit has been reached, and the buffer is still
+/* Same  as  the read  functions  above, however  `ringbuffer_write()'  will block
+ * when the ring buffer's  size limit has  been reached, and  the buffer is  still
  * full (and the buffer hasn't been closed), whereas `ringbuffer_write_nonblock()'
  * will not block in that scenario.
  * If the ring buffer is closed before all data could be written, the amount of
- * data (in bytes) that was written before it got closed is returned.
- * `ringbuffer_writesome()' is similar to `ringbuffer_write()', however will
- * return rather than block if some data has already been written, where-as
- * `ringbuffer_write()' will block indefinitely until all data was written, or
+ * data (in  bytes)  that  was  written  before  it  got  closed  is  returned.
+ * `ringbuffer_writesome()' is  similar to  `ringbuffer_write()', however  will
+ * return  rather than  block if some  data has already  been written, where-as
+ * `ringbuffer_write()' will block indefinitely until all data was written,  or
  * the ring buffer was closed.
  * NOTE: `ringbuffer_write_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()' when trying to acquire `self->rb_lock',
@@ -622,7 +622,7 @@ again:
 				RETHROW();
 			}
 			/* Install the new buffer (if it is larger than the current
-			 * one, but smaller than the (now) effective limit) */
+			 * one,   but  smaller  than  the  (now)  effective  limit) */
 			if (new_buffer.hp_siz > self->rb_size &&
 			    new_buffer.hp_siz <= ATOMIC_READ(self->rb_limit)) {
 				size_t lo, hi;
@@ -712,13 +712,13 @@ again_locked:
 		/* Current buffer size is greater than the set limit */
 		if (self->rb_avail >= limit) {
 			/* Number of written bytes exceeds the buffer limit.
-			 * -> In this case we're not allowed to write anything!
+			 * -> In  this  case  we're not  allowed  to  write  anything!
 			 * HINT: This is the likely case once a ringbuffer was closed! */
 			was_empty = false;
 			goto done_unlock;
 		}
 		/* Limit the amount of bytes we're allowed to
-		 * write to the user-specified pipe limit. */
+		 * write  to  the user-specified  pipe limit. */
 		temp = limit - self->rb_avail;
 	}
 	assert(result <= num_bytes);
@@ -769,10 +769,10 @@ copy_faulting_byte:
 				if unlikely(self->rb_rptr >= self->rb_size)
 					self->rb_rptr = 0;
 			} else {
-				/* Race condition: Some other thread wrote the byte we were trying
-				 * to copy from the user-buffer while we didn't have the lock.
+				/* Race  condition: Some other  thread wrote the  byte we were trying
+				 * to  copy  from  the user-buffer  while  we didn't  have  the lock.
 				 * To prevent that byte from being written twice, we mustn't indicate
-				 * that the byte in question never got copied in the first place! */
+				 * that  the byte  in question never  got copied in  the first place! */
 			}
 			goto again_locked;
 		}
@@ -905,7 +905,7 @@ libringbuffer_skipread(struct ringbuffer *__restrict self,
 
 /* A combination of `ringbuffer_unread()' and `ringbuffer_skipread()' that can be used
  * to some-what implement support for SEEK_CUR for ring buffers, where negative values
- * for `offset' will call `ringbuffer_unread()', whilst positive values will call
+ * for `offset'  will call  `ringbuffer_unread()', whilst  positive values  will  call
  * `ringbuffer_skipread()'
  * The return value is always the new total number of read bytes since the last re-size. */
 INTERN NONNULL((1)) size_t CC

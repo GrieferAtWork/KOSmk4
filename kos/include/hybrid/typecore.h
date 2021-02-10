@@ -210,7 +210,7 @@
 #endif /* !__INT8_C */
 
 #ifndef __CC__
-/* Don't append anything when not hosting by a
+/* Don't  append  anything  when not  hosting  by a
  * C-compiler (e.g.: A linker script, or assembler) */
 #undef __INT8_C
 #undef __INT16_C
@@ -1179,7 +1179,7 @@
 #endif /* __SIZEOF_LONG__ != 8 */
 
 /* The max integral type that the target's main address bus is optimized for.
- * Currently, that is equal to `sizeof(void *)' for all targets. */
+ * Currently,  that   is  equal   to   `sizeof(void *)'  for   all   targets. */
 #ifndef __SIZEOF_BUSINT__
 #define __SIZEOF_BUSINT__ __SIZEOF_POINTER__
 #define __BUSINT_TYPE__   __INTPTR_TYPE__
@@ -1205,8 +1205,8 @@
 #if !defined(_MSC_VER) && !defined(__INTELLISENSE__)
 #include "host.h"
 #if defined(__i386__) && !defined(__x86_64__)
-/* On i386, `-mno-align-double' is the ABI default, which causes `long long'
- * and `double' to have 4-byte alignment, rather than be 8-byte aligned!
+/* On i386,  `-mno-align-double' is  the ABI  default, which  causes  `long long'
+ * and  `double'  to  have  4-byte  alignment,  rather  than  be  8-byte aligned!
  * s.a. `https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#index-malign-double' */
 #define __ALIGNOF_INT64__ 4
 #endif /* __i386__ && !__x86_64__ */
@@ -1434,9 +1434,9 @@
 
 
 #ifdef __INTELLISENSE__
-/* Don't #define builtin keywords with Intellisense.
- * Sometimes, Intellisense doesn't notice when those macros
- * get deleted and will continue chugging along as though
+/* Don't  #define   builtin   keywords   with   Intellisense.
+ * Sometimes, Intellisense doesn't  notice when those  macros
+ * get deleted  and will  continue chugging  along as  though
  * they were still defined (leading to sporadic syntax errors
  * in arbitrary source files...) */
 
@@ -1889,7 +1889,7 @@
 #endif /* !__INTELLISENSE__ */
 
 
-/* Since C defines 5 integer types (char, short, int, long, long long), which
+/* Since C defines 5  integer types (char, short,  int, long, long long),  which
  * usually only map to 4 types (int8, int16, int32, int64), this macro describes
  * the C name of that fifth type:
  *   - __SIZEOF_FIFTHINT__      (e.g. `8')          The size of the fifth integer

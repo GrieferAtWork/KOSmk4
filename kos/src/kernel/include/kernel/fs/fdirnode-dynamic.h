@@ -34,7 +34,7 @@ DECL_BEGIN
 /* Pre-defined directory access helper node for dynamically
  * constructed directories.
  *
- * A directory of this type may be used for dynamically
+ * A directory of this type may be used for  dynamically
  * generated directories, such as those found in `/proc'
  */
 

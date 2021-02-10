@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
- *       which may not necessarily use the given, or default `codec' and `palette'
+ *       which may not necessarily use the  given, or default `codec' and  `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
 INTDEF WUNUSED /*REF*/ struct video_buffer *CC
@@ -41,7 +41,7 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
                        struct video_codec *codec, struct video_palette *palette);
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
- * Note that screen buffer access is only granted to ROOT and the window server */
+ * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
 INTDEF WUNUSED /*REF*/ struct video_buffer *CC libvideo_buffer_screen(void);
 
 /* Return a handle for the video device driver that is being used.

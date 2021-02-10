@@ -229,7 +229,7 @@ NOTHROW(KCALL pointer_set_contains)(struct pointer_set const *__restrict self,
 
 
 
-/* Set the given pointer_set and re-hash it to be
+/* Set the given pointer_set  and re-hash it to  be
  * able to sustain at least `min_allocation' items. */
 LOCAL void KCALL
 pointer_set_clear_and_rehash(struct pointer_set *__restrict self,

@@ -71,7 +71,7 @@ typedef struct di_addr2line_dl_sections_struct {
 typedef struct {
 	/* Notes about address ranges on inlined/top-level/inline-caller levels:
 	 *   - al_symstart...al_symend:
-	 *     INLINE:  The bounds of the matched address range of the associated inline function.
+	 *     INLINE: The bounds of the matched address range of the associated inline function.
 	 *     REGULAR: The start/end of the surrounding function symbol.
 	 *   - al_linestart...al_lineend:
 	 *     INLINE/TOP-LEVEL FUNCTION: address of the previous/next A2L label.
@@ -138,7 +138,7 @@ typedef struct {
 	 * >> }
 	 */
 	__uintptr_t al_levelcnt;  /* The number of available source levels (The argument
-	                           * passed to `level' must be smaller than this) */
+	                           * passed  to  `level'  must  be  smaller  than  this) */
 	__uintptr_t al_symstart;  /* Starting address of the surrounding symbol (module-relative). */
 	__uintptr_t al_symend;    /* End address of the surrounding symbol (module-relative). */
 	__uintptr_t al_linestart; /* Starting address of the associated source location (module-relative). */
@@ -162,15 +162,15 @@ typedef struct {
 /* Analyze data from the given `sections' to locate source-level information about `module_relative_pc'.
  * HINT: Using this function, you can implement the behavior of `$ addr2line -ife ...' entirely in
  *       software, by combining this api with functions from <dlfcn.h>
- * @param: sections: The mapping locations for the different debug sections associated with the program.
+ * @param: sections: The mapping locations for the different debug sections associated with the  program.
  *                   This structure must be initialized with available section information by the caller,
- *                   although for minimal functionality, only the .debug_line section is required.
- *                   Note however that other sections are mandatory (and recommended) in order to
+ *                   although for  minimal  functionality,  only the  .debug_line  section  is  required.
+ *                   Note however  that  other sections  are  mandatory  (and recommended)  in  order  to
  *                   provide full support of available features.
- * @param: level:    Inline function indirection depth for the location to query.
- *                   Level #0 always refers to the exact source location, as retrievable
- *                   via the .debug_line program, while all levels greater than this refer
- *                   to the call-sites of inlined functions found at that location.
+ * @param: level:    Inline  function  indirection  depth   for  the  location  to   query.
+ *                   Level  #0 always refers  to the exact  source location, as retrievable
+ *                   via  the .debug_line program, while all levels greater than this refer
+ *                   to  the  call-sites  of  inlined  functions  found  at  that location.
  *                   Alternatively, you may also pass `DEBUG_ADDR2LINE_LEVEL_SOURCE', which
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
@@ -188,7 +188,7 @@ typedef struct {
  * >> } while (++level < info.al_levelcnt);
  * NOTE: The return value differs from `DEBUG_INFO_ERROR_SUCCESS', `*result' will have
  *       been initialized as follows:
- *        - al_levelcnt:  The number of known information levels for the
+ *        - al_levelcnt:  The  number of known  information levels for the
  *                        address, or 0 if no information is known at all.
  *        - al_symstart:  Set to `module_relative_pc'
  *        - al_symend:    Set to `module_relative_pc'
@@ -198,8 +198,8 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully retrieved information.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either no information is known about `module_relative_pc',
  *                                    or the given `level >= OUT(result->al_levelcnt)', and also
- *                                    isn't equal to `DEBUG_ADDR2LINE_LEVEL_SOURCE', where
- *                                    `result->al_levelcnt' is set to 0 if no information is
+ *                                    isn't  equal  to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
+ *                                    `result->al_levelcnt' is set  to 0 if  no information  is
  *                                    known at all, or whatever the total number of information
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
@@ -218,7 +218,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line)(di_addr2line_sections_t const *__
 
 
 /* Print the fully qualified filename for a given string
- * triplet, as extractable from `di_debug_addr2line_t':
+ * triplet, as extractable from  `di_debug_addr2line_t':
  *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile);
  *     "/home/me/project/c/foo/src/bar.c"
  *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile);
@@ -237,11 +237,11 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
  * >> These functions are simply light-weight wrappers around `dllocksection()',
- *    taking the job of locking debug information sections into memory off of
+ *    taking  the job of  locking debug information sections  into memory off of
  *    the user.
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully loaded debug sections.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either `dl_handle' is invalid, or the specified library
- *                                    doesn't provide any of the necessary debug information
+ *                                    doesn't  provide any of the necessary debug information
  *                                    sections.
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */

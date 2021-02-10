@@ -91,14 +91,14 @@ __DECL_BEGIN
 #endif /* !__ARCH_HAVE_COMPAT */
 #define UVIO_OPCODE_GETUCMD   0xfe /* req  (user command request (don't actually respond to this!)) */
 #define UVIO_OPCODE_PUTUCMD   0xff /* resp (user command trigger (causes a `UVIO_OPCODE_GETNOOP' to become readable))
-                                    * NOTE: The `ur_respid' field should be one of `UVIO_OPCODE_UCMD_*' */
+                                    * NOTE:  The   `ur_respid'   field   should  be   one   of   `UVIO_OPCODE_UCMD_*' */
 
 /* Values for `ur_respid' of `UVIO_OPCODE_PUTNOOP' responses */
 #define UVIO_OPCODE_UCMD_STOP 0x01 /* Destroy the associated UVIO object.
-                                    * Used internally by `libvio.so' to terminate the service thread,
+                                    * Used internally by  `libvio.so' to terminate  the service  thread,
                                     * as well as `close(2)' the associated UVIO handle. NOTE: To prevent
-                                    * some other thread from destroying a shared UVIO object, libvio.so
-                                    * checks `uq_pid' to match `getpid(2)', and ignores stop requests
+                                    * some other thread from destroying a shared UVIO object,  libvio.so
+                                    * checks `uq_pid' to  match `getpid(2)', and  ignores stop  requests
                                     * from processes other than its own. */
 /* Range of user commands that are free for use by custom protocols.
  * aka.: These will never be used by the `libvio.so' implementation. */

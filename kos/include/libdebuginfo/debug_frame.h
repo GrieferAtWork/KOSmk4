@@ -28,15 +28,15 @@
 #include <libunwind/eh_frame.h>
 
 /* The .debug_frame section is (somewhat) different, such that we need
- * our own versions of `unwind_fde_scan()' and `unwind_fde_load()'.
+ * our own  versions of  `unwind_fde_scan()' and  `unwind_fde_load()'.
  * These .debug_frame-versions are exported from libdebuginfo.so under
  * the names `unwind_fde_scan_df()' and `unwind_fde_load_df()' */
 
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Load the next debug_frame function descriptor from `*PDEBUG_FRAME_READER', which
- * must either be a pointer to the start of the `.debug_frame' section, or be the
+/* Load  the   next  debug_frame   function   descriptor  from   `*PDEBUG_FRAME_READER',   which
+ * must   either  be  a  pointer  to  the  start  of  the  `.debug_frame'  section,  or  be  the
  * value written back to `*PDEBUG_FRAME_READER' after a previous call to `unwind_fde_load_df()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
@@ -56,7 +56,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__byte_t **__restrict __pdebug
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Same as `unwind_fde_load_df()', but quickly search for and return the
- * FDE descriptor containing the given `ABSOLUTE_PC' text address.
+ * FDE  descriptor  containing  the  given  `ABSOLUTE_PC'  text address.
  * @assume(!return || RESULT->f_pcstart <= ABSOLUTE_PC);
  * @assume(!return || RESULT->f_pcend > ABSOLUTE_PC);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.

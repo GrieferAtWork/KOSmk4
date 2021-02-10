@@ -39,10 +39,10 @@ typedef ssize_t linebuffer_retval_t;
 
 
 
-/* Re-write the used area of the given capture within the given buffer.
- * For this purpose, try to re-instate `capture' as the active line, or
+/* Re-write  the  used area  of the  given capture  within the  given buffer.
+ * For  this  purpose, try  to re-instate  `capture' as  the active  line, or
  * alternatively (when new data has already been written), write the contents
- * of the capture using `linebuffer_write()', before destroying the capture.
+ * of the capture using `linebuffer_write()', before destroying the  capture.
  * @return: * : The number of re-written bytes.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTDEF NONNULL((1, 2)) linebuffer_retval_t CC
@@ -51,10 +51,10 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 
-/* Append up to `num_bytes' of data from `src' to the current line.
+/* Append up to `num_bytes' of data from `src' to the current  line.
  * If the line is too small to contain all data, wait until the line
  * is emptied before writing more data.
- * If the linebuffer is closed before all data could be written, return
+ * If the linebuffer is closed before  all data could be written,  return
  * the amount of written data, or 0 if the buffer was already closed when
  * the function was called.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
@@ -64,9 +64,9 @@ liblinebuffer_write(struct linebuffer *__restrict self,
 		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 
-/* Similar to `linebuffer_write()', but only block if the line was full
- * the first time the function was called. If the linebuffer is closed
- * before at least 1 byte of data could be written, 0 is returned.
+/* Similar to `linebuffer_write()',  but only  block if the  line was  full
+ * the first time  the function  was called.  If the  linebuffer is  closed
+ * before at  least  1  byte of  data  could  be written,  0  is  returned.
  * Alternatively, if the given buffer is zero-length, 0 is always returned.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTDEF NONNULL((1)) linebuffer_retval_t CC
@@ -75,7 +75,7 @@ liblinebuffer_writesome(struct linebuffer *__restrict self,
 		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 
-/* Similar to `linebuffer_write()', but never block before writing data.
+/* Similar to `linebuffer_write()', but  never block before writing  data.
  * If the given buffer was full at the time of this function being called,
  * or had been closed, then 0 is returned immediately.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */

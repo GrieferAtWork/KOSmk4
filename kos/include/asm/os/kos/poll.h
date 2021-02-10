@@ -40,7 +40,7 @@
 
 /* Event types always implicitly polled for.
  * These don't need to be set in `events', but they will appear
- * in `revents' to indicate their respective status condition. */
+ * in  `revents' to indicate their respective status condition. */
 #define __POLLERR  0x008 /* Error condition. */
 #define __POLLHUP  0x010 /* Hung up. (writes are no longer possible) */
 #define __POLLNVAL 0x020 /* Invalid polling request. */

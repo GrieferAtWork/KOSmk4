@@ -21,6 +21,7 @@
 #define LONGOP(name, repr)
 #endif /* !LONGOP */
 
+/* clang-format off */
 LONGOP(LO_FUCOMPP, "fucompp\t" OP_VERBOSE_ST1 OP_VERBOSE_ST0)
 
 LONGOP(LO_PREFETCHNTA, "prefetchnta\t" OP_MEM)
@@ -1019,3 +1020,4 @@ LONGOP(LO_MOVDIR64BW, "movdir64bw\t" OP_RM64 OP_R16)
 LONGOP(LO_MOVDIR64BL, "movdir64bl\t" OP_RM64 OP_R32)
 
 LONGOP(LO_MOVDIR64BQ, "movdir64bq\t" OP_RM64 OP_R64)
+/* clang-format on */

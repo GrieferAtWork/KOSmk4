@@ -39,7 +39,7 @@ DECL_BEGIN
 
 /* >> rpc_service(2)
  * Service RPC callbacks (user-space variant of the kernel-space `task_serve()')
- * @return:  1: At least 1 RPC callback was serviced. (though this may
+ * @return:  1: At least 1 RPC callback  was serviced. (though this  may
  *              have been a kernel-level RPC that didn't actually affect
  *              user-space)
  * @return:  0: No RPC callbacks were served.

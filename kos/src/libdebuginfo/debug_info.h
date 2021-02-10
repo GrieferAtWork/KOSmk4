@@ -38,15 +38,15 @@ DECL_BEGIN
 #define debuginfo_cu_parser_skipform(...) \
 	libdi_debuginfo_cu_parser_skipform(__VA_ARGS__)
 
-/* Given a pointer to the start of a debug_info CU (or a pointer to the start
+/* Given  a pointer to the start of a  debug_info CU (or a pointer to the start
  * of the .debug_info section), as well as the start & end of the .debug_abbrev
- * section, initialize the given debuginfo CU parser structure `result', and
+ * section, initialize the  given debuginfo CU  parser structure `result',  and
  * advance `*pdebug_info_reader' to the start of the next unit.
  * NOTE: Upon success (return == DEBUG_INFO_ERROR_SUCCESS), the caller is responsible for
  *       finalizing the given `abbrev' through use of `debuginfo_cu_abbrev_fini(abbrev)',
  *       once the associated parser `result' is no longer being used.
  * @param: first_component_pointer: A pointer to the first component to load, or `NULL'
- *                                  to simply load the first component following the
+ *                                  to simply load  the first  component following  the
  *                                  start of the associated CU descriptor.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
@@ -81,14 +81,14 @@ INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(d
 INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self);
 
 /* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
- * debug information start location of the next componet within `*pdip' */
+ * debug information start location of  the next componet within  `*pdip' */
 INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self, byte_t const **__restrict pdip);
 
-/* Skip the attributes of the current component (must be called if not
+/* Skip the attributes  of the  current component  (must be  called if  not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*') */
 INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__restrict self);
 
-/* Load the current debug information as an attribute encoded as
+/* Load the current debug information as an attribute encoded  as
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
  *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
@@ -128,7 +128,7 @@ INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_va
 
 
 /* Print the C/C++-like representation of a given value, given DWARF debug information
- * about its typing, where `parser' must have been set up to have already loaded the
+ * about  its typing, where `parser' must have been  set up to have already loaded the
  * given `type' component for the given data blob:
  * >> di_debuginfo_variable_t var;
  * >> ... // Load `var'

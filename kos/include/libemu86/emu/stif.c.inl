@@ -57,7 +57,7 @@ case EMU86_OPCODE_ENCODE(0xfa): {
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STI
 case EMU86_OPCODE_ENCODE(0xfb): {
 	/* FB     STI     Set interrupt flag; external, maskable interrupts
-	 *                enabled at the end of the next instruction. */
+	 *                enabled  at  the  end  of  the  next instruction. */
 #if EMU86_EMULATE_CONFIG_WANT_STI && EMU86_EMULATE_CONFIG_VM86
 	if (EMU86_ISVM86()) {
 		EMU86_EMULATE_VM86_SETIF(1);

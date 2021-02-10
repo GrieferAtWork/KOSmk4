@@ -49,7 +49,7 @@ struct usb_interface;
 
 struct usb_endpoint {
 	WEAK refcnt_t                    ue_refcnt;    /* Reference counter. */
-	REF struct usb_interface        *ue_interface; /* [1..1][const][ref_if(!= this)] The associated interface.
+	REF struct usb_interface        *ue_interface; /* [1..1][const][ref_if(!= this)]    The    associated     interface.
 	                                                * Note that an interface is also always a descriptor for endpoint 0! */
 	u16                              ue_maxpck;    /* [const] Max packet size allowed by this endpoint. */
 	u8                               ue_dev;       /* [const] Device address. */
@@ -79,8 +79,8 @@ struct usb_interface
 #ifndef __cplusplus
 	struct usb_endpoint              ui_endp;      /* The associated endpoint. */
 #endif /* !__cplusplus */
-	REF struct usb_device           *ui_device;    /* [1..1][const][ref_if(!= this)] The associated device.
-	                                                * Note that a device is also always a descriptor for endpoint 0!
+	REF struct usb_device           *ui_device;    /* [1..1][const][ref_if(!= this)]       The       associated       device.
+	                                                * Note that  a  device  is  also always  a  descriptor  for  endpoint  0!
 	                                                * Though also note that an interface is also a descriptor for endpoint 0. */
 	u8                               ui_intf;      /* [const][valid_if(ui_device != this)][== ue_intf_desc->ui_intf]
 	                                                * Interface index. (part of the USB protocol; not part of the packet addressing system) (set to `0' if invalid) */
@@ -109,13 +109,13 @@ struct usb_device
 	char                     *ud_str_serial;   /* [0..1][const][owned] Device serial number (NUL-terminated utf-8 string) */
 	struct usb_configuration *ud_config;       /* [1..1][const] Used configuration. (WARNING: May be NULL for strange devices; s.a. `USB_ENDPOINT_FLAG_STRANGE') */
 	struct usb_configuration  ud_configv[16];  /* [1..ud_configc] Vector of possible configurations.
-	                                            * Each entry in this vector has a total size of `ENT->uc_total_len' bytes,
+	                                            * Each entry in this vector has  a total size of `ENT->uc_total_len'  bytes,
 	                                            * with the main descriptor being followed by a variable number of additional
-	                                            * descriptors, starting at `(byte_t *)ENT + ENT->uc_size', each of which is
+	                                            * descriptors,  starting at `(byte_t *)ENT + ENT->uc_size', each of which is
 	                                            * lead by a 2-byte pair `byte_t SIZE, TYPE;' */
 	u16                       ud_lang_used;    /* [const] Language code used for strings (or 0 if unsupported). */
 	u8                        ud_dev;          /* [const] Device address (usually equals `ue_dev', except during the address-assign phase).
-	                                            * Essentially, when it comes to checking which addresses are already in use,
+	                                            * Essentially,   when  it   comes  to  checking   which  addresses  are   already  in  use,
 	                                            * use `ud_dev'. When it comes to actually talking to a device, use `ue_dev'! */
 	u8                        ud_dev_class;    /* [const] Device class */
 	u8                        ud_dev_subclass; /* [const] Device subclass */
@@ -160,8 +160,8 @@ struct block_device;
 
 
 /* USB interrupt handler.
- * @param: self:   [1..1] Either a `struct character_device' or `struct block_device'
- *                 When a reference could not be acquired to the given, the callback
+ * @param: self:   [1..1] Either a  `struct character_device'  or  `struct block_device'
+ *                 When  a reference  could not be  acquired to the  given, the callback
  *                 is not invoked, and behaves as if `USB_INTERRUPT_HANDLER_RETURN_STOP'
  *                 was returned.
  * @param: status: One of `USB_INTERRUPT_HANDLER_STATUS_*'
@@ -173,19 +173,19 @@ typedef NOBLOCK NONNULL((1)) unsigned int
                                             size_t datalen);
 #define USB_INTERRUPT_HANDLER_STATUS_OK    0 /* Data was successfully received. */
 #define USB_INTERRUPT_HANDLER_STATUS_ERROR 1 /* The USB controller has indicated an error.
-                                              * In this case, error_data() has been filled in with additional
-                                              * information about the error (usually identical to what would
+                                              * In this case,  error_data() has been  filled in with  additional
+                                              * information about  the error  (usually identical  to what  would
                                               * be thrown if the same problem had happened during a transmission
                                               * started with `usb_controller_transfer()')
-                                              * Note however that the interrupt handler itself is called from
-                                              * a context where it may not propagate errors itself, or perform
-                                              * any blocking operation, meaning that the only safe thing for it
+                                              * Note however  that  the  interrupt handler  itself  is  called  from
+                                              * a  context  where it  may not  propagate  errors itself,  or perform
+                                              * any blocking  operation, meaning  that the  only safe  thing for  it
                                               * to do if it wishes to propagate the exception, is to use a mechanism
                                               * similar (or maybe even backed) by `AIO_COMPLETION_FAILURE' */
 
 #define USB_INTERRUPT_HANDLER_RETURN_SCHED 0 /* Re-schedule the interrupt to-be executed once again. */
 #define USB_INTERRUPT_HANDLER_RETURN_STOP  1 /* Stop polling the device for data, and remove the interrupt descriptor
-                                              * from the set of those that the USB controller will use for polling
+                                              * from the set of  those that the USB  controller will use for  polling
                                               * connected devices for incoming data. */
 
 typedef NOBLOCK NONNULL((1)) unsigned int
@@ -242,16 +242,16 @@ NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
 
 /* Similar to `decref()', but simultaneously prevent the interrupt for ever firing again.
- * Note that a USB interrupt will stop firing and be removed from the controller's chain
+ * Note  that a USB interrupt will stop firing and be removed from the controller's chain
  * of registered interrupts under 3 circumstances:
  *   - When the `USB_INTERRUPT_FLAG_DELETED' flag was set.
  *   - When the bound character- or block-device has been destroyed.
  *   - When the associated callback returns `USB_INTERRUPT_HANDLER_RETURN_STOP'.
  * This function is mean to be used in places such as an ioctl() with the purpose of
- * suspending the data reception from a device such as a microphone.
+ * suspending   the   data  reception   from  a   device   such  as   a  microphone.
  * WARNING: Even after this function was called, there exists a small window of time
- *          where the associated interrupt handler will still be invoked, since the
- *          USB controller driver may have already checked for the presence of the
+ *          where  the associated interrupt handler will still be invoked, since the
+ *          USB controller driver may have already  checked for the presence of  the
  *          `USB_INTERRUPT_FLAG_DELETED' flag before it got set here, at which point
  *          the callback may be invoked after the interrupt should have already been
  *          deleted. */
@@ -263,10 +263,10 @@ NOTHROW(KCALL usb_interrupt_delete)(REF struct usb_interrupt *__restrict self) {
 	decref(self);
 }
 
-/* Similar to `decref()', but must be called from the finalizer of the bound character-
- * or block-device in order to both inform the USB controller that the device to which
- * this interrupt was bound has been destroyed (this part is required since a USB
- * interrupt only ever holds a weak reference to the bound device, thus preventing the
+/* Similar  to `decref()', but must be called from the finalizer of the bound character-
+ * or  block-device in order to both inform the  USB controller that the device to which
+ * this  interrupt  was bound  has been  destroyed (this  part is  required since  a USB
+ * interrupt only ever holds a weak reference  to the bound device, thus preventing  the
  * possibility of a reference loop, meaning it needs to be notified when the device gets
  * destroyed), as well as drop the reference previously held by the bound device. */
 LOCAL NOBLOCK void
@@ -289,27 +289,27 @@ struct usb_controller
 #endif /* !__cplusplus */
 	struct atomic_rwlock    uc_devslock; /* Lock for `uc_devs' */
 	REF struct usb_device  *uc_devs;     /* [0..1][lock(uc_devslock)] Chain of known USB devices. */
-	struct mutex            uc_disclock; /* Lock that must be held when resetting ports for the purpose
+	struct mutex            uc_disclock; /* Lock  that must be held when resetting ports for the purpose
 	                                      * of discovering new devices. This lock is required to prevent
 	                                      * multiple threads from resetting the ports of different hubs,
 	                                      * which could lead to multiple devices bound to ADDR=0, making
 	                                      * it impossible to safely configure them individually. */
-	/* [1..1] Perform a one-time transfer of a sequence of packets.
+	/* [1..1] Perform a one-time transfer of a sequence of  packets.
 	 * This is the primary functions for OS-initiated communications
 	 * with connected USB devices.
 	 * For communications initiated by the device, see the interface
 	 * for doing this below.
 	 * @param: self: The controller which will be used for the transfer
 	 * @param: endp: The targeted USB endpoint.
-	 * @param: tx:   A chain of USB packets that must be transmitted to
-	 *               the given `endp' in the same order in which they
+	 * @param: tx:   A  chain  of USB  packets  that must  be  transmitted to
+	 *               the  given  `endp'  in  the  same  order  in  which they
 	 *               are given here (the chain is described by `->ut_next->')
 	 * @param: aio:  The AIO handle allowing the caller to perform the transfer
 	 *               asynchronously.
-	 *               Note that the caller is free to invalidate `tx', as well as
-	 *               any of the pointed-to buffer controller structures (though
+	 *               Note  that the caller  is free to invalidate  `tx', as well as
+	 *               any  of  the pointed-to  buffer controller  structures (though
 	 *               obviously not the buffers themself), as well as later transfer
-	 *               descriptors even before the given `aio' handle is invoked to
+	 *               descriptors even before the given  `aio' handle is invoked  to
 	 *               indicate completion. */
 	NONNULL((1, 2, 3)) void
 	(KCALL *uc_transfer)(struct usb_controller *__restrict self,
@@ -320,16 +320,16 @@ struct usb_controller
 	 * @param: endp:                          The endpoint from which to poll data.
 	 * @param: handler:                       The handler to-be invoked.
 	 * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
-	 *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
+	 *                                        depending  on  the  setting  of  `USB_INTERRUPT_FLAG_ISABLK'
 	 * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
 	 *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
-	 *                                        mandatory buffer size, with it being an error if the device
-	 *                                        produces less data that this, meaning that unless said flag is
+	 *                                        mandatory buffer size,  with it  being an error  if the  device
+	 *                                        produces  less data that this, meaning that unless said flag is
 	 *                                        set, your handler is allowed to completely ignore its `datalen'
-	 *                                        argument and simply assume that the buffer's size is equal to
-	 *                                        the `buflen' value passed when the interrupt was registered.
+	 *                                        argument and simply assume that  the buffer's size is equal  to
+	 *                                        the `buflen' value  passed when the  interrupt was  registered.
 	 * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
-	 * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
+	 * @param: poll_interval_in_milliseconds: A   hint  for  how  often  the  USB  device  should  be  polled.
 	 *                                        When set to `0', the device will be polled as often as possible. */
 	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *
 	(KCALL *uc_interrupt)(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
@@ -343,25 +343,25 @@ struct usb_controller
 	 mutex_cinit(&(self)->uc_disclock))
 
 
-/* Perform a one-time transfer of a sequence of packets.
+/* Perform  a  one-time  transfer  of  a  sequence  of  packets.
  * This is the primary functions for OS-initiated communications
  * with connected USB devices.
  * For communications initiated by the device, see the interface
  * for doing this below.
  * @param: self: The controller which will be used for the transfer
- * @param: tx:   A chain of USB packets that must be transmitted to
- *               the given `endp' in the same order in which they
+ * @param: tx:   A  chain  of USB  packets  that must  be  transmitted to
+ *               the  given  `endp'  in  the  same  order  in  which they
  *               are given here (the chain is described by `->ut_next->')
  * @param: aio:  The AIO handle allowing the caller to perform the transfer
  *               asynchronously.
- *               Note that the caller is free to invalidate `tx', as well as
- *               any of the pointed-to buffer controller structures (though
+ *               Note  that the caller  is free to invalidate  `tx', as well as
+ *               any  of  the pointed-to  buffer controller  structures (though
  *               obviously not the buffers themself), as well as later transfer
- *               descriptors even before the given `aio' handle is invoked to
+ *               descriptors even before the given  `aio' handle is invoked  to
  *               indicate completion.
- *               Note that USB protocols also allow for back-propagation of
+ *               Note that  USB protocols  also allow  for back-propagation  of
  *               the total number of transferred bytes from, which is available
- *               upon AIO completion via the `ht_retsize' operator of `aio',
+ *               upon AIO completion  via the `ht_retsize'  operator of  `aio',
  *               which is guarantied to have been initialized by this function. */
 LOCAL NONNULL((1, 2, 3)) void KCALL
 usb_controller_transfer(struct usb_controller *__restrict self,
@@ -370,7 +370,7 @@ usb_controller_transfer(struct usb_controller *__restrict self,
 	(*self->uc_transfer)(self, tx, aio);
 }
 
-/* Same as `usb_controller_transfer()', but wait for the transfer to
+/* Same as  `usb_controller_transfer()',  but  wait for  the  transfer  to
  * complete (essentially just a wrapper using `struct aio_handle_generic')
  * @return: * : The total number of transferred bytes. */
 FUNDEF NONNULL((1, 2)) size_t KCALL
@@ -383,16 +383,16 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
  * @param: endp:                          The endpoint from which to poll data.
  * @param: handler:                       The handler to-be invoked.
  * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
- *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
+ *                                        depending  on  the  setting  of  `USB_INTERRUPT_FLAG_ISABLK'
  * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
  *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
- *                                        mandatory buffer size, with it being an error if the device
- *                                        produces less data that this, meaning that unless said flag is
+ *                                        mandatory buffer size,  with it  being an error  if the  device
+ *                                        produces  less data that this, meaning that unless said flag is
  *                                        set, your handler is allowed to completely ignore its `datalen'
- *                                        argument and simply assume that the buffer's size is equal to
- *                                        the `buflen' value passed when the interrupt was registered.
+ *                                        argument and simply assume that  the buffer's size is equal  to
+ *                                        the `buflen' value  passed when the  interrupt was  registered.
  * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
- * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
+ * @param: poll_interval_in_milliseconds: A   hint  for  how  often  the  USB  device  should  be  polled.
  *                                        When set to `0', the device will be polled as often as possible. */
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
 usb_controller_interrupt_create(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
@@ -448,15 +448,15 @@ usb_controller_interrupt_create(struct usb_controller *__restrict self,
 
 
 /* Perform a USB control request.
- * This causes a sequence of at least 3 packets to be sent
- * out to the specified endpoint, starting with a token
- * command packet containing the given `request', followed
+ * This  causes a sequence  of at least 3  packets to be sent
+ * out to  the  specified  endpoint, starting  with  a  token
+ * command packet  containing the  given `request',  followed
  * by as many in/out data packets for interfacing with `buf',
  * and finally followed by a handshake packet
  * @param: buf: A buffer of `request->ur_length' bytes used for
  *              request input/output data.
  *              The flag `request->ur_reqtype & USB_REQUEST_RETYPE_DIR_D2H'
- *              determines the direction in which data is send to/from
+ *              determines the  direction in  which  data is  send  to/from
  *              the device. */
 FUNDEF NONNULL((1, 2, 3, 5)) void KCALL
 usb_controller_request(struct usb_controller *__restrict self,
@@ -465,7 +465,7 @@ usb_controller_request(struct usb_controller *__restrict self,
                        void *buf, /*out*/ struct aio_handle *__restrict aio);
 
 /* Same as `usb_controller_request()', but wait for the operation to complete.
- * Additionally, return the number of bytes written to, or read from `buf' */
+ * Additionally,  return the  number of bytes  written to, or  read from `buf' */
 FUNDEF NONNULL((1, 2, 3)) size_t KCALL
 usb_controller_request_sync(struct usb_controller *__restrict self,
                             struct usb_endpoint *__restrict endp,
@@ -473,7 +473,7 @@ usb_controller_request_sync(struct usb_controller *__restrict self,
                             void *buf);
 
 /* Print the device string associated with `index' to the given `printer'.
- * If `index' is invalid, or the given `dev' didn't return a string, then
+ * If `index' is invalid, or the given `dev' didn't return a string,  then
  * return 0 without doing anything. */
 FUNDEF NONNULL((1, 2, 4)) ssize_t KCALL
 usb_controller_printstring(struct usb_controller *__restrict self,
@@ -482,7 +482,7 @@ usb_controller_printstring(struct usb_controller *__restrict self,
 
 /* Helper wrapper for `usb_controller_printstring()'
  * This function returns a heap-allocated string, or NULL under the same
- * circumstances where `usb_controller_printstring()' would return `0' */
+ * circumstances where `usb_controller_printstring()'  would return  `0' */
 FUNDEF ATTR_MALLOC WUNUSED NONNULL((1, 2)) /*utf-8*/ char *KCALL
 usb_controller_allocstring(struct usb_controller *__restrict self,
                            struct usb_device *__restrict dev, u8 index);
@@ -490,10 +490,10 @@ usb_controller_allocstring(struct usb_controller *__restrict self,
 
 
 /* Function called when a new USB endpoint is discovered.
- * NOTE: This function also releases a lock to `self->uc_disclock'
+ * NOTE: This  function also releases a lock to `self->uc_disclock'
  *       once the device has been assigned an address. In the event
- *       that an exception occurs before then, this lock will also
- *       be released, meaning that this function _always_ releases
+ *       that an exception occurs before then, this lock will  also
+ *       be  released, meaning that this function _always_ releases
  *       such a lock.
  * @param: endpoint_flags: Set of `USB_ENDPOINT_FLAG_*', though only
  *                         flags masked by `USB_ENDPOINT_MASK_SPEED'
@@ -506,23 +506,23 @@ usb_device_discovered(struct usb_controller *__restrict self,
 /* Try to bind the given USB device `dev' to a driver.
  * This function should look at `dev->ud_dev_(class|subclass|protocol)'
  * in order to determine the type of connected device.
- * If all registered callbacks fail to identify the device, at least one
+ * If all registered callbacks fail to identify the device, at least  one
  * of the device's configurations will be chosen, which will then be used
- * to scan for interfaces, which are then passed to callbacks registered
+ * to  scan for interfaces, which are then passed to callbacks registered
  * with `usb_register_interface_probe()'
  * @assume(dev->ud_configc >= 2);
  * @assume(dev->ud_dev_class != 0);
  * @return: true:  The device was discovered successfully.
- *                 In this case, the callback will have initialized
+ *                 In   this   case,  the   callback  will   have  initialized
  *                 `dev->ud_config' to point to the appropriate configuration.
  * @return: false: The device wasn't recognized. */
 typedef bool (KCALL *PUSB_DEVICE_PROBE)(struct usb_controller *__restrict self,
                                         struct usb_device *__restrict dev);
 
-/* Try to bind the given `intf', as well as the associated endpoints a driver.
- * This function should be implemented by USB driver providers, and should look
- * at `intf->ui_intf_desc->ui_intf_(class|subclass|protocol)' in order to determine
- * if the interface's classification is recognized by the specific driver.
+/* Try  to  bind the  given `intf',  as well  as the  associated endpoints  a driver.
+ * This  function  should be  implemented by  USB driver  providers, and  should look
+ * at `intf->ui_intf_desc->ui_intf_(class|subclass|protocol)' in  order to  determine
+ * if  the  interface's  classification  is   recognized  by  the  specific   driver.
  * If the interface isn't recognized, the function should bail out and return `false'
  * @assume(endpv[0..endpc-1] != NULL)
  * @return: true:  The interface was discovered successfully.
@@ -533,7 +533,7 @@ typedef bool (KCALL *PUSB_INTERFACE_PROBE)(struct usb_controller *__restrict sel
 
 /* Register/unregister USB device/interface probe callbacks that get invoked
  * when a new device is discovered.
- * Note that device probes are only invoked for multi-function devices (i.e. ones
+ * Note that device  probes are  only invoked  for multi-function  devices (i.e.  ones
  * with multiple configurations), and have the purpose to allow drivers to be provided
  * for combinations of certain devices.
  * NOTE: After registering a new interface probe function, any USB interface that had
@@ -549,8 +549,8 @@ struct block_device;
 struct character_device;
 
 /* Register mappings between USB devices and device files, such that
- * the USB system can attempt to unregister and remove device files
- * bound to some USB device when it is detected that the usb device
+ * the  USB system can attempt to unregister and remove device files
+ * bound to some USB device when it is detected that the usb  device
  * was unplugged from the system.
  * Note that these functions should be called like this:
  * >> struct (character|block)_device *mydev;
@@ -562,8 +562,8 @@ struct character_device;
  * >>     (character|block)_device_unregister(mydev);
  * >>     RETHROW();
  * >> }
- * Note that it is possible to register any number of devices for any
- * single given USB device, however it is not possible to delete such
+ * Note that it is  possible to register any  number of devices for  any
+ * single  given USB device,  however it is not  possible to delete such
  * a registration, other than physically removing the associated device.
  */
 FUNDEF void KCALL usb_register_block_device(struct usb_device *__restrict usb_dev, struct block_device *__restrict dev) THROWS(E_WOULDBLOCK, E_BADALLOC);

@@ -22,45 +22,45 @@
 
 #include "../../__stdinc.h"
 
-/* NOTE: The ATREE API is deprecated! From now on, all new code should use the
+/* NOTE: The  ATREE API is deprecated! From now on, all new code should use the
  *       RBTREE API, and existing code should be transition to use RBTREEs from
  *       now on.
- * The main advantage from this change is a performance boost in pretty much
- * every usage case, since ATREEs were really only good when it comes to read-
- * only lookup, but totally failed in terms of insert/removal, which have a
+ * The main advantage from  this change is a  performance boost in pretty  much
+ * every  usage case, since ATREEs were really only good when it comes to read-
+ * only  lookup, but  totally failed in  terms of insert/removal,  which have a
  * _really_ bad worst case timings (never calculated it properly, but it always
  * felt like O(N^x) | x>1 for larger N-values)
  *
- * Compare this to a guarantied worst-case of O(log(N)) for locate, insert and
- * delete when using RBTREEs (where ATREEs only managed to get O(log(N)) for
+ * Compare  this  to a  guarantied worst-case  of O(log(N))  for locate,  insert and
+ * delete when  using  RBTREEs (where  ATREEs  only  managed to  get  O(log(N))  for
  * locate), and you've got a much-improved performance for any kind of modification.
  */
 
 __DECL_BEGIN
 
 /* An key tree is a binary-tree based container designed
- * for extremely fast lookup to a mapping for any key.
+ * for extremely fast lookup to  a mapping for any  key.
  * Worst case lookup speed is O(31) on 32-bit and O(63) on 64-bit,
- * though available ram will severely reduce this number again,
- * with lookup speed also being affected by the amount of mapped
- * leafs/branches, as well as how they are mapped, as well as the
+ * though available ram  will severely reduce  this number  again,
+ * with lookup speed also being  affected by the amount of  mapped
+ * leafs/branches, as well as how they are mapped, as well as  the
  * index of the least significant bit set in a given key.
  *
  * Also noteworthy is the fact that instead of mapping individual
- * addresses to unique leafs, an key tree maps regions of
+ * addresses  to  unique  leafs,  an  key  tree  maps  regions of
  * addresses (so called key ranges/regions).
- * With that in mind, mapping an key range more than once
+ * With that  in  mind,  mapping  an key  range  more  than  once
  * isn't allowed, causing either an error, or undefined behavior.
  *
- * An key tree follows strict ordering rules that enforce
+ * An key tree follows strict ordering rules that  enforce
  * a min-max mapping for every leaf that can be determined
  * by its associated addrsemi and addrlevel value.
  *
  * addrsemi:
  *   - The center point used as hint to plot the
- *     correct path for any mapped key.
+ *     correct  path   for   any   mapped   key.
  *   - Each time a branch is reached, the given pointer
- *     is checked to be located inside of its mapping.
+ *     is checked to be located inside of its  mapping.
  *     Only when it wasn't found, continue search as described below.
  *   Assuming 32-bit addresses, a path might be plotted like this:
  *     ADDR: 0x73400000
@@ -74,11 +74,11 @@ __DECL_BEGIN
  *     LEVEL 24; SEMI 0x73000000 < 0x73400000 -> MAX (              set bit 23)
  *     LEVEL 23; SEMI 0x73800000 > 0x73400000 -> MIN (unset bit 23; set bit 22)
  *     LEVEL 22; SEMI 0x73400000 = 0x73400000 -> STOP SEARCH
- *   >> The key `0x73400000' can be mapped to 10 different leafes,
+ *   >> The key `0x73400000' can be  mapped to 10 different  leafes,
  *      with the worst case (here: failure) lookup time for this key
  *      always being O(10).
  *      Note though that for the lookup time to actually be 10, other mappings
- *      must exist that cover _all_ of the SEMI-values during all levels.
+ *      must exist  that cover  _all_ of  the SEMI-values  during all  levels.
  *
  * addrlevel:
  *   - The index of the bit that was set for the current iteration.

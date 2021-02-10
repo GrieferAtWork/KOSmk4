@@ -52,7 +52,7 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
                        char32_t const *__restrict data, size_t datalen);
 
 /* Same as `video_fontprinter()', but only print a single UTF-32 character.
- * @return: * : The width of the printed character (unrecognized characters
+ * @return: * : The  width  of  the  printed  character  (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
 INTDEF NONNULL((1)) size_t CC

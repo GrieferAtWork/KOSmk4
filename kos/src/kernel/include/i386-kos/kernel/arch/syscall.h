@@ -145,14 +145,14 @@ DECL_END
 /* Define compatibility-mode system calls. */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifdef __x86_64__
-/* When defining a 64-bit system call, alias compatible 32-bit variant(s) onto it,
- * thus implementing system calls without dedicated compatibility-mode variants
- * by calling forward to their 64-bit (regular) variants (if possible).
- * A listing of compatible system calls can be found in: `<asm/syscall3264-compat.h>',
+/* When   defining   a  64-bit   system   call,  alias   compatible   32-bit  variant(s)   onto  it,
+ * thus    implementing    system    calls    without    dedicated    compatibility-mode    variants
+ * by    calling    forward    to    their     64-bit    (regular)    variants    (if     possible).
+ * A  listing  of   compatible  system   calls  can  be   found  in:   `<asm/syscall3264-compat.h>',
  * available as `#define __NR3264COMPAT_<NAME> <COMPAT_COUNT>(<FIRST_COMPAT>,<SECOND_COMPAT>,<...>)'
- * Comments found further below detail exactly how this meta-data is used to define
- * system call aliases (don't even try to read the preprocessor magic used to implement
- * the logic. - It works and is standard-compliant, but it is extremely convoluted) */
+ * Comments  found  further   below  detail   exactly  how  this   meta-data  is   used  to   define
+ * system  call  aliases  (don't  even  try  to  read  the  preprocessor  magic  used  to  implement
+ * the  logic.  -   It  works   and  is  standard-compliant,   but  it   is  extremely   convoluted) */
 #undef __ARCH_DEFINE_SYSCALL_COMMON
 #undef __ARCH_DEFINE_SYSCALL32_COMMON
 
@@ -367,8 +367,8 @@ DECL_END
 #include <asm/instr/interrupt.h>
 
 /* Do the equivalent of `intr_exit', but try to make use of `sysretl' if the register
- * state described by the iret tail stored at `0(%rsp)' allow for this to be done.
- * Note that if sysexit ends up being used, the following user-space registers
+ * state described by the iret  tail stored at `0(%rsp)' allow  for this to be  done.
+ * Note  that  if sysexit  ends  up being  used,  the following  user-space registers
  * will be clobbered (which cannot be prevented):
  *  - %rcx      (Set to OFFSET_IRREGS_RIP(%rsp))
  *  - %r8-%r15  (Undefined, but since these are invisible to 32-bit programs, this shouldn't matter) */
@@ -376,8 +376,8 @@ DECL_END
 	jmp __x86_32_syscall_iret
 
 /* Do the equivalent of `intr_exit', but try to make use of `sysretq' if the register
- * state described by the iret tail stored at `0(%rsp)' allow for this to be done.
- * Note that if sysexit ends up being used, the following user-space registers
+ * state described by the iret  tail stored at `0(%rsp)' allow  for this to be  done.
+ * Note  that  if sysexit  ends  up being  used,  the following  user-space registers
  * will be clobbered (which cannot be prevented):
  *  - %rcx      (Set to OFFSET_IRREGS_RIP(%rsp))
  *  - %r11      (Set to OFFSET_IRREGS_RFLAGS(%rsp)) */
@@ -386,9 +386,9 @@ DECL_END
 
 #else /* __x86_64__ */
 
-/* Do the equivalent of `iret', but try to make use of `sysexit' if the register
+/* Do  the equivalent of `iret', but try to  make use of `sysexit' if the register
  * state described by the iret tail stored at `0(%esp)' allow for this to be done.
- * Note that if sysexit ends up being used, the following user-space registers
+ * Note  that if  sysexit ends up  being used, the  following user-space registers
  * will be clobbered (which cannot be prevented):
  *  - %ecx   (Set to OFFSET_IRREGS_ESP(%esp))
  *  - %edx   (Set to OFFSET_IRREGS_EIP(%esp)) */

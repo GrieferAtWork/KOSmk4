@@ -1392,7 +1392,7 @@ print_string_or_buffer(pformatprinter printer, void *arg,
 			used_length = LIMIT_STRLEN;
 		validate_readable(buf, used_length);
 		/* Check if all characters are printable.
-		 * If all of them are, output as a  */
+		 * If  all  of  them  are,  output  as  a */
 		if (is_printable_string((char const *)buf, used_length)) {
 			result = format_printf(printer, arg, "%$q", used_length, buf);
 			if unlikely(result < 0)
@@ -1725,7 +1725,7 @@ err:
 
 #if defined(NEED_print_ioctl_command) || defined(__DEEMON__)
 /* Use the same trick as also used in libdebuginfo/repr.c to encode
- * symbolic constant names (such as those for ioctl() commands) as
+ * symbolic constant names (such as those for ioctl() commands)  as
  * efficiently as possible. */
 
 /*[[[deemon
@@ -3773,11 +3773,11 @@ print_epoll_ctl(pformatprinter printer, void *arg,
 
 
 
-/* Print the representation of a given system call argument
+/* Print the representation of a given system call  argument
  * value, given both its `argtype' (one of `*'), and `value'
  * WARNING: Depending on `argtype', an exception may be thrown
  *          if the system call invoker has passed some invalid
- *          argument to a system call (i.e. a faulty pointer
+ *          argument to a system  call (i.e. a faulty  pointer
  *          when a structure pointer or string was expected) */
 INTERN NONNULL((1)) ssize_t CC
 libsc_printvalue(pformatprinter printer, void *arg,
@@ -4958,7 +4958,7 @@ do_struct_timespecx64:
 
 #ifdef HAVE_SC_REPR_MODE_T
 	case SC_REPR_MODE_T:
-		/* Handle the special case of the 3rd argument
+		/* Handle the special  case of  the 3rd  argument
 		 * to sys_open(), where the mode value is ignored */
 		if (link &&
 		    (link->sa_value.sv_u64 & O_CREAT) != O_CREAT &&

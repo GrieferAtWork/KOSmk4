@@ -87,28 +87,28 @@ DECL_BEGIN
 #endif
 
 /* Very early: Nothing is initialized, yet
- *    WARNING: Strings passed on this level will become invalid invalidated
+ *    WARNING: Strings passed on  this level will  become invalid  invalidated
  *             once `DEFINE_KERNEL_COMMANDLINE_OPTION()' options are evaluated */
 #ifndef DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION
 #error "Forgot to #define DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(addr, type, name) ..."
 #endif /* !DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION */
 
 /* Early:      Memory and system information was gathered
- *    WARNING: Strings passed on this level will become invalid invalidated
+ *    WARNING: Strings passed on  this level will  become invalid  invalidated
  *             once `DEFINE_KERNEL_COMMANDLINE_OPTION()' options are evaluated */
 #ifndef DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION
 #error "Forgot to #define DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION(addr, type, name) ..."
 #endif /* !DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION */
 
-/* Stable:     System devices have gotten at least minimal
+/* Stable:     System  devices   have  gotten   at  least   minimal
  *             initialization, and kernel VM protections are active */
 #ifndef DEFINE_KERNEL_COMMANDLINE_OPTION
 #error "Forgot to #define DEFINE_KERNEL_COMMANDLINE_OPTION(addr, type, name) ..."
 #endif /* !DEFINE_KERNEL_COMMANDLINE_OPTION */
 
-/* NoFS:       All builtin and bootloader drivers have been loaded and initialized,
+/* NoFS:       All builtin and bootloader drivers  have been loaded and  initialized,
  *             however no filesystem has yet to be mounted (this boot stage is mainly
- *             intended to implement the `boot' commandline option to allow the boot
+ *             intended  to implement the `boot' commandline option to allow the boot
  *             device that should get mounted under `/' to be overwritten) */
 #ifndef DEFINE_LATE_KERNEL_COMMANDLINE_OPTION
 #error "Forgot to #define DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(addr, type, name) ..."

@@ -142,7 +142,7 @@ NOTHROW_NCX(CC succ_8f)(byte_t *pc_after_8f, emu86_opflags_t op_flags) {
 #endif
 	/* The actual instruction opcode byte */
 	opcode = *result++;
-	/* NOTE: The behavior of undefined opcodes if assumed, and inferred from
+	/* NOTE: The  behavior of  undefined opcodes  if assumed,  and inferred from
 	 *       likely correct patterns in how AMD appears to allocate XOP opcodes. */
 	switch (vex & EMU86_VEX3B_MMMMM_M) {
 
@@ -171,7 +171,7 @@ ud:
 
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
- * assuming that `pc' points to the start of another instruction.
+ * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
@@ -201,20 +201,20 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc,
 #if NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x2ff
 		if (opcode <= 0x2ff) {
 			/* All 0x0f3800-0x0f38ff opcodes encode to either
-			 * I_RM or I_UD (always use I_RM for these!) */
+			 * I_RM  or  I_UD  (always use  I_RM  for these!) */
 			type = COMMON_OPCODE_TYPE_0f38xx;
 		} else
 #endif /* NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x2ff */
 #if NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x3ff
 		if (opcode <= 0x3ff) {
 			/* All 0x0f3a00-0x0f3aff opcodes encode to either
-			 * I_RM1 or I_UD (always use I_RM1 for these!) */
+			 * I_RM1 or I_UD  (always use  I_RM1 for  these!) */
 			type = COMMON_OPCODE_TYPE_0f3axx;
 		} else
 #endif /* NUMBER_OF_EXPLICITLY_DEFINED_OPCODES <= 0x3ff */
 		{
 			/* Shouldn't get here. (but since `emu86_opcode_decode()' is
-			 * part of a different library, better be safe about this!) */
+			 * part of a different library, better be safe about  this!) */
 			goto ud;
 		}
 	} else {

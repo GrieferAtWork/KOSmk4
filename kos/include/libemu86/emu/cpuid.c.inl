@@ -26,7 +26,7 @@ EMU86_INTELLISENSE_BEGIN(cpuid) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if EMU86_EMULATE_CONFIG_WANT_CPUID
 case EMU86_OPCODE_ENCODE(0x0fa2): {
-	/* 0F A2     CPUID     Returns processor identification and feature information to the
+	/* 0F A2     CPUID     Returns  processor identification and feature information to the
 	 *                     EAX, EBX, ECX, and EDX registers, as determined by input entered
 	 *                     in EAX (in some cases, ECX as well). */
 #ifdef EMU86_EMULATE_HANDLE_CPUID

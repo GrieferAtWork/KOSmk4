@@ -55,7 +55,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_FSGSBASE_32BIT */
 		switch (modrm.mi_reg) {
-	
+
 #if EMU86_EMULATE_CONFIG_WANT_RDFSBASE
 		case 0: {
 			/* F3       0F AE /0     RDFSBASE r32     Load the 32-bit destination register with the FS base address.
@@ -77,7 +77,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
-	
+
 
 #if EMU86_EMULATE_CONFIG_WANT_RDGSBASE
 		case 1: {
@@ -101,7 +101,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
 
-	
+
 #if EMU86_EMULATE_CONFIG_WANT_WRFSBASE && defined(EMU86_SETFSBASE)
 		case 2: {
 			/* F3       0F AE /2     WRFSBASE r32     Load the FS base address with the 32-bit value in the source register.
@@ -133,7 +133,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
-	
+
 #if EMU86_EMULATE_CONFIG_WANT_WRGSBASE && defined(EMU86_SETGSBASE)
 		case 3: {
 			/* F3       0F AE /3     WRGSBASE r32     Load the GS base address with the 32-bit value in the source register.
@@ -165,7 +165,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* ... */
-	
+
 		default:
 			break;
 		}
@@ -213,7 +213,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_STMXCSR
 		case 3: {
 			/*         NP 0F AE /3 STMXCSR m32      Store contents of MXCSR register to m32.
-			 * VEX.LZ.0F.WIG AE /3 VSTMXCSR m32     Store contents of MXCSR register to m32.*/
+			 * VEX.LZ.0F.WIG AE /3 VSTMXCSR m32     Store contents of MXCSR register to m32. */
 			if ((op_flags & (EMU86_F_VEX_VVVVV_M | EMU86_F_VEX_LL_M)) != 0)
 				goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
@@ -321,7 +321,7 @@ case EMU86_OPCODE_ENCODE(0x0fae): {
 				}
 
 
-				/* 66 0F AE /6     CLWB m8     Writes back modified cache line containing m8, and may
+				/* 66 0F AE /6     CLWB m8     Writes back modified  cache line containing  m8, and  may
 				 *                             retain the line in cache hierarchy in non-modified state. */
 #if EMU86_EMULATE_CONFIG_WANT_CLWB
 #ifdef EMU86_EMULATE_CLWB

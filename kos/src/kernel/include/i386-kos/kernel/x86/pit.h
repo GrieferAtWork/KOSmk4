@@ -37,7 +37,7 @@ DECL_BEGIN
 #ifndef CONFIG_NO_SMP
 /* Lock used to synchronize access to the PIT.
  * WARNING: When acquiring this lock, you must first disable preemption!
- * In single-core mode, it is sufficient to only disable preemption. */
+ * In  single-core mode,  it is  sufficient to  only disable preemption. */
 DATDEF struct atomic_lock x86_pit_lock;
 #define x86_pit_lock_acquire_nopr() atomic_lock_acquire_nopr(&x86_pit_lock);
 #define x86_pit_lock_release_nopr() atomic_lock_release(&x86_pit_lock)

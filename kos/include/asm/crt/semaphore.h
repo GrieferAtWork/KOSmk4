@@ -24,17 +24,17 @@
 
 /* #define __ARCH_HAVE_INTERPROCESS_SEMAPHORES
  * >> Defined if `sem_init(3)' with a non-zero value for `pshared'
- *    succeeds, rather than returning with `errno=ENOSYS'. */
+ *    succeeds,   rather   than  returning   with  `errno=ENOSYS'. */
 #if defined(__CRT_KOS) || defined(__CRT_GLC)
 #define __ARCH_HAVE_INTERPROCESS_SEMAPHORES 1
 #endif /* ... */
 
 /* #define __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
- * >> Defined if `sem_open(3)' returns non-unique semaphore objects
- *    when passed separate names. (current) POSIX requires that calls
+ * >> Defined if  `sem_open(3)' returns  non-unique semaphore  objects
+ *    when passed separate names. (current) POSIX requires that  calls
  *    to `sem_open(3)' that use identical values for `name' shall also
- *    return identical pointers, rather than allowing it to return
- *    different pointer, and simply require those points to be backed
+ *    return identical  pointers, rather  than allowing  it to  return
+ *    different pointer, and simply require those points to be  backed
  *    by identical physical memory. */
 #if defined(__CRT_KOS)
 #define __ARCH_HAVE_NON_UNIQUE_SEM_OPEN 1

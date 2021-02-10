@@ -179,9 +179,9 @@ PRIVATE byte_t const video_buffer_empty_data[1] = { 0 };
 PRIVATE NONNULL((1, 2)) int CC
 video_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
                         struct video_lock *__restrict result) {
-	/* Must assign a valid, non-NULL, but empty buffer.
+	/* Must   assign   a  valid,   non-NULL,  but   empty  buffer.
 	 * Technically, any arbitrary non-NULL address would work, but
-	 * set an actual, read-only buffer so-as to catch bad writes. */
+	 * set an actual, read-only buffer so-as to catch bad  writes. */
 	result->vl_data   = (byte_t *)video_buffer_empty_data;
 	result->vl_size   = 0;
 	result->vl_stride = 0;

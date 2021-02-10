@@ -32,7 +32,7 @@ case EMU86_OPCODE_ENCODE(0x0fc3): {
 	MODRM_DECODE_MEMONLY();
 #define NEED_return_expected_memory_modrm
 	addr = MODRM_MEMADDR();
-	/* MOVNTI has weaker instruction ordering when compared to regular MOV, meaning
+	/* MOVNTI  has weaker instruction ordering when compared to regular MOV, meaning
 	 * that the processor is allowed to re-order MOVNTI with other instructions that
 	 * may access memory.
 	 * As such, it is safe to simply emulate MOVNTI via a regular MOV. */

@@ -128,7 +128,7 @@ libterminal_do_iwrite_set_eofing(struct terminal *__restrict self) {
 	/* Set the EOFing bit */
 	ATOMIC_OR(self->t_ios.c_lflag, __IEOFING);
 	/* Broadcast the signal send when the input buffer becomes non-empty,
-	 * thus causing any thread waiting on input data to wake up. */
+	 * thus  causing  any  thread  waiting  on  input  data  to  wake up. */
 	sched_signal_broadcast(&self->t_ibuf.rb_nempty);
 }
 
@@ -548,14 +548,14 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 		size_t character_count;
 		character_count = num_bytes;
 		/* If UTF-8 is supported, count the number of characters
-		 * to delete, rather than the number of bytes. */
+		 * to  delete,  rather   than  the   number  of   bytes. */
 		if (iflag & IUTF8)
 			character_count = utf8_character_count((__USER __CHECKED /*utf-8*/ char const *)erased_data, num_bytes);
 		while (character_count) {
 			--character_count;
 			temp = libterminal_do_owrite_echo(self, erase1, COMPILER_LENOF(erase1), mode,
 			                                  /* Disable `ECHOCTL', since `erase1' would
-			                                   * otherwise get escaped as `^H ^H' */
+			                                   * otherwise  get   escaped   as   `^H ^H' */
 			                                  lflag & ~ECHOCTL);
 			if unlikely(temp < (ssize_t)COMPILER_LENOF(erase1))
 				goto err_or_done;
@@ -901,7 +901,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		end         = iter + num_bytes;
 		flush_start = iter;
 		/* If any input is given (which was tested above), support the IXANY
-		 * flag which will restore output whenever any input is typed out. */
+		 * flag which will restore output  whenever any input is typed  out. */
 		assert(num_bytes);
 		if ((iflag & IXANY) &&
 		    (ATOMIC_READ(self->t_ios.c_iflag) & IXOFF) != 0 &&
@@ -1027,7 +1027,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 					goto done;
 				}
 				/* If this is the last character, or not just any sort of input
-				 * can disable XOFF-mode then disable output processing. */
+				 * can   disable  XOFF-mode  then  disable  output  processing. */
 				if (iter == end - 1 || !(iflag & IXANY))
 					ATOMIC_OR(self->t_ios.c_iflag, IXOFF);
 				++result; /* Account for the control character */
@@ -1355,12 +1355,12 @@ libterminal_flush_ibuf(struct terminal *__restrict self,
  * @return: >= 0 : The sum of return values from calls to the associated printer
  *                 - The usual rules apply where negative return values are propagated immediately.
  *                 - Data printed when an I/O buffer is flushed is not added to this sum, however
- *                   negative values resulting from this case are propagated none-the-less.
- *                 - In cases where data is written to multiple printers (e.g. terminal_iwrite() w/ ECHO),
- *                   only the return value of the intended printer (in this case `t_iprint') is added to
- *                   the eventually returned sum. - Additionally, in this case, the lower of the return
+ *                   negative values  resulting  from  this case  are  propagated  none-the-less.
+ *                 - In cases where  data is written  to multiple printers  (e.g. terminal_iwrite() w/  ECHO),
+ *                   only the return  value of  the intended  printer (in this  case `t_iprint')  is added  to
+ *                   the  eventually  returned sum.  - Additionally,  in this  case, the  lower of  the return
  *                   value of the original call to `t_iprint' and num_bytes passed to it is used as the number
- *                   of bytes that would be echoed on-screen. (meaning that no characters will get echoed
+ *                   of bytes that  would be echoed  on-screen. (meaning  that no characters  will get  echoed
  *                   that can't be added to the input queue)
  * @return: < 0:   A format-printer returned a negative value
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */

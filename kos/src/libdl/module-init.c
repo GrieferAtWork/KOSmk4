@@ -65,7 +65,7 @@ INTERN char *dl_library_path = NULL;
 
 /* This is the prototype by which ELF initializer callbacks are invoked.
  * For this purpose, calling them is essentially the same as calling the
- * primary program's main() function, only that these are expected to
+ * primary program's main()  function, only that  these are expected  to
  * return without doing the program's main task! */
 typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]);
 #define CALLINIT(funptr)                        \
@@ -121,7 +121,7 @@ done_dyntag:
 	 * arguments as are also passed to main():
 	 * >> void (*)(int argc, char *argv[], char *envp[]);
 	 *
-	 * As such, call them like that, rather than without any arguments!
+	 * As  such, call them like that, rather than without any arguments!
 	 * HINT: We can take all of the required information from `root_peb' */
 	for (i = 0; i < preinit_array_size; ++i)
 		CALLINIT(preinit_array_base[i] /* + self->dm_loadaddr*/);
@@ -135,12 +135,12 @@ done_dyntag:
 		CALLINIT(init_array_base[i] /* + self->dm_loadaddr*/);
 }
 
-/* Invoke the static initializers of all currently loaded modules.
- * This is called late during initial module startup once the initial
- * set of libraries, + the initial application have been loaded.
+/* Invoke the  static initializers  of  all currently  loaded  modules.
+ * This is called late during  initial module startup once the  initial
+ * set of  libraries,  +  the initial  application  have  been  loaded.
  * Note that initializers are invoked in reverse order of those modules
- * appearing within `DlModule_AllList', meaning that the primary
- * application's __attribute__((constructor)) functions are invoked
+ * appearing   within  `DlModule_AllList',  meaning  that  the  primary
+ * application's  __attribute__((constructor))  functions  are  invoked
  * _AFTER_ those from (e.g.) libc. */
 INTERN void CC DlModule_RunAllStaticInitializers(void) {
 	REF DlModule *primary;
@@ -150,9 +150,9 @@ INTERN void CC DlModule_RunAllStaticInitializers(void) {
 	DlModule_Incref(primary);
 again_search_noinit:
 	atomic_rwlock_read(&DlModule_GlobalLock);
-	/* XXX: last = LIST_LAST(&DlModule_GlobalList);
-	 *      Change this code if we ever change the list
-	 *      type used by `DlModule_GlobalList' to something
+	/* XXX: last     =      LIST_LAST(&DlModule_GlobalList);
+	 *      Change this  code if  we  ever change  the  list
+	 *      type used by `DlModule_GlobalList' to  something
 	 *      that allows for O(1) lookup of the last element. */
 	last = LIST_FIRST(&DlModule_GlobalList);
 	while (LIST_NEXT(last, dm_globals) != NULL)
@@ -279,8 +279,8 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 				                                             dep_flags);
 				if (!dependency && ATOMIC_READ(dl_error_message) == NULL) {
 					/* Before doing more open() system calls, check to see if we've
-					 * already loaded a matching candidate of this library!
-					 * We can do this because `dl_library_path' never changes. */
+					 * already   loaded  a  matching  candidate  of  this  library!
+					 * We  can  do  this because  `dl_library_path'  never changes. */
 					dependency = DlModule_FindFilenameInPathListFromAll(filename);
 					if (!dependency) {
 						dependency = DlModule_OpenFilenameInPathList(dl_library_path,
@@ -292,8 +292,8 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 				}
 			} else {
 				/* Before doing more open() system calls, check to see if we've
-				 * already loaded a matching candidate of this library!
-				 * We can do this because `dl_library_path' never changes. */
+				 * already   loaded  a  matching  candidate  of  this  library!
+				 * We  can  do  this because  `dl_library_path'  never changes. */
 				dependency = DlModule_FindFilenameInPathListFromAll(filename);
 				if (!dependency) {
 					dependency = DlModule_OpenFilenameInPathList(dl_library_path,
@@ -483,9 +483,9 @@ done_dynamic:
 	if (flags & DL_MODULE_ELF_INITIALIZE_FTEXTREL)
 		DlModule_ElfMakeTextReadonly(self);
 
-	/* Signal the initialization of the library to GDB _after_ relocations have been
+	/* Signal the initialization of the library  to GDB _after_ relocations have  been
 	 * applied. - Otherwise, GDB may place a breakpoint on an instruction that's going
-	 * to be modified by a relocation, causing undefined behavior when the relocation
+	 * to be modified by a relocation, causing undefined behavior when the  relocation
 	 * is applied to the breakpoint-instruction, rather than the original instruction.
 	 * However: Still signal init before calling constructors, so that those are invoked
 	 *          after GDB has injected potential breakpoints, so-as to allow breakpoints

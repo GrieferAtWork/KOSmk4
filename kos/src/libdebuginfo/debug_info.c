@@ -68,19 +68,19 @@ DECL_BEGIN
 #ifdef __KERNEL__
 
 #ifdef CONFIG_HAVE_DEBUGGER
-/* Lock to keep track of attempts to allocate memory for the
+/* Lock  to keep track of attempts to allocate memory for the
  * purposes of abbreviation code caches. Because libdebuginfo
- * is heavily used by the kernel's builtin debugger, we have
- * to be as robust as possible against problems occurring in
+ * is heavily used by the kernel's builtin debugger, we  have
+ * to be as robust as possible against problems occurring  in
  * critical places, such as the heap (which we're using here)
  *
- * Because of this, we use a lock to prevent the debugger
- * accidentally allocating temporary heap memory if the fault
+ * Because  of  this,  we  use  a  lock  to  prevent  the debugger
+ * accidentally  allocating  temporary  heap memory  if  the fault
  * happening while we were already trying to allocate some memory.
  *
  * For this, acquire a write-lock while debugging (which fails if
- * any other thread is already holding some other kind of lock),
- * and acquire a read-lock (to keep track of the recursion when
+ * any  other thread is already holding some other kind of lock),
+ * and acquire a read-lock (to  keep track of the recursion  when
  * calling of these functions) otherwise.
  *
  * With this, we can prevent the debugging from recursively faulting
@@ -101,9 +101,9 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
 /* The debugger overrides the #PF handler to disable any form of lazy initialization
- * of memory, meaning that if we're being called from there, the only way we can
- * safely allocate memory is by allocating from the LOCKED heap with the PREFAULT
- * flag set (thus preventing any possibility of triggering a pagefault in case new
+ * of  memory, meaning that  if we're being called  from there, the  only way we can
+ * safely allocate memory is  by allocating from the  LOCKED heap with the  PREFAULT
+ * flag  set (thus preventing any possibility of  triggering a pagefault in case new
  * memory had to be allocated) */
 #ifndef CONFIG_NO_DEBUGGER
 #define MY_KMALLOC_HEAP (&kernel_locked_heap)
@@ -386,15 +386,15 @@ do_fill_dynamic_cache:
 }
 
 
-/* Given a pointer to the start of a debug_info CU (or a pointer to the start
+/* Given  a pointer to the start of a  debug_info CU (or a pointer to the start
  * of the .debug_info section), as well as the start & end of the .debug_abbrev
- * section, initialize the given debuginfo CU parser structure `result', and
+ * section, initialize the  given debuginfo CU  parser structure `result',  and
  * advance `*pdebug_info_reader' to the start of the next unit.
  * NOTE: Upon success (return == DEBUG_INFO_ERROR_SUCCESS), the caller is responsible for
  *       finalizing the given `abbrev' through use of `debuginfo_cu_abbrev_fini(abbrev)',
  *       once the associated parser `result' is no longer being used.
  * @param: first_component_pointer: A pointer to the first component to load, or `NULL'
- *                                  to simply load the first component following the
+ *                                  to simply load  the first  component following  the
  *                                  start of the associated CU descriptor.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
@@ -469,7 +469,7 @@ again:
 	result->dup_cu_info_pos = reader;
 	if (first_component_pointer) {
 		/* Check if the given pointer is apart of this CU.
-		 * Otherwise, continue onwards to the next CU. */
+		 * Otherwise,  continue  onwards to  the  next CU. */
 		if (first_component_pointer >= result->dup_cu_info_end)
 			goto again;
 		if (first_component_pointer < reader)
@@ -613,7 +613,7 @@ again:
 	if (self->dup_cu_info_pos >= self->dup_cu_info_end)
 		return false; /* EOF */
 	/* DWARF 7.5.2: Each debugging information entry begins with an unsigned
-	 * LEB128 number containing the abbreviation code for the entry */
+	 * LEB128  number  containing  the  abbreviation  code  for  the   entry */
 	abbrev_code = dwarf_decode_uleb128(&self->dup_cu_info_pos);
 	if (!abbrev_code) {
 		if (self->dup_child_depth)
@@ -627,7 +627,7 @@ again:
 }
 
 /* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
- * debug information start location of the next componet within `*pdip' */
+ * debug information start location of  the next componet within  `*pdip' */
 INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self,
                                                         byte_t const **__restrict pdip) {
@@ -638,7 +638,7 @@ again:
 	if (self->dup_cu_info_pos >= self->dup_cu_info_end)
 		return false; /* EOF */
 	/* DWARF 7.5.2: Each debugging information entry begins with an unsigned
-	 * LEB128 number containing the abbreviation code for the entry */
+	 * LEB128  number  containing  the  abbreviation  code  for  the   entry */
 	*pdip       = self->dup_cu_info_pos;
 	abbrev_code = dwarf_decode_uleb128(&self->dup_cu_info_pos);
 	if (!abbrev_code) {
@@ -686,7 +686,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *_
 	return libdi_debuginfo_cu_parser_next(self);
 }
 
-/* Skip the attributes of the current component (must be called if not
+/* Skip the attributes  of the  current component  (must be  called if  not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*')
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
@@ -701,7 +701,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__r
 
 INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
 
-/* Load the current debug information as an attribute encoded as
+/* Load the current debug information as an attribute encoded  as
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
  *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
@@ -1658,7 +1658,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 			break;
 
 		case DW_AT_data_member_location:
-			/* NOTE: Normally, `DW_AT_data_member_location' can also be an expression,
+			/* NOTE: Normally,  `DW_AT_data_member_location' can also be an expression,
 			 *       however in the case of struct members, we're pretty safe to assume
 			 *       that this shouldn't ~normally~ happen... */
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
@@ -2938,7 +2938,7 @@ err:
 
 
 /* Print the C/C++-like representation of a given value, given DWARF debug information
- * about its typing, where `parser' must have been set up to have already loaded the
+ * about  its typing, where `parser' must have been  set up to have already loaded the
  * given `type' component for the given data blob:
  * >> di_debuginfo_variable_t var;
  * >> ... // Load `var'
@@ -3265,7 +3265,7 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	                                                 secname_eh_frame,
 	                                                 MODULE_LOCKSECTION_FNODATA);
 	if (dl_sections->ds_eh_frame) {
-		/* Make sure that user-level data for the section is available.
+		/* Make  sure  that  user-level  data  for  the  section  is available.
 		 * This is essentially a portable way to assert that SHF_ALLOC was set. */
 		if unlikely(module_section_getudata(dl_sections->ds_eh_frame,
 		                                    module_type) == (void *)-1) {

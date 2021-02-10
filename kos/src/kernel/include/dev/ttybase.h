@@ -55,7 +55,7 @@ struct ttybase_device
 #endif /* !__cplusplus */
 	struct terminal         t_term;  /* The associated terminal driver controller. */
 	struct taskpid_awref    t_cproc; /* [0..1] Controlling terminal support.
-	                                  * When non-NULL, points to a session leader thread, such that
+	                                  * When  non-NULL,  points  to  a  session  leader  thread,  such that
 	                                  * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
 	                                  * is the case. */
 	struct taskpid_axref    t_fproc; /* [0..1] PID of the foreground process group leader.
@@ -68,7 +68,7 @@ FUNDEF ssize_t LIBTERM_CC kernel_terminal_check_sigttou(struct terminal *__restr
 FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self, signo_t signo);
 
 /* Check if the calling thread is allowed to read from `self'
- * This function must be called by read-operator overrides! */
+ * This  function must be  called by read-operator overrides! */
 FUNDEF void KCALL kernel_terminal_check_sigttin(struct terminal *__restrict self);
 
 /* Check if a given character device is actually a ttybase */
@@ -93,7 +93,7 @@ NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
                                     pterminal_oprinter_t oprinter);
 struct stat;
 
-/* Default character-device read/write operator implementations for tty devices
+/* Default character-device read/write  operator implementations  for tty  devices
  * These functions will call forward to `terminal_iread()' and `terminal_owrite()'
  * NOTE: The implementation of these functions assumes that the oprinter associated
  *       with the terminal never returns negative values! */
@@ -139,7 +139,7 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty D
 
 /* Finalize a given TTY character device.
  * NOTE: This function must be called from a user-provided, device-level finalizer,
- *       or in other words: You must call this from a function which you must then
+ *       or  in other words: You must call this from a function which you must then
  *       assign to `self->cd_type.ct_fini'! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self);

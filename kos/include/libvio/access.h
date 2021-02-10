@@ -37,7 +37,7 @@ __DECL_BEGIN
 
 /* VIO internal functions for dispatching operations. */
 
-/* Invoke VIO callbacks, automatically substituting operators for one-another.
+/* Invoke  VIO  callbacks, automatically  substituting operators  for one-another.
  * If an operation is impossible, these functions will throw a SEGFAULT exception.
  * @param: atomic: Throw an error if the operation cannot be performed atomically. */
 typedef __ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *PVIO_READB)(struct vioargs *__restrict args, vio_addr_t addr) /*__THROWS(...)*/;

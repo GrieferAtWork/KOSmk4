@@ -663,11 +663,11 @@ NOTHROW_KERNEL(CC text_vga_bios)(void) {
 	if (vga_vm86_state_init(&vs) != VGA_STATE_ERROR_SUCCESS)
 		return;
 	/* Try to switch to text mode, using VESA first, but
-	 * with regular, old VGA interrupts as a fallback.
+	 * with  regular, old VGA  interrupts as a fallback.
 	 * NOTE: 0x8000 is the flag `MF_NOCLEARMEM' (name taken from seabios,
-	 *       as seen apart of QEMU's source tree). This flag (when set),
-	 *       will prevent display memory from being cleared (which is
-	 *       something we really want, we want to manually save/restore
+	 *       as  seen apart of QEMU's source tree). This flag (when set),
+	 *       will prevent  display memory  from being  cleared (which  is
+	 *       something we really want,  we want to manually  save/restore
 	 *       only the part of video memory that we're actually using)
 	 */
 	if (!bios_load_vesa_mode(&vs, 0x8000 | 3)) {

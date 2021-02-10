@@ -404,14 +404,14 @@
 
 /* Behavior/use for `DW_CFA_KOS_startcapsule' / `DW_CFA_KOS_endcapsule'
  *
- * As already stated, these instructions only have special meaning when used in
+ * As  already stated,  these instructions only  have special meaning  when used in
  * functions that also contain a landing pad (similar to how `DW_CFA_GNU_args_size'
  * also only finds special use in such functions)
  *
  * When used, these instructions form "capsules" that can be used to define ranges
- * of CFI instructions that should be executed for the purpose of unwinding, both
+ * of CFI instructions that should be executed for the purpose of unwinding,  both
  * during normal unwinding of a function, as well as when unwinding in the context
- * of jumping to a different location within the same function for the purpose of
+ * of  jumping to a different location within the same function for the purpose of
  * executing an exception handler. As such, the following is done prior to jumping
  * to any landing pad:
  *
@@ -471,20 +471,20 @@
  * >> .Lexcept:
  * >>     ...
  *
- * When jumping to `.Lexcept' as the landing pad of an exception thrown by `syscall',
- * the custom piece of CFI instrumentation used to set `%rflags.DF = 0' will still be
- * executed, even though normally such instrumentation would only be serviced when the
+ * When jumping to `.Lexcept'  as the landing  pad of an  exception thrown by  `syscall',
+ * the custom piece  of CFI instrumentation  used to set  `%rflags.DF = 0' will still  be
+ * executed,  even though normally  such instrumentation would only  be serviced when the
  * surrounding CFI-proc would get unwound (which isn't the case when `.Lexcept' is jumped
- * to as the target of a local landing pad transition). But if `.Lexcept' was located
- * within the same capsule as `syscall' (internally: .Lexcept would have to be followed
- * by at least 1 additional byte of program code before followed by a .cfi_endcapsule
- * directive), then the unwind rule specified by `.cfi_escape' would not be executed
+ * to  as the target  of a local landing  pad transition). But  if `.Lexcept' was located
+ * within  the same capsule as `syscall' (internally:  .Lexcept would have to be followed
+ * by at least 1  additional byte of  program code before  followed by a  .cfi_endcapsule
+ * directive), then the  unwind rule  specified by  `.cfi_escape' would  not be  executed
  * (since the landing pad would not leave the capsule)
  *
- * Using capsules, one is thus able to force certain registers to be restored before
- * executing code from a local landing pad, which is quite useful when one needs custom
- * unwinding behavior for dealing with exceptions produced by inline assembly (which is
- * also the reason why this extension was originally created). Additionally, this also
+ * Using capsules, one  is thus  able to  force certain  registers to  be restored  before
+ * executing code from a local  landing pad, which is quite  useful when one needs  custom
+ * unwinding  behavior for dealing  with exceptions produced by  inline assembly (which is
+ * also  the reason  why this extension  was originally created).  Additionally, this also
  * makes it possible to populate registers with custom values based on where in a function
  * an exception originates:
  *
@@ -521,16 +521,16 @@
  * Implementation:
  *  - CFI capsules are implemented using 2 new CFI instruction `.cfi_startcapsule' and `.cfi_endcapsule'.
  *  - As far as other tools should be concerned, `.cfi_startcapsule' and `.cfi_endcapsule'
- *    are just aliases for `.cfi_remember_state' and `.cfi_restore_state'
- *  - For compatibility, `DW_CFA_GNU_args_size' instrumentation is not affected by capsules.
- *    As such, using capsules to alter the value of the stack-pointer while a non-zero value
+ *    are   just    aliases    for    `.cfi_remember_state'    and    `.cfi_restore_state'
+ *  - For compatibility, `DW_CFA_GNU_args_size' instrumentation is not affected by  capsules.
+ *    As  such, using capsules to alter the value of the stack-pointer while a non-zero value
  *    for `DW_CFA_GNU_args_size' is in effect results in weak undefined behavior (that is: it
  *    is undefined in which order capsule/DW_CFA_GNU_args_size adjustments are performed)
  *  - CFI capsules may not to used inside of initialization text (f_inittext), but can only
  *    appear inside of eval-text (f_evaltext)
  *
  * A patch to (among other things) enable support for this extension by binutils can be found
- * as part of the KOS source tree under /kos/misc/patches/binutils-2.32.patch
+ * as   part   of   the   KOS   source   tree   under   /kos/misc/patches/binutils-2.32.patch
  */
 
 
@@ -641,13 +641,13 @@ typedef struct unwind_emulator_struct {
 	void                   *ue_regset_arg;         /* [?..?][const] Argument passed to `ue_regset'. */
 	di_debuginfo_location_t const
 	                       *ue_framebase;          /* [0..1][const] Frame base expression (for use with `DW_OP_fbreg').
-	                                                * Set to NULL to consider `DW_OP_fbreg' as an illegal instruction. */
+	                                                * Set to NULL to consider `DW_OP_fbreg' as an illegal  instruction. */
 	__uintptr_t             ue_addroffset;         /* [const] Offset added to the value of `DW_OP_addr'. For .eh_frame, this should be `0', but
 	                                                *         for all other purposes, this should be the loadaddr of the associated module. */
 	void                   *ue_objaddr;            /* [0..1][const] Object address value (for use with `DW_OP_push_object_address').
 	                                                * Set to NULL to consider `DW_OP_push_object_address' as an illegal instruction. */
-	__uint32_t              ue_bjmprem;            /* Number of remaining allowed backwards-jumps (used to prevent infinite loops,
-	                                                * which get terminated and cause `UNWIND_EMULATOR_LOOP' to be returned)
+	__uint32_t              ue_bjmprem;            /* Number of remaining allowed backwards-jumps  (used to prevent infinite  loops,
+	                                                * which  get  terminated  and  cause  `UNWIND_EMULATOR_LOOP'  to  be   returned)
 	                                                * During initialization, you may simply assign `UNWIND_EMULATOR_BJMPREM_DEFAULT'
 	                                                * to this field. */
 	__uint8_t               ue_addrsize;           /* [const] Address size (one of 1,2,4 or 8) (operand size of `DW_OP_addr') */
@@ -658,26 +658,26 @@ typedef struct unwind_emulator_struct {
 	__size_t                ue_piecesiz;           /* [const] Size of the `ue_piecebuf' buffer in bytes. */
 	__size_t                ue_piecebits;          /* [<= ue_piecesiz * 8] Number of _BITS_ within the `ue_piecebuf' buffer that are in use. */
 	__uintptr_t             ue_call_frame_cfa;     /* [0..1] Lazily calculated value for the call-frame-CFA of the given register state.
-	                                                * When set to ZERO(0), this value is calculated as-needed, using:
+	                                                * When   set   to   ZERO(0),   this   value   is   calculated   as-needed,    using:
 	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
 	                                                *  - unwind_fde_exec(...) */
 	struct di_debuginfo_compile_unit_simple_struct const
 	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
-	                                                * are listed in the documentation of `debuginfo_location_getvalue()') */
+	                                                * are  listed  in the  documentation  of `debuginfo_location_getvalue()') */
 	__uintptr_t             ue_module_relative_pc; /* [const] Module-relative program counter position (used for selecting callbacks within expression lists) */
 	__byte_t               *ue_tlsbase;            /* [0..1] Base to-be added to an offset in order to form a TLS address within the
-	                                                * targeted thread (or `NULL' if unknown, in which case `DW_OP_form_tls_address'
+	                                                * targeted thread (or `NULL' if unknown, in which case  `DW_OP_form_tls_address'
 	                                                * is considered an illegal instruction, or `(__byte_t *)-1' to lazily calculate) */
 } unwind_emulator_t;
 
-/* Execute the CFI expression loaded into the given unwind-emulator `SELF'.
- * Upon success, `SELF->ue_stacksz' will have been updated to the new stack
- * size, allowing the caller to read the expression's return values from it.
+/* Execute  the   CFI  expression   loaded  into   the  given   unwind-emulator   `SELF'.
+ * Upon  success,  `SELF->ue_stacksz'   will  have   been  updated  to   the  new   stack
+ * size,  allowing  the  caller  to  read   the  expression's  return  values  from   it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
  *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'
  *        before returning (if no such value exists, `UNWIND_EMULATOR_NO_RETURN_VALUE' is returned).
- *        If no stack of sufficient size could be allocated (or if the required stack size is
+ *        If no stack  of sufficient  size could  be allocated  (or if  the required  stack size  is
  *        absurdly large), `UNWIND_EMULATOR_STACK_OVERFLOW' will be returned instead.
  * @param: PENTRY_STACK_TOP:      A value to-be pushed onto the stack upon entry (or NULL).
  * @param: PEXIT_STACK_TOP:       A value to-be popped off of the stack upon exit (or NULL).
@@ -770,7 +770,7 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __se
 
 /* Return a pointer to the next unwind instruction following `UNWIND_PC'
  * -> Useful for dumping unwind instruction without having to take care
- *    of handling all possible instruction (after all: CFI has a CISC
+ *    of handling all possible instruction  (after all: CFI has a  CISC
  *    instruction set with variable-length instructions)
  * @param: ADDRSIZE: Size of a target address.
  * @param: PTRSIZE:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
@@ -806,8 +806,8 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
 struct di_debuginfo_compile_unit_simple_struct;
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
- * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
- *                                Optionally, this argument may be `NULL', however if this is the
+ * @param: SECTINFO:              Emulator section  information  (to-be  filled in  by  the  caller)
+ *                                Optionally,  this argument may  be `NULL', however  if this is the
  *                                case, the function may fail in cases where it would have otherwise
  *                                succeeded.
  * @param: REGGET:                Register getter callback.
@@ -815,17 +815,17 @@ struct di_debuginfo_compile_unit_simple_struct;
  * @param: REGSET:                Register setter callback.
  * @param: REGSET_ARG:            Register setter callback argument.
  * @param: CU:                    Associated compilation unit debug info (or NULL).
- *                                When non-NULL, the following fields may be used:
+ *                                When  non-NULL, the following fields may be used:
  *                                  - CU->cu_ranges.r_startpc
  *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
- *                                the appropriate expression within a location list.
+ *                                the   appropriate  expression  within  a  location  list.
  * @param: MODULE_ADDROFFSET:     The load address of the associated module. (addend for DW_OP_addr)
  * @param: BUF:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
  * @param: BUFSIZE:               Size of the given `BUF' in bytes.
  * @param: PNUM_WRITTEN_BITS:     The number of _BITS_ (not bytes!) read from the location expression,
- *                                and written to the given `BUF' (any trailing bits of buffer memory
+ *                                and written to the given `BUF'  (any trailing bits of buffer  memory
  *                                that weren't written will be filled with `0' upon success)
  * @param: PNUM_READ_BITS:        The number of _BITS_ (not bytes!) written to the location expression,
  *                                and read from the given `BUF'.

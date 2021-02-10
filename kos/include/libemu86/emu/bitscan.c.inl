@@ -54,7 +54,7 @@ case EMU86_OPCODE_ENCODE(0x0fbc):
 #if EMU86_EMULATE_CONFIG_WANT_BSF
 		/*         0F BC /r BSF r16, r/m16   Bit scan forward on r/m16
 		 *         0F BC /r BSF r32, r/m32   Bit scan forward on r/m32
-		 * REX.W + 0F BC /r BSF r64, r/m64   Bit scan forward on r/m64.*/
+		 * REX.W + 0F BC /r BSF r64, r/m64   Bit scan forward on r/m64. */
 #if !EMU86_EMULATE_CONFIG_WANT_TZCNT
 		MODRM_DECODE();
 #endif /* !EMU86_EMULATE_CONFIG_WANT_TZCNT */
@@ -137,7 +137,7 @@ case EMU86_OPCODE_ENCODE(0x0fbd):
 #if EMU86_EMULATE_CONFIG_WANT_BSR
 		/*         0F BD /r BSR r16, r/m16   Bit scan reverse on r/m16
 		 *         0F BD /r BSR r32, r/m32   Bit scan reverse on r/m32
-		 * REX.W + 0F BD /r BSR r64, r/m64   Bit scan reverse on r/m64.*/
+		 * REX.W + 0F BD /r BSR r64, r/m64   Bit scan reverse on r/m64. */
 #if !EMU86_EMULATE_CONFIG_WANT_LZCNT
 		MODRM_DECODE();
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LZCNT */

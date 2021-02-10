@@ -44,14 +44,14 @@ __HYBRID_ALTINT_TYPEDEF(u64, lba_t, false); /* LinearBlockAddress */
 
 struct block_device_type {
 	/* [0..1] Finalizer callback.
-	 * NOTE: In order to ensure a safe cleanup, this function (while required to
+	 * NOTE: In  order to ensure  a safe cleanup, this  function (while required to
 	 *       be async-safe) will always be executed in the context of the boot CPU.
 	 * Since the boot CPU is meant to be responsible for serving any and all device
-	 * interrupts, by disabling preemption within this finalizer, you can safely
-	 * modify data structures that are used locklessly by such interrupt handlers. */
+	 * interrupts, by disabling  preemption within this  finalizer, you can  safely
+	 * modify  data structures that are used locklessly by such interrupt handlers. */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_fini)(struct block_device *__restrict self);
 	/* [1..1] Read function.
-	 * NOTE: Errors may propagated by calling `aio->ah_func' with `AIO_COMPLETION_FAILURE'
+	 * NOTE: Errors may  propagated  by  calling  `aio->ah_func'  with  `AIO_COMPLETION_FAILURE'
 	 *       Errors that are thrown by this function are automatically passed to `aio->ah_func'.
 	 * @assume(num_sectors != 0);
 	 * @param: self:        The block device being addressed.
@@ -82,10 +82,10 @@ struct block_device_type {
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 	/* [1..1] Write function.
 	 * Same as `dt_read', but used for writing data instead.
-	 * NOTE: Errors may propagated by calling `aio->ah_func' with `AIO_COMPLETION_FAILURE'
+	 * NOTE: Errors may  propagated  by  calling  `aio->ah_func'  with  `AIO_COMPLETION_FAILURE'
 	 *       Errors that are thrown by this function are automatically passed to `aio->ah_func'.
 	 * NOTE: The caller is responsible to check the `BLOCK_DEVICE_FLAG_READONLY' flag,
-	 *       and trigger an `E_IOERROR_READONLY' error if that bit is set.
+	 *       and  trigger  an   `E_IOERROR_READONLY'  error  if   that  bit  is   set.
 	 * @assume(num_sectors != 0); */
 	NONNULL((1, 5))
 	void (KCALL *dt_write)(struct block_device *__restrict self,
@@ -109,7 +109,7 @@ struct block_device_type {
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 	/* [0..1] Perform a misc. ioctl() command on this block device.
 	 * @param: partition: The actual partition on which the ioctl() was performed.
-	 *                    In case the command was invoked on the primary device,
+	 *                    In case the command was  invoked on the primary  device,
 	 *                    this argument will be equal to `self' */
 	NONNULL((1))
 	syscall_slong_t (KCALL *dt_ioctl)(struct block_device *__restrict self,
@@ -185,10 +185,10 @@ struct block_device
 	                                                     *       Attempting to sub-partition another partition
 	                                                     *       will simply simply adjust offsets, and create
 	                                                     *       the new partition as part of the main device. */
-	WEAK struct block_device_partition  *bd_delparts;   /* [0..1] Chain of partitions that should be deleted.
-	                                                     * Whenever a lock to `bd_parts_lock' should be acquired,
+	WEAK struct block_device_partition  *bd_delparts;   /* [0..1] Chain of  partitions  that  should  be  deleted.
+	                                                     * Whenever  a lock to `bd_parts_lock' should be acquired,
 	                                                     * this chain must be cleared. In the case of a read-lock,
-	                                                     * this attempt must be made after a try-upgrade, and in
+	                                                     * this attempt must be made  after a try-upgrade, and  in
 	                                                     * the case of a write-lock always. */
 	struct atomic_rwlock                 bd_parts_lock; /* Lock for sub-partitions of this device. */
 	guid_t                               bd_guid;       /* Disk GUID (set during auto-partitioning) */
@@ -197,13 +197,13 @@ struct block_device
 	unsigned int                         bd_cache_cnxt; /* Next cache slot to reset and re-use. */
 	size_t                               bd_cache_size; /* [const][!0] Allocated heap size of `bd_cache_base' */
 	/* TODO: Make so that `bd_cache_base' is allocated in continuous memory,
-	 *       and store its physical base address here in order to improve
+	 *       and  store its physical  base address here  in order to improve
 	 *       performance when interfacing with DMA. */
 	byte_t                              *bd_cache_base; /* [lock(bd_cache_lock)][const]
 	                                                     * [1..BD_MAX_CACHE_SECTORS * bd_cache_ssiz]
 	                                                     * [owned][== vm_node_getminaddr(&bd_cache_node)]
 	                                                     * Base address for the sector cache. */
-	size_t                               bd_cache_ssiz; /* [const][!0][>= bd_sector_size] offset between sectors in `bd_cache_base'.
+	size_t                               bd_cache_ssiz; /* [const][!0][>= bd_sector_size]    offset    between    sectors    in     `bd_cache_base'.
 	                                                     * Cached data for cache-index `i' can then be found at `bd_cache_base + i * bd_cache_ssiz',
 	                                                     * where `i' is an index into `bd_cache' */
 	u8                                   bd_max_retry;  /* How often to re-attempt I/O, not counting the first attempt.
@@ -260,7 +260,7 @@ NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct basic_block_device, bd_refcnt, block_device_destroy)
 
 /* Allocate and initialize a new block device.
- * The caller must still initialize:
+ * The   caller    must   still    initialize:
  *   >> return->bd_type;
  *   >> return->bd_total_bytes;
  *   >> return->bd_sector_count;
@@ -277,13 +277,13 @@ block_device_alloc(size_t sector_size DFL(512),
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */
 #define block_device_devno(self) ((self)->bd_devlink.a_vaddr)
 
-/* Lookup a block device associated with `devno' and return a reference to it.
+/* Lookup  a block device associated with `devno'  and return a reference to it.
  * When no block device is associated that device number, return `NULL' instead. */
 FUNDEF WUNUSED REF struct basic_block_device *KCALL
 block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK);
 
 /* Same as `block_device_lookup()', but return `NULL'
- * if the lookup would have caused an exception. */
+ * if  the  lookup  would have  caused  an exception. */
 FUNDEF WUNUSED REF struct basic_block_device *
 NOTHROW(KCALL block_device_lookup_nx)(dev_t devno);
 
@@ -291,13 +291,13 @@ NOTHROW(KCALL block_device_lookup_nx)(dev_t devno);
  * as will appear in the /dev/ directory, and may optionally be prefixed
  * by a string `/dev/' that is stripped before comparison.
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
- * an encoding that is always attempted first by attempting to decode the
+ * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
  * >> block_device_lookup_name("3:64");      // MKDEV(3, 64)
  * >> block_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
  * >> block_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
  * This function is mainly intended for decoding device names from commandline
- * arguments, such as the kernel's `boot=<NAME>' option which overrides the
+ * arguments, such as  the kernel's `boot=<NAME>'  option which overrides  the
  * kernel's boot partition (in case the kernel can't auto-detect its partition
  * properly).
  * @return: NULL: No device matching `name' exists. */
@@ -314,7 +314,7 @@ block_device_lookup(USER CHECKED char const *name)
 #endif /* __cplusplus */
 
 
-/* Unregister the given block-device from the block-device-id tree, as well as
+/* Unregister  the  given  block-device  from  the  block-device-id  tree,  as  well as
  * removing its auto-generated entry from `/dev' (should that entry have been created).
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
@@ -330,11 +330,11 @@ block_device_register(struct basic_block_device *__restrict self, dev_t devno)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Automatically register the given block-device, assigning it an auto-generated device ID.
- * If `self' is a partition (s.a. `block_device_ispartition()'), assign based on other
- * preexisting partitions `MKDEV(MAJOR(bp_master),LOWEST_UNUSED_MINOR)', or assign
+ * If `self'  is a  partition (s.a.  `block_device_ispartition()'), assign  based on  other
+ * preexisting   partitions   `MKDEV(MAJOR(bp_master),LOWEST_UNUSED_MINOR)',   or    assign
  * `MKDEV(MAJOR(bp_master),MINOR(bp_master) + 1)'.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
- * NOTE: When empty, `bd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
+ * NOTE:   When   empty,    `bd_name'   will   be    set   to    `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 FUNDEF NONNULL((1)) void KCALL
 block_device_register_auto(struct basic_block_device *__restrict self)
@@ -365,13 +365,13 @@ block_device_makepart(struct basic_block_device *__restrict master,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
 
 
-/* Automatically parse the MBR/EFI tables of the disk, and try to partition if accordingly.
- * If one of the partitions found have the ACTIVE/BOOTABLE flag set, a reference to that
- * partition is returned to the caller. If more than one partition has that flag set, or
- * if none of them do, `NULL' is returned instead, though the function has still succeeded.
+/* Automatically parse the MBR/EFI tables of the  disk, and try to partition if  accordingly.
+ * If one of  the partitions found  have the ACTIVE/BOOTABLE  flag set, a  reference to  that
+ * partition is returned  to the caller.  If more than  one partition has  that flag set,  or
+ * if  none of them do, `NULL' is returned  instead, though the function has still succeeded.
  * NOTE: The caller should invoke `block_device_delparts' in the master partition beforehand.
  * NOTE: When `self' is a partition itself, its contents will still be parsed for partition
- *       tables like they usually would, though new partitions will still be added to the
+ *       tables like they usually would, though new  partitions will still be added to  the
  *       master device, as `block_device_makepart()' is used to create them. */
 FUNDEF NONNULL((1)) void KCALL
 block_device_autopart(struct basic_block_device *__restrict self)
@@ -387,7 +387,7 @@ block_device_delparts(struct block_device *__restrict self)
 
 
 /* Read/write data to/from a block device or partition.
- * NOTE: Attempting to read outside of the valid device LBA bounds will yield all zeros.
+ * NOTE: Attempting  to  read  outside  of  the  valid  device  LBA  bounds  will  yield  all  zeros.
  * NOTE: Attempting to write outside of the valid device LBA bounds will cause `E_IOERROR_BADBOUNDS'.
  * NOTE: `completed' is guarantied to get executed, even if an exception is thrown. */
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL block_device_aread_sector)(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC,...);
@@ -415,11 +415,11 @@ FUNDEF NONNULL((1)) void KCALL block_device_writev_sync(struct basic_block_devic
 FUNDEF NONNULL((1)) void KCALL block_device_readv_phys_sync(struct basic_block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC,...);
 FUNDEF NONNULL((1)) void KCALL block_device_writev_phys_sync(struct basic_block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC,...);
 
-/* High-level read/write to/from a block-device, on a per-byte basis.
+/* High-level  read/write  to/from  a  block-device,  on  a  per-byte   basis.
  * These functions are mainly intended for use by file-system drivers, as well
- * as for creating disk partitions. - Regular user-space access usually goes
- * through the VM data-block mapping interface, which is backed by some sort
- * of system which will call though to `block_device_a(read|write)()', if
+ * as for creating disk partitions.  - Regular user-space access usually  goes
+ * through the VM data-block mapping interface,  which is backed by some  sort
+ * of system  which will  call  though to  `block_device_a(read|write)()',  if
  * not `block_device_a(read|write)_sector()'. */
 FUNDEF NONNULL((1)) void KCALL block_device_read(struct basic_block_device *__restrict self, VIRT CHECKED void *dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC,...);
 FUNDEF NONNULL((1)) void KCALL block_device_write(struct basic_block_device *__restrict self, VIRT CHECKED void const *src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC,...);
@@ -444,7 +444,7 @@ FUNDEF NONNULL((1)) size_t KCALL block_device_sync(struct basic_block_device *__
  *       and fill in at some earlier point in time.
  *       After that, the ~boot_partition~ should be determined via:
  *           vfs_kernel->root->inode->super->device */
-/* [0..1] The block device / partition from which the kernel was booted.
+/* [0..1] The  block  device  / partition  from  which the  kernel  was booted.
  * Set to `(struct basic_block_device *)-1' if indeterminate during early boot. */
 DATDEF REF struct basic_block_device *boot_partition;
 #endif /* __CC__ */

@@ -188,7 +188,7 @@ DECL_BEGIN
 
 /* Database entry layout for system call descriptors:
  *    unsigned int sc_argc: 3;                   // Argument count (0-6) (7 is unused)
- *    unsigned int sc_regdw: 5;                  // Bitset of doube-wide arguments (5 is enough,
+ *    unsigned int sc_regdw: 5;                  // Bitset  of doube-wide arguments (5 is enough,
  *                                               // because the worst case is 5-arg,6-reg,dw=[4])
  *    char         sc_name[*] = "...";           // Name of the system call
  *    char         sc_namenul = '\0';            // NUL-byte
@@ -310,15 +310,15 @@ DECL_BEGIN
 
 
 
-/* Define offset lists for where to find specific
+/* Define  offset lists for where to find specific
  * system call entries the database defined above. */
 typedef uint16_t syscalldb_offset_t;
 
-/* Make sure that our chosen offset type can represent all possible offsets.
+/* Make  sure that our  chosen offset type can  represent all possible offsets.
  * Note that an offset equal to `(syscalldb_offset_t)-1' indicates an undefined
  * system call!
- * If any of these assertions fail, then you must assign a larger type
- * for `syscalldb_offset_t', though given that right now it's already
+ * If  any of these assertions fail, then  you must assign a larger type
+ * for `syscalldb_offset_t', though  given that right  now it's  already
  * 16-bit, any of these assertions failing is rather likely to be caused
  * by some kind of problem with the system call table distribution. */
 #define ASSERT_OFFSET_OK(table_id) \
@@ -370,8 +370,8 @@ __NR64FEAT_SYSCALL_TABLE_FOREACH(COMPAT_ASSERT_OFFSET_OK)
 
 
 
-/* Lookup the database entry for the given system call.
- * The returned pointer points to the start of a structure that
+/* Lookup  the   database  entry   for  the   given  system   call.
+ * The returned pointer  points to  the start of  a structure  that
  * matches the `Database entry layout for system call descriptors',
  * as documented further up in this file. */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
@@ -433,8 +433,8 @@ unknown_syscall:
 
 
 
-/* Get a description of the system call described by `sc_info' in `desc'
- * This is the main function used to access the system call description
+/* Get a description  of the  system call  described by  `sc_info' in  `desc'
+ * This  is  the main  function used  to access  the system  call description
  * database for the purpose of doing things such as printing a representation
  * of a system call invocation.
  * @return: true:  The system call was recognized, and `desc' was filled accordingly.
@@ -485,11 +485,11 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 			} else
 #endif /* __ARCH_HAVE_COMPAT */
 			{
-				/* XXX: Technically, double-wide here would mean double-syscall_ulong_t.
-				 *      Only when syscall_ulong_t is 32-bit would that translate to 64-bit
-				 *      in total. However, since KOS doesn't actually have any 128-bit
+				/* XXX: Technically,  double-wide  here  would  mean  double-syscall_ulong_t.
+				 *      Only when syscall_ulong_t  is 32-bit would  that translate to  64-bit
+				 *      in total.  However,  since  KOS doesn't  actually  have  any  128-bit
 				 *      system calls when running with a 64-bit bus width, this functionality
-				 *      is unused, though still partially implemented in case such system
+				 *      is  unused, though  still partially  implemented in  case such system
 				 *      calls ever needs to be defined. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 				desc->sc_argv[i].sa_value.sv_u64 = (uint64_t)((uint64_t)(uintptr_t)sc_info->rsi_regs[regi] |

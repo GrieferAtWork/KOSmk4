@@ -31,7 +31,7 @@
 #define __ASM_ARG(x)     x
 #else /* __TPP_VERSION__ */
 /* CPP doesn't seem to escape this backslash when using PP_STR()?
- * Don't know if that's a bug, but I do know TPP does escape it.
+ * Don't  know if that's a bug, but I do know TPP does escape it.
  * So... Add the second slash manually to work around that. */
 #define __ASM_ARG(x)     \x
 #endif /* !__TPP_VERSION__ */

@@ -47,9 +47,9 @@ DECL_BEGIN
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct driver;
 
-/* Perform arch-specific driver initialization.
+/* Perform   arch-specific   driver    initialization.
  * On x86, this function handles code alternatives, as
- * defined via the optional `.alternatives' section. */
+ * defined via the  optional `.alternatives'  section. */
 INTDEF NONNULL((1)) void KCALL
 arch_driver_initialize(struct driver *__restrict self);
 

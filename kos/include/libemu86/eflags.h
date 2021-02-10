@@ -32,7 +32,7 @@ __DECL_BEGIN
 
 /* ShiftArithmeticRight (same as `unsigned(val) >> num_bits | (val & MaskForMostSignificanBit)')
  * XXX: The C standard leaves the behavior of signed right-shift undefined!
- *      For portability, we should check some kind of arch-feature here! */
+ *      For portability, we  should check some  kind of arch-feature  here! */
 #if 1
 #define emu86_sarb(val, num_bits) ((__int8_t)(val) >> (num_bits))
 #define emu86_sarw(val, num_bits) ((__int16_t)(val) >> (num_bits))
@@ -70,7 +70,7 @@ __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
 }
 
 /* According to Wikipedia (see link above), x86 only considers the
- * least significant bit in the calculation of the parity flag. */
+ * least significant bit  in the calculation  of the parity  flag. */
 #define emu86_geteflags_PFw(v) emu86_geteflags_PFb((__uint8_t)(v))
 #define emu86_geteflags_PFl(v) emu86_geteflags_PFb((__uint8_t)(v))
 #if CONFIG_LIBEMU86_WANT_64BIT

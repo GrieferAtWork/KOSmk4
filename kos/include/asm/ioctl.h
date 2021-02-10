@@ -2,17 +2,17 @@
 #define _ASM_IOCTL_H 1
 
 /* DISCLAIMER: _STRONGLY_ Based on '/usr/include/asm-generic/ioctl.h'
- * NOTE: Do not add a license header to this file!*/
+ * NOTE: Do not add a license header to this file! */
 
 #include <__stdinc.h>
 #include <features.h>
 
-/* ioctl command encoding: 32 bits total, command in lower 16 bits,
+/* ioctl  command  encoding:  32  bits  total,  command  in  lower  16  bits,
  * size of the parameter structure in the lower 14 bits of the upper 16 bits.
- * Encoding the size of the parameter structure in the ioctl request
- * is useful for catching programs compiled with old versions
- * and to avoid overwriting user space outside the user buffer area.
- * The highest 2 bits are reserved for indicating the ``access mode''.
+ * Encoding  the  size  of  the  parameter  structure  in  the  ioctl request
+ * is   useful   for   catching   programs   compiled   with   old   versions
+ * and  to  avoid  overwriting  user  space  outside  the  user  buffer area.
+ * The highest  2  bits  are reserved  for  indicating  the  ``access mode''.
  * NOTE: This limits the max parameter size to 16kB -1 !
  *
  * IOCTL format layout:

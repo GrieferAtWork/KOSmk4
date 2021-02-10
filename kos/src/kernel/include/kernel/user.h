@@ -28,7 +28,7 @@
 
 DECL_BEGIN
 
-/* Skew a kernel pointer such that it remains unique, continues to
+/* Skew a  kernel pointer  such that  it remains  unique, continues  to
  * point into kernel-space, but doesn't necessarily indicate the proper
  * address of the pointed-to kernel object.
  * For this purpose, these functions usually just:
@@ -37,7 +37,7 @@ DECL_BEGIN
  * Note that what exactly is done depends on how the kernel was configured,
  * and a one-time-initialized blob of random data that will not change ever
  * until the next reboot.
- * Also note that these functions may simply not do anything at all, or do
+ * Also note that these functions may simply  not do anything at all, or  do
  * something 100% predictable, especially in situations where the kernel was
  * configured for debugging, rather than security. */
 #define skew_kernel_pointer(p)   (void *)(p) /* TODO */
@@ -46,9 +46,9 @@ DECL_BEGIN
 
 #ifdef __CC__
 /* Validate user-pointers for being allowed to be used for the specified operations.
- * Since the kernel is allowed to access memory that is marked as `PROT_NOUSER',
- * user-pointers passed from user-space must be checked for the same restrictions.
- * In order words: If the user passes a pointer that is part of kernel-space,
+ * Since the kernel  is allowed to  access memory that  is marked as  `PROT_NOUSER',
+ * user-pointers passed from user-space must  be checked for the same  restrictions.
+ * In order words: If  the  user passes  a pointer  that  is part  of kernel-space,
  *                 these functions are used to deny the user access to such memory.
  * @throw E_SEGFAULT: User-space has not been granted access to the given address range. */
 FUNDEF void KCALL validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
@@ -70,15 +70,15 @@ FUNDEF void KCALL validate_readwritem_opt(UNCHECKED USER void *base, size_t num_
 FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROWS(E_SEGFAULT);
 
 /* Same as the regular validate functions, but are allowed to be used for verification
- * of pointers originating from compatibility mode (this allows for an optimization
- * on x86_64 where a 32-bit pointer originating from user-space doesn't need to be
- * checked for overlap with kernel-space, since the kernel-space lies outside of said
+ * of  pointers originating from  compatibility mode (this  allows for an optimization
+ * on x86_64 where  a 32-bit pointer  originating from user-space  doesn't need to  be
+ * checked for overlap with kernel-space, since the kernel-space lies outside of  said
  * 32-bit address space, meaning that the check could never succeed)
  * If you're unsure if some given pointer is allowed to be checked using these functions,
  * first check if the code you're working on only gets compiled with `__ARCH_HAVE_COMPAT'
- * is defined. If it doesn't and also gets compiled at other times, _dont_ use these.
- * If the code only gets compiled when `__ARCH_HAVE_COMPAT' is defined and you're still
- * not sure if these could be used, better do the safe thing and don't use them either. */
+ * is  defined. If it  doesn't and also gets  compiled at other  times, _dont_ use these.
+ * If  the code only gets compiled when  `__ARCH_HAVE_COMPAT' is defined and you're still
+ * not sure if these could be used, better  do the safe thing and don't use them  either. */
 #ifdef __ARCH_HAVE_COMPAT
 #define compat_validate_user           validate_user
 #define compat_validate_userm          validate_userm

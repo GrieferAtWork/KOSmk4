@@ -42,11 +42,11 @@ typedef unsigned int gfp_t;
 #endif /* __KERNEL__ */
 
 
-/* Similar to `cmdline_decode()', however return a heap-allocated
+/* Similar  to `cmdline_decode()', however return a heap-allocated
  * vector of the individual argument strings, which itself is then
  * terminated by a NULL-entry.
  * When `pargc' is non-NULL, store the number of arguments leading
- * up to (but not including) the terminating NULL-entry.
+ * up  to  (but   not  including)   the  terminating   NULL-entry.
  * Upon error, NULL is returned. */
 typedef __ATTR_NONNULL((1)) __ATTR_WUNUSED /*__ATTR_MALLOC*/ char **
 (LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp));
@@ -58,25 +58,25 @@ cmdline_decode_argv(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp __DFL(0))
 
 
 /* Decode and transform a given `cmdline' (which must be a \0-terminated string),
- * and invoke `arg_printer' with each individual argument segment.
+ * and    invoke   `arg_printer'   with   each   individual   argument   segment.
  * NOTE: When `arg_printer' return an error ((*arg_printer)(...) < 0), that error
- *       is propagated and re-returned by this function. In this case, `cmdline'
+ *       is  propagated and re-returned by this function. In this case, `cmdline'
  *       is left in an undefined state.
  * This function recognizes the following commandline rules:
  *   - >\x<    can be used to escape a given character `x'
- *             This character can be anything, and in the leading \-character
+ *             This character can  be anything, and  in the leading  \-character
  *             is always removed, meaning that in order to include a \-character
  *             in the actual argument vector, \\ must be written
  *   - >a b<   Any sort of space characters (s.a. `unicode_isspace()') is recognized
  *             as a suitable separator between arguments.
  *             Multiple consecutive space characters are merged into a single one.
- *   - >"a b"< Write text in space-escaped mode. - In this mode, space characters
+ *   - >"a b"< Write text in  space-escaped mode.  - In this  mode, space  characters
  *             do not mark separate arguments. Additionally, the leading and trailing
  *             "-characters are removed from the generated arguments
- *   - >'a b'< Same as "a b", but with this, you can do >"How's it going"< or
+ *   - >'a b'< Same  as "a b", but with this, you can do >"How's it going"< or
  *             >'I said "Hello"'< instead of having to use >'How\'s it going'<
  *             and >"I said \"Hello\""<
- *   - >""<    Special case: When >""< or >''< is encountered, but is surrounded
+ *   - >""<    Special case: When  >""< or  >''< is encountered,  but is  surrounded
  *             by whitespace, or the start/end of the commandline, an empty argument
  *             will be emit (see examples below)
  * Examples:
@@ -98,8 +98,8 @@ cmdline_decode(char *cmdline,
 
 
 /* Split a given commandline into tightly-packed, NUL-terminated
- * strings, and return the total number of strings.
- * NOTE: Obviously, this function will modify `cmdline'
+ * strings,   and   return   the   total   number   of  strings.
+ * NOTE:  Obviously,   this  function   will  modify   `cmdline'
  * >> char *iter, *my_cmdline = get_cmdline();
  * >> size_t i, argc = cmdline_split(my_cmdline, NULL);
  * >> for (iter = my_cmdline, i = 0; i < argc; ++i, iter = strend(iter) + 1) {

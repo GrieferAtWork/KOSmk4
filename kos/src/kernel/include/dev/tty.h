@@ -27,23 +27,23 @@
 
 DECL_BEGIN
 
-/* Terminal display drivers such as VGA should not implement the
- * tty interface. Instead, they should only need to implement
+/* Terminal display  drivers such  as VGA  should not  implement  the
+ * tty  interface.  Instead,  they  should  only  need  to  implement
  * the normal character_device interface and provide a write-operator
- * that implements an ansi-compliant display port (using libansitty)
+ * that  implements an ansi-compliant display port (using libansitty)
  *
  * An actual `struct tty_device' shouldn't actually be something that gets created
- * implicitly, but should be created explicitly (using the mktty() syscall) by
- * combining 2 arbitrary file descriptors, one providing a read-operator and
- * presumably being implemented by something like the ps2 driver, and the
- * other providing a write-operator and presumably being implemented by
+ * implicitly, but should  be created  explicitly (using the  mktty() syscall)  by
+ * combining  2  arbitrary file  descriptors,  one providing  a  read-operator and
+ * presumably  being  implemented  by  something  like  the  ps2  driver,  and the
+ * other  providing  a   write-operator  and  presumably   being  implemented   by
  * something like the VGA driver.
  *
  * The actual `struct tty_device' then uses `struct terminal' to implement the TERMIOS
- * interface, forwarding/pulling data from its connected read/write object handles
+ * interface, forwarding/pulling  data from  its connected  read/write object  handles
  * as needed, while also encapsulating all of the required POSIX job control
  *
- * On-top of this, it would then also be possible to allow the tty objects to
+ * On-top  of this, it would then also be  possible to allow the tty objects to
  * react to the CTRL+ALT+F{1-NN} key combinations to switch between each other.
  *
  * The common base-class of this and PTY objects is `struct ttybase_device'
@@ -83,12 +83,12 @@ struct tty_device
 FUNDEF NONNULL((1)) void KCALL tty_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF NONNULL((1)) poll_mode_t KCALL tty_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 
-/* Create (but don't register) a new TTY device that connects the two given
+/* Create (but  don't register)  a new  TTY device  that connects  the two  given
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
- * and ansi-compliant display output is written to `ohandle_ptr'
- * For this purpose, special handling is done for certain handles:
- *   - ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isanansitty(ohandle_ptr):
- *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty device
+ * and   ansi-compliant   display    output   is    written   to    `ohandle_ptr'
+ * For   this   purpose,  special   handling   is  done   for   certain  handles:
+ *   - `ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isanansitty(ohandle_ptr)':
+ *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty  device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
  *     When the returned tty device is destroyed, this link gets severed automatically.
  * Upon success, the caller should:
@@ -102,12 +102,12 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
                  uintptr_half_t ohandle_typ, void *ohandle_ptr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Start/Stop forwarding input handle data on the given TTY
- * Note that for any given input handle, only a single TTY should
+/* Start/Stop forwarding  input  handle  data  on  the  given  TTY
+ * Note that for any given input handle, only a single TTY  should
  * ever be allowed to process data. - Allowing multiple TTYs to do
- * so could result in weakly undefined behavior as it would no
- * longer be clear who should actually receive data, causing a
- * soft race condition with the potential of data being scattered
+ * so could result  in weakly  undefined behavior as  it would  no
+ * longer  be clear  who should  actually receive  data, causing a
+ * soft race condition with the potential of data being  scattered
  * between readers, or some random reader getting all of the data.
  * @return: true:  The FWD thread was started/stopped
  * @return: false: The FWD thread was already running/halted */

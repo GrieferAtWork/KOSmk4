@@ -34,15 +34,15 @@
 __DECL_BEGIN
 
 /* Same as the regular unwind(3) (from libunwind.so), however (if configured),
- * this one also handles the case where `ABSOLUTE_PC' points into user-space,
+ * this  one also handles the case where `ABSOLUTE_PC' points into user-space,
  * allowing user-space text locations to be correctly unwound.
  * NOTE: This function should only be used when printing tracebacks for
- *       debugging purposes, but _NEVER_ for the purpose of something
+ *       debugging purposes, but _NEVER_  for the purpose of  something
  *       like exception unwinding!
  * To improve the success-rate of unwinding, this function does a number of things:
  *   - Try to make use of the regular, old `unwind(3)' from `libunwind.so'
  *   - Make use of DWARF `.debug_frame' debug information (if present)
- *   - Inspect/emulate the underlying program text to detect patterns
+ *   - Inspect/emulate  the underlying program  text to detect patterns
  *     that lead to known return instructions. Though this is only done
  *     if implemented and supported for the hosting architecture.
  * Also note that in kernel-space, once the kernel has been poisoned, no

@@ -47,7 +47,7 @@ struct file {
 	pos_t                       f_curidx; /* [lock(f_curlck)][valid_if(INODE_ISDIR(f_node))]
 	                                       * The index of the directory entry currently selected by `f_curent'. */
 	REF struct directory_entry *f_curent; /* [lock(f_curlck)][valid_if(INODE_ISDIR(f_node))][0..1]
-	                                       * The f_curidx-2'th directory of `f_node', or NULL. */
+	                                       * The  f_curidx-2'th  directory of  `f_node',  or NULL. */
 };
 
 /* Destroy the given file object. */
@@ -55,13 +55,13 @@ FUNDEF NOBLOCK void NOTHROW(KCALL file_destroy)(struct file *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct file, f_refcnt, file_destroy)
 
 
-/* A special kind of file stream that is intended to be used
- * for enumerating directories that contain data which could
+/* A special  kind  of  file  stream  that  is  intended  to  be  used
+ * for  enumerating  directories   that  contain   data  which   could
  * randomly change at any time, independent of the filesystem. (/proc)
- * This type of file makes use of the `it_directory.d_oneshot.o_enum'
+ * This type of file makes use of the  `it_directory.d_oneshot.o_enum'
  * facility exposed by the `struct inode_type' structure.
  *  - This type of directory stream is designed to collect _all_
- *    entries that will ever show up _once_ during the first
+ *    entries  that will  ever show  up _once_  during the first
  *   `readdir()' operation. */
 struct oneshot_directory_buffer;
 struct oneshot_directory_file {

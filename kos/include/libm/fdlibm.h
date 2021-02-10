@@ -36,7 +36,7 @@ __DECL_BEGIN
 #define __LIBM_LOCAL_DECLARE_BEGIN             __NAMESPACE_LOCAL_BEGIN
 #define __LIBM_LOCAL_DECLARE_END               __NAMESPACE_LOCAL_END
 #define __LIBM_LOCAL_DECLARE(T, name, value)   __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name = value;
-#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name[n] = 
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name[n] =
 #define __LIBM_LOCAL_VALUE(name)               __NAMESPACE_LOCAL_SYM __libm_##name
 
 /* NOTE: Heavy modifications were made to the original fdlibm! */

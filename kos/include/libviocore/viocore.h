@@ -43,25 +43,25 @@
  * >> viocore_emulate(struct vio_descriptor *self,
  * >>                 void *faultaddr,
  * >>                 vio_cpustate_t *state);
- * This API would then also be exported within a user-space library. This API could then be
- * combined with `memfd_create()', alongside a potential kernel extension that can be used
+ * This API would then  also be exported within  a user-space library. This  API could then  be
+ * combined with `memfd_create()',  alongside a  potential kernel  extension that  can be  used
  * to delegate user-space VIO memory accesses such that the kernel can delegate memory accesses
  * made to user-space VIO as follows:
  *     - Call `sys_write()' with a memory block containing a user-space VIO mapping
  *     - The memory access causes a #PF
  *     - The memory access is handled via kernel-space VIO
  *     - Kernel-space VIO is implemented using a server/client model,
- *       where the client is the kernel-space VIO wrapper, and the
+ *       where the client  is the kernel-space  VIO wrapper, and  the
  *       client is some user-space thread.
- * -> Since user-space memory can only ever be accessed when the
+ * -> Since user-space memory can only  ever be accessed when  the
  *    kernel isn't actually holding any critical lock/resource, it
  *    is quite possible to have a memory access behave as blocking
  *    until user-space return the proper result!
  * NOTE: In this model, user-space wouldn't even need to be able to emulate X86 instructions!
- *       Since memory access is already broken down to its basic operations, kernel-space
+ *       Since  memory access  is already broken  down to its  basic operations, kernel-space
  *       can simply include some operation ID in the request that is send to user-space!
  * >> fd_t userviofd(int flags);
- * The returned fd_t can be used with mmap(). Notifications can be read(2) and responded
+ * The returned fd_t  can be used  with mmap().  Notifications can be  read(2) and  responded
  * through use of write(2), as well as poll(2)ed to wait for memory accesses to be requested.
  * A memory request would include the following information:
  *     >> syscall_ulong_t id;    // Unique ID that must be echoed back when responding
@@ -90,11 +90,11 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
+/* Emulate  the instruction pointed-to  by `self->vea_args.va_state' and dispatch
  * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' by dispatching
  * it using the VIO callback table.
  * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
- * which may be placed at a different address than it was upon entry.
+ * which may  be  placed  at  a  different address  than  it  was  upon  entry.
  * This function is intended to be called from a page fault handler. */
 typedef void (LIBVIOCORE_CC *PVIOCORE_EMULATE)(struct vio_emulate_args *__restrict self);
 #ifdef LIBVIOCORE_WANT_PROTOTYPES

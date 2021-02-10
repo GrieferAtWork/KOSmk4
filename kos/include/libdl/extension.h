@@ -105,10 +105,10 @@ typedef struct dlmodule DlModule;
 #endif /* !__DlModule_defined */
 
 
-/* Jump-table of callbacks which may be invoked by libdl extensions.
- * A pointer to this structure is stored by the libdl core in extension
+/* Jump-table  of callbacks  which may  be invoked  by libdl extensions.
+ * A pointer to this structure is stored by the libdl core in  extension
  * module-type ops descriptors during initialization of such extensions.
- * This table contains internal callbacks which may be used by libdl
+ * This table contains  internal callbacks  which may be  used by  libdl
  * extensions to call back into the libdl core.
  * Essentially, this is a reverse V-Table to expose internal libdl functions
  * to loader extensions (and loader extensions only), without clobbering the
@@ -122,7 +122,7 @@ struct dlcore_ops {
 struct __dl_info_struct;
 
 struct dl_sect_info {
-	void     *dsi_addr;     /* [0..1] Allocation section address (when non-NULL, pointer to
+	void     *dsi_addr;     /* [0..1] Allocation section  address (when  non-NULL, pointer  to
 	                         * the static program image to where the section's mapping starts) */
 	size_t    dsi_size;     /* Section size (in bytes) */
 	size_t    dsi_entsize;  /* Section entry size (in bytes) (or 0 if unknown) */
@@ -148,7 +148,7 @@ struct dlmodule_format {
 	byte_t df_magic[((DL_MODULE_MAXMAGIC + (__SIZEOF_POINTER__ - 1)) & ~(__SIZEOF_POINTER__ - 1)) + (__SIZEOF_POINTER__ - 1)];
 	byte_t df_magsz; /* Length of this format's magic header. <= DL_MODULE_MAXMAGIC */
 
-	/* [1..1] Open a DL module, given a header, filename and file descriptor.
+	/* [1..1] Open  a  DL  module,  given   a  header,  filename  and  file   descriptor.
 	 * NOTE: This function is only called when `memcmp(header, df_magic, df_magsz) == 0'! */
 	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open)(byte_t const header[DL_MODULE_MAXMAGIC],
 	                                                    /*inherit(on_success,HEAP)*/ char *__restrict filename,
@@ -164,7 +164,7 @@ struct dlmodule_format {
 
 	/* [1..1] Finalizer callback, to-be invoked when the module is destroyed.
 	 * NOTE: This callback is also responsible for calling `sys_unmap()' on
-	 *       any mapped program segment associated with the given module. */
+	 *       any mapped program segment  associated with the given  module. */
 	NONNULL((1)) void (LIBDL_CC *df_fini)(DlModule *__restrict self);
 	/* [0..1] Run user-defined module initializers. */
 	NONNULL((1)) void (LIBDL_CC *df_run_initializers)(DlModule *__restrict self);

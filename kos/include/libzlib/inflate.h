@@ -33,7 +33,7 @@
  *    of dynamically allocated heap memory, given enough time.
  *    Besides that: have you looked at how wasteful miniz is when it comes to memory
  *    allocations? geez... that thing is a monster!
- * 
+ *
  */
 
 __DECL_BEGIN
@@ -152,7 +152,7 @@ __NOTHROW_NCX(LIBZLIB_CC zlib_reader_fini)(struct zlib_reader *__restrict self);
  * If an error occurs during this operation, return one of `ZLIB_ERROR_*'
  * @param: buf :           The destination buffer, or `NULL' if data should be skipped.
  * @return: > 0 :          The actual number of decompressed bytes.
- * @return: 0 :            End of input stream, or want more input data.
+ * @return: 0 :            End  of  input  stream,  or  want  more  input   data.
  *                         You may check for the former using `zlib_reader_eof()'
  * @return: ZLIB_ERROR_* : Deflate error. */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
@@ -164,14 +164,14 @@ zlib_reader_read(struct zlib_reader *__restrict self,
                  void *buf, __size_t bufsize);
 #endif /* LIBZLIB_WANT_PROTOTYPES */
 
-/* Feed the given ZLIB reader another blob of compressed data.
- * This function must be called to continue decompression after
+/* Feed the given ZLIB reader  another blob of compressed  data.
+ * This function must be called to continue decompression  after
  * `zlib_reader_read()' returned 0 with a non-empty buffer size,
  * and `zlib_reader_eof(self)' also returning false.
  * WARNING: In order for `feed' to function properly, the reader
- *          must have access to a sliding window buffer.
+ *          must   have  access  to  a  sliding  window  buffer.
  *          Otherwise, you must ensure that the compressed data
- *          blob is already complete from the get-go. */
+ *          blob   is   already  complete   from   the  get-go. */
 typedef __ATTR_NONNULL((1)) void
 (LIBZLIB_CC *PZLIB_READER_FEED)(struct zlib_reader *__restrict self,
                                 void const *blob, size_t blob_size);
@@ -181,7 +181,7 @@ zlib_reader_feed(struct zlib_reader *__restrict self,
                  void const *blob, size_t blob_size);
 #endif /* LIBZLIB_WANT_PROTOTYPES */
 
-/* NOTE: All of the following functions can only (safely) be used if the
+/* NOTE: All of the following functions can only (safely) be used if  the
  *       entire compressed data blob is already known from the beginning! */
 
 /* Set the absolute reader position.

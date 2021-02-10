@@ -21,7 +21,7 @@
 #define __NO_WARNINGS 1
 
 
-/* In order to ensure that all of our system headers work nice with each other,
+/* In order to  ensure that all  of our system  headers work nice  with each  other,
  * try to include every single one at the same time in the following configurations:
  *   - <nothing>
  *   - _EVERY_SOURCE
@@ -47,7 +47,7 @@
  *   - _ISOC_PURE_SOURCE, __KERNEL__, _EVERY_SOURCE
  *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus
  *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus, _EVERY_SOURCE
- * NOTE: The __KERNEL__ variants are achieved by include all *.c files
+ * NOTE: The __KERNEL__ variants are achieved by include all *.c  files
  *       twice, once as part of the kernel core, and once again as part
  *       of /bin/system-test
  */
@@ -1124,7 +1124,7 @@ incdir("");
 /* libstdc++ doesn't work in kernel-space:
  *  - missing functions that libstdc++ assumes to be there (locale, etc...)
  *  - The fact that most libc functions are defined as STDCALL,
- *    which breaks assigning them to prototype pointers. */
+ *    which   breaks  assigning  them  to  prototype  pointers. */
 #ifndef __KERNEL__
 #undef min
 #undef max
@@ -1171,4 +1171,3 @@ incdir("");
 #endif /* _GNU_SOURCE */
 #endif /* !__CRT_FREESTANDING */
 #endif /* __cplusplus */
-

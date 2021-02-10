@@ -84,10 +84,10 @@ struct inode_type {
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *it_fini)(struct inode *__restrict self);
 
 	struct {
-		/* [1..1][locked(WRITE(self))] Load INode attributes.
+		/* [1..1][locked(WRITE(self))]  Load  INode   attributes.
 		 * Upon success, the caller will set `INODE_FATTRLOADED'.
 		 * NOTE: Nodes that are only ever constructed with the `INODE_FATTRLOADED'
-		 *       flag already set (often such nodes are filesystem root nodes),
+		 *       flag already set  (often such nodes  are filesystem root  nodes),
 		 *       do not need to implement this operator.
 		 * REMINDER: This operator is also responsible to load the `i_filenlink' field!
 		 * @throw: E_IOERROR: Failed to load INode attributes. */
@@ -95,7 +95,7 @@ struct inode_type {
 		void (KCALL *a_loadattr)(struct inode *__restrict self)
 				THROWS(E_IOERROR, ...);
 
-		/* [0..1][locked(WRITE(self))] Save INode attributes.
+		/* [0..1][locked(WRITE(self))]   Save   INode    attributes.
 		 * Upon success, the caller will clear `INODE_FATTRCHANGED'.
 		 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_WRATTR:
 		 *                             [...] (Same as not implementing this function)
@@ -108,17 +108,17 @@ struct inode_type {
 
 
 		/* [0..1][locked(WRITE(self))]
-		 * Mask INode attributes not supported by the filesystem by restoring their
-		 * default default as would have been initialized by `a_loadattr()'.
+		 * Mask INode attributes not supported  by the filesystem by restoring  their
+		 * default  default  as  would  have  been  initialized  by   `a_loadattr()'.
 		 * When this operator isn't implemented, all attributes are assumed supported
 		 * by the filesystem.
-		 * Otherwise, this operator is invoked for `chmod()' and `chown()' in order
+		 * Otherwise, this  operator is  invoked for  `chmod()' and  `chown()' in  order
 		 * to check if changes to attributes would become undone once the node is saved.
-		 * If changes would become undone, this function will do that before they could
-		 * become visible in user-space, as well as allow the caller to detect those
+		 * If changes would become undone, this function will do that before they  could
+		 * become visible in  user-space, as well  as allow the  caller to detect  those
 		 * changes and throw an `E_FSERROR_UNSUPPORTED_OPERATION'.
 		 * However, if chmod() or chown() is used to keep previous values (or as with
-		 * the case of `chmod()', filesystem types like FAT still implement a way of
+		 * the case of `chmod()', filesystem types like FAT still implement a way  of
 		 * setting a read-only attribute), this function deciphers such uses when the
 		 * underlying superblock supports attributes only partially.
 		 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_CHMOD:
@@ -127,11 +127,11 @@ struct inode_type {
 		void (KCALL *a_maskattr)(struct inode *__restrict self)
 				/*THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...)*/;
 
-		/* [0..1] Optional callback to implement dynamic handling for stat() on a given INode.
+		/* [0..1] Optional callback to implement dynamic handling for stat() on a given  INode.
 		 * Before this callback is invoked, the caller will have already filled in _all_ fields
-		 * of `result' with values read from the various member fields of `self'.
+		 * of   `result'  with  values   read  from  the  various   member  fields  of  `self'.
 		 * This callback may then overwrite those values however it pleases.
-		 * The intend use of this operator is to lazily calculate dynamic file attribute, such
+		 * The  intend use of this operator is to lazily calculate dynamic file attribute, such
 		 * as the timestamps of /proc/[pid] files, for which lookup doesn't need to happen when
 		 * the INode is created, since this type of lookup is fairly expensive, meaning it's ok
 		 * if it's only done when it's actually needed. */
@@ -152,7 +152,7 @@ struct inode_type {
 		size_t /*NOTHROW*/ (KCALL *a_clearcache)(struct inode *__restrict self);
 
 		/* [0..1] Open the given INode by returning a new handle that should be
-		 * returned to the user-space program. Note that the `h_mode' field of
+		 * returned  to the user-space program. Note that the `h_mode' field of
 		 * the returned handle is ignored and it is up to the caller to fill it
 		 * in as `return.h_mode = IO_FROM_OPENFLAG(oflags)'.
 		 *
@@ -191,20 +191,20 @@ struct inode_type {
 
 	struct {
 		/* [0..1][locked(READ(self))] Read function.
-		 * This function must either perform the read directly, before broadcasting the
-		 * given `completed' signal and returning normally, or must schedule the read to
+		 * This function  must either  perform the  read directly,  before broadcasting  the
+		 * given  `completed' signal  and returning normally,  or must schedule  the read to
 		 * be performed asynchronously, with `completed' being broadcast once that finishes.
 		 * Errors can also be indicated in one of 2 ways:
-		 *  - Either by throwing the error directly before this function returns,
+		 *  - Either by throwing the error directly before this function  returns,
 		 *    in which `completed' must still be invoked with something other than
 		 *    `BD_ASYNC_COMPLETED_SUCCESS' before actually returning.
-		 *  - Or by only invoking `completed' with something other than
+		 *  - Or by only invoking  `completed' with something other  than
 		 *    `BD_ASYNC_COMPLETED_SUCCESS', which can also be done at any
-		 *    point after this function has already returned normally.
+		 *    point after this  function has  already returned  normally.
 		 *    I.e.: It is done asynchronously!
-		 * NOTE: Don't call `aio_multihandle_done(aio)' from within these callbacks!
+		 * NOTE: Don't call  `aio_multihandle_done(aio)'  from  within  these  callbacks!
 		 *       It is the responsibility of whoever declared the multihandle to indicate
-		 *       that all async operations to-be performed with it have been started!
+		 *       that all async  operations to-be  performed with it  have been  started!
 		 * @assume(self->i_flags & INODE_FATTRLOADED);
 		 * @assume(num_bytes != 0);
 		 * @assume(file_position + num_bytes <= self->i_filesize);
@@ -240,11 +240,11 @@ struct inode_type {
 		                       struct aio_multihandle *__restrict aio)
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
-		/* [0..1][locked(WRITE(self))] Write function.
+		/* [0..1][locked(WRITE(self))]     Write      function.
 		 * Same as `f_read', but used for writing data instead.
-		 * NOTE: Don't call `aio_multihandle_done(aio)' from within these callbacks!
+		 * NOTE: Don't call  `aio_multihandle_done(aio)'  from  within  these  callbacks!
 		 *       It is the responsibility of whoever declared the multihandle to indicate
-		 *       that all async operations to-be performed with it have been started!
+		 *       that all async  operations to-be  performed with it  have been  started!
 		 * @assume(self->i_flags & INODE_FATTRLOADED);
 		 * @assume(num_bytes != 0);
 		 * @assume(file_position + num_bytes <= self->i_filesize);
@@ -285,13 +285,13 @@ struct inode_type {
 
 		/* [0..1][locked(WRITE(self))]
 		 * Truncate or increment the length of `self' to `new_size' bytes.
-		 * Upon success, the caller will update `self->i_filesize',
+		 * Upon   success,  the  caller  will  update  `self->i_filesize',
 		 * by setting it to be equal to `new_size'.
-		 * NOTE: When ZERO(0) is passed for `new_size', this function must
-		 *       deallocate any blocks allocated for the file. (These semantics
+		 * NOTE: When  ZERO(0)  is  passed  for  `new_size',  this  function  must
+		 *       deallocate any blocks  allocated for the  file. (These  semantics
 		 *       are required during `unlink()' before removing the last reference
 		 *       to a regular file; however, empty directories are removed through
-		 *       use of the `d_rmdir()' operator when applied to the hosting
+		 *       use  of  the `d_rmdir()'  operator  when applied  to  the hosting
 		 *       directory)
 		 * @assume(self->i_flags & INODE_FATTRLOADED);
 		 * @assume(self->i_filesize != new_size);
@@ -311,9 +311,9 @@ struct inode_type {
 
 		/* [0..1] Flexible read operator.
 		 * This function can be used in place of the more low-level read operators
-		 * defined above, and allows the implementing filesystem to dynamically
-		 * control the behavior of the read(2) system call when invoked on this
-		 * INode. (mainly intended for configuration files found in places such
+		 * defined above, and  allows the implementing  filesystem to  dynamically
+		 * control  the behavior of  the read(2) system call  when invoked on this
+		 * INode. (mainly intended  for configuration files  found in places  such
 		 * as the procfs) */
 		NONNULL((1))
 		size_t (KCALL *f_flexread)(struct inode *__restrict self,
@@ -323,8 +323,8 @@ struct inode_type {
 
 #ifdef LIBVIO_CONFIG_ENABLED
 		/* [0..1][locked(READ(self) / WRITE(self))]
-		 * VIO file data access interface.
-		 * Since INodes are derived from data blocks, they can also implement the VIO
+		 * VIO   file   data   access    interface.
+		 * Since  INodes are derived from data blocks,  they can also implement the VIO
 		 * interface, with this pointer being usable as hook for implementing file I/O,
 		 * as well as memory mappings through virtual I/O callbacks. */
 		struct vio_operators *f_vio;
@@ -334,11 +334,11 @@ struct inode_type {
 	union {
 		struct {
 			/* [0..1][locked(READ(self))]
-			 * NOTE: This function should not yield entries for `.'
+			 * NOTE: This  function  should not  yield entries  for `.'
 			 *       and `..', as those are created by the VFS overlay.
-			 * Read a new directory entry from the data stream of `self', starting at
-			 * data offset `*pentry_pos'. Upon success, return a reference to the newly
-			 * allocated directory entry and update `*pentry_pos' to point to the next
+			 * Read  a  new directory  entry  from the  data  stream of  `self',  starting at
+			 * data  offset  `*pentry_pos'. Upon  success, return  a  reference to  the newly
+			 * allocated  directory  entry  and update  `*pentry_pos'  to point  to  the next
 			 * directory entry (which can then be re-used in further calls to this function).
 			 * When the directory has ended, return `NULL' instead to indicate EOF.
 			 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
@@ -352,15 +352,15 @@ struct inode_type {
 
 			/* One-shot directory enumeration operators.
 			 * These can be provided as an alternative when `d_readdir'
-			 * isn't implemented, and are best suited for dynamic
+			 * isn't  implemented,  and  are  best  suited  for dynamic
 			 * directories such as `/proc'. */
 			struct {
 				/* [0..1][locked(READ(self))]
-				 * Optional operator that can be implemented to
-				 * accommodate dynamically allocated directory entries.
-				 * When implemented, this operator is used during
+				 * Optional   operator   that  can   be   implemented  to
+				 * accommodate dynamically  allocated directory  entries.
+				 * When  implemented,  this   operator  is  used   during
 				 * path traversion instead of using `d_readdir' for that.
-				 * NOTE: The implementation of this function is free to make use
+				 * NOTE: The implementation of this function is free to make  use
 				 *       of the following fields of the returned directory_entry,
 				 *       as it sees fit:
 				 *           - return->de_next
@@ -400,7 +400,7 @@ struct inode_type {
 			 * [locked(WRITE(target_directory))]
 			 * [locked(WRITE(target_directory->i_super->s_nodes_lock))]
 			 * Allocate a new regular (`S_IFREG') INode referred to by a single link
-			 * that is created within `target_directory', using `target_dirent'
+			 * that is  created  within  `target_directory',  using  `target_dirent'
 			 * as INode directory entry.
 			 * This function must initialize the following members of `target_dirent':
 			 *     - de_fsdata (optionally, depending on filesystem implementation)
@@ -411,13 +411,13 @@ struct inode_type {
 			 *     - i_type
 			 *     - i_filenlink (To `>= 1')
 			 *     - i_fsdata (Optionally; pre-initialized to `NULL')
-			 * During this operation, the new directory entry should be
+			 * During this operation, the new directory entry should  be
 			 * constructed on-disk, or scheduled for such an allocation.
-			 * NOTE: This function may also choose to set the `INODE_FCHANGED' flag
-			 *       of `new_node', in which case the caller will add the node to
+			 * NOTE: This function may also choose  to set the `INODE_FCHANGED'  flag
+			 *       of  `new_node', in  which case the  caller will add  the node to
 			 *       the set of changed nodes of the accompanying superblock, meaning
-			 *       that filesystem implementations may choose to lazily set save
-			 *       attributes of newly constructed nodes to disk once the disk
+			 *       that filesystem implementations  may choose to  lazily set  save
+			 *       attributes of  newly constructed  nodes to  disk once  the  disk
 			 *       is supposed to be synchronized.
 			 * @assume(new_node->db_refcnt == 1); (Exclusive user)
 			 * @assume(new_node->i_flags & INODE_FATTRLOADED);
@@ -446,7 +446,7 @@ struct inode_type {
 			/* [0..1]
 			 * [locked(WRITE(target_directory))]
 			 * [locked(WRITE(target_directory->i_super->s_nodes_lock))]
-			 * Allocate a new directory INode referred to by a single link
+			 * Allocate a  new directory  INode referred  to by  a single  link
 			 * that is created within `target_directory', using `target_dirent'
 			 * as INode directory entry.
 			 * This function must initialize the following members of `target_dirent':
@@ -458,13 +458,13 @@ struct inode_type {
 			 *     - i_type
 			 *     - i_filenlink (To `>= 1')
 			 *     - i_fsdata (Optionally; pre-initialized to `NULL')
-			 * During this operation, the new directory entry should be
+			 * During this operation, the new directory entry should  be
 			 * constructed on-disk, or scheduled for such an allocation.
-			 * NOTE: This function may also choose to set the `INODE_FCHANGED' flag
+			 * NOTE: This function may  also choose to  set the `INODE_FCHANGED'  flag
 			 *       of `new_directory', in which case the caller will add the node to
-			 *       the set of changed nodes of the accompanying superblock, meaning
-			 *       that filesystem implementations may choose to lazily set save
-			 *       attributes of newly constructed nodes to disk once the disk
+			 *       the set of changed nodes of the accompanying superblock,  meaning
+			 *       that filesystem  implementations may  choose to  lazily set  save
+			 *       attributes  of  newly constructed  nodes  to disk  once  the disk
 			 *       is supposed to be synchronized.
 			 * @assume(new_directory->db_refcnt == 1); (Exclusive user)
 			 * @assume(new_directory->i_super == target_directory->i_super);
@@ -492,7 +492,7 @@ struct inode_type {
 			/* [0..1]
 			 * [locked(WRITE(target_directory))]
 			 * [locked(WRITE(target_directory->i_super->s_nodes_lock))]
-			 * Insert the given symbolic-link node `link_node' into the given
+			 * Insert the given symbolic-link  node `link_node' into the  given
 			 * target directory `target_directory' under `target_dirent', while
 			 * initializing the following members of `link_node':
 			 *    - i_fileino
@@ -530,7 +530,7 @@ struct inode_type {
 			 * [locked(WRITE(target_directory))]
 			 * [locked(WRITE(target_directory->i_super->s_nodes_lock))]
 			 * Allocate a new device node referred to by a single link that
-			 * is created within `target_directory', using `target_dirent'
+			 * is created within `target_directory', using  `target_dirent'
 			 * as INode directory entry.
 			 * This function must initialize the following members of `target_dirent':
 			 *    - de_fsdata (optionally, depending on filesystem implementation)
@@ -546,13 +546,13 @@ struct inode_type {
 			 *                 })
 			 *    - i_filenlink (To `>= 1')
 			 *    - i_fsdata (Optionally; pre-initialized to `NULL')
-			 * During this operation, the new directory entry should be
+			 * During this operation, the new directory entry should  be
 			 * constructed on-disk, or scheduled for such an allocation.
-			 * NOTE: This function may also choose to set the `INODE_FCHANGED' flag
-			 *       of `nod', in which case the caller will add the node to
+			 * NOTE: This function may also choose  to set the `INODE_FCHANGED'  flag
+			 *       of `nod',  in  which  case  the caller  will  add  the  node  to
 			 *       the set of changed nodes of the accompanying superblock, meaning
-			 *       that filesystem implementations may choose to lazily set save
-			 *       attributes of newly constructed nodes to disk once the disk
+			 *       that filesystem implementations  may choose to  lazily set  save
+			 *       attributes of  newly constructed  nodes to  disk once  the  disk
 			 *       is supposed to be synchronized.
 			 * @assume(nod->db_refcnt == 1); (Exclusive user)
 			 * @assume(nod->i_flags & INODE_FATTRLOADED);
@@ -582,7 +582,7 @@ struct inode_type {
 			 * [locked(WRITE(link_target))]
 			 * [locked(WRITE(target_directory))]
 			 * Construct a new hardlink to `link_target' as a new directory
-			 * entry `target_dirent' within `target_directory'.
+			 * entry     `target_dirent'     within     `target_directory'.
 			 * This function must initialize the following members of `target_dirent':
 			 *    - de_fsdata (optionally, depending on filesystem implementation)
 			 *    - de_pos
@@ -615,17 +615,17 @@ struct inode_type {
 			 * [locked(WRITE(source_directory))]
 			 * [locked(WRITE(source_node))]
 			 * [locked(WRITE(source_node->i_super->s_nodes_lock))]
-			 * Move the given `source_node' from one directory into another.
-			 * This operation may construct a new INode for the target directory
-			 * and have it inherit all data from the old node, in which case that
-			 * new node must be returned, with the caller then marking `source_node'
-			 * as deleted and removing it from the associated superblock's INode tree.
-			 * Otherwise, a reference to `source_node' should be re-returned, and the
+			 * Move  the   given  `source_node'   from   one  directory   into   another.
+			 * This  operation  may  construct  a  new  INode  for  the  target directory
+			 * and have  it inherit  all  data from  the old  node,  in which  case  that
+			 * new node  must be  returned, with  the caller  then marking  `source_node'
+			 * as  deleted and removing  it from the  associated superblock's INode tree.
+			 * Otherwise,  a reference  to `source_node'  should be  re-returned, and the
 			 * caller will proceed to only remove `source_dirent' from `source_directory'
-			 * (if it was created by something other than `o_lookup'), before adding
-			 * `target_dirent' to the target directory (unless that directory implements
+			 * (if it  was created  by something  other than  `o_lookup'), before  adding
+			 * `target_dirent' to the target directory (unless that directory  implements
 			 * the one-shot interface)
-			 * NOTE: When a new INode is returned, `source_node' must
+			 * NOTE: When a new  INode is  returned, `source_node'  must
 			 *       _NOT_ be marked as having changed by this function!
 			 *
 			 * This function must initialize the following members of `target_dirent':
@@ -633,8 +633,8 @@ struct inode_type {
 			 *    - de_pos
 			 *    - de_ino
 			 *
-			 * If the filesystem supports hardlinks, this operator can be left
-			 * as `NULL', as it must then be possible to emulate it through use
+			 * If the filesystem supports hardlinks,  this operator can be  left
+			 * as `NULL', as it must then be possible to emulate it through  use
 			 * of `d_link(target_directory,target_dirent,source_node)', followed
 			 * by `d_unlink(source_directory,source_dirent,source_node)'.
 			 * NOTE: The invoked `d_rename' operator is always the one of `source_directory'
@@ -673,10 +673,10 @@ struct inode_type {
 			 * NOTE: The given `containing_entry' may be another directory,
 			 *       in which case the caller is responsible to ensure that
 			 *      `i_filenlink' is greater than ZERO(0).
-			 * NOTE: This function is not responsible to deallocate file data
-			 *       allocated for the INode. If the INode has a non-ZERO(0)
-			 *       `i_filesize' value prior to the caller choosing to invoke
-			 *       this operator, the `f_truncate' operator will be invoked
+			 * NOTE: This function is not  responsible to deallocate file  data
+			 *       allocated for the  INode. If the  INode has a  non-ZERO(0)
+			 *       `i_filesize' value prior to the caller choosing to  invoke
+			 *       this  operator, the `f_truncate'  operator will be invoked
 			 *       first, making it its responsibility to deallocate any file
 			 *       data associated with the INode before it goes away.
 			 * NOTE: Upon success, this function must decrement `i_filenlink'.
@@ -739,15 +739,15 @@ struct inode_type {
 
 			/* [if(sl_readlink == NULL,[1..1]) else([0..1])]
 			 * [locked(READ(self))]
-			 * Used when `sl_readlink' isn't implemented to dynamically generate
+			 * Used when `sl_readlink'  isn't implemented  to dynamically  generate
 			 * the symlink text of a given INode. This operator is used by symlinks
 			 * that can arbitrarily change their text, or who's text depends on the
 			 * calling thread (e.g. `/proc/self')
 			 * NOTE: This function is not required to append a terminating NUL-character,
-			 *       and even if it does, it mustn't include its memory requirement in
+			 *       and  even if it  does, it mustn't include  its memory requirement in
 			 *       the required buffer size returned.
 			 * @return: * : The required buffer size. (EXCLUDING a terminating
-			 *              NUL-character that can even be OMITTED)
+			 *              NUL-character   that   can   even   be    OMITTED)
 			 * @throw: E_SEGFAULT: The given user-buffer is faulty.
 			 * @throw: E_IOERROR:  Failed to read data from disk. */
 			NONNULL((1))
@@ -791,39 +791,39 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
 
 #define INODE_FNORMAL      0x0000 /* Normal INode flags. */
 #define INODE_FPERSISTENT  0x0001 /* [const] This INode is persistent and must not be unloaded in order to
-                                   * free available memory. While INodes of regular file systems, such as
-                                   * FAT or EXT2 can simply be saved and unloaded once no longer used
-                                   * anywhere but by the associated superblock, RAM-based file systems,
-                                   * such as DEVFS keep all of their data in memory, meaning that they
+                                   * free  available memory. While INodes of regular file systems, such as
+                                   * FAT or EXT2  can simply  be saved and  unloaded once  no longer  used
+                                   * anywhere but by  the associated superblock,  RAM-based file  systems,
+                                   * such as DEVFS  keep all of  their data in  memory, meaning that  they
                                    * must set this flag for their nodes.
                                    *  - When set, the associated superblock's INODE table holds a reference
                                    *    to this INode, thereby (intentionally) causing a reference loop due
                                    *    to `self->i_super->INODE_TABLE->self'
-                                   *  - As a consequence the this, when unlinking the INode, it is also
+                                   *  - As a consequence the this, when  unlinking the INode, it is  also
                                    *    necessary to decrement the INode's reference counter after it has
                                    *    been removed from the superblock's INODE table. */
 #define INODE_FCHANGED     0x0002 /* The INode's file contents (as cached through the underlying datablock's
-                                   * data parts) have changed. - This flag, as well as `INODE_FATTRCHANGED'
+                                   * data  parts) have changed. - This flag, as well as `INODE_FATTRCHANGED'
                                    * are atomically set in order to safely insert the node into the chain of
                                    * changed nodes found in its superblock. */
-#define INODE_FATTRCHANGED 0x0004 /* Similar to `INODE_FCHANGED', but indicates that only the node's
-                                   * attributes (size, time stamps, permissions, etc.) have changed.
-                                   * This flag is set atomically in conjunction with the node being chained
+#define INODE_FATTRCHANGED 0x0004 /* Similar  to   `INODE_FCHANGED',   but   indicates  that   only   the   node's
+                                   * attributes   (size,   time   stamps,   permissions,   etc.)   have   changed.
+                                   * This  flag  is set  atomically  in conjunction  with  the node  being chained
                                    * to the list of changed nodes found in the superblock. (s.a. `i_changed_next') */
 #define INODE_FATTRLOADED  0x0008 /* [lock(WRITE_ONCE)] The node's attributes have been loaded. */
 #define INODE_FDIRLOADED   0x0010 /* [lock(WRITE_ONCE)] The entires of a directory INode has been fully loaded. */
 #define INODE_FLNK_DONT_FOLLOW_FINAL_LINK 0x2000 /* - Don't follow the symlink of this INode if it's the final link of some given path.
                                                   * - Skip the `if (!(oflags & O_SYMLINK)) THROW(E_FSERROR_IS_A_SYMBOLIC_LINK);' check during open.
-                                                  * This flag is used to implement open() for procfs's `/proc/[pid]/fd/[no]' files. */
-#define INODE_FSUPERDEL    0x4000 /* Set alongside `INODE_FDELETED' when the INode was closed because of the
-                                   * superblock being unmounted, when `superblock_set_unmounted()' was called.
+                                                  * This   flag   is  used   to  implement   open()   for  procfs's   `/proc/[pid]/fd/[no]'  files. */
+#define INODE_FSUPERDEL    0x4000 /* Set  alongside  `INODE_FDELETED'  when the  INode  was closed  because  of the
+                                   * superblock being  unmounted,  when  `superblock_set_unmounted()'  was  called.
                                    * If `superblock_set_unmounted()' then fails to synchronize outstanding changes,
-                                   * nodes with this bit set will have their `INODE_FDELETED' flags cleared again. */
+                                   * nodes with this bit set will have their `INODE_FDELETED' flags cleared  again. */
 #define INODE_FDELETED     0x8000 /* FLAG: The INode has been deleted.
                                    * When this flag is set, it is illegal to set any of the following flags:
                                    *  - INODE_FCHANGED
                                    *  - INODE_FATTRCHANGED
-                                   * Additionally, it is illegal to perform any of the following operations,
+                                   * Additionally, it is illegal to  perform any of the following  operations,
                                    * with the addition that the INode no longer appears, or is currently being
                                    * removed from its containing directory, as well as the VFS dentry cache:
                                    *  - read(2)
@@ -877,12 +877,12 @@ struct inode
 	ATREE_NODE_SINGLE(struct inode,ino_t)
 	                    i_filetree;     /* File tree. */
 #ifdef __INTELLISENSE__
-	ino_t               i_fileino;      /* [const] File INode number (used to unambiguously identify an INode).
+	ino_t               i_fileino;      /* [const] File  INode   number   (used   to  unambiguously   identify   an   INode).
 	                                     * NOTE: This chain holds a reference to nodes with the `INODE_FPERSISTENT' flag set. */
 #else /* __INTELLISENSE__ */
 #define i_fileino       i_filetree.a_vaddr
 #endif /* !__INTELLISENSE__ */
-	pos_t               i_filesize;     /* [lock(this)][valid_if(INODE_FATTRLOADED)] Size of the file (in bytes)
+	pos_t               i_filesize;     /* [lock(this)][valid_if(INODE_FATTRLOADED)]  Size of the file (in bytes)
 	                                     * NOTE: Before `INODE_FATTRLOADED' is set, this field is set to ZERO(0)! */
 	mode_t              i_filemode;     /* [lock(this)][valid_if(INODE_FATTRLOADED)][const(MASK(S_IFMT))]
 	                                     * File type and permissions (see `S_*' above).
@@ -890,7 +890,7 @@ struct inode
 	nlink_t             i_filenlink;    /* [lock(this)][valid_if(INODE_FATTRLOADED)]
 	                                     * Link counter of this INode.
 	                                     * When this counter reaches ZERO(0), data of the node is
-	                                     * deleted and the node can no longer be operated upon. */
+	                                     * deleted and the node can  no longer be operated  upon. */
 	uid_t               i_fileuid;      /* [lock(this)][valid_if(INODE_FATTRLOADED)] File user ID */
 	gid_t               i_filegid;      /* [lock(this)][valid_if(INODE_FATTRLOADED)] File group ID */
 	struct timespec     i_fileatime;    /* [lock(this)][valid_if(INODE_FATTRLOADED)] Last accessed time. */
@@ -940,7 +940,7 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_downgrade)(void);
 #endif /* !____devfs_datablock_defined */
 
 /* When locking an INode, it is no longer unlikely that that Inode is devfs.
- * For this reason, re-define sync functions for INodes to explicitly get
+ * For  this reason, re-define  sync functions for  INodes to explicitly get
  * rid of the unlikely() for the DEVFS comparison. */
 #define inode_lock_read(self)             (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_read() : (void)rwlock_read(__inode_lock(self)))
 #define inode_lock_write(self)            (__inode_as_datablock(self) == &__devfs_datablock ? devfs_lock_write() : (void)rwlock_write(__inode_lock(self)))
@@ -991,22 +991,22 @@ struct directory_entry {
 	struct directory_entry            *de_next;    /* [0..1][lock(this)] Next directory entry with the same hash. */
 	LLIST_NODE(struct directory_entry) de_bypos;   /* [lock(this)] Chain of directory entires, sorted by their in-directory position.
 	                                                * NOTE: When a directory entry is removed, this link is set to NULL,
-	                                                *       meaning that enumerating a directory is as simple as taking
+	                                                *       meaning that enumerating a directory is as simple as  taking
 	                                                *      `:d_bypos' of the directory node while holding `this'
 	                                                *       and acquire a reference.
 	                                                *       Then to continue enumeration, simply re-acquire the `this'
 	                                                *       lock and traverse the `de_bypos' chain, stopping when NULL is encountered.
-	                                                *       When `NULL' is encountered, you may check if your current node
-	                                                *       is `d_bypos_end'. If it isn't, enumeration was halted because your
-	                                                *       current node was deleted. It it was, make use of a secondary entry
+	                                                *       When  `NULL'  is  encountered,  you   may  check  if  your  current   node
+	                                                *       is  `d_bypos_end'.  If  it  isn't,  enumeration  was  halted  because your
+	                                                *       current  node  was deleted.  It  it was,  make  use of  a  secondary entry
 	                                                *       index you've been keeping track of to skip to the next entry.
 	                                                * NOTE: If you reach EOF normally, check the `INODE_FDIRLOADED' flag to see
 	                                                *       if additional directory entries exist that haven't been loaded yet. */
 	struct ATTR_PACKED { /* Optional, filesystem-specific data. */
 		pos_t                         de_start;   /* [const][valid_if(?)]
 		                                           * Filesystem-specific starting position of data for this directory entry.
-		                                           * Filesystem where the actual name of the file is located before the its
-		                                           * data block (such as FAT's long file names), use this to point to the
+		                                           * Filesystem where the actual name of the file is located before the  its
+		                                           * data block (such as FAT's  long file names), use  this to point to  the
 		                                           * start of such data.
 		                                           * NOTE: The filesystem is allowed to use this location for whatever it chooses. */
 		unsigned char                 de_data[16];/* Arbitrary, filesystem-specific data. (in FAT, this is the 8.3 version of the filename) */
@@ -1026,7 +1026,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct directory_entry, de_refcnt, directory_entry_destroy)
 
-/* Allocate a new directory entry.
+/* Allocate a  new directory  entry.
  * The caller must still initialize:
  *   - de_next
  *   - de_bypos
@@ -1126,10 +1126,10 @@ __DEFINE_SYNC_PROXY(struct symlink_node,sl_node)
 struct fifo_node;   /* S_ISFIFO  (define in <fs/special-node.h>) */
 struct socket_node; /* S_ISSOCK  (define in <fs/special-node.h>) */
 
-/* Mandatory finalizier that must be called by `struct inode_type::it_fini'
- * of any INode that is `S_ISFIFO()'. This function must be called by
+/* Mandatory finalizier that  must be  called by  `struct inode_type::it_fini'
+ * of any  INode  that  is  `S_ISFIFO()'. This  function  must  be  called  by
  * file-system specific overrides for `struct inode_type::it_fini', and should
- * be linked in as part of the `struct inode_type::it_directory::d_mknod'
+ * be  linked  in  as part  of  the `struct inode_type::it_directory::d_mknod'
  * callback. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fifo_node_fini)(struct inode *__restrict self);
@@ -1139,7 +1139,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_node_fini)(struct inode *__restrict self);
 
 
-/* Indicate that `self' has been used recently, allowing the INode to be cached
+/* Indicate that  `self' has  been used  recently,  allowing the  INode to  be  cached
  * such that it will remain allocated for a while, even when not referenced elsewhere. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL inode_recent)(struct inode *__restrict self);
@@ -1164,9 +1164,9 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL inode_recent_getcur)(void);
 DATDEF WEAK size_t inodes_recent_lim;
 
 /* Read/write data to/from the given INode.
- * NOTE: These functions automatically do everything required to safely read/modify
+ * NOTE: These functions automatically do  everything required to safely  read/modify
  *       INode data, searching through the memory mapping cache containing all of the
- *       node's possible data parts, as well as creating missing parts and unsharing
+ *       node's possible data parts, as well as creating missing parts and  unsharing
  *       copy-on-write mappings when writing.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1208,9 +1208,9 @@ FUNDEF NONNULL((1)) void NOTHROW(KCALL inode_areadall_phys)(struct inode *__rest
 FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallv)(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallv_phys)(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 
-/* Same as the read functions above, but if no data could be read (because the read
+/* Same  as  the read  functions above,  but  if no  data could  be  read (because  the read
  * happened to be performed beyond the file's allocated size), block until data can be read.
- * If some data could be read (regardless of how much), do not block, and return even
+ * If some data  could be  read (regardless  of how  much), do  not block,  and return  even
  * when `return < num_bytes'.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1242,9 +1242,9 @@ inode_preadv_blocking(struct inode *__restrict self,
  * and chain the node as part of the associated superblock's list of
  * changed INodes.
  * @param: what:   Set of `INODE_FCHANGED|INODE_FATTRCHANGED',
- *                 of which at least one must be given.
+ *                 of  which  at  least  one  must  be  given.
  * @return: true:  Successfully marked the INode for having been changed,
- *                 or the node had already been scheduled as having been
+ *                 or the node had already been scheduled as having  been
  *                 changed.
  * @return: false: The `INODE_FDELETED' bit has been set for `self' */
 FUNDEF NOBLOCK NONNULL((1)) bool
@@ -1255,9 +1255,9 @@ NOTHROW(KCALL inode_changedattr)(struct inode *__restrict self) {
 	return inode_changed(self, INODE_FATTRCHANGED);
 }
 
-/* Same as `inode_changed()', but the caller is required to be holding
- * a lock on `self', whilst this function will also update the file's
- * modified timestamp, before setting both `INODE_FCHANGED|INODE_FATTRCHANGED'
+/* Same   as   `inode_changed()',  but   the  caller   is   required  to   be  holding
+ * a   lock   on  `self',   whilst  this   function  will   also  update   the  file's
+ * modified   timestamp,   before  setting   both  `INODE_FCHANGED|INODE_FATTRCHANGED'
  * bits the same way a call to `inode_changed(self,INODE_FCHANGED|INODE_FATTRCHANGED)'
  * would. */
 FUNDEF NONNULL((1)) bool KCALL
@@ -1270,7 +1270,7 @@ inode_loadattr(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...);
 
 
-/* Assert that the calling thread is allowed to access the given
+/* Assert that the  calling thread  is allowed to  access the  given
  * the specified file, throwing an `E_FSERROR_ACCESS_DENIED' if not.
  * @param: type: Set of `R_OK | W_OK | X_OK' */
 FUNDEF NONNULL((1)) void KCALL
@@ -1300,7 +1300,7 @@ inode_access_accmode(struct inode *__restrict self, iomode_t iomode)
 
 struct stat;
 
-/* Collect stat-information about the given INode `self', implementing
+/* Collect  stat-information about the  given INode `self', implementing
  * the behavior of the `stat(2)' system call for INodes, as well as many
  * other handle types, including PATH and FILE objects. */
 FUNDEF NONNULL((1)) void KCALL
@@ -1346,9 +1346,9 @@ inode_chtime(struct inode *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
 
 /* Change permissions, SUID/SGID and the sticky
- * bit of the given INode (flags mask: 07777)
+ * bit  of the given  INode (flags mask: 07777)
  * The new file mode is calculated as `(old_mode & perm_mask) | perm_flag',
- * before being masked by what the underlying filesystem is capable of
+ * before being  masked by  what the  underlying filesystem  is capable  of
  * representing.
  * @return: * : The old file mode
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
@@ -1383,7 +1383,7 @@ inode_chown(struct inode *__restrict self,
  * NOTE: This function is allowed to be called after a node has been
  *       deleted, though only if
  * @param: what: Set of `INODE_FCHANGED|INODE_FATTRCHANGED',
- *               of which at least one must be given.
+ *               of  which  at  least  one  must  be  given.
  * @return: * :  Set of `INODE_FCHANGED|INODE_FATTRCHANGED' describing what was actually synced
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1393,8 +1393,8 @@ inode_sync(struct inode *__restrict self,
            uintptr_t what DFL(INODE_FCHANGED | INODE_FATTRCHANGED))
 		THROWS(E_FSERROR_DELETED, E_IOERROR, ...);
 
-/* Ensure that the given symbolic-link INode has been loaded.
- * This function is a no-op when `self->sl_text != NULL' upon entry,
+/* Ensure  that  the  given  symbolic-link  INode  has  been  loaded.
+ * This function is a no-op when `self->sl_text != NULL' upon  entry,
  * and guaranties that `self->sl_text' will be non-NULL upon success.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1408,9 +1408,9 @@ FUNDEF NONNULL((1)) bool KCALL
 symlink_node_load(struct symlink_node *__restrict self)
 		THROWS(E_FSERROR_DELETED, E_BADALLOC, E_IOERROR, ...);
 
-/* Wrapper around `symlink_node_load()' for reading the text of a symbolic
+/* Wrapper around `symlink_node_load()' for reading the text of a  symbolic
  * link into a user-supplied user-space buffer, whilst returning the number
- * of required bytes of memory (EXCLUDING a trailing NUL-character, which
+ * of required bytes of memory  (EXCLUDING a trailing NUL-character,  which
  * this function will _NOT_ append to the supplied buffer!) */
 FUNDEF NONNULL((1)) size_t KCALL
 symlink_node_readlink(struct symlink_node *__restrict self,
@@ -1418,7 +1418,7 @@ symlink_node_readlink(struct symlink_node *__restrict self,
 		THROWS(E_FSERROR_DELETED, E_BADALLOC, E_IOERROR, E_SEGFAULT, ...);
 
 /* Read the next directory entry from `self' that hasn't been loaded, yet.
- * Return NULL and set the `INODE_FDIRLOADED' flag once the entirety of
+ * Return  NULL and set  the `INODE_FDIRLOADED' flag  once the entirety of
  * the directory has been loaded.
  * NOTE: The caller must be holding a read-lock on `self'.
  * @assume(sync_reading(self));
@@ -1429,7 +1429,7 @@ FUNDEF NONNULL((1)) struct directory_entry *KCALL
 directory_readnext(struct directory_node *__restrict self)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
-/* Same as `directory_readnext()', but return the
+/* Same as `directory_readnext()', but return  the
  * self-pointer of the newly read directory entry. */
 FUNDEF WUNUSED NONNULL((1)) struct directory_entry **KCALL
 directory_readnext_p(struct directory_node *__restrict self)
@@ -1510,11 +1510,11 @@ directory_getcaseentry(struct directory_node *__restrict self,
 
 /* Same as the function above, but return the entry's self-pointer within the directory node.
  * @param: poneshot_entry:  A storage location for directories implementing the one-shot interface.
- * @return: poneshot_entry: The directory implements the one-shot interface, and the
+ * @return: poneshot_entry: The  directory  implements  the one-shot  interface,  and the
  *                          located directory entry has been stored in `*poneshot_entry'.
- *                          In this case, `*poneshot_entry' is a reference that must be
+ *                          In this case, `*poneshot_entry' is  a reference that must  be
  *                          inherited by the caller.
- * @return: * :   The directory entries self-pointer (NOT A REFERENCE!).
+ * @return: * :   The  directory  entries  self-pointer  (NOT  A  REFERENCE!).
  *                In this case, `*poneshot_entry' will have been set to `NULL'
  * @return: NULL: No INode with the given `name' exists.
  *              (`E_FSERROR_(FILE|PATH)_NOT_FOUND'-style)
@@ -1591,7 +1591,7 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 
 
 /* Same as `directory_getentry()', but automatically dereference
- * the directory entry to retrieve the associated INode.
+ * the   directory  entry  to  retrieve  the  associated  INode.
  * Additionally, the caller isn't required to already be holding
  * a read-lock for the given directory.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
@@ -1668,11 +1668,11 @@ directory_getcasenode(struct directory_node *__restrict self,
 
 
 /* Create a new file within the given directory.
- * NOTE: When `open_mode & O_EXCL' is set, only `struct regular_node' are ever returned.
+ * NOTE: When `open_mode & O_EXCL'  is  set,  only `struct regular_node'  are  ever returned.
  * NOTE: When `open_mode & O_DOSPATH' is set, ignore casing when checking for existing files.
  * @param: open_mode: Set of `O_CREAT|O_EXCL|O_DOSPATH'
  * @param: ptarget_dirent: When non-NULL, store a reference to the resulting node's directory entry here.
- * @param: pwas_newly_created: When non-NULL, write `true' if a new file was
+ * @param: pwas_newly_created: When non-NULL,  write `true'  if  a new  file  was
  *                             created, or `false' when the file already existed.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
  * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
@@ -1698,14 +1698,14 @@ directory_creatfile(struct directory_node *__restrict target_directory,
 
 #define DIRECTORY_REMOVE_FREGULAR   0x0001 /* Remove regular files (`unlink()') */
 #define DIRECTORY_REMOVE_FDIRECTORY 0x0002 /* Remove directories (`rmdir()') */
-#define DIRECTORY_REMOVE_FCHKPMOUNT 0x2000 /* Check if `containing_path' has been re-mounted before actually removing anything.
+#define DIRECTORY_REMOVE_FCHKPMOUNT 0x2000 /* Check if  `containing_path' has  been re-mounted  before actually  removing  anything.
                                             * If it has been, don't perform the removal and return `DIRECTORY_REMOVE_STATUS_REMOUNT'
                                             * NOTE: This flag may only be set when `containing_path' is non-NULL, and the
-                                            *       check itself will only be performed when removing child directories. */
+                                            *       check itself will only be performed when removing child  directories. */
 #define DIRECTORY_REMOVE_FCHKACCESS 0x4000 /* Check access permissions of the calling thread, and throw `E_FSERROR_ACCESS_DENIED'
                                             * if the calling thread may not delete the affected file.
-                                            * NOTE: Only what would eventually become `*premoved_inode' is
-                                            *       checked for permissions. - The containing directory is
+                                            * NOTE: Only  what  would eventually  become  `*premoved_inode' is
+                                            *       checked  for  permissions. -  The containing  directory is
                                             *       not checked for anything, leaving this task to the caller. */
 #define DIRECTORY_REMOVE_FNOCASE    0x8000 /* Ignore casing. */
 
@@ -1714,9 +1714,9 @@ directory_creatfile(struct directory_node *__restrict target_directory,
 #define DIRECTORY_REMOVE_STATUS_UNLINK   0x0001 /* The operation has removed or unlinked a file. */
 #define DIRECTORY_REMOVE_STATUS_RMDIR    0x0002 /* The operation has removed or unlinked a directory. */
 #define DIRECTORY_REMOVE_STATUS_FDELETED 0x4000 /* FLAG: The associated node has been deleted.
-                                                 * This flag is set when the node's NLINK counter has reached
+                                                 * This  flag is set when the node's NLINK counter has reached
                                                  * ZERO(0) as a result of the remove operation, at which point
-                                                 * the `INODE_FDELETED' flag is set, and the node is removed
+                                                 * the `INODE_FDELETED' flag is set,  and the node is  removed
                                                  * from the INode tree of the associated superblock. */
 
 /* Remove an entry from this directory.
@@ -1759,14 +1759,14 @@ directory_remove(struct directory_node *__restrict self,
 
 
 #define DIRECTORY_RENAME_FNORMAL    0x0000 /* Normal rename flags. */
-#define DIRECTORY_RENAME_FCHKPMOUNT 0x2000 /* Check if `source_path' has been re-mounted before actually removing anything.
+#define DIRECTORY_RENAME_FCHKPMOUNT 0x2000 /* Check  if  `source_path'  has  been  re-mounted  before  actually  removing  anything.
                                             * If it has been, don't perform the removal and return `DIRECTORY_RENAME_STATUS_REMOUNT'
-                                            * NOTE: This flag may only be set when `source_path' is non-NULL, and the
+                                            * NOTE: This  flag may only  be set when `source_path'  is non-NULL, and the
                                             *       check itself will only be performed when removing child directories. */
 #define DIRECTORY_RENAME_FCHKACCESS 0x4000 /* Check access permissions of the calling thread, and throw `E_FSERROR_ACCESS_DENIED'
                                             * if the calling thread may not rename the affected file.
-                                            * NOTE: Only what would eventually become `*premoved_inode' is
-                                            *       checked for permissions. - The containing directory is
+                                            * NOTE: Only  what  would eventually  become  `*premoved_inode' is
+                                            *       checked  for  permissions. -  The containing  directory is
                                             *       not checked for anything, leaving this task to the caller. */
 #define DIRECTORY_RENAME_FNOCASE    0x8000 /* Ignore casing. */
 
@@ -1935,7 +1935,7 @@ struct superblock_type {
 #define SUPERBLOCK_TYPE_FNODEV           0x01 /* The superblock should be constructed without a device. */
 #define SUPERBLOCK_TYPE_FSINGLE          0x80 /* This type of superblock is a singleton (e.g. the `devfs' superblock) */
 	u8     st_flags;                          /* [const] Superblock type flags (Set of `SUPERBLOCK_TYPE_F*') */
-	size_t st_sizeof_superblock;              /* [const] == sizeof(struct superblock) + sizeof(FS_SPECIFIC_SUPERBLOCK_DATA)
+	size_t st_sizeof_superblock;              /* [const] ==  sizeof(struct  superblock)  +  sizeof(FS_SPECIFIC_SUPERBLOCK_DATA)
 	                                           * The heap size to which a superblock is allocated before `st_open()' is called. */
 	union ATTR_PACKED {
 		/* [1..1][const]
@@ -1943,9 +1943,9 @@ struct superblock_type {
 		 * [locked(WRITE(fs_filesystems.f_superlock))]
 		 * Open a new superblock for `dev'.
 		 * NOTE: To prevent race conditions, or hardware damage, this
-		 *       function should not attempt to modify on-disk data,
-		 *       as it may be called, only to have the return value
-		 *       discarded when multiple tasks attempt to open a
+		 *       function  should not attempt to modify on-disk data,
+		 *       as it may be called,  only to have the return  value
+		 *       discarded  when  multiple  tasks attempt  to  open a
 		 *       given device as a superblock at the same time.
 		 * This function must initialize the following members of `self':
 		 *   - s_features.sf_magic
@@ -1969,10 +1969,10 @@ struct superblock_type {
 		 *   - s_features.sf_rec_xfer_align     = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
 		 * After this, the caller will add the superblock to the global chain
 		 * of existing superblocks through use of the `s_filesystems' field.
-		 * @param: args: Type-specific user-space data passed to the constructor.
+		 * @param: args: Type-specific  user-space data passed to the constructor.
 		 *               When non-NULL, most filesystem types expect this to point
 		 *               to a comma-separated string of ~flags~ describing special
-		 *               mounting behavior, as pass to the `mount' command using
+		 *               mounting behavior, as pass  to the `mount' command  using
 		 *               the `-o' option.
 		 * @throw: E_FSERROR_WRONG_FILE_SYSTEM:     [...]
 		 * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM: [...]
@@ -2001,7 +2001,7 @@ struct superblock_type {
 
 		/* [1..1][const]
 		 * [locked(WRITE(self->s_nodes_lock))]
-		 * Perform additional initialization for loading a given `node'.
+		 * Perform  additional  initialization  for loading  a  given `node'.
 		 * The caller has already initialize the following members of `node':
 		 *    - i_attr.a_ino
 		 *    - i_attr.a_mode & I_FMT
@@ -2009,7 +2009,7 @@ struct superblock_type {
 		 * This function must then initialize the following members of `node':
 		 *    - i_type
 		 *    - i_fsdata (Optionally; pre-initialized to `NULL')
-		 * Optionally, INode attributes may be initialized, as would also be
+		 * Optionally, INode attributes may be initialized, as would also  be
 		 * done with a call to `a_loadattr()'. If this is done, this operator
 		 * should set the `INODE_FATTRLOADED' flag before returning. */
 		NONNULL((1, 2, 3, 4))
@@ -2028,7 +2028,7 @@ struct superblock_type {
 
 		/* [0..1][const]
 		 * Synchronize all unwritten data of this superblock.
-		 * NOTE: This function is called when `superblock_sync()'
+		 * NOTE: This function is called when  `superblock_sync()'
 		 *       finishes flushing the data of all changed INodes. */
 		NONNULL((1))
 		void (KCALL *f_sync)(struct superblock *__restrict self)
@@ -2091,7 +2091,7 @@ struct superblock
 	                                               * NOTE: Every node apart of this chain must have either the
 	                                               *      `INODE_FCHANGED' or `INODE_FATTRCHANGED' flag set. */
 	WEAK struct inode            *s_delnodes;     /* [0..1][CHAIN(->i_changed_next)]
-	                                               * Chain of nodes that are pending deletion and wish to be removed
+	                                               * Chain  of nodes that  are pending deletion and  wish to be removed
 	                                               * from the `s_nodes' tree, but couldn't do so themself after failing
 	                                               * to acquire a lock to `s_nodes_lock'
 	                                               * This chain must atomically be exchanged with `NULL' every time
@@ -2101,7 +2101,7 @@ struct superblock
 	struct rwlock                 s_nodes_lock;   /* Lock for `s_nodes' */
 	ATREE_HEAD(struct inode)      s_nodes;        /* [1..1][lock(s_nodes_lock)] Address tree of Inodes.
 	                                               * WARNING: This tree may contain INodes with a reference counter of ZERO(0).
-	                                               * NOTE: This tree is holding a reference (causing an intentional
+	                                               * NOTE: This  tree  is  holding  a  reference  (causing  an  intentional
 	                                               *       reference loop) for nodes with the `INODE_FPERSISTENT' flag set.
 	                                               * NOTE: This tree _always_ contains the superblock
 	                                               *       root node (which is the superblock itself) */
@@ -2154,8 +2154,8 @@ FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL superblock_mountlock_upgr
 
 /* Open the given block-device as a superblock.
  * NOTE: If the given `device' has already been opened, return the existing
- *       filesystem or throw an `E_FSERROR_DEVICE_ALREADY_MOUNTED'
- *       error if the given type doesn't match the existing association.
+ *       filesystem   or   throw   an    `E_FSERROR_DEVICE_ALREADY_MOUNTED'
+ *       error if the  given type doesn't  match the existing  association.
  * @param: flags:                   Set of `SUPERBLOCK_F*'
  * @param: pnew_superblock_created: When non-NULL, set to `true' if a new
  *                                  superblock was created, otherwise set to `false'
@@ -2181,23 +2181,23 @@ superblock_open(struct superblock_type *__restrict type,
 /* Synchronize all modified nodes within the given superblock
  * NOTE: This function is allowed to be called after `SUPERBLOCK_FUNMOUNTED' has been set!
  * @param: sync_device: When `true', also synchronize the underlying
- *                      block-device (if any) before returning. */
+ *                      block-device  (if  any)  before   returning. */
 FUNDEF NONNULL((1)) void KCALL
 superblock_sync(struct superblock *__restrict self,
                 bool sync_device DFL(true))
 		THROWS(E_IOERROR, ...);
 
 /* Call `superblock_sync()' for all system-wide existing superblock.
- * NOTE: Underlying block-devices will be synced as well. */
+ * NOTE:   Underlying   block-devices  will   be  synced   as  well. */
 FUNDEF void KCALL superblock_syncall(void) THROWS(E_IOERROR, ...);
 
 
 /* #1: Set the `SUPERBLOCK_FUNMOUNTED' flag
- * #2: Set the DELETED flag for all nodes.
- * #3: Synchronize the superblock (`superblock_sync(self)')
- * Future attempts to create new nodes with `superblock_opennode()' will
+ * #2:  Set the DELETED flag for all nodes.
+ * #3:     Synchronize     the     superblock      (`superblock_sync(self)')
+ * Future attempts  to create  new nodes  with `superblock_opennode()'  will
  * cause an `E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED' to be thrown.
- * WARNING: This function will _NOT_ remove existing mounting points of
+ * WARNING: This function will _NOT_ remove existing mounting points  of
  *          the superblock, however is used to implement `path_umount()'
  * @return: true:  Successfully unmounted the superblock.
  * @return: false: The superblock had already been set to an unmounted state. */
@@ -2220,7 +2220,7 @@ superblock_opennode(struct superblock *__restrict self,
                     struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_FSERROR_DELETED, E_IOERROR, E_BADALLOC, ...);
 
-/* Find some mounting point that is apart of the given `ns'
+/* Find some  mounting point  that is  apart of  the given  `ns'
  * If multiple such paths exist, arbitrarily return one of them.
  * If no such paths exist, return NULL instead. */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct path *KCALL
@@ -2262,7 +2262,7 @@ DATDEF struct filesystems      fs_filesystems;      /* Global tracking of existi
  * Chain of superblocks that are pending deletion. */
 DATDEF WEAK REF struct superblock *fs_filesystems_delblocks;
 
-/* Acquire a lock to `fs_filesystems.f_superlock', ensuring that any
+/* Acquire  a  lock  to `fs_filesystems.f_superlock',  ensuring  that any
  * superblocks that are pending deletion will have actually been deleted. */
 FUNDEF void KCALL fs_filesystems_lock_read(void) THROWS(E_WOULDBLOCK);
 FUNDEF void KCALL fs_filesystems_lock_write(void) THROWS(E_WOULDBLOCK);
@@ -2291,9 +2291,9 @@ fs_filesystems_loadall(REF struct superblock **buffer, size_t buffer_length)
 /* Returns a reference to (the driver of the) filesystem type, given its `name'.
  * XXX: Returning a reference to a driver isn't safe here!
  *      The driver may have allocate the superblock_type on the heap, whilst another
- *      thread is currently performing driver finalization, which is now freeing
+ *      thread  is currently  performing driver  finalization, which  is now freeing
  *      the superblock type returned by this function
- *      The solution would be to add a reference counter to `superblock_type', and
+ *      The solution would be to add a reference counter to `superblock_type',  and
  *      have this function return 2 references (one to the superblock_type, and one
  *      to the driver)
  * @return: NULL: No filesystem type matching the given `name' was found. */

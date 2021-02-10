@@ -63,9 +63,9 @@ ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 
 
 /* Initialize a given ansitty device.
- * NOTE: `ops->ato_output' must be set to NULL when calling this function.
+ * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
- *       is done dynamically when the ANSI TTY is connected to the output
+ *       is done dynamically when the ANSI  TTY is connected to the  output
  *       channel of a `struct tty_device'
  * This function initializes the following operators:
  *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!

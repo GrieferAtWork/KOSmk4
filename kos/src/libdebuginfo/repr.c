@@ -60,7 +60,7 @@ DECL_BEGIN
  * >>     result = NULL;
  * >> return result;
  * The raw text database strings could then be encoding via an inline
- * deemon script that looks at the associated headers.
+ * deemon    script   that   looks   at   the   associated   headers.
  */
 
 

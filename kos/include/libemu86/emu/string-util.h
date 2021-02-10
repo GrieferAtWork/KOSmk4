@@ -25,7 +25,7 @@
 #endif /* __INTELLISENSE__ */
 
 /* Read a from %DS:%(|E|R)SI into a variant `value', then expand `useval<addrsize>',
- * and write-back the incremented/decremented (based on EFLAGS.DF) string pointer.
+ * and write-back the incremented/decremented  (based on EFLAGS.DF) string  pointer.
  * Also handle a `rep' prefix when `isrep' evaluates to non-zero. */
 #define EMU86_READ_STRING(DS, SI, BWLQ, Nbits, Nbytes, value, useval) \
 	EMU86_READ_STRING_EX(DS, SI, BWLQ, Nbits, Nbytes, value,          \
@@ -98,8 +98,8 @@
 	}
 
 
-/* Write `value' to %ES:%(|E|R)DI, and write-back the
- * incremented/decremented (based on EFLAGS.DF) string pointer.
+/* Write   `value'   to   %ES:%(|E|R)DI,   and   write-back   the
+ * incremented/decremented (based on  EFLAGS.DF) string  pointer.
  * Also handle a `rep' prefix when `isrep' evaluates to non-zero. */
 #define EMU86_WRITE_STRING(ES, DI, BWLQ, Nbits, Nbytes, value) \
 	EMU86_WRITE_STRING_EX(ES, DI, BWLQ, Nbits, Nbytes, value, op_flags & EMU86_F_REP)

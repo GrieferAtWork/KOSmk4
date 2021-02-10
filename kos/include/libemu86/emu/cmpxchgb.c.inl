@@ -29,9 +29,9 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 
 	case 1: {
 		/*         0F C7 /1 CMPXCHG8B m64      Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX
-		 *                                     into m64. Else, clear ZF and load m64 into EDX:EAX.
+		 *                                     into  m64.  Else,  clear  ZF  and  load  m64  into EDX:EAX.
 		 * REX.W + 0F C7 /1 CMPXCHG16B m128    Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX
-		 *                                     into m128. Else, clear ZF and load m128 into RDX:RAX. */
+		 *                                     into m128.  Else,  clear  ZF and  load  m128  into  RDX:RAX. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm;

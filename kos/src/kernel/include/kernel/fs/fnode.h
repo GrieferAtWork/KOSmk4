@@ -39,17 +39,17 @@ DECL_BEGIN
 /*
  * ==== Introduction to the new filesystem API ====
  *
- * It should be getting obvious by now: the new filesystem API is greatly
+ * It should be getting  obvious by now: the  new filesystem API is  greatly
  * unifying component-access across different API-layers, such as by merging
  * different operator-tables into a single, common table that is extended by
- * sub-classes as needed, as well as further abstraction and simplification
+ * sub-classes as needed, as well as further abstraction and  simplification
  * of old APIs.
  *
- * The main difference to the old system is probably the strict adherence to
- * the fact that no API-level operator callbacks should ever be called while
+ * The main difference to  the old system is  probably the strict adherence  to
+ * the  fact that no  API-level operator callbacks should  ever be called while
  * holding any kind of lock, meaning that the new system will be able to follow
- * the lock-less/async design philosophy that can already be seen (and felt)
- * within the new memory manager which recently took the place of the old VM
+ * the  lock-less/async design philosophy  that can already  be seen (and felt)
+ * within the new memory manager  which recently took the  place of the old  VM
  * system.
  *
  */
@@ -165,26 +165,26 @@ struct fnode
 	mode_t                      fn_mode;     /* [lock(ATOMIC)] INode access mode (but note that file-type bits are [const]). */
 	ino_t                       fn_ino;      /* [lock(_MFILE_F_SMP_TSLOCK)] INode number.
 	                                          * On some filesystems, this number may change when the file is renamed (e.g. FAT)
-	                                          * As such, a lock is required when reading/writing the INode number! */
+	                                          * As   such,  a  lock   is  required  when   reading/writing  the  INode  number! */
 	REF struct fsuper          *fn_super;    /* [1..1][const] Associated super-block. */
 	SLIST_ENTRY(REF fnode)      fn_changed;  /* [lock(ATOMIC)][LIST(fn_super->fsp_changed)]
 	                                          * [valid_if(!fsuper_datachanged_isanon(fn_super) &&
 	                                          *           !mfile_isanon(self) && (MFILE_F_CHANGED | MFILE_F_ATTRCHANGED)]
 	                                          * Link entry in the list of changed file-nodes. */
 	LLRBTREE_NODE(struct fnode) fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]
-	                                          * Tree entry within the super block's tree of file-nodes.
-	                                          * When `rb_lhs' is set to `FSUPER_NODES_DELETED', then the
-	                                          * file-node is no longer apart of the super's tree of file
+	                                          * Tree entry within the  super block's tree of  file-nodes.
+	                                          * When  `rb_lhs' is set to `FSUPER_NODES_DELETED', then the
+	                                          * file-node  is no longer apart of the super's tree of file
 	                                          * nodes. In this case, the `MFILE_F_PERSISTENT' flag may be
 	                                          * assumed to have already been cleared. */
 	union {
 		LIST_ENTRY(fnode)       fn_allnodes; /* [0..1][lock(:fnode_all_lock)][valid_if(!fnode_issuper(self))]
-		                                      * Link entry within the global list of all file nodes. When
-		                                      * `MFILE_FN_GLOBAL_REF' is set, then the global list holds a
+		                                      * Link entry within  the global  list of all  file nodes.  When
+		                                      * `MFILE_FN_GLOBAL_REF' is set,  then the global  list holds  a
 		                                      * reference to this node. */
 		LIST_ENTRY(fsuper)      fn_allsuper; /* [0..1][lock(:fsuper_all_lock)][valid_if(fnode_issuper(self))]
-		                                      * Link entry within the global list of all super blocks. When
-		                                      * `MFILE_FN_GLOBAL_REF' is set, then the global list holds a
+		                                      * Link entry within the global  list of all super blocks.  When
+		                                      * `MFILE_FN_GLOBAL_REF' is set,  then the global  list holds  a
 		                                      * reference to this node. */
 	};
 };
@@ -220,12 +220,12 @@ struct fnode
 #define _fnode_fini(self) decref_nokill((self)->fn_super)
 
 /* Mandatory callback for all types derived from `struct fnode',
- * for use with `mf_ops->mo_changed'. MUST NOT BE OVERWRITTEN! */
+ * for  use with `mf_ops->mo_changed'.  MUST NOT BE OVERWRITTEN! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
                                uintptr_t old_flags, uintptr_t new_flags);
 
-/* File-node destroy callback. Must be set in `mo_destroy',
+/* File-node  destroy callback. Must be set in `mo_destroy',
  * but may be overwritten by sub-classes, in which case this
  * function must be called as the last thing done within the
  * sub-class destroy-operator. */

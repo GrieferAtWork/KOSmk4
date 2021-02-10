@@ -70,7 +70,7 @@ DATDEF ATTR_PERCPU uintptr_t thiscpu_x86_saved_cr4;
  *   - x86_64-only: IA32_STAR
  *   - x86_64-only: IA32_FMASK
  *   - x86_64-only: IA32_LSTAR
- * However, (currently) these registers are never modified at all, or only
+ * However,  (currently)  these  registers are  never  modified at  all,  or only
  * modified in very controlled environments, such that the default initialization
  * done by the SMP startup code is sufficient to deal with them properly. */
 

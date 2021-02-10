@@ -133,9 +133,9 @@ FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getrd(void) THROWS(...);
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)'
- * NOTE: When calling thread has the `TASK_FUSERPROCMASK' flag set,
+ * NOTE: When  calling thread has  the `TASK_FUSERPROCMASK' flag set,
  *       then this function will return the address of the currently-
- *       assigned user-space signal mask, rather than its in-kernel
+ *       assigned  user-space signal mask,  rather than its in-kernel
  *       counterpart! */
 FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLOC, ...);
 #else /* __INTELLISENSE__ || CONFIG_HAVE_USERPROCMASK */
@@ -147,15 +147,15 @@ FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLO
 FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
 
 /* Same as `sigmask_check()', but if a signal gets triggered, act as though
- * it was being serviced after the current system call has exited with the
+ * it was being serviced after the current system call has exited with  the
  * given `syscall_result' return value. (preventing system call restarting,
  * or indicating an interrupt exception to user-space)
  * If no signal was triggered, simply return normally.
- * This function is meant to be used to check for pending signals after the
+ * This function is meant to  be used to check  for pending signals after  the
  * original signal mask got restored following the completion of a `pselect()'
  * or `ppoll()' system call. (at which point a previously masked signal should
- * no longer cause the system call to fail and error out with -EINTR (to be
- * restarted), but instead return its normal value once returning from its
+ * no longer cause the system  call to fail and error  out with -EINTR (to  be
+ * restarted), but instead  return its  normal value once  returning from  its
  * associated user-space signal handler (if any))
  * With this in mind, the call order for temporarily overriding the signal mask
  * for the purpose of a single system call looks like this:
@@ -185,7 +185,7 @@ sigmask_check_after_syscall(syscall_ulong_t syscall_result)
 		THROWS(E_INTERRUPT, E_WOULDBLOCK);
 
 /* Same as `sigmask_check()', but should be called in order to have
- * user-space handle the currently set exception in case a signal
+ * user-space handle the currently set  exception in case a  signal
  * handler has to be invoked.
  * See the documentation of `sigmask_check_after_syscall()' for when
  * this function needs to be called. */
@@ -214,8 +214,8 @@ struct kernel_sigaction {
 	USER CHECKED user_sigrestore_func_t     sa_restore;   /* [1..1][valid_if(SIGACTION_SA_RESTORER)] Signal handler restore function. */
 	uintptr_t                               sa_flags;     /* Signal handler flags (Set of `SIGACTION_SA_*'). */
 	REF struct kernel_sigmask              *sa_mask;      /* [0..1] Mask of additional signals to block during execution of the handler
-	                                                       * NOTE: When NULL, no additional signals been to be blocked.
-	                                                       * NOTE: The pointed-to mask is [const] if its reference counter is `> 1' */
+	                                                       * NOTE:  When   NULL,   no   additional  signals   been   to   be   blocked.
+	                                                       * NOTE:  The pointed-to  mask is [const]  if its reference  counter is `> 1' */
 };
 
 struct sighand {
@@ -238,10 +238,10 @@ struct sighand_ptr {
 	/* Secondary indirection for sighand that allows
 	 * for copy-on-write between different processes
 	 * that were fork()-ed from each other.
-	 * Because of the fact that fork() would otherwise have to
-	 * copy the sighand table, only to have a likely following
-	 * call to exec() destroy that table again, we simply share
-	 * the sighand table between the old and new process until
+	 * Because of the  fact that fork()  would otherwise have  to
+	 * copy the sighand  table, only to  have a likely  following
+	 * call to exec() destroy that  table again, we simply  share
+	 * the sighand table  between the old  and new process  until
 	 * either one of the processes dies or calls exec(), or until
 	 * one of them attempts to modify the sighand table, in which
 	 * case this indirection allows for lazy copy-on-write. */
@@ -256,7 +256,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL sighand_ptr_destroy)(struct sighand_ptr *__res
 DEFINE_REFCOUNT_FUNCTIONS(struct sighand_ptr, sp_refcnt, sighand_ptr_destroy)
 
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
- * User-space signal handlers for the calling thread. */
+ * User-space  signal   handlers   for   the   calling   thread. */
 DATDEF ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr;
 #define THIS_SIGHAND_PTR        PERTASK_GET(this_sighand_ptr)
 
@@ -271,7 +271,7 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr);
 
 
 /* Acquire a lock to the underlying signal handler table that is associated
- * with the given `sighand_ptr', either for reading, or for writing.
+ * with the  given  `sighand_ptr',  either for  reading,  or  for  writing.
  * For reading:
  * >> struct sighand *h;
  * >> h = sighand_ptr_lockread(THIS_SIGHAND_PTR);
@@ -285,8 +285,8 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr);
  * >> h = sighand_ptr_lockwrite();
  * >> ...
  * >> sync_endwrite(h);
- * With that in mind, these function will perform the necessary unsharing of
- * copy-on-write signal handler tables, while still keeping association of
+ * With that in mind, these function will perform the necessary unsharing  of
+ * copy-on-write signal handler  tables, while still  keeping association  of
  * handlers in check when it comes to shared handler tables, as usually found
  * within the same process. */
 FUNDEF struct sighand *KCALL
@@ -301,7 +301,7 @@ FUNDEF NOBLOCK WUNUSED ATTR_CONST user_sighandler_func_t
 NOTHROW(KCALL sighand_default_action)(signo_t signo);
 
 
-/* Reset the current handler for `signo' when `current_action' matches the currently set action.
+/* Reset  the current handler for `signo' when  `current_action' matches the currently set action.
  * This function should be called by kernel-space signal delivery implementations to implement the
  * behavior of `SIGACTION_SA_RESETHAND' when handling a signal.
  * @return: true:  Successfully reset the handler
@@ -315,16 +315,16 @@ sighand_reset_handler(signo_t signo,
 struct icpustate;
 struct rpc_syscall_info;
 /* Update the given `state' to raise the specified `siginfo'
- * as a user-space signal within the calling thread.
- * NOTE: The caller is responsible to handle special signal
- *       handlers (`KERNEL_SIG_*') before calling this function!
+ * as   a  user-space  signal  within  the  calling  thread.
+ * NOTE: The   caller  is  responsible  to  handle  special  signal
+ *       handlers  (`KERNEL_SIG_*')  before calling  this function!
  *       This function should only be used to enqueue the execution
  *       of a signal handler with a user-space entry point.
  * @param: state:   The interrupt CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.
  * @param: siginfo: The signal that is being raised.
  * @param: sc_info: When non-NULL, `sc_info' describes a system call that may be restarted.
- *                  Note however that ontop of this, [restart({auto,must,dont})]
+ *                  Note  however   that   ontop   of   this,   [restart({auto,must,dont})]
  *                  logic will still be applied, which is done in cooperation
  *                  with the system call restart database.
  * @return: * :     The updated CPU state.
@@ -338,7 +338,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 /* Suspend execution of the calling thread by setting `TASK_FSUSPENDED',
- * and keep the thread suspended until `task_sigcont()' is called.
+ * and keep  the  thread  suspended until  `task_sigcont()'  is  called.
  * This is used to implement SIGSTOP/SIGCONT behavior.
  * @param: stop_code: The stop code (created with `W_STOPCODE(signo)') */
 FUNDEF void KCALL task_sigstop(int stop_code) THROWS(E_WOULDBLOCK,E_INTERRUPT);
@@ -346,7 +346,7 @@ FUNDEF void KCALL task_sigstop(int stop_code) THROWS(E_WOULDBLOCK,E_INTERRUPT);
 /* Continue execution in `thread', if that thread is currently suspended
  * due to having called `task_sigstop()'
  * WARNING: A race condition exists where `thread' may not have started waiting
- *          yet, in which case this function will return `false', indicating
+ *          yet, in which  case this function  will return `false',  indicating
  *          that the given thread wasn't actually woken.
  * @return: true:  Successfully set `thread' to continue execution
  * @return: false: Either `thread' hasn't started sleeping, or was already continued. */
@@ -355,7 +355,7 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL task_sigcont)(struct task *__restrict thread);
 
 
 struct sigqueue_entry {
-	/* Descriptor for a signal that was send, but was
+	/* Descriptor for  a signal  that  was send,  but  was
 	 * blocked and thereby scheduled to be received later. */
 	struct sigqueue_entry *sqe_next;  /* [owned][0..1] Next queued signal. */
 	siginfo_t              sqe_info;  /* Signal information. */
@@ -377,7 +377,7 @@ task_raisesignalthread(struct task *__restrict target,
  * @return: false: The given process `target' has already terminated execution.
  * @return: false: The given process `target' is a kernel thread.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `_NSIG+1'
- * @throw: E_INTERRUPT_USER_RPC:         The calling thread is apart of the same process,
+ * @throw: E_INTERRUPT_USER_RPC:         The calling thread is apart of the same  process,
  *                                       and the signal isn't being blocked at the moment. */
 FUNDEF NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,

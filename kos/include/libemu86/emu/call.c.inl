@@ -29,7 +29,7 @@ EMU86_INTELLISENSE_BEGIN(call) {
 case EMU86_OPCODE_ENCODE(0xe8): {
 	/* E8 cw    CALL rel16   Call near, relative, displacement relative to next instruction.
 	 * E8 cd    CALL rel32   Call near, relative, displacement relative to next instruction.
-	 *                       32-bit displacement sign extended to 64-bits in 64-bit mode. */
+	 *                       32-bit displacement sign  extended to 64-bits  in 64-bit  mode. */
 	EMU86_UREG_TYPE dest_ip;
 	s32 offset;
 	IF_16BIT_OR_32BIT(

@@ -35,22 +35,22 @@
 
 /* The memory manager core heap.
  * This is the low-level, self-sustaining heap used for allocating
- * `struct mnode' and `struct mpart' objects for the purpose of
- * describing higher-level heap systems which should no longer
+ * `struct mnode' and `struct mpart'  objects for  the purpose  of
+ * describing  higher-level  heap systems  which should  no longer
  * have to make use of these functions.
  *
  * The sole consumer of functions exposed by this API should be the
- * low-level kernel ram alloc/free functions found in "mm-kram.h" */
+ * low-level  kernel ram alloc/free  functions found in "mm-kram.h" */
 
 #ifdef __CC__
 DECL_BEGIN
 
-/* This is the type of object (or rather: this one's size is the
- * size of the objects) that get allocated by the mcoreheap system.
+/* This is  the type  of object  (or  rather: this  one's size  is  the
+ * size of the  objects) that  get allocated by  the mcoreheap  system.
  * The obvious intend here is to use the coreheap system for allocating
- * mem-parts and mem-nodes for use with `mfile_zero' and `mman_kernel'
- * in order to implement a higher-level memory mapping system that is
- * then capable of mapping arbitrary-size memory mappings.
+ * mem-parts and mem-nodes for use with `mfile_zero' and  `mman_kernel'
+ * in order to implement a  higher-level memory mapping system that  is
+ * then    capable   of   mapping   arbitrary-size   memory   mappings.
  * s.a.:
  *   - MPART_F_COREPART
  */
@@ -72,11 +72,11 @@ union mcorepart {
 
 
 /* Figure out how many parts we can cram into a single page, while still
- * maintaining at least pointer-alignment for all of them,  */
+ * maintaining   at   least   pointer-alignment   for   all   of   them, */
 #if __ALIGNOF_MCOREPART > __SIZEOF_POINTER__
 /* NOTE: 3*pointer is the smallest possible header, since we always need
- *       at least 2 pointers for the list-link, and 1 more pointer for
- *       the smallest-sized in-use bitset. But also align that offset
+ *       at least 2 pointers for the  list-link, and 1 more pointer  for
+ *       the smallest-sized in-use  bitset. But also  align that  offset
  *       to match the alignment requirements of core-heap-parts. */
 #define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (((3 * __SIZEOF_POINTER__) + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))) / __SIZEOF_MCOREPART)
 #else /* __ALIGNOF_MCOREPART > __SIZEOF_POINTER__ */
@@ -102,8 +102,8 @@ union mcorepart {
 
 
 /* On a level as low as the mcoreheap is implemented at, all allocations
- * have to be done in multiples of whole pages. As such, the mcoreheap
- * allocator is implemented as a slab-style allocator for  */
+ * have  to be done in multiples of  whole pages. As such, the mcoreheap
+ * allocator is implemented as a slab-style allocator for */
 struct mcorepage;
 LIST_HEAD(mcorepage_list, mcorepage);
 struct mcorepage {
@@ -123,10 +123,10 @@ DATDEF struct mcorepage_list mcoreheap_usedlist;
 
 /* [1..n][lock(mman_kernel.mm_lock)]
  * List of mcoreheap pages that still contain available parts.
- * NOTE: This list must _always_ be non-empty, and there must
- *       _always_ be at least 2 additional core parts ready
+ * NOTE: This list must _always_ be non-empty, and there  must
+ *       _always_ be at  least 2 additional  core parts  ready
  *       for allocation at any time. This is required, because
- *       in order to allocate additional pages, the mcoreheap
+ *       in  order to allocate additional pages, the mcoreheap
  *       allocator itself already requires 2 parts in order to
  *       do the actual allocation! */
 DATDEF struct mcorepage_list mcoreheap_freelist;
@@ -143,22 +143,22 @@ DATDEF size_t mcoreheap_freecount;
 
 
 /* Allocate an additional core part from the core heap.
- * The caller must be holding a lock to the kernel mman, but should also
- * be aware that a call to this function may result in additional nodes
- * to be mapped into the kernel mman (meaning that the caller must be
+ * The  caller must be holding a lock to the kernel mman, but should also
+ * be  aware that a call to this  function may result in additional nodes
+ * to be mapped  into the kernel  mman (meaning that  the caller must  be
  * able to deal with the kernel mman's mappings-tree changing as a result
  * of a call to this function)
  * @return: * :   The base-address of the newly allocated mem-core-part.
  * @return: NULL: Insufficient physical/virtual memory. This is only ever
- *                returned when memory has actually run out, since this
- *                function doesn't actually need to do any locking.
+ *                returned when memory has  actually run out, since  this
+ *                function  doesn't  actually  need  to  do  any locking.
  *                As such, a NULL-return-value here means that the system
- *                has run out of memory on the lowest, possible level.
+ *                has run out  of memory on  the lowest, possible  level.
  *                That is: `page_malloc()' failed. */
 FUNDEF NOBLOCK WUNUSED ATTR_MALLOC union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void);
 
-/* Do all of the necessary locking and throw an exception if the allocation failed.
+/* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
  * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
 FUNDEF ATTR_RETNONNULL ATTR_MALLOC union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
@@ -167,9 +167,9 @@ mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part);
 
-/* Same as `mcoreheap_free()', but no need to just through all of the hoops
+/* Same as `mcoreheap_free()', but no need to just through all of the  hoops
  * of enqueuing the free of `part' as a mlockop when no lock can be acquired
- * to the kernel mman, since the caller allows us to assume that they've
+ * to the kernel  mman, since the  caller allows us  to assume that  they've
  * already acquired a lock to the kernel mman. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part);

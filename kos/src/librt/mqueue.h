@@ -47,12 +47,12 @@
 
 DECL_BEGIN
 
-/* Establish connection between a process and a message queue NAME and
- * return message queue descriptor or (mqd_t)-1 on error. OFLAGS determines
- * the type of access used. If O_CREAT is on OFLAGS, the third argument is
+/* Establish  connection  between  a process  and  a message  queue  NAME and
+ * return message queue descriptor or  (mqd_t)-1 on error. OFLAGS  determines
+ * the type of access used.  If O_CREAT is on  OFLAGS, the third argument  is
  * taken as a `mode_t', the mode of the created message queue, and the fourth
- * argument is taken as `struct mq_attr *', pointer to message queue
- * attributes. If the fourth argument is NULL, default attributes are used. */
+ * argument  is  taken  as  `struct mq_attr *',  pointer  to  message   queue
+ * attributes. If the fourth argument  is NULL, default attributes are  used. */
 INTDEF WUNUSED NONNULL((1)) mqd_t
 NOTHROW_NCX(VCC librt_mq_open)(char const *__restrict name, oflag_t oflags, ...);
 
@@ -88,7 +88,7 @@ INTDEF NONNULL((2)) int
 NOTHROW_RPC(CC librt_mq_send)(mqd_t mqdes, char const *msg_ptr,
                               size_t msg_len, unsigned int msg_prio);
 
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 INTDEF NONNULL((2, 5)) ssize_t
 NOTHROW_RPC(CC librt_mq_timedreceive)(mqd_t mqdes, char *__restrict msg_ptr,
@@ -96,13 +96,13 @@ NOTHROW_RPC(CC librt_mq_timedreceive)(mqd_t mqdes, char *__restrict msg_ptr,
                                       struct __timespec32 const *__restrict abs_timeout);
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 INTDEF NONNULL((2, 5)) int
 NOTHROW_RPC(CC librt_mq_timedsend)(mqd_t mqdes, char const *msg_ptr,
                                    size_t msg_len, unsigned int msg_prio,
                                    struct __timespec32 const *abs_timeout);
 
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 INTDEF NONNULL((2, 5)) ssize_t
 NOTHROW_RPC(CC librt_mq_timedreceive64)(mqd_t mqdes, char *__restrict msg_ptr,
@@ -110,7 +110,7 @@ NOTHROW_RPC(CC librt_mq_timedreceive64)(mqd_t mqdes, char *__restrict msg_ptr,
                                         struct __timespec64 const *__restrict abs_timeout);
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 INTDEF NONNULL((2, 5)) int
 NOTHROW_RPC(CC librt_mq_timedsend64)(mqd_t mqdes, char const *msg_ptr,
                                      size_t msg_len, unsigned int msg_prio,

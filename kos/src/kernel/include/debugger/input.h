@@ -43,7 +43,7 @@ FUNDEF NOBLOCK u16 NOTHROW(FCALL dbg_trygetkey)(void); /* @return: 0: No keys av
 FUNDEF NOBLOCK bool NOTHROW(FCALL dbg_ungetkey)(u16 key);
 
 /* Wait for the user to press a key and return the pressed character.
- * NOTE: Modifier keys aren't returned by this function. */
+ * NOTE:   Modifier   keys   aren't   returned   by   this  function. */
 FUNDEF /*utf-8*/ char NOTHROW(FCALL dbg_getc)(void);
 FUNDEF /*utf-32*/ char32_t NOTHROW(FCALL dbg_getuni)(void);
 FUNDEF NOBLOCK /*utf-8*/ char NOTHROW(FCALL dbg_trygetc)(void); /* @return: 0: No characters available. */
@@ -76,20 +76,20 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_altgr)(void);
 #define DBG_IRQLEVEL_NONE    0 /* Code is never considered to be interrupted. */
 #define DBG_IRQLEVEL_CTRL_C  1 /* An interrupt is present as soon as a \3-byte is pending for `dbg_getc()' */
 #define DBG_IRQLEVEL_KEYDOWN 2 /* An interrupt is present as soon as a key-down event is pending,
-                                * or there is unread data for `dbg_getc()' or `dbg_getuni()' */
+                                * or there  is unread  data  for `dbg_getc()'  or  `dbg_getuni()' */
 #define DBG_IRQLEVEL_INPUT   3 /* An interrupt is present once any kind of input is pending. */
 
-/* The debugger IRQ level, which can be used to select
+/* The debugger IRQ level, which  can be used to  select
  * which condition is checked for by `dbg_interrupted()'
  * Must be one of `DBG_IRQLEVEL_*' */
 DATDEF unsigned int dbg_irqlevel;
 
-/* Set to true if the caller is considered to have been
+/* Set to  true if  the caller  is considered  to have  been
  * interrupted, as per the current setting of `dbg_irqlevel' */
 DATDEF bool const volatile dbg_interrupted;
 
-/* Try to clear `dbg_interrupted', but keep it turned
- * on in case the selected IRQ event is still raised.
+/* Try  to clear `dbg_interrupted',  but keep it turned
+ * on in case the selected  IRQ event is still  raised.
  * Alternatively, if the interrupt is no longer raised,
  * then `dbg_interrupted' is set to `false' */
 DATDEF void NOTHROW(FCALL dbg_update_interrupted)(void);
@@ -101,15 +101,15 @@ DATDEF void NOTHROW(FCALL dbg_update_interrupted)(void);
 #define DBG_AWAIT_GETKEY 2 /* Await `dbg_getkey()' */
 
 /* Begin/end expecting further user-input in the near future.
- * While user-input is being awaited, `dbg_awaituser()' will
+ * While  user-input is being awaited, `dbg_awaituser()' will
  * return `true' when `dbg_getc()' would not block.
  * @param: what: One of `DBG_AWAIT_*' */
 FUNDEF NOBLOCK void NOTHROW(FCALL dbg_awaituser_begin)(unsigned int what);
 FUNDEF NOBLOCK void NOTHROW(FCALL dbg_awaituser_end)(__BOOL force DFL(0));
 
 /* Check if there is pending user-input left to-be processed,
- * and that the debugger is currently awaiting user-input.
- * This function should be called from within long-running
+ * and that the  debugger is  currently awaiting  user-input.
+ * This function should  be called  from within  long-running
  * functions, and a `true' return value should be interpreted
  * as a request to stop the function and return to the caller
  * with some sort of consistent state as soon as possible. */

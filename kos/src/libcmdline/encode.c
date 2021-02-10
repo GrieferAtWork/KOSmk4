@@ -208,11 +208,11 @@ err:
 	return temp;
 }
 
-/* Encode the given `arg_start' argument by escaping characters
- * that would confuse the commandline decoder, and print the
- * resulting string using the given `printer' with `arg'
- * The caller is still responsible to insert space-separators with
- * a width of at least 1 space-character (' ') between successive
+/* Encode  the  given `arg_start'  argument by  escaping characters
+ * that would  confuse  the  commandline  decoder,  and  print  the
+ * resulting   string   using  the   given  `printer'   with  `arg'
+ * The caller is still responsible to insert space-separators  with
+ * a width of at least  1 space-character (' ') between  successive
  * arguments. Alternatively, you may also use `cmdline_encode()' to
  * encode an entire commandline at once.
  * @return: * : The sum of return values of `printer'
@@ -278,8 +278,8 @@ escape_all:
 escape_double_quote:
 		result = encode_quote(printer, arg, arg_start, arg_len, '\"', num_slash);
 	} else {
-		/* Special case: If we don't need to escape any space characters,
-		 * and have exactly 1 of each quotes, we can still encode the entire
+		/* Special case: If  we don't  need to escape  any space  characters,
+		 * and have exactly 1 of each quotes, we can still encode the  entire
 		 * argument with only 2 additional characters injected to escape both
 		 * quotes.
 		 * Without this check, such a string would be encoded with +3 additional
@@ -291,7 +291,7 @@ escape_double_quote:
 		if (num_squote == 1 && num_dquote == 1 && !num_spaces)
 			goto escape_all;
 #endif
-		/* There are both single-quote and double-quote characters
+		/* There  are  both   single-quote  and  double-quote   characters
 		 * If there are more ' and ", escape all ", else escape all with ' */
 		if (num_squote >= num_dquote) {
 			result = encode_escape_quote(printer, arg, arg_start, arg_end, '\"');
@@ -304,7 +304,7 @@ escape_double_quote:
 
 
 /* Encode an entire commandline given by `argc' pointers found within
- * the given `argv' vector. (s.a. `cmdline_encode_argument()')
+ * the  given  `argv'   vector.  (s.a.   `cmdline_encode_argument()')
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
 INTERN NONNULL((1, 4)) ssize_t CC

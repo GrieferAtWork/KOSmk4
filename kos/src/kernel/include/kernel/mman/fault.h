@@ -49,26 +49,26 @@ struct aio_buffer;
 
 /* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
  * may succeed when re-attempted.
- * @return: * : The # of leading bytes that this function managed to fault. For
- *              this purpose, any non-zero value means that `*(byte_t *)addr'
+ * @return: * : The # of leading bytes that this function managed to fault.  For
+ *              this purpose, any  non-zero value  means that  `*(byte_t *)addr'
  *              was made accessible for at least one moment before this function
- *              returns. Note though that memory may have already been unloaded
+ *              returns. Note though that memory may have already been  unloaded
  *              by the time this function returns (unlikely), so the caller must
  *              still be ready to deal with the possibility that another attempt
- *              at doing nopf access at `*(byte_t *)addr' might immediatly fail
+ *              at doing nopf access at `*(byte_t *)addr' might immediatly  fail
  *              again.
- *              Also note that for any memory that had already been faulted within
- *              the given address range, this function acts as though it had been
- *              the one to fault that range, meaning that the return value doesn't
+ *              Also note that for any memory  that had already been faulted  within
+ *              the  given address range,  this function acts as  though it had been
+ *              the one to fault that range,  meaning that the return value  doesn't
  *              actually represent how much memory had just been faulted, but rather
- *              how much continuous memory (starting at `addr' and limited by at
- *              most `num_bytes') was faulted simultaneously at some point before
+ *              how much continuous  memory (starting  at `addr' and  limited by  at
+ *              most `num_bytes') was  faulted simultaneously at  some point  before
  *              this function returns.
- * @return: 0 : Nothing could be faulted. This might be because `addr' doesn't
+ * @return: 0 : Nothing could be faulted. This  might be because `addr'  doesn't
  *              point into mapped memory, or the memory that is pointed-to by it
  *              is backed by VIO storage.
- *              The caller should handle this case by attempting direct memory
- *              access to the affected region (i.e. using `memcpy' rather than 
+ *              The caller should handle this  case by attempting direct  memory
+ *              access to the affected region  (i.e. using `memcpy' rather  than
  *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 FUNDEF size_t FCALL
@@ -77,8 +77,8 @@ mman_prefault(USER CHECKED void const *addr,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Enumerate segments from `buffer', and prefault up to `num_bytes' of pointed-to
- * memory, after skipping the first `offset' bytes. The return value is the sum
- * of successfully faulted segments, however faulting also stops on the first
+ * memory,  after skipping the first `offset' bytes.  The return value is the sum
+ * of successfully faulted  segments, however  faulting also stops  on the  first
  * segment that cannot be fully faulted.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 FUNDEF NONNULL((1)) size_t FCALL
@@ -87,27 +87,27 @@ mman_prefaultv(struct aio_buffer const *__restrict buffer,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
-/* Force all bytes within the given address range to be faulted for either reading
- * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
+/* Force  all  bytes within  the given  address range  to be  faulted for  either reading
+ * or writing. If any page within the  specified range isn't mapped, throw an  E_SEGFAULT
  * exception. Otherwise, ensure that copy-on-write is performed when `MMAN_FAULT_F_WRITE'
- * is set, and that irregardless of `MMAN_FAULT_F_WRITE', physical memory is allocated
+ * is  set, and that  irregardless of `MMAN_FAULT_F_WRITE',  physical memory is allocated
  * for any mapping that can be made to be backed by RAM.
  *
  * NOTES:
  *  - When `MMAN_FAULT_F_WRITE' is set, this function also verifies that the mem-nodes
- *    associated with the given address range all have the `MNODE_F_PWRITE' flag set.
+ *    associated with the given address range all have the `MNODE_F_PWRITE' flag  set.
  *  - Any VIO mappings within the specified range are simply ignored (and will not
- *    count towards the returned value), unless `MMAN_FAULT_F_NOVIO' is set, in
+ *    count towards the  returned value), unless  `MMAN_FAULT_F_NOVIO' is set,  in
  *    which case such mappings will cause an exception to be thrown.
  *  - This function will automatically wide the given range to encompass whole pages.
- *  - This function will also update the page directory mappings for any mem-parts
- *    that get faulted during its invocation, meaning that use of `memcpy_nopf()'
- *    within the indicated address range (whilst still checking it for errors for
+ *  - This function will also update the page directory mappings for any  mem-parts
+ *    that get faulted during its  invocation, meaning that use of  `memcpy_nopf()'
+ *    within the indicated address range (whilst  still checking it for errors  for
  *    the even of the mapping changing, or the mapping being a VIO mapping) becomes
- *    possible immediately, without having to force any sort of additional memory
- *    access (note though that this only applies to the page directory of `self',
- *    though also note that if some mem-part within the range was already faulted,
- *    its page directory mapping in `self' will still be updated if need be, as it
+ *    possible immediately, without having to  force any sort of additional  memory
+ *    access  (note though that this only applies  to the page directory of `self',
+ *    though also note that if some mem-part within the range was already  faulted,
+ *    its  page directory mapping in `self' will still be updated if need be, as it
  *    may have been faulted as a lazy memory mapping).
  */
 FUNDEF NONNULL((1)) void FCALL
@@ -186,14 +186,14 @@ struct mfault {
 	PAGEDIR_PAGEALIGNED void           *mfl_addr;  /* [const] address where faulting starts */
 	PAGEDIR_PAGEALIGNED size_t          mfl_size;  /* [in|out][!0] The # of bytes that should be/were faulted. */
 	unsigned int                        mfl_flags; /* [const] Access flags (set of `MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE') */
-	struct mnode                       *mfl_node;  /* [1..1][in|out] The node being accessed. Depending
+	struct mnode                       *mfl_node;  /* [1..1][in|out] The node  being accessed.  Depending
 	                                                * on how the access is made, this node may be altered */
 	struct mpart                       *mfl_part;  /* [1..1][in|out][== mfl_node->mn_part] The locked part (on success). */
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mfl_offs;  /* [out] Mapping offset into `mfl_part'. */
 
-	/* All of the below fields should not be touched, and are [in|out],
+	/* All of the  below fields  should not  be touched,  and are  [in|out],
 	 * though may also be modified when `mfault_or_unlock()' returns `false'
-	 * Leave them alone. - They're needed to make `mfault_or_unlock()'
+	 * Leave them  alone.  -  They're needed  to  make  `mfault_or_unlock()'
 	 * fully re-entrant following a lock re-acquisition. */
 	struct unlockinfo                   mfl_unlck;    /* Unlock controller. */
 	struct mpart_setcore_data           mfl_scdat;    /* Load-data for setcore. */
@@ -221,7 +221,7 @@ struct mfault {
 
 
 /* (Try to) acquire locks, and load/split/unshare/... backing memory,
- * as well as mem-parts and mem-nodes in order to prepare everything
+ * as  well as mem-parts and mem-nodes in order to prepare everything
  * needed in order to map a given sub-address-range of a given mpart,
  * as accessed through a given mnode into memory.
  *
@@ -269,12 +269,12 @@ struct mfault {
  *
  * @param: self:   mem-lock control descriptor.
  * @return: true:  Successfully faulted memory.
- * @return: false: The lock to `self->mfl_mman' was lost, but the goal
+ * @return: false: The lock to `self->mfl_mman' was lost, but the  goal
  *                 of faulting memory has gotten closer, and the caller
  *                 should re-attempt the call after re-acquiring locks.
  * @return: false: The accessed address range lies outside the bounds
  *                 of the associated mem-part.
- *                 Resolve this issue by simply trying again (this
+ *                 Resolve  this  issue  by simply  trying  again (this
  *                 inconsistency can result from someone else splitting
  *                 the associated mem-part) */
 FUNDEF NONNULL((1)) __BOOL FCALL

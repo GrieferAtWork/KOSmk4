@@ -187,7 +187,7 @@ err_eof_in_repeat_escaped:
 					if (!result->mc_max) {
 						/* Don't allow an upper bound of ZERO, which would be pointless
 						 * -> Instead, force the user to not write non-sensical regex
-						 *    that would only slow down the matching algorithm. */
+						 *    that  would  only  slow  down  the  matching algorithm. */
 						if (!(data->flags & REGEX_FLAG_IGNORE_NOOP_PATTERNS)) {
 							interval_error = (char *)REGEX_ERROR_LBRACE_BOUND_UPPER_ZERO;
 							goto handle_interval_error;
@@ -270,7 +270,7 @@ err_eof_in_repeat:
 					if (!result->mc_max) {
 						/* Don't allow an upper bound of ZERO, which would be pointless
 						 * -> Instead, force the user to not write non-sensical regex
-						 *    that would only slow down the matching algorithm. */
+						 *    that  would  only  slow  down  the  matching algorithm. */
 						if (!(data->flags & REGEX_FLAG_IGNORE_NOOP_PATTERNS)) {
 							interval_error = (char *)REGEX_ERROR_LBRACE_BOUND_UPPER_ZERO;
 							goto handle_interval_error;
@@ -482,7 +482,7 @@ is_in_range(char *range_start, char *range_end,
 				uint32_t high;
 				++iter;
 				high = unicode_readutf8_n((char const **)&iter, range_end);
-				/* NOTE: Perform the empty-range check for unifying case, so-as to
+				/* NOTE: Perform the empty-range check  for unifying case, so-as  to
 				 *       only generate an error based on the pattern, but not on the
 				 *       context flags. */
 				if (ch > high && !(data->flags & REGEX_FLAG_ALLOW_EMPTY_RANGES))
@@ -979,7 +979,7 @@ do_match_lparen_escaped:
 
 			case '=':
 				if unlikely(!match.mc_min) {
-					/* Don't allow optional matches, which would mean that the entire lookahead
+					/* Don't allow optional matches, which  would mean that the entire  lookahead
 					 * was optional in itself. And considering that it's not meant to consume any
 					 * data, it would become a no-op altogether! */
 err_lookahead_must_be_nonzero:
@@ -1119,7 +1119,7 @@ err_lookahead_must_be_nonzero:
 			}
 
 			/* Found a matching variant. - Do a greedy match
-			 * with the remainder of the pattern string. */
+			 * with  the  remainder of  the  pattern string. */
 			assert(match.mc_max >= 2);
 			match_count = 1;
 
@@ -1162,7 +1162,7 @@ err_lookahead_must_be_nonzero:
 				                         &variant_piter, content_end,
 				                         data,
 				                         REGEX_CONTEXT_FINPAREN |
-				                         /* Pass EMPTYOK, because we check for that case
+				                         /* Pass  EMPTYOK,  because  we check  for  that case
 				                          * explicitly by jumping to `has_infinite_submatch'. */
 				                         REGEX_CONTEXT_FEMPTYOK);
 				if unlikely(REGEX_ISERROR(error)) {
@@ -1191,7 +1191,7 @@ err_backup_v:
 						                         &alt_variant_piter, content_end,
 						                         data,
 						                         REGEX_CONTEXT_FINPAREN |
-						                         /* Pass EMPTYOK, because we check for that case
+						                         /* Pass  EMPTYOK,  because  we check  for  that case
 						                          * explicitly by jumping to `has_infinite_submatch'. */
 						                         REGEX_CONTEXT_FEMPTYOK);
 						if unlikely(REGEX_ISERROR(error))
@@ -1569,7 +1569,7 @@ match_unicode_trait:
 				goto err;
 			if (((error != 0) ^ inverse_range) ||
 			    /* Special case: Don't allow inverse ranges to catch line-feed characters
-			     *               when the `REGEX_FLAG_RANGE_NOT_NEWLINE' flag is set. */
+			     *               when the  `REGEX_FLAG_RANGE_NOT_NEWLINE'  flag  is  set. */
 			    (inverse_range && unicode_islf(data_ch) &&
 			     (data->flags & REGEX_FLAG_RANGE_NOT_NEWLINE))) {
 				data_iter = prev_diter;
@@ -1736,13 +1736,13 @@ libregex_matches(/*utf-8*/ char const *__restrict data, size_t datalen,
 }
 
 
-/* Same as `regex_matches()', but also store a pointer to the end of
+/* Same as `regex_matches()',  but also  store a  pointer to  the end  of
  * consumed data in `pdataend'. Because input data is formatted in UTF-8,
  * this position would only be equal to `data + return' if all input data
- * was ASCII only, meaning that in the universal case, this function
+ * was ASCII  only, meaning  that in  the universal  case, this  function
  * becomes useful when dealing with unicode data.
  * @param: pdataend:          Upon success (return != 0 && return != (size_t)-1),
- *                            save a pointer to the end of consumed data here.
+ *                            save a pointer  to the end  of consumed data  here.
  * @param: datalen:           Number of bytes (not characters) in data.
  * @param: patternlen:        Number of bytes (not characters) in pattern.
  * @return: * :               Number of characters (not bytes) matched in `data'.
@@ -1849,7 +1849,7 @@ LOCAL WUNUSED ATTR_CONST bool CC is_regex_suffix(char ch, uintptr_t flags) {
 }
 
 
-/* Find the first instance matching `pattern' and store the
+/* Find  the   first  instance   matching  `pattern'   and  store   the
  * character indices (not byte offsets) in `*pstart' and `*pattern_end'
  * @return: 1:                Pattern was found.
  * @return: 0:                Pattern not found.

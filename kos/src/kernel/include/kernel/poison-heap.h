@@ -27,19 +27,19 @@
 #include <kernel/malloc-defs.h>
 /**/
 
-/* Config option: When the kernel becomes poisoned, re-direct all
- * of the following functions to use a small, secondary heap system
- * that is designed for simplicity, being as robust as possible
+/* Config option:  When the  kernel becomes  poisoned, re-direct  all
+ * of the following functions to  use a small, secondary heap  system
+ * that  is  designed for  simplicity,  being as  robust  as possible
  * against further corruption, whilst ignoring any noticeable illegal
- * API use. This heap is not meant to be used forever, since the way
- * that it is designed has it lacking an actual free() function,
- * meaning that once enabled, the kernel will run out of memory
+ * API  use. This heap is not meant to be used forever, since the way
+ * that it  is designed  has it  lacking an  actual free()  function,
+ * meaning  that  once enabled,  the kernel  will  run out  of memory
  * sooner or later.
- * This poison-heap is simply meant to be used as a drop-in replacement
- * when the ship is already sinking, at which point it is meant to be
+ * This poison-heap is simply meant to  be used as a drop-in  replacement
+ * when the ship is  already sinking, at  which point it  is meant to  be
  * used for allocating memory needed for holding decompressed .debug_info
- * and the like, when not being able to allocate such buffers would
- * normally mean that the kernel would be unable to (safely) display
+ * and  the  like, when  not being  able to  allocate such  buffers would
+ * normally mean  that the  kernel would  be unable  to (safely)  display
  * tracebacks following a crash.
  * List of functions that get overwritten/re-directed:
  *   - heap_alloc

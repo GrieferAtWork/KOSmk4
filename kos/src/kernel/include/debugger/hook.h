@@ -60,8 +60,8 @@ DECL_BEGIN
 
 
 
-/* Optional, per-module section containing debugger hooks.
- * This section contains an arbitrary number of hooks, each
+/* Optional,  per-module  section  containing  debugger  hooks.
+ * This section  contains an  arbitrary number  of hooks,  each
  * of which follows the layout mandated by `struct dbg_hookhdr'
  * The hooks array can be terminated in a couple of ways:
  *   - By simply reaching the end of the .dbg.hooks section (intended method)
@@ -79,7 +79,7 @@ DECL_BEGIN
 #define DBG_HOOKFLAG_RELATIVE 0x01 /* Pointers to other components defined in this hook are
                                     * relative to the base-address (i.e. `drv_loadaddr') of
                                     * the module containing the hook. */
-#define DBG_HOOKFLAG_SPECIFIC 0xf0 /* Mask of flags who's meaning depends on `dh_type'
+#define DBG_HOOKFLAG_SPECIFIC 0xf0 /* Mask  of  flags who's  meaning depends  on `dh_type'
                                     * If not specified otherwise, undefined bits masked by
                                     * this must be set to 0 */
 
@@ -169,15 +169,15 @@ struct dbg_morehook {
 
 
 /* Additional flags for `struct dbg_commandhook::dh_flag' */
-#define DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE 0x10 /* Options listed by the auto-completion callback are exclusive, in
+#define DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE 0x10 /* Options listed  by the  auto-completion callback  are exclusive,  in
                                                  * that no other options are accepted than those that can be enumerated
-                                                 * by the auto-completion callback (if no auto-completion callback was
-                                                 * specified, then the function doesn't accept any argument and will
-                                                 * return `DBG_STATUS_INVALID_ARGUMENTS' whenever `argc != 1' (1,
+                                                 * by the auto-completion callback (if no auto-completion callback  was
+                                                 * specified, then the  function doesn't accept  any argument and  will
+                                                 * return  `DBG_STATUS_INVALID_ARGUMENTS'   whenever  `argc != 1'   (1,
                                                  * because argv[0] is the name of the function))
                                                  * When this flag is set, the commandline changes its color (to red)
-                                                 * whenever the word currently being written can no longer be auto-
-                                                 * completed (the same way it changes color when the typed command
+                                                 * whenever  the word currently being written can no longer be auto-
+                                                 * completed (the same way it  changes color when the typed  command
                                                  * name doesn't match any known command) */
 
 /* Debugger command provider hook */
@@ -190,7 +190,7 @@ typedef intptr_t (DBG_CALL *dbg_command_t)(size_t argc, char *argv[]);
 /* Callback prototype for `dbg_autocomplete_t()' */
 typedef void (DBG_CALL *dbg_autocomplete_cb_t)(void *arg, char const *name, size_t namelen);
 
-/* Enumerate a list of possible words that may follow after
+/* Enumerate a  list of  possible words  that may  follow  after
  * argc+argv by invoking `(*cb)(arg, ...)' for each possibility.
  * @param: starts_with: (optional) When non-NULL (and non-empty), the function
  *                       is allowed to only enumerate auto-completion options
@@ -223,7 +223,7 @@ struct dbg_commandhook {
 	dbg_hook_type_t    dc_type; /* == DBG_HOOK_COMMAND */
 	dbg_hook_flag_t    dc_flag; /* ... */
 	dbg_hook_size_t    dc_size; /* >= offsetafter(struct dbg_commandhook, dc_main) &&
-	                             * <= offsetafter(struct dbg_commandhook, dc_auto) */
+	                             * <=  offsetafter(struct  dbg_commandhook,  dc_auto) */
 	char const        *dc_name; /* [1..1][const] The function's name. */
 	dbg_command_t      dc_main; /* [1..1][const] The function's callback. */
 	char const        *dc_help; /* [0..1][const] An optional help string for the function. */
@@ -341,7 +341,7 @@ struct dbg_commandhook {
  * >> DBG_COMMAND(Keyword name) { ... }
  * >> DBG_COMMAND(Keyword name, char const help[]) { ... }
  * >> DBG_COMMAND(Keyword name, char const help[], Keyword argc, Keyword argv) { ... }
- * >> DBG_COMMAND(Keyword name, Keyword autocomplete, char const help[], Keyword argc, Keyword argv) { ... } 
+ * >> DBG_COMMAND(Keyword name, Keyword autocomplete, char const help[], Keyword argc, Keyword argv) { ... }
  * >> DBG_COMMAND(Keyword name, Keyword autocomplete, unsigned int flags, char const help[], Keyword argc, Keyword argv) { ... } */
 #define DBG_COMMAND(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_COMMAND_, (__VA_ARGS__))(__VA_ARGS__)
 
@@ -355,7 +355,7 @@ struct dbg_commandhook {
  * >> DBG_NAMED_COMMAND(Keyword id, String name) { ... }
  * >> DBG_NAMED_COMMAND(Keyword id, String name, char const help[]) { ... }
  * >> DBG_NAMED_COMMAND(Keyword id, String name, char const help[], Keyword argc, Keyword argv) { ... }
- * >> DBG_NAMED_COMMAND(Keyword id, String name, Keyword autocomplete, char const help[], Keyword argc, Keyword argv) { ... } 
+ * >> DBG_NAMED_COMMAND(Keyword id, String name, Keyword autocomplete, char const help[], Keyword argc, Keyword argv) { ... }
  * >> DBG_NAMED_COMMAND(Keyword id, String name, Keyword autocomplete, unsigned int flags, char const help[], Keyword argc, Keyword argv) { ... } */
 #define DBG_NAMED_COMMAND(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_NAMED_COMMAND_, (__VA_ARGS__))(__VA_ARGS__)
 
@@ -421,7 +421,7 @@ struct dbg_finihook {
 	PRIVATE ATTR_USED ATTR_DBGTEXT void DBG_CALL dbg_fini_##func(void)
 /* >> void KCALL func(void);
  * Define a debug initializer/reset/finalizer function
- * INIT:  Called whenever the debugger is entered (not called upon recursive re-entry)
+ * INIT: Called whenever the debugger is entered (not called upon recursive re-entry)
  * FINI:  Called whenever the debugger is exited
  * RESET: Called whenever the debugger is entered (after INIT, including on recursive re-entry) */
 #define DBG_INIT(func)  _DBG_PRIVATE_INIT(func)
@@ -475,7 +475,7 @@ struct dbg_clearhook {
 #define _DBG_PRIVATE_BZERO_NAME(prefix) _DBG_PRIVATE_BZERO_NAME2(prefix, __LINE__)
 
 /* Define the callbacks necessary to do `memset(p, 0, size)' during a debugger
- * reset, as well as safely backup/restore the original contents of the
+ * reset,  as  well  as safely  backup/restore  the original  contents  of the
  * specified memory range upon initialization/finalization. */
 #define DEFINE_DBG_BZERO(p, size)                                                   \
 	PRIVATE ATTR_COLDBSS byte_t _DBG_PRIVATE_BZERO_NAME(_debug_bzero_backup)[size]; \
@@ -558,11 +558,11 @@ struct dbg_hookiterator {
 	size_t                     dhi_nextdriver; /* Index for the next driver to scan. */
 	REF struct driver_section *dhi_section;    /* [1..1] Section currently being scanned.
 	                                            * HINT: This is 1..1, since the kernel _always_ defines
-	                                            *       a .dbg.hook section, so we know that at least
+	                                            *       a .dbg.hook section, so  we know that at  least
 	                                            *       one such section will exist at run-time! */
 	struct dbg_hookhdr        *dhi_sectnext;   /* [1..1] Pointer to the next hook to enumerate. */
 	struct dbg_hookhdr        *dhi_sectend;    /* [== dhi_section->ds_data + dhi_section->ds_size]
-	                                            * Pointer to the end of the current driver's .dbg.hook section.
+	                                            * Pointer  to  the  end  of  the  current  driver's  .dbg.hook  section.
 	                                            * Set to point to the end of the MORE-vector when `dhi_sectprev != NULL' */
 	struct dbg_hookhdr        *dhi_sectprev;   /* [0..1] Return-pointer for DBG_HOOK_MORE-hooks. */
 };
@@ -610,7 +610,7 @@ dbg_lookup_command(char const *__restrict name);
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct dbg_commandhook const *FCALL
 dbg_lookup_command_fuzzy(char const *__restrict similar_to_name);
 
-/* Search for a debug command who's name starts with `name'.
+/* Search  for  a  debug  command   who's  name  starts  with   `name'.
  * If more than one command matches this criteria, return NULL instead. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct dbg_commandhook const *FCALL
 dbg_lookup_command_startswith(char const *__restrict name_start);

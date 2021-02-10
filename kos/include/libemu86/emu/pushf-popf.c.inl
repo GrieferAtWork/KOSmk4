@@ -83,7 +83,7 @@ case EMU86_OPCODE_ENCODE(0x9d): {
 	} else
 #endif /* EMU86_EMULATE_CONFIG_VM86 */
 	{
-		/* Allow modifications to #IOPL and #IF when IOPL=3 in user-space.
+		/* Allow modifications to  #IOPL and #IF  when IOPL=3 in  user-space.
 		 * This matches the official documentation of `popf' which can modify
 		 * #IF whenever #IOPL >= #CPL (where #CPL=3 for user-space) */
 		if (EMU86_ISUSER() && (EMU86_GETFLAGS() & EFLAGS_IOPLMASK) != EFLAGS_IOPL(3))

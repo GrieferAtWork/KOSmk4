@@ -49,12 +49,12 @@ struct mpostlockop {
 /* Callback prototype for mman pending locked operations.
  * @return: NULL: Completed.
  * @return: * :   A descriptor for an operation to perform
- *                after the mman-lock has been released. */
+ *                after the mman-lock  has been  released. */
 typedef NOBLOCK NONNULL((1)) struct mpostlockop *
 /*NOTHROW*/ (FCALL *mlockop_callback_t)(struct mlockop *__restrict self);
 
 /* Memory-manager locked operation.
- * This struct describes a pending operation that should be executed
+ * This struct describes a pending  operation that should be  executed
  * while holding a lock to the associated memory manager the next time
  * that someone releases its `mm_lock' */
 struct mlockop {

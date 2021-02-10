@@ -87,11 +87,11 @@ typedef u64 uintptr_quarter_t;
 /* Time (in Nano seconds == 1/1000000000 (1/1_000_000_000) seconds)
  * since the system was booted (s.a. `boottime')
  * NOTE: 64 bits is enough to keep this counter from overflowing for
- *       almost 600 years (so don't worry too much about overflows) */
+ *       almost 600 years (so don't worry too much about  overflows) */
 typedef u64 ktime_t;
 
 /* Special values accepted by all interfaces that expose
- * a `ktime_t abs_timeout' or `ktime_t rel_timeout' */
+ * a   `ktime_t abs_timeout'   or  `ktime_t rel_timeout' */
 #define KTIME_NONBLOCK ((ktime_t)0)  /* Don't block (but possibly yield) */
 #define KTIME_INFINITE ((ktime_t)-1) /* Wait indefinitely (never time out) */
 

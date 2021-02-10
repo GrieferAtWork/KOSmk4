@@ -117,4 +117,3 @@ libvio_copytovio_from_phys(struct vioargs *__restrict args,
 
 DECL_END
 #endif /* __KERNEL__ */
-

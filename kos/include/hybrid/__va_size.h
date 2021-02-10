@@ -23,19 +23,19 @@
 #include "../__stdinc.h"
 #include "host.h"
 
-/* __VA_SIZE: Minimal size of integral type arguments in ellipsis
- *            May be used to optimize PRI* macros from <inttypes.h>,
+/* __VA_SIZE: Minimal  size  of  integral  type  arguments  in  ellipsis
+ *            May be  used to  optimize PRI*  macros from  <inttypes.h>,
  *            as well as implement a more efficient `printf()' function. */
 #ifndef __VA_SIZE
 #if defined(__x86_64__)
 /* Must still be 4 because gcc (understandably) doesn't sign-extend
- * 32-bit integers to 64 bits when passed through ellipsis. */
+ * 32-bit  integers  to  64  bits  when  passed  through  ellipsis. */
 #define __VA_SIZE 4
 #elif defined(__i386__)
 #define __VA_SIZE 4
 #else /* ... */
 #include "typecore.h"
-/* The C standard implies a minimal alignment for int-types.
+/* The C  standard  implies  a minimal  alignment  for  int-types.
  * With this in mind (and so-as not to do something wrong), assume
  * integer alignment an all other cases */
 #define __VA_SIZE __SIZEOF_INT__

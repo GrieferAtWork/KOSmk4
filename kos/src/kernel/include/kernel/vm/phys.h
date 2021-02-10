@@ -178,11 +178,11 @@ typedef uintptr_t pagedir_pushval_t;
 
 /* Helper functions for accessing very small segments of physical memory.
  * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical memory,
- *          either make use of `vm_copy(from|to)phys()' or `THIS_TRAMPOLINE_PAGE'.
+ *          either  make  use   of  `vm_copy(from|to)phys()'  or   `THIS_TRAMPOLINE_PAGE'.
  *          These functions will try to make use arch-specific physical identity mappings,
- *          like can be found on `x86_64' for the first 1Gib of physical memory.
- *          However any memory outside that region (or any memory at all if no such
- *          region is defined by the arch (as is the case for `i386'), will need to
+ *          like can  be  found  on  `x86_64'  for the  first  1Gib  of  physical  memory.
+ *          However  any  memory outside  that region  (or any  memory at  all if  no such
+ *          region is  defined by  the arch  (as is  the case  for `i386'),  will need  to
  *          be accessed through use of `THIS_TRAMPOLINE_PAGE'!) */
 FUNDEF NOBLOCK WUNUSED u8 NOTHROW(KCALL vm_readphysb)(PHYS physaddr_t addr);
 FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw)(/*aligned(2)*/ PHYS physaddr_t addr);
@@ -312,17 +312,17 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS p
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src);
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src);
 
-/* A single page of virtual memory in the kernel VM, that is always
+/* A single page of  virtual memory in the  kernel VM, that is  always
  * prepared for being used for whatever purposes a thread has in mind.
- * NOTE: This page is also used by PAGEFAULTS, though it will
+ * NOTE: This page is also used  by PAGEFAULTS, though it  will
  *       restore a previous mapping, if such a mapping existed.
  * NOTE: Because this page is unique for each thread, the user is not
- *       required to acquire a lock to the kernel VM when wishing to
+ *       required to acquire a lock to the kernel VM when wishing  to
  *       map something at this location! */
 DATDEF ATTR_PERTASK __ARCH_PAGEID_TYPE this_trampoline_page;
 
 /* TODO: Go through all uses of `THIS_TRAMPOLINE_PAGE' and add
- *       optimizations for supporting `PHYS_IS_IDENTITY()' */
+ *       optimizations  for  supporting   `PHYS_IS_IDENTITY()' */
 #define THIS_TRAMPOLINE_PAGE PERTASK_GET(this_trampoline_page)
 #ifdef __ARCH_PAGEID_DECODE_KERNEL
 #define THIS_TRAMPOLINE ((byte_t *)__ARCH_PAGEID_DECODE_KERNEL(THIS_TRAMPOLINE_PAGE))

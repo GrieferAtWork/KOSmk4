@@ -118,12 +118,12 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_destroy)(struct mman *__rest
 DEFINE_REFCOUNT_FUNCTIONS(struct mman, mm_refcnt, mman_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mman, mm_weakrefcnt, mman_free)
 
-/* Memory manager construction functions.
+/* Memory   manager   construction    functions.
  * NOTE: mman_fork() will fork the current mman. */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_new(void) THROWS(E_BADALLOC, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_fork(void) THROWS(E_BADALLOC, ...);
 
-/* Set the mman active within the calling thread, as well as
+/* Set  the mman active within the calling thread, as well as
  * change page directories to make use of the new mman before
  * returning. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -153,8 +153,8 @@ SLIST_HEAD(mlockop_slist, mlockop);
  * that should be executed (via a reap-mechanism) whenever the lock
  * for this mman is released.
  * This list is situated such that for user-space mmans, it always
- * appears as an empty list, meaning that the must-reap-check can
- * simply be performed for every mman, and will simply be a no-op
+ * appears as an empty list, meaning that the must-reap-check  can
+ * simply be performed for every mman, and will simply be a  no-op
  * when done for anything but the kernel mman.
  * However, you still mustn't add anything into it for a user-space
  * memory manager! */

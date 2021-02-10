@@ -34,10 +34,10 @@ DECL_BEGIN
 
 struct x86_alternative {
 	/* NOTE: Adjacent feature descriptors with the same xa_start/xa_end are skipped
-	 *       once the first feature descriptor for which `xa_feature' is true has
+	 *       once the first feature descriptor  for which `xa_feature' is true  has
 	 *       been found. */
 	u32       xa_feature; /* Feature code specifying when this alternative should be
-	                       * used (s.a. `X86_FEATURE()' from <asm/cpu-features.h>) */
+	                       * used (s.a.  `X86_FEATURE()' from  <asm/cpu-features.h>) */
 	u32       xa_altlen;  /* Length of `xa_altcode' */
 	uintptr_t xa_start;   /* (Module-relative) starting address of where to apply this alternative. */
 	uintptr_t xa_end;     /* (Module-relative) end address of where to apply this alternative. */

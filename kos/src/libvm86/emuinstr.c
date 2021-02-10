@@ -344,14 +344,14 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 #define EMU86_EMULATE_CONFIG_ONLY_MEMORY     0 /* Emulate all instructions */
 #define EMU86_EMULATE_CONFIG_CHECKUSER       0 /* Disable user-access checks (realmode always has full permissions) */
 #define EMU86_EMULATE_CONFIG_CHECKERROR      0 /* Don't check disabled instructions for usage errors (disabled
-                                                * instruction don't exist for all that we're concerned about) */
+                                                * instruction don't exist for all that we're concerned  about) */
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 0 /* Any instruction not explicitly configured is enabled */
 
 /* Configure ISA extensions */
 #define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       0 /* [not enabled: fsgsbase isn't enabled in realmode] */
 #define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 0 /* [not enabled: There is no user-space in realmode] */
 /* Ignore this config option. - Only realmode code specifically written for KOS would be
- * able to take advantage of this, and given that libvm86 is meant to emulate 3rd-party
+ * able  to take advantage of this, and given that libvm86 is meant to emulate 3rd-party
  * assembly, that assembly probably would never make use of something like this. */
 #if defined(CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS) && 0
 #define EMU86_EMULATE_CONFIG_LOCK_SHIFT           1 /* [enabled] Accept `lock' for shl/shr/sal/sar/rol/ror/rcl/rcr */
@@ -368,7 +368,7 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 #define EMU86_EMULATE_CONFIG_WANT_RDMSR_EMULATED_FSGSBASE 0 /* Don't emulate `IA32_FS_BASE' or `IA32_GS_BASE' */
 #define EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED          0 /* Don't emulate wrmsr */
 
-/* Disable some instructions who's use doesn't make sense in pure real-mode, or
+/* Disable  some instructions  who's use doesn't  make sense in  pure real-mode, or
  * that couldn't actually be emulated without also emulating all of protected-mode! */
 #define EMU86_EMULATE_CONFIG_WANT_RDFSBASE 0 /* Realmode uses the segment index << 4 as segment base! */
 #define EMU86_EMULATE_CONFIG_WANT_RDGSBASE 0 /* ... */
@@ -377,7 +377,7 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 #define EMU86_EMULATE_CONFIG_WANT_SWAPGS   0 /* ... */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_DREG 0 /* We're not emulating debug registers, so disable this instruction! */
 
-/* Actually enable emulation of mov-from-creg, but implement mov-to-creg such
+/* Actually enable emulation of mov-from-creg, but implement mov-to-creg  such
  * that any attempt to modify any of the bits from their fixed, constant state
  * will result in a #GP getting thrown. */
 #define EMU86_EMULATE_CONFIG_WANT_MOV_CREG 1
@@ -402,7 +402,7 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 #define EMU86_EMULATE_WRCR3(value) (void)(self->vr_regs.vr_cr3 = (u32)(value))
 
 /* The TS-bit of our emulated %cr0 has a fixed value. - As such, `clts'
- * is either always a no-op, or always causes a #GP as the result of
+ * is either always a no-op,  or always causes a  #GP as the result  of
  * attempting to set a bit into an unexpected state. */
 #define EMU86_EMULATE_CONFIG_WANT_CLTS 1
 #if (EMU86_EMULATE_RDCR0() & CR0_TS) == 0

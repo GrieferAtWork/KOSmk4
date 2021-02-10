@@ -65,7 +65,7 @@ FUNDEF ssize_t NOTHROW(KCALL error_print_into)(__pformatprinter printer, void *a
 typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 
-/* Ensure that the 1-bits of `input' can entirely be masked by `allowed'
+/* Ensure that  the  1-bits of  `input'  can  entirely be  masked  by  `allowed'
  * If this isn't the case, throw an `E_INVALID_ARGUMENT_UNKNOWN_FLAG' exception.
  * @param: context: One of `E_INVALID_ARGUMENT_CONTEXT_*' */
 #define VALIDATE_FLAGSET(input, allowed, context)                                \

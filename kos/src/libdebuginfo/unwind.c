@@ -77,7 +77,7 @@ PRIVATE bool CC load_libunwind(void) {
 	LOAD(pdyn_unwind_fde_exec, "unwind_fde_exec");
 	COMPILER_WRITE_BARRIER();
 
-	/* Load this one last, as its used to
+	/* Load  this  one last,  as its  used to
 	 * check if libunwind was already loaded. */
 	LOAD(pdyn_unwind, "unwind");
 
@@ -139,15 +139,15 @@ unwind_through_debug_frame(void const *absolute_pc,
 
 
 /* Same as the regular unwind(3) (from libunwind.so), however (if configured),
- * this one also handles the case where `ABSOLUTE_PC' points into user-space,
+ * this  one also handles the case where `ABSOLUTE_PC' points into user-space,
  * allowing user-space text locations to be correctly unwound.
  * NOTE: This function should only be used when printing tracebacks for
- *       debugging purposes, but _NEVER_ for the purpose of something
+ *       debugging purposes, but _NEVER_  for the purpose of  something
  *       like exception unwinding!
  * To improve the success-rate of unwinding, this function does a number of things:
  *   - Try to make use of the regular, old `unwind(3)' from `libunwind.so'
  *   - Make use of DWARF `.debug_frame' debug information (if present)
- *   - Inspect/emulate the underlying program text to detect patterns
+ *   - Inspect/emulate  the underlying program  text to detect patterns
  *     that lead to known return instructions. Though this is only done
  *     if implemented and supported for the hosting architecture.
  * Also note that in kernel-space, once the kernel has been poisoned, no
@@ -171,10 +171,10 @@ libdi_unwind_for_debug(void const *absolute_pc,
 		                reg_getter, reg_getter_arg,
 		                reg_setter, reg_setter_arg);
 	}
-	/* Supporting .debug_frame for kernel-space drivers doesn't make any sense,
-	 * since the same information also exists in .eh_frame, and since the KOS
+	/* Supporting .debug_frame for kernel-space drivers doesn't make any  sense,
+	 * since  the same information  also exists in .eh_frame,  and since the KOS
 	 * kernel is written in C++, and requires .eh_frame-based unwind information
-	 * support to have exceptions work correctly, no kernel driver should exist
+	 * support  to have exceptions work correctly, no kernel driver should exist
 	 * that doesn't have a .eh_frame section which already contains _all_ of the
 	 * information we could ever need.
 	 * As such, only parse .debug_frame while in user-space! */
@@ -189,7 +189,7 @@ libdi_unwind_for_debug(void const *absolute_pc,
 
 	if (result == UNWIND_NO_FRAME) {
 		/* TODO: Try to inspect/emulate the underlying program text
-		 *       to unwind until the next return-like instruction. */
+		 *       to  unwind until the next return-like instruction. */
 	}
 	return result;
 }

@@ -43,7 +43,7 @@ DECL_BEGIN
 
 /* The logecho-enabled state for debugger output.
  * When enabled (default), debugger output is echoed via some
- * architecture-specific mechanism onto an external logging
+ * architecture-specific mechanism onto  an external  logging
  * sink which then allows external programs to inspect/record
  * debugger output. */
 DATDEF bool dbg_logecho_enabled;
@@ -127,11 +127,11 @@ typedef struct {
 
 
 
-/* Get/set the scroll position the DBG output display.
- * Scroll positions increment upwards, meaning that `pos=0'
+/* Get/set  the  scroll  position  the  DBG  output  display.
+ * Scroll positions increment  upwards, meaning that  `pos=0'
  * scrolls to the active display, while any other number will
  * display content that has been visible before then.
- * NOTE: When `pos' > `dbg_scroll_maxline', it will
+ * NOTE: When `pos'  >  `dbg_scroll_maxline',  it  will
  *       be clamped to that value before being applied.
  * @param: pos: The position to which to scroll.
  * @return: * : The position that has been set. */
@@ -170,7 +170,7 @@ DATDEF struct ansitty dbg_tty;
 
 
 /* Get/Set debug TTY screen data
- * NOTE: Out-of-bound cells are read as the same value as a space-character
+ * NOTE: Out-of-bound cells  are read  as the  same value  as a  space-character
  *       cell when written using `dbg_putc(' ')' at the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
  * NOTE: These functions will read/write the SCROLL-TOP screen data, and
@@ -187,7 +187,7 @@ FUNDEF ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_getcur_visible)(void);
 FUNDEF bool NOTHROW(FCALL dbg_setcur_visible)(bool visible);
 
 /* Hints towards the screen driver to temporarily stop drawing to the screen,
- * but instead draw to a separate buffer, thus preventing flickering in the
+ * but instead draw to a separate  buffer, thus preventing flickering in  the
  * case of whole screen redraw operations.
  * NOTE: Also affects updates made to the cursor position
  * @param: force: When true, force a switch back to the screen-buffer. */
@@ -195,8 +195,8 @@ FUNDEF void NOTHROW(FCALL dbg_beginupdate)(void);
 FUNDEF void NOTHROW(FCALL dbg_endupdate)(bool force DFL(false));
 
 /* TTY show-screen support (display the contents of the monitor before the debugger was enabled)
- * WARNING: `dbg_beginshowscreen()' also implies the behavior of `dbg_endupdate(true)'
- * NOTE: This functionality of these functions is also available through the `screen' command */
+ * WARNING:  `dbg_beginshowscreen()'  also   implies  the   behavior  of   `dbg_endupdate(true)'
+ * NOTE: This functionality of  these functions is also  available through the `screen'  command */
 FUNDEF void NOTHROW(FCALL dbg_beginshowscreen)(void);
 FUNDEF void NOTHROW(FCALL dbg_endshowscreen)(void);
 

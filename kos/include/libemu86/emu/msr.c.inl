@@ -167,8 +167,8 @@ case EMU86_OPCODE_ENCODE(0x0f30): {
 	(void)index;
 	(void)value;
 
-	/* A couple of MSR registers can throw #GP if the written value
-	 * is a non-canonical pointer. Since KOS throws `E_SEGFAULT' for
+	/* A  couple  of MSR  registers can  throw #GP  if the  written value
+	 * is a  non-canonical pointer.  Since  KOS throws  `E_SEGFAULT'  for
 	 * this case, manually check if we're dealing with one of these MSRs,
 	 * and the written value is such a pointer.
 	 * s.a. Intel instruction set reference for `WRMSR' (Vol. 2C) */
@@ -320,4 +320,3 @@ case EMU86_OPCODE_ENCODE(0x0f33): {
 EMU86_INTELLISENSE_END
 
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-

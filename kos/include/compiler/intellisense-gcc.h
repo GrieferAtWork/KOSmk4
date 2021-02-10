@@ -24,7 +24,7 @@
 #undef __clang__
 
 /*
- * While the `linux-gcc-x86' intellisense driver is _extremely_ welcome if you ask me,
+ * While the `linux-gcc-x86' intellisense driver is _extremely_ welcome if you ask  me,
  * there are still a couple of things that it does wrong when compared against the real
  * deal. - Fix those in here!.
  * Also: Implement the common intellisense types used to implement alternate integral
@@ -129,8 +129,8 @@
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
 static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #else
-/* This isn't really correct, either. wchar_t on linux is 4 bytes, however we
- * can't really change sizeof(xxx) using preprocessor directives, so the best
+/* This isn't really correct, either. wchar_t on linux is 4 bytes, however  we
+ * can't really change sizeof(xxx) using preprocessor directives, so the  best
  * we _can_ do is change intellisense to at least be consistent with itself... */
 #undef __SIZEOF_WCHAR_T__
 #define __SIZEOF_WCHAR_T__ 2
@@ -164,17 +164,17 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 
 namespace __intern {
 
-/* Intellisense doesn't emulate `__int128' properly (or rather: at all; it only
+/* Intellisense doesn't emulate `__int128' properly  (or rather: at all; it  only
  * defines the `__SIZEOF_INT128__' feature test macro, but don't actually care to
  * implement the actual feature it is used to test for... ~ugh~)
- * -> So try to fix that _BUG_! Because that's totally what it is, and not
- *    just the vs developers being lazy. Oh no, it totally isn't that they
- *    probably just copied a list of gcc's predefined macros and called it
+ * -> So try to  fix that  _BUG_! Because  that's totally  what it  is, and  not
+ *    just the  vs developers  being lazy.  Oh no,  it totally  isn't that  they
+ *    probably  just  copied a  list of  gcc's predefined  macros and  called it
  *    a day without actually going through all of them and checking that they're
  *    actually doing what they're supposed to do.
- * I mean: How else do you think not only something like this happened, but
+ * I mean: How else do you think  not only something like this happened,  but
  * also something like `__INT64_TYPE__' not actually being 64-bit because its
- * default definition is (just like it is in gcc) `signed long int' (again:
+ * default definition is (just like  it is in gcc) `signed long int'  (again:
  * Intellisense continues to define `long int' as 32-bit, instead of defining
  * it as pointer-sized) */
 #ifdef __SIZEOF_INT128__
@@ -826,9 +826,9 @@ void __cyg_profile_func_enter(void *, void *);
 void __cyg_profile_func_exit(void *, void *);
 #ifdef __SIZEOF_INT128__
 /* For some reason, intellisense seems to ?somewhat? know of these functions?
- * Even though it doesn't know about them from the get-go, manually defining
+ * Even though it doesn't know about them from the get-go, manually  defining
  * them by their actual names will cause intellisense to still not know about
- * them, and act as though they hadn't actually be declared at all...
+ * them, and  act  as though  they  hadn't  actually be  declared  at  all...
  * Work around this bug by defining these as macro aliases */
 #define __sync_fetch_and_add_16         __builtin_sync_fetch_and_add_16
 #define __sync_fetch_and_sub_16         __builtin_sync_fetch_and_sub_16
@@ -893,7 +893,7 @@ __UINT128_TYPE__ __builtin_atomic_fetch_nand_16(void volatile *, __UINT128_TYPE_
 __UINT128_TYPE__ __builtin_atomic_fetch_xor_16(void volatile *, __UINT128_TYPE__, int);
 __UINT128_TYPE__ __builtin_atomic_fetch_or_16(void volatile *, __UINT128_TYPE__, int);
 
-/* This one works though, which I presume is because it was created after the version of
+/* This  one works though, which I presume is  because it was created after the version of
  * intellisense that I'm using, so intellisense couldn't possibly have known about it back
  * then... */
 __UINT128_TYPE__ __builtin_speculation_safe_value_16(__UINT128_TYPE__, __UINT128_TYPE__ = 0);

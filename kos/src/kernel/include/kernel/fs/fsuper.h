@@ -133,11 +133,11 @@ struct fsuper_ops {
 SLIST_HEAD(fnode_slist, fnode);
 #endif /* !__fnode_slist_defined */
 
-/* Special value for `struct fsuper::fs_changed'. When set, further
- * changed parts are no longer traced, and `fnode'-s will no longer
+/* Special  value for `struct fsuper::fs_changed'. When set, further
+ * changed  parts are no longer traced, and `fnode'-s will no longer
  * be added to the changed-node list. This value is assigned as part
- * of unmounting a superblock, which is also includes deleting all
- * files still opened within the superblock's node-tree, thus also
+ * of unmounting a superblock, which  is also includes deleting  all
+ * files still opened within  the superblock's node-tree, thus  also
  * causing all loaded files to be deleted. */
 #define FSUPER_NODES_DELETED ((struct fnode *)-1)
 
@@ -157,13 +157,13 @@ LIST_HEAD(vmount_list, vmount);
 struct fsuper {
 	/* More fields of custom (fs-specific) `fsuper' sub-classes go here. */
 	REF_IF([*].mf_flags & MFILE_F_PERSISTENT)
-	LLRBTREE_ROOT(struct fnode) fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of known nodes (ordered by INO number)
+	LLRBTREE_ROOT(struct fnode) fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of  known nodes (ordered  by INO  number)
 	                                               * This tree holds a reference to any file that has the `MFILE_F_PERSISTENT'
-	                                               * flag set. When set to `FSUPER_NODES_DELETED', no further file-nodes can
+	                                               * flag set. When set to  `FSUPER_NODES_DELETED', no further file-nodes  can
 	                                               * be opened, and `fsuper_opennode()' will throw `E_FSERROR_DELETED'. */
 	struct atomic_rwlock        fs_nodeslock;     /* Lock for `fs_nodes' */
 	struct fsuper_lockop_slist  fs_nodeslockops;  /* [lock(ATOMIC)] Pending lock-operations for `fs_nodeslock' */
-	struct vmount_list          fs_mounts;        /* [0..n][lock(fs_mountslock)] List of mounting points of this superblock.
+	struct vmount_list          fs_mounts;        /* [0..n][lock(fs_mountslock)]  List of mounting points of this superblock.
 	                                               * When this list becomes empty, `fsuper_delete()' is automatically called. */
 	struct atomic_rwlock        fs_mountslock;    /* Lock for `fs_mounts' */
 	struct fsuper_lockop_slist  fs_mountslockops; /* [lock(ATOMIC)] Pending lock-operations for `fs_mountslock' */
@@ -171,9 +171,9 @@ struct fsuper {
 	REF struct blkdev          *fs_dev;           /* [0..1][const] Underlying block-device. (if any) */
 	struct fsuperfeat           fs_feat;          /* Filesystem features. */
 	struct REF fnode_slist      fs_changed;       /* [0..n][lock(ATOMIC)][const_if(FSUPER_NODES_DELETED)]
-	                                               * List of changed node (set to DELETED during unmount)
-	                                               * Note that for ramfs filesystems, this list will always
-	                                               * be marked as DELETED, in order to prevent the tracking
+	                                               * List of changed  node (set to  DELETED during  unmount)
+	                                               * Note that for ramfs filesystems, this list will  always
+	                                               * be marked as DELETED, in order to prevent the  tracking
 	                                               * of changed files, since there'd be no point in tracking
 	                                               * them if one can't write them do any backing storage! */
 	struct fdirnode             fs_root;          /* Filesystem root. NOTE: The `mf_flags' field of this
@@ -183,7 +183,7 @@ struct fsuper {
 
 /* Reference count control simply uses `fs_root' as basis.
  * Note that fields of `struct fsuper' grow upwards so that custom sub-classes of `fdirnode'
- * can simply be used in order to implement `fs_root', allowing for binary compatibility in
+ * can  simply be used in order to implement `fs_root', allowing for binary compatibility in
  * terms of fsuper field offsets between all possible variants. */
 #define fsuper_destroy(self) mfile_destroy(&(self)->fs_root)
 DEFINE_REFCOUNT_FUNCTIONS(struct fsuper, fs_root.mf_refcnt, fsuper_destroy)
@@ -196,24 +196,24 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fsuper, fs_root.mf_refcnt, fsuper_destroy)
 	                                                _fdirnode_ops_firstfield(so_))))
 
 /* Return a pointer to the filesystem superblock, given a pointer to its root directory.
- * This function may be used by custom implementations for `fs_root.mo_ops' */
+ * This   function  may   be  used   by  custom   implementations  for  `fs_root.mo_ops' */
 #define fsuper_from_root(root) \
 	__COMPILER_CONTAINER_OF(root, struct fsuper, fs_root)
 
 
 /* Mark `self' as deleted (should be called when all
- * mounting points using `self' have gone away):
+ * mounting  points  using `self'  have  gone away):
  *  - For all nodes in `self->fs_nodes':
  *    - Call `mfile_delete()'
  *    - Clear the `MFILE_F_PERSISTENT' and `MFILE_FN_GLOBAL_REF' flags
  *    - Remove the fnode from the global list of file-nodes
  *  - Mark the `fs_nodes' and `fs_changed' as `FSUPER_NODES_DELETED',
- *    and drop references from all changed files that were captured.
+ *    and drop references from all changed files that were  captured.
  * Note that the caller should first invoke `fsuper_sync()' to ensure
  * that any unwritten changes are written to disk.
  *
  * Anything from the above that couldn't be done via synchronously via
- * non-blocking operations will instead be completed asynchronously,
+ * non-blocking operations will  instead be completed  asynchronously,
  * meaning that the caller should let the superblock cleanup itself as
  * required locks become available... */
 FUNDEF NOBLOCK NONNULL((1)) void

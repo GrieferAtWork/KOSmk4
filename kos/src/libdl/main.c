@@ -28,8 +28,8 @@
 /**/
 
 /* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
- *       Instead look into `-fsanitize=unreachable' (which does something similar
- *       on a compiler-basis and don't make the library call mandatory for all
+ *       Instead  look into `-fsanitize=unreachable' (which does something similar
+ *       on  a compiler-basis  and don't make  the library call  mandatory for all
  *       code compiled with debug enabled) */
 /* TODO: Look into enabling `-fsanitize=signed-integer-overflow' for all code... */
 
@@ -175,7 +175,7 @@ linker_main(struct elfexec_info *__restrict info,
 
 	/* User-level initializers must be run _after_ we've initialized static TLS!
 	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
-	 *       just prior to jumping to the primary application's _start() function. */
+	 *       just   prior   to  jumping   to   the  primary   application's   _start()  function. */
 
 	/* Initialize the static TLS table. */
 	if unlikely(DlModule_InitStaticTLSBindings())
@@ -199,9 +199,9 @@ err:
 	{
 		char *error = libdl_dlerror();
 		syslog(LOG_ERR, "DL Initialization failed: %s\n", error);
-		/* If STDERR is a tty, also print the error message there.
-		 * Don't do so when STDERR is something different (such as
-		 * a file) in order to not accidentally inject an unexpected
+		/* If STDERR is  a tty,  also print the  error message  there.
+		 * Don't  do so  when STDERR  is something  different (such as
+		 * a file) in order to  not accidentally inject an  unexpected
 		 * error message into an error stream that wouldn't understand
 		 * such an error. */
 		{

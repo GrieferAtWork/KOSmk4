@@ -106,7 +106,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_font, vf_refcnt, video_font_destroy)
 
 /* Lookup and return a reference to a video font, given its name.
  * @param: NAME: The font's name (the name of a file in `/lib/fonts/')
- *               Else, you may pass one of `VIDEO_FONT_*'
+ *               Else,    you   may   pass   one   of   `VIDEO_FONT_*'
  * @return: NULL:errno=ENOENT: Unknown font `NAME' */
 typedef __ATTR_WUNUSED __REF struct video_font *(LIBVIDEO_GFX_CC *PVIDEO_FONT_LOOKUP)(char const *__name);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
@@ -130,7 +130,7 @@ struct video_fontprinter_data {
 	__intptr_t         vfp_curx;     /* X coord for the top-left corner of the next glyph */
 	__intptr_t         vfp_cury;     /* Y coord for the top-left corner of the next glyph */
 	__intptr_t         vfp_lnstart;  /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */
-	__intptr_t         vfp_lnend;    /* Ending X coord for additional lines (when `> vfp_lnstart',
+	__intptr_t         vfp_lnend;    /* Ending  X coord for additional lines (when `> vfp_lnstart',
 	                                  * wrap to a new line when a glyph would exceed this position) */
 	video_color_t      vfp_color;    /* Output color for the next glyph. */
 	__uint32_t         vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
@@ -160,7 +160,7 @@ video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Same as `video_fontprinter()', but only print a single UTF-32 character.
- * @return: * : The width of the printed character (unrecognized characters
+ * @return: * : The  width  of  the  printed  character  (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
 typedef __ATTR_NONNULL((1)) __size_t

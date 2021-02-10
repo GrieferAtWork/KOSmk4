@@ -51,7 +51,7 @@
                                       * >>     (LIST_FIRST(&self->mn_part->mp_copy) != self ||
                                       * >>      LIST_NEXT(self, mn_link) != NULL)
                                       * If any of these checks succeed, then `mn_part' is replaced with
-                                      * the required private copy, thus allowing for copy-on-write */
+                                      * the  required  private  copy, thus  allowing  for copy-on-write */
 #define MNODE_F_UNMAPPED  0x00000040 /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
                                       * NOTE: You should never see this flag on any node still part of an mman's node-tree! */
 #define MNODE_F_MPREPARED 0x00000080 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
@@ -81,10 +81,10 @@
                                       *  - mn_part->mp_file->mf_blockshift == PAGESHIFT
                                       *  - mn_part->mp_file->mf_parts == MFILE_PARTS_ANONYMOUS
                                       *  - MPART_ST_INMEM(mn_part->mp_state)
-                                      * You may force a node to no longer be hinted by ensuring that all of its
+                                      * You may force  a node  to no longer  be hinted  by ensuring that  all of  its
                                       * pages have been accessed at least once (read-only access is enough for this),
-                                      * and (in SMP-only) waited until `mman_kernel_hintinit_inuse' became zero.
-                                      * Afterwards, you may clear this flag. But also note that before then, you
+                                      * and  (in  SMP-only)  waited until  `mman_kernel_hintinit_inuse'  became zero.
+                                      * Afterwards, you may  clear this  flag. But also  note that  before then,  you
                                       * must also be aware of the fact that requirements imposed by `MNODE_F_NOSPLIT'
                                       * and `MNODE_F_NOMERGE' also apply to nodes that are hinted! */
 #define MNODE_F_MLOCK     0x00002000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
@@ -111,7 +111,7 @@
 
 
 /* Expand to `MNODE_F_MPREPARED' if kernel-space is automatically prepared.
- * Otherwise, expand to `0'. May be used by static initializers. */
+ * Otherwise,  expand  to  `0'.  May   be  used  by  static   initializers. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 #define _MNODE_F_MPREPARED_KERNEL 0
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -161,11 +161,11 @@ typedef size_t mpart_reladdr_t;
 #endif
 
 struct mnode {
-	/* WARNING: Because mem-nodes aren't reference counter, they are always
-	 *          implicitly owned by the associated mman, such that you really
+	/* WARNING: Because  mem-nodes  aren't reference  counter, they  are always
+	 *          implicitly owned by the associated  mman, such that you  really
 	 *          need to be holding a lock to that mman (or some other lock that
-	 *          will prevent the node from being destroyed, such as a lock to
-	 *          the part that is being mapped), else you have no guaranty that
+	 *          will prevent the node from being  destroyed, such as a lock  to
+	 *          the part that is being mapped), else you have no guaranty  that
 	 *          the node won't just be free'd, and you'll end up accessing dead
 	 *          memory! */
 #ifdef __INTELLISENSE__
@@ -191,26 +191,27 @@ struct mnode {
 	union {
 		/*WEAK REF*/ struct mman       *mn_mman;     /* [1..1][const] Associated memory manager.
 		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
-		                                              *       and the node has to be inserted into the associated part's dead-node-list.
+		                                              *       and  the node  has to be  inserted into the  associated part's dead-node-list.
 		                                              *       Unless this has happened, this is just a regular, old pointer! */
 		_slist_entry_mnode             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 	};
 #else /* __WANT_MNODE__mn_alloc */
 	/*WEAK REF*/ struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
 	                                                  * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
-	                                                  *       and the node has to be inserted into the associated part's dead-node-list.
+	                                                  *       and  the node  has to be  inserted into the  associated part's dead-node-list.
 	                                                  *       Unless this has happened, this is just a regular, old pointer! */
 #endif /* !__WANT_MNODE__mn_alloc */
 	/*PAGEDIR_PAGEALIGNED*/ mpart_reladdr_t
 	                                    mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	_list_entry_mnode                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
-	_list_entry_mnode                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Chain of nodes that (may) contain pages that
-	                                                  * are current mapped with write-access enabled. This list is used to speed
-	                                                  * up the clearing of write-access of modified memory mappings when copying
-	                                                  * a memory manager as part of fork(2). For this purpose, this list contains
-	                                                  * all memory nodes that request write-access, and have actually been mapped
-	                                                  * with write-access enabled (which happens lazily upon first access)
-	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
+	_list_entry_mnode                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)]  Chain  of nodes  that (may)
+	                                                  * contain pages that  are current mapped  with write-access enabled.  This
+	                                                  * list is used to speed up the clearing of write-access of modified memory
+	                                                  * mappings when copying  a memory  manager as  part of  fork(2). For  this
+	                                                  * purpose, this list contains all memory nodes that request  write-access,
+	                                                  * and have actually been mapped  with write-access enabled (which  happens
+	                                                  * lazily upon first access).
+	                                                  * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 #else /* __INTELLISENSE__ */
 #ifdef __WANT_MNODE__mn_dead
@@ -232,39 +233,40 @@ struct mnode {
 	union {
 		WEAK REF struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.
 		                                              * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
-		                                              *       and the node has to be inserted into the associated part's dead-node-list.
+		                                              *       and  the node  has to be  inserted into the  associated part's dead-node-list.
 		                                              *       Unless this has happened, this is just a regular, old pointer! */
 		SLIST_ENTRY(mnode)             _mn_alloc;    /* Internal list of freshly allocated nodes. */
 	};
 #else /* __WANT_MNODE__mn_alloc */
 	WEAK REF struct mman               *mn_mman;     /* [1..1][const] Associated memory manager.
 	                                                  * NOTE: This only becomes a weak reference when `wasdestroyed(self->mn_mman)' is true,
-	                                                  *       and the node has to be inserted into the associated part's dead-node-list.
+	                                                  *       and  the node  has to be  inserted into the  associated part's dead-node-list.
 	                                                  *       Unless this has happened, this is just a regular, old pointer! */
 #endif /* !__WANT_MNODE__mn_alloc */
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
-	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Chain of nodes that (may) contain pages that
-	                                                  * are current mapped with write-access enabled. This list is used to speed
-	                                                  * up the clearing of write-access of modified memory mappings when copying
-	                                                  * a memory manager as part of fork(2). For this purpose, this list contains
-	                                                  * all memory nodes that request write-access, and have actually been mapped
-	                                                  * with write-access enabled (which happens lazily upon first access)
-	                                                  * Nodes are removed from this list by `mnode_clear_write(_locked)'.
+	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)]  Chain  of nodes  that (may)
+	                                                  * contain pages that  are current mapped  with write-access enabled.  This
+	                                                  * list is used to speed up the clearing of write-access of modified memory
+	                                                  * mappings when copying  a memory  manager as  part of  fork(2). For  this
+	                                                  * purpose, this list contains all memory nodes that request  write-access,
+	                                                  * and have actually been mapped  with write-access enabled (which  happens
+	                                                  * lazily upon first access).
+	                                                  * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 #endif /* !__INTELLISENSE__ */
-	/* TODO: `struct usermod' and `struct driver' integration right here!
-	 *       For this, add a field [0..1] `union { REF struct usermod *, ... }',
+	/* TODO: `struct usermod'   and   `struct driver'    integration   right    here!
+	 *       For this,  add  a  field  [0..1]  `union { REF struct usermod *, ... }',
 	 *       For `mman_kernel', it'll always be a `driver', and elsewhere a `usermod'
-	 * The field itself would simply behave the same as `mn_fspath'/`mn_fspath'
+	 * The  field  itself would  simply  behave the  same  as `mn_fspath'/`mn_fspath'
 	 * already do, with the addition of being [lock(mn_mman->mm_lock && WRITE_ONCE)],
-	 * thus allowing for lazy initialization. (But also note that in the case of a
-	 * driver, it shouldn't be a `REF', but rather an implicit weak-ref, since the
-	 * node shouldn't prevent the driver from being destroyed, and the driver should
+	 * thus allowing for lazy initialization.  (But also note that  in the case of  a
+	 * driver, it shouldn't be  a `REF', but rather  an implicit weak-ref, since  the
+	 * node shouldn't prevent the driver from being destroyed, and the driver  should
 	 * automatically get rid of all nodes it may be mapping during unloading)
 	 *
 	 * NOTE: Since the current usermod/driver system isn't integrated into the old vm
-	 *       system, this is something that should only be tackled once the new mman
+	 *       system, this is something that should only be tackled once the new  mman
 	 *       has been enabled in all other aspects! */
 	void *_mn_module;
 };
@@ -295,9 +297,9 @@ struct mnode {
 
 
 /* Load the bounding set of page directory permissions with which
- * a given mem-nodes should have its backing memory be mapped.
+ * a given mem-nodes  should have its  backing memory be  mapped.
  * NOTE: The caller must ensure that `self->mn_part' is non-NULL,
- *       and that they are holding a lock to said part!
+ *       and  that  they  are  holding  a  lock  to  said   part!
  *
  * Write permissions which may have been requested by the node
  * are automatically removed for the purpose of copy-on-write:
@@ -318,7 +320,7 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self);
 #define mnode_getperm(self) \
 	(mnode_getperm_nouser(self) | (mnode_isuser(self) ? PAGEDIR_MAP_FUSER : 0))
 
-/* Return mem-node paging permissions, irregardless of copy-on-write
+/* Return mem-node paging  permissions, irregardless of  copy-on-write
  * semantics. - That is: allow write whenever the node requests write,
  * no matter who else might also be using the underlying mem-part. */
 #if (PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC && \
@@ -371,9 +373,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
 
 
 
-/* Clear page-directory-level write-access to `self'. This function must be
+/* Clear page-directory-level  write-access to  `self'. This  function must  be
  * called for all writable memory mappings of a MMAN when the MMAN is cloned or
- * a copy-on-write mapping is created for an already-shared `mn_part':
+ * a  copy-on-write  mapping  is  created  for  an  already-shared   `mn_part':
  * >> mmap() {
  * >>     ...
  * >>     if (flags & MNODE_F_SHARED) {
@@ -400,7 +402,7 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
 #define MNODE_CLEAR_WRITE_BADALLOC   2 /* ERROR: Failed to prepare the underlying page directory for making modifications to the associated mapping. */
 
 /* Same as `mnode_clear_write', but the caller is already holding a lock to `mm',
- * and this function will never return with `MNODE_CLEAR_WRITE_WOULDBLOCK'.
+ * and  this  function  will  never  return  with `MNODE_CLEAR_WRITE_WOULDBLOCK'.
  * NOTE: Unlike with `mnode_clear_write', when calling this function,
  *       the caller must ensure that:
  *        - !wasdestroyed(mm)
@@ -413,11 +415,11 @@ NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
                                           struct mman *__restrict mm);
 
 /* Same as `mnode_clear_write_locked_p()', but directory operate
- * on the current page directory / memory manager. */
+ * on   the   current   page   directory   /   memory   manager. */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self);
 
-/* Split `lonode' (which contains `addr_where_to_split') at that address.
+/* Split  `lonode'  (which  contains  `addr_where_to_split')  at  that  address.
  * If this cannot be done without blocking, unlock and eventually return `false' */
 FUNDEF WUNUSED NONNULL((1, 2)) __BOOL FCALL
 mnode_split_or_unlock(struct mman *__restrict self,
@@ -426,15 +428,15 @@ mnode_split_or_unlock(struct mman *__restrict self,
                       struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* While holding a lock to `self->mn_mman' and `self->mn_part', try
+/* While holding  a lock  to `self->mn_mman'  and `self->mn_part',  try
  * to merge the given node with its successor/predecessor node, without
  * releasing any of the locks still held.
  * @return: * : The new, merged node (which may have a different min-addr
- *              that the original node `self'). Also note that this node
+ *              that the original node `self'). Also note that this  node
  *              may or may not be equal to `self', and that it's min- and
- *              max-addr fields may be different from those that `self'
+ *              max-addr fields may be  different from those that  `self'
  *              had upon entry, irregardless of `self' being re-returned.
- *              As a matter of fact `*self' becomes invalid after a call
+ *              As  a matter of fact `*self' becomes invalid after a call
  *              to this function! */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self);
@@ -469,7 +471,7 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct m
 #define mman_mappings_minmaxlocate(self, minkey, maxkey, result) mnode_tree_minmaxlocate((self)->mm_mappings, minkey, maxkey, result)
 
 
-/* A special per-MMAN node that is used to cover the kernel core
+/* A special per-MMAN node that is  used to cover the kernel  core
  * with a reservation within user-space memory manager. Within the
  * kernel mman itself, this field is undefined. */
 DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
@@ -478,7 +480,7 @@ DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
  * This counter behaves similar to the in-use counter found in <kos/aref.h>, and is needed in order
- * to allow for syncing of internal re-trace operations in `mman_unmap_kram_locked()' with
+ * to  allow  for  syncing  of  internal  re-trace  operations  in  `mman_unmap_kram_locked()' with
  * other CPUs having previously started initializing hinted pages.
  *
  * For more information on the data race solved by this counter, see the detailed explanation

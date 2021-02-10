@@ -53,7 +53,7 @@ struct directory_entry;
 
 struct mounted_path {
 	struct path                *mp_path;     /* [1..1][const] The associated path. */
-	REF struct directory_node  *mp_orig;     /* [0..1][lock(mp_path->p_lock)] The original node (for when this
+	REF struct directory_node  *mp_orig;     /* [0..1][lock(mp_path->p_lock)]  The  original  node  (for  when  this
 	                                          * path is used as a mounting point) (or `NULL' for the VFS root path). */
 	REF struct superblock      *mp_super;    /* [1..1][lock(mp_path->p_lock)][== :p_parent->i_super]
 	                                          * The superblock being mounted. */
@@ -64,7 +64,7 @@ struct mounted_path {
 	                                          * [CHAIN(mp_path->p_vfs->v_mount)]
 	                                          * Chain of mounting points of the associated super-block. */
 	struct path                *mp_pending;  /* Used to chain paths that are pending being unmounted,
-	                                          * either within their associated VFS or superblock. */
+	                                          * either  within  their associated  VFS  or superblock. */
 };
 
 
@@ -81,17 +81,17 @@ struct path {
 	struct mounted_path        *p_mount;   /* [0..1][lock(p_lock)][owned_if(!= &p_vfs->v_rootmount)] Mounting point data. */
 	REF struct directory_entry *p_dirent;  /* [1..1][const] Name of this directory entry (empty for VFS root). */
 	LLIST_NODE(struct path)     p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
-	                                        * Next sibling directory with the same `p_dirent->de_hash' */
+	                                        * Next sibling directory  with the same  `p_dirent->de_hash' */
 	size_t                      p_cldmask; /* [lock(p_lock)] Mask for the `p_cldlist' hash-map. */
 	size_t                      p_cldsize; /* [lock(p_lock)] Amount of entires within the `p_cldlist' hash-map. */
 	LLIST(struct path)         *p_cldlist; /* [0..1][lock(p_lock)][0..p_cldmask + 1][lock(p_lock)][owned] Child paths. */
 	struct path                *p_delpend; /* [0..1][CHAIN(->p_delpend)][lock(p_lock)] Chain of paths that are pending removal from `p_cldlist'. */
 	LLIST_NODE(struct path)     p_recent;  /* [0..1][lock(p_vfs->v_recent_lock)] Chain of recently used paths. */
-	size_t                      p_isdrive; /* [lock(p_vfs->v_drives_lock)] Non-zero if this path is a drive root.
+	size_t                      p_isdrive; /* [lock(p_vfs->v_drives_lock)] Non-zero   if  this  path  is  a  drive  root.
 	                                        * This field represents the number of drives for which this path is the root. */
 };
 
-/* Path allocation functions. (using a cache, because of how
+/* Path allocation functions. (using a cache, because of  how
  * often path objects can potentially be allocated and freed) */
 DECLARE_PREALLOCATION_CACHE(FUNDEF, path, struct path)
 
@@ -139,17 +139,17 @@ __DEFINE_SYNC_RWLOCK(struct path,
 
 /* Mount or unmount a given directory under the specified path.
  * NOTE: Calling `path_umount()' will automatically clear the caches of recently
- *       used INodes and paths (`inode_recent_clear()' / `path_recent_clear()')
+ *       used  INodes and paths (`inode_recent_clear()' / `path_recent_clear()')
  * NOTE: When `path_umount()' removes the last mounting point for some filesystem,
  *      `superblock_set_unmounted()' is called on the associated superblock.
- * @param: override_existing: When true, override an existing mounting point.
+ * @param: override_existing: When true, override  an existing mounting  point.
  *                            Otherwise, throw `E_FSERROR_PATH_ALREADY_MOUNTED'
  *                            if the given path `self' is already mounted.
- * @throw: E_FSERROR_PATH_ALREADY_MOUNTED: When `override_existing' is false,
+ * @throw: E_FSERROR_PATH_ALREADY_MOUNTED: When   `override_existing'   is  false,
  *                                         and `self' is already a mounting point.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
  *                            Cannot create new mounting points: `v_mount' has been set to `VFS_MOUNT_ILLEGAL',
- *                            or the superblock associated with `node' has already been set to be unmounted. */
+ *                            or the superblock associated  with `node' has already  been set to be  unmounted. */
 FUNDEF void KCALL path_mount(struct path *__restrict self,
                              struct directory_node *__restrict node,
                              bool override_existing DFL(true))
@@ -272,7 +272,7 @@ path_mount(struct path *__restrict self,
 FUNDEF void KCALL path_umount(struct path *__restrict self)
 		THROWS(E_WOULDBLOCK, E_FSERROR_NOT_A_MOUNTING_POINT, E_IOERROR, ...);
 
-/* Atomically move a mounting point from `src' to `dst'
+/* Atomically  move  a  mounting  point  from  `src'  to  `dst'
  * NOTE: The caller must ensure that `dst->p_vfs == src->p_vfs' */
 FUNDEF void KCALL path_movemount(struct path *__restrict dst,
                                  struct path *__restrict src,
@@ -280,10 +280,10 @@ FUNDEF void KCALL path_movemount(struct path *__restrict dst,
 		THROWS(E_WOULDBLOCK, E_FSERROR_NOT_A_MOUNTING_POINT,
 		       E_FSERROR_PATH_ALREADY_MOUNTED, E_IOERROR, ...);
 
-/* Indicate that `self' has been used recently, allowing the path to be cached
+/* Indicate  that  `self' has  been  used recently,  allowing  the path  to  be cached
  * such that it will remain allocated for a while, even when not referenced elsewhere.
  * NOTE: When `self->p_vfs->v_fscount' is ZERO(0) upon entry, or drops to ZERO(0) before
- *       returning, `self' will not be cached as recently used, and the call
+ *       returning,  `self'  will  not  be  cached  as  recently  used,  and  the   call
  *       behaves as a no-op.
  * NOTE: Always re-returns `self' */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct path *
@@ -303,9 +303,9 @@ path_printex(struct path *__restrict self,
 #define PATH_PRINT_MODE_NORMAL   0x00000000 /* Print the path normally. */
 #define PATH_PRINT_MODE_INCTRAIL 0x00000001 /* Include a trailing slash/backslash. */
 #define PATH_PRINT_MODE_DOSPATH  0x00100000 /* Print the path as a DOS-path (including drive letters).
-                                             * NOTE: In this mode, if the path reaches `root' before a
+                                             * NOTE: In this mode,  if the path  reaches `root' before  a
                                              *       DOS drive is encountered, the path will be pre-fixed
-                                             *       with `\\unix\', indicative of it being relative to
+                                             *       with  `\\unix\', indicative of  it being relative to
                                              *       the UNIX filesystem root. */
 #define PATH_PRINT_MODE_EXCDRIVE 0x00000002 /* Exclude the name of the associated drive in `PATH_PRINT_MODE_DOSPATH' mode. */
 #define PATH_PRINT_MODE_CANREACH 0x00000004 /* Assume that `root' is reachable from `self' */
@@ -342,7 +342,7 @@ FUNDEF NONNULL((3, 5)) size_t KCALL path_sprintex(USER CHECKED char *buffer, siz
 FUNDEF NONNULL((3)) size_t KCALL path_sprint(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self) THROWS(E_SEGFAULT);
 
 /* Search for a specific child path within `self', _OR_ store a reference
- * to the INode of `self' within `*pparent_inode' when NULL is returned.
+ * to  the INode of `self' within `*pparent_inode' when NULL is returned.
  * In the case where non-NULL is returned, `*pparent_inode' is left in an undefined state. */
 FUNDEF REF struct path *KCALL
 path_getchild_or_parent_inode(struct path *__restrict self,
@@ -358,7 +358,7 @@ path_getcasechild_or_parent_inode(struct path *__restrict self,
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 /* Same as `path_getchild_or_parent_inode()', but _always_ store a reference
- * to the INode of the given path `self' within `*pparent_inode' */
+ * to  the  INode   of  the  given   path  `self'  within   `*pparent_inode' */
 FUNDEF REF struct path *KCALL
 path_getchild_and_parent_inode(struct path *__restrict self,
                                USER CHECKED /*utf-8*/ char const *name,
@@ -373,7 +373,7 @@ path_getcasechild_and_parent_inode(struct path *__restrict self,
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 /* Create or lookup the path or a given `child_dir' within `self'
- * NOTE: This function is meant to be used to instantiate paths that could not
+ * NOTE: This function  is meant  to be  used to  instantiate paths  that could  not
  *       be found before (aka.: those for which `path_(case)child()' returned false) */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_newchild(struct path *__restrict self,
@@ -390,10 +390,10 @@ path_newchild(struct path *__restrict self,
  * @param: premoved_inode:        Upon success, store a reference to the removed INode here.
  * @param: premoved_dirent:       Upon success, store a reference to the removed INode's directory entry here.
  * @param: pcontaining_directory: Upon success, store a reference to the directory node from which an element got removed here.
- *                                Since `self->p_inode' can arbitrarily change due to mounting, this is the
+ *                                Since   `self->p_inode'   can   arbitrarily   change   due   to   mounting,   this   is   the
  *                                only save way to determine the exact directory from which the element got removed.
  * @param: premoved_path:         Upon success, store a reference to the removed path here (or `NULL' if it wasn't
- *                                a directory that got removed, or if that directory didn't have a path node)
+ *                                a directory that  got removed, or  if that  directory didn't have  a path  node)
  * @return: * : Set of `DIRECTORY_REMOVE_STATUS_*'
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified file was already deleted)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (self was deleted)
@@ -435,7 +435,7 @@ path_remove(struct path *__restrict self,
  * @param: psource_directory: When non-NULL, store a reference to the source directory from which an element got removed here.
  * @param: ptarget_directory: When non-NULL, store a reference to the target directory to which an element got added here.
  * @param: premoved_path:     When non-NULL, store a reference to the removed child-path
- *                            of `source_path' here, or `NULL' if no path got removed.
+ *                            of `source_path' here, or `NULL'  if no path got  removed.
  * @return: * : Set of `DIRECTORY_RENAME_STATUS_*', though never `DIRECTORY_RENAME_STATUS_REMOUNT'
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RENAME: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified source file was deleted)
@@ -479,17 +479,17 @@ path_rename(struct path *__restrict source_path,
 
 
 
-/* Traverse a relative path, starting at `cwd' and walking until the
- * requested path was found, or until a missing path segment was encountered.
- * This function will automatically deal with `.' and `..' segments, always
- * accepting `/' between directories, and `\\' when `FS_MODE_FDOSPATH' is set.
+/* Traverse  a  relative  path,  starting   at  `cwd'  and  walking  until   the
+ * requested  path was found,  or until a missing  path segment was encountered.
+ * This function  will automatically  deal with  `.' and  `..' segments,  always
+ * accepting `/' between directories, and  `\\' when `FS_MODE_FDOSPATH' is  set.
  * Additionally, symbolic links are followed, with the final path segment stored
- * in the provided output arguments, with `*plastlen' set to 0 when the final
- * segment was empty and `FS_MODE_FIGNORE_TRAILING_SLASHES' wasn't set, or
- * when the entire input path is empty and `FS_MODE_FEMPTY_PATH' was set, or
- * if the last segment of the input path was one of `.' or `..', or if the
- * input path referred to the root path, or a drive root (`/' or `C:')
- * Additionally, when `plastseg' itself is `NULL', always walk the entire path.
+ * in the provided output  arguments, with `*plastlen' set  to 0 when the  final
+ * segment  was  empty  and  `FS_MODE_FIGNORE_TRAILING_SLASHES'  wasn't  set, or
+ * when  the entire  input path is  empty and `FS_MODE_FEMPTY_PATH'  was set, or
+ * if the last  segment of the  input path  was one of  `.' or `..',  or if  the
+ * input path  referred  to  the root  path,  or  a drive  root  (`/'  or  `C:')
+ * Additionally,  when `plastseg' itself is `NULL', always walk the entire path.
  *     INPUT      |  RETURN  |  LASTSEG
  *    ------------+----------+------------
  *     ""         |  "."     |  ""         (Throws `E_FSERROR_ILLEGAL_PATH' unless `FS_MODE_FEMPTY_PATH' is set)
@@ -508,8 +508,8 @@ path_rename(struct path *__restrict source_path,
  *                      were given, in which case the last segment being a symlink will cause an
  *                     `E_FSERROR_TOO_MANY_SYMBOLIC_LINKS' exception to be thrown.
  * @param: premaining_symlinks: [in|out] When non-NULL, load/store the amount of remaining
- *                              symbolic link indirection which the path may have still
- *                              traversed during evaluation (aka.: the limit on how many
+ *                              symbolic link indirection  which the path  may have  still
+ *                              traversed during evaluation (aka.: the limit on how  many
  *                              symbolic links may still be traversed during further path
  *                              walks)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
@@ -765,18 +765,18 @@ struct vfs
 	struct path            v_path;        /* The underlying path. */
 #endif
 	WEAK refcnt_t          v_fscount;     /* The number of file systems using this VFS as root.
-	                                       * NOTE: New mounting points can only be defined when
-	                                       *       this number is non-zero, and once this number
+	                                       * NOTE: New  mounting  points can  only be  defined when
+	                                       *       this number is  non-zero, and  once this  number
 	                                       *       drops down to zero, all existing mounting points
 	                                       *       must be removed.
 	                                       * NOTE: When accessing `v_mount' by use of `v_mount_lock',
-	                                       *       the caller is required to be holding a reference
+	                                       *       the caller is required  to be holding a  reference
 	                                       *       to this field. */
 	struct mounted_path    v_rootmount;   /* Mounting point data for the VFS root.
-	                                       * Usually set in `super.p_mount' */
+	                                       * Usually   set   in    `super.p_mount' */
 	struct atomic_rwlock   v_mount_lock;  /* Lock for all mounting points within this VFS (`v_mount') */
 	LLIST(REF struct path) v_mount;       /* [0..1][CHAIN(->p_mount->mp_vfsmount)][lock(v_mount_lock)] Chain of pointing points.
-	                                       * WARNING: This chain may contain paths with a reference counter of ZERO(0).
+	                                       * WARNING: This  chain  may  contain  paths with  a  reference  counter  of  ZERO(0).
 	                                       * NOTE: Set to `VFS_MOUNT_ILLEGAL' when mounting becomes illegal. */
 #define VFS_MOUNT_ILLEGAL ((struct path *)-1)
 	struct atomic_lock     v_recent_lock; /* Lock for recently used paths. */
@@ -786,7 +786,7 @@ struct vfs
 	size_t                 v_recent_limit;/* [lock(v_recent_lock)] Max number of recently used paths. */
 #define VFS_DRIVECOUNT  (('Z' - 'A') + 1)
 	struct atomic_rwlock   v_drives_lock; /* Lock for accessing DOS drive mounting points. */
-	REF struct path       *v_drives[VFS_DRIVECOUNT]; /* [0..1][lock(v_drives_lock)][*] Root paths for DOS drives.
+	REF struct path       *v_drives[VFS_DRIVECOUNT]; /* [0..1][lock(v_drives_lock)][*]  Root  paths   for  DOS   drives.
 	                                                  * Each is set to `VFS_MOUNT_ILLEGAL' once binding becomes illegal. */
 };
 
@@ -795,7 +795,7 @@ struct vfs
 #define vfs_dec_fscount(x) (void)(__hybrid_atomic_decfetch((x)->v_fscount, __ATOMIC_SEQ_CST) || (vfs_clearmounts(x), 0))
 
 /* Called when `v_fscount' reaches ZERO(0): Clear all remaining mounting points.
- * NOTE: This function also sets `v_mount' to `VFS_MOUNT_ILLEGAL'. */
+ * NOTE:   This   function   also   sets   `v_mount'   to   `VFS_MOUNT_ILLEGAL'. */
 FUNDEF NOBLOCK void NOTHROW(KCALL vfs_clearmounts)(struct vfs *__restrict self);
 
 /* Allocate a new VFS object */
@@ -826,7 +826,7 @@ struct fs {
 	struct atomic_rwlock f_pathlock;             /* Lock for accessing dynamic filesystem paths (cwd, root, drive-local CWDs) */
 	REF struct path     *f_root;                 /* [1..1][lock(f_pathlock)] Root directory. */
 	REF struct path     *f_cwd;                  /* [1..1][lock(f_pathlock)] Current working directory. */
-	REF struct path     *f_dcwd[VFS_DRIVECOUNT]; /* [0..1][lock(f_pathlock)][*] Per-drive working directories.
+	REF struct path     *f_dcwd[VFS_DRIVECOUNT]; /* [0..1][lock(f_pathlock)][*]  Per-drive  working directories.
 	                                              * NOTE: When `NULL', `f_vfs->v_drives[INDEX]' is used instead. */
 	WEAK mode_t          f_umask;                /* The currently effective UMASK.
 	                                              * NOTE: All bits not masked by `0777' _MUST_ always be ZERO(0)! */

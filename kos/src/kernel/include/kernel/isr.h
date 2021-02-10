@@ -46,13 +46,13 @@ typedef NOBLOCK NOPREEMPT bool /*NOTHROW*/ (FCALL *isr_function_t)(void *arg);
 typedef NOBLOCK NOPREEMPT void /*NOTHROW*/ (FCALL *isr_greedy_function_t)(void *arg);
 
 /* Register ISR handlers, either by automatically selecting an
- * appropriate vector, or by specifying the required vector.
+ * appropriate  vector, or by  specifying the required vector.
  * WARNING: The caller is responsible to ensure that any given func+arg
  *          combination will only be registered once.
  * @return: ISR_VECTOR_INVALID: The given `func' maps to a driver that is currently being finalized.
  * @throws: E_SEGFAULT:         The given `func' doesn't map to the static segment of any known driver.
  * @throws: E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS: The given, or all vectors are already in use,
- *                                                     or the given vector cannot be allocated. */
+ *                                                     or the  given  vector  cannot  be  allocated. */
 FUNDEF isr_vector_t KCALL isr_register(isr_function_t func, void *arg) THROWS(E_BADALLOC);
 FUNDEF isr_vector_t KCALL isr_register_at(isr_vector_t vector, isr_function_t func, void *arg) THROWS(E_BADALLOC);
 FUNDEF isr_vector_t KCALL isr_register_greedy(isr_greedy_function_t func, void *arg) THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS);
@@ -61,7 +61,7 @@ FUNDEF isr_vector_t KCALL isr_register_greedy_at(isr_vector_t vector, isr_greedy
 /* Unregister a callback registered
  * When `vector' is equal to `ISR_VECTOR_INVALID', true is returned and the function is a no-op
  * Also: Yes, these unregister functions can throw E_BADALLOC, so they should only
- *       be called from driver-level finalizers, rather than object-level ones.
+ *       be called from  driver-level finalizers, rather  than object-level  ones.
  * @return: true:  The ISR was successfully unregistered.
  * @return: false: No ISR matching the given arguments was registered for `vector' */
 #if defined(__cplusplus) && !defined(__NO_ASMNAME)
@@ -90,8 +90,8 @@ struct isr_vector_handler {
 	isr_function_t        ivh_fun; /* [1..1][const] Handler function. */
 	void                 *ivh_arg; /* [?..?][const] Handler argument. */
 	REF struct driver    *ivh_drv; /* [1..1][const] Driver associated with the greedy handler. */
-	/* The following 2 statistics are used for automatic optimization to always try to
-	 * handle incoming interrupts first with the handler with the best hit-to-miss ratio.
+	/* The following 2  statistics are  used for automatic  optimization to  always try  to
+	 * handle incoming interrupts first with the  handler with the best hit-to-miss  ratio.
 	 * To deal with the risk of overflows, either of these statistics overflowing is lazily
 	 * handled by dividing both stats by 2.
 	 * WARNING: These numbers may not be 100% correct. - Don't rely on them for the purpose of an application state */
@@ -127,13 +127,13 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector);
 
 
 
-/* Register a handle-based ISR handler, either by automatically
+/* Register  a  handle-based   ISR  handler,   either  by   automatically
  * selecting an appropriate vector, or by specifying the required vector.
  * WARNING: The caller is responsible to ensure that any given func+arg
  *          combination will only be registered once.
  * These functions are quite similar to those above, however ISR
  * callback invocation is improved such that:
- *   - `*func' is invoked with a temporary reference to the associated
+ *   - `*func' is invoked with a temporary reference to the  associated
  *     object, and in the event of the associated object already having
  *     been destroyed (i.e. having its reference counter set to 0), the
  *     callback will not be destroyed.
@@ -141,12 +141,12 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector);
  *     exposed `hisr_unregister[_at]()' functions should be called from
  *     the destructor of `ob_pointer'
  * As such, these functions should be used to register interrupt handlers
- * on a per-object basis, while the functions above should be used to
+ * on  a per-object  basis, while the  functions above should  be used to
  * register interrupt handlers on a per-driver basis.
  * @param: ob_pointer: Handle data pointer.
  * @param: ob_type:    Handle type (one of `HT_*')
  * @throws: E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS: The given, or all vectors are already in use,
- *                                                     or the given vector cannot be allocated. */
+ *                                                     or the  given  vector  cannot  be  allocated. */
 FUNDEF isr_vector_t KCALL hisr_register(isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC);
 FUNDEF isr_vector_t KCALL hisr_register_at(isr_vector_t vector, isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC);
 FUNDEF isr_vector_t KCALL hisr_register_greedy(isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS);

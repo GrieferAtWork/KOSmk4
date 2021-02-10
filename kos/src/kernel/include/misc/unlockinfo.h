@@ -28,11 +28,11 @@ DECL_BEGIN
 struct unlockinfo;
 struct unlockinfo {
 	/* [1..1] Callback that is invoked in order to release
-	 *        additional locks when a blocking operation
+	 *        additional locks when  a blocking  operation
 	 *        is performed by an `*_or_unlock()' function.
 	 * This callback may then be used to release additional atomic
 	 * locks which the caller may be holding, and it guarantied to
-	 * be called on all `return == false' and `EXCEPT' braches of
+	 * be called on all `return == false' and `EXCEPT' braches  of
 	 * the called `*_or_unlock()' function. */
 #ifdef __INTELLISENSE__
 	/*   */ NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct unlockinfo *__restrict self);

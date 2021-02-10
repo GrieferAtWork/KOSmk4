@@ -30,8 +30,8 @@
 
 __DECL_BEGIN
 
-/* Combination of writer + parser that can be used to define object layout definitions,
- * which can then be used to describe a mapping between json and regular, old C-structs.
+/* Combination of writer  + parser that  can be  used to define  object layout  definitions,
+ * which  can then be  used to describe a  mapping between json  and regular, old C-structs.
  * For this purpose, a special bytecode exists that encodes field names, types, and offsets:
  * >> struct my_struct {
  * >> 	int   ms_alpha;
@@ -159,7 +159,7 @@ struct json_parser;
 
 /* End an object or array.
  * Must be followed by one of the same as the opcodes
- * as those allowed at the start of a codec. */
+ * as  those  allowed  at  the  start  of  a   codec. */
 #define JGEN_END          0x01
 
 /* Begin a new object.
@@ -174,7 +174,7 @@ struct json_parser;
  * Must be followed by one of:
  *    - JGEN_OPTIONAL     // Followed by `JGEN_INDEX' or `JGEN_INDEX_REP_OP')
  *    - JGEN_INDEX        // Repeated any number of times, though with ever increasing
- *                        // indices Note that unspecified indices are ignored during
+ *                        // indices  Note that unspecified indices are ignored during
  *                        // decoding, and written as `null' during encoding)
  *    - JGEN_INDEX_REP_OP // May only appear once, and must then be used to describe
  *                        // the entire array from start to finish)
@@ -182,18 +182,18 @@ struct json_parser;
  *    - JGEN_END */
 #define JGEN_BEGINARRAY   0x03
 
-/* [+uint16_t offset][+uint16_t id] Insert an external json codec at this location.
+/* [+uint16_t offset][+uint16_t id] Insert an external  json codec at this  location.
  * This is the same as having all instructions of that external codec appear in-line,
- * with `offset' added to the offset field of every `JGEN_INTO' instruction.
- * The given `id' is an index into the `ext' array accepted by the encode/decode
+ * with  `offset'  added  to  the  offset  field  of  every  `JGEN_INTO' instruction.
+ * The given `id'  is an index  into the  `ext' array accepted  by the  encode/decode
  * API functions. */
 #define JGEN_EXTERN_OP    0x04
 #define JGEN_EXTERN(offset, id) \
 	JGEN_EXTERN_OP, JGEN_ENCODE_UINT16(offset), JGEN_ENCODE_UINT16(id)
 
 /* Optional modifier prefix.
- * When the associated data doesn't exist, or is initiated using
- * the `null'-token, data is zero-initialized during decoding.
+ * When  the  associated  data  doesn't  exist,  or  is  initiated   using
+ * the   `null'-token,   data   is   zero-initialized   during   decoding.
  * Must be followed by one of (depending on where this modifier was used):
  *    - JGEN_FIELD
  *    - JGEN_BEGINOBJECT

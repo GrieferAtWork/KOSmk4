@@ -76,8 +76,8 @@ typedef size_t mpart_reladdr_t;
 
 
 /* NOTE: Because a regular, old `struct mnode' doesn't contain the 64-bit `pos_t'
- *       field `mbn_filpos', the natural alignment of `struct mnode' may be less
- *       than that of `struct mbnode'. As such, we may need special work-arounds
+ *       field `mbn_filpos', the natural alignment of `struct mnode' may be  less
+ *       than  that of `struct mbnode'. As such, we may need special work-arounds
  *       in order to safely access the `mbn_filpos' field of `struct mbnode'. */
 #if __ALIGNOF_MBNODE > __ALIGNOF_MNODE
 #define mnode_mbn_filpos_get(self)    ((pos_t)__hybrid_unaligned_get64(&(self)->mbn_filpos))
@@ -89,7 +89,7 @@ typedef size_t mpart_reladdr_t;
 
 struct mbnode {
 	/* NOTE: This structure is (intentionally) binary-compatible
-	 *       (for the most part) with `struct mnode'!
+	 *       (for   the   most   part)   with    `struct mnode'!
 	 * This is because when the memory image constructed within
 	 * an mbuilder is loaded into an mman, all of the builder's
 	 * nodes become mnode objects! */
@@ -113,11 +113,11 @@ struct mbnode {
 			 *    - mbn_nxtfile
 			 *    - mbn_file
 			 *    - mbn_filpos
-			 * are [valid_if(this IN :mb_files)]. If this is the case,
+			 * are  [valid_if(this IN :mb_files)]. If this is the case,
 			 * our `mbn_filnxt' (if non-NULL) points to the second node
 			 * that is being used to map this file. */
 			pos_t                       mbn_filpos;   /* [const] Absolute position of where `mbn_part' is (supposed)
-			                                           * to start. Ignored when `mbn_file' is an anonymous file.
+			                                           * to start.  Ignored when  `mbn_file' is  an anonymous  file.
 			                                           * NOTE: Access using `mnode_mbn_filpos_(get|set)' */
 #if __SIZEOF_POS_T__ < (__SIZEOF_POINTER__ * 2)
 			byte_t __mbn_pad[(__SIZEOF_POINTER__ * 2) - __SIZEOF_POS_T__];
@@ -203,9 +203,9 @@ struct mbuilder {
 		struct mbnode_slist   _mb_fbnodes;  /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 		struct mnode_slist    _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 	};
-	struct rpc_entry          *mb_killrpc;  /* [0..n][link(re_next)] List of pre-allocated RPC
+	struct rpc_entry          *mb_killrpc;  /* [0..n][link(re_next)]  List  of  pre-allocated  RPC
 	                                         * descriptors, as used by `mbuilder_apply()' in order
-	                                         * to terminate threads using the given target mman. */
+	                                         * to  terminate threads using  the given target mman. */
 };
 
 /* Initialize the given mem-builder. */
@@ -241,10 +241,10 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
  * This function does:
  *  - assert(fmnode->mbn_part != NULL);
  *  - assert(fmnode->mbn_file != NULL);
- *  - fmnode->mbn_filnxt = NULL;       // Only single-nde initial mappings are supported.
+ *  - fmnode->mbn_filnxt = NULL;       // Only   single-nde   initial  mappings   are  supported.
  *                                     // Additional required nodes are added lazily if necessary
  *                                     // via the re-flow mechanism that is done as part of a call
- *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
+ *                                     // to              `mbuilder_partlocks_acquire_or_unlock()'
  *  - SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
  *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
  *                                           fmnode->mbn_part),
@@ -264,16 +264,16 @@ NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
                                       struct mbnode *__restrict fmnode);
 /* Remove `fmnode' from `self'. - Asserts that no secondary nodes have
  * been allocated for use with `fmnode' (as could happen if the caller
- * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior call
+ * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior  call
  * to `mbuilder_insert_fmnode()' and the call to this function) */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
                                       struct mbnode *__restrict fmnode);
 
 
-/* Acquire locks to all of the parts being mapped by `self', and
- * ensure that all mappings within `self' are fully continuous.
- * If this cannot be done without blocking, invoke `unlock' (if
+/* Acquire  locks to all  of the parts being  mapped by `self', and
+ * ensure that  all mappings  within `self'  are fully  continuous.
+ * If  this cannot  be done  without blocking,  invoke `unlock' (if
  * given), try to make it so that a repeated call will (eventually)
  * succeed, and return `false'.
  * Otherwise (if all locks have been acquired, and all mappings are
@@ -286,31 +286,31 @@ mbuilder_partlocks_acquire_or_unlock(struct mbuilder *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
- * will keep on attempting the operation until it succeeds. */
+ * will  keep  on  attempting  the  operation  until  it  succeeds. */
 FUNDEF NONNULL((1)) void FCALL
 mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Release locks to all of the mapped mem-parts, as should have previously
- * been acquired during a call to `mbuilder_partlocks_acquire()' */
+ * been   acquired   during  a   call   to  `mbuilder_partlocks_acquire()' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self);
 
 
-/* Apply all of the mappings from `self' onto `target', whilst simultaneously deleting
+/* Apply all of the mappings from  `self' onto `target', whilst simultaneously  deleting
  * any memory mapping still present within `target' (except for the kernel-reserve node)
  * NOTES:
  *  - When calling this function, the caller must ensure that:
  *     - mbuilder_partlocks_acquire(self)    (was called)
  *     - mman_lock_acquired(target)
  *  - Upon return, this function will have released all of the part-locks originally
- *    acquired by `mbuilder_partlocks_acquire()', however the mman-lock to `target'
- *    will _not_ have been released yet, and the caller must release that lock once
+ *    acquired  by `mbuilder_partlocks_acquire()', however the mman-lock to `target'
+ *    will  _not_ have been released yet, and the caller must release that lock once
  *    they've finished doing other additional builder-apply operations.
- *  - This function doesn't actually modify the page directory of `target'.
+ *  - This  function  doesn't  actually  modify  the  page  directory  of   `target'.
  *    The caller is responsible for doing this by calling `pagedir_unmap_userspace()'
  * @param: self:   The mman Builder object from which to take mappings to-be applied to `target'
- *                 Upon success, the contents of `self' are left undefined and must either be
+ *                 Upon success, the contents  of `self' are left  undefined and must either  be
  *                 re-initialized, or not be attempted to be finalized.
  * @param: target: The target mman to which to apply the new memory mappings.
  *                 Upon success, this mman will only contain the mappings from `self', with all
@@ -323,11 +323,11 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 /* Terminate all threads bound to `target', other than the calling
  * thread by sending an RPC that throws an E_EXIT_THREAD exception
  * to each of them.
- * For this purpose, first pre-allocate a set of RPC descriptors
- * for every target thread, before sending them all at once.
- * If the allocation cannot be done without blocking, do the usual
+ * For this  purpose, first  pre-allocate a  set of  RPC  descriptors
+ * for  every  target  thread,  before  sending  them  all  at  once.
+ * If  the allocation cannot  be done without  blocking, do the usual
  * unlock+return_false. Otherwise, when this function returns `true',
- * then you know that no thread other than yourself is still making
+ * then you know that no thread  other than yourself is still  making
  * any use of the given `target' mman.
  *
  * NOTE: This function is used to implement `MBUILDER_APPLY_AA_TERMTHREADS'
@@ -348,12 +348,12 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 
-/* Slightly simplified version of `mbuilder_apply_or_unlock()'
+/* Slightly   simplified   version   of   `mbuilder_apply_or_unlock()'
  * that should be called while not already holding any locks, and will
- * automatically acquire necessary locks, do the requested calls, and
- * finally release all locks acquired, and still held at that point.
+ * automatically acquire necessary locks, do the requested calls,  and
+ * finally release all locks acquired,  and still held at that  point.
  * @param: additional_actions: Additional actions to be atomically performed
- *                             alongside the setting of the new mem-node
+ *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
 FUNDEF NONNULL((1, 2)) void KCALL
 mbuilder_apply(struct mbuilder *__restrict self,
@@ -362,7 +362,7 @@ mbuilder_apply(struct mbuilder *__restrict self,
                struct mexecinfo *execinfo DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define MBUILDER_APPLY_AA_NOTHING      0x0000 /* No additional actions */
-#define MBUILDER_APPLY_AA_TERMTHREADS  0x0001 /* Terminate all threads using `target', excluding the caller.
+#define MBUILDER_APPLY_AA_TERMTHREADS  0x0001 /* Terminate  all threads using `target', excluding the caller.
                                                * If the calling thread isn't using `target', simply terminate
                                                * all threads that are using `target' */
 #define MBUILDER_APPLY_AA_SETEXECINFO  0x0002 /* Set the given `execinfo' for the given mman.
@@ -389,10 +389,10 @@ NOTHROW(mbuilder_findunmapped)(struct mbuilder *__restrict self, void *addr,
 #endif /* !__INTELLISENSE__ */
 
 /* MBuilder-version of `mman_getunmapped_or_unlock()' (without the unlock-part)
- * But note that unlike `mman_getunmapped_or_unlock()', this version always
- * acts as though `MAP_FIXED_NOREPLACE' was given when `MAP_FIXED' is used.
- * After all: there is no functionality for removing nodes from an mbuilder
- * once they've been added. Not because this would be impossible, but because
+ * But  note  that unlike  `mman_getunmapped_or_unlock()', this  version always
+ * acts  as though  `MAP_FIXED_NOREPLACE' was  given when  `MAP_FIXED' is used.
+ * After  all: there  is no functionality  for removing nodes  from an mbuilder
+ * once they've been added. Not because  this would be impossible, but  because
  * such functionality is never required.
  * Also: This function never returns `MAP_FAILED'! */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
@@ -447,11 +447,11 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 
 
 /* TODO: The PEB API is deprecated, and at some point in the future,
- *       process startup information will be passed via the main()
+ *       process startup information will  be passed via the  main()
  *       thread's stack! */
 
-/* Allocate a PEB (Process Environment Block) within the given MBuilder,
- * initializing its contents with the strings from the given argv+envp pair.
+/* Allocate  a  PEB  (Process  Environment   Block)  within  the  given   MBuilder,
+ * initializing  its  contents  with the  strings  from the  given  argv+envp pair.
  * This function is called from `vm_exec()' after the remainder of the application,
  * as well as the dynamic linker have already been loaded into memory.
  * @param: argc_inject: The number of arguments from `argv_inject' to inject

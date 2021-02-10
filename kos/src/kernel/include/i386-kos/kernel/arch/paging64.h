@@ -93,7 +93,7 @@ DECL_BEGIN
  *    2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0
  *
  * NOTE: In the case of E4, you may assume that any address with `P64_PDIR_VEC4INDEX(addr) >= 256'
- *       always has the `P64_PAGE_FPRESENT' bit set, and that it points to a statically allocated
+ *       always  has the `P64_PAGE_FPRESENT' bit set, and that it points to a statically allocated
  *       block of `union p64_pdir_e3[512]' that are shared between all page directories.
  */
 
@@ -164,7 +164,7 @@ DECL_BEGIN
 #define P64_IS_1GIB_ALIGNED(addr) (((addr) & __UINT64_C(0x000000003fffffff)) == 0)
 
 /* Return the in-page offset of a regular pointer mapping,
- * or one that has been mapped within a 2MiB page. */
+ * or  one  that  has  been  mapped  within  a  2MiB page. */
 #define P64_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(ptr) & 0xfff)
 #define P64_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(ptr) & 0x1fffff)
 #define P64_PDIR_PAGEINDEX_1GIB(ptr) (__CCAST(u64)(ptr) & 0x3fffffff)
@@ -345,13 +345,13 @@ struct p64_pdir {
 
 /* Page directory self-mapping addresses.
  * NOTE: We put the self-mapping 512 GIB after `KERNELSPACE_BASE', just
- *       so we can ensure that the first kernel-page can remain
- *       unmapped, meaning that the kernel can allow user-space
- *       pointers to overflow into kernel-space, at which point
- *       any read/write operation will fault long before it would
+ *       so  we  can  ensure  that  the  first  kernel-page  can remain
+ *       unmapped,   meaning  that  the  kernel  can  allow  user-space
+ *       pointers   to  overflow  into  kernel-space,  at  which  point
+ *       any read/write  operation  will  fault long  before  it  would
  *       ever reach any real kernel data.
- *       The reason why we can't place it closer to the beginning,
- *       is that since the self-mapping takes up a total of 512 GIB
+ *       The  reason why we  can't place it  closer to the beginning,
+ *       is that since the self-mapping takes  up a total of 512  GIB
  *       of memory (at most), we can only place it with a granularity
  *       of that same size. */
 #define P64_PDIR_E1_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNELSPACE_BASE + 512GiB */
@@ -360,7 +360,7 @@ struct p64_pdir {
 #define P64_PDIR_E4_IDENTITY_BASE  __UINT64_C(0xffff80c060301000)
 #if 0
 /* These are the actual addresses, as well as how they are calculated.
- * However, for clarity and compilation speed, we use the pre-computed versions above instead.
+ * However, for clarity  and compilation  speed, we use  the pre-computed  versions above  instead.
  * Still though, these versions are statically asserted to be equal to the pre-computed ones above! */
 #define P64_PDIR_E2_IDENTITY_BASE (P64_PDIR_E1_IDENTITY_BASE + (P64_PDIR_VEC4INDEX(P64_PDIR_E1_IDENTITY_BASE) * P64_PDIR_E3_SIZE))
 #define P64_PDIR_E3_IDENTITY_BASE (P64_PDIR_E2_IDENTITY_BASE + (P64_PDIR_VEC3INDEX(P64_PDIR_E2_IDENTITY_BASE) * P64_PDIR_E2_SIZE))
@@ -492,7 +492,7 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 
 
 /* When more than `ARCH_PAGEDIR_LARGESYNC_THRESHOLD' need to be synced, rather
- * than performing that number of single-page TLB invalidations, invalidate
+ * than performing that  number of single-page  TLB invalidations,  invalidate
  * everything instead. */
 #ifndef ARCH_PAGEDIR_LARGESYNC_THRESHOLD
 #define ARCH_PAGEDIR_LARGESYNC_THRESHOLD 0x100000 /* 256 pages */
@@ -509,7 +509,7 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 #ifdef __CC__
 /* Synchronize the entirety of the current page directory.
  * Note that this function may only sync all user-space mappings. If the
- * intent is to also sync all of kernel-space, `pagedir_syncall()'
+ * intent is  to  also  sync all  of  kernel-space,  `pagedir_syncall()'
  * must be used instead. */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pagedir_syncall_user)(void) {
@@ -519,12 +519,12 @@ NOTHROW(FCALL pagedir_syncall_user)(void) {
 	                     : "=&r" (temp));
 }
 
-/* Same as `pagedir_syncall_user()', but also
+/* Same as `pagedir_syncall_user()', but  also
  * ensures that all of kernel-space is synced. */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
 
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
- * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
+ * overlaps with kernel-space, behave  the same as `pagedir_syncall()',  otherwise,
  * behave the same as `pagedir_syncall_user()' */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -558,7 +558,7 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		}
 		if (num_bytes > KERNELSPACE_BASE) {
 			/* We know that the address always _has_ to
-			 * fall into kernel-space in this case! */
+			 * fall into  kernel-space  in  this  case! */
 			pagedir_syncall();
 			return;
 		}

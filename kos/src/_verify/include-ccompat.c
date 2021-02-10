@@ -21,12 +21,12 @@
 #define _DOS_SOURCE_CLEAN 1
 #define _ISOC_PURE_SOURCE 1
 
-/* This file is used to make sure that C/C++ header pairs
- * function properly, especially when faced with prototypes
- * making use of types that get declared in std::, but then
+/* This file is  used to  make sure that  C/C++ header  pairs
+ * function properly, especially  when faced with  prototypes
+ * making use of types that  get declared in std::, but  then
  * don't end up being imported into the root namespace before
  * the function's prototype itself gets declared.
- * -> Such bugs can usually be fixed within the header's magic
+ * -> Such bugs can usually be fixed within the header's  magic
  *    source file by adding `$' before the type in the affected
  *    declaration's prototype. */
 

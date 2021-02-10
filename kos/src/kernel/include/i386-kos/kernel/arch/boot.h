@@ -35,7 +35,7 @@
 DECL_BEGIN
 
 /* Minimum amount of ram to detect during early boot.
- * If less than this amount is detected, keep trying to find ways of
+ * If less than  this amount is  detected, keep trying  to find ways  of
  * locating more (using different BIOS functions, or by simply guessing) */
 #define X86_BOOT_MINIMUM_AVAILABLE_RAM \
 	(0x100000 / __ARCH_PAGESIZE) /* 1MB */
@@ -48,7 +48,7 @@ DATDEF struct fcpustate32 boot_cpustate;
 struct boot_device_info {
 	u8 bdi_biosdev;           /* [valid_if(bdi_partition != 0xff)] int 13h - compatible device number */
 	u8 bdi_partition;         /* 0-based index of the partition from which the kernel was loaded
-	                           * If no boot device information is available, then this is 0xff */
+	                           * If no boot device information  is available, then this is  0xff */
 	u8 bdi_sub_partition;     /* 0-based index of the sub-partition from which the kernel was loaded
 	                           * If not available, set to 0xff. */
 	u8 bdi_sub_sub_partition; /* 0-based index of the sub-sub-partition from which the kernel was loaded

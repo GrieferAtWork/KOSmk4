@@ -95,10 +95,10 @@ linebuffer_waitfor(struct linebuffer *__restrict self) {
 #endif /* !__KERNEL__ */
 
 
-/* Re-write the used area of the given capture within the given buffer.
- * For this purpose, try to re-instate `capture' as the active line, or
+/* Re-write  the  used area  of the  given capture  within the  given buffer.
+ * For  this  purpose, try  to re-instate  `capture' as  the active  line, or
  * alternatively (when new data has already been written), write the contents
- * of the capture using `linebuffer_write()', before destroying the capture.
+ * of the capture using `linebuffer_write()', before destroying the  capture.
  * @return: * : The number of re-written bytes.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1, 2)) linebuffer_retval_t CC
@@ -132,10 +132,10 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 	return result;
 }
 
-/* Append up to `num_bytes' of data from `src' to the current line.
+/* Append up to `num_bytes' of data from `src' to the current  line.
  * If the line is too small to contain all data, wait until the line
  * is emptied before writing more data.
- * If the linebuffer is closed before all data could be written, return
+ * If the linebuffer is closed before  all data could be written,  return
  * the amount of written data, or 0 if the buffer was already closed when
  * the function was called.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
@@ -201,9 +201,9 @@ done:
 #endif /* !__KERNEL__ */
 }
 
-/* Similar to `linebuffer_write()', but only block if the line was full
- * the first time the function was called. If the linebuffer is closed
- * before at least 1 byte of data could be written, 0 is returned.
+/* Similar to `linebuffer_write()',  but only  block if the  line was  full
+ * the first time  the function  was called.  If the  linebuffer is  closed
+ * before at  least  1  byte of  data  could  be written,  0  is  returned.
  * Alternatively, if the given buffer is zero-length, 0 is always returned.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
@@ -251,7 +251,7 @@ again:
 	return result;
 }
 
-/* Similar to `linebuffer_write()', but never block before writing data.
+/* Similar to `linebuffer_write()', but  never block before writing  data.
  * If the given buffer was full at the time of this function being called,
  * or had been closed, then 0 is returned immediately.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
@@ -338,7 +338,7 @@ again_locked:
 			atomic_lock_acquire(&self->lb_lock);
 			COMPILER_READ_BARRIER();
 			/* Check for race condition: Another thread expanded the buffer in
-			 * the mean time, or the buffer was closed/before more limited. */
+			 * the mean time,  or the buffer  was closed/before more  limited. */
 			limit = ATOMIC_READ(self->lb_limt);
 			if likely(self->lb_line.lc_alloc < newline.hp_siz && new_size <= limit) {
 				assert(self->lb_line.lc_size <= self->lb_line.lc_alloc);
@@ -352,7 +352,7 @@ again_locked:
 			}
 			atomic_lock_release(&self->lb_lock);
 			/* We could keep our lock to `lb_lock' here, but it's better to
-			 * only ever be holding atomic locks for as short as possible. */
+			 * only  ever be holding atomic locks for as short as possible. */
 			HEAP_FREE(oldline.hp_ptr,
 			          oldline.hp_siz);
 			goto again;

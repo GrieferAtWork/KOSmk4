@@ -40,28 +40,28 @@
 #define CONFIG_X86_EMULATE_LCALL7 1
 #elif !defined(CONFIG_NO_X86_EMULATE_LCALL7)
 /* Emulate lcall7 even on i386 by default, since doing so greatly simplifies
- * the implementation of `task_enable_redirect_usercode_rpc()' */
+ * the      implementation      of     `task_enable_redirect_usercode_rpc()' */
 #undef CONFIG_X86_EMULATE_LCALL7
 #define CONFIG_X86_EMULATE_LCALL7 1
 #endif
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-/* Mangled names for assembly wrappers for a given
- * system call, when invoked via the specified mechanism.
- * Any possible combination of these is pre-defined as a
+/* Mangled   names   for   assembly   wrappers   for   a  given
+ * system  call,  when  invoked  via  the  specified mechanism.
+ * Any possible  combination  of  these  is  pre-defined  as  a
  * weak-internal wrapper that calls the associated `sys_##name'
- * function whilst passing the correct number and combination
+ * function  whilst passing the  correct number and combination
  * of arguments, before correctly propagating the system call's
  * return value back into user-space.
  * NOTE: These macros are mainly provided since some system calls
- *       are better implemented in assembly, such as sched_yield
- *       being implemented such that the task's scpustate will
- *       already point back into user-space, as well as other
- *       system calls such as `sigreturn', which don't even have
+ *       are  better implemented in assembly, such as sched_yield
+ *       being implemented such  that the  task's scpustate  will
+ *       already point  back into  user-space, as  well as  other
+ *       system calls such as `sigreturn', which don't even  have
  *       any real prototype.
  * NOTE: In x86_64, the 386 symbols refer to the symbols that are
- *       called by a process in 32-bit compatibility-mode.
+ *       called   by  a  process  in  32-bit  compatibility-mode.
  * For the default implementations, see:
  *  - /src/kernel/core/arch/i386/syscall/wrappers32.S
  *  - /src/kernel/core/arch/i386/syscall/wrappers64.S
@@ -76,14 +76,14 @@
  *                  - A user-space IRET tail was pushed and created
  *                  - Compatibility-mode
  *     X86_ASMSYSCALL32_RUNC32:
- *         x86_64:  SYSVABI-compatible, takes a register vector `u64 *regv = %rdi'
+ *         x86_64:  SYSVABI-compatible, takes a  register vector  `u64 *regv = %rdi'
  *                  Used to wrap around `sys32_*' system calls, handling double-wide
- *                  registers, as well as smaller-than-32-bit arguments by zero-
+ *                  registers,  as  well as  smaller-than-32-bit arguments  by zero-
  *                  extending them when necessary.
  *     X86_ASMSYSCALL64:
  *         x86_64:  SYSVABI-compatible
  * HINT: The low-level interrupt/entry handlers
- *       for system calls are implemented in:
+ *       for system calls  are implemented  in:
  *        - /src/kernel/core/arch/i386/syscall/wrappers32.S
  *        - /src/kernel/core/arch/i386/syscall/wrappers64.S
  */
@@ -128,7 +128,7 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
 #endif /* !__x86_64__ */
 
 
-/* Entry point for `sysenter' (32-bit system call invocation)
+/* Entry point for  `sysenter' (32-bit  system call  invocation)
  * NOTE: When this function is called, no IRET tail exists, yet.
  * Method:
  *    RPC_SYSCALL_INFO_METHOD_SYSENTER_32
@@ -151,7 +151,7 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
  *    %ecx:       May be clobbered
  *    %edx:       May be clobbered
  *    *:          All other registers are preserved by default, though individual
- *                system calls may cause specific registers to become clobbered. */
+ *                system calls may cause specific registers to become  clobbered. */
 FUNDEF void ASMCALL x86_syscall32_sysenter(void);
 FUNDEF void ASMCALL x86_syscall32_sysenter_traced(void);
 
@@ -171,16 +171,16 @@ FUNDEF void ASMCALL x86_syscall32_sysenter_traced(void);
  *    %eax:       low  32-bit of return value
  *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
  *    *:          All other registers are preserved by default, though individual
- *                system calls may cause specific registers to become clobbered. */
+ *                system calls may cause specific registers to become  clobbered. */
 FUNDEF void ASMCALL x86_syscall32_int80(void) ASMNAME("x86_idt_syscall");
 FUNDEF void ASMCALL x86_syscall32_int80_traced(void) ASMNAME("x86_idt_syscall_traced");
 #ifdef __x86_64__
 /* int80 entry points for 64-bit mode.
  * Note that these are actually identical to the 32-bit mode entry points, as the actual
- * behavior to-be used is decided at run-time, based on whether the calling user-space
+ * behavior  to-be used is decided at run-time,  based on whether the calling user-space
  * code was running in compatibility mode.
  * NOTE: The register conventions for a 64-bit int80h system call are identical to the
- *       64-bit `syscall' system call (s.a. `x86_syscall64_syscall()') */
+ *       64-bit    `syscall'    system    call    (s.a.     `x86_syscall64_syscall()') */
 FUNDEF void ASMCALL x86_syscall64_int80(void) ASMNAME("x86_idt_syscall");
 FUNDEF void ASMCALL x86_syscall64_int80_traced(void) ASMNAME("x86_idt_syscall_traced");
 /* Same as above, but these symbols point after the swapgs+sti introductory part.
@@ -198,7 +198,7 @@ FUNDEF void ASMCALL x86_syscall64x32_int80_traced(void);
  * Method:
  *    RPC_SYSCALL_INFO_METHOD_LCALL7_32
  * In:
- *    %eax:       System call number (`__NR32_*')  (If `lcall $7, $0' was
+ *    %eax:       System call number  (`__NR32_*') (If `lcall $7, $0'  was
  *                used. Otherwise `SYS_xxx' is used as system call number)
  *    0(%esp):    Arg #0  (If `kernel_syscall32_regcnt(%eax) >= 1')
  *    4(%esp):    Arg #1  (If `kernel_syscall32_regcnt(%eax) >= 2')
@@ -211,7 +211,7 @@ FUNDEF void ASMCALL x86_syscall64x32_int80_traced(void);
  *    %eax:       low  32-bit of return value
  *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
  *    *:          All other registers are preserved by default, though individual
- *                system calls may cause specific registers to become clobbered. */
+ *                system calls may cause specific registers to become  clobbered. */
 #ifndef CONFIG_X86_EMULATE_LCALL7
 FUNDEF void ASMCALL x86_syscall32_lcall7(void);
 /* Same as `x86_syscall32_lcall7()', but an IRET tail has already been created. */
@@ -221,7 +221,7 @@ FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
 
 
 #ifdef __x86_64__
-/* Entry point for `syscall' (64-bit system call invocation)
+/* Entry  point  for `syscall'  (64-bit system  call invocation)
  * NOTE: When this function is called, no IRET tail exists, yet.
  * Method:
  *    RPC_SYSCALL_INFO_METHOD_INT80H_64
@@ -242,7 +242,7 @@ FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
  *    %eip:    Always set to `IN(%edi)'
  *             When cleared on entry, set on return if an exception was propagated
  *    *:       All other registers are preserved by default, though individual
- *             system calls may cause specific registers to become clobbered. */
+ *             system calls may cause specific registers to become  clobbered. */
 FUNDEF void ASMCALL x86_syscall64_syscall(void);
 FUNDEF void ASMCALL x86_syscall64_syscall_traced(void);
 #endif /* __x86_64__ */

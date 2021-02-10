@@ -104,14 +104,14 @@ nic_device_sendall(struct nic_device *__restrict self,
                    struct aio_multihandle *__restrict aio);
 
 /* Same as `nic_device_sendall()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
+ * WARNING:    This    function    may   still    clobber    exception   pointers! */
 FUNDEF NONNULL((1, 2, 3)) void
 NOTHROW(KCALL nic_device_sendall_nx)(struct nic_device *__restrict self,
                                      struct nic_packetlist const *__restrict packets,
                                      struct aio_multihandle *__restrict aio);
 
 /* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
- * NOTE: Transmit errors get logged, but are silently discarded. */
+ * NOTE:  Transmit   errors  get   logged,  but   are  silently   discarded. */
 FUNDEF NONNULL((1, 2)) void KCALL
 nic_device_sendall_background(struct nic_device *__restrict self,
                               struct nic_packetlist const *__restrict packets);
@@ -167,12 +167,12 @@ NOTHROW(KCALL nic_packet_desc_for_packet)(struct nic_packet_desc *__restrict sel
 }
 
 /* Extended version of `nic_packetlist_segments()'
- * NOTE: Memory from `packet->npd_head' and `packet->npd_tail' will
- *       be hard-copied into the new packets as implicit head/tail
- *       data objects. In other words: Only `npd_payload' has to be
- *       kept valid until after the packet has been fully sent.
+ * NOTE: Memory from `packet->npd_head' and `packet->npd_tail'  will
+ *       be hard-copied into the  new packets as implicit  head/tail
+ *       data objects. In other words: Only `npd_payload' has to  be
+ *       kept valid  until after  the packet  has been  fully  sent.
  *       As such, head/tail is meant to be used for kernel-generated
- *       descriptors, while the payload may also contain user-space
+ *       descriptors,  while the payload may also contain user-space
  *       data.
  * HINT: After this call, you may assume:
  * >> for (i = self->npl_cnt - return; i < self->npl_cnt; ++i) {
@@ -189,14 +189,14 @@ nic_packetlist_segments_ex(struct nic_packetlist *__restrict self,
                            size_t max_segment_tail_size)
 		THROWS(E_BADALLOC);
 
-/* Split `packet' into multiple packets that are added to `self'
- * All packets have a real max-size of `max_segment_payload_size +
+/* Split `packet' into  multiple packets that  are added to  `self'
+ * All packets have a real max-size of `max_segment_payload_size  +
  * max_segment_head_size + max_segment_tail_size', where the latter
  * two are optional addend that have to be allocated through use of
  * the `nic_packet_alloc(head|tail)(...)' functions.
  * @return: * : [!0] The number of newly created packets
  *                   Note that even in the even that the given `packet'
- *                   is entirely empty, this will still be at least 1! */
+ *                   is entirely empty, this will still be at least  1! */
 LOCAL NONNULL((1, 2, 3)) size_t KCALL
 nic_packetlist_segments(struct nic_packetlist *__restrict self,
                         struct nic_device *__restrict dev,

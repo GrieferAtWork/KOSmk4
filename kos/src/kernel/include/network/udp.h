@@ -48,7 +48,7 @@ udp_routepacket(struct nic_device *__restrict dev,
 /* TODO: Implement UDP support */
 /* TODO: Implement DHCP support */
 /* TODO: Use DHCP to automatically configure `nic_addresses::na_ip' the
- *       first time that we need our own IP address for some protocol. */
+ *       first time that we need our own IP address for some  protocol. */
 
 #endif /* __CC__ */
 

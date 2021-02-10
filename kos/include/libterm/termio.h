@@ -58,7 +58,7 @@ typedef __ATTR_NONNULL((1, 2)) __ssize_t
                                    __size_t num_bytes, iomode_t mode);
 
 /* Raise a given signal `signo' (one of `SIG*')
- * within the foreground process group associated with the terminal.
+ * within the foreground process  group associated with the  terminal.
  * A negative return value of this function is propagated immediately.
  * s.a. `task_raisesignalprocess()'
  * @return: < 0:  An error status that should be propagated immediately. */
@@ -66,12 +66,12 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
                                 __signo_t signo);
 
-/* Check if the calling process's group leader is apart of the foreground process
- * group associated with the given terminal `self'. - If it is, return 0. Otherwise,
- * the POSIX behavior is to raise a signal `SIGTTOU' within every process in the caller's
- * process group, however the implementation of this function may also choose to do
- * something completely different. (or just be a no-op; >I'm just a sign, not a cop...<)
- * For a POSIX-compliant terminal, a kernel-side implementation of this would look like:
+/* Check  if  the  calling  process's  group  leader  is  apart  of  the  foreground   process
+ * group associated  with  the  given terminal  `self'.  -  If it  is,  return  0.  Otherwise,
+ * the POSIX behavior  is to raise  a signal `SIGTTOU'  within every process  in the  caller's
+ * process  group,  however  the  implementation  of  this  function  may  also  choose  to do
+ * something completely different.  (or just  be a  no-op; >I'm just  a sign,  not a  cop...<)
+ * For  a  POSIX-compliant terminal,  a kernel-side  implementation of  this would  look like:
  * >> PRIVATE ssize_t LIBTERM_CC my_terminal_check_sigttou(struct terminal *__restrict self) {
  * >>	MY_TERMINAL *term = container_of(self, MY_TERMINAL, t_term);
  * >>	REF struct task *my_leader = task_getprocessgroupleader();
@@ -95,20 +95,20 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 struct terminal {
 	/* Terminal controller, implementing input/output transformations and control characters. */
 	pterminal_check_sigttou_t t_chk_sigttou; /* [0..1][const] When non-NULL, called once every time `terminal_owrite()'
-	                                          *               is called while `t_ios.c_lflag & TOSTOP' is set.
+	                                          *               is  called   while   `t_ios.c_lflag & TOSTOP'   is   set.
 	                                          * The intended use of this callback is to check if the caller is apart
-	                                          * of the foreground process group, and suspend them if they aren't. */
+	                                          * of  the foreground process  group, and suspend  them if they aren't. */
 	pterminal_raise_t         t_raise;       /* [0..1][const] Raise a signal in the foreground process. */
 	pterminal_oprinter_t      t_oprint;      /* [1..1][const] Print output to the screen. */
 	struct ringbuffer         t_ibuf;        /* Buffer for keyboard input.
 	                                          * NOTE: When `__IEOFING' is set, `t_ibuf.rb_nempty' must be broadcast! */
 	struct linebuffer         t_canon;       /* Canonical buffer for line-wise input (used for input when `t_ios.c_lflag & ICANON' is set)
-	                                          * NOTE: When `ICANON' is cleared, `t_canon.lb_nful' must be broadcast! */
+	                                          * NOTE:   When    `ICANON'    is    cleared,   `t_canon.lb_nful'    must    be    broadcast! */
 	struct linebuffer         t_opend;       /* Buffer for pending output text (used when `t_ios.c_iflag & IXOFF' is set)
-	                                          * NOTE: When `IXOFF' is cleared, `t_opend.lb_nful' must be broadcast!
+	                                          * NOTE: When  `IXOFF'  is  cleared, `t_opend.lb_nful'  must  be  broadcast!
 	                                          * NOTE: When `(c_lflag & (ECHO | EXTPROC)) != ECHO', `t_opend.lb_nful' must be broadcast! */
 	struct linebuffer         t_ipend;       /* Buffer for pending input text (used when `t_ios.c_iflag & __IIOFF' is set)
-	                                          * NOTE: When `__IIOFF' is cleared, `t_ipend.lb_nful' must be broadcast! */
+	                                          * NOTE: When  `__IIOFF' is  cleared,  `t_ipend.lb_nful' must  be  broadcast! */
 	struct termios            t_ios;         /* Terminal I/O configuration. */
 	sched_signal_t            t_ioschange;   /* Signal broadcast when: `IXOFF' is set, `(c_lflag & (ECHO | EXTPROC)) != ECHO' */
 };
@@ -139,12 +139,12 @@ __NOTHROW_NCX(LIBTERM_CC terminal_init)(struct terminal *__restrict self,
  * @return: >= 0 : The sum of return values from calls to the associated printer
  *                 - The usual rules apply where negative return values are propagated immediately.
  *                 - Data printed when an I/O buffer is flushed is not added to this sum, however
- *                   negative values resulting from this case are propagated none-the-less.
- *                 - In cases where data is written to multiple printers (e.g. terminal_iwrite() w/ ECHO),
- *                   only the return value of the intended printer (in this case `t_iprint') is added to
- *                   the eventually returned sum. - Additionally, in this case, the lower of the return
+ *                   negative values  resulting  from  this case  are  propagated  none-the-less.
+ *                 - In cases where  data is written  to multiple printers  (e.g. terminal_iwrite() w/  ECHO),
+ *                   only the return  value of  the intended  printer (in this  case `t_iprint')  is added  to
+ *                   the  eventually  returned sum.  - Additionally,  in this  case, the  lower of  the return
  *                   value of the original call to `t_iprint' and num_bytes passed to it is used as the number
- *                   of bytes that would be echoed on-screen. (meaning that no characters will get echoed
+ *                   of bytes that  would be echoed  on-screen. (meaning  that no characters  will get  echoed
  *                   that can't be added to the input queue)
  * @return: < 0:   A format-printer returned a negative value
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */

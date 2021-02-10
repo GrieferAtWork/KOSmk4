@@ -33,11 +33,11 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* Same as the regular `struct rwlock', however neither read-after-write,
- * nor write-after-read is allowed. However read-after-read is allowed,
+/* Same  as the regular `struct rwlock', however neither read-after-write,
+ * nor write-after-read is  allowed. However  read-after-read is  allowed,
  * and unlike with `struct rwlock', read/write-locks created by one thread
  * can be inherited by another.
- * Essentially, a `shared_rwlock' is the same as an `atomic_rwlock', with
+ * Essentially, a `shared_rwlock' is the  same as an `atomic_rwlock',  with
  * the addition that a `shared_rwlock' includes a signal with which one can
  * do blocking waits for the lock to become available. */
 
@@ -85,7 +85,7 @@ LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self);
 
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
- *       may have been held temporarily, meaning that the caller should
+ *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
 LOCAL NONNULL((1)) __BOOL
 (FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
@@ -93,7 +93,7 @@ LOCAL NONNULL((1)) __BOOL
 		THROWS(E_WOULDBLOCK);
 
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
- *       no lock may have been held temporarily, meaning that the caller should
+ *       no lock may have been held  temporarily, meaning that the caller  should
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
@@ -239,7 +239,7 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
 }
 
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
- *       may have been held temporarily, meaning that the caller should
+ *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
 LOCAL NONNULL((1)) __BOOL
 (FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
@@ -253,7 +253,7 @@ LOCAL NONNULL((1)) __BOOL
 }
 
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
- *       no lock may have been held temporarily, meaning that the caller should
+ *       no lock may have been held  temporarily, meaning that the caller  should
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */

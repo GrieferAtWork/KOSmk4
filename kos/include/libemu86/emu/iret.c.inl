@@ -204,7 +204,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 	 EFLAGS_TF | EFLAGS_DF | EFLAGS_OF | EFLAGS_NT)
 
 	/* Return to outer privilege level, or return from 64-bit mode.
-	 * In this case, always pop (|E|R)SP and SS as well! */
+	 * In  this  case,  always  pop   (|E|R)SP  and  SS  as   well! */
 #if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
 	if (EMU86_F_IS64(op_flags) || ((new_cs & 3) && !EMU86_ISUSER()))
 #endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
@@ -222,7 +222,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		u16 new_ss;
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (IS_64BIT()) {
-			/* EMU86_EMULATE_POP() and EMU86_READ_USER_MEMORY()
+			/* EMU86_EMULATE_POP()  and  EMU86_READ_USER_MEMORY()
 			 * were already invoked with the proper values above! */
 			/*EMU86_EMULATE_POP(sp - 24, 16 + 24);*/
 			/*EMU86_READ_USER_MEMORY(sp - 24, 16 + 24);*/
@@ -250,7 +250,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #if EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
 		/* Verify segment registers.
 		 * NOTE: We can only get here with `EMU86_ISUSER() == true'
-		 *       when the calling code is running in 64-bit mode,
+		 *       when the calling code  is running in 64-bit  mode,
 		 *       so these checks aren't necessary otherwise! */
 		if (EMU86_ISUSER()) {
 			if (!SEGMENT_IS_VALID_USERCODE(new_cs)) {

@@ -29,7 +29,7 @@
 DECL_BEGIN
 
 /* [0..1][ATOMIC(APPEND)] Chain of registered DL extensions.
- * NOTE: Once registered, a DL extension cannot be deleted! */
+ * NOTE: Once registered, a DL extension cannot be  deleted! */
 INTERN struct dlmodule_format *dl_extensions = NULL;
 
 PRIVATE struct dlcore_ops dl_coreops;

@@ -36,10 +36,10 @@
 
 DECL_BEGIN
 
-/* Management of user-space descriptors for kernel data, here called
- * handles, but referred to as file-descriptors in user-space.
+/* Management of user-space descriptors  for kernel data, here  called
+ * handles,   but  referred  to  as  file-descriptors  in  user-space.
  * The associated user-space data type is `fd_t', which aliases `int',
- * which is why the kernel uses `unsigned int' as its internal
+ * which  is  why  the  kernel  uses  `unsigned int'  as  its internal
  * descriptor type. */
 
 
@@ -50,49 +50,49 @@ struct aio_multihandle;
 struct path;
 struct directory_entry;
 
-/* Closing a handle (for the last time) is allowed to automatically remove
+/* Closing a handle (for the last  time) is allowed to automatically  remove
  * that handle from every epoll controller that may have been monitoring it.
  *
  * Using this mechanic, kernel objects that need it can be made to implement
- * a weak reference system (while objects that don't need this can just be
+ * a  weak reference system (while objects that  don't need this can just be
  * made to use normal references in place of weak ones)
  *
  * For this purpose, the following weak reference API exists. */
 struct handle_weakref_ops {
 	/* [1..1] Return a new weak reference, given a proper object pointer.
-	 * Note that the returned pointer may differ from `obj_ptr'! */
+	 * Note  that  the  returned  pointer  may  differ  from   `obj_ptr'! */
 	NOBLOCK NONNULL((1)) WEAK REF void * /*NOTHROW*/ (FCALL *hwo_weakincref)(void *__restrict obj_ptr);
 	/* [1..1] Decrement the weak reference counter of `weakref_ptr' */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *hwo_weakdecref)(void *__restrict weakref_ptr);
 	/* [1..1] Given a weak reference `weakref_ptr', try to acquire a reference to
 	 *        the proper handle object (to which a reference is returned on success)
-	 * Note that the returned pointer may differ from `weakref_ptr' when the object
+	 * Note  that the  returned pointer may  differ from `weakref_ptr'  when the object
 	 * uses a weak reference proxy object (like `struct taskpid' is for `struct task'),
-	 * instead of a dedicated weak reference counter (like found in `struct driver') */
+	 * instead  of a dedicated  weak reference counter  (like found in `struct driver') */
 	NOBLOCK WUNUSED NONNULL((1)) REF void * /*NOTHROW*/ (FCALL *hwo_weaklckref)(void *__restrict weakref_ptr);
 };
 
 
 struct handle_mmap_info {
 	/* mmap information to-be filled in by implementations of the `h_mmap' operator.
-	 * Note that the caller will have already filled in fields as:
+	 * Note  that   the   caller   will   have  already   filled   in   fields   as:
 	 *   - hmi_minaddr = 0;
 	 *   - hmi_maxaddr = (pos_t)-1;
 	 *   - hmi_fspath  = NULL;
 	 *   - hmi_fsname  = NULL;
 	 * Meaning that in order to comply with requirements, the `h_mmap' implementation
-	 * only needs to fill in `hmi_file' in order to be able to indicate success. */
+	 * only needs to  fill in `hmi_file'  in order  to be able  to indicate  success. */
 	REF struct mfile           *hmi_file;    /* [1..1][out] The file that should be mapped. */
 	pos_t                       hmi_minaddr; /* [in|out] Lowest mmap-able address from `hmi_file'. This value will also
-	                                          * be used as an addend to the offset-argument of `mmap(2)', meaning that
+	                                          * be used as an addend to the offset-argument of `mmap(2)', meaning  that
 	                                          * any file-map operation will be relative to this. */
-	pos_t                       hmi_maxaddr; /* [in|out] Similar to `hmi_minaddr': The max address that may be mapped
-	                                          * by user-space. Note that this field slightly differs from an mmap
-	                                          * limit which may be imposed by `hmi_file->mf_filesize': Whereas
+	pos_t                       hmi_maxaddr; /* [in|out] Similar  to `hmi_minaddr':  The max  address that  may be mapped
+	                                          * by user-space.  Note  that  this  field slightly  differs  from  an  mmap
+	                                          * limit   which   may  be   imposed  by   `hmi_file->mf_filesize':  Whereas
 	                                          * the later will throw `E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE'
-	                                          * when trying to mmap beyond the end of a file, attempting to mmap
-	                                          * memory beyond this address will simply result in mfile_zero to be
-	                                          * mapped within that area, rather than the intended file being mapped.
+	                                          * when trying  to  mmap  beyond the  end  of  a file,  attempting  to  mmap
+	                                          * memory beyond  this  address  will  simply result  in  mfile_zero  to  be
+	                                          * mapped within  that area,  rather than  the intended  file being  mapped.
 	                                          * s.a. `mman_map_subrange()' and `mfile_getpart()' */
 	REF struct path            *hmi_fspath;  /* [0..1][in|out] Filesystem path of `hmi_file' */
 	REF struct directory_entry *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */
@@ -104,11 +104,11 @@ DATDEF
 struct handle_types {
 	/* NOTE: _ALL_ callbacks in here are _always_ defined. (aka. `[1..1]')
 	 *       Those that aren't explicitly implemented are aliased to `h_*[HANDLE_TYPE_UNDEFINED]',
-	 *       which (when invoked) always throws an `E_NOT_IMPLEMENTED_UNSUPPORTED' exception.
+	 *       which  (when  invoked)  always throws  an  `E_NOT_IMPLEMENTED_UNSUPPORTED' exception.
 	 *       In other words: To check if a function is implemented, compare it with
 	 *                       its `HANDLE_TYPE_UNDEFINED' counterpart!
 	 * NOTE: The incref() and decref() functions for `HANDLE_TYPE_UNDEFINED' are no-ops.
-	 * NOTE: The reason why type-ids are vectored at this lowest possible level
+	 * NOTE: The  reason why type-ids  are vectored at  this lowest possible level
 	 *       is to speed up callback selection by ensuring a constant base address
 	 *      (since `handle_type_db' is known at compile-time, and offsets to fields
 	 *       are known, also), with the type-index then only having to be multiplied
@@ -212,7 +212,7 @@ struct handle_types {
 
 	/* Try to convert the given object into a handle data pointer of a different type.
 	 * If such a conversion isn't possible, this operator should simply return `NULL'.
-	 * NOTE: This operator is allowed to throw exceptions, however only as the result
+	 * NOTE: This operator is allowed to throw exceptions, however only as the  result
 	 *       of attempting to acquire some kind of lock while preemption was disabled.
 	 * The caller must ensure that `wanted_type' isn't already this handle's type. */
 	REF void *(NONNULL((1)) KCALL *h_tryas[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, uintptr_half_t wanted_type)
@@ -376,12 +376,12 @@ struct handle_manager {
 	WEAK refcnt_t        hm_refcnt;   /* Reference counter. */
 	struct atomic_rwlock hm_lock;     /* Lock for this handle manager's control structures. */
 	unsigned int         hm_cntlimit; /* [lock(hm_lock)] The max number of handles which may be bound.
-	                                   * NOTE: May not be set to `HANDLE_HASHENT_SENTINEL_ID'! */
+	                                   * NOTE:  May  not   be  set  to   `HANDLE_HASHENT_SENTINEL_ID'! */
 	unsigned int         hm_maxlimit; /* [lock(hm_lock)] The max allowed handle number which may be used.
-	                                   * NOTE: May not be set to `HANDLE_HASHENT_SENTINEL_ID'! */
+	                                   * NOTE:  May   not   be   set   to   `HANDLE_HASHENT_SENTINEL_ID'! */
 	unsigned int         hm_count;    /* [lock(hm_lock)] Number of handles currently in use. */
 	unsigned int         hm_minfree;  /* [lock(hm_lock)] Lowest handle index that is potentially unused.
-	                                   * When searching for a new, unused handle, start searching here. */
+	                                   * When searching for a new, unused handle, start searching  here. */
 	unsigned int         hm_mode;     /* [lock(hm_lock)] Handle manager operations mode (one of `HANDLE_MANAGER_MODE_*'). */
 #define HANDLE_MANAGER_MODE_LINEAR     0x0000 /* Handles are indexed linearly. */
 #define HANDLE_MANAGER_MODE_HASHVECTOR 0x0001 /* Handles are indexed via hash-vector indirection. */
@@ -397,11 +397,11 @@ struct handle_manager {
 			struct handle *hm_vector; /* [0..hm_alloc][owned] Vector of handles. (index == hm_hashvec[*]) */
 			struct handle_hashent
 			              *hm_hashvec;/* [lock(hm_lock)][1..hm_hashmsk+1][owned] Hash-vector for translating
-			                           * handle IDs from `fd_t' into an index into `hm_vector'. */
+			                           * handle  IDs   from  `fd_t'   into   an  index   into   `hm_vector'. */
 			unsigned int   hm_hashmsk;/* [lock(hm_lock)] Hash-mask for `hm_hashvec'. */
 			unsigned int   hm_hashuse;/* [lock(hm_lock)] Number of used handle_hashent (i.e. ones with
 			                           * `hh_handle_id != HANDLE_HASHENT_SENTINEL_ID').
-			                           * Note that this is very similar to `hm_count', but includes handles
+			                           * Note  that this is very similar to `hm_count', but includes handles
 			                           * that have been deleted (i.e. `hh_vector_index == (unsigned int)-1') */
 			unsigned int   hm_vecfree;/* [lock(hm_lock)] Lowest index in `hm_vector' that may contain an unused slot. */
 #define handle_manager_hashnext(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
@@ -415,7 +415,7 @@ NOTHROW(KCALL handle_manager_destroy)(struct handle_manager *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct handle_manager, hm_refcnt, handle_manager_destroy)
 
 /* Allocate a new or / copy the given (which won't
- * copy any `IO_CLOFORK' handle) handle manager */
+ * copy  any  `IO_CLOFORK' handle)  handle manager */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
 handle_manager_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
@@ -467,8 +467,8 @@ handle_close_nosym(unsigned int fd,
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 /* Close all open file handles `>= fd' and return how many were actually closed.
- * If nothing was closed at all (i.e. what would be `return == 0'), then this
- * function returns by throwing an `E_INVALID_HANDLE_FILE' (-EBADF) exception. */
+ * If nothing was closed  at all (i.e. what  would be `return == 0'), then  this
+ * function  returns by throwing  an `E_INVALID_HANDLE_FILE' (-EBADF) exception. */
 FUNDEF NONNULL((2)) unsigned int FCALL
 handle_closefrom_nosym(unsigned int startfd,
                        struct handle_manager *__restrict self)
@@ -491,7 +491,7 @@ handle_stflags(struct handle_manager *__restrict self,
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 
-/* Add the given handle to the handle manager and
+/* Add the given handle  to the handle manager  and
  * return the handle number of where it was placed.
  * @throw: E_BADALLOC: Insufficient kernel memory to allocate more handle slots
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
@@ -504,7 +504,7 @@ handle_install(struct handle_manager *__restrict self,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
 
-/* Similar to `handle_put()', but place the handle in a
+/* Similar to  `handle_put()', but  place  the handle  in  a
  * descriptor slot that is greater than, or equal to `hint'.
  * @throw: E_BADALLOC: Insufficient kernel memory to allocate more handle slots
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
@@ -531,7 +531,7 @@ handle_installinto(struct handle_manager *__restrict self,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
 
-/* Same as `handle_installinto()', but return the old handle
+/* Same  as `handle_installinto()', but  return the old handle
  * (or a HANDLE_TYPE_UNDEFINED) previously bound to that slot. */
 FUNDEF WUNUSED NONNULL((1, 3)) REF struct handle FCALL
 handle_installxchg(struct handle_manager *__restrict self,
@@ -545,7 +545,7 @@ handle_installxchg(struct handle_manager *__restrict self,
 
 struct hop_openfd;
 /* Do everything required to install a handle via a open openfd
- * command data packet that has been passed via user-space.
+ * command data  packet that  has been  passed via  user-space.
  * Note that `data' is an UNCHECKED user pointer! */
 FUNDEF NONNULL((2)) unsigned int FCALL
 handle_installhop(USER UNCHECKED struct hop_openfd *data,
@@ -634,7 +634,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 
 /* Lookup a given fd-number and return the associated handle.
  * NOTE: When `fd' doesn't refer to a valid handle, the returned
- *       handle has its type set to `HANDLE_TYPE_UNDEFINED'.
+ *       handle  has  its type  set  to `HANDLE_TYPE_UNDEFINED'.
  * NOTE: This function also handles symbolic file descriptors!
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
 FUNDEF WUNUSED REF struct handle FCALL
@@ -742,7 +742,7 @@ handle_get_vfs(unsigned int fd)
 #define handle_get_socket(fd)           ((REF struct socket *)handle_getas(fd, HANDLE_TYPE_SOCKET))
 #define handle_get_epoll_controller(fd) ((REF struct epoll_controller *)handle_getas(fd, HANDLE_TYPE_EPOLL))
 
-/* Cast the given handle `self' into `wanted_type', and return a reference
+/* Cast  the given handle `self' into `wanted_type', and return a reference
  * to a handle-compatible object with type `wanted_type'. If such a cast is
  * impossible, an `E_INVALID_HANDLE_FILETYPE' error is thrown.
  * NOTE: This function also inherits a reference to `self' (unless an exception is thrown) */

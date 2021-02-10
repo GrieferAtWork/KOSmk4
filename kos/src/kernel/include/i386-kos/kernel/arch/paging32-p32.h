@@ -57,16 +57,16 @@ DECL_BEGIN
  *    3 2 2 2 2 2 1 1 1 1 1 8 6 4 2 0
  *    0 8 6 4 2 0 8 6 4 2 0
  *
- * NOTE: All entires of E2 >= 768 are always allocated (these are the ones
- *       responsible for mapping kernel-space at 0xc0000000-0xffffffff), and
- *       always point to E1-vectors, or [const] and present 4MiB pages that
+ * NOTE: All entires of  E2 >=  768 are always  allocated (these  are the  ones
+ *       responsible for  mapping kernel-space  at 0xc0000000-0xffffffff),  and
+ *       always point to  E1-vectors, or  [const] and present  4MiB pages  that
  *       will never go away for the entire duration of KOS running (these pages
- *       may contain the kernel core itself, which is done as an optimization
+ *       may contain the kernel core itself,  which is done as an  optimization
  *       to simplify management of the core itself by allowing the CPU to cache
  *       the entire kernel core using only 1 or 2 TLB entires.
- *    -> Since only 2 indirections exist (`struct p32_pdir::p_e2' and `union p32_pdir_e2::p_e1'),
- *       both of which are always pre-allocated/or const-initialized for addresses >= 0xc0000000,
- *       there is no need to prepare kernel-space memory for paging before mapping memory. I.e.:
+ *    -> Since   only   2   indirections   exist   (`struct p32_pdir::p_e2'   and  `union p32_pdir_e2::p_e1'),
+ *       both   of  which  are   always  pre-allocated/or  const-initialized   for  addresses  >=  0xc0000000,
+ *       there   is  no  need  to  prepare  kernel-space  memory  for  paging  before  mapping  memory.  I.e.:
  *       when PAE integration is disabled, `paging32.h' can `#undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE'
  *
  */
@@ -116,7 +116,7 @@ DECL_BEGIN
 #define P32_IS_4MIB_ALIGNED(addr) (((addr) & __UINT32_C(0x003fffff)) == 0)
 
 /* Return the in-page offset of a regular pointer mapping,
- * or one that has been mapped within a 4MiB page. */
+ * or  one  that  has  been  mapped  within  a  4MiB page. */
 #define P32_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u32)(__CCAST(uintptr_t)(ptr) & P32_PAGE_OFFST_4KIB))
 #define P32_PDIR_PAGEINDEX_4MIB(ptr) (__CCAST(u32)(__CCAST(uintptr_t)(ptr) & P32_PAGE_OFFST_4MIB))
 
@@ -209,7 +209,7 @@ struct p32_pdir {
 #define P32_PDIR_E2_IDENTITY_BASE    __UINT32_C(0xfffff000) /* The `p32_pdir::p_e2' vector is mapped here. */
 #if 0
 /* These are the actual addresses, as well as how they are calculated.
- * However, for clarity and compilation speed, we use the pre-computed versions above instead.
+ * However, for clarity  and compilation  speed, we use  the pre-computed  versions above  instead.
  * Still though, these versions are statically asserted to be equal to the pre-computed ones above! */
 #define P32_PDIR_E2_IDENTITY_BASE (P32_PDIR_E1_IDENTITY_BASE + (P32_PDIR_VEC2INDEX(P32_PDIR_E1_IDENTITY_BASE) * P32_PDIR_E1_SIZE))
 #endif
@@ -279,7 +279,7 @@ typedef u64 p32_pagedir_pushval_t;
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
- * controller itself, which must be aligned and sized
+ * controller itself, which  must be  aligned and  sized
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
@@ -310,10 +310,10 @@ NOTHROW(FCALL p32_pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 
 /* Set a mapping hint for pages apart of the given virtual memory range.
- * Mapping hints are overwritten once a page has been mapped, and when
+ * Mapping hints are overwritten once a  page has been mapped, and  when
  * not specified, will default to `NULL'.
  * Their main purpose is to be accessible through atomic means, allowing
- * them to be used by the PAGE_FAULT handler, while still ensuring that
+ * them to be used by the PAGE_FAULT handler, while still ensuring  that
  * access remains non-blocking. */
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -340,9 +340,9 @@ NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                u16 perm);
 
 /* Special variants of `pagedir_mapone()' that should be used to
- * temporary override the mapping of a single, prepared page.
- * These functions are mainly intended for use with `this_trampoline_page', allowing
- * each thread to push/pop its trampoline page, with doing so actually being an atomic
+ * temporary override the  mapping of a  single, prepared  page.
+ * These functions are  mainly intended for  use with `this_trampoline_page',  allowing
+ * each  thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
@@ -370,7 +370,7 @@ NOTHROW(FCALL p32_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
- *       can perform the task without needing to allocate more memory! */
+ *       can perform the task without  needing to allocate more  memory! */
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace)(void);
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void);
 

@@ -57,9 +57,9 @@ DECL_BEGIN
 	(IDT_CONFIG_ALLOWUSER(vector_id) ? 3 : 0)
 
 /* Returns non-zero if `vector_id' should behave as a TRAP, i.e.:
- * call its C-level handler with interrupts enabled, so-long as
+ * call its C-level handler  with interrupts enabled, so-long  as
  * the interrupted program location had them enabled, too.
- * WARNING: This macro is only used for vectors 00h...2fh!
+ * WARNING: This  macro  is  only used  for  vectors 00h...2fh!
  *          All other vectors are handled as non-trapping, with
  *          the exception of vector 80h (which is a trap) */
 #define IDT_CONFIG_ISTRAP(vector_id)                            \
@@ -96,10 +96,10 @@ DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
 
 /* Start modifying `x86_idt'
  * This function must be called prior to making modifications to `x86_idt'.
- * Doing this is required to prevent other CPUs/threads from servicing
- * interrupts with IDT segments that aren't fully initialized.
- * As such, any modifications made to `x86_idt' after this function
- * is called will only come into effect once `x86_idt_modify_end()' is
+ * Doing this  is required  to prevent  other CPUs/threads  from  servicing
+ * interrupts   with   IDT   segments   that   aren't   fully  initialized.
+ * As  such,  any  modifications  made  to  `x86_idt'  after  this function
+ * is called  will only  come into  effect once  `x86_idt_modify_end()'  is
  * called. These functions are implemented as:
  *   x86_idt_modify_begin():
  *     - Acquire an internal mutex
@@ -111,14 +111,14 @@ DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
  *     - Broadcast an IPI, telling all CPUs to `lidt(&x86_idt_ptr)'
  *     - Free the internal copy previously allocated by `x86_idt_modify_begin()'
  *     - Release the internal mutex
- * Using this method, changes can be staged for eventual use in `x86_idt',
+ * Using this method, changes can be staged for eventual use in  `x86_idt',
  * without running the risk of any CPU/thread ever accessing an incomplete/
  * corrupt IDT entry.
- * When calling `x86_idt_modify_end()', the caller is responsible to ensure
+ * When calling  `x86_idt_modify_end()', the  caller is  responsible to  ensure
  * that the call was preceded by `x86_idt_modify_begin()', as well as to ensure
- * that any call to `x86_idt_modify_begin()' is eventually followed by another
+ * that any call to `x86_idt_modify_begin()' is eventually followed by  another
  * call to `x86_idt_modify_end()'
- * Also note that these functions must not be called recursively from the same
+ * Also note that these  functions must not be  called recursively from the  same
  * thread. - A call to `x86_idt_modify_begin()' must _NOT_ be followed by another
  * call to `x86_idt_modify_begin()' from the same thread!
  * @param: nx:     When true, don't do anything that could throw an exception, or block.

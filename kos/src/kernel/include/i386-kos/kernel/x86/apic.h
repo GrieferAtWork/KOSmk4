@@ -29,7 +29,7 @@
 DECL_BEGIN
 
 #ifdef __CC__
-/* [const] Virtual base addresses of the local (per-cpu) APIC.
+/* [const] Virtual  base  addresses  of  the  local  (per-cpu) APIC.
  * HINT: APIC stands for Advanced Programmable Interrupt Controller. */
 DATDEF VIRT volatile __byte_t *const x86_lapicbase;
 #define X86_HAVE_LAPIC             (x86_lapicbase != __NULLPTR)

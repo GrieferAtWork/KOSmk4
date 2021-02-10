@@ -57,7 +57,7 @@
 DECL_BEGIN
 
 
-/* Return the size (in bytes) of the keyboard translation code block, that
+/* Return the size (in bytes) of the keyboard translation code block,  that
  * is the number of bytes until after the terminating `KMP_OP_STOP' opcode.
  * @return: <0: The code contains unrecognized/invalid instructions. */
 INTERN NONNULL((1, 2)) ssize_t
@@ -218,7 +218,7 @@ error:
 /* Translate a given key `key' when modifiers `mod' are applied into a unicode character.
  * @return: 0  : Either `printer' always returned 0, or the key doesn't have a mapping.
  * @return: *  : Sum of all calls to `printer'
- * @return: <0 : A call to `printer' returned this same negative value  */
+ * @return: <0 : A call to `printer' returned this same negative value */
 INTERN NONNULL((1, 4)) ssize_t
 NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
                                     uint16_t const key, /* `const' so we don't accidentally write this one instead of `reg_key' */
@@ -533,14 +533,14 @@ done:
 
 
 /* Wrapper for buffer-based translating, using snprintf()-like buffer printing.
- * NOTE: Upon success, this function will optionally append a NUL-character
+ * NOTE: Upon success,  this function  will  optionally append  a  NUL-character
  *       if sufficient buffer space is available (`return < buflen'). Otherwise,
- *       when `return == buflen', no trailing NUL-character exists, but the
+ *       when  `return == buflen',  no  trailing NUL-character  exists,  but the
  *       function still succeeds.
  * @param: buffer: The buffer to which to print translated characters.
  * @param: buflen: The given buffer size.
  * @return: 0 :    The given `key' cannot be translated with `mod'
- * @return: * :    The required number of buffer bytes. (excluding a trailing NUL-character)  */
+ * @return: * :    The required number of buffer bytes. (excluding a trailing NUL-character) */
 INTERN NONNULL((1, 4)) size_t
 NOTHROW_NCX(CC libkeymap_translate_buf)(struct keymap *__restrict self,
                                         uint16_t key, uint16_t mod,
@@ -560,10 +560,10 @@ NOTHROW_NCX(CC libkeymap_translate_buf)(struct keymap *__restrict self,
 
 
 /* Open a memory-blob of a KMP (KeyboardMaP) file (see above for the file format specs)
- * NOTE: The caller must ensure that a keymap blob loaded form some file must end with at
+ * NOTE: The  caller must ensure that a keymap blob  loaded form some file must end with at
  *       least 5 additional trailing 0-bytes (i.e. `blob_base[blob_size+{0,1,2,3,4}] == 0')
  * NOTE: Upon success, the caller must also ensure that `self->km_ext...+=(blob_base+blob_size)-self->km_ext'
- *       will not be freed. Alternatively, the caller may replace `self->km_ext' with a duplicate of that
+ *       will  not be freed.  Alternatively, the caller may  replace `self->km_ext' with  a duplicate of that
  *       memory region and free it themself after finalization
  * @return: true:  Successfully loaded the given blob and initialized `self'
  * @return: false: Failed to open the blob (not a valid KMP file) */

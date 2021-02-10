@@ -44,8 +44,8 @@ struct ffilesys {
 	REF struct driver            *ffs_drv;   /* [1..1][const] The implementing driver application. */
 	union {
 		/* [1..1][valid_if(!FFILESYS_F_SINGLE)]
-		 * Construct a new superblock instance of this filesystem type that uses
-		 * the given `dev'. May return `NULL' (if and only if `dev != NULL') if
+		 * Construct  a new superblock  instance of this  filesystem type that uses
+		 * the  given `dev'.  May return `NULL'  (if and only  if `dev != NULL') if
 		 * that device doesn't contain a valid instance of the expected filesystem.
 		 * @param: dev: [1..1][!FFILESYS_F_NODEV] The backing storage device for the filesystem.
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
@@ -66,14 +66,14 @@ struct ffilesys {
 #define ffilesys_destroy(self) driver_destroy((self)->ffs_drv)
 DEFINE_REFCOUNT_FUNCTIONS(struct ffilesys, ffs_drv->d_refcnt, ffilesys_destroy)
 
-/* Register a given filesystem. - May only be called once for any given
+/* Register a given filesystem. - May only be called once for any  given
  * filesystem. Furthermore, the filesystem will be automatically removed
  * from the list of known filesystem types when the associated driver is
  * being unloaded. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL ffilesys_register)(struct ffilesys *__restrict self);
 
-/* TODO: API for inspecting registered filesystem types.
+/* TODO: API for inspecting registered filesystem  types.
  *       Should work the same as the all-mpart-s systems. */
 
 DECL_END

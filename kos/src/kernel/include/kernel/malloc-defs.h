@@ -30,11 +30,11 @@ DECL_BEGIN
 //#define CONFIG_NO_TRACE_MALLOC           1
 
 
-/* Enable heap memory pre-initialization, as well as special
- * data patterns for unallocated memory, in addition to the
+/* Enable heap memory  pre-initialization, as  well as  special
+ * data patterns  for unallocated  memory, in  addition to  the
  * ability of tracking use-after-free through `heap_validate()'
- * Note that `heap_validate()' attempts to optimize itself not
- * to check data blocks that haven't been modified since the
+ * Note  that `heap_validate()' attempts to optimize itself not
+ * to check data  blocks that haven't  been modified since  the
  * previous check, making use of `pagedir_haschanged()', should
  * the host support that function (`ARCH_PAGEDIR_HAVE_CHANGED') */
 #ifndef CONFIG_DEBUG_HEAP
@@ -49,7 +49,7 @@ DECL_BEGIN
 
 
 /* Randomize in-heap allocation offsets (using `rand()') when
- * less memory than the best matching free slot contains is
+ * less memory than the best  matching free slot contains  is
  * allocated:
  * >> slot(48 bytes):  FREEFREEFREEFREEFREEFREEFREEFREEFREEFREEFREEFREE
  * >> alloc(16 bytes): FREEFREEFREEFREE                                 (Without `CONFIG_HEAP_RANDOMIZE_OFFSETS')
@@ -58,16 +58,16 @@ DECL_BEGIN
  * >> alloc(16 bytes): FREEFREEFREEFREE                                 (With `CONFIG_HEAP_RANDOMIZE_OFFSETS')
  * This configuration option affects the results of `heap_alloc()' and `heap_align()'
  * Reasoning:
- *   - Although even without this option, we are randomizing the kernel heap location
+ *   - Although even without this option, we are randomizing the kernel heap  location
  *     during early boot, once that's been established, no further randomization would
  *     be done without this option enabled.
- *     That could lead to bugs going undetected that depend on the relative offsets
+ *     That  could lead to bugs going undetected  that depend on the relative offsets
  *     between allocated data blocks, something that this option prevents by ensuring
  *     that more randomization is added into the mix whenever memory is allocated.
  *   - Without this option, only address bits above `PAGESIZE' would be randomized
- *     for the kernel's default heaps, while bits between it and `HEAP_ALIGNMENT'
- *     would be predictably consistent for consecutive allocations.
- *     That might be another cause for buggy code that might accidentally rely on
+ *     for  the kernel's default heaps, while bits between it and `HEAP_ALIGNMENT'
+ *     would   be    predictably   consistent    for   consecutive    allocations.
+ *     That might be another cause for buggy code that might accidentally rely  on
  *     those bits never changing.
  */
 #ifndef CONFIG_HEAP_RANDOMIZE_OFFSETS
@@ -82,52 +82,52 @@ DECL_BEGIN
 #endif
 
 
-/* Trace dangling heap data in order to minimize unnecessary allocations:
- * Since the introduction of `CONFIG_ATOMIC_HEAP' and it having become
+/* Trace dangling heap data in  order to minimize unnecessary  allocations:
+ * Since the  introduction of  `CONFIG_ATOMIC_HEAP'  and it  having  become
  * mandatory shortly after, one problem arose that could potentially result
  * in unnecessary and excessive core allocations when there is still enough
  * heap memory available:
- *   - Say you want to allocate 64 bytes of memory. However
- *     the nearest free data block has a size of 8Mib.
- *     Since the heap can't know how much of that data block
- *     has already been faulted, it doesn't want to run the
- *     risk of keeping a lock to the heap while splitting that
- *     data block in 2, potentially causing a #PF and keeping
+ *   - Say  you  want  to  allocate  64  bytes  of  memory.  However
+ *     the  nearest   free  data   block  has   a  size   of   8Mib.
+ *     Since the  heap  can't  know  how much  of  that  data  block
+ *     has  already  been  faulted,  it  doesn't  want  to  run  the
+ *     risk  of  keeping a  lock to  the  heap while  splitting that
+ *     data block  in  2,  potentially causing  a  #PF  and  keeping
  *     a heap lock for an eternity (#PF still can happen regardless,
  *     but keeping them to a minimum is the best way to ensure heaps
  *     operating as lock-less as possible)
  *   - With that in mind, what `heap_alloc()' must do is allocate the entirety
- *     of that data block before releasing any portion that isn't actually
- *     being used (this is also where `CONFIG_HEAP_RANDOMIZE_OFFSETS' into
- *     play, as it chooses a random position in that larger data block to
- *     return as newly allocated memory, rather than always returning its
- *     starting address, which while be faster as at most one remaining data
- *     block will have to released to the heap following the split, degrades
+ *     of that data  block before  releasing any portion  that isn't  actually
+ *     being  used  (this is  also where  `CONFIG_HEAP_RANDOMIZE_OFFSETS' into
+ *     play, as it  chooses a  random position in  that larger  data block  to
+ *     return as  newly allocated  memory, rather  than always  returning  its
+ *     starting address, which while be faster  as at most one remaining  data
+ *     block will have to released to  the heap following the split,  degrades
  *     resilience to faulty code; see above...)
- *   - Yet before your thread has finished splitting the 8Mib data
- *     block, another thread wants to allocate more memory, too.
- *     Since there are no other data blocks sufficient for what it
- *     needs, it would have to request more pages from the core,
+ *   - Yet  before your  thread has  finished splitting  the 8Mib data
+ *     block, another  thread  wants  to allocate  more  memory,  too.
+ *     Since there are  no other  data blocks sufficient  for what  it
+ *     needs,  it  would have  to request  more  pages from  the core,
  *     despite the fact that ~7.995Mib are about to become free again.
- *  -> The TRACE_DANGLE heap configuration option fixes this problem
+ *  -> The  TRACE_DANGLE heap configuration  option fixes this problem
  *     by introducing a mechanism for tracing dangling heap allocation
- *     in the form of the `h_dangle' dangle field of heap structures
- *     containing information about those ~7.995Mib and allowing a
- *     thread that wants to allocate less than that to wait for the
- *     first thread to release that data, rather than immediately
+ *     in the form of the  `h_dangle' dangle field of heap  structures
+ *     containing  information  about those  ~7.995Mib and  allowing a
+ *     thread  that wants to  allocate less than that  to wait for the
+ *     first thread  to release  that  data, rather  than  immediately
  *     inquire the core for more memory.
- * NOTE: The situation described above is quite rare, because of which
+ * NOTE: The situation described above is  quite rare, because of  which
  *       it could be argued that this option slows down heap allocations
  *       rather than speeding them up.
  *       However, since there really isn't a true upper limit to how large
- *       such ~dangling~ blocks of memory can grow, having this turned on
- *       counteracts heap fragmentation and unnecessary restrictions to
- *       system resources in situations where large blocks of memory are
- *       concurrently being freed at the same time other large blocks are
+ *       such  ~dangling~ blocks of memory can grow, having this turned on
+ *       counteracts heap  fragmentation and  unnecessary restrictions  to
+ *       system resources in situations where  large blocks of memory  are
+ *       concurrently  being freed at the same time other large blocks are
  *       being allocated in other threads.
  *      (Such a situation could arise from excessive use of `fork()' and
  *       the consequentially required duplication of the caller's VM needing
- *       at least a couple of pages of virtual memory at once) */
+ *       at  least  a   couple  of   pages  of  virtual   memory  at   once) */
 #ifndef CONFIG_HEAP_TRACE_DANGLE
 #ifndef CONFIG_NO_HEAP_TRACE_DANGLE
 #define CONFIG_HEAP_TRACE_DANGLE 1
@@ -140,19 +140,19 @@ DECL_BEGIN
 
 
 /* Configuration option to enable/disable a debug functionality
- * of `kmalloc()', as well as make it much more robust than it
+ * of `kmalloc()', as well as make it much more robust than  it
  * would otherwise be:
- *   - Enable GC-style tracing of reachable memory blocks, including the ability
- *     to dump the kernel's dynamic memory leaks using `mall_dump_leaks()', or
+ *   - Enable  GC-style  tracing  of  reachable  memory  blocks,  including  the   ability
+ *     to  dump  the   kernel's  dynamic  memory   leaks  using  `mall_dump_leaks()',   or
  *     alternatively the user-space kernel control command `KERNEL_CONTROL_DBG_DUMP_LEAKS'
  *   - Disconnect the header containing the data block's size and allocation heap
- *     from the data block itself, instead storing that information elsewhere
- *     in order to prevent it from being corrupted as the reuslt of invalid use.
+ *     from  the data  block itself,  instead storing  that information elsewhere
+ *     in  order to prevent it from being corrupted as the reuslt of invalid use.
  *   - Add a small header and tail data block surrounding every allocation
  *     that can be verified for modifications to detect array overruns, or
  *     data block underflows.
  *     Validation of the header and tail is automatically performed for a
- *     heap data block whenever it is passed to one of `kfree()',
+ *     heap data  block  whenever  it  is passed  to  one  of  `kfree()',
  *    `krealloc()' (and friends) or `kmalloc_usable_size()'
  *     Alternatively, `mall_validate_padding()' or the user-space kernel
  *     control command `KERNEL_CONTROL_DBG_CHECK_PADDING' can be used to
@@ -178,7 +178,7 @@ DECL_BEGIN
 #   define HEAP_ALIGNMENT  8
 #else
 /* Using 16 allows a human to quickly notice heap pointers by realizing
- * that the last digit in a hexadecimal representation is ZERO(0). */
+ * that the  last digit  in a  hexadecimal representation  is  ZERO(0). */
 #   define HEAP_ALIGNMENT 16
 #endif
 #endif
@@ -205,17 +205,17 @@ typedef unsigned int gfp_t;
 #define GFP_NORMAL  0x0000 /* Allocate normal memory. */
 #endif /* !GFP_NORMAL */
 #define GFP_LOCKED  0x0001 /* FLAG: Allocate memory that has been locked in-core.
-                            * WARNING: Do not mix locked allocations with unlocked
-                            *          ones when allocating from the same heap!
-                            *          When used with kmalloc(), this flag will be
-                            *          used to choose between `kernel_default_heap'
-                            *          and `kernel_locked_heap', though when custom
-                            *          heaps are used, or the kernel heaps directly,
-                            *          make sure to always set this flag correctly,
-                            *          as failure to do so may result in the locked
-                            *          heap containing pre-allocated pages of unlocked
+                            * WARNING: Do not  mix  locked  allocations  with  unlocked
+                            *          ones  when  allocating   from  the  same   heap!
+                            *          When  used  with  kmalloc(), this  flag  will be
+                            *          used  to  choose  between  `kernel_default_heap'
+                            *          and  `kernel_locked_heap',  though  when  custom
+                            *          heaps are used,  or the  kernel heaps  directly,
+                            *          make  sure  to always  set this  flag correctly,
+                            *          as  failure to  do so  may result  in the locked
+                            *          heap containing pre-allocated pages of  unlocked
                             *          memory, destroying the expectation of its memory
-                            *          not being subjugated to the SWAP machinery, as
+                            *          not  being subjugated to  the SWAP machinery, as
                             *          well as being atomic. */
 #define GFP_PREFLT  0x0002 /* FLAG: Pre-fault newly allocated memory immediately, rather than upon first access.
                             * NOTE: This flag only affects newly allocated pages, but doesn't affect memory allocated from previous over-allocations! */
@@ -229,33 +229,33 @@ typedef unsigned int gfp_t;
 /*      GFP_        0x0100  * s.a. `GFP_MAP_BELOW' */
 /*      GFP_        0x0200  * s.a. `GFP_MAP_ABOVE' */
 /*efine GFP_        0x0400  * ... */
-#define GFP_ATOMIC  0x0800 /* FLAG: Don't block when waiting to acquire any sort of lock.
-                            *       Instead, failure to acquire some required lock causes
+#define GFP_ATOMIC  0x0800 /* FLAG: Don't block when waiting to  acquire any sort of  lock.
+                            *       Instead,  failure to acquire  some required lock causes
                             *       the allocation to fail itself, either returning `NULL',
                             *       or throwing an error.
-                            * NOTE: This flag is implicitly set during free operations.
-                            *       If a free operation then fails to acquire some lock,
+                            * NOTE: This flag is  implicitly set  during free  operations.
+                            *       If a free operation then  fails to acquire some  lock,
                             *       the data-block that was meant to be freed will instead
-                            *       be tracked as a pending free, and be released at the
+                            *       be tracked as a pending  free, and be released at  the
                             *       nearest convenient point in time.
-                            * NOTE: This flag is very strictly enforced, meaning that when
-                            *       passing this flag, you are able to allocate memory in
+                            * NOTE: This flag is  very strictly enforced,  meaning that  when
+                            *       passing  this flag,  you are  able to  allocate memory in
                             *       whatever situation you might find yourself in, regardless
-                            *       of what locks may be held, or whether or not preemption
-                            *       is enabled. - If anything happens that could cause the
-                            *       calling thread to block, either through task_yield(), or
-                            *       through `task_waitfor()', the allocation will only fail
-                            *       by throwing an E_WOULDBLOCK error, or returning NULL in
+                            *       of what locks may be  held, or whether or not  preemption
+                            *       is enabled. -  If anything happens  that could cause  the
+                            *       calling  thread to block, either through task_yield(), or
+                            *       through `task_waitfor()', the  allocation will only  fail
+                            *       by throwing an E_WOULDBLOCK  error, or returning NULL  in
                             *       NX mode. */
-#define GFP_NOOVER  0x1000 /* FLAG: Don't overallocate memory when allocating new pages.
-                            *       This only affects overallocation of full pages. Allocating
-                            *       heap memory in such a way that less than 1 page of overflow
+#define GFP_NOOVER  0x1000 /* FLAG: Don't   overallocate   memory  when   allocating   new  pages.
+                            *       This  only  affects overallocation  of full  pages. Allocating
+                            *       heap memory in such  a way that less  than 1 page of  overflow
                             *       remains will still produce some overflow that will be reserved
                             *       for future allocations. */
 #define GFP_NOSWAP  0x2000 /* FLAG: Don't invoke the swap machinery to free up memory. */
 #define GFP_VCBASE  0x4000 /* FLAG: Allocate page controllers using the core-base allocators. (VmCoreBASE) */
 #define GFP_NOMOVE  0x8000 /* FLAG: Only for `heap_realloc()' / `heap_realign()': use `realloc_in_place()' semantics,
-                            *       returning `NULL' (even in exception-mode) when the re-allocation is impossible
+                            *       returning `NULL' (even  in exception-mode) when  the re-allocation is  impossible
                             *       due to an overlap with some other memory mapping. */
 
 /* Mask of GFP flags that are inherited by recursive allocations for control structures. */

@@ -52,17 +52,17 @@ DATDEF unsigned int const x86_fpustate_variant;
 /* Save/Load the register state of the FPU unit.
  * NOTE: `x86_fpustate_save()' may reset the active FPU context before
  *        returning. - If this isn't intended, `x86_fpustate_save_noreset()'
- *        must be used, which will leave the current FPU state unchanged. */
+ *        must  be used, which  will leave the  current FPU state unchanged. */
 FUNDEF NOBLOCK void FCALL x86_fpustate_load(struct fpustate const *__restrict state);
 FUNDEF NOBLOCK void FCALL x86_fpustate_save(struct fpustate *__restrict state);
 FUNDEF NOBLOCK void FCALL x86_fpustate_save_noreset(struct fpustate *__restrict state);
 FUNDEF NOBLOCK void NOTHROW(FCALL x86_fpustate_init)(struct fpustate *__restrict state);
 
 
-/* Same as the instructions of the same name, but
+/* Same as the instructions  of the same name,  but
  * emulated if those instructions aren't supported.
  * NOTE: On x86_64, `x86_fxsave()' and `x86_fxrstor()' map to the 64-bit variants of the
- *       individual instruction. - To use the 32-bit variants, use the functions below. */
+ *       individual instruction. - To use the 32-bit variants, use the functions  below. */
 FUNDEF NOBLOCK void FCALL x86_fxsave(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK void FCALL x86_fxrstor(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT);
 #ifdef __x86_64__

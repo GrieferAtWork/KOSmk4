@@ -70,10 +70,10 @@ elf_symhash(char const *__restrict name) {
 
 
 /* Return a pointer to the Elf_Sym object assigned with `name'.
- * WARNING: The returned symbol may not necessarily be defined by `self'.
+ * WARNING: The returned symbol  may not necessarily  be defined by  `self'.
  *          This function merely returns the associated entry from `.dynsym'
  * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
- *       case of the error is the result of a corrupted hash table. */
+ *       case of the error is the  result of a corrupted hash  table. */
 INTERN ElfW(Sym) const *CC
 DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
                            char const *__restrict name,

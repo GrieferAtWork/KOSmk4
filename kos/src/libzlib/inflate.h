@@ -46,21 +46,21 @@ NOTHROW_NCX(CC libzlib_reader_fini)(struct zlib_reader *__restrict self);
  * If an error occurs during this operation, return one of `ZLIB_ERROR_*'
  * @param: buf :           The destination buffer, or `NULL' if data should be skipped.
  * @return: > 0 :          The actual number of decompressed bytes.
- * @return: 0 :            End of input stream, or want more input data.
+ * @return: 0 :            End  of  input  stream,  or  want  more  input   data.
  *                         You may check for the former using `zlib_reader_eof()'
  * @return: ZLIB_ERROR_* : Deflate error. */
 INTDEF WUNUSED NONNULL((1)) ssize_t CC
 libzlib_reader_read(struct zlib_reader *__restrict self,
                     void *buf, size_t bufsize);
 
-/* Feed the given ZLIB reader another blob of compressed data.
- * This function must be called to continue decompression after
+/* Feed the given ZLIB reader  another blob of compressed  data.
+ * This function must be called to continue decompression  after
  * `zlib_reader_read()' returned 0 with a non-empty buffer size,
  * and `zlib_reader_eof(self)' also returning false.
  * WARNING: In order for `feed' to function properly, the reader
- *          must have access to a sliding window buffer.
+ *          must   have  access  to  a  sliding  window  buffer.
  *          Otherwise, you must ensure that the compressed data
- *          blob is already complete from the get-go. */
+ *          blob   is   already  complete   from   the  get-go. */
 INTDEF NONNULL((1)) void CC
 libzlib_reader_feed(struct zlib_reader *__restrict self,
                     void const *blob, size_t blob_size);

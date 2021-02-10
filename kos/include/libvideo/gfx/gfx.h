@@ -111,9 +111,9 @@ typedef __uint64_t gfx_blendmode_t;
 
 /* Video graphic flags.
  * [READ]:  Indicates a flag that affects the results when the associated
- *          GFX context is used as source, or when reading pixel data.
+ *          GFX  context is used  as source, or  when reading pixel data.
  * [WRITE]: Indicates a flag that affects the results of graphics operations
- *          that use the associated GFX context as destination, or when
+ *          that use  the associated  GFX context  as destination,  or  when
  *          writing pixel data. */
 #define VIDEO_GFX_FNORMAL      0x0000 /* Normal render flags. */
 #define VIDEO_GFX_FAALINES     0x0001 /* [WRITE] Render smooth lines. */
@@ -130,7 +130,7 @@ struct video_gfx;
 
 struct video_gfx_pxops {
 	/* All of the following callbacks are [1..1]
-	 * WARNING: None of these functions will add `vx_offt_(x|y)' to the given X/Y,
+	 * WARNING: None  of these functions will add `vx_offt_(x|y)' to the given X/Y,
 	 *          as well as always assume that the given coords are in-bounds of the
 	 *          underlying buffer. */
 	/* Get the color of a pixel */
@@ -225,7 +225,7 @@ struct video_gfx_ops {
 	                               __uintptr_t __bitskip, __size_t __bitscan);
 
 	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask.
-	 * The resulting image will be similar (but not necessarily identical) to:
+	 * The  resulting  image   will  be   similar  (but  not   necessarily  identical)   to:
 	 * >> struct video_buffer *temp;
 	 * >> struct video_gfx temp_gfx;
 	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, SRC_SIZE_X, SRC_SIZE_Y,
@@ -320,7 +320,7 @@ struct video_gfx {
 #undef bitstretchblit
 
 public:
-	/* Create a secondary GFX context for a given clip rectangle
+	/* Create a secondary GFX context for a given clip  rectangle
 	 * that is interpreted relative to the clip rectangle of this
 	 * GFX object.
 	 * NOTE: Implemented in ./buffer.h because the implementation

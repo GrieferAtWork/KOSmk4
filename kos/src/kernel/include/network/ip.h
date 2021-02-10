@@ -40,14 +40,14 @@ DECL_BEGIN
 
 struct ip_datagram_hole {
 	u16 dh_prev; /* Absolute offset (i.e. offset from `dg_buf') to the
-	              * previous hole (or 0xffff if this is the last one) */
+	              * previous hole (or 0xffff if this is the last  one) */
 	u16 dh_end;  /* Offset of the first byte no longer apart of this hole. */
 };
 
 union ip_datagram_id {
-	/* The following 3 fields are used for datagram identification
-	 * s.a. `BUFID <- source|destination|protocol|identification;'
-	 * in rfc791 (https://tools.ietf.org/html/rfc791#page-28)
+	/* The following 3 fields  are used for datagram  identification
+	 * s.a.   `BUFID <- source|destination|protocol|identification;'
+	 * in    rfc791     (https://tools.ietf.org/html/rfc791#page-28)
 	 * Since KOS isn't designed for packet routing, we don't account
 	 * for the destination IP, but discard any packet not specifying
 	 * us (or broadcast) at an earlier step. */
@@ -68,16 +68,16 @@ struct ip_datagram {
 	union ip_datagram_id dg_id;  /* [const] Datagram identification */
 	time_t               dg_tmo; /* [lock(:network_ip_datagrams::nid_lock)]
 	                              * `realtime()' timeout for when this datagram should be discarded.
-	                              * Set to 60 seconds after the first fragment has arrived
+	                              * Set  to  60  seconds  after  the  first  fragment  has   arrived
 	                              * (s.a. https://tools.ietf.org/html/rfc2460#page-22) */
 	u32                  dg_flg; /* [lock(:network_ip_datagrams::nid_lock)] Set of `IP_DATAGRAM_FLAG_*' */
 	u16                  dg_len; /* [lock(:network_ip_datagrams::nid_lock)]
 	                              * [const_if(IP_DATAGRAM_FLAG_GOTLAST)][>= 20]
 	                              * Current total datagram length */
 	u16                  dg_hol; /* [lock(:network_ip_datagrams::nid_lock)]
-	                              * Offset into `dg_buf' to the last ~hole~ (s.a. rfc815)
-	                              * The structure used for this is `struct ip_datagram_hole'
-	                              * Set to `0xffff' is no holes are present (in which case the
+	                              * Offset  into  `dg_buf'   to  the  last   ~hole~  (s.a.   rfc815)
+	                              * The  structure  used   for  this  is   `struct ip_datagram_hole'
+	                              * Set  to  `0xffff' is  no holes  are present  (in which  case the
 	                              * datagram may still be incomplete when `IP_DATAGRAM_FLAG_GOTLAST'
 	                              * hasn't been set, yet) */
 	struct iphdr        *dg_buf; /* [1..dg_len][owned] Packet buffer. */
@@ -101,19 +101,19 @@ ip_routedatagram(struct nic_device *__restrict dev,
 
 /* Send a given IP datagram packet `packet'.
  * NOTE: The caller is responsible to ensure that `packet'
- *       still has sufficient head/tail memory to include
+ *       still  has sufficient head/tail memory to include
  *       ethernet headers.
  * Or in other words, this function assumes that:
  * >> assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
  * >> assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
- * - Additionally, the caller is responsible to ensure that the
- *   partially initialized IP header (i.e. `struct iphdr') is pointed
- *   to by `packet->np_head' upon entry, as this function will try
+ * - Additionally,  the  caller  is  responsible  to  ensure  that   the
+ *   partially initialized IP  header (i.e.  `struct iphdr') is  pointed
+ *   to  by  `packet->np_head' upon  entry,  as this  function  will try
  *   to read/write from that structure in order to figure out addressing
- *   information required for filling in information for underlying
+ *   information  required  for  filling in  information  for underlying
  *   network layers.
  * - NOTE: If necessary, this function will also perform the required
- *         ARP network traffic in order to translate the target IP
+ *         ARP network traffic  in order to  translate the target  IP
  *         address pointed to by the IP header of `packet'.
  *         This is done asynchronously, and transparently to the caller.
  * NOTE: This function automatically fills in the following fields of the IP header:
@@ -138,14 +138,14 @@ ip_senddatagram(struct nic_device *__restrict dev,
 
 struct nic_packet_desc;
 
-/* Similar to `ip_senddatagram()', however instead of taking a NIC
- * packet object, this function takes a packet descriptor. With this
+/* Similar to `ip_senddatagram()',  however instead of  taking a  NIC
+ * packet object, this function takes a packet descriptor. With  this
  * in mind, this function is more efficient in cases where the caller
  * isn't given a packet object, but rather, is presented with an I/O-
  * vector, or similar.
- * Note however that if you've been given a NIC packet, you should really
- * use the above function instead, since doing so reduces the amount of
- * copying necessary when the datagram can fit into a single fragment.
+ * Note  however  that  if  you've  been  given  a  NIC  packet,  you  should really
+ * use  the  above  function  instead,  since   doing  so  reduces  the  amount   of
+ * copying  necessary  when   the  datagram   can  fit  into   a  single   fragment.
  * NOTE: This function automatically fills in the following fields of the IP header:
  *   - ip_v      (With the value `4')
  *   - ip_len    (With the value `nic_packet_size(packet)')

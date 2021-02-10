@@ -446,9 +446,9 @@ da_print_modrm_rm_memory(struct disassembler *__restrict self,
 		s32 offset;
 		disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_PREFIX);
 		offset = rm->mi_offset;
-		/* Only render small negative offsets as actually being negative.
+		/* Only render small negative  offsets as actually being  negative.
 		 * Very large offsets are probably absolute pointers, unless a base
-		 * register is given. In that case, always render negative number
+		 * register is given. In that  case, always render negative  number
 		 * as actually being negative! */
 		if (offset < 0 && (rm->mi_rm != 0xff
 		                   ? offset != INT32_MIN /* Special case for INT32_MIN (always render as being positive) */
@@ -701,9 +701,9 @@ libda_select_jcc(struct disassembler *__restrict self,
 #endif /* CONFIG_AUTOSELECT_JCC */
 
 #ifdef __GNUC__
-/* GCC emits a false warning about `self->d_pad1[0] = (void *)(uintptr_t)whole_opcode' supposedly
- * using the uninitialized variable `opcode'. Now mind you that this isn't a typo. - That expression
- * is neither using the variable `opcode', nor is opcode uninitialized at the time that piece of
+/* GCC  emits  a false  warning about  `self->d_pad1[0] = (void *)(uintptr_t)whole_opcode' supposedly
+ * using  the uninitialized variable `opcode'. Now mind you that this isn't a typo. - That expression
+ * is neither using  the variable `opcode',  nor is opcode  uninitialized at the  time that piece  of
  * code is reached, nor is this is the first time that `opcode' is accessed within any of the control
  * paths that lead to said statement. */
 #pragma GCC diagnostic push
@@ -773,7 +773,7 @@ search_chain:
 	for (;; ++chain) {
 		if (chain->i_opcode != opcode) {
 			if (chain->i_opcode > opcode) {
-				/* Opcodes are always sorted ascendingly, so if the encountered
+				/* Opcodes are always  sorted ascendingly, so  if the  encountered
 				 * code is greater than ours, then we know that we've already went
 				 * past what we were looking for. */
 				break;
@@ -788,8 +788,8 @@ search_chain:
 		if (DA86_IS16(self)) {
 			/* The 0x66 prefix acts inverted on 16-bit mode.
 			 * As such, instruction _with_ the prefix are used by default,
-			 * whilst instruction _without_ the prefix are used any other
-			 * time (thus not breaking instructions that don't care about
+			 * whilst instruction _without_ the prefix are used any  other
+			 * time (thus not breaking instructions that don't care  about
 			 * the prefix at all). */
 			if ((chain->i_flags & IF_66) && (op_flags & EMU86_F_66))
 				continue;
@@ -839,7 +839,7 @@ search_chain:
 					if ((f & IF_VEX_B0_LIG) != IF_VEX_B0_LIG) {
 						if (op_flags & EMU86_F_EVEX_b) {
 							/* When EVEX.b is set, then a 512-bit vector size is implied,
-							 * SAE is enabled, and VEX.LL is used as a rounding control
+							 * SAE is enabled, and VEX.LL  is used as a rounding  control
 							 * indicator, as displayed by `OP_ER' and `OP_SAE' */
 							if ((f & IF_VEX_B0_LL_M) != 2 << IF_VEX_B0_LL_S)
 								continue; /* Different length value */
@@ -1671,7 +1671,7 @@ unknown_opcode:
 		chain      = ops_3dnow;
 		/* `3DNow!` instructions encode the opcode byte _after_ the modr/m suffix!
 		 * as such, all together, they behave more akin to a single instruction:
-		 *    I(0x0f0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx) */
+		 *    >> I(0x0f0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx) */
 		opcode     = *self->d_pc++;
 #ifdef CONFIG_AUTOSELECT_JCC
 		whole_opcode = 0;

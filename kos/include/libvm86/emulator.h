@@ -104,11 +104,11 @@ typedef struct {
 
 typedef struct vm86_state_struct vm86_state_t;
 
-/* Translate a given linear memory pointer `ptr' to
+/* Translate  a given linear  memory pointer `ptr' to
  * the real memory location where its data is stored.
  * The returned pointer should be usable for 1-15 byte reads and writes.
  * NOTE: This function is used to translate _any_ kind of pointer, including
- *       the instruction pointer itself, making it a very powerful function
+ *       the instruction pointer itself, making it a very powerful  function
  *       (though also turning it into a potential bottleneck)
  *       One potential use of this function might be to virtually relocate VM86
  *       code away from the address space bottom, allowing real-mode code to be
@@ -117,7 +117,7 @@ typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 (LIBVM86_TRANSLATE_CC *vm86_translate_t)(vm86_state_t *__restrict self, void *ptr);
 
 /* Handle operations on unrecognized I/O ports, where `action' is one of `VM86_HANDLE_IO_*'
- * Note that certain ports (mostly relating to the PIC) are emulated directly and don't
+ * Note that certain ports  (mostly relating to  the PIC) are  emulated directly and  don't
  * cause this callback to be invoked.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
@@ -147,7 +147,7 @@ struct vm86_state_struct {
 };
 
 /* realmode/vm86 is _always_ constrained to 0xffff register offsets.
- * s.a. `https://wiki.osdev.org/Real_Mode#Addressing_Modes' */
+ * s.a.          `https://wiki.osdev.org/Real_Mode#Addressing_Modes' */
 #define vm86_state_canpush(self, num_bytes) ((self)->vr_regs.vr_sp < (__uint16_t)((__uint16_t)0-(num_bytes)))
 #define vm86_state_canpop(self, num_bytes)  ((self)->vr_regs.vr_sp >= (__uint16_t)(num_bytes))
 #define vm86_state_sp(self)  VM86_ADDR((self)->vr_regs.vr_ss, (self)->vr_regs.vr_sp)

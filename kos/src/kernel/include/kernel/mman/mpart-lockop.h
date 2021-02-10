@@ -49,7 +49,7 @@ struct mpart_postlockop {
 /* Callback prototype for mpart pending locked operations.
  * @return: NULL: Completed.
  * @return: * :   A descriptor for an operation to perform
- *                after the mpart-lock has been released. */
+ *                after the mpart-lock has been  released. */
 typedef NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
 /*NOTHROW*/ (FCALL *mpart_lockop_callback_t)(struct mpart_lockop *__restrict self,
                                              struct mpart *__restrict part);

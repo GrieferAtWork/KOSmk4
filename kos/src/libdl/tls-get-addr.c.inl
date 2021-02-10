@@ -25,7 +25,7 @@ DECL_BEGIN
 
 #ifdef FAIL_ON_ERROR
 /* Return a pointer to the base of the given module's
- * TLS segment, as seen form the calling thread.
+ * TLS  segment,  as  seen form  the  calling thread.
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
@@ -34,12 +34,12 @@ libdl_dltlsbase(DlModule *__restrict self)
 #else /* FAIL_ON_ERROR */
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
- *       passed to `dltlsalloc()' will be called by this function upon the first use of
- *       that segment within each individual thread, also causing the finalizer to be
+ *       passed  to `dltlsalloc()' will be called by this function upon the first use of
+ *       that  segment within each  individual thread, also causing  the finalizer to be
  *       enqueued for invocation when the calling thread exits.
  * WARNING: The order in which TLS finalizers are invoked is entirely UNDEFINED!
- * NOTE: the given `TLS_HANDLE' may also be a module handle, as returned by `dlopen()',
- *       in which case this function returns a pointer to the TLS segment of that module for
+ * NOTE: the  given  `TLS_HANDLE' may  also  be a  module  handle, as  returned  by `dlopen()',
+ *       in which case this function  returns a pointer to the  TLS segment of that module  for
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
@@ -125,12 +125,12 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 		}
 	}
 	/* XXX: This isn't re-entrant! - What if a signal handler accesses a TLS variable from
-	 *      from a dynamically loaded library, while the calling thread was interrupted
-	 *      within the following atomic lock? (In other words: This lock needs to allow
+	 *      from  a dynamically loaded  library, while the  calling thread was interrupted
+	 *      within the following atomic  lock? (In other words:  This lock needs to  allow
 	 *      for recursion within the same thread)
 	 * ->:  What about the fact that we're also using malloc() here? malloc() most definitely
-	 *      isn't (any probably couldn't) be re-entrant in the general case...
-	 *      What do the specs say about a signal handler being the first to access some
+	 *      isn't   (any   probably  couldn't)   be   re-entrant  in   the   general  case...
+	 *      What do the  specs say  about a  signal handler being  the first  to access  some
 	 *      thread-local variable? */
 	atomic_rwlock_write(&seg->ts_exlock);
 	{

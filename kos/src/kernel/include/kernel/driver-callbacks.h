@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-/* API for defining/managing atomic callback lists of hooks to-be
+/* API for defining/managing  atomic callback lists  of hooks  to-be
  * invoked during some abstract event, such that driver can register
  * callbacks from constructors/destructors. */
 

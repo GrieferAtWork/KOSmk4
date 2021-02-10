@@ -23,7 +23,7 @@
 #define _KOS_SOURCE                 1
 #define LIBANSITTY_EXPOSE_INTERNALS 1
 
-/* NOTE: References used during the implementation of this ansitty
+/* NOTE: References  used  during the  implementation of  this ansitty
  *       processor can be found in `/kos/include/libansitty/ansitty.h' */
 
 #include "api.h"
@@ -56,7 +56,7 @@
 
 
 #undef CONFIG_HIDE_CURSOR_DURING_NAVIGATION
-/* Hide the terminal cursor while navigating to gather information
+/* Hide the  terminal cursor  while  navigating to  gather  information
  * about the terminal, or moving it to perform some specific operation. */
 #define CONFIG_HIDE_CURSOR_DURING_NAVIGATION 1
 
@@ -161,7 +161,7 @@ DECL_BEGIN
 /* TTY states */
 #define STATE_TEXT_UTF8        0 /* Default state: at the start of the next character. */
 #define STATE_TEXT_UTF8_MBS    1 /* Inside of a multi-byte-character-string (same as `STATE_TEXT_UTF8', \
-                                  * but `at_esclen' is non-NULL and refers to the number of UTF-8  \
+                                  * but  `at_esclen'  is non-NULL  and refers  to the  number of  UTF-8 \
                                   * characters already present within `at_escape') */
 #define STATE_ESC              2 /* State set immediately after a `\e' character was encountered */
 #define STATE_CSI              3 /* Process escape arguments. */
@@ -446,7 +446,7 @@ stub_scroll(struct ansitty *__restrict self,
 
 /* Initialize the given ANSI TTY
  * After calling this function, the caller is still responsible
- * to initialize at the very least `self->at_ops.ato_putc'. */
+ * to  initialize  at the  very  least `self->at_ops.ato_putc'. */
 INTERN NONNULL((1, 2)) void CC
 libansitty_init(struct ansitty *__restrict self,
                 struct ansitty_operators const *__restrict ops) {
@@ -592,9 +592,9 @@ resetterminal(struct ansitty *__restrict self,
 			(*self->at_ops.ato_termios)(self, &oldios, NULL);
 			memcpy(&newios, &oldios, sizeof(struct termios));
 			newios.c_oflag |= ONLCR;
-			/* After a reset (or power-on), a terminal is supposed to clear the
+			/* After  a reset (or  power-on), a terminal is  supposed to clear the
 			 * XOFF flag in order to indicate that it has once again gained power.
-			 * We emulate this behavior by clearing the XOFF status flag within
+			 * We  emulate this behavior  by clearing the  XOFF status flag within
 			 * the IOS structure.
 			 * s.a. `https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.27' */
 			newios.c_iflag &= ~IXOFF;
@@ -1503,7 +1503,7 @@ done_insert_ansitty_flag_hedit:
 
 		case 'b': /* REP -- \e[80b   Repeat character 80 times */
 			/* Note while the specs don't say which character should be repeated,
-			 * I implement this one as repeat-the-next-character. */
+			 * I    implement    this    one    as     repeat-the-next-character. */
 			if (n <= 0)
 				break;
 			ansitty_do_repeat_unicode(self,
@@ -2268,7 +2268,7 @@ done_insert_ansitty_flag_hedit:
 				 * PM = 0 - not recognized
 				 * PM = 1 - set
 				 * PM = 2 - reset
-				 * PM = 3 - permanently set
+				 * PM = 3  -  permanently set
 				 * PM = 4 - permanently reset
 				 * NOTE: `PS' is the same as in `\e[<PS>h' and `\e[<PS>l' */
 				size_t len;
@@ -2464,10 +2464,10 @@ done_insert_ansitty_flag_hedit:
 				endline = (ansitty_coord_t)strtoul(end, &end, 10);
 				if (end != arg + arglen)
 					goto nope;
-#if 0 /* The bottom-line is actually the index of the last
-       * line to-be included within the scroll region.
+#if 0 /* The bottom-line  is actually  the  index of  the  last
+       * line  to-be   included  within   the  scroll   region.
        * As such, we'd have to add +1 onto it later, so we skip
-       * that step by never subtracting 1 in the first place! */
+       * that step by never subtracting  1 in the first  place! */
 				if (endline)
 					--endline;
 #endif
@@ -3174,7 +3174,7 @@ do_process_string_command:
 			goto do_process_string_command;
 		}
 	}	break;
-	
+
 	case STATE_ESC_5:
 		if (ch == 'n') {
 			/* VT100: devstat DSR */
@@ -3238,14 +3238,14 @@ do_process_string_command:
 			/* Screen alignment display (whatever that is) */
 			/* screen(1) documents this one as:
 			 *     ESC # 8               (V)  Fill Screen with E's
-			 * So I guess that's a simple enough explanation, although I'm not
-			 * entirely sure if there's some kind of joke I'm missing, or if
+			 * So  I guess that's a simple enough explanation, although I'm not
+			 * entirely  sure if there's  some kind of joke  I'm missing, or if
 			 * this one's _literally_ supposed?? to fill the entire screen with
-			 * all E's (I mean: don't get me wrong. How often didn't I want a
-			 * screen full of E's, wishing there was an easier way of getting
+			 * all E's (I mean: don't get me  wrong. How often didn't I want  a
+			 * screen full of E's, wishing there  was an easier way of  getting
 			 * them all...)
 			 * -> I've just checked with putty, and yes: It literally fills
-			 *    the tty with all E's. As dumb as that sounds... */
+			 *    the  tty  with  all  E's.  As  dumb  as  that   sounds... */
 			{
 				ansitty_coord_t xy[2];
 				ansitty_coord_t sxy[2];
@@ -3285,9 +3285,9 @@ do_process_string_command:
 
 	case STATE_ESC_Y2:
 		/* ESC Y Ps Ps    Move the cursor to given row and column.
-		 * Parameters for cursor movement are at the end of the ESC Y  escape
-		 * sequence.  Each ordinate is encoded in a single character as value+32.
-		 * For example, !  is 1.  The screen coordinate system is 0-based. */
+		 * Parameters for cursor  movement are at  the end of  the ESC Y  escape
+		 * sequence. Each ordinate is encoded in a single character as value+32.
+		 * For example,  !  is  1.  The screen  coordinate  system  is  0-based. */
 		if ((byte_t)ch < 32) {
 			if (ch == CC_CAN)
 				goto set_text_and_done;
@@ -3342,7 +3342,7 @@ libansitty_printer(void *arg, char const *data, size_t datalen) {
 
 
 /* Translate a given unicode input character `ch' (which should originate form
- * the keyboard) into the sequence of bytes mandated by the code page that is
+ * the  keyboard) into the sequence of bytes mandated by the code page that is
  * currently being used by the ansitty.
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
@@ -3498,7 +3498,7 @@ NOTHROW_NCX(CC encode_function_key)(char *__restrict buf, uint8_t fn, uint16_t m
 
 
 /* Encode the representation of a misc. keyboard key `key' with `mod',
- * and finalize encoding of certain keyboard characters after already
+ * and finalize encoding of certain keyboard characters after  already
  * having been translated through the keymap.
  * @param: self: The ANSITTY to use (or `NULL' to use default settings)
  * @param: key:  The keyboard key (one of `KEY_*' from <kos/keyboard.h>; e.g. `KEY_UP')
@@ -3899,7 +3899,7 @@ handle_cursor_key:
 			goto set_buf_escape;
 		} else if (ENABLE_APP_CURSOR()) {
 			/* Application cursor key mode.
-			 * NOTE: When modifiers are present, then the
+			 * NOTE: When modifiers are present, then  the
 			 *       key is encoded as \e[1;<mod>(A|B|C|D) */
 			goto set_buf_escape_O_3_or_lbracket_1_semicolon_mod_buf2;
 		}

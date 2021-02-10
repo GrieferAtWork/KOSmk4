@@ -31,17 +31,17 @@ DECL_BEGIN
 /* Mask/Flag pair used to modify eflags when calling into user-space:
  *  - raise(): A user-space posix signal handler is invoked
  *  - THROW(): A user-space exception handler (s.a. `set_exception_handler()') is called
- * This descriptor is mainly used to ensure SysV ABI compliance when it
- * comes to clearing the #DF flag before calling a user-space function,
- * which is doubly important when we call an exception handler as the
- * result of user-space invoking an exception-enabled system-call, which
- * is done by setting EFLAGS.DF=1 before triggering the system call, meaning
+ * This  descriptor  is mainly  used  to ensure  SysV  ABI compliance  when it
+ * comes  to  clearing  the #DF  flag  before calling  a  user-space function,
+ * which is  doubly  important  when  we call  an  exception  handler  as  the
+ * result  of  user-space  invoking  an  exception-enabled  system-call, which
+ * is done by setting EFLAGS.DF=1  before triggering the system call,  meaning
  * that this right here is also used to ensure that when the exception handler
- * calls more system calls, those won't be triggered with exceptions enabled.
+ * calls  more system calls, those won't be triggered with exceptions enabled.
  * This mask/flag pair can be modified by:
  *  - Passing a `user_eflags_mask=mask,flag' kernel commandline option
  *  - Reading/writing to/from `/proc/sys/x86/user_eflags_mask'
- * NOTE: The later only allows for bits to be changed that are masked
+ * NOTE: The later only allows for bits  to be changed that are  masked
  *       by `cred_allow_eflags_modify_mask()' for the thread attempting
  *       to perform the modification. */
 union x86_user_eflags_mask {

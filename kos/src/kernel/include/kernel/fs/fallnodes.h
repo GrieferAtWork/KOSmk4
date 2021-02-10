@@ -48,7 +48,7 @@ struct fallsuper_lockop;
 struct fallnodes_postlockop;
 struct fallnodes_lockop;
 
-/* All of these callbacks behave/operate in the expected manner.
+/* All of  these  callbacks  behave/operate in  the  expected  manner.
  * For documentation reference, you may look at <kernel/mman/lockop.h> */
 
 typedef NOBLOCK NONNULL((1)) void

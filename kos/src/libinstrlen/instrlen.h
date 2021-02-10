@@ -37,7 +37,7 @@ DECL_BEGIN
 INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa);
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
- * assuming that `pc' points to the start of another instruction.
+ * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
@@ -47,7 +47,7 @@ INTDEF ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa);
 
 /* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
- * Other exceptions are propagated normally (which could happen due to VIO access emulation)
+ * Other  exceptions are propagated normally (which could  happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
 INTDEF ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa);

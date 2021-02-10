@@ -50,7 +50,7 @@
 #endif /* !__CEIL_ALIGN */
 
 /* Implementation of the general-purpose packet-buffer
- * used to implement kernel-space socket queues. */
+ * used  to  implement  kernel-space  socket   queues. */
 
 
 /* Min alignment of all packet buffer data. */
@@ -74,16 +74,16 @@
 __DECL_BEGIN
 
 struct pb_packet {
-	__uint16_t p_total;     /* [!0][const] Total size size of the packet (in bytes, including this
+	__uint16_t p_total;     /* [!0][const]  Total  size size  of the  packet  (in bytes,  including this
 	                         * header and any trailing data used for padding, as well as ancillary data)
 	                         * NOTE: Aligned by `PACKET_BUFFER_ALIGNMENT' */
 	__uint8_t  p_state;     /* [lock(pb_lock)] Packet state (one of `PB_PACKET_STATE_*') */
 	__uint8_t  p_payoff;    /* [lock(p_state == PB_PACKET_STATE_READABLE)] Offset to the start of payload data. */
 	__uint16_t p_payload;   /* [lock(p_state == PB_PACKET_STATE_READABLE)] Size of the packet's payload
-	                         * (located immediately after the header) NOTE: Allowed to be ZERO(0) */
+	                         * (located  immediately  after the  header)  NOTE: Allowed  to  be ZERO(0) */
 	__uint16_t p_ancillary; /* [lock(p_state == PB_PACKET_STATE_READABLE)] Size of ancillary data
-	                         * (in bytes; located at the next `PACKET_BUFFER_ALIGNMENT'
-	                         * aligned address after the payload, and spans for `p_ancillary')
+	                         * (in   bytes;   located  at   the   next  `PACKET_BUFFER_ALIGNMENT'
+	                         * aligned address after  the payload, and  spans for  `p_ancillary')
 	                         * With that in mind:
 	                         * >> `p_payoff + p_payload + p_ancillary <= p_total' */
 	/* OFFSET_FROM_BASE == PB_PACKET_HEADER_SIZE */
@@ -119,7 +119,7 @@ struct pb_packet {
 
 
 /* Return the base address/size of the containing buffer for buffer control packet.
- * NOTE: Buffer control packets can be identified by having `p_total == 0', though
+ * NOTE: Buffer control packets  can be identified  by having `p_total == 0',  though
  *       also note that the public pb_buffer API never exposes buffer control packets
  *       to the user.
  * Also note that `_pb_packet_bufctl_bufsize()' is only valid when the packet-buffer
@@ -220,7 +220,7 @@ struct pb_buffer {
 	 *
 	 * // End reading, but allow `packet' to be returned by `begin_read()' once again
 	 * // HINT: This is actually the same as `end_read_update()', but may assume that
-	 * //       the given packet pointer hasn't actually been modified.
+	 * //       the   given   packet   pointer   hasn't   actually   been   modified.
 	 * >> NOBLOCK end_read_abort(struct pb_packet *packet) {
 	 * >>     assert(packet          == pb_rptr);
 	 * >>     assert(packet->p_state == PB_PACKET_STATE_READING);
@@ -395,12 +395,12 @@ struct pb_buffer {
 #ifdef PB_BUFFER_WANT_PB_RPTR_UINTPTR_ALIAS
 	union {
 		struct pb_packet*pb_rptr; /* [lock(pb_lock || PB_PACKET_STATE_READING)][1..1][valid_if(!= pb_wptr)]
-		                           * Pointer to the next unread packet/the packet currently being read. */
+		                           * Pointer  to the  next unread  packet/the packet  currently being read. */
 		__uintptr_t      pb_rptr_uint;
 	};
 #else /* PB_BUFFER_WANT_PB_RPTR_UINTPTR_ALIAS */
 	struct pb_packet    *pb_rptr; /* [lock(pb_lock || PB_PACKET_STATE_READING)][1..1][valid_if(!= pb_wptr)]
-	                               * Pointer to the next unread packet/the packet currently being read. */
+	                               * Pointer  to the  next unread  packet/the packet  currently being read. */
 #endif /* !PB_BUFFER_WANT_PB_RPTR_UINTPTR_ALIAS */
 	struct pb_packet    *pb_wptr; /* [lock(pb_lock)][1..1] Offset to the end of the last unread packet. */
 	__WEAK __size_t      pb_used; /* Total amount of used buffer space. (checked against `pb_limt') */
@@ -413,8 +413,8 @@ struct pb_buffer {
 };
 
 /* Broadcast the `pb_psta' signal.
- * NOTE: In user-space, we increment the signal counter before broadcasting,
- *       since other code uses the value of the signal itself for inter-locking
+ * NOTE: In user-space,  we  increment  the signal  counter  before  broadcasting,
+ *       since  other code uses  the value of the  signal itself for inter-locking
  *       with the monitoring of changes made to components affected by the signal. */
 #ifdef __KERNEL__
 #define pb_buffer_psta_broadcast(self)          sig_broadcast(&(self)->pb_psta)
@@ -480,7 +480,7 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 
 /* Finalize the given packet-buffer.
  * If given, `cb_fini_ancillary(struct pb_packet *packet)' is invoked
- * for the ancillary data blob of any packet that was never read. */
+ * for  the ancillary  data blob of  any packet that  was never read. */
 #define pb_buffer_fini(self) pb_buffer_fini_ex(self, __pb_buffer_cb_fini_ancillary_noop)
 #define pb_buffer_fini_ex(self, cb_fini_ancillary)                     \
 	do {                                                               \
@@ -511,7 +511,7 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 	}	__WHILE0
 
 /* Close the given packet buffer, making it impossible to enqueue as further packets.
- * Any attempt at writing more data will result in `pb_buffer_startwrite()' simply
+ * Any  attempt at writing  more data will  result in `pb_buffer_startwrite()' simply
  * returning `NULL' */
 #ifdef __INTELLISENSE__
 __NOBLOCK __ATTR_NONNULL((1)) void
@@ -568,18 +568,18 @@ __NOTHROW(pb_packet_get_totalsize)(__size_t payload_size,
  * NOTES:
  *   - All of the packet's struct fields will have already been filled in by this function.
  *   - It is weakly undefined when a packet that was started before another was committed
- *     will be read. It may happen before, but it may also happen after.
- *   - The only guaranty in concerns to packet read order is that packets that are
+ *     will  be  read.   It  may   happen  before,  but   it  may   also  happen   after.
+ *   - The  only guaranty in concerns to packet read order is that packets that are
  *     generated linearly by the same thread will always be read in that same order
  *     in relation to each other.
  *   - Similarly, a packet that for which `pb_buffer_endwrite_commit()' was caled before
- *     the call to `pb_buffer_startwrite()' of another packet will always be read
+ *     the  call  to  `pb_buffer_startwrite()' of  another  packet will  always  be read
  *     before that other packet.
  * @return: * : Pointer to the packet's descriptor. Once the caller has finished filling
  *              in the packet's contents, they must use `pb_buffer_endwrite_commit()' in
  *              order to make the packet available for being read.
  *              In case that packet initialization should fail, `pb_buffer_endwrite_abort()'
- *              may be called to undo what was previously done by this function.
+ *              may  be  called  to  undo  what  was  previously  done  by  this   function.
  *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
  *                    >> void *pb_packet_payload(struct pb_packet *);
  *                    >> void *pb_packet_ancillary(struct pb_packet *);
@@ -660,18 +660,18 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_endwrite_abort)(struct pb_buffer *__restrict se
  * >> #endif
  * >> }
  * Note that with this design, recursive- or parallel read operations
- * aren't allowed (which also wouldn't really make much sense, since
+ * aren't allowed (which also wouldn't really make much sense,  since
  * packets are meant to be read in order, alongside the guaranty that
  * any packet will only ever be read once).
- * However, due to things such as VIO, there is a good chance that a
- * malicious program might cause a recursive read operation to be
- * performed. (i.e. recv(2) is called with a VIO-buffer, who's write
- * callbacks will invoke recv(2) again). If this happens, then the
- * second call to recv(2) will block indefinitely, and the malicious
+ * However, due to things such as VIO,  there is a good chance that  a
+ * malicious program  might cause  a recursive  read operation  to  be
+ * performed. (i.e. recv(2) is called  with a VIO-buffer, who's  write
+ * callbacks  will invoke  recv(2) again).  If this  happens, then the
+ * second call to recv(2) will  block indefinitely, and the  malicious
  * program will be soft-locked (but can still be CTRL+C'd, so it's ok)
  *
  * @return: * :   A pointer to a read-handle for the packet that is next-in-line to-be received.
- *                This handle must be released by a call to one of the pb_buffer_read_[end/...]
+ *                This handle must be released by a call to one of the  pb_buffer_read_[end/...]
  *                functions.
  * @return: NULL: No unread packet is available at the moment, or the most recent packet is
  *                currently being read. */
@@ -695,11 +695,11 @@ __NOTHROW_NCX(LIBBUFFER_CC pb_buffer_startread)(struct pb_buffer *__restrict sel
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 
-/* Truncate the packet from which the caller is currently reading by updating
+/* Truncate the packet from which the  caller is currently reading by  updating
  * its base-pointer, acting as though the first `bytes_to_consume' bytes of the
  * packet weren't actually apart of its payload.
- * This can be called any number of times, though the caller must always ensure
- * that `bytes_to_consume <= packet->p_payload', and that the returned pointer
+ * This  can be called any number of times, though the caller must always ensure
+ * that `bytes_to_consume <= packet->p_payload', and  that the returned  pointer
  * becomes the new handle that must be used for reading from the current packet:
  * >> struct pb_packet *packet;
  * >> packet = pb_buffer_startread(self);
@@ -725,7 +725,7 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_truncate_packet)(struct pb_buffer *__restrict s
                                                   __uint16_t bytes_to_consume);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
-/* End reading the current packet, and discard the packet from the data stream.
+/* End reading the  current packet, and  discard the packet  from the data  stream.
  * The next call to `pb_buffer_startread()' will return NULL or a different packet. */
 typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
 /*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_ENDREAD_CONSUME)(struct pb_buffer *__restrict self,
@@ -738,7 +738,7 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_endread_consume)(struct pb_buffer *__restrict s
 
 
 /* End reading the current packet, and restore it to have it
- * be returned by the next call to `pb_buffer_startread()' */
+ * be  returned by the  next call to `pb_buffer_startread()' */
 #ifdef __INTELLISENSE__
 __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(pb_buffer_endread_restore)(struct pb_buffer *__restrict self,

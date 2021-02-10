@@ -45,10 +45,10 @@ typedef struct ATTR_PACKED {
 	u8         mp_length;          /* Size of this structure (in 16-byte increments). */
 	u8         mp_specrev;         /* MP version. */
 	u8         mp_chksum;          /* memsum()-alignment to ZERO. */
-	u8         mp_defcfg;          /* If this is not zero, then configuration_table should be
+	u8         mp_defcfg;          /* If this  is  not  zero, then  configuration_table  should  be
 	                                * ignored and a default configuration should be loaded instead. */
 	u32        mp_features;        /* If bit 7 (0x80) is set, then the IMCR is present and PIC mode is being used.
-	                                * Otherwise virtual wire mode is; all other bits are reserved. */
+	                                * Otherwise  virtual   wire   mode   is;  all   other   bits   are   reserved. */
 } MpFloatingPointerStructure;
 
 typedef struct ATTR_PACKED {
@@ -65,7 +65,7 @@ typedef struct ATTR_PACKED {
 	u16        tab_extab_length;   /* Extended table length. */
 	u8         tab_extab_checksum; /* Extended table checksum. */
 	u8         tab_reserved;       /* Reserved... */
-	/* Inlined vector of MP entires, containing `tab_entryc' entires
+	/* Inlined  vector of MP  entires, containing `tab_entryc' entires
 	 * for a total of `tab_length-sizeof(MpConfigurationTable)' bytes. */
 } MpConfigurationTable;
 

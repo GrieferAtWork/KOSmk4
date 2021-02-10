@@ -976,7 +976,7 @@ extern void (__va_end)(__builtin_va_list ap);
 #elif (defined(__NO_KOS_SYSTEM_HEADERS__) && \
        (defined(__NO_has_include) || __has_include(<stdarg.h>)))
 /* Without KOS's system headers around, we can
- * try to make use of someone else's work :) */
+ * try to make use  of someone else's work  :) */
 #include <stdarg.h>
 #define __builtin_va_list         va_list
 #define __builtin_va_start(ap, v) va_start(ap, v)

@@ -29,9 +29,9 @@
 #include <stdbool.h>
 
 
-/* Since the entire kernel-space has its E1-vectors pre-allocated (so-as
+/* Since the entire kernel-space has its E1-vectors pre-allocated  (so-as
  * to allow them to be share across all page-directories), page directory
- * mappings within kernel space itself do not require and sort of
+ * mappings within  kernel  space  itself  do not  require  and  sort  of
  * preparations being made. */
 #undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 //#define ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE 1
@@ -220,7 +220,7 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 
 
 /* When more than `ARCH_PAGEDIR_LARGESYNC_THRESHOLD' need to be synced, rather
- * than performing that number of single-page TLB invalidations, invalidate
+ * than performing that  number of single-page  TLB invalidations,  invalidate
  * everything instead. */
 #ifndef ARCH_PAGEDIR_LARGESYNC_THRESHOLD
 #define ARCH_PAGEDIR_LARGESYNC_THRESHOLD 0x100000 /* 256 pages */
@@ -266,7 +266,7 @@ typedef pae_pagedir_pushval_t pagedir_pushval_t;
 
 /* Synchronize the entirety of the current page directory.
  * Note that this function may only sync all user-space mappings. If the
- * intent is to also sync all of kernel-space, `pagedir_syncall()'
+ * intent is  to  also  sync all  of  kernel-space,  `pagedir_syncall()'
  * must be used instead. */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pagedir_syncall_user)(void) {
@@ -276,12 +276,12 @@ NOTHROW(FCALL pagedir_syncall_user)(void) {
 	                     : "=&r" (temp));
 }
 
-/* Same as `pagedir_syncall_user()', but also
+/* Same as `pagedir_syncall_user()', but  also
  * ensures that all of kernel-space is synced. */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
 
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
- * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
+ * overlaps with kernel-space, behave  the same as `pagedir_syncall()',  otherwise,
  * behave the same as `pagedir_syncall_user()' */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -310,7 +310,7 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		}
 		if (num_bytes > KERNELSPACE_BASE) {
 			/* We know that the address always _has_ to
-			 * fall into kernel-space in this case! */
+			 * fall into  kernel-space  in  this  case! */
 			pagedir_syncall();
 			return;
 		}

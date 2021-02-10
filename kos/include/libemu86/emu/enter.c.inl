@@ -94,7 +94,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 #else /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 			/* Validate the memory region from which data will be copied.
-			 * NOTE: The destination area was already validated above! */
+			 * NOTE: The destination  area was  already validated  above! */
 			if (EMU86_ISUSER()) {
 				size_t access_total;
 				if (IS_16BIT()) {

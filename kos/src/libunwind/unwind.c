@@ -45,7 +45,7 @@
 DECL_BEGIN
 
 
-/* NOTE: In kernel-space, `libuw_unwind_fde_find()' is
+/* NOTE: In  kernel-space,  `libuw_unwind_fde_find()'   is
  *       implemented in `/kos/src/kernel/core/fs/driver.c' */
 #ifndef __KERNEL__
 
@@ -77,11 +77,11 @@ err:
 	return UNWIND_NO_FRAME;
 }
 
-/* Lookup FDE information associated with a given program counter position.
+/* Lookup FDE information  associated with a  given program counter  position.
  * Using integration with KOS's DL extension APIs, this function automatically
- * accesses the `.eh_frame' sections of the module associated with the given
- * address, as well as keep track of a lazily allocated address-tree of FDE
- * caches for quick (O(1)) repeated access to an FDE located within a known
+ * accesses the `.eh_frame' sections of  the module associated with the  given
+ * address, as well as  keep track of a  lazily allocated address-tree of  FDE
+ * caches for quick (O(1))  repeated access to an  FDE located within a  known
  * function. */
 INTERN NONNULL((2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
@@ -101,10 +101,10 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 
 
 /* Top-level function for unwinding the specific register state, automatically
- * locating the associated FDE entry, before using it to unwind the specified
+ * locating the associated FDE entry, before using it to unwind the  specified
  * register state.
  * NOTE: The given `ABSOLUTE_PC' should point _to_ or _into_ the instruction that
- *       should be unwound; Not after it. - i.e. range checking is done as:
+ *       should be  unwound; Not  after it.  - i.e.  range checking  is done  as:
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTERN NONNULL((2, 4)) unsigned int CC
@@ -146,7 +146,7 @@ done:
 DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
 
 /* In certain configurations, the kernel's `unwind_for_debug(3)'
- * is identical to its regular, old `unwind(3)' function. */
+ * is  identical  to  its  regular,  old  `unwind(3)'  function. */
 #ifdef __KERNEL__
 #if !defined(CONFIG_HAVE_USERMOD) && defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
 DEFINE_PUBLIC_ALIAS(unwind_for_debug, linuw_unwind);

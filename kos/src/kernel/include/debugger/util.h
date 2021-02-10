@@ -36,7 +36,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Display a selections menu with a set of `options' (which is a NULL-terminated vector strings)
- * Options are on top of each other, and can be navigated using the arrow keys.
+ * Options  are  on  top  of   each  other,  and  can  be   navigated  using  the  arrow   keys.
  * @return: * : The index of the selected option, or one of `DBG_MENU_SELECTION_*' */
 FUNDEF WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
@@ -71,15 +71,15 @@ FUNDEF void *NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly DFL(false))
  * @return: * : The final selected address when the viewer was closed. */
 FUNDEF void *NOTHROW(FCALL dbg_asmview)(void *addr);
 
-/* Process input for an edit field at the given position, allowing
+/* Process input for an edit  field at the given position,  allowing
  * the user to type in input text, with that text then being written
  * to the given `buf'.
  * Note that if `buf' is non-empty (buf[0] != '\0') upon entry,
- * editing will resume with the current contents of `buf'
+ * editing will  resume  with  the current  contents  of  `buf'
  * @param: pcursor_pos:  [0..1][in|out]: The index where the cursor starts out/ends up
  * @param: pscreen_left: [0..1][in|out]: The index of the left-most visible character
  * @param: return_on_changed: When true, return `DBG_EDITFIELD_RETURN_CHANGED' after any
- *                            kind of user-input that changes `buf', `pcursor_pos', or
+ *                            kind  of user-input that  changes `buf', `pcursor_pos', or
  *                            `pscreen_left' and doesn't already return one of the other
  *                            return codes.
  * @return: * : One of `DBG_EDITFIELD_RETURN_*' */
@@ -119,17 +119,17 @@ FUNDEF bool NOTHROW(FCALL dbg_evaladdr)(char const *__restrict expr,
 #define dbg_evalexpr(expr, presult) dbg_evaladdr(expr, presult, DBG_EVALADDR_FLAG_NO_HEX)
 #define DBG_EVALADDR_FLAG_NO_ERROR  0x0001 /* Don't show an error message describing what's wrong with the syntax. */
 #define DBG_EVALADDR_FLAG_NO_HEX    0x0002 /* When not set, `512' is `0x512', else it is decimal. Regardless of this,
-                                            * `5C2' is always hex, and `+512' or `(512)' are always decimal.
+                                            * `5C2'  is  always  hex,  and  `+512'  or  `(512)'  are  always decimal.
                                             * This flag only affects top-level integral constants. */
 
 
 
 /* Print addr2line optimized for the debugger.
- * Example (of an inlined function):
+ * Example   (of    an   inlined    function):
  * >> c010783a+4   [my_inline_function+8] [bar.c:9]
  * >> c0107828+38  [my_function+26] [bar.c:42]
  * This is similar to `addr2line_printf()', however doesn't include the full source path,
- * and doesn't follow the file(line,col) format, but instead opts for much shorter lines
+ * and doesn't follow the file(line,col) format, but instead opts for much shorter  lines
  * which can then (usually) be displayed in one continuous line, rather than having to be
  * split up into multiple lines.
  * Additionally, this function also highlights output using differing colors. */
@@ -142,9 +142,9 @@ NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
 
 
 #ifndef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
-/* Helper wrappers to determine the predecessor/successor of a given `pc',
+/* Helper wrappers to  determine the predecessor/successor  of a given  `pc',
  * which is allowed to point into user-space, in which case user-space memory
- * is accessed through use of `dbg_readmemory()', rather than direct access. */
+ * is accessed through use of `dbg_readmemory()', rather than direct  access. */
 FUNDEF ATTR_PURE WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t isa);
 FUNDEF ATTR_PURE WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa);
 FUNDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, instrlen_isa_t isa);

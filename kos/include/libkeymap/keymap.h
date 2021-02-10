@@ -30,7 +30,7 @@ __DECL_BEGIN
 
 
 /* KMP File format.
- * NOTE: KMP files are the compiled versions of keymap definition files
+ * NOTE: KMP  files  are  the  compiled  versions  of  keymap  definition   files
  *       An API for invoking a compiler to create these files is provided via the
  *      `compileKeymap()' function found in `/kos/misc/libgen/libkeymap/compiler.dee'
  * Keymap source files can be found in `/kos/src/misc/keymaps/*'
@@ -53,13 +53,13 @@ typedef struct __ATTR_PACKED {
 #define KMP_ENCODING_ASCII   0x00 /* All characters are encoded as 7-bit ascii characters with the 8th bit ZERO */
 #define KMP_ENCODING_LATIN1  0x00 /* All characters are encoded as 8-bit integers (single-byte LATIN-1 characters) */
 #define KMP_ENCODING_UTF8    0x01 /* All characters are encoded as UTF-8 sequences. */
-#define KMP_ENCODING_UTF16LE 0x02 /* All characters are encoded as UTF-16 sequences (Little endian) with a length
+#define KMP_ENCODING_UTF16LE 0x02 /* All  characters are  encoded as UTF-16  sequences (Little endian)  with a length
                                    * of a single character each (max. 2 UTF-16 characters; 1 if it isn't a surrogate) */
 #define KMP_ENCODING_UTF16BE 0x03 /* Same as `KMP_ENCODING_UTF16LE', but big endian. */
 #define KMP_ENCODING_UTF32LE 0x04 /* Characters are encoded as UTF32, little-endian (max 1 character) */
 #define KMP_ENCODING_UTF32BE 0x05 /* Characters are encoded as UTF32, big-endian */
 #define KMP_ENCODING_MCS     0x06 /* Multi-character-string (each character is encoded as UTF-8,
-                                   * and the sequence is terminated by a NUL-character). */
+                                   * and   the  sequence  is  terminated  by  a  NUL-character). */
 #define KMP_ENCODING_MAX     0x06 /* Max recognized encoding. */
 #ifdef __CC__
 typedef struct __ATTR_PACKED {
@@ -127,7 +127,7 @@ typedef struct __ATTR_PACKED {
 
 
 
-/* Max supported code size for keymaps (when code becomes larger than this,
+/* Max supported code size for keymaps (when code becomes larger than  this,
  * the kernel may choose to disallow the code being loaded into a the keymap
  * of some given keyboard; s.a. `KBDIO_SETKEYMAP') */
 #ifndef KEYMAP_MAX_CODESIZE
@@ -150,7 +150,7 @@ struct keymap {
 };
 
 
-/* Return the size (in bytes) of the keyboard translation code block, that
+/* Return the size (in bytes) of the keyboard translation code block,  that
  * is the number of bytes until after the terminating `KMP_OP_STOP' opcode.
  * @return: <0: The code contains unrecognized/invalid instructions. */
 typedef __ATTR_NONNULL((1, 2)) __ssize_t
@@ -192,7 +192,7 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_init_en_US)(struct keymap *__restrict self);
 /* Translate a given key `key' when modifiers `mod' are applied into a unicode character.
  * @return: 0  : Either `printer' always returned 0, or the key doesn't have a mapping.
  * @return: *  : Sum of all calls to `printer'
- * @return: <0 : A call to `printer' returned this same negative value  */
+ * @return: <0 : A call to `printer' returned this same negative value */
 typedef __ATTR_NONNULL((1, 4)) __ssize_t
 (LIBKEYMAP_CC *PKEYMAP_TRANSLATE)(struct keymap *__restrict self,
                                   __uint16_t key, __uint16_t mod,
@@ -206,14 +206,14 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_translate)(struct keymap *__restrict self,
 
 
 /* Wrapper for buffer-based translating, using snprintf()-like buffer printing.
- * NOTE: Upon success, this function will optionally append a NUL-character
+ * NOTE: Upon success,  this function  will  optionally append  a  NUL-character
  *       if sufficient buffer space is available (`return < buflen'). Otherwise,
- *       when `return == buflen', no trailing NUL-character exists, but the
+ *       when  `return == buflen',  no  trailing NUL-character  exists,  but the
  *       function still succeeds.
  * @param: buffer: The buffer to which to print translated characters.
  * @param: buflen: The given buffer size.
  * @return: 0 :    The given `key' cannot be translated with `mod'
- * @return: * :    The required number of buffer bytes. (excluding a trailing NUL-character)  */
+ * @return: * :    The required number of buffer bytes. (excluding a trailing NUL-character) */
 typedef __ATTR_NONNULL((1, 4)) __size_t
 (LIBKEYMAP_CC *PKEYMAP_TRANSLATE_BUF)(struct keymap *__restrict self,
                                       __uint16_t key, __uint16_t mod,
@@ -232,7 +232,7 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_translate_buf)(struct keymap *__restrict self,
  *       a keymap blob loaded form some file is followed by at least `KEYMAP_UNTRUSTED_NUM_TRAILING_ZERO_BYTES'
  *       additional trailing 0-bytes (i.e. `blob_base[blob_size+{0-8}] == 0')
  * NOTE: Upon success, the caller must also ensure that `self->km_ext...+=(blob_base+blob_size)-self->km_ext'
- *       will not be freed. Alternatively, the caller may replace `self->km_ext' with a duplicate of that
+ *       will  not be freed.  Alternatively, the caller may  replace `self->km_ext' with  a duplicate of that
  *       memory region and free it themself after finalization
  * @return: true:  Successfully loaded the given blob and initialized `self'
  * @return: false: Failed to open the blob (not a valid KMP file) */

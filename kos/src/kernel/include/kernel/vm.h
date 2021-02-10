@@ -764,13 +764,13 @@ typedef __ARCH_PAGEID_TYPE pageid_t;
 #endif /* !__ARCH_PAGEID_DECODE_KERNEL */
 
 /* Check if a given `pageid' or [startpageid,endpageid)
- * is consider apart of user- or kernel-space.
- * The *_PARTIAL functions check if the range has any overlapping
- * parts with the named address space, while the non-_PARTIAL functions
- * check that the entire range is apart of the named address space.
- * Note that the range-checking functions are allowed to assume that
+ * is  consider   apart  of   user-  or   kernel-space.
+ * The  *_PARTIAL  functions  check  if   the  range  has  any   overlapping
+ * parts with  the named  address space,  while the  non-_PARTIAL  functions
+ * check that  the  entire  range  is apart  of  the  named  address  space.
+ * Note  that  the  range-checking  functions  are  allowed  to  assume that
  * `endpageid >= startpageid'. In the case where `endpageid == startpageid',
- * the range-checking functions behave identical to `ADDR_IS(KERN|USER)',
+ * the range-checking  functions behave  identical to  `ADDR_IS(KERN|USER)',
  * or in other words: will use `endpageid = startpageid+1' */
 #ifdef KERNELSPACE_HIGHMEM
 #define KERNELSPACE_MINPAGEID   PAGEID_ENCODE(KERNELSPACE_BASE)
@@ -851,7 +851,7 @@ typedef void /*NOTHROW*/ (KCALL *vm_dmaresetfunc_t)(void *arg);
 
 #ifdef __CC__
 struct vm_datapart {
-	/* NOTE: The reference loop between `vm_datablock' <--> `vm_datapart' is
+	/* NOTE: The reference loop  between `vm_datablock'  <--> `vm_datapart'  is
 	 *       intentional, as it allows data parts to remain allocated as caches
 	 *       which can easily be deallocated by making them anonymous, at which
 	 *       point they become detached from their associated data block. */
@@ -882,26 +882,26 @@ struct vm_datapart {
 	LLIST(struct vm_node)    dp_srefs;   /* [0..1][lock(dp_lock)] Chain of vm_node mappings this part in write-shared mode (VM_MAP_FSHARED). */
 	WEAK struct vm_node     *dp_stale;   /* [0..1][CHAIN(->vn_byaddr.ln_next)] Chain of nodes still bound to this node, but no longer mapped.
 	                                      * NOTE: Each of these nodes is holding a reference to its associated VM via that VM's `v_weakrefcnt'
-	                                      *       reference counter, which once it reaches 0, will cause the VM to be freed.
-	                                      *       This is required to ensure that the VMs reachable via `dp_crefs/dp_srefs'->vn_vm
+	                                      *       reference  counter,  which   once  it  reaches   0,  will   cause  the  VM   to  be   freed.
+	                                      *       This  is  required  to  ensure   that  the  VMs  reachable  via   `dp_crefs/dp_srefs'->vn_vm
 	                                      *       are still allocated, so-long as a lock to `dp_lock' is being held. */
 	REF struct vm_datablock *dp_block;   /* [1..1][lock(dp_lock)] The associated data block (Points to `&vm_datablock_anonymous_zero_vec[*]' for anonymous/unshared parts) */
 	uintptr_half_t           dp_flags;   /* Data part flags (Set of `VM_DATAPART_FLAG_*') */
 #define VM_DATAPART_FLAG_NORMAL   0x0000 /* Normal datapart flags. */
-#define VM_DATAPART_FLAG_LOCKED   0x0001 /* [lock(dp_lock)] Keep the data part locked in memory. (Any state
+#define VM_DATAPART_FLAG_LOCKED   0x0001 /* [lock(dp_lock)] Keep the data part locked in memory. (Any  state
                                           * transition to `VM_DATAPART_STATE_INCORE' will instead transition
                                           * to `VM_DATAPART_STATE_LOCKED')
                                           * NOTE: This flag can be modified by user-space. */
-#define VM_DATAPART_FLAG_CHANGED  0x0004 /* [lock(dp_lock,SET(READ(dp_lock)))] Set when any of the part's page property
-                                          * bits are changed to indicate a modified page (cleared once all modified
-                                          * pages have been saved once again (s.a. `vm_datablock_type::dt_savepart'))
-                                          * NOTE: This flag is ignored when `VM_DATAPART_FLAG_TRKCHNG' is set.
+#define VM_DATAPART_FLAG_CHANGED  0x0004 /* [lock(dp_lock,SET(READ(dp_lock)))] Set  when  any  of  the  part's  page property
+                                          * bits are  changed  to  indicate  a  modified  page  (cleared  once  all  modified
+                                          * pages   have  been  saved  once  again  (s.a.  `vm_datablock_type::dt_savepart'))
+                                          * NOTE:  This   flag   is   ignored   when   `VM_DATAPART_FLAG_TRKCHNG'   is   set.
                                           * NOTE: This flag may be set atomically while only holding a read-lock to `dp_lock' */
 #define VM_DATAPART_FLAG_KEEPRAM  0x0800 /* [const] Don't page_free() RAM or swap_free() SWAP when the part is destroyed. */
 #define VM_DATAPART_FLAG_TRKCHNG  0x1000 /* [lock(dp_lock)][config_if(== 0)][== 0 || == dp_block && dp_block->db_type->dt_savepart != NULL]
                                           * Changes made to this data part should be tracked.
                                           * This bit is cleared when the part gets anonymized, until which point it is
-                                          * indicative of the associated block's support for saving modified parts. */
+                                          * indicative of the  associated block's support  for saving modified  parts. */
 #define VM_DATAPART_FLAG_HEAPPPP  0x2000 /* [const] The page property vector is allocated on the heap (s.a. `dp_pprop_p'). */
 #define VM_DATAPART_FLAG_COREPRT  0x4000 /* [const] This `struct vm_datapart' was allocated using the core-page allocator. */
 #define VM_DATAPART_FLAG_KERNPRT  0x8000 /* [const] This `struct vm_datapart' is part of the kernel's static VM state.
@@ -926,7 +926,7 @@ struct vm_datapart {
 			                                    * Vector of ram blocks. */
 			union {
 				struct vm_ramblock rd_block0;  /* [lock(dp_lock)][valid_if(rd_blockv == &rd_block0)]
-				                                * Inline-allocated space for a single memory block. */
+				                                * Inline-allocated  space for a single memory block. */
 				size_t             rd_blockc;  /* [lock(dp_lock)][!0][valid_if(rd_blockv != &rd_block0)]
 				                                * Amount of ram blocks. */
 			};
@@ -937,7 +937,7 @@ struct vm_datapart {
 			                                    * Vector of swap blocks. */
 			union {
 				struct vm_swpblock sd_block0;  /* [lock(dp_lock)][valid_if(sd_blockv == &sd_block0)]
-				                                * Inline-allocated space for a single swap block. */
+				                                * Inline-allocated space  for a  single swap  block. */
 				size_t             sd_blockc;  /* [lock(dp_lock)][!0][valid_if(sd_blockv != &sd_block0)]
 				                                * Amount of swap blocks. */
 			};
@@ -949,27 +949,27 @@ struct vm_datapart {
 		WEAK uintptr_t             dp_pprop;   /* [lock(READ(dp_lock))][valid_if(!VM_DATAPART_FLAG_HEAPPPP)] Inline bitset. */
 		WEAK uintptr_t            *dp_pprop_p; /* [lock(READ(dp_lock))][0..CEILDIV(vm_datapart_numdpages(self),BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)]
 		                                        * [valid_if(VM_DATAPART_FLAG_HEAPPPP)][owned][lock(dp_lock)]
-		                                        * Dynamically allocated bitset (or `NULL' when all pages have a state
-		                                        * identical to `VM_DATAPART_PPP_INITIALIZED', and changes are not
+		                                        * Dynamically allocated bitset (or `NULL'  when all pages have a  state
+		                                        * identical  to  `VM_DATAPART_PPP_INITIALIZED',  and  changes  are  not
 		                                        * required for tracking, also requiring that `VM_DATAPART_FLAG_TRKCHNG'
 		                                        * not be set) */
 	};
-	struct vm_futex_controller    *dp_futex;   /* [0..1][lock(dp_lock)][owned] Futex support controller.
+	struct vm_futex_controller    *dp_futex;   /* [0..1][lock(dp_lock)][owned]    Futex    support   controller.
 	                                            * Lazily allocated/de-allocated as futex objects are being used.
 	                                            * NOTE: For the duration of at least one futex object existing,
-	                                            *       this field can be considered `[1..1][const]'
+	                                            *       this   field   can   be   considered    `[1..1][const]'
 	                                            *       However, you still may not dereference this field from
 	                                            *      `struct vm_futex::vmf_part' without first acquiring `dp_lock',
-	                                            *       since there exists a chance that the associated is currently
-	                                            *       being split, and that the futex is currently being moved
+	                                            *       since there exists  a chance that  the associated is  currently
+	                                            *       being split,  and  that  the futex  is  currently  being  moved
 	                                            *       to the data part then responsible for the upper half of memory.
-	                                            *       The only case where this does not apply is you dereference the
+	                                            *       The only case where this does not apply is you dereference  the
 	                                            *      `vmf_part' pointer of a futex object with a reference counter of
-	                                            *       ZERO(0), since this would guaranty that the futex will not be
-	                                            *       carried over during a potential data-part split, as the process
-	                                            *       of splitting a data part containing futex objects also involves
-	                                            *       first acquiring references to all those futex objects in order
-	                                            *       to ensure a consistent set of those futex objects that are
+	                                            *       ZERO(0),  since this would  guaranty that the  futex will not be
+	                                            *       carried over during a potential data-part split, as the  process
+	                                            *       of splitting a data part containing futex objects also  involves
+	                                            *       first acquiring references to all  those futex objects in  order
+	                                            *       to  ensure  a consistent  set of  those  futex objects  that are
 	                                            *       still alive (in other words: `vm_futex_destroy()' is allowed to,
 	                                            *       and as a matter of fact: _is_ dereferencing this field) */
 };
@@ -988,19 +988,19 @@ NOTHROW(KCALL vm_datapart_destroy)(struct vm_datapart *__restrict self,
 DEFINE_REFCOUNT_FUNCTIONS(struct vm_datapart, dp_refcnt, vm_datapart_destroy);
 
 
-/* Decrement the reference counter of `self', and try to merge it with sibling data parts.
- * This functionality is combined with a decref() since a data part can only be merged when
+/* Decrement  the reference counter of `self', and try  to merge it with sibling data parts.
+ * This  functionality is combined with a decref() since a data part can only be merged when
  * it is only visible from within its own data block, or for any VM mapping, the latter only
  * allowing the part to the merged if _all_ mappings are laid out in a way that has the part
- * be mapped alongside its closest siblings in a continuous memory mapping.
- * Note that a data part will never be merged if it has any outside references which would
- * keep it being visible outside the small region that is controllable by the part itself.
+ * be   mapped   alongside   its  closest   siblings   in  a   continuous   memory  mapping.
+ * Note that a data part will never be  merged if it has any outside references which  would
+ * keep  it being visible outside the small region  that is controllable by the part itself.
  * These references are: `self->dp_block->db_parts*' (1), `self->dp_crefs*' (n) and `self->dp_srefs*' (n)
- *                        Should references exist beyond those explainable via these pointers, plus
- *                        one additional reference that is gifted to this function by its caller, merging
- *                        will not be done.
+ *                       Should references  exist  beyond  those explainable  via  these  pointers,  plus
+ *                       one additional reference that is gifted to this function by its caller, merging
+ *                       will not be done.
  * If merging is impossible for any other reason (blocking locks, insufficient memory, etc.), the
- * operation will stop, and the function behaves identical to a regular `decref(self)' */
+ * operation  will  stop,  and  the  function  behaves  identical  to  a  regular  `decref(self)' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_decref_and_merge)(REF struct vm_datapart *__restrict self);
 
@@ -1047,9 +1047,9 @@ __DEFINE_SYNC_RWLOCK(struct vm_datapart,
 
 
 #ifdef __INTELLISENSE__
-/* The size of the given datapart, either in data-pages, or in virt-pages.
+/* The   size  of  the   given  datapart,  either  in   data-pages,  or  in  virt-pages.
  * NOTE: The caller must be holding a read-lock on `self', or `self' must not be shared.
- * DATA-PAGES: Usually same as `virt-pages', but often 512-bytes large for files.
+ * DATA-PAGES:  Usually  same  as `virt-pages',  but  often 512-bytes  large  for files.
  * VIRT-PAGES: Same as `pageid_t' (PAGESIZE-bytes large) */
 NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart const *__restrict self);
 NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes_atomic)(struct vm_datapart const *__restrict self);
@@ -1103,12 +1103,12 @@ NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_endvpage_atomic)(struct vm_datapart
 #endif /* !__INTELLISENSE__ */
 
 
-/* Allocate/free ram/swap data for the given data part.
+/* Allocate/free ram/swap data  for the  given data  part.
  * NOTE: The caller must be holding a write-lock to `self'
- * NOTE: When the functions return by throwing an error,
+ * NOTE: When  the  functions return  by throwing  an error,
  *       the caller's write-lock to `self' will have already
  *       been released!
- * NOTE: When allocating, these functions will set the part's
+ * NOTE: When  allocating, these functions  will set the part's
  *       state to either INCORE, LOCKED or INSWAP upon success.
  * @return: * : One of VM_DATAPART_ALLOC_*. */
 FUNDEF NONNULL((1)) unsigned int KCALL vm_datapart_allocram(struct vm_datapart *__restrict self) THROWS(E_WOULDBLOCK, E_BADALLOC);
@@ -1121,7 +1121,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_freeswap)(struct vm_d
 #define VM_DATAPART_ALLOC_SUCCESS        1 /* Successfully allocated memory. */
 #define VM_DATAPART_ALLOC_SUCCESS_RELOCK 2 /* Successfully allocated memory, but `self' was unlocked temporarily */
 #define VM_DATAPART_ALLOC_CHANGED_RELOCK 3 /* Following a re-lock, the state of `self' is no longer `VM_DATAPART_STATE_ABSENT'
-                                            * In this case, the caller re-inherits a new lock to `self', but the part's state
+                                            * In  this case, the caller re-inherits a new lock to `self', but the part's state
                                             * is not what they would have expected it to be. */
 
 /* Similar to `vm_datapart_allocram()', but leave all locking & state changes up to the caller. */
@@ -1142,21 +1142,21 @@ NOTHROW(KCALL vm_datapart_do_freeram)(struct vm_datapart *__restrict self);
 
 /* Copy the physical memory backing of `src' into `dst'.
  * The caller is responsible to ensure that both parts are INCORE or LOCKED,
- * as well as to provide for both parts to be properly locked. */
+ * as   well  as  to   provide  for  both  parts   to  be  properly  locked. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
                                       struct vm_datapart *__restrict src);
 
 /* Allocate physical memory (intended for use by datablocks)
- * @param: pblock0:   A pointer to a union of `struct vm_ramblock *' and `size_t *',
- *                    the first of which will be filled if the allocation was possible
+ * @param: pblock0:   A  pointer  to  a  union  of  `struct vm_ramblock *'  and   `size_t *',
+ *                    the  first  of which  will  be filled  if  the allocation  was possible
  *                    using only a single chunk of physical memory (and `return == pblock0').
- *                    In case more than 1 ramblock was needed, a pointer to a heap-allocated
- *                    vector of ram-blocks is returned, and it's length is written to
+ *                    In case more than 1 ramblock was needed, a pointer to a  heap-allocated
+ *                    vector of  ram-blocks  is  returned,  and it's  length  is  written  to
  *                   `*(size_t *)pblock0'
  * @param: num_pages: The total number of physical pages of memory that need to be allocated.
  * @param: flags:     Heap flags used for allocating the heap vector when more than 1 block is used.
- *                    NOTE: It is recommended to pass `GFP_LOCKED | GFP_PREFLT | GFP_VCBASE'
+ *                    NOTE:  It  is   recommended  to  pass   `GFP_LOCKED | GFP_PREFLT | GFP_VCBASE'
  * @return: pblock0:  A single block was used.
  * @return: * :       A pointer to a kmalloc()-allocated heap vector of used ram blocks.
  * @return: NULL:    [vm_do_allocram_nx] Failed to allocate physical memory, or the required heap vector. */
@@ -1175,14 +1175,14 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
                              struct vm_ramblock *__restrict blocks);
 
-/* Map the given data part (which must be INCORE or LOCKED) into the current
+/* Map  the given data part (which must be INCORE or LOCKED) into the current
  * page directory at the specified location, using the specified permissions.
- * NOTE: The caller is responsible to ensure that `self' doesn't change state
+ * NOTE: The caller is  responsible to  ensure that `self'  doesn't change  state
  *       or size, as well as to ensure that the given address range isn't already
- *       in use. - This function is merely a thin wrapper around `pagedir_map',
+ *       in use. - This function is  merely a thin wrapper around  `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `pagedir_prepare'
+ *       has  been   prepared   in   a  prior   call   to   `pagedir_prepare'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -1194,8 +1194,8 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
 
 /* Same as `vm_datapart_map_ram()', but automatically restrict permissions:
  *  - Pages not fully marked as changed are mapped as read-only, unless
- *    the `VM_DATAPART_FLAG_TRKCHNG' bit isn't set in `self'
- *  - Pages not fully initialized are mapped as invalid-access, meaning
+ *    the  `VM_DATAPART_FLAG_TRKCHNG'   bit   isn't   set   in   `self'
+ *  - Pages not fully initialized are mapped as invalid-access,  meaning
  *    that a page-fault will be triggered upon first use of that memory.
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -1210,42 +1210,42 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
 
 
 /* Check if the given datapart `self' has modified
- * data pages within the specified address range.
- * NOTE: The caller must be holding any kind of lock that prevents `self'
- *       from having its length changed (aka. a VM-tree read-lock of a VM
- *       that is mapping `self', a read-lock to `self', or a read-lock to
+ * data  pages within the specified address range.
+ * NOTE: The  caller must  be holding any  kind of lock  that prevents `self'
+ *       from  having its  length changed (aka.  a VM-tree read-lock  of a VM
+ *       that  is mapping  `self', a read-lock  to `self', or  a read-lock to
  *       the associated data-block, so-long as `self' hasn't been anonymized) */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
                                       size_t partrel_min_dpage DFL(0),
                                       size_t partrel_max_dpage DFL((size_t)-1));
 
-/* Synchronize all modified pages within the given part-relative address range.
- * If the given part-relative address range is out-size of the bounds of `self'
- * after a lock to `self' has been acquired, then that range is truncated first.
+/* Synchronize   all   modified  pages   within   the  given   part-relative   address  range.
+ * If  the  given  part-relative   address  range  is  out-size   of  the  bounds  of   `self'
+ * after   a  lock  to  `self'  has  been  acquired,  then  that  range  is  truncated  first.
  * NOTE: The caller should not be holding any kind of lock to either `self' or its data block.
- * NOTE: If the data block associated with `self' does not implement a `dt_savepart'
+ * NOTE: If  the  data block  associated  with `self'  does  not implement  a `dt_savepart'
  *       function, or if `self' doesn't have the CHANGED flag set, the function immediately
  *       returns `0'.
  * NOTE: Once done, this function will transition the state of all saved data pages
- *       from `VM_DATAPART_PPP_HASCHANGED' back to `VM_DATAPART_PPP_INITIALIZED'
+ *       from `VM_DATAPART_PPP_HASCHANGED'  back  to  `VM_DATAPART_PPP_INITIALIZED'
  *       Also note that during this process, any memory mapping of `self' which may
- *       have previously become writable due to the associated part having been
- *       changed to be HASCHANGED will be re-mapped as read-only, so-as to allow
- *       it to transition back to `VM_DATAPART_PPP_HASCHANGED' the next time a
+ *       have previously become  writable due  to the associated  part having  been
+ *       changed  to be HASCHANGED  will be re-mapped as  read-only, so-as to allow
+ *       it to  transition back  to `VM_DATAPART_PPP_HASCHANGED'  the next  time  a
  *       write is performed to such a region of memory.
  * NOTE: If the saved address range spans the entirety of `self', then this function
  *       will also unset the CHANGED bit of `self'
  * @param: recheck_modifications_before_remap: When true and `self' has some SHARED memory
- *                                             mappings, re-check that there are actually
+ *                                             mappings, re-check that there are  actually
  *                                             changed pages within the given address range
  *                                             before doing all of the work associated with
  *                                             re-mapping all shared mappings as read-only.
- *                                       NOTE: This is merely a hint, and only affects the
- *                                             performance of this function. - It is ignored
- *                                             when no SHARED memory mappings exist, and should
+ *                                       NOTE: This is  merely  a  hint,  and  only  affects  the
+ *                                             performance  of  this  function. -  It  is ignored
+ *                                             when  no SHARED memory  mappings exist, and should
  *                                             only be set to TRUE when the caller hasn't already
- *                                             been told in one way or another that there
+ *                                             been  told  in  one  way  or  another  that  there
  *                                             probably are changed pages within the given range.
  * @return: * : The number of saved data pages. */
 FUNDEF NONNULL((1)) size_t KCALL
@@ -1257,9 +1257,9 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
 
 
 /* Directly copy memory to/from the given buffer and `self'
- * NOTE: These functions automatically deal with page properties, such
+ * NOTE: These  functions  automatically  deal with  page  properties, such
  *       that `vm_datapart_do_read()' will ensure INITIALIZED pages, whilst
- *       `vm_datapart_do_write()' ensures HASCHANGED pages (so-long as the
+ *       `vm_datapart_do_write()'  ensures HASCHANGED pages (so-long as the
  *       TRACKCHANGES bit is set)
  * NOTE: The caller must be holding a read-lock to `self', as well as ensure
  *       that `self' is either INCORE or LOCKED */
@@ -1268,16 +1268,16 @@ FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restri
 FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, physaddr_t dst, size_t num_bytes, size_t src_offset) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, physaddr_t src, size_t num_bytes, size_t dst_offset) THROWS(...);
 
-/* Same as `vm_datapart_do_read()' / `vm_datapart_do_write()', but copy memory
- * into the supplied user-space buffer `dst' / `src' using `memcpy_nopf()', meaning
+/* Same   as  `vm_datapart_do_read()'  /  `vm_datapart_do_write()',  but  copy  memory
+ * into  the supplied user-space  buffer `dst' /  `src' using `memcpy_nopf()', meaning
  * that these functions will never cause the given buffer to become faulted, or invoke
  * VIO callbacks in case the given buffer is a VIO memory mapping.
- * @return: * : The number of trailing bytes from the given buffer that could not be
- *              accessed (i.e. memcpy_nopf() returned non-zero upon attempting to access
- *              them). When this is non-zero, then the caller should manually access the
- *              affected byte (_after_ releasing their lock on `self'), then proceed to
- *              re-acquire the lock on `self', before manually reading/writing the single
- *              byte previously read/allocated, before finally moving on to reading/writing
+ * @return: * : The number  of  trailing  bytes from  the  given  buffer that  could  not  be
+ *              accessed (i.e.  memcpy_nopf() returned  non-zero  upon attempting  to  access
+ *              them). When this  is non-zero,  then the  caller should  manually access  the
+ *              affected  byte  (_after_ releasing  their lock  on  `self'), then  proceed to
+ *              re-acquire  the lock  on `self',  before manually  reading/writing the single
+ *              byte previously read/allocated, before  finally moving on to  reading/writing
  *              into the remainder of the original buffer, once again allowing for user-space
  *              memory faults. */
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_read_nopf(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(...);
@@ -1285,19 +1285,19 @@ FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *_
 
 
 /* Read/write data to/from the given data part.
- * NOTE: When given a virtual memory buffer, these functions automatically
- *       check if the memory backing that buffer could potentially overlap
+ * NOTE: When given  a virtual  memory buffer,  these functions  automatically
+ *       check  if the  memory backing  that buffer  could potentially overlap
  *       with `self', in which case reading is performed using an intermediate
- *       buffer, so-as to prevent a possible dead-lock when `self' is already
- *       locked, whilst a #PF caused by writing to the target buffer attempts
+ *       buffer,  so-as to prevent a possible dead-lock when `self' is already
+ *       locked, whilst a #PF caused by writing to the target buffer  attempts
  *       to acquire another lock to `self'
  * NOTE: The caller must _NOT_ be holding any lock to `self', the associated
  *       block, or any VM-tree when calling this function.
- * @param: split_bytes: The number of bytes after which to split the part in
+ * @param: split_bytes: The  number of bytes after which to split the part in
  *                      order to minimize the memory impact of copy-on-write.
  *                      Usually the same as `num_bytes'
  * @return: * : The number of read/written bytes (limited by `num_bytes',
- *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
+ *              and     `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, physaddr_t dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -1308,9 +1308,9 @@ FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *_
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
- * memory backing is `safe' (i.e. access could never cause a #PF attempting to
- * acquire a lock to `self' when doing so is impossible; i.e. `dst'/`src' are
- * guarantied to not be apart of a mapping of `self', or be otherwise accessed
+ * memory backing is `safe' (i.e. access could never cause a #PF attempting  to
+ * acquire  a lock to `self' when doing  so is impossible; i.e. `dst'/`src' are
+ * guarantied  to not be apart of a mapping of `self', or be otherwise accessed
  * by code called from a page-fault handler) */
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_read_unsafe(struct vm_datapart *__restrict self, void *__restrict dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart *__restrict self, void const *__restrict src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -1319,22 +1319,22 @@ FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart 
  * to access made to the given `dst'/`src' buffers (s.a. `memcpy_nopf()').
  * @assume(num_bytes <= SSIZE_MAX);
  * @return: >= 0:
- *     Successfully transferred all possible data in regards to the actual size
+ *     Successfully  transferred all possible data in regards to the actual size
  *     of `self' encountered when the lock associated with it was held. This may
  *     be less than num_bytes' in case the data part ended up being smaller that
  *     the given buffer, where it should be noted that a data part can shrink at
- *     any time that its lock isn't being held due to possibly getting split by
+ *     any  time that its lock isn't being held due to possibly getting split by
  *     another thread.
  * @return: < 0:
  *     Failed to read/write the last `-return' bytes of the given buffer,
  *     as accessing them triggers a #PF for the range:
  *         `(dst|src) + (num_bytes - (size_t)(-return)) ... (dst|src) + num_bytes - 1'
- *     As such, the first `num_bytes - (size_t)(-return)' bytes were successfully
+ *     As such, the  first `num_bytes - (size_t)(-return)'  bytes were  successfully
  *     read/written, and the caller should not attempt to read/write them again, but
  *     should instead manually read/write at least 1 byte starting at:
  *         `((byte_t *)(dst|src))[num_bytes - (size_t)(-return)]'
- *     using a temporary buffer, in order to allow the associated memory mapping to
- *     be faulted while not holding any locks to VM control structures, also allowing
+ *     using a temporary  buffer, in order  to allow the  associated memory mapping  to
+ *     be  faulted while not holding any locks  to VM control structures, also allowing
  *     for the proper handling in case the memory associated with `dst'/`src' is backed
  *     by a VIO memory mapping. */
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
@@ -1348,21 +1348,21 @@ vm_datapart_write_nopf(struct vm_datapart *__restrict self,
                        size_t split_bytes, size_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Perform I/O using an intermediate buffer, thus solving the deadlock
- * scenario possible when using `vm_datapart_(read|write)_unsafe', as
- * well as to perform the faulting/vio-interaction needed when a call
- * to `vm_datapart_(read|write)_nopf()' returned a negative value.
+/* Perform I/O using  an intermediate buffer,  thus solving the  deadlock
+ * scenario possible  when  using  `vm_datapart_(read|write)_unsafe',  as
+ * well  as to  perform the  faulting/vio-interaction needed  when a call
+ * to  `vm_datapart_(read|write)_nopf()'  returned   a  negative   value.
  * Even though they can, these functions should _not_ be used to transfer
- * a data part in its entirety, since they rely on a limited-size buffer
- * allocated on the kernel stack, meaning that their use requires the
+ * a data part in its entirety, since they rely on a limited-size  buffer
+ * allocated on the  kernel stack,  meaning that their  use requires  the
  * indirection of an intermediate memory location.
- * In general, raw I/O on data parts should always be performed with the
- * help of `vm_datapart_(read|write)()', which will automatically try to
- * call the `*_nopf()' function, and fall back for a limited number of
+ * In general, raw  I/O on data  parts should always  be performed with  the
+ * help  of  `vm_datapart_(read|write)()', which  will automatically  try to
+ * call  the  `*_nopf()' function,  and fall  back for  a limited  number of
  * bytes to making use of `vm_datapart_(read|write)_buffered()' for handling
  * VIO, as well as faulting memory mappings. (s.a. `vm_prefault()')
  * @return: * : The number of read/written bytes (limited by `num_bytes',
- *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
+ *              and     `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 FUNDEF NONNULL((1)) size_t KCALL
 vm_datapart_read_buffered(struct vm_datapart *__restrict self,
                           USER CHECKED void *dst, size_t num_bytes,
@@ -1377,7 +1377,7 @@ vm_datapart_write_buffered(struct vm_datapart *__restrict self,
 
 /* Enumerate physical memory of `self' within the given address range.
  * NOTE: The caller must be holding a read-lock on `self', as well as ensure
- *       that the given address range is in-bounds, that `self' is either
+ *       that  the given address  range is in-bounds,  that `self' is either
  *       INCORE or LOCKED, and that `num_bytes' is non-zero. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
@@ -1387,17 +1387,17 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
 
 
 
-/* Split the given datapart after `vpage_offset' pages of virtual memory.
- * Additionally, map new nodes within all VMs in with `self' is mapped as part of.
+/* Split   the    given    datapart    after   `vpage_offset'    pages    of    virtual    memory.
+ * Additionally,   map  new  nodes  within  all  VMs  in   with  `self'  is  mapped  as  part  of.
  * NOTE: The caller must not be holding locks to _any_ of those VMs or the given data part itself.
  * @return: * :   A reference to the new upper-half of `self', starting
- *                after `vpage_offset' pages at the end of `self'
+ *                after  `vpage_offset'  pages  at  the  end  of `self'
  * @return: NULL: The given `vpage_offset >= vm_datapart_numvpages(self)' */
 FUNDEF NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datapart_split(struct vm_datapart *__restrict self, size_t vpage_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Same as `vm_datapart_split()', but don't throw an exception if something goes
+/* Same  as `vm_datapart_split()', but don't throw an exception if something goes
  * wrong. - Instead, return `VM_DATAPART_SPLIT_NX_FAILED', though `NULL' is still
  * returned in the event that `vpage_offset' is too large. */
 FUNDEF NONNULL((1)) REF struct vm_datapart *
@@ -1413,7 +1413,7 @@ NOTHROW(KCALL vm_datapart_split_nx)(struct vm_datapart *__restrict self,
 FUNDEF NONNULL((1)) void FCALL
 vm_datapart_lockwrite_setcore(struct vm_datapart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-/* Acquire a write-lock on `self', and ensure that pages are in-core, and that
+/* Acquire  a  write-lock  on   `self',  and  ensure  that   pages  are  in-core,  and   that
  * copy-on-write mappings have been unshared (that is: ensure that `self->dp_crefs == NULL'). */
 FUNDEF NONNULL((1)) void FCALL
 vm_datapart_lockwrite_setcore_unsharecow(struct vm_datapart *__restrict self)
@@ -1431,15 +1431,15 @@ FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL vm_datapart_lockread_setcore_unsh
 
 
 /* Return the address of a physical page at the given `vpage_offset'
- * The caller must be holding a read- or write-lock on `self',
- * as well as guaranty that the part is either INCORE or LOCKED. */
+ * The  caller  must be  holding a  read-  or write-lock  on `self',
+ * as  well as  guaranty that the  part is either  INCORE or LOCKED. */
 FUNDEF NOBLOCK NONNULL((1)) physpage_t
 NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset);
 
-/* Ensure that the page at `vpage_offset' has been initialized
- * The caller must be holding a read- or write-lock on `self',
- * as well as guaranty that the part is either INCORE or LOCKED.
+/* Ensure  that  the  page   at  `vpage_offset'  has  been   initialized
+ * The  caller  must  be  holding  a  read-  or  write-lock  on  `self',
+ * as well  as  guaranty that  the  part  is either  INCORE  or  LOCKED.
  * Alternatively, they may also use this function when `!isshared(self)'
  * HINT: The easiest way to ensure this is through
  *       use of `vm_datapart_lockread_setcore()'
@@ -1449,14 +1449,14 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
  * @param: pchanged: [OUT] Set to true if all associated data-pages are marked as changed.
  * @return: * : The underlying physical page of memory that is bound to `vpage_offset'
  * @throw: * :  Only throws whatever exception may get thrown by `dt_loadpart', meaning that
- *              when the loadpart function is NOEXCEPT, then so is this function! */
+ *              when   the  loadpart  function  is  NOEXCEPT,  then  so  is  this  function! */
 FUNDEF NONNULL((1, 3)) physpage_t KCALL
 vm_datapart_loadpage(struct vm_datapart *__restrict self,
                      size_t vpage_offset,
                      bool *__restrict pchanged)
 		THROWS(...);
 
-/* Similar to `vm_datapart_loadpage()', however instead used for accessing only a single data
+/* Similar to  `vm_datapart_loadpage()',  however  instead  used for  accessing  only  a  single  data
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
 FUNDEF NONNULL((1)) physaddr_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
@@ -1533,7 +1533,7 @@ NOTHROW(KCALL vm_datapart_setstate)(struct vm_datapart *__restrict self,
 	}
 }
 
-/* Atomically compare-exchange the state of a page,
+/* Atomically  compare-exchange  the state  of  a page,
  * returning true/false if the exchange was successful. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(KCALL vm_datapart_cmpxchstate)(struct vm_datapart *__restrict self,
@@ -1595,10 +1595,10 @@ struct vm_datablock_type {
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_destroy)(struct vm_datablock *__restrict self);
 	/* [0..1] Initialize the given data part (called whenever a new part is created)
 	 * NOTE: This function isn't required to do anything, and may assume that the
-	 *       given part is already fully initialized as ABSENT, with the proper
+	 *       given part is already fully  initialized as ABSENT, with the  proper
 	 *       address range already assigned.
 	 * This function is mainly intended to assign physical memory ranges for data blocks
-	 * that directly map physical memory into virtual memory, allowing them to use this
+	 * that directly map physical memory into virtual memory, allowing them to use  this
 	 * function to assign the proper memory ranges. */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_initpart)(struct vm_datapart *__restrict part);
 	/* [0..1] Initialize the data buffer.
@@ -1612,7 +1612,7 @@ struct vm_datablock_type {
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
 	NONNULL((1)) void (KCALL *dt_savepart)(struct vm_datablock *__restrict self, datapage_t start, physaddr_t buffer, size_t num_data_pages);
 	/* [0..1] Called the first time the `VM_DATAPART_FLAG_CHANGED' flag is set for `part'.
-	 * WARNING: While this function is allowed to block and throw exceptions,
+	 * WARNING: While this function is allowed to block and throw  exceptions,
 	 *          you should rather think of it as being required to be NOBLOCK,
 	 *          as it may be called from within the page-fault handler. */
 	NONNULL((1, 2)) void (KCALL *dt_changed)(struct vm_datablock *__restrict self, struct vm_datapart *__restrict part);
@@ -1621,7 +1621,7 @@ struct vm_datablock_type {
 
 	/* [0..1] Optional operators for when read(2) or write(2) is used with
 	 *        a file descriptor pointing to a vm_datablock of this type.
-	 * These callbacks are used by UVIO datablocks to implement the
+	 * These callbacks are  used by UVIO  datablocks to implement  the
 	 * server/client architecture for user-space driven VIO emulation. */
 	WUNUSED NONNULL((1)) size_t
 	(KCALL *mo_stream_read)(struct vm_datablock *__restrict self,
@@ -1631,9 +1631,9 @@ struct vm_datablock_type {
 	(KCALL *mo_stream_write)(struct vm_datablock *__restrict self,
 	                         USER CHECKED void const *src,
 	                         size_t num_bytes, iomode_t mode) THROWS(...);
-	/* [0..1] Same as above, but used when polling for data being available.
+	/* [0..1] Same as above, but used  when polling for data being  available.
 	 * When not implemented (i.e. when set to `NULL'), poll is implemented for
-	 * the datablock through use of `rwlock_poll(read|write)(&self->db_lock)' */
+	 * the datablock through use of  `rwlock_poll(read|write)(&self->db_lock)' */
 	NONNULL((1)) void
 	(KCALL *dt_handle_pollconnect)(struct vm_datablock *__restrict self,
 	                               poll_mode_t what) THROWS(...);
@@ -1643,7 +1643,7 @@ struct vm_datablock_type {
 };
 
 
-/* Value for `db_parts' when all parts are not tracked as shared, but are instead
+/* Value for  `db_parts' when  all  parts are  not tracked  as  shared, but  are  instead
  * newly allocated each time they are accessed through `vm_paged_datablock_locatepart()'. */
 #define MFILE_PARTS_ANONYMOUS ((struct vm_datapart *)-1)
 
@@ -1653,30 +1653,30 @@ struct vio_operators;
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 struct vm_datablock {
-	/* An infinite-length data block descriptor, used to refer
+	/* An  infinite-length data block descriptor, used to refer
 	 * to the contents, and represent ownership of memory, both
 	 * shared, and private.
 	 * Its most important distinction is its ability to track all
-	 * nodes that are mapping some portion of it, as well as its
-	 * use by the filesystem, as every file-INode contains a
-	 * vm_datablock that is used to address the INode's file
+	 * nodes that are mapping some portion of it, as well as  its
+	 * use by  the filesystem,  as  every file-INode  contains  a
+	 * vm_datablock that  is used  to  address the  INode's  file
 	 * contents when mapped in memory. */
 	WEAK refcnt_t                       db_refcnt; /* Reference counter. */
 	struct rwlock                       db_lock;   /* Lock for this data block.
 	                                                * HINT: You can poll the signal of this lock if you wish to wait
-	                                                *       for changes in parts where changes must be tracked. */
+	                                                *       for changes  in parts  where  changes must  be  tracked. */
 	struct vm_datablock_type const     *db_type;   /* [1..1][const] The type descriptor for this datablock. */
 #ifdef LIBVIO_CONFIG_ENABLED
 	struct vio_operators const         *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
 #endif /* LIBVIO_CONFIG_ENABLED */
 	REF ATREE_HEAD(struct vm_datapart)  db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
-	                                                * NOTE: When set to `MFILE_PARTS_ANONYMOUS', new parts are always
+	                                                * NOTE: When  set  to  `MFILE_PARTS_ANONYMOUS',  new  parts  are always
 	                                                *       allocated anonymously, and never added to the actual datablock.
-	                                                * NOTE: Due the process of anonymizing a data block, this field is set
+	                                                * NOTE: Due  the process of  anonymizing a data block,  this field is set
 	                                                *       to `MFILE_PARTS_ANONYMOUS', as is done when (e.g.) the associated
 	                                                *       file gets deleted. */
 	/* Page index conversion.
-	 * NOTE: This can entirely be ignored for most data
+	 * NOTE: This can entirely  be ignored  for most  data
 	 *       blocks which simply fill in these members as:
 	 * >> db_pageshift = 0;
 	 * >> db_addrshift = PAGESHIFT;
@@ -1684,16 +1684,16 @@ struct vm_datablock {
 	 * >> db_pagemask  = 0;
 	 * >> db_pagesize  = PAGESIZE; */
 	unsigned int              db_pageshift; /* [const][<= PAGESHIFT] Shift applied to page indices for converting between
-	                                         * `pageid_t' and `datapage_t', or `uintptr_t' and `pos_t' or `pos_t'.
-	                                         * -> Since loading file data is most efficient when done in blocks,
-	                                         *    which are usually 512 bytes large, it would be a waste if any
+	                                         * `pageid_t' and  `datapage_t',  or  `uintptr_t'  and  `pos_t'  or  `pos_t'.
+	                                         * -> Since  loading file data is most efficient when done in blocks,
+	                                         *    which  are usually 512 bytes large, it  would be a waste if any
 	                                         *    form of file access that wishes to use VM data-blocks as access
-	                                         *    mechanism would always have to load whole pages (usually 4096
+	                                         *    mechanism would always have to  load whole pages (usually  4096
 	                                         *    bytes) when it is known that this much isn't actually needed.
 	                                         * -> In this case, `db_pageshift' could be set to `3', because
 	                                         *   (512 << 3) == 4096, thus allowing the page-property vectors
 	                                         *    to still have 512-byte precision, while faulting whole pages
-	                                         *    simply require to load 8 continuous blocks at once. */
+	                                         *    simply  require  to  load  8  continuous  blocks  at   once. */
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 	unsigned int              db_addrshift; /* [const][== PAGESHIFT - db_pageshift]
 	                                         * Shift that must be applied to convert between `datapage_t' and `pos_t' or `pos_t' or `uintptr_t'. */
@@ -1872,20 +1872,20 @@ DATDEF struct vm_datablock_type inode_datablock_type;
 #define vm_datablock_isinode(x) ((x)->db_type == &inode_datablock_type)
 
 
-/* Anonymize the given data block `self' (tearing down its part tree, and
+/* Anonymize the  given  data block  `self'  (tearing  down its  part  tree,  and
  * changing all of the nodes to be bound to `vm_datablock_anonymous_zero_vec[*]',
- * meaning that any future memory access will yield all ZEROes)
- * This in turn will resolve all of the reference loops between every
- * part reachable from `db_parts', which then point back via their `dp_block'
- * pointer, essentially getting rid of all of the data block's self-references.
- * NOTE: The caller should _NOT_ already be holding a lock to `self'!
+ * meaning   that   any   future   memory   access   will   yield   all   ZEROes)
+ * This  in  turn  will  resolve  all  of  the  reference  loops  between   every
+ * part reachable from  `db_parts', which  then point back  via their  `dp_block'
+ * pointer, essentially getting rid of  all of the data block's  self-references.
+ * NOTE: The caller  should  _NOT_  already  be holding  a  lock  to  `self'!
  *       Doing so may cause this function to dead-lock, as it would be unable
  *       to perform a single-lock wait operation in case some other thread is
  *       already holding a lock to one of the parts, whilst trying to acquire
  *       a lock to the associated block, without would already be held by the
  *       caller.
  * HINT: This function is used to detach file mappings when a file gets
- *       deleted, or when an entire superblock block is unmounted.
+ *       deleted, or  when an  entire  superblock block  is  unmounted.
  * @return: true:  The given datablock has now become anonymous.
  * @return: false: The given datablock had already been anonymized.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
@@ -1899,16 +1899,16 @@ vm_datablock_anonymize(struct vm_datablock *__restrict self)
  *        INode is truncated. */
 
 
-/* Allow the use of `vm_datablock_deanonymize()' on the given `self'
- * Currently, only inode-based datablocks can be deanonymized.
+/* Allow the  use  of  `vm_datablock_deanonymize()'  on  the  given  `self'
+ * Currently,    only   inode-based   datablocks   can   be   deanonymized.
  * Note that for any class of datablock to support non-anonymous dataparts,
- * they must be able to deal with the reference loop that is formed from
- * the use of non-anonymous dataparts (vm_datablock->db_parts->dp_block),
- * in a way that makes sense and doesn't result in memory leaks.
+ * they must be able to  deal with the reference  loop that is formed  from
+ * the use of  non-anonymous dataparts  (vm_datablock->db_parts->dp_block),
+ * in  a  way  that  makes  sense  and  doesn't  result  in  memory  leaks.
  *
  * For Inodes, this loop is actually intentional, and is what keeps
- * pre-loaded files cached in main memory, such that the files are
- * only unloaded once they are deleted, the associated superblock
+ * pre-loaded  files cached in main memory, such that the files are
+ * only unloaded once they  are deleted, the associated  superblock
  * is unmounted, or the system is low on memory. */
 #define vm_datablock_allow_deanonymize(self) \
 	vm_datablock_isinode(self)
@@ -1932,7 +1932,7 @@ NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
 	(__hybrid_atomic_load((self)->db_parts, __ATOMIC_ACQUIRE) == MFILE_PARTS_ANONYMOUS)
 
 
-/* Synchronize all modified data pages within the specified address range.
+/* Synchronize all modified data pages within the specified address  range.
  * When called, this function will go through all data parts of `self', and
  * save any changed data pages using `self->db_type->dt_savepart'
  * @return: * : The number of saved data pages. */
@@ -1943,7 +1943,7 @@ vm_datablock_sync(struct vm_datablock *__restrict self,
 		THROWS(E_WOULDBLOCK, ...);
 
 /* Check if there are changed parts within the specified address range.
- * NOTE: The caller must be holding a read-lock on `self' */
+ * NOTE:  The   caller  must   be  holding   a  read-lock   on   `self' */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
                                        datapage_t minpage DFL((datapage_t)0),
@@ -1953,11 +1953,11 @@ NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
 /* Construct a new datapart for the given address range.
  * NOTES:
  *  - The data part is _not_ inserted into the part-tree of `self',
- *    and it is the caller's task to do so, or to ensure that the
+ *    and it is the caller's task to  do so, or to ensure that  the
  *    given datablock is anonymous.
  *  - The data part is created as `VM_DATAPART_STATE_ABSENT', or
  *    `VM_DATAPART_STATE_VIOPRT' in the event that the data part
- *    refers to a VIO mapping. Additionally, all data pages are
+ *    refers to a VIO mapping. Additionally, all data pages  are
  *    initialized as `VM_DATAPART_PPP_UNINITIALIZED'. */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_createpart(struct vm_datablock *__restrict self,
@@ -1975,8 +1975,8 @@ vm_paged_datablock_createpart(struct vm_datablock *__restrict self,
 
 /* Lookup and return a reference the data part containing the given `start_offset'
  * NOTE: When `self' is an anonymous data block (`self->db_parts == MFILE_PARTS_ANONYMOUS'),
- *       the the returned data part will be allocated anonymously as well, meaning that
- *       it will not be shared (`!isshared(return)'), and not be re-returned when the
+ *       the the returned  data part  will be allocated  anonymously as  well, meaning  that
+ *       it  will  not be  shared  (`!isshared(return)'), and  not  be re-returned  when the
  *       call is repeated with the same arguments passed once again. */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart(struct vm_datablock *__restrict self,
@@ -1992,8 +1992,8 @@ vm_paged_datablock_locatepart(struct vm_datablock *__restrict self,
 	                               num_vpages_hint * PAGESIZE);
 }
 
-/* Same as `vm_paged_datablock_locatepart()', but ensure that the returned datapart
- * starts at exactly at `start_offset', and that it doesn't have span more than
+/* Same as `vm_paged_datablock_locatepart()', but ensure that the returned  datapart
+ * starts at exactly  at `start_offset',  and that it  doesn't have  span more  than
  * `max_num_bytes' pages of virtual memory (though it may still span less than that) */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
@@ -2016,9 +2016,9 @@ vm_paged_datablock_locatepart_exact(struct vm_datablock *__restrict self,
  *       with memory from `self', in which case reading is performed using
  *       an intermediate buffer, so-as to prevent a possible dead-lock.
  * NOTE: The caller must _NOT_ be holding any lock to `self', or any of its
- *       data parts, or even any VM-tree when calling this function.
+ *       data parts,  or  even  any VM-tree  when  calling  this  function.
  * WARNING: None of these functions do any bound-checks!
- *          In other words, it is up to `dt_loadpart()' to still initialize
+ *          In  other  words,  it  is  up  to  `dt_loadpart()'  to  still initialize
  *          memory past the end of a file properly (usually by zero-initializing it)
  * @return: * : The number of transferred bytes. */
 FUNDEF NONNULL((1)) void KCALL vm_datablock_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -2031,7 +2031,7 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *_
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
- * memory backing is `safe' (i.e. access could never cause a #PF attempting to
+ * memory  backing is `safe' (i.e. access could  never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_read_unsafe(struct vm_datablock *__restrict self, void *__restrict dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_write_unsafe(struct vm_datablock *__restrict self, void const *__restrict src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -2065,14 +2065,14 @@ DATDEF struct vm_datablock_type vm_datablock_anonymous_type;
 DATDEF struct vm_datablock vm_datablock_anonymous_zero;
 DATDEF struct vm_datablock_type vm_datablock_anonymous_zero_type;
 
-/* Same as `vm_datablock_anonymous_zero', however the index refers to the intended pageshift.
- * This is required so that `vm_datablock_anonymize()' doesn't have to deal with initializing
- * partially initialized physical pages of data parts, with even though could be done noexcept,
- * could only done so for parts that are either absent, or have been allocated as INCORE/LOCKED.
- * It can't however be done NOEXCEPT for INSWAP parts, as those would first have to be loaded
- * from swap, which in itself might cause an `E_IOERROR', which the function wouldn't know how
+/* Same as  `vm_datablock_anonymous_zero', however  the index  refers to  the intended  pageshift.
+ * This is required  so that  `vm_datablock_anonymize()' doesn't  have to  deal with  initializing
+ * partially initialized physical pages of  data parts, with even  though could be done  noexcept,
+ * could  only done so for parts that are  either absent, or have been allocated as INCORE/LOCKED.
+ * It can't however be  done NOEXCEPT for  INSWAP parts, as  those would first  have to be  loaded
+ * from  swap, which in  itself might cause an  `E_IOERROR', which the  function wouldn't know how
  * to deal with. - So instead, it simply re-assigns an anonymous data part with the same pageshift
- * as was originally used by the original data block, further simplifying anonymization as this
+ * as was originally used by  the original data block,  further simplifying anonymization as  this
  * way it doesn't entail any changes made to a part's address range or data-page encoding. */
 DATDEF struct vm_datablock vm_datablock_anonymous_zero_vec[PAGESHIFT + 1];
 DATDEF struct vm_datablock_type vm_datablock_anonymous_zero_type_vec[PAGESHIFT + 1];
@@ -2081,8 +2081,8 @@ DATDEF struct vm_datablock_type vm_datablock_anonymous_zero_type_vec[PAGESHIFT +
 
 
 struct mramfile {
-	/* RAM File (a datablock type that can be used to represent a
-	 * limited segment of physical RAM available as a generic data
+	/* RAM File (a  datablock type  that can  be used  to represent  a
+	 * limited  segment of  physical RAM  available as  a generic data
 	 * block) - This type of data block is used to safely load dynamic
 	 * loaders into user-space memory. */
 	struct vm_datablock rf_block; /* The underlying ram block. */
@@ -2112,16 +2112,16 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 #define VM_NODE_FLAG_PREPARED     0x0001 /* The node has been prepared within the associated page directory. */
 /* TODO: Remove `VM_NODE_FLAG_PARTITIONED' */
 #define VM_NODE_FLAG_PARTITIONED  0x0002 /* Set if the node has been split when the associated data part was split.
-                                          * This flag affects how the page directory is un-prepared when the node
+                                          * This flag affects how the page  directory is un-prepared when the  node
                                           * gets unmapped. When set, associated memory must be unmapped as:
                                           * >> pagedir_prepare(vm_node_getaddr(self), vm_node_getsize(self)); // NOTE: This may cause an error!
                                           * >> pagedir_unmap(vm_node_getaddr(self), vm_node_getsize(self));
                                           * >> pagedir_unprepare(vm_node_getaddr(self), vm_node_getsize(self));
-                                          * When not set, associated memory can simply be unmapped as:
+                                          * When  not  set,  associated  memory  can  simply  be  unmapped  as:
                                           * >> pagedir_unmap(vm_node_getaddr(self), vm_node_getsize(self));
                                           * >> pagedir_unprepare(vm_node_getaddr(self), vm_node_getsize(self)); */
 #define VM_NODE_FLAG_GROWSUP      0x0004 /* When guarding, the node grows up rather than down. */
-#define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized pages apart of this node hint towards it.
+#define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized  pages  apart  of  this  node  hint  towards  it.
                                           * This flag is set for memory mapping that can be initialized atomically.
                                           * When set the following restrictions are applied:
                                           *  - node->vn_prot & VM_PROT_SHARED
@@ -2142,8 +2142,8 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
                                           *  - node->vn_part->dp_state == VM_DATAPART_STATE_LOCKED
                                           * Additionally, this `struct vm_node' must be hinted towards by the
                                           * entirety of its associated page directory mapping range, with all
-                                          * of these requirements put together allowing memory mapped by the
-                                          * node to be initialized without ever needing to block, making it
+                                          * of these requirements put together allowing memory mapped by  the
+                                          * node to be initialized without  ever needing to block, making  it
                                           * suitable for initialization of `GFP_LOCKED' heap memory. */
 #define VM_NODE_FLAG_NOMERGE      0x2000 /* [const] This node was allocated by custom means and must not be merged with its neighbors! */
 #define VM_NODE_FLAG_COREPRT      0x4000 /* [const] The part was allocated as a corebase datapart. (see /src/memory/corebase.h) */
@@ -2159,8 +2159,8 @@ struct vm_node {
 	uintptr_half_t              vn_flags;  /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] VM Node flags (Set of `VM_FLAG_F*'). */
 	struct vm                  *vn_vm;     /* [1..1][const] The associated VM */
 	REF struct vm_datapart     *vn_part;   /* [0..1][lock(vn_vm->v_treelock)][const_if(VM_NODE_FLAG_HINTED || VM_NODE_FLAG_KERNPRT)]
-	                                        * NOTE: When `vn_block' is `NULL', then this field is _required_ to be `NULL'
-	                                        * The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
+	                                        * NOTE:  When  `vn_block'  is  `NULL',  then  this  field  is  _required_  to  be `NULL'
+	                                        * The mapped  part (or  `NULL'  if this  VM Node  describes  a reserved  memory  region) */
 	REF struct vm_datablock    *vn_block;  /* [0..1][const] The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
 	REF struct path            *vn_fspath; /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry *vn_fsname; /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
@@ -2168,16 +2168,16 @@ struct vm_node {
 	                                        * `vn_part->dp_crefs' or `vn_part->dp_srefs'.
 	                                        * Which chain is used depends on the `VM_PROT_SHARED' bit. */
 	uintptr_t                   vn_guard;  /* [const] An associated guard descriptor, used to implement lazy stack growth.
-	                                        * When `0', the node acts normally and guard behavior is disabled.
+	                                        * When  `0',  the  node  acts   normally  and  guard  behavior  is   disabled.
 	                                        * When `1', any access made to the node results in an `E_STACK_OVERFLOW' exception being generated.
-	                                        * Otherwise, accessing any page apart of this node will cause a new 1-page large node to be
-	                                        * created either below or above this one (depending on `VM_NODE_FLAG_GROWSUP'), with that
+	                                        * Otherwise, accessing  any page  apart of  this node  will cause  a new  1-page large  node to  be
+	                                        * created either  below  or  above  this  one  (depending  on  `VM_NODE_FLAG_GROWSUP'),  with  that
 	                                        * node being created with `vn_guard' decremented by one.
 	                                        * If the `vn_guard' value of the new node is `1', `vn_part' of that node is set to `NULL'.
-	                                        * Otherwise, the node is initialized to map to the proper data part above of below the
+	                                        * Otherwise, the node is  initialized to map to  the proper data part  above of below  the
 	                                        * one that this node is mapped to.
 	                                        * When a node is split due to a call to `vm_datapart_split()', only the upper (w/ VM_NODE_FLAG_GROWSUP)
-	                                        * or lower (w/o VM_NODE_FLAG_GROWSUP) node will retain its `vn_guard' setting, while the other
+	                                        * or lower  (w/o  VM_NODE_FLAG_GROWSUP)  node will  retain  its  `vn_guard' setting,  while  the  other
 	                                        * will have this field set to 0. */
 	/* TODO: Memory breakpoint support (any memory access is emulated using VIO) */
 };
@@ -2199,17 +2199,17 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self);
 
 
 /* Delete the mapping `self' for the purpose of re-loading
- * write permissions in on the following scenarios:
+ * write   permissions  in  on  the  following  scenarios:
  *  - mmap(MAP_PRIVATE):
- *    The first mapping of a data part that is already being SHARED by
+ *    The first mapping of a data part that is already being SHARED  by
  *    any number of other mappings. - In this case, all existing SHARED
- *    mappings need to have their write-access updated, so-as to allow
+ *    mappings need to have their write-access updated, so-as to  allow
  *    the copy-on-write mapping to be unshared after the next write.
  *    -> `vm_node_update_write_access()' needs to be called for every
  *        pre-existing SHARED memory mapping.
  *  - mmap(MAP_PRIVATE):
  *    The second mapping of an anonymous datapart (aka. the first datapart
- *    had been granted write-access since it was the sole owner owner of
+ *    had been granted write-access since it  was the sole owner owner  of
  *    the underlying anonymous memory)
  *    -> `vm_node_update_write_access()' needs to be called for the
  *        pre-existing PRIVATE memory mapping.
@@ -2223,7 +2223,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self);
 #define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC   2 /* ERROR: Failed to prepare the underlying page directory for making modifications to the associated mapping. */
 
 /* Same as `vm_node_update_write_access()', but the caller
- * is already holding a write-lock to `locked_vm' */
+ * is  already   holding  a   write-lock  to   `locked_vm' */
 FUNDEF NOBLOCK unsigned int
 NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict self,
                                                      struct vm *__restrict locked_vm);
@@ -2306,17 +2306,17 @@ struct vm {
 	size_t                     v_heap_size;     /* [const] Size of the heap pointer used to allocated this VM. */
 	struct atomic_rwlock       v_treelock;      /* Lock for this VM */
 	struct task_list           v_tasks;         /* [0..1][lock(v_tasklock)] Chain of threads using this VM.
-	                                             * WARNING: This chain may contain terminated tasks,
+	                                             * WARNING: This  chain  may  contain  terminated  tasks,
 	                                             *          tasks that haven't yet started, or even tasks
 	                                             *          with a reference counter of ZERO(0)! */
 	struct atomic_rwlock       v_tasklock;      /* Lock for `v_tasks' */
 	WEAK REF struct task      *v_deltasks;      /* [0..1][CHAIN(key:KEY_task__next)]
-	                                             * Chain of tasks that are pending deletion from `v_tasks',
-	                                             * as well as follow-up `heap_free()' of the task in question.
+	                                             * Chain   of   tasks   that   are   pending   deletion   from   `v_tasks',
+	                                             * as   well  as   follow-up  `heap_free()'   of  the   task  in  question.
 	                                             * NOTE: All other components of the task will have already been destroyed. */
-	struct vm_node             v_kernreserve;   /* A special RESERVED-like node that is used by user-space VMs
-	                                             * to cover the entire kernel-space, preventing user-space from
-	                                             * accidentally overwriting it, without the need of adding too
+	struct vm_node             v_kernreserve;   /* A special RESERVED-like node that  is used by user-space  VMs
+	                                             * to  cover the entire kernel-space, preventing user-space from
+	                                             * accidentally overwriting it, without  the need of adding  too
 	                                             * many special-case exceptions to various VM-related functions.
 	                                             * NOTE: For the kernel-VM itself, this node is unused. */
 };
@@ -2340,8 +2340,8 @@ FUNDEF ATTR_RETNONNULL WUNUSED REF struct vm *KCALL
 vm_alloc(void) THROWS(E_BADALLOC, ...);
 
 /* Clone the given VM `self'
- * NOTE: The clone operation is performed atomically, meaning that
- *       this function guaranties that at one point both `self' and
+ * NOTE: The clone operation  is performed  atomically, meaning  that
+ *       this function guaranties that at  one point both `self'  and
  *       the returned VM contained perfectly identical mappings, even
  *       if during the course of this function operating the mappings
  *       contained within `self' are being changed.
@@ -2352,7 +2352,7 @@ vm_clone(struct vm *__restrict self, bool keep_loose_mappings DFL(false))
 		THROWS(E_BADALLOC, ...);
 
 
-/* Set the VM active within the calling thread, as well as
+/* Set  the VM active within the calling thread, as well as
  * change page directories to make use of the new VM before
  * returning.
  * NOTE: The caller must NOT be holding a lock to either
@@ -2470,9 +2470,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  *
  * vm_sync():
  *    - Sync memory only for the page directory of the given VM.
- *      Special case when `self == &vm_kernel', in which case
+ *      Special case  when `self == &vm_kernel',  in which  case
  *      memory is synced on every online CPU.
- *    - Aside from that special case, same as
+ *    - Aside from that  special case, same  as
  *      `pagedir_sync_smp_p(self->v_pdir_phys)'
  *
  * this_vm_sync():
@@ -2490,29 +2490,29 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  *
  * pagedir_sync():
  *    - Low-level, arch-specific page directory syncing.
- *    - Syncs memory within the given page directory, but only does so in
+ *    - Syncs memory within  the given  page directory,  but only  does so  in
  *      the context of the calling CPU. May be used for deleting thread-local,
- *      temporary memory mappings if you can guaranty that these mappings
- *      never left the view of your current thread. - Else, depending on
- *      where the mapping was placed, either `pagedir_sync_smp()' or
+ *      temporary memory  mappings if  you can  guaranty that  these  mappings
+ *      never  left  the view  of your  current thread.  - Else,  depending on
+ *      where  the  mapping   was  placed,   either  `pagedir_sync_smp()'   or
  *      `vm_supersync()' must be used instead.
- *    - Note that when a thread is transfered to a different CPU, the old
+ *    - Note that when a  thread is transfered to  a different CPU, the  old
  *      cpu will always perform a call to `pagedir_syncall()', thus ensuring
- *      that it no longer has any memories of memory mappings that may have
- *      been private to that thread, and thus should no longer be visible
+ *      that it no longer has any memories of memory mappings that may  have
+ *      been  private to that  thread, and thus should  no longer be visible
  *      to the old CPU.
  */
 
 
 /* vm syncing functions. These functions must be called when a memory mapping
- * becomes more restrictive, or has been deleted. These functions will
- * automatically send IPIs to all CPUs that are using a given VM, such that
+ * becomes more  restrictive,  or  has been  deleted.  These  functions  will
+ * automatically send IPIs to all CPUs that  are using a given VM, such  that
  * the caller may assume that upon return of these functions:
  *  - All CPUs that may have been using `self' will have either synced
- *    their page directory cache to mirror the current mapping state,
- *    or are about to do so no later than the next time such a CPU is
+ *    their page directory cache to mirror the current mapping  state,
+ *    or  are about to do so no later than the next time such a CPU is
  *    going to enable preemption.
- * Note though that all other vm_*-level APIs already perform syncing
+ * Note though that all other vm_*-level APIs already perform  syncing
  * automatically, unless otherwise documented by individual functions. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_sync)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_syncone)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
@@ -2584,7 +2584,7 @@ vm_paged_mapat(struct vm *__restrict self,
 }
 
 /* Same as `vm_paged_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
- * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
+ * to  be  mapped  from  `data'.  - Any  attempted  to  map  data  from outside  that  range  will  instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
  * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
@@ -2648,18 +2648,18 @@ vm_mapresat(struct vm *__restrict self,
 
 
 /* Determine a suitable, free memory location for `num_pages'
- * aligned by a multiple of `min_alignment_in_pages' pages.
+ * aligned by a  multiple of `min_alignment_in_pages'  pages.
  * Search happens as follows:
  *   #1: Search according to `VM_GETFREE_ABOVE/VM_GETFREE_BELOW'
  *       Additionally, check for surrounding nodes which are set
  *       up as GUARD nodes. - If such a node is found, it's size
  *       is considered to have reached its maximum potential for
- *       this purpose (limited by how often `vn_guard' can be
+ *       this purpose (limited  by how often  `vn_guard' can  be
  *       decremented, as well as any other memory mapping it may
  *       run into before then)
  *       If a this process yields only a single candidate, that
  *       candidate is returned as result.
- *       If a this process yields more than 1 candidate, the one chosen
+ *       If  a this  process yields more  than 1 candidate,  the one chosen
  *       depends on `VM_GETFREE_ABOVE / VM_GETFREE_BELOW / VM_GETFREE_ASLR'
  *        - VM_GETFREE_ABOVE: The candidate with the lowest memory address is used
  *        - VM_GETFREE_BELOW: The candidate with the greatest memory address is used
@@ -2682,10 +2682,10 @@ NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
 #define VM_GETFREE_ABOVE  0x0000 /* Search for viable, free mappings that are `>= hint' */
 #define VM_GETFREE_BELOW  0x0001 /* Search for viable, free mappings that are `<= hint-num_pages'  */
 #define VM_GETFREE_STRICT 0x0002 /* After a search for free space failed to yielding a viable memory
-                                  * location in accordance to `VM_GETFREE_ABOVE|VM_GETFREE_BELOW',
+                                  * location in  accordance to  `VM_GETFREE_ABOVE|VM_GETFREE_BELOW',
                                   * do _NOT_ re-attempt the search into the other direction. */
 #define VM_GETFREE_ASLR   0x0004 /* Randomize return values (see above) */
-/* TODO: Flag `VM_GETFREE_USER'  --  When `self' is `&vm_kernel', allow returned pointers
+/* TODO: Flag `VM_GETFREE_USER'  -- When  `self' is  `&vm_kernel', allow  returned  pointers
  *       to be apart of user-space, as opposed to only ever returning kernel-space pointers. */
 #define VM_PAGED_GETFREE_ERROR  (__CCAST(pageid_t)(__ARCH_PAGEID_MAX + 1))
 
@@ -2712,7 +2712,7 @@ NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
 
 
 /* Get/set ASLR-disabled (defaults to `false'; can also be
- * enabled by passing `noaslr' on the kernel commandline)
+ * enabled  by passing `noaslr' on the kernel commandline)
  * When enabled, the `VM_GETFREE_ASLR' is simply ignored
  * when passed to either `vm_paged_getfree()' or `vmb_paged_getfree()'
  * @return: * : The state of ASLR_DISABLED prior to the call being made. */
@@ -2781,7 +2781,7 @@ vm_paged_map(struct vm *__restrict self,
 }
 
 /* Same as `vm_paged_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
- * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
+ * to be  mapped  from `data'.  -  Any attempted  to  map  data from  outside  that range  will  instead  cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
  * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
@@ -2858,17 +2858,17 @@ vm_mapres(struct vm *__restrict self,
 #define VM_UNMAP_GUARD            0x0002 /* Unmap guard nodes (nodes with `vn_guard != 0') */
 #define VM_UNMAP_RESERVE          0x0004 /* Unmap reserved regions of memory (nodes with `vn_part == NULL') */
 #define VM_UNMAP_SEGFAULTIFUNUSED 0x2000 /* When set, throw an `E_SEGFAULT_UNMAPPED' exception with the lowest address
-                                          * of the first segment of memory apart of the given range that isn't mapped
-                                          * to some node that's allowed to be unmapped. This check is done such that
-                                          * it happens before any memory may get unmapped, meaning that when given,
-                                          * the function will only succeed when the entire range can be unmapped at
+                                          * of  the first segment of memory apart of the given range that isn't mapped
+                                          * to some node that's allowed to be  unmapped. This check is done such  that
+                                          * it  happens before any  memory may get unmapped,  meaning that when given,
+                                          * the function will only  succeed when the entire  range can be unmapped  at
                                           * once, and fail with an E_SEGFAULT otherwise.
-                                          * When not set, unmapped portions of the given address range are simply ignored,
+                                          * When not set, unmapped portions of the given address range are simply  ignored,
                                           * and will not count towards the return value's meaning of the number of unmapped
                                           * pages of memory. */
 #define VM_UNMAP_NOSPLIT          0x4000 /* Don't split nodes in order to be able to partially unmap one of them.
                                           * Instead, only unmap whole nodes, or nothing at all. */
-#define VM_UNMAP_NOKERNPART       0x8000 /* Instead of causing kernel panic when attempting to unmap
+#define VM_UNMAP_NOKERNPART       0x8000 /* Instead of causing kernel  panic when attempting to  unmap
                                           * a kernel part, simply ignore the request (this flag is set
                                           * when user-space tries to unmap memory) */
 #define VM_UNMAP_ANYTHING         0x0fff /* Unmap anything */
@@ -2906,7 +2906,7 @@ vm_protect(struct vm *__restrict self,
 
 
 
-/* Insert the given node into its associated VM (self->vn_vm)
+/* Insert  the  given  node  into  its  associated  VM   (self->vn_vm)
  * NOTE: The caller must be holding a write-lock to the associated VM. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self);
@@ -2937,7 +2937,7 @@ NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
 }
 
 /* Unmap a kernel-space memory mapping (that was created using `VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED')
- * from kernel-space, where the caller must be holding a lock to `vm_kernel_treelock_write()'
+ * from   kernel-space,   where  the   caller  must   be  holding   a  lock   to  `vm_kernel_treelock_write()'
  * HINT: In order to do this entirely non-blocking, you should make use
  *       of `vm_kernel_pending_operations'! */
 FUNDEF NOBLOCK void
@@ -2946,7 +2946,7 @@ NOTHROW(FCALL vm_unmap_kernel_mapping_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void
 
 
 
-/* Get the node associated with the given `page'
+/* Get  the  node   associated  with   the  given   `page'
  * NOTE: The caller must be holding a read-lock on `self'. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
 NOTHROW(FCALL vm_getnodeofpageid)(struct vm *__restrict self,
@@ -2959,7 +2959,7 @@ NOTHROW(FCALL vm_getnodeofaddress)(struct vm *__restrict self,
 
 
 /* Check if some part of the given address range is currently in use.
- * NOTE: The caller must be holding a read-lock on `self'. */
+ * NOTE:  The  caller  must  be   holding  a  read-lock  on   `self'. */
 FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(FCALL vm_paged_isused)(struct vm *__restrict self,
                                pageid_t min_page, pageid_t max_page);
@@ -2977,13 +2977,13 @@ NOTHROW(FCALL vm_isused)(struct vm *__restrict self,
 /* Try to prefault memory for the given address range within the current VM.
  * This function is intended to be used in conjunction with `memcpy_nopf()',
  * as well as functions using it in order to speed up the lock-copy-unlock-do_buffered_io-repeat
- * cycle by potentially allowing the caller to skip having to perform buffered I/O
- * in cases where the backing memory can be made to be backed by real, physical memory,
+ * cycle   by  potentially  allowing  the  caller  to   skip  having  to  perform  buffered  I/O
+ * in  cases  where the  backing memory  can  be made  to be  backed  by real,  physical memory,
  * as opposed to not being mapped at all, or being mapped by VIO memory.
- * NOTE: This function should only be used as a hint for figuring out how buffered I/O should
- *       be performed in face of a memory range that cannot be accessed by `memcpy_nopf()'.
+ * NOTE: This  function should only be used as a  hint for figuring out how buffered I/O should
+ *       be performed in face  of a memory  range that cannot  be accessed by  `memcpy_nopf()'.
  *       In practice, this means that code using it should be aware that as far as the reliable
- *       semantics of this function go, one valid implementation could simply look like this:
+ *       semantics  of this function go, one valid  implementation could simply look like this:
  *       >> PUBLIC size_t FCALL
  *       >> vm_prefault(USER CHECKED void const *addr, size_t num_bytes, bool for_writing)
  *       >>         THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -2996,23 +2996,23 @@ NOTHROW(FCALL vm_isused)(struct vm *__restrict self,
  *       >>     // as well as handle the case of VIO memory being accessed.
  *       >>     return 1;
  *       >> }
- * NOTE: For a valid usage example of this function, you may look at the implementation of
- *       the `vm_datapart_(read|write)()' function pair, which uses it in order to determine
+ * NOTE: For a valid  usage example of  this function, you  may look at  the implementation  of
+ *       the  `vm_datapart_(read|write)()' function pair,  which uses it  in order to determine
  *       the number of bytes that must be processed using `vm_datapart_(read|write)_buffered()'
  * @param: for_writing: When true, make sure that memory within the associated gets
  *                      faulted such that copy-on-write operations are carried out.
- *                      Otherwise, only make sure that memory from the given range
+ *                      Otherwise, only make  sure that memory  from the given  range
  *                      can be read from (though again: even this is only to be taken
- *                      as a hint. - This function is allowed to just do nothing if
+ *                      as  a hint. - This function is  allowed to just do nothing if
  *                      it wants to)
  * @assume(num_bytes != 0);
  * @return: 0 :
- *     At least 1 page of memory (the one containing `addr') was faulted.
- *     In this case, the caller can immediately go back to performing direct I/O,
+ *     At least  1  page  of  memory  (the  one  containing  `addr')  was  faulted.
+ *     In  this case, the caller can immediately  go back to performing direct I/O,
  *     though the possibility exists that either due to the backing physical memory
  *     for the given address range being swapped out, or this function choosing not
- *     to prefault the given range in its entirety, more transfer errors may still
- *     occur as memory from the given range is accessed using `memcpy_nopf()'.
+ *     to prefault the given range in its entirety, more transfer errors may  still
+ *     occur as  memory from  the given  range is  accessed using  `memcpy_nopf()'.
  *     Another possible reason for more transfer errors could be a VIO, or unmapped
  *     segment of memory starting further into the given range.
  * @return: >= 1 && <= num_bytes:
@@ -3030,22 +3030,22 @@ FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
 #define VM_FORCEFAULT_FLAG_NOVIO 0x0002 /* Throw an `E_SEGFAULT' exception when a VIO mapping is encountered. */
 #endif /* LIBVIO_CONFIG_ENABLED */
 
-/* Force all bytes within the given address range to be faulted for either reading
- * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
+/* Force all  bytes  within  the  given  address range  to  be  faulted  for  either  reading
+ * or writing. If  any page  within the  specified range  isn't mapped,  throw an  E_SEGFAULT
  * exception. Otherwise, ensure that copy-on-write is invoked when `VM_FORCEFAULT_FLAG_WRITE'
- * is set, and that irregardless of `VM_FORCEFAULT_FLAG_WRITE', physical memory is allocated
+ * is  set, and that irregardless of `VM_FORCEFAULT_FLAG_WRITE', physical memory is allocated
  * for any mapping that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
- * towards the returned value), unless `VM_FORCEFAULT_FLAG_NOVIO' is set
+ * towards   the   returned   value),   unless   `VM_FORCEFAULT_FLAG_NOVIO'   is  set
  * @return: * : The total number of bytes that had their mappings updated.
- * NOTE: This function will also update the page directory mappings for any dataparts
- *       that get faulted during its invocation, meaning that use of `memcpy_nopf()'
- *       within the indicated address range (whilst still checking it for errors for
+ * NOTE: This function will also update the page directory mappings for any  dataparts
+ *       that get faulted during its  invocation, meaning that use of  `memcpy_nopf()'
+ *       within the indicated address range (whilst  still checking it for errors  for
  *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
- *       possible immediately, without having to force any sort of additional memory
- *       access (note though that this only applies to the page directory of `self',
- *       though also note that if some datapart within the range was already faulted,
- *       its page directory mapping in `self' will still be updated, as it may have
+ *       possible immediately, without having to  force any sort of additional  memory
+ *       access  (note though that this only applies  to the page directory of `self',
+ *       though also note that if some datapart within the range was already  faulted,
+ *       its page directory mapping in  `self' will still be  updated, as it may  have
  *       been faulted as a lazy memory mapping). */
 FUNDEF size_t FCALL
 vm_forcefault(struct vm *__restrict self,
@@ -3055,7 +3055,7 @@ vm_forcefault(struct vm *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 /* Same as `vm_forcefault()', but automatically extend the faulted range
- * to all pages that are touched by the given `addr...+=num_bytes' */
+ * to  all  pages that  are  touched by  the  given `addr...+=num_bytes' */
 FUNDEF size_t FCALL
 vm_forcefault_p(struct vm *__restrict self,
                 UNCHECKED void *addr, size_t num_bytes,
@@ -3064,25 +3064,25 @@ vm_forcefault_p(struct vm *__restrict self,
 
 
 /* Lock and (possibly) unshare some given datapart for the purpose of performing
- * writes to its backing memory in the context of the given vm `self'.
+ * writes to  its  backing  memory  in  the context  of  the  given  vm  `self'.
  * This funciton is used by the #PF handler, `vm_write()', `vm_prefault()' and `vm_forcefault()'
- * whenever memory is accessed in a way that it is necessary to perform a write.
+ * whenever   memory  is  accessed  in  a  way  that   it  is  necessary  to  perform  a  write.
  * @param: self:              The VM inside of which `node' is mapped.
  * @param: ppart:             [in|out] A reference to the effective part being accessed (may be modified during unsharing)
  * @param: addr:              The access that is being accessed.
- * @param: node:              A pointer to the node that is being accessed. Note that since no lock is held to
+ * @param: node:              A pointer to the node that is being accessed. Note that since no lock is held  to
  *                            `self' when this function is called, this pointer may already no longer be valid!
  * @param: node_prot:         The original value of `node->vn_prot'
  * @param: node_vpage_offset: Page-offset into `node' to the first page to which write-access is actually required.
- *                            This must be equal to `PAGEID_ENCODE(addr) - vm_node_getstartpageid(node)'
- * @param: node_vpage_count:  The max number of consecutive pages for which write-access is required. For most
+ *                            This   must   be   equal   to    `PAGEID_ENCODE(addr) - vm_node_getstartpageid(node)'
+ * @param: node_vpage_count:  The  max number of consecutive pages for  which write-access is required. For most
  *                            kinds of memory accesses (including #PF-related ones), this argument is simply `1'
  * @param: pdid_unshare:      When non-NULL, set to `true' if the caller should try to merge `part' during decref(),
- *                            as the result of this function having actually performed an unshare.
- * @return: * : The number of consecutive pages loaded for write-access.
+ *                            as  the   result   of   this   function  having   actually   performed   an   unshare.
+ * @return: * : The  number  of consecutive  pages loaded  for write-access.
  *              In this case, a read-lock on `part' is passed to the caller.
  *              This is always at most `node_vpage_count'
- * @return: 0 : `node' is no longer valid (must re-attempt its lookup)
+ * @return: 0 : `node' is no longer  valid (must re-attempt its  lookup)
  *              In this case, no lock on `part' is passed to the caller. */
 FUNDEF size_t KCALL
 vm_lock_and_unshare_datapart_for_writing(struct vm *__restrict self,
@@ -3095,8 +3095,8 @@ vm_lock_and_unshare_datapart_for_writing(struct vm *__restrict self,
                                          bool *pdid_unshare);
 
 
-/* Sync changes made to file mappings within the given address
- * range with on-disk file images. (s.a. `vm_datablock_sync()')
+/* Sync  changes  made  to  file  mappings  within  the  given address
+ * range   with  on-disk  file  images.  (s.a.  `vm_datablock_sync()')
  * NOTE: Memory ranges that aren't actually mapped are simply ignored.
  * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
 FUNDEF u64 FCALL
@@ -3119,7 +3119,7 @@ vm_syncmem(struct vm *__restrict self,
 
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they
- * will only ever copy _true_ RAM, and never access VIO or cause LOA/COW.
+ * will only ever copy _true_ RAM, and never access VIO or cause  LOA/COW.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory range is:
@@ -3135,12 +3135,12 @@ NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
                               int byte, size_t num_bytes);
 
 
-/* High-level read/write memory to/from the given `src_vm'.
- * These functions do all the things necessary to read/write memory
+/* High-level  read/write   memory  to/from   the  given   `src_vm'.
+ * These functions do all the things necessary to read/write  memory
  * the same way a regular memory access would, including LOA/COW, as
  * well as properly accessing VIO.
  * @param: force_readable_source:      When true, force `addr' to be readable, ignoring `VM_PROT_READ'
- * @param: force_writable_destination: When true, force `addr' to be writable, invoking COW as needed.  */
+ * @param: force_writable_destination: When true, force `addr' to be writable, invoking COW as needed. */
 FUNDEF void KCALL
 vm_read(struct vm *__restrict self,
         UNCHECKED void const *addr, USER CHECKED void *buf,
@@ -3180,16 +3180,16 @@ NOTHROW(vm_dmalock_release)(struct vm_dmalock *__restrict self);
 
 /* Start DMAing on memory within the specified address range.
  * @param: prange:     A callback that is invoked for each affected physical memory range
- *                     Should this callback return `false', all previously acquired DMA
+ *                     Should this callback return  `false', all previously acquired  DMA
  *                     locks are released, and `vm_startdma[v][_nx]()' returns `0'
- * @param: preset:     A callback this is invoked when it was impossible to acquire all
- *                     necessary DMA locks simultaneously without causing a dead-lock.
- *                     This is then resolved by releasing all pre-existing locks, before
+ * @param: preset:     A callback this is invoked when  it was impossible to acquire  all
+ *                     necessary DMA locks  simultaneously without  causing a  dead-lock.
+ *                     This is then resolved by releasing all pre-existing locks,  before
  *                     forcibly acquiring+releasing the blocking lock (thus ensuring that
  *                     it has become available), before starting over.
  *                     This callback is then invoked just after all previously acquired
- *                     DMA locks have been released, but just before the blocking lock
- *                     is forcibly acquired. - It's purpose is then to reset whatever
+ *                     DMA  locks have been released, but just before the blocking lock
+ *                     is forcibly acquired. - It's  purpose is then to reset  whatever
  *                     information was already gathered from then released ranges.
  * @param: arg:        Argument passed to `prange' and `preset' upon execution.
  * @param: lockvec:    Vector of DMA lock slots provided by the caller.
@@ -3199,7 +3199,7 @@ NOTHROW(vm_dmalock_release)(struct vm_dmalock *__restrict self);
  * @param: buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
  * @param: for_writing:When true, unshare copy-on-write mappings of associated memory, allowing the
  *                     caller to then write to the acquired memory ranges without accidentally having
- *                     any changes made appear in PRIVATE mappings of the associated memory region.
+ *                     any changes made appear in PRIVATE  mappings of the associated memory  region.
  * @return: 0 :       `*prange' returned `false'
  * @return: 0 :        Some portion of the specified address range(s) doesn't actually map to a VM node.
  * @return: 0 :        Some portion of the specified address range(s) maps to a VM node reservation (no associated data part).
@@ -3231,8 +3231,8 @@ NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
                                struct aio_buffer const *__restrict vaddr_buf, bool for_writing);
 
 /* Similar to `vm_startdma[v][_nx]', however instead used to enumerate the DMA memory range individually.
- * @param: prange:     A callback that is invoked for each affected physical memory range
- *                     Should this callback return `false', enumeration will half and the
+ * @param: prange:     A  callback that is  invoked for each  affected physical memory range
+ *                     Should this callback  return `false', enumeration  will half and  the
  *                     function will return the number of previously successfully enumerated
  *                     DMA bytes.
  * @param: arg:        Argument passed to `prange' upon execution.
@@ -3241,10 +3241,10 @@ NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
  * @param: buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
  * @param: for_writing:When true, unshare copy-on-write mappings of associated memory, allowing the
  *                     caller to then write to the acquired memory ranges without accidentally having
- *                     any changes made appear in PRIVATE mappings of the associated memory region.
+ *                     any changes made appear in PRIVATE  mappings of the associated memory  region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(buf)',
+ *              Upon  full success, this  is identical to the  given `num_bytes' / `aio_buffer_size(buf)',
  *              though for the same reasons that `vm_startdma[v][_nx]' can fail (s.a. `@return: 0' cases),
  *              this may be less than that */
 FUNDEF NONNULL((1, 2)) size_t KCALL
@@ -3272,7 +3272,7 @@ NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
 
 
 /* Stop DMAing by releasing all of the specified DMA locks.
- * NOTE: The caller must ensure that `lockcnt == return(vm_startdma*())', and
+ * NOTE: The  caller  must  ensure  that  `lockcnt == return(vm_startdma*())',  and
  *       that the specified `lockvec' is either the exact same `lockvec' originally
  *       passed to `vm_startdma*()', or an identical memory copy of it. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -3282,13 +3282,13 @@ struct execargs;
 
 /* Load an executable binary `exec_node' into a temporary, emulated VM.
  * If this succeeds, clear all of the mappings from `effective_vm', and
- * replace them with the contents of the temporary, emulated VM (such
- * that the entire process of mapping the new contents is always able
- * to either seamlessly restore the old memory mappings, or not even
+ * replace them with the contents  of the temporary, emulated VM  (such
+ * that the entire process of mapping  the new contents is always  able
+ * to  either seamlessly restore  the old memory  mappings, or not even
  * touch them at all upon error)
  * -> This function is used to implement the exec() family of system calls
- *    in such that exec() is always able to allow the calling program to
- *    handle load errors (at least so long as those errors aren't caused
+ *    in  such that exec() is always able  to allow the calling program to
+ *    handle load errors (at least so  long as those errors aren't  caused
  *    by the executable's initialization, such as missing libraries)
  * NOTE: Upon successful return, all threads using the given `effective_vm' (excluding
  *       the caller themself if they are using the VM, too) will have been terminated.
@@ -3301,7 +3301,7 @@ vm_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 
 
-/* Assert that `self' is a regular node for the purpose of being used as the
+/* Assert that `self'  is a regular  node for the  purpose of being  used as  the
  * file to-be executed in an exec() system call, by throwing one of the annotated
  * exceptions if this isn't the case. */
 FUNDEF NONNULL((1)) void KCALL
@@ -3321,9 +3321,9 @@ struct vm_mapinfo {
 	pos_t                       vmi_offset; /* Byte-offset into `vmi_block', where the mapping at `vmi_min' starts. */
 	REF struct path            *vmi_fspath; /* [0..1] Mapped object filesystem path (or NULL if unknown or N/A) */
 	REF struct directory_entry *vmi_fsname; /* [0..1] Mapped object filesystem name (or NULL if unknown or N/A) */
-	size_t                      vmi_index;  /* ID of the first `struct vm_node' that this area is apart of.
-	                                         * For this purpose, node-ids are counted such that the first node
-	                                         * that either overlaps, or comes after `enum_minaddr' has `vmi_index=0'.
+	size_t                      vmi_index;  /* ID  of   the   first   `struct vm_node'   that  this   area   is   apart   of.
+	                                         * For  this   purpose,  node-ids   are  counted   such  that   the  first   node
+	                                         * that  either  overlaps,  or  comes  after  `enum_minaddr'  has  `vmi_index=0'.
 	                                         * This counter is used to generate INode numbers for `/proc/[pid]/map_files/...' */
 };
 #define vm_mapinfo_size(self) ((size_t)((byte_t *)(self)->vmi_max - (byte_t *)(self)->vmi_min) + 1)
@@ -3337,24 +3337,24 @@ struct vm_mapinfo {
 typedef ssize_t (FCALL *vm_enum_callback_t)(void *arg, struct vm_mapinfo *__restrict info);
 
 /* Enumerate all mappings contained within the given `enum_minaddr...enum_maxaddr'
- * address range within the given VM `self'. This function will automatically re-
- * assemble memory mappings that had previously been split into multiple nodes,
- * such that adjacent `struct vm_node's that describe a contiguous memory mapping
+ * address range within the given VM `self'. This function will automatically  re-
+ * assemble  memory mappings that  had previously been  split into multiple nodes,
+ * such that adjacent `struct vm_node's that describe a contiguous memory  mapping
  * do not appear as individual, separate nodes.
- * @param: cb:           A callback that should be invoked for every mapped memory region
+ * @param: cb:           A callback  that  should  be  invoked for  every  mapped  memory  region
  *                       contained with the given address range `enum_minaddr' ... `enum_maxaddr'
- *                       The sum of return values returned by this callback will eventually be
+ *                       The  sum of return  values returned by this  callback will eventually be
  *                       returned by this function, unless `cb()' returns a negative value, which
- *                       will cause enumeration to halt immediately, and that same value to be
+ *                       will  cause enumeration to  halt immediately, and that  same value to be
  *                       propagated to the caller.
- *                       Note that mappings are enumerated in strictly ascending order, and that
+ *                       Note that mappings are enumerated  in strictly ascending order, and  that
  *                       this function guaranties that even in the modifications being made to the
- *                       given `self' while enumeration takes place, the `vmi_min' of all future
+ *                       given `self' while enumeration takes  place, the `vmi_min' of all  future
  *                       mappings will always be `> vmi_max' of every already/currently enumerated
  *                       mapping.
  * @param: arg:          An argument (cookie) to-be passed to `cb()'
  * @param: enum_minaddr: The starting address of mappings to-be enumerated, such that any mapping
- *                       that overlap with `enum_minaddr ... enum_maxaddr' will be enumerated.
+ *                       that overlap  with `enum_minaddr ... enum_maxaddr'  will be  enumerated.
  * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
  *                       mapping. */
 FUNDEF ssize_t KCALL
@@ -3382,7 +3382,7 @@ struct vm_kernel_pending_operation {
 };
 
 /* [0..1][lock(ATOMIC)] Chain of pending operations to-be performed
- * the next time a lock to the kernel VM could be acquired. */
+ * the next  time  a lock  to  the  kernel VM  could  be  acquired. */
 DATDEF WEAK struct vm_kernel_pending_operation *vm_kernel_pending_operations;
 
 /* Run `op->vkpo_exec' in the context of holding a lock to the kernel VM at some
@@ -3405,8 +3405,8 @@ NOTHROW(vm_kernel_locked_operation)(T *__restrict obj,
 #endif /* __cplusplus */
 
 
-/* List of callbacks that should be invoked after vm_exec()
- * These are called alongside stuff like `handle_manager_cloexec()'
+/* List  of   callbacks  that   should  be   invoked  after   vm_exec()
+ * These  are  called alongside  stuff  like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_MMAN', and is never `&vm_kernel' */
 DATDEF CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks;
 /* VM initialization/finalization callbacks. */

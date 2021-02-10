@@ -27,7 +27,7 @@
 __DECL_BEGIN
 
 #ifdef ____INTELLISENSE_STDINC_COMMON_H
-/* @return: true:  Overflow occurred (unlikely; `*res' contains the truncated result)
+/* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
  *                 Overflow here means that the finite result stored in `*res' doesn't
  *                 match a value that would have been produced when infinite precision
  *                 was available.
@@ -42,7 +42,7 @@ __DECL_BEGIN
 #define __hybrid_overflow_smul  __intern::__intellisense_overflow_smul
 #elif ((__has_builtin(__builtin_add_overflow) && !defined(__ibmxl__)) || \
        (defined(__GNUC__) && (__GNUC__ >= 5) && !defined(__INTEL_COMPILER)))
-/* @return: true:  Overflow occurred (unlikely; `*res' contains the truncated result)
+/* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
  *                 Overflow here means that the finite result stored in `*res' doesn't
  *                 match a value that would have been produced when infinite precision
  *                 was available.
@@ -387,7 +387,7 @@ __IMPL_HYBRID_DEFINE_OVERFLOW_MATH(128, 128)
 }
 #endif /* __cplusplus */
 
-/* @return: true:  Overflow occurred (unlikely; `*res' contains the truncated result)
+/* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
  *                 Overflow here means that the finite result stored in `*res' doesn't
  *                 match a value that would have been produced when infinite precision
  *                 was available.

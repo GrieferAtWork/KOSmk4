@@ -117,14 +117,14 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vm_futex, vmf_refcnt, vm_futex_destroy)
 
 struct vm_futex_controller {
 	ATREE_HEAD(WEAK struct vm_futex) fc_tree;  /* [lock(:dp_lock)] Futex tree.
-	                                            * HINT: Dead futex objects are automatically removed
+	                                            * HINT: Dead futex objects are automatically  removed
 	                                            *       from the tree whenever `dp_lock' is acquired,
-	                                            *       though more futex objects can die even while
+	                                            *       though  more futex objects can die even while
 	                                            *       a lock to `dp_lock' is being held. */
 	uintptr_t                        fc_semi0; /* [lock(:dp_lock)] Futex tree SEMI0 value. */
 	unsigned int                     fc_leve0; /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
 	WEAK struct vm_futex            *fc_dead;  /* [0..1][LINK(->vmf_ndead)] Chain of dead futex objects.
-	                                            * This chain is serviced at the same time as `dp_stale' */
+	                                            * This chain is serviced at the same time as  `dp_stale' */
 #ifdef ARCH_HAVE_RTM
 	/* We keep the RTM version and lock fields in the futex controller, such that
 	 * they don't take up space in the base vm_datapart structure, but only exist
@@ -142,14 +142,14 @@ struct vm_futex_controller {
 
 
 /* Return a reference to the futex associated with `datapart_offset' bytes into the given data part.
- * If no such futex already exists, use this chance to allocate it, as well as a potentially
- * missing `vm_futex_controller' when `self->dp_futex' was `NULL' when this function was called.
+ * If no  such futex  already exists,  use this  chance to  allocate it,  as well  as a  potentially
+ * missing `vm_futex_controller' when  `self->dp_futex' was  `NULL' when this  function was  called.
  * @return: * : A reference to the futex associated with `datapart_offset'
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
  *              The given `datapart_offset' is greater than `vm_datapart_numbytes(self)', which
- *              may be the case even if you checked before that it wasn't (or simply
+ *              may be  the  case  even  if  you checked  before  that  it  wasn't  (or  simply
  *              used `vm_paged_datablock_locatepart()' in order to lookup the associated part),
- *              because there always exists the possibility that any data part gets split
+ *              because  there  always exists  the possibility  that any  data part  gets split
  *              into multiple smaller parts. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self,
@@ -157,7 +157,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define VM_DATAPART_GETFUTEX_OUTOFRANGE ((REF struct vm_futex *)-1)
 
-/* Same as `vm_datapart_getfutex()', but don't allocate a new
+/* Same   as  `vm_datapart_getfutex()',  but   don't  allocate  a  new
  * futex object if none already exists for the given `datapart_offset'
  * @return: * :   A reference to the futex bound to the given `datapart_offset'
  * @return: NULL: No futex exists for the given `datapart_offset', even though `datapart_offset'
@@ -171,21 +171,21 @@ FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
                                       uintptr_t datapart_offset)
 		THROWS(E_WOULDBLOCK);
 
-/* Lookup a futex at a given address that is offset from the start of a given
+/* Lookup  a futex at a given address that is offset from the start of a given
  * data block. Note though the possibly unintended behavior which applies when
  * the given `vm_datablock' is anonymous at the time of the call being made.
- * WARNING: Using this function when `self' has been, or always was anonymous, will
+ * WARNING: Using this function  when `self'  has been,  or always  was anonymous,  will
  *          cause the data part associated with the returned futex to also be anonymous,
- *          meaning that the part would get freshly allocated, and repeated calls with
+ *          meaning that the part would get  freshly allocated, and repeated calls  with
  *          the same arguments would not yield the same futex object!
- *       -> As such, in the most common case of a futex lookup where you wish to find
- *          the futex associated with some given `uintptr_t', the process would be to
- *          to determine the `vm_node' of the address, and using that node then determine
+ *       -> As such, in  the most  common case of  a futex  lookup where you  wish to  find
+ *          the  futex  associated with  some given  `uintptr_t', the  process would  be to
+ *          to  determine the `vm_node' of the address,  and using that node then determine
  *          the associated vm_datapart, and relative offset into that datapart. If a lookup
- *          of the futex then returns `VM_DATAPART_GETFUTEX_OUTOFRANGE', loop back around
+ *          of the futex then  returns `VM_DATAPART_GETFUTEX_OUTOFRANGE', loop back  around
  *          and once again lookup the `vm_node'.
- *       -> In the end, there exists no API also found on linux that would make use of this
- *          function, however on KOS it is possible to access this function through use of
+ *       -> In the  end, there  exists no  API also  found on  linux that  would make  use of  this
+ *          function,  however  on  KOS it  is  possible to  access  this function  through  use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `offset' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
@@ -193,7 +193,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `vm_datablock_getfutex()', but don't allocate a new
- * futex object if none already exists for the given `offset'
+ * futex object if none already exists for the given  `offset'
  * @return: * : The futex associated with the given `offset'
  * @return: NULL: No futex exists for the given address. */
 FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
@@ -201,12 +201,12 @@ FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
 		THROWS(E_WOULDBLOCK);
 
 /* Return the futex object that is associated with the given virtual memory address.
- * In the event that `addr' isn't  */
+ * In the event that `addr' isn't */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_getfutex)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
-/* Same as `vm_getfutex()', but don't allocate a new
+/* Same  as  `vm_getfutex()',  but  don't  allocate  a  new
  * futex object if none already exists for the given `addr'
  * @return: * : The futex associated with the given `addr'
  * @return: NULL: No futex exists for the given address. */

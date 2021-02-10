@@ -29,17 +29,17 @@ DECL_BEGIN
 
 /* Try to invoke the user-space exception handler for `except_data'
  * WARNING: Because this function writes to the user-space stack,
- *          it is capable of throwing an E_SEGFAULT itself.
+ *          it  is  capable  of  throwing  an  E_SEGFAULT itself.
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
- * @param: sc_info: When non-NULL, information about the system call that caused the exception.
+ * @param: sc_info: When  non-NULL, information about  the system call  that caused the exception.
  *                  Otherwise, if this argument is `NULL', the exception was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from `sc_info->rsi_flags' (s.a. `<librpc/bits/rpc-common.h>')
+ *                  from      `sc_info->rsi_flags'      (s.a.       `<librpc/bits/rpc-common.h>')
  * @return: NULL:   User-space does not define an exception handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space exception handler once user-space execution
+ *                  user-space exception handler once user-space  execution
  *                  resumes. */
 FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
@@ -48,7 +48,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 		THROWS(E_SEGFAULT);
 
 #ifdef __x86_64__
-/* Dedicated functions which may be used if the caller already
+/* Dedicated  functions  which  may  be  used  if  the  caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
 FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler32(struct icpustate *__restrict state,
@@ -67,12 +67,12 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 
 /* Raise a posix signal in user-space for `siginfo'
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
- * @param: sc_info: When non-NULL, information about the system call that caused the signal.
- *                  Otherwise, if this argument is `NULL', the signal was caused by user-space,
+ * @param: sc_info: When  non-NULL,  information about  the system  call  that caused  the signal.
+ *                  Otherwise,  if this argument  is `NULL', the signal  was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from `sc_info->rsi_flags'! (s.a. `<librpc/bits/rpc-common.h>')
+ *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
  *                  and if a coredump ends up being generated as a result of the signal being
@@ -80,7 +80,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
  *                  than the given `siginfo'
  * @return: NULL:   User-space does not define an signal handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space signal handler once user-space execution
+ *                  user-space signal  handler  once  user-space  execution
  *                  resumes. */
 struct __siginfo_struct;
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
@@ -89,11 +89,11 @@ x86_userexcept_raisesignal(struct icpustate *__restrict state,
                            struct __siginfo_struct const *__restrict siginfo,
                            struct exception_info const *except_info DFL(__NULLPTR));
 
-/* Helper function for `x86_userexcept_raisesignal()' that may be used
+/* Helper function for  `x86_userexcept_raisesignal()' that  may be  used
  * to raise the appropriate POSIX signal for the currently set exception.
  * @return: NULL: The current exception cannot be translated into a posix signal.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space signal handler once user-space execution
+ *                  user-space signal  handler  once  user-space  execution
  *                  resumes. */
 FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
@@ -101,14 +101,14 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
                                           struct exception_info const *__restrict except_info);
 
 /* Translate the current exception into an errno and set that errno
- * as the return value of the system call described by `sc_info'. */
+ * as the return value of  the system call described by  `sc_info'. */
 FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
                                        struct rpc_syscall_info const *__restrict sc_info,
                                        struct exception_data const *__restrict except_data);
 
 #ifdef __x86_64__
-/* Dedicated functions which may be used if the caller already
+/* Dedicated  functions  which  may  be  used  if  the  caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
 FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
@@ -123,9 +123,9 @@ NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 
 
-/* Propagate the currently thrown exception into user-space, using either the user-space
- * exception handler, by raising a POSIX signal, or by translating the exception into an
- * E* error code in the event of a system call with exceptions disabled (on x86, except-
+/* Propagate the currently  thrown exception  into user-space, using  either the  user-space
+ * exception handler, by raising  a POSIX signal,  or by translating  the exception into  an
+ * E* error code in  the event of a  system call with exceptions  disabled (on x86,  except-
  * enabled is usually controlled by the CF bit, however this function takes that information
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
@@ -137,28 +137,28 @@ NOTHROW(FCALL x86_userexcept_propagate)(struct icpustate *__restrict state,
  * accounting for additional user-space RPC redirection, before serving user-level
  * RPC functions, and finally propagating the then set exception (if one still is)
  * into user-space with the help of `x86_userexcept_propagate()'.
- * Afterwards, load the updated icpustate at the base of the calling thread's stack,
+ * Afterwards, load  the updated  icpustate at  the base  of the  calling thread's  stack,
  * and finally fully unwind into user-space by use of `x86_userexcept_unwind_interrupt()'.
  * NOTE: This is the function that should be called by the personality functions of
- *       custom system call handlers that also reset the kernel-space stack. */
+ *       custom system  call  handlers  that also  reset  the  kernel-space  stack. */
 FUNDEF ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict state,
                                      struct rpc_syscall_info const *sc_info);
 
-/* Same as `x86_userexcept_unwind()', however the caller has already done the work
+/* Same  as  `x86_userexcept_unwind()',  however  the  caller  has  already  done  the work
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
 FUNDEF ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
                                        struct rpc_syscall_info const *sc_info);
 
 /* Unwind the currently set exception through an interrupt.
- * If the interrupt leads into user-space, service user-space RPC functions before
- * checking if the exception is (still) set by looking at `error_code() != E_OK'.
+ * If   the  interrupt  leads   into  user-space,  service   user-space  RPC  functions  before
+ * checking  if  the   exception  is   (still)  set  by   looking  at   `error_code() != E_OK'.
  * If the exception is still set at that point, propagate it using `x86_userexcept_propagate()'
- * If the exception was cleared, continue unwinding into user-space the normal way.
- * If the interrupt leads into kernel-space, invoke the unwinding machinery unconditionally,
+ * If  the  exception  was  cleared,  continue  unwinding  into  user-space  the  normal   way.
+ * If  the interrupt leads  into kernel-space, invoke  the unwinding machinery unconditionally,
  * even when `error_code() == E_OK' (this is required to correctly handle the case of unwinding
- * an interrupt after an exception was propagated into user-space, before an RPC caused the
+ * an interrupt after an  exception was propagated  into user-space, before  an RPC caused  the
  * kernel's IRET tail to be re-directed once again) */
 FUNDEF ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL x86_userexcept_unwind_interrupt)(struct icpustate *__restrict state);
@@ -172,7 +172,7 @@ FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_esp)(v
 #endif /* !__x86_64__ */
 
 /* Function for the sub-branch of `x86_userexcept_unwind_interrupt_esp()'
- * that assumes that the target is located in kernel-space. */
+ * that  assumes   that   the   target  is   located   in   kernel-space. */
 #ifdef __x86_64__
 FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_kernel_rsp)(void);
 #else /* __x86_64__ */

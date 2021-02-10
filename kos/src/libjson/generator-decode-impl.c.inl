@@ -590,7 +590,7 @@ again_inner:
 			}
 			is_first = false;
 			/* XXX: In well-defined code, indices only ever increase, so
-			 *      we could speed this up by remembering the previous
+			 *      we could speed this  up by remembering the  previous
 			 *      index and advancing by the difference... */
 			result = libjson_parser_findindex(parser, index);
 			if (result != JSON_ERROR_OK) {

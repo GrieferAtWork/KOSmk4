@@ -23,7 +23,7 @@
 #include "api.h"
 
 /* Simple API access for low-level read/write of physical memory.
- * Note that in kernel-space, all of the necessary functions are
+ * Note that in kernel-space, all of the necessary functions  are
  * instead provided by the core (in <kernel/mman/phys.h>) */
 
 #ifdef __KERNEL__
@@ -116,10 +116,10 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC memsetphys)(__PHYS physaddr_t d
  * Memory is always mapped as `PROT_READ | PROT_WRITE'.
  *
  * The returned memory block should be unmapped as `munmapphys(return, num_bytes)'
- * The caller need not concern themself with the alignment of `addr' and/or
- * `num_bytes', as this function will automatically CEIL_ALIGN the requested
- * address range to contain whole pages, and later adjusted the returned
- * pointed to account for a potential in-page alignment offset of `addr'
+ * The  caller  need not  concern  themself with  the  alignment of  `addr' and/or
+ * `num_bytes', as  this  function  will automatically  CEIL_ALIGN  the  requested
+ * address  range  to  contain  whole  pages,  and  later  adjusted  the  returned
+ * pointed  to  account  for  a  potential  in-page  alignment  offset  of  `addr'
  * This adjustment will later be undone automatically by `munmapphys(3)'
  *
  * @return: * :         Base address of the newly created memory mapping.

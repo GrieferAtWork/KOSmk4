@@ -66,7 +66,7 @@
 
 
 /* In kernel-space, memory accesses can also cause E_WOULDBLOCK to be thrown
- * when preemption is disabled. - Handle that error like we do SEGFAULTS. */
+ * when  preemption is disabled.  - Handle that error  like we do SEGFAULTS. */
 #ifdef __KERNEL__
 #define WAS_SEGFAULT_THROWN() (was_thrown(E_SEGFAULT) || was_thrown(E_WOULDBLOCK))
 #else /* __KERNEL__ */
@@ -188,7 +188,7 @@ again:
 		goto err_close;
 	COMPILER_WRITE_BARRIER();
 	/* This one has to be loaded last, since it's
-	 * used as the fast-pass for already-loaded */
+	 * used as the  fast-pass for  already-loaded */
 	*(void **)&pdyn_debuginfo_cu_abbrev_fini = dlsym(pdyn_libdebuginfo, "debuginfo_cu_abbrev_fini");
 	if unlikely(!pdyn_debuginfo_cu_abbrev_fini)
 		goto err_close;
@@ -379,7 +379,7 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	if unlikely(error != UNWIND_SUCCESS)
 		goto done;
 	/* Calculate the absolute address of the associated CFA,
-	 * and store the result in `self->ue_call_frame_cfa' */
+	 * and store  the  result  in  `self->ue_call_frame_cfa' */
 	error = libuw_unwind_cfa_calculate_cfa(&cfa,
 	                                       self->ue_regget,
 	                                       self->ue_regget_arg,
@@ -739,7 +739,7 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 	/* Lazily load libdebuginfo.so */
 	if (!pdyn_debuginfo_run_entry_value_emulator &&
 	    unlikely(libuw_load_libdebuginfo())) {
-		/* If we can't get libdebuginfo.so to load, act like
+		/* If we can't get libdebuginfo.so to load, act  like
 		 * we don't know the `DW_OP_entry_value' instruction. */
 		return UNWIND_EMULATOR_UNKNOWN_INSTRUCTION;
 	}
@@ -752,14 +752,14 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 
 
 
-/* Execute the CFI expression loaded into the given unwind-emulator `SELF'.
- * Upon success, `SELF->ue_stacksz' will have been updated to the new stack
- * size, allowing the caller to read the expression's return values from it.
+/* Execute  the   CFI  expression   loaded  into   the  given   unwind-emulator   `SELF'.
+ * Upon  success,  `SELF->ue_stacksz'   will  have   been  updated  to   the  new   stack
+ * size,  allowing  the  caller  to  read   the  expression's  return  values  from   it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
  *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'
  *        before returning (if no such value exists, `UNWIND_EMULATOR_NO_RETURN_VALUE' is returned).
- *        If no stack of sufficient size could be allocated (or if the required stack size is
+ *        If no stack  of sufficient  size could  be allocated  (or if  the required  stack size  is
  *        absurdly large), `UNWIND_EMULATOR_STACK_OVERFLOW' will be returned instead.
  * @param: PENTRY_STACK_TOP:      A value to-be pushed onto the stack upon entry (or NULL).
  * @param: PEXIT_STACK_TOP:       A value to-be popped off of the stack upon exit (or NULL).
@@ -807,11 +807,11 @@ again_switch_opcode:
 			/* To quote a comment found within the GDB source tree:
 			 * """
 			 *   Some versions of GCC emit DW_OP_addr before
-			 *   DW_OP_GNU_push_tls_address.  In this case the value is an
-			 *   index, not an address.  We don't support things like
+			 *   DW_OP_GNU_push_tls_address. In this case the value is an
+			 *   index, not  an address.  We  don't support  things  like
 			 *   branching between the address and the TLS op.
 			 * """
-			 * So just mirror what it does, and don't include the module
+			 * So just mirror what it  does, and don't include the  module
 			 * offset when the next opcode is `DW_OP_GNU_push_tls_address' */
 			if (pc < self->ue_pc_end && *pc == DW_OP_GNU_push_tls_address) {
 				/* ... */
@@ -1774,8 +1774,8 @@ libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
                                      unwind_ste_t *pexit_stack_top,
                                      uintptr_t *pexit_stack_top_const) {
 	unsigned int error;
-	/* First off: Try to allocate an execution stack on our own stack.
-	 *            If that stack overflows, move on to allocating a stack
+	/* First off: Try  to allocate  an execution  stack on  our own stack.
+	 *            If that stack overflows, move  on to allocating a  stack
 	 *            on the heap (userspace), or carefully increase the stack
 	 *            size up to a certain point (kernelspace) */
 	error = libuw_unwind_emulator_exec_alloca_stack(self,
@@ -1857,7 +1857,7 @@ err_no_return_value:
 
 /* Return a pointer to the next unwind instruction following `UNWIND_PC'
  * -> Useful for dumping unwind instruction without having to take care
- *    of handling all possible instruction (after all: CFI has a CISC
+ *    of handling all possible instruction  (after all: CFI has a  CISC
  *    instruction set with variable-length instructions)
  * @param: ADDRSIZE: Size of a target address.
  * @param: PTRSIZE:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
@@ -2168,8 +2168,8 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
- * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
- *                                Optionally, this argument may be `NULL', however if this is the
+ * @param: SECTINFO:              Emulator section  information  (to-be  filled in  by  the  caller)
+ *                                Optionally,  this argument may  be `NULL', however  if this is the
  *                                case, the function may fail in cases where it would have otherwise
  *                                succeeded.
  * @param: REGGET:                Register getter callback.
@@ -2177,17 +2177,17 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @param: REGSET:                Register setter callback.
  * @param: REGSET_ARG:            Register setter callback argument.
  * @param: CU:                    Associated compilation unit debug info (or NULL).
- *                                When non-NULL, the following fields may be used:
+ *                                When  non-NULL, the following fields may be used:
  *                                  - CU->cu_ranges.r_startpc
  *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
- *                                the appropriate expression within a location list.
+ *                                the   appropriate  expression  within  a  location  list.
  * @param: MODULE_ADDROFFSET:     The load address of the associated module. (addend for DW_OP_addr)
  * @param: BUF:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
  * @param: BUFSIZE:               Size of the given `BUF' in bytes.
  * @param: PNUM_WRITTEN_BITS:     The number of _BITS_ (not bytes!) read from the location expression,
- *                                and written to the given `BUF' (any trailing bits of buffer memory
+ *                                and written to the given `BUF'  (any trailing bits of buffer  memory
  *                                that weren't written will be filled with `0' upon success)
  * @param: PNUM_READ_BITS:        The number of _BITS_ (not bytes!) written to the location expression,
  *                                and read from the given `BUF'.

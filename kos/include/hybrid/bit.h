@@ -36,13 +36,13 @@
 
 /* unsigned int CLZ(unsigned Integer i):
  *     CountLeadingZeroes
- *     Return the number of leading ZEROes in `i', starting at the most
+ *     Return  the number of  leading ZEROes in `i',  starting at the most
  *     significant bit. When `i' is ZERO(0), then the result is undefined. */
 #define CLZ(i) __hybrid_clz(i)
 
 /* unsigned int CTZ(unsigned Integer i):
  *     CounTrailingZeroes
- *     Return the number of trailing ZEROes in `i', starting at the least
+ *     Return the number of trailing ZEROes in `i', starting at the  least
  *     significant bit. When `i' is ZERO(0), then the result is undefined. */
 #define CTZ(i) __hybrid_ctz(i)
 
@@ -58,7 +58,7 @@
 /* unsigned int CLRSB(signed Integer i):
  *     CoultLeadingRedundantSignBits
  *     Return the number of leading, redundant sign-bits,
- *     that is: The number of bits following the most
+ *     that is:  The number  of bits  following the  most
  *     significant bit that are identical to it. */
 #define CLRSB(i) __hybrid_clrsb(i)
 

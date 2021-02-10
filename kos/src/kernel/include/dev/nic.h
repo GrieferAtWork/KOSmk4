@@ -53,13 +53,13 @@ struct aio_buffer_entry {
 #endif /* !__aio_buffer_entry_defined */
 
 struct nic_packet {
-	/* NetworkInterfaceCard buffer for outgoing packets.
+	/* NetworkInterfaceCard buffer for outgoing  packets.
 	 * This buffer is designed to have a reference stored
 	 * within some given `struct aio_handle'
 	 * NIC packet data should be enumerated as:
 	 * #1: np_head...np_headend
 	 * #2: np_payloadv[0..np_payloadc]
-	 * #3: np_tail...np_tailend */
+	 * #3:        np_tail...np_tailend */
 	WEAK refcnt_t     np_refcnt;   /* Reference counter. */
 	byte_t           *np_head;     /* [1..1] Start of headers (grows up) */
 	union {
@@ -68,20 +68,20 @@ struct nic_packet {
 	};
 	byte_t           *np_tailend;  /* [1..1] End of tail data (grows down) */
 	/* TODO: Add a field `REF struct vm *np_payldvm; // [0..1][lock(WRITE_ONCE)]'
-	 *       that contains a non-NULL pointer when the VM containing
+	 *       that  contains   a  non-NULL   pointer   when  the   VM   containing
 	 *       the memory regions described by payload entires differs
-	 *       from the current VM of the calling thread.
-	 * -> Right now, a lot of VM context switching happens as part of
-	 *    outbound packet routing, and we could drastically cut down
-	 *    on this (especially in cases where the NIC driver back-end
-	 *    doesn't even need to access memory directly, but can use
-	 *    some sort of DMA access), by having drivers deal with the
-	 *    task of selecting the proper VM for accessing the packet
-	 *    payload. (This could especially improve performance for
-	 *    packets that exist _only_ in kernel-space, such that no VM
-	 *    switch would be necessary at all when `np_payloads == 0',
-	 *    indicative of the packet only consisting of header+tail
-	 *    data, as would be the case for packets created by the kernel
+	 *       from   the   current   VM   of   the   calling  thread.
+	 * -> Right  now, a  lot of VM  context switching happens  as part of
+	 *    outbound packet  routing, and  we  could drastically  cut  down
+	 *    on this  (especially in  cases where  the NIC  driver  back-end
+	 *    doesn't even  need  to  access memory  directly,  but  can  use
+	 *    some  sort  of DMA  access), by  having  drivers deal  with the
+	 *    task of  selecting  the  proper VM  for  accessing  the  packet
+	 *    payload.  (This  could   especially  improve  performance   for
+	 *    packets that  exist _only_  in kernel-space,  such that  no  VM
+	 *    switch  would  be  necessary  at  all  when `np_payloads == 0',
+	 *    indicative   of  the  packet  only  consisting  of  header+tail
+	 *    data,  as would be  the case for packets  created by the kernel
 	 *    itself (such as ARP packets, or other packets send by protocols
 	 *    directly implemented within the kernel)) */
 	size_t            np_payloads; /* [const] Total payload size (in bytes) */
@@ -95,7 +95,7 @@ struct nic_packet {
 
 /* Allocate space for headers/footers.
  * NOTE: The caller is responsible to ensure that the packet was originally
- *       allocated with sufficient space for all headers and footers. */
+ *       allocated with  sufficient  space  for all  headers  and  footers. */
 #define nic_packet_allochead(self, num_bytes)                   \
 	(__hybrid_assertf((num_bytes) <= nic_packet_headfree(self), \
 	                  "Insufficient head space (%Iu > %Iu)",    \
@@ -122,7 +122,7 @@ struct nic_packet {
 /* Invoke `cb(USER CHECKED void *base, size_t num_bytes)' (where `num_bytes' may be 0)
  * over each of the different parts of the given packet.
  * TODO: Get rid of this macro. - Instead, add a helper for enumerating
- *       I/O segments containing data for packet payload parts. */
+ *       I/O   segments  containing  data  for  packet  payload  parts. */
 #define nic_packet_print(self, cb)                                                    \
 	do {                                                                              \
 		size_t _npp_i;                                                                \
@@ -141,15 +141,15 @@ DEFINE_REFCOUNT_FUNCTIONS(struct nic_packet, np_refcnt, nic_packet_destroy)
 
 struct nic_device_ops {
 	/* [1..1] Send a packet.
-	 * WARNING: Any NIC packet can only ever be sent _once_ at the same time!
-	 *          Don't call this function multiple times for the same packet
+	 * WARNING: Any NIC packet can only ever be sent _once_ at the same  time!
+	 *          Don't call this  function multiple times  for the same  packet
 	 *          before a previous call has indicated completion through `aio'!
 	 * WARNING: The given `packet' must have been allocated via `nic_device_newpacket()'
-	 *          for the _same_ NIC device as `self'. Don't go mix-and-matching packets
-	 *          from different NIC devices, as packet buffer may get allocated with
+	 *          for the _same_ NIC device  as `self'. Don't go mix-and-matching  packets
+	 *          from different  NIC devices,  as packet  buffer may  get allocated  with
 	 *          differing storage .
-	 * However, you are allowed (and encouraged) to drop your own reference to
-	 * `packet' after calling this function. If the implementation requires its
+	 * However, you are allowed (and encouraged)  to drop your own reference  to
+	 * `packet' after calling this function. If the implementation requires  its
 	 * own reference to `packet' for the purpose of enqueuing a pending transmit
 	 * operation, then it will acquire its own reference! */
 	void (KCALL *nd_send)(struct nic_device *__restrict self,
@@ -196,15 +196,15 @@ struct nic_device
 	struct nic_device_ops   nd_ops;     /* Device operators. */
 	WEAK uintptr_t          nd_ifflags; /* [lock(INTERN)] Netword interface flags (set of `IFF_*') */
 	struct nic_device_stat  nd_stat;    /* Usage statistics */
-	gfp_t                   nd_hdgfp;   /* [const] Additional GFP flags for packet header/tail buffers.
-	                                     * This is mainly useful in case the driver can be written more
+	gfp_t                   nd_hdgfp;   /* [const] Additional GFP  flags for  packet header/tail  buffers.
+	                                     * This  is mainly useful  in case the driver  can be written more
 	                                     * efficiently if header/tail memory is allocated as `GFP_LOCKED'. */
 	struct nic_addresses    nd_addr;    /* Network addresses. */
 	struct network          nd_net;     /* A description of the attached network. */
 };
 
 
-/* Allocate a new NIC packet which may be used to send the given payload.
+/* Allocate  a new NIC packet which may be used to send the given payload.
  * Reserve sufficient space for headers and footers of up to the specified
  * sizes to be included alongside the payload. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
@@ -266,14 +266,14 @@ nic_device_send(struct nic_device *__restrict self,
 }
 
 /* Same as `nic_device_send()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
+ * WARNING:    This   function   may    still   clobber   exception   pointers! */
 FUNDEF NONNULL((1, 2, 3)) void
 NOTHROW(KCALL nic_device_send_nx)(struct nic_device *__restrict self,
                                   struct nic_packet *__restrict packet,
                                   /*out*/ struct aio_handle *__restrict aio);
 
 /* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
- * NOTE: Transmit errors get logged, but are silently discarded. */
+ * NOTE:  Transmit   errors  get   logged,  but   are  silently   discarded. */
 FUNDEF NONNULL((1, 2)) void KCALL
 nic_device_send_background(struct nic_device *__restrict self,
                            struct nic_packet *__restrict packet);
@@ -287,7 +287,7 @@ struct nic_rpacket {
 
 /* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
  * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
- *                          The guaranty here is that: `return->rp_size >= max_packet_size'
+ *                          The guaranty here  is  that:  `return->rp_size >= max_packet_size'
  *                          NOTE: Must be at least `ETH_ZLEN' */
 FUNDEF ATTR_RETNONNULL struct nic_rpacket *KCALL
 nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC);
@@ -296,8 +296,8 @@ nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC);
 FUNDEF NOBLOCK void NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self);
 
 /* Inherit a routable NIC packet and route it.
- * Routing may either be done synchronously (i.e. before this function returns),
- * or asynchronously (i.e. at some future point in time by some other thread)
+ * Routing  may either be done synchronously (i.e. before this function returns),
+ * or asynchronously (i.e.  at some future  point in time  by some other  thread)
  * If the caller _needs_ routing to be performed immediately, they should instead
  * make use of `eth_routepacket()', followed by `nic_rpacket_free()'
  * @param: real_packet_size: The actual used packet size (`<= packet->rp_size')

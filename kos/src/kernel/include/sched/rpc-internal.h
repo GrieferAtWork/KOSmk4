@@ -61,16 +61,16 @@ struct rpc_entry {
 };
 
 
-/* Allocate an RPC entry for later delivery without having to deal with the possibility
- * of a bad allocation at that later point in time. (s.a. `task_deliver_rpc()')
+/* Allocate an  RPC entry  for  later delivery  without having  to  deal with  the  possibility
+ * of  a  bad   allocation  at   that  later   point  in   time.  (s.a.   `task_deliver_rpc()')
  * These functions behave identical to their `task_schedule_*' counterparts from <sched/rpc.h>,
- * except that the caller is not required to specify the eventual target thread just yet.
+ * except that the  caller is  not required  to specify the  eventual target  thread just  yet.
  * NOTE: Prior to commiting an RPC allocation by one of these functions through `task_deliver_rpc()',
- *       the caller is free to make use of the returned RPC's `re_next' field for whatever purpose
- *       they deem useful, allowing the caller to allocate a number of RPCs at once, without
+ *       the caller is free to  make use of the returned  RPC's `re_next' field for whatever  purpose
+ *       they deem  useful, allowing  the  caller to  allocate  a number  of  RPCs at  once,  without
  *       having to set up a secondary vector for storing them before using them.
- *    -> The main purpose of these APIs is to provide a means of pre-allocating synchronous
- *       RPC descriptors beforehand, allowing them to later be used in a scenario where code
+ *    -> The main purpose of  these APIs is  to provide a  means of pre-allocating  synchronous
+ *       RPC descriptors beforehand, allowing them  to later be used  in a scenario where  code
  *       would no longer be capable of dealing with a bad allocation error that should normally
  *       arise if the regular `task_schedule_*' functions were to be used.
  * NOTE: The *_nx variants return `NULL' if the allocation failed. */
@@ -101,7 +101,7 @@ NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(task_rpc_t func,
 
 
 /* Free a previously allocated RPC that hasn't been (successfully) delivered.
- * This function should be called as an alternative to `task_deliver_rpc()',
+ * This function should be called as an alternative to  `task_deliver_rpc()',
  * as well as in the event that `task_deliver_rpc()' returned an error code. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc);
@@ -116,8 +116,8 @@ NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc);
  * @return: TASK_DELIVER_RPC_TERMINATED:  Failed to deliver the RPC: The given `target' has already terminated.
  * @return: TASK_DELIVER_RPC_SUCCESS:     Successfully delivered RPC
  * @return: TASK_DELIVER_RPC_INTERRUPTED: Successfully delivered RPC (but `target' is the caller, and `rpc' is an interrupting
- *                                        USER-level RPC, and the caller should return to user-space as soon as possible)
- *                                        NOTE: Only returned when `task_alloc_user_[s]rpc[_nx]()' was used to create `rpc'
+ *                                        USER-level RPC, and  the caller  should return to  user-space as  soon as  possible)
+ *                                        NOTE: Only returned when `task_alloc_user_[s]rpc[_nx]()'  was used to create  `rpc'
  *                                        NOTE: Propagation may be performed by throwing an `E_INTERRUPT_USER_RPC' exception. */
 FUNDEF NOBLOCK NONNULL((1, 2)) int
 NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,

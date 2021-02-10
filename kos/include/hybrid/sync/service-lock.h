@@ -18,15 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-/* Helper functions for automatically generating lock wrapper functions for invoking
- * some service function whenever a lock is acquired (either for reading or writing).
- * This is useful in cases where cleanup operations would normally require a blocking
+/* Helper functions for  automatically generating lock  wrapper functions for  invoking
+ * some  service function whenever a lock is  acquired (either for reading or writing).
+ * This  is useful in cases where cleanup  operations would normally require a blocking
  * lock to be held, however using service-locks, this can be made non-blocking by first
- * trying to acquire the lock during finalization, and if doing so fails, using atomic
- * operations to build a linked list of objects that are pending destruction, and are
+ * trying  to acquire the lock during finalization, and if doing so fails, using atomic
+ * operations to build a linked list of  objects that are pending destruction, and  are
  * SERVICEd whenever the thread that was holding the lock which prevented the operation
- * from being non-blocking releases said lock. Additionally, to deal with some corner
- * cases where doing so improves performance, servicing is also checked when a lock is
+ * from being non-blocking releases said lock.  Additionally, to deal with some  corner
+ * cases  where doing so improves performance, servicing is also checked when a lock is
  * acquired.
  *
  * >> struct foo;
@@ -76,18 +76,18 @@
  * >> }
  *
  * Assumptions that may be made by this implementation:
- *   - Any time that `SERLOCK_LOCK_READ()' or `SERLOCK_LOCK_WRITE()' would block,
- *     the thread that is currently holding the lock will always (try to) service
- *     dead objects using `SERLOCK_SERVICE()' when the lock is released.
+ *   - Any  time that `SERLOCK_LOCK_READ()' or `SERLOCK_LOCK_WRITE()' would block,
+ *     the thread that is currently holding the lock will always (try to)  service
+ *     dead  objects  using  `SERLOCK_SERVICE()'   when  the  lock  is   released.
  *     In the case of a read-lock, the holding thread will try to upgrade the lock
  *     and service dead objects if doing so succeeds.
  *   - Whenever no thread is holding a read- or write-lock, it may be assumed that
- *     the chain of dead objects is either empty, or about to become empty.
+ *     the chain  of dead  objects is  either  empty, or  about to  become  empty.
  *
  */
 
 
-/* TODO: Update all of the cases where kernel-space already uses a mechanism
+/* TODO: Update  all of the  cases where kernel-space  already uses a mechanism
  *       such as this one, such that it uses this exact mechanism for providing
  *       the necessary implementations! */
 
@@ -250,12 +250,12 @@ SERLOCK_DECL void
 __NOTHROW_NCX(SERLOCK_CC SERLOCK(endwrite))(SERLOCK_SELFPARAM) {
 __again:
 	/* Technically, we could check for service here, and doing so would improve
-	 * performance in cases where in the majority of times there is something
-	 * that needs to be serviced. However, in general, the most common case is
+	 * performance in cases where in the  majority of times there is  something
+	 * that needs to be serviced. However, in general, the most common case  is
 	 * that nothing needs to be serviced, and we still always have to check for
-	 * service after having released the lock (in order to ensure interlocked
-	 * semantics in regards to there never being objects left in the service-
-	 * queue while no lock is held, and no thread is about to service them).
+	 * service after having released the  lock (in order to ensure  interlocked
+	 * semantics in regards to there never  being objects left in the  service-
+	 * queue while no lock is  held, and no thread  is about to service  them).
 	 * So with this in mind, we _only_ service after releasing the lock. */
 	SERLOCK_LOCK_ENDWRITE();
 	if __unlikely(SERLOCK_MUSTSERVICE()) {
@@ -357,14 +357,14 @@ __NOTHROW(SERLOCK_CC SERLOCK(write_nx))(SERLOCK_SELFPARAM) {
 
 #ifdef SERLOCK_LOCK_UPGRADE_NX
 /* Upgrade a read-lock into a write-lock while blocking,
- * but without causing an `E_WOULDBLOCK' exception.
+ * but  without  causing  an  `E_WOULDBLOCK'  exception.
  * NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
- *       no lock may have been held temporarily, meaning that the caller should
+ *       no lock may have been held  temporarily, meaning that the caller  should
  *       re-load local copies of affected resources.
  * @return: 0 : A previously held read-lock was lost and could not be re-acquired.
  * @return: 1 : Successfully upgraded the read-only to a write-lock.
  * @return: 2 : Successfully upgraded the read-only to a write-lock,
- *              but at one point, no lock at all was being held. */
+ *              but at one  point, no  lock at all  was being  held. */
 SERLOCK_DECL __ATTR_WUNUSED unsigned int
 __NOTHROW(SERLOCK_CC SERLOCK(upgrade_nx))(SERLOCK_SELFPARAM) {
 	unsigned int __res;

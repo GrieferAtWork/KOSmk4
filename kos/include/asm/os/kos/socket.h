@@ -134,10 +134,10 @@
 /*      __MSG_             __UINT32_C(0x02000000)  * .... */
 /*      __MSG_             __UINT32_C(0x04000000)  * .... */
 /*      __MSG_             __UINT32_C(0x08000000)  * .... */
-#define __MSG_CMSG_COMPAT  __UINT32_C(0x10000000) /* [in] Write ancillary data as `struct compat_cmsghdr'   \
-                                                   * WARNING: No user-space interface accepts this flag!    \
-                                                   * WARNING: The KOS kernel only uses this flag internally \
-                                                   *          when compiled with __ARCH_HAVE_COMPAT */
+#define __MSG_CMSG_COMPAT  __UINT32_C(0x10000000) /* [in] Write ancillary data as `struct compat_cmsghdr'
+                                                   * WARNING:  No user-space interface accepts this flag!
+                                                   * WARNING: The KOS kernel only uses this flag internally
+                                                   *          when    compiled    with   __ARCH_HAVE_COMPAT */
 #define __MSG_FASTOPEN     __UINT32_C(0x20000000) /* [in] Send data in TCP SYN. */
 #define __MSG_CMSG_CLOEXEC __UINT32_C(0x40000000) /* [in] Set O_CLOEXEC for file descriptor received through SCM_RIGHTS. */
 #ifdef __KOS__

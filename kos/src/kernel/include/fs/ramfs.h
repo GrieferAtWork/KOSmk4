@@ -43,12 +43,12 @@ DATDEF struct inode_type ramfs_symlink_type;
 DATDEF struct superblock devfs;
 
 /* Without blocking, remove an INode from the
- * root directory of the /dev filesystem
- * NOTE: This function is used to remove the automatically
+ * root  directory  of  the  /dev  filesystem
+ * NOTE: This  function  is  used  to  remove  the automatically
  *       created /dev INodes for every detected block-device, or
- *       character-device when that device is being destroyed.
+ *       character-device when that  device is being  destroyed.
  * WARNING: Do not use this function to remove directory
- *          nodes from `/dev'. - Doing so may not clear
+ *          nodes from `/dev'. - Doing so may not  clear
  *          the directory from recent-path caches in VFS
  *          mappings of the /dev filesystem.
  * NOTE: If the given node/entry have already been removed,
@@ -58,8 +58,8 @@ NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
                             struct directory_entry *__restrict entry);
 
 /* Insert a new device node into /dev, using `name' as the
- * filename of the file to-be placed under /dev.
- * NOTE: The caller is responsible to ensure that `name'
+ * filename  of  the   file  to-be   placed  under   /dev.
+ * NOTE: The  caller  is responsible  to ensure  that `name'
  *       is a valid filename, suitable to a directory entry.
  * @param: name:         The name of the file to-be placed under /dev
  * @param: kind:         The type of file to create (either `S_IFCHR' or `S_IFBLK')
@@ -69,7 +69,7 @@ NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
  * @return: true:  Successfully created a new entry under /dev
  * @return: false: A file matching `name' already exists.
  *                 In this case, both `*pdevfs_node' and `*pdevfs_entry'
- *                 (if given) will have been set to `NULL'. */
+ *                 (if   given)   will   have   been   set   to  `NULL'. */
 FUNDEF bool KCALL
 devfs_insert(USER CHECKED char const *name,
              mode_t kind, dev_t devno,

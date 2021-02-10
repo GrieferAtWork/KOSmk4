@@ -28,10 +28,10 @@
 #include <compat/config.h>
 #include <kos/aref.h>
 
-/* Executable format ABI definition hook (for drivers
+/* Executable format  ABI  definition  hook  (for  drivers
  * that wish to provide extended support for exec formats) */
 
-/* Max # of ~magic~ bytes that may be provided by exec ABIs.
+/* Max  #  of ~magic~  bytes that  may be  provided by  exec ABIs.
  * Also specifies the # of bytes that get pre-read by the exec-ABI
  * invocation machinery before the ABI's exec callback is invoked. */
 #ifndef CONFIG_EXECABI_MAXHEADER
@@ -73,11 +73,11 @@ DATDEF byte_t execabi_system_rtld_size[];
 #endif /* !__INTELLISENSE__ */
 #endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD */
 
-/* A static VM file blob for the built-in RTLD user-space program.
+/* A static VM file blob  for the built-in RTLD user-space  program.
  * This is a raw ELF binary blob that is hard-linked into the kernel
  * core, and is mapped via copy-on-write into any user-space process
  * that requests the use of a dynamic linker
- * NOTE: The associated source code can be found in `/kos/src/libdl/...', and
+ * NOTE: The associated source code can be found in `/kos/src/libdl/...',  and
  *       the (unstripped) library file can be found on-disk as `/lib/libdl.so' */
 #ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD_FILE
 DATDEF struct mramfile execabi_system_rtld_file;
@@ -97,7 +97,7 @@ DATDEF byte_t compat_execabi_system_rtld_size[];
 #endif /* !__INTELLISENSE__ */
 #endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD */
 
-/* A static VM file blob for the building RTLD user-space program.
+/* A static VM file blob  for the building RTLD user-space  program.
  * This is a raw ELF binary blob that is hard-linked into the kernel
  * core, and is mapped via copy-on-write into any user-space process
  * that requests the use of a dynamic linker
@@ -130,14 +130,14 @@ struct execargs {
 	                                             *       meaning that the caller will become apart of the given mman. */
 	struct icpustate           *ea_state;       /* [1..1] The user-space CPU state to update upon success in a manner
 	                                             *        that proper execution of the loaded binary is possible.
-	                                             * Note however that in the case of a dynamic binary, a dynamic linker
+	                                             * Note however that  in the  case of a  dynamic binary,  a dynamic  linker
 	                                             * may be injected to perform dynamic linking whilst already in user-space. */
 	REF struct path            *ea_xpath;       /* [1..1] Filesystem path for the directory inside of which `ea_xnode' is located. */
 	REF struct directory_entry *ea_xdentry;     /* [1..1] Directory entry containing the filename of `ea_xnode'. */
 	REF struct regular_node    *ea_xnode;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
 	byte_t                      ea_header[CONFIG_EXECABI_MAXHEADER];
-	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xnode'. Of this buffer,
-	                                             * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If the
+	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xnode'. Of this  buffer,
+	                                             * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If  the
 	                                             * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
 	                                             * are simply zero-initialized. */
 	bool                        ea_change_mman_to_effective_mman;
@@ -159,16 +159,16 @@ NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self);
 
 struct execabi {
 	/* NOTE: All fields of this structure are [const] */
-	WEAK REF struct driver *ea_driver; /* [1..1] Weak reference to the implementing driver.
-	                                    * Before any of the callbacks below are invoked, a strong
+	WEAK REF struct driver *ea_driver; /* [1..1] Weak   reference   to   the   implementing   driver.
+	                                    * Before  any of  the callbacks  below are  invoked, a strong
 	                                    * reference is acquired to this driver (using `tryincref()'),
-	                                    * and in case this fails, an attempt is made to discard the
-	                                    * associated ABI (and the kernel will behave as though the
+	                                    * and in case this fails, an  attempt is made to discard  the
+	                                    * associated ABI (and  the kernel will  behave as though  the
 	                                    * ABI hadn't actually been defined) */
 	u8                      ea_magsiz; /* # of provided magic bytes (s.a. `ea_magic')
-	                                    * When non-zero, this ABI will only be used for files that
+	                                    * When  non-zero,  this ABI  will only  be  used for  files that
 	                                    * start with a byte sequence identical to `ea_magic[:ea_magsiz]'
-	                                    * When set to 0, all files are considered suitable candidates
+	                                    * When set to  0, all files  are considered suitable  candidates
 	                                    * for this ABI. */
 	byte_t                  ea_magic[CONFIG_EXECABI_MAXHEADER]; /* ABI ~magic~ */
 
@@ -208,7 +208,7 @@ ARREF(execabis_arref, execabis_struct);
 /* [1..1] Currently registered exec-ABIs */
 DATDEF struct execabis_arref execabis;
 
-/* Register a given exec-ABI. Note that the only way to unregister
+/* Register  a given exec-ABI. Note that the only way to unregister
  * an ABI is to unload the associated driver (in which case the ABI
  * is automatically unregistered)
  * @return: true:  Successfully registered the given `abi'.

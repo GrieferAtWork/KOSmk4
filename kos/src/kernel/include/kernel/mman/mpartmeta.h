@@ -37,9 +37,9 @@
 #include <kos/aref.h>
 
 /* NOTE: Unlike `mpart' and its other fields, `mpartmeta', as well
- *       `mfutex' objects may be allocated without `GFP_LOCKED'!
- *       This is because these components don't add anything that
- *       might be needed within the context of loading data from
+ *       `mfutex' objects may  be allocated without  `GFP_LOCKED'!
+ *       This is because these components don't add anything  that
+ *       might be needed within the  context of loading data  from
  *       swap. */
 
 #ifdef __CC__
@@ -73,15 +73,15 @@ struct mfutex {
 	/* Memory-Fast-Userspace-mUTEX */
 	WEAK refcnt_t                    mfu_refcnt; /* Reference counter. */
 	struct mpart_awref               mfu_part;   /* [1..1] The (currently) associated mem-part.
-	                                              * Note that this part may change arbitrarily as the result of calls to
-	                                              * `mpart_split()'. To prevent this, read out this field, acquire a lock
-	                                              * to the mem-part, or the futex-tree-lock, then read out this field again
+	                                              * Note that this  part may change  arbitrarily as the  result of calls  to
+	                                              * `mpart_split()'.  To prevent this,  read out this  field, acquire a lock
+	                                              * to the mem-part, or the futex-tree-lock, then read out this field  again
 	                                              * until the mem-part no longer changes. At this point, the mem-part you'll
 	                                              * end up with will be consistent.
 	                                              * end up with will be consistent. */
 	mpart_reladdr_t                  mfu_addr;   /* [lock(mfu_part->mp_meta->mpm_ftx)] Address of this mem-futex
 	                                              * (relative to mfu_part; within the R/B-tree)
-	                                              * NOTE: The least-significant bit is used as R/B-bit, meaning
+	                                              * NOTE: The least-significant bit  is used  as R/B-bit,  meaning
 	                                              *       that part addresses must be aligned by at least 2 bytes. */
 	union {
 		LLRBTREE_NODE(struct mfutex) mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
@@ -113,7 +113,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutex_destroy)(struct mfutex *__
 DEFINE_REFCOUNT_FUNCTIONS(struct mfutex, mfu_refcnt, mfutex_destroy)
 
 
-/* Mem-futex tree API. All of these functions require that the caller
+/* Mem-futex tree API. All of  these functions require that the  caller
  * be holding a lock to the associated `struct mpartmeta::mpm_ftxlock'. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mfutex *NOTHROW(FCALL mfutex_tree_locate)(/*nullable*/ struct mfutex *root, mpart_reladdr_t key);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mfutex *NOTHROW(FCALL mfutex_tree_rlocate)(/*nullable*/ struct mfutex *root, mpart_reladdr_t minkey, mpart_reladdr_t maxkey);
@@ -127,14 +127,14 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_removenode)(struct
 
 struct mpartmeta {
 	struct atomic_rwlock              mpm_ftxlock;  /* Lock for `mpm_ftx' */
-	LLRBTREE_ROOT(WEAK struct mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree.
+	LLRBTREE_ROOT(WEAK struct mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)]   Futex   tree.
 	                                                 * NOTE: May contain dead futex objects! */
 	struct WEAK mfutex_slist          mpm_ftx_dead; /* [0..n][lock(ATOMIC)] Chain of dead futex objects. */
 	WEAK refcnt_t                     mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
 	                                                 * # of DMA locks referencing the associated part. */
 	struct sig                        mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
 #ifdef ARCH_HAVE_RTM
-	/* We keep the RTM version and field in the futex controller, such that
+	/* We  keep the RTM version and field  in the futex controller, such that
 	 * they don't take up space in the base `mpart' structure, but only exist
 	 * conditionally, and upon first access. */
 	uintptr_t                         mpm_rtm_vers; /* [lock(:dp_lock)]
@@ -232,7 +232,7 @@ NOTHROW(mpart_dma_dellock)(struct mpart *__restrict self) {
 /* Futex access/creation API                                            */
 /************************************************************************/
 
-/* Return a pointer to the meta-data controller of `self', allocating it
+/* Return  a pointer to  the meta-data controller  of `self', allocating it
  * if not already allocated in the past. This function should not be called
  * when already holding a lock to `self'. - Use `mpart_hasmeta_or_unlock()'
  * for that purpose instead! */
@@ -244,8 +244,8 @@ mpart_getmeta(struct mpart *__restrict self) THROWS(E_BADALLOC);
  * `partrel_offset >= PAGESIZE' as the result of the accessed part being split. */
 #define MPART_FUTEX_OOB ((struct mfutex *)-1)
 
-/* Return a reference to the futex associated with `file_position' within the given part.
- * If no such futex already exists, use this chance to allocate it, as well as a potentially
+/* Return a reference  to the futex  associated with `file_position'  within the given  part.
+ * If no such futex already exists, use this chance to allocate it, as well as a  potentially
  * missing `mfutex_controller' when `self->mp_meta' was `NULL' when this function was called.
  * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
  *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
@@ -267,29 +267,29 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 		THROWS(E_WOULDBLOCK);
 
 /* Lookup a futex at a given address that is offset from the start of a given
- * mem-file. Note though the possibly unintended behavior which applies when
+ * mem-file. Note though the possibly unintended behavior which applies  when
  * the given `mfile' is anonymous at the time of the call being made.
  * @param: addr: Absolute file-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally)
- * WARNING: Using this function when `self' has been, or always was anonymous, will
+ * WARNING: Using  this function  when `self' has  been, or always  was anonymous, will
  *          cause the mem-part associated with the returned futex to also be anonymous,
- *          meaning that the part would get freshly allocated, and repeated calls with
+ *          meaning that the part would get freshly allocated, and repeated calls  with
  *          the same arguments would not yield the same futex object!
- *       -> As such, in the most common case of a futex lookup where you wish to find
- *          the futex associated with some given `uintptr_t', the process would be to
+ *       -> As  such, in the most common case of  a futex lookup where you wish to find
+ *          the futex associated with some given  `uintptr_t', the process would be  to
  *          to determine the `mnode' of the address, and using that node then determine
- *          the associated mpart, and relative offset into that mem-part. If a lookup
- *          of the futex then returns `MPART_FUTEX_OOB', loop back around
+ *          the associated mpart, and relative offset  into that mem-part. If a  lookup
+ *          of  the   futex   then   returns  `MPART_FUTEX_OOB',   loop   back   around
  *          and once again lookup the `mnode'.
- *       -> In the end, there exists no API also found on linux that would make use of this
- *          function, however on KOS it is possible to access this function through use of
+ *       -> In the  end, there  exists no  API also  found on  linux that  would make  use of  this
+ *          function,  however  on  KOS it  is  possible to  access  this function  through  use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `addr' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL
 mfile_createfutex(struct mfile *__restrict self, pos_t addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
-/* Same as `mfile_createfutex()', but don't allocate a new
+/* Same  as `mfile_createfutex()', but don't allocate a new
  * futex object if none already exists for the given `addr'
  * @param: addr:  Absolute file-address of the futex (will be floor-aligned by
  *                `MFUTEX_ADDR_ALIGNMENT' internally)
@@ -300,7 +300,7 @@ mfile_lookupfutex(struct mfile *__restrict self, pos_t addr)
 		THROWS(E_WOULDBLOCK);
 
 /* Return the futex object that is associated with the given virtual memory address.
- * In the event that `addr' isn't mapped to anything (or is mapped to a reserved
+ * In  the event that  `addr' isn't mapped to  anything (or is  mapped to a reserved
  * node), then throw an `E_SEGFAULT' exception.
  * @param: addr: Absolute memory-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally) */
@@ -319,7 +319,7 @@ mman_lookupfutex(struct mman *__restrict self, UNCHECKED void *addr)
 		THROWS(E_WOULDBLOCK);
 
 /* Broadcast to all thread waiting for a futex at `addr' within the current mman.
- * If `addr' isn't mapped, or no pre-existing node is bound to that address,
+ * If `addr' isn't  mapped, or  no pre-existing node  is bound  to that  address,
  * simply do nothing and return immediately.
  * @param: addr: Absolute memory-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally) */

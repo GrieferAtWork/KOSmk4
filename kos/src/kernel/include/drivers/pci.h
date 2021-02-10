@@ -144,7 +144,7 @@ struct pci_device {
 SLIST_HEAD(pci_device_list, pci_device);
 DATDEF struct pci_device_list pci_list;
 
-/* Return a PCI device located at the given
+/* Return  a  PCI device  located at  the given
  * `address', or NULL if no such device exists. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct pci_device *
 NOTHROW(KCALL lookup_pci_device)(pci_addr_t address);

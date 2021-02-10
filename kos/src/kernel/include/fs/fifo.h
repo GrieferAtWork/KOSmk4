@@ -35,98 +35,98 @@ struct fifo_node;
 struct fifo {
 	/* Fifo semantics for read/write/open/close:
 	 *
-	 * open() {
-	 *     if ((mode & O_ACCMODE) == O_RDONLY) {
-	 *         for (;;) {
-	 *             if (ff_wrcnt != 0)
-	 *                 break;
-	 *             if (mode & O_NONBLOCK)
-	 *                 break;
-	 *             task_connect_for_poll(&ff_buffer.rb_nempty);
-	 *             if (ff_wrcnt != 0)
-	 *                 break;
-	 *             task_waitfor();
-	 *         }
-	 *         CREATE_READER();
-	 *         if (++ff_rdcnt == 1) // atomic!
-	 *             sig_broadcast(&ff_buffer.rb_nfull);
-	 *     } else if ((mode & O_ACCMODE) == O_WRONLY) {
-	 *         for (;;) {
-	 *             if (ff_rdcnt != 0)
-	 *                 break;
-	 *             if (mode & O_NONBLOCK)
-	 *                 THROW(ERROR_FOR(ENXIO));
-	 *             task_connect_for_poll(&ff_buffer.rb_nfull);
-	 *             if (ff_rdcnt != 0)
-	 *                 break;
-	 *             task_waitfor();
-	 *         }
-	 *         CREATE_WRITER();
-	 *         if (++ff_wrcnt == 1) // atomic!
-	 *             sig_broadcast(&ff_buffer.rb_nempty);
-	 *     } else {
-	 *         CREATE_READ_WRITE();
-	 *         if (++ff_rdcnt == 1) // atomic!
-	 *             sig_broadcast(&ff_buffer.rb_nfull);
-	 *         if (++ff_wrcnt == 1) // atomic!
-	 *             sig_broadcast(&ff_buffer.rb_nempty);
-	 *     }
-	 * }
+	 * >> open() {
+	 * >>     if ((mode & O_ACCMODE) == O_RDONLY) {
+	 * >>         for (;;) {
+	 * >>             if (ff_wrcnt != 0)
+	 * >>                 break;
+	 * >>             if (mode & O_NONBLOCK)
+	 * >>                 break;
+	 * >>             task_connect_for_poll(&ff_buffer.rb_nempty);
+	 * >>             if (ff_wrcnt != 0)
+	 * >>                 break;
+	 * >>             task_waitfor();
+	 * >>         }
+	 * >>         CREATE_READER();
+	 * >>         if (++ff_rdcnt == 1) // atomic!
+	 * >>             sig_broadcast(&ff_buffer.rb_nfull);
+	 * >>     } else if ((mode & O_ACCMODE) == O_WRONLY) {
+	 * >>         for (;;) {
+	 * >>             if (ff_rdcnt != 0)
+	 * >>                 break;
+	 * >>             if (mode & O_NONBLOCK)
+	 * >>                 THROW(ERROR_FOR(ENXIO));
+	 * >>             task_connect_for_poll(&ff_buffer.rb_nfull);
+	 * >>             if (ff_rdcnt != 0)
+	 * >>                 break;
+	 * >>             task_waitfor();
+	 * >>         }
+	 * >>         CREATE_WRITER();
+	 * >>         if (++ff_wrcnt == 1) // atomic!
+	 * >>             sig_broadcast(&ff_buffer.rb_nempty);
+	 * >>     } else {
+	 * >>         CREATE_READ_WRITE();
+	 * >>         if (++ff_rdcnt == 1) // atomic!
+	 * >>             sig_broadcast(&ff_buffer.rb_nfull);
+	 * >>         if (++ff_wrcnt == 1) // atomic!
+	 * >>             sig_broadcast(&ff_buffer.rb_nempty);
+	 * >>     }
+	 * >> }
 	 *
-	 * read() {
-	 * again:
-	 *     TRYREAD();
-	 *     if (did_read_something)
-	 *         return;
-	 *     if (!ff_wrcnt)
-	 *         return 0; // EOF
-	 *     if (iomode & IO_NONBLOCK)
-	 *         return -EWOULDBLOCK;
-	 *     task_connect(&ff_buffer.rb_nempty);
-	 *     TRYREAD();
-	 *     if (did_read_something)
-	 *         return;
-	 *     if (!ff_wrcnt)
-	 *         return 0; // EOF
-	 *     task_waitfor(); // Wait for more data, or all writers to disconnect
-	 *     goto again;
-	 * }
+	 * >> read() {
+	 * >> again:
+	 * >>     TRYREAD();
+	 * >>     if (did_read_something)
+	 * >>         return;
+	 * >>     if (!ff_wrcnt)
+	 * >>         return 0; // EOF
+	 * >>     if (iomode & IO_NONBLOCK)
+	 * >>         return -EWOULDBLOCK;
+	 * >>     task_connect(&ff_buffer.rb_nempty);
+	 * >>     TRYREAD();
+	 * >>     if (did_read_something)
+	 * >>         return;
+	 * >>     if (!ff_wrcnt)
+	 * >>         return 0; // EOF
+	 * >>     task_waitfor(); // Wait for more data, or all writers to disconnect
+	 * >>     goto again;
+	 * >> }
 	 *
-	 * write() {
-	 * again:
-	 *     if (!ff_rdcnt) {
-	 * no_readers:
-	 *         raise(SIGPIPE);
-	 *         return -EPIPE;
-	 *     }
-	 *     TRYWRITE();
-	 *     if (did_write_something)
-	 *         return;
-	 *     if (iomode & IO_NONBLOCK)
-	 *         return -EWOULDBLOCK;
-	 *     if (!ff_rdcnt)
-	 *         goto no_readers;
-	 *     task_connect(&ff_buffer.rb_nfull);
-	 *     TRYWRITE();
-	 *     if (did_write_something)
-	 *         return;
-	 *     if (!ff_rdcnt)
-	 *         goto no_readers;
-	 *     task_waitfor(); // Wait for more data, or all writers to disconnect
-	 *     goto again;
-	 * }
+	 * >> write() {
+	 * >> again:
+	 * >>     if (!ff_rdcnt) {
+	 * >> no_readers:
+	 * >>         raise(SIGPIPE);
+	 * >>         return -EPIPE;
+	 * >>     }
+	 * >>     TRYWRITE();
+	 * >>     if (did_write_something)
+	 * >>         return;
+	 * >>     if (iomode & IO_NONBLOCK)
+	 * >>         return -EWOULDBLOCK;
+	 * >>     if (!ff_rdcnt)
+	 * >>         goto no_readers;
+	 * >>     task_connect(&ff_buffer.rb_nfull);
+	 * >>     TRYWRITE();
+	 * >>     if (did_write_something)
+	 * >>         return;
+	 * >>     if (!ff_rdcnt)
+	 * >>         goto no_readers;
+	 * >>     task_waitfor(); // Wait for more data, or all writers to disconnect
+	 * >>     goto again;
+	 * >> }
 	 *
 	 *
-	 * close(READER) {
-	 *     if (IS_READER) {
-	 *         if (--ff_rdcnt == 0) // !atomic
-	 *             sig_broadcast(&ff_buffer.rb_nfull);
-	 *     }
-	 *     if (IS_WRITER) {
-	 *         if (--ff_wrcnt == 0) // !atomic
-	 *             sig_broadcast(&ff_buffer.rb_nempty);
-	 *     }
-	 * }
+	 * >> close(READER) {
+	 * >>     if (IS_READER) {
+	 * >>         if (--ff_rdcnt == 0) // !atomic
+	 * >>             sig_broadcast(&ff_buffer.rb_nfull);
+	 * >>     }
+	 * >>     if (IS_WRITER) {
+	 * >>         if (--ff_wrcnt == 0) // !atomic
+	 * >>             sig_broadcast(&ff_buffer.rb_nempty);
+	 * >>     }
+	 * >> }
 	 *
 	 */
 	struct ringbuffer ff_buffer; /* The pipe's buffer. */
@@ -148,7 +148,7 @@ struct fifo {
  *    - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE
  *    - HANDLE_TYPE_FIFO_USER
  * This hop-backend implements command codes normally reserved for pipe
- * objects, thus allowing user-space to make use of pipe hop commands
+ * objects, thus allowing user-space to  make use of pipe hop  commands
  * with FIFO objects. */
 INTDEF syscall_slong_t KCALL
 fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
@@ -171,7 +171,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fifo_user, fu_refcnt, fifo_user_destroy)
 
 /* Create a reader/writer for the given `pipe'
  * NOTE: If applicable, the caller should fill in `fu_path' and/or
- *       `fu_dirent' directly after calling this function.
+ *       `fu_dirent'   directly   after  calling   this  function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
 FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED NONNULL((1)) REF struct fifo_user *FCALL

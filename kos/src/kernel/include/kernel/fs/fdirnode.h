@@ -65,9 +65,9 @@ struct fmkfile_info {
 	u16                               _mkf_pad;     /* ... */
 	u32                                mkf_flags;   /* [in|out] Set of `FMKFILE_F_*' */
 	REF struct fdirent                *mkf_dent;    /* [1..1][out] Directory entry for the new file (s.a. `dno_lookup') */
-	mode_t                             mkf_fmode;   /* [in] File type & access permissions for the new file-node.
-	                                                 * If a hard-link should be created, this is field is set to ZERO.
-	                                                 * For this purpose, node that all S_IF*-file-type-flags are non-zero,
+	mode_t                             mkf_fmode;   /* [in] File  type   &  access   permissions  for   the  new   file-node.
+	                                                 * If a  hard-link should  be created,  this  is field  is set  to  ZERO.
+	                                                 * For this purpose,  node that all  S_IF*-file-type-flags are  non-zero,
 	                                                 * meaning you can simply switch on this field and use `0' for hard-link. */
 	union {
 		/* [1..1][out] The newly constructed file-node. */
@@ -111,7 +111,7 @@ struct frename_info {
 	struct fnode                      *frn_file;    /* [1..1][in] The file that should be renamed. */
 	struct fdirent                    *frn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir' */
 	struct fdirnode                   *frn_olddir;  /* [1..1][in] Old containing directory. (Part of the same superblock!)
-	                                                 * NOTE: The new directory is guarantied not to be a child of this
+	                                                 * NOTE: The new  directory  is  guarantied  not to  be  a  child  of  this
 	                                                 *       directory! (this must be asserted by the caller of `dno_rename()') */
 };
 
@@ -130,15 +130,15 @@ struct fdirenum_ops {
 			THROWS(...);
 
 	/* [1..1] Directory stream seeking.
-	 * This callback must at least be capable of `offset=0,whence=SEEK_SET',
+	 * This callback must at least be capable of  `offset=0,whence=SEEK_SET',
 	 * which may be used to rewind the directory and re-read all entries that
 	 * had already been read before. (s.a. `rewinddir(3)')
-	 * Other than this, it is undefined what an absolute `offset' actually
-	 * represents. - It may be an index (seeking to the n'th entry), or an
+	 * Other  than this, it is undefined what an absolute `offset' actually
+	 * represents.  - It may be an index (seeking to the n'th entry), or an
 	 * absolute position within the containing directory file, or something
-	 * entirety different. (multiple directory entires are even allowed to
-	 * share the same ~position~, meaning that reading the position, and
-	 * later restoring it is _not_ a usage-case that has to be supported)
+	 * entirety different. (multiple directory entires are even allowed  to
+	 * share the same  ~position~, meaning that  reading the position,  and
+	 * later restoring it is _not_ a  usage-case that has to be  supported)
 	 * @return: * : The new position (however that may be defined) within
 	 *              the directory stream. */
 	NONNULL((1)) pos_t
@@ -290,18 +290,18 @@ struct fdirnode
 #define fdirnode_lookup(self, info) \
 	(*fdirnode_getops(self)->dno_lookup)(self, info)
 
-/* Construct a directory enumerator object in `*result'.
+/* Construct a directory  enumerator object in  `*result'.
  * This function must initialize _all_ fields of `*result'
- * It is undefined if files created or deleted after the creation of an
+ * It  is undefined if files created or  deleted after the creation of an
  * enumerator, will still be enumerated by said enumerator. It is however
- * guarantied that all files not created/deleted afterwards will always
+ * guarantied that all files  not created/deleted afterwards will  always
  * be enumerated */
 #define fdirnode_enum(self, result) \
 	(*fdirnode_getops(self)->dno_enum)(self, result)
 
 
 /* Create new files within a given directory.
- * If another file with the same name already existed, then
+ * If another  file with  the same  name already  existed,  then
  * `FMKFILE_F_EXISTS' is set, and that file is returned instead.
  * @throw: E_FSERROR_ILLEGAL_PATH:        `info->mkf_name' contains bad characters
  * @throw: E_FSERROR_DISK_FULL:           Disk full
@@ -314,7 +314,7 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS);
 
 /* Delete the specified file from this directory
- * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had already been deleted, or
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or
  *                                        renamed (it no longer exists as `entry'
  *                                        within `self').
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
@@ -332,7 +332,7 @@ fdirnode_unlink(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DISK_FULL:               Disk full
  * @throw: E_FSERROR_READONLY:                Read-only filesystem
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `info->frn_name' already exists
- * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted 
+ * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted
  * @throw: E_FSERROR_CROSS_DEVICE_LINK:       ...
  * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: ... */
 FUNDEF NONNULL((1, 2)) void FCALL

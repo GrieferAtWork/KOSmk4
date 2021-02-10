@@ -24,42 +24,42 @@
 
 /*
  * #define __ARCH_HAVE_VFORK_SHARED_VM
- * >> Defined when the system implements the vfork(2) system call such
- *    that it isn't a shallow alias for fork(2), but rather executes
- *    the child process within the same VM as the parent process, only
+ * >> Defined when the system implements the vfork(2) system call  such
+ *    that  it isn't a  shallow alias for  fork(2), but rather executes
+ *    the child process within the same VM as the parent process,  only
  *    that the parent will not resume execution before the child exits,
  *    or invokes one the exec(2) system calls.
  *
- * >> Knowing this at compile-time allows for some trickery where the
- *    child process will be able to write back extended exec status
- *    information (such as the exec-errno upon failure) back to main
- *    memory, such that once `vfork(2)' returns to the parent process,
+ * >> Knowing  this at  compile-time allows  for some  trickery where the
+ *    child  process  will be  able to  write  back extended  exec status
+ *    information (such  as the  exec-errno upon  failure) back  to  main
+ *    memory, such that  once `vfork(2)' returns  to the parent  process,
  *    that parent can assume that (among everything else that is memory),
- *    its `errno' was shared with the child process, such that (assuming
- *    that the error was caused by exec(2)->errno=ENOENT), the vfork(2)
+ *    its  `errno' was shared with the child process, such that (assuming
+ *    that the error was  caused by exec(2)->errno=ENOENT), the  vfork(2)
  *    system call will (seemingly) return with `errno=ENOENT'
  *
- * -> Knowing this, it becomes significantly easier to implement error
+ * -> Knowing this, it becomes  significantly easier to implement  error
  *    propagation as the result of a failed exec() in situations such as
  *    system(3) or the spawn(3) family of functions (both POSIX and DOS)
  *
  *
  *
  * #define __ARCH_HAVE_SIGBLOCK_VFORK
- * >> POSIX signals send to a vfork'd child (except for SIGSTOP/SIGKILL)
+ * >> POSIX signals send to a vfork'd child (except for  SIGSTOP/SIGKILL)
  *    are always masked, no matter what the vfork-process's actual signal
  *    mask says about the signal!
- * >> Linux doesn't do this, but handles the problem in user-space in a
- *    way that essentially requires one to _always_ _unconditionally_ do a
- *    `sigprocmask()' to mask _all_ signals before the vfork(), such that
- *    the child process doesn't accidentally run any signal handlers in the
+ * >> Linux  doesn't  do this,  but  handles the  problem  in user-space  in a
+ *    way  that essentially  requires one  to _always_  _unconditionally_ do a
+ *    `sigprocmask()' to  mask _all_  signals before  the vfork(),  such  that
+ *    the  child process doesn't  accidentally run any  signal handlers in the
  *    context of the parent VM (which could result in an inconsistency between
- *    process contexts such as memory and open file descriptors (where only
- *    the former is shared, but a signal handler of the vfork()'d child may
- *    still run the handler, thinking it's the parent) and consequently
+ *    process  contexts such as  memory and open  file descriptors (where only
+ *    the former is shared,  but a signal handler  of the vfork()'d child  may
+ *    still run  the  handler,  thinking it's  the  parent)  and  consequently
  *    close a file handle that remains open for the parent).
  * >> On KOS this problem is handled differently, such that a thread with
- *    the `TASK_FVFORK' flag set is handled as though `sigmask_getrd()'
+ *    the `TASK_FVFORK' flag set  is handled as though  `sigmask_getrd()'
  *    always returned a signal mask identical to `&kernel_sigmask_full'
  * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGBLOCK_VFORK'
  *    like this:

@@ -346,7 +346,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 		commonTail = "";
 	if ("'" in commonTail)
 		commonTail = commonTail[commonTail.rindex("'")+1:];
-	for (local c: "@-*") {
+	for (local c: "@-*`'\"") {
 		local p = commonPrefix.find(c);
 		if (p >= 0)
 			commonPrefix = commonPrefix[:p];
@@ -473,7 +473,27 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	local numLines = #paragraphBlock;
 	for (local i = 0; i < numLines;) {
 		local l = paragraphBlock[i];
-		local nspc = countLeadingSpaces(l);
+		local nspc;
+		if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
+			local j = 2;
+			while (j < #l && l.issymcont(j))
+				++j;
+			while (j < #l && l.isspace(j))
+				++j;
+			if (j < #l && l[j] in ":") {
+				/* Element-tag annotation */
+				++j;
+				while (j < #l && l.isspace(j))
+					++j;
+				nspc = j;
+				if (currentBlock) {
+					result.extend(reflowBlockComment(currentBlock, lineLength));
+					currentBlock = none;
+				}
+			}
+		} else {
+			nspc = countLeadingSpaces(l);
+		}
 		if (currentBlock is none) {
 			currentBlock = [l];
 			prevIndent = nspc;
@@ -527,14 +547,29 @@ reflow_normal_block:
 		local firstLinePrefix = prevLine[:subParagraphIndent];
 		local secondLinePrefix = l[:subParagraphIndent];
 		currentBlock = [prevLine[subParagraphIndent:], l[subParagraphIndent:]];
+		local activeIndentations = [subParagraphIndent];
 		for (;;) {
 			++i;
 			if (i >= numLines)
 				break;
 			l = paragraphBlock[i];
 			nspc = countLeadingSpaces(l);
-			if (nspc != subParagraphIndent)
-				break;
+			if (nspc !in activeIndentations) {
+				/* Check for something like this:
+				 * >> FOO: a b c
+				 * >>      b c a
+				 * >>      BAR: liz
+				 * >>           laz */
+				while (activeIndentations && nspc < activeIndentations.last)
+					activeIndentations.popback();
+				if (!activeIndentations)
+					break;
+				local prevLine = currentBlock.last;
+				local relnspc = nspc - subParagraphIndent;
+				if (#prevLine < relnspc || !prevLine.isspace(relnspc - 1))
+					break;
+				activeIndentations.append(nspc);
+			}
 			currentBlock.append(l[subParagraphIndent:]);
 		}
 		local isFirst = true;

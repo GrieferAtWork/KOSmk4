@@ -35,21 +35,21 @@ DECL_BEGIN
 /* vio_create(3):
  * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
  * >>                 size_t initial_size, oflag_t flags);
- * Create an mmap(2)able VIO object where memory accesses
+ * Create  an mmap(2)able VIO object where memory accesses
  * made to the object are serviced by dispatching them via
  * the given `ops' table.
  * The returned file descriptor mustn't be deleted by `close(2)',
  * but rather through use of `vio_destroy(3)'.
- * Note that callbacks in `ops' may be invoked in the context
- * of a different thread than the one that performed the memory
+ * Note  that callbacks in  `ops' may be  invoked in the context
+ * of  a different thread than the one that performed the memory
  * access. Also note that the returned `fd_t' can be shared with
  * other processes, but still function as expected. (when shared
  * with a different process, that process should once again make
- * use of `close(2)' for cleanup, rather than `vio_destroy(3)')
+ * use  of `close(2)' for cleanup, rather than `vio_destroy(3)')
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK'
  * @param: cookie:       A cookie pointer that is available as `args->va_cookie'
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This size may be altered at a later point in time
+ *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
 INTDEF WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(CC libvio_create)(struct vio_operators const *ops, void *cookie,

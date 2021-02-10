@@ -28,7 +28,7 @@
 #include <bits/crt/format-printer.h>
 #include <bits/types.h>
 
-/* Json writer example usage:
+/* Json  writer  example  usage:
  * >> struct json_writer writer;
  * >> json_writer_init(&writer, printer, arg, format);
  * >> json_writer_beginobject(&writer);

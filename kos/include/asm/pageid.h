@@ -20,21 +20,21 @@
 #ifndef _ASM_PAGEID_H
 #define _ASM_PAGEID_H 1
 
-/* Convert virtual memory addresses to/form their compressed variants
- * in the form of Page-IDs, where a Page-ID strips away any redundant
+/* Convert  virtual memory addresses  to/form their compressed variants
+ * in the form of Page-IDs, where  a Page-ID strips away any  redundant
  * address bits, as well as the unpagable lower `__ARCH_PAGESHIFT' bits
- * The idea of this mechanism is to use it to define a special address
- * space mechanism that can be used for encoding/decoding keys for use
+ * The  idea of this mechanism is to use it to define a special address
+ * space  mechanism that can be used for encoding/decoding keys for use
  * with an address tree with the purpose of associating additional data
  * with specific addresses/address-ranges.
  * >> __ARCH_PAGEID_TYPE pageid  = __ARCH_PAGEID_ENCODE(addr);
  * >> void              *newaddr = __ARCH_PAGEID_DECODE(pageid);
- * Note that following an encode+decode, the resulting address is always
- * floor-aligned by a multiple of `__ARCH_PAGESIZE' (if defined; if not
- * defined, this mechanism is unavailable), and may not necessary be the
- * same as the floor-page-aligned value of the original address, as other
- * redundant address may have been stripped (an example of this behavior
- * would be the address-space sign-extension found on x86_64 processors,
+ * Note that following  an encode+decode, the  resulting address is  always
+ * floor-aligned  by a  multiple of  `__ARCH_PAGESIZE' (if  defined; if not
+ * defined,  this mechanism is  unavailable), and may  not necessary be the
+ * same as the floor-page-aligned value  of the original address, as  other
+ * redundant  address may have  been stripped (an  example of this behavior
+ * would be the  address-space sign-extension found  on x86_64  processors,
  * where these macros simply strip off redundant sign-bits during encoding,
  * but re-add then during decoding)
  * Additionally, the following constants are defined:

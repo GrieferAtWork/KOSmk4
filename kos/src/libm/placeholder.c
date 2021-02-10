@@ -29,7 +29,7 @@ DECL_BEGIN
 
 /* libm doesn't actually do anything in KOS.
  * All of the math functions are already defined in libc (for compatibility with DOS),
- * so when libm is loaded, attempting to dlsym() or simply use one of the many math
+ * so when libm is loaded,  attempting to dlsym() or simply  use one of the many  math
  * functions will cause `libdl.so' to walk the dependency tree of libm (which contains
  * libc.so), allowing it to find the implementations provided there.
  * We could in theory provide some linux/gnu-specific math functions here and keep them

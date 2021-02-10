@@ -34,15 +34,15 @@
 DECL_BEGIN
 
 /* Analyze data from the given `sections' to locate source-level information about `module_relative_pc'.
- * @param: sections: The mapping locations for the different debug sections associated with the program.
+ * @param: sections: The mapping locations for the different debug sections associated with the  program.
  *                   This structure must be initialized with available section information by the caller,
- *                   although for minimal functionality, only the .debug_line section is required.
- *                   Note however that other sections are mandatory (and recommended) in order to
+ *                   although for  minimal  functionality,  only the  .debug_line  section  is  required.
+ *                   Note however  that  other sections  are  mandatory  (and recommended)  in  order  to
  *                   provide full support of available features.
- * @param: level:    Inline function indirection depth for the location to query.
- *                   Level #0 always refers to the exact source location, as retrievable
- *                   via the .debug_line program, while all levels greater than this refer
- *                   to the call-sites of inlined functions found at that location.
+ * @param: level:    Inline  function  indirection  depth   for  the  location  to   query.
+ *                   Level  #0 always refers  to the exact  source location, as retrievable
+ *                   via  the .debug_line program, while all levels greater than this refer
+ *                   to  the  call-sites  of  inlined  functions  found  at  that location.
  *                   Alternatively, you may also pass `DEBUG_ADDR2LINE_LEVEL_SOURCE', which
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
@@ -61,9 +61,9 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully retrieved information.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either no information is known about `module_relative_pc',
  *                                    or the given `level >= OUT(result->al_levelcnt)', and also
- *                                    isn't equal to `DEBUG_ADDR2LINE_LEVEL_SOURCE', where
- *                                    `result->al_levelcnt' is set to 0 if no information is
- *                                    known at all, or whatever the total number of information
+ *                                    isn't     equal     to     `DEBUG_ADDR2LINE_LEVEL_SOURCE',     where
+ *                                    `result->al_levelcnt'  is   set   to   0  if   no   information   is
+ *                                    known  at  all,  or  whatever   the  total  number  of   information
  *                                    levels know is. (all other fields of `*result' are NULL-initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
 INTDEF NONNULL((1, 2)) unsigned int
@@ -74,7 +74,7 @@ NOTHROW_NCX(CC libdi_debug_addr2line)(di_addr2line_sections_t const *__restrict 
                                       uintptr_t flags);
 
 /* Print the fully qualified filename for a given string
- * triplet, as extractable from `di_debug_addr2line_t':
+ * triplet, as extractable from  `di_debug_addr2line_t':
  *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile); // /home/me/project/c/foo/src/bar.c
  *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile); // /home/me/project/c/foo/include/bar.h
  * NOTE: When `filename' is NULL, print `???' (3 question marks) instead. */
@@ -86,7 +86,7 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
  * >> These functions are simply light-weight wrappers around `dllocksection()',
- *    taking the job of locking debug information sections into memory off of
+ *    taking  the job of  locking debug information sections  into memory off of
  *    the user. */
 INTDEF NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,

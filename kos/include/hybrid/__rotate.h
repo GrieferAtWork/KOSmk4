@@ -86,7 +86,7 @@ __DECL_BEGIN
 __DECL_BEGIN
 __NAMESPACE_INT_BEGIN
 
-/* `-fnon-call-exception' currently requires __asm__ to be marked as volatile.
+/* `-fnon-call-exception' currently  requires  __asm__  to be  marked  as  volatile.
  * s.a. the following bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357 */
 #ifndef __asm_ncx_memop__
 #ifdef __NON_CALL_EXCEPTIONS

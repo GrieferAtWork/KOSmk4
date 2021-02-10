@@ -77,22 +77,22 @@ struct linecapture {
 
 
 struct linebuffer {
-	/* A linebuffer is a special kind of buffer that is designed to be
-	 * written to in a way similar to a ring buffer (in that consecutive
-	 * writes will form a continuous data stream, and in that there exists
-	 * a maximal size to which a line buffer may grow), however unlike with
+	/* A linebuffer  is a  special kind  of buffer  that is  designed to  be
+	 * written to in  a way similar  to a ring  buffer (in that  consecutive
+	 * writes will form a continuous data  stream, and in that there  exists
+	 * a maximal size to which a line buffer may grow), however unlike  with
 	 * a ring buffer, a line buffer is not read linearly. - Instead, reading
-	 * is done by capturing the entirety of the line buffer's contents as a
-	 * whole, and stealing them, to-be processed afterwards, and eventually
+	 * is done by capturing the entirety of the line buffer's contents as  a
+	 * whole, and stealing them, to-be processed afterwards, and  eventually
 	 * re-used, or destroyed when data has been processed.
-	 * This in turn allows data to be collected before being processed in
-	 * larger batches. - It also offers itself as a way of implementing
+	 * This  in turn allows  data to be collected  before being processed in
+	 * larger batches. -  It also  offers itself  as a  way of  implementing
 	 * canonical line-buffers in TTYs, where user-input needs to be buffered
 	 * until an end-of-line character is received. */
 	struct atomic_lock lb_lock; /* Lock for this line buffer */
 	struct linecapture lb_line; /* [lock(lb_lock)] The current line */
 	__WEAK __size_t    lb_limt; /* Max # of bytes that may appear in a single line
-	                             * When set to 0, the buffer is considered closed */
+	                             * When set to 0, the buffer is considered  closed */
 	sched_signal_t     lb_nful; /* Signal broadcast when the buffer becomes non-full, or gets closed */
 };
 
@@ -182,10 +182,10 @@ __NOTHROW(LIBBUFFER_CC linebuffer_clear)(struct linebuffer *__restrict __self);
 #endif /* !__KERNEL__ */
 
 
-/* Re-write the used area of the given capture within the given buffer.
- * For this purpose, try to re-instate `capture' as the active line, or
+/* Re-write  the  used area  of the  given capture  within the  given buffer.
+ * For  this  purpose, try  to re-instate  `capture' as  the active  line, or
  * alternatively (when new data has already been written), write the contents
- * of the capture using `linebuffer_write()', before destroying the capture.
+ * of the capture using `linebuffer_write()', before destroying the  capture.
  * @return: * : The number of re-written bytes.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 typedef __ATTR_NONNULL((1, 2)) __KERNEL_SELECT(__size_t, __ssize_t)
@@ -201,10 +201,10 @@ LIBBUFFER_DECL __ATTR_NONNULL((1, 2)) __KERNEL_SELECT(__size_t, __ssize_t)
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
-/* Append up to `num_bytes' of data from `src' to the current line.
+/* Append up to `num_bytes' of data from `src' to the current  line.
  * If the line is too small to contain all data, wait until the line
  * is emptied before writing more data.
- * If the linebuffer is closed before all data could be written, return
+ * If the linebuffer is closed before  all data could be written,  return
  * the amount of written data, or 0 if the buffer was already closed when
  * the function was called.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
@@ -223,9 +223,9 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
-/* Similar to `linebuffer_write()', but only block if the line was full
- * the first time the function was called. If the linebuffer is closed
- * before at least 1 byte of data could be written, 0 is returned.
+/* Similar to `linebuffer_write()',  but only  block if the  line was  full
+ * the first time  the function  was called.  If the  linebuffer is  closed
+ * before at  least  1  byte of  data  could  be written,  0  is  returned.
  * Alternatively, if the given buffer is zero-length, 0 is always returned.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
@@ -243,7 +243,7 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
-/* Similar to `linebuffer_write()', but never block before writing data.
+/* Similar to `linebuffer_write()', but  never block before writing  data.
  * If the given buffer was full at the time of this function being called,
  * or had been closed, then 0 is returned immediately.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */

@@ -30,13 +30,13 @@ DECL_BEGIN
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
 /* Low-level, arch-specific enable/disable system call tracing.
- * NOTE: Don't call `arch_syscall_tracing_setenabled()' directly.
+ * NOTE: Don't   call   `arch_syscall_tracing_setenabled()'    directly.
  *       Low-level system call tracing is enabled/disabled automatically
- *       when tracing callbacks are installed/deleted as the result of
- *       calls to `syscall_trace_start()' and `syscall_trace_stop()'.
+ *       when tracing callbacks are  installed/deleted as the result  of
+ *       calls to  `syscall_trace_start()'  and  `syscall_trace_stop()'.
  *       Manually enabling/disable tracing will work, however attempting
- *       to start/stop tracing via installation of dynamic tracing
- *       callbacks may break, since those functions may only call this
+ *       to  start/stop  tracing  via  installation  of  dynamic tracing
+ *       callbacks may break, since those  functions may only call  this
  *       one when the first callback is registered, or the last callback
  *       is deleted.
  * NOTE: A user can manually invoke this function from the builtin debugger
@@ -44,7 +44,7 @@ DECL_BEGIN
  * @param: nx:     When true, don't throw an exception or block.
  * @return: true:  Successfully changed the current tracing state.
  * @return: false: Tracing was already enabled/disabled, or could
- *                 not be enabled/disabled when `nx == true'. */
+ *                 not  be  enabled/disabled  when  `nx == true'. */
 FUNDEF bool (KCALL arch_syscall_tracing_setenabled)(bool enable, bool nx);
 
 /* Check if system call tracing is enabled. */
@@ -53,18 +53,18 @@ FUNDEF WUNUSED bool NOTHROW(KCALL arch_syscall_tracing_getenabled)(void);
 struct rpc_syscall_info;
 
 /* Trace a given system call.
- * This function is called at the start of any user-level system
- * call so-long as `arch_syscall_tracing_getenabled() == true'
+ * This  function is called  at the start  of any user-level system
+ * call   so-long   as  `arch_syscall_tracing_getenabled() == true'
  * Custom system call invocation mechanisms that directly call into
  * the underlying system call tables, rather than going through the
- * provided `syscall_emulate()' family of functions must manually
+ * provided `syscall_emulate()' family  of functions must  manually
  * invoke this callback */
 FUNDEF NONNULL((1)) void FCALL
 syscall_trace(struct rpc_syscall_info const *__restrict info);
 
 
 /* Prototype for dynamically defined system call tracing callbacks.
- * @param: self: A temporary reference to the object registered
+ * @param: self: A temporary  reference  to  the  object  registered
  *               in `syscall_trace_start()' alongside this callback. */
 typedef NONNULL((1, 2)) void
 (FCALL *syscall_trace_callback_t)(void *__restrict self,
@@ -72,11 +72,11 @@ typedef NONNULL((1, 2)) void
 #define _SYSCALL_TRACE_CALLBACK_T(name, Tself) \
 	void (FCALL *name)(Tself *__restrict self, struct rpc_syscall_info const *__restrict info)
 
-/* Start/stop the tracing of system calls by installing/deleting callbacks
+/* Start/stop the  tracing of  system  calls by  installing/deleting  callbacks
  * that are invoked for every system call invoked after `syscall_trace_start()'
  * returns, and before `syscall_trace_stop()' returns.
  * NOTE: The internal structures related to these functions don't keep a permanent
- *       reference to the given `ob_pointer' object, meaning that so-long as you
+ *       reference to the given `ob_pointer'  object, meaning that so-long as  you
  *       make sure to call `syscall_trace_stop()' from the object's finalizer, you
  *       can safely use these functions with arbitrary kernel objects.
  * @param: cb:         The callback to-be invoked when a system call is performed.

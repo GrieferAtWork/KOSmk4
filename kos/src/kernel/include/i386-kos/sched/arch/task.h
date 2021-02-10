@@ -42,11 +42,11 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Inline optimizations for scheduler functions implemented via assembly.
- * Using this, we can help GCC generate better code by telling it which
- * registers get clobbered by which function, allowing it to keep more
+ * Using  this, we can help GCC generate  better code by telling it which
+ * registers  get clobbered by  which function, allowing  it to keep more
  * variables in registers across calls to these functions (which is quite
  * useful, considering that these functions often appear in the middle of
- * long functions needing to use the same objects both before and after
+ * long functions needing to use the  same objects both before and  after
  * the call) */
 #ifndef __INTELLISENSE__
 #ifdef __NO_XBLOCK
@@ -99,7 +99,7 @@ FORCELOCAL ATTR_ARTIFICIAL unsigned int NOTHROW(__x86_task_tryyield_or_pause)(vo
 
 #define task_yield() __x86_task_yield()
 /* This wrapper cannot be implemented using __XBLOCK due to a GCC bug
- * that causes `__asm__ __volatile__' by itself to be considered as
+ * that causes `__asm__ __volatile__' by  itself to be considered  as
  * NOTHROW, forcing one to wrap by an inline function:
  *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357
  */
@@ -313,7 +313,7 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
 
 
 /* Entry point for IRET tails that have been re-directed for RPC.
- * Used to redirect how the kernel will return to user-space:
+ * Used  to redirect  how the  kernel will  return to user-space:
  * >> redirect_iret_to_execute_rpcs() {
  * >>     struct irregs_kernel *irr;
  * >>     PREEMPTION_DISABLE(); // Redirection is only
@@ -332,13 +332,13 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  * from another, asynchronous kernel RPC:
  * >> task_schedule_asynchronous_rpc(target, &redirect_iret_to_execute_rpcs);
  * Once entered, `x86_rpc_user_redirection()' will then restore the saved IRET
- * tail, before proceeding to serve _all_ pending RPC callbacks (s.a.:
- * the `Anytime the thread returns to user-space' row in `task_rpc()')
+ * tail,  before  proceeding  to  serve  _all_  pending  RPC  callbacks (s.a.:
+ * the   `Anytime the thread returns to user-space'   row   in   `task_rpc()')
  * WARNING:
- *    Because of the redirection, in order to get/set any of the kernel IRET
- *    registers when inside of an interrupt/syscall with preemption enabled,
+ *    Because of the redirection, in order to get/set any of the kernel  IRET
+ *    registers when inside of an interrupt/syscall with preemption  enabled,
  *    you must always use the functions below, so-as to ensure that you don't
- *    re-override the RPC redirection, but modify the saved state when it
+ *    re-override the RPC  redirection, but  modify the saved  state when  it
  *    comes to the IRET tail. */
 FUNDEF void ASMCALL x86_rpc_user_redirection(void);
 
@@ -354,7 +354,7 @@ DATDEF ATTR_PERTASK struct irregs this_x86_rpc_redirection_iret;
 DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 #endif /* !___this_x86_kernel_psp0_defined */
 
-/* Return a pointer to the original user-space IRET tail of the calling thread.
+/* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
  *       and that `thread' is hosted by the calling CPU. */
@@ -367,7 +367,7 @@ DATDEF ATTR_PERTASK struct irregs_kernel this_x86_rpc_redirection_iret;
 
 struct irregs_user;
 
-/* Return a pointer to the original user-space IRET tail of the calling thread.
+/* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
  *       and that `thread' is hosted by the calling CPU. */

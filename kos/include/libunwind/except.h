@@ -26,7 +26,7 @@
 
 #include <kos/except.h>
 
-/* The KOS kernel uses a different exception ABI that isn't compatible with
+/* The  KOS kernel  uses a different  exception ABI that  isn't compatible with
  * IA-64, since it doesn't need to ensure binary compatibility with regular C++
  * exceptions, and only needs to support KOS exceptions (<kos/except.h>) */
 #if !defined(__KOS__) || !defined(__KERNEL__)
@@ -38,7 +38,7 @@
 
 #ifdef __KOS__
 /* Exception class for KOS kernel exceptions (exceptions thrown through <kos/except.h>)
- * NOTE: Exceptions of this class behave somewhat different from other
+ * NOTE: Exceptions of this class behave somewhat different from  other
  *       classes, in that unwinding happens (usually) in a single pass:
  * >> FOREACH(frame: stack) {
  * >>     context.uc_fde   = frame.fde();
@@ -68,28 +68,28 @@ __DECL_BEGIN
 struct ATTR_PACKED gcc_lsda_callsite {
 	/* Exception handling in GCC works as follows:
 	 *   - If a function doesn't have a .cfi_personality function,
-	 *     exceptions will simply be propagated through it.
-	 *   - If a function has `__gxx_personality_v0' or `__gcc_personality_v0'
+	 *     exceptions   will  simply  be  propagated  through  it.
+	 *   - If  a function has `__gxx_personality_v0' or `__gcc_personality_v0'
 	 *     as its personality function, its callsite table is searched for the
 	 *     associated unwind PC.
 	 *      - If the unwind PC wasn't found, then the program must std::terminate()
 	 *      - If the unwind PC was found as a valid call-site,
 	 *        then the associated action must be taken. */
 	uintptr_t gcs_start;       /* [ENCODING(:gl_callsite_enc)]
-	                            * Offset from the LSDA landing base to the first instruction byte that is
+	                            * Offset from the LSDA  landing base to the  first instruction byte that  is
 	                            * covered by this exception handler. (i.e. to the start of guarded assembly) */
 	uintptr_t gcs_size;        /* [ENCODING(:gl_callsite_enc)]
 	                            * The number of contiguous bytes of text guarded, starting at `gcs_start' */
 	uintptr_t gcs_handler;     /* [ENCODING(:gl_callsite_enc)]
-	                            * Offset from the LSDA landing base to the first instruction apart of the
+	                            * Offset from the LSDA  landing base to the  first instruction apart of  the
 	                            * exception handler's executing block. (i.e. the start of the catch-handler)
 	                            * If there is no handler, this field is ZERO(0)
-	                            * NOTE: Dependent on architecture, certain registers must be filled with
+	                            * NOTE: Dependent on  architecture, certain  registers must  be filled  with
 	                            *       exception-related data before the runtime may jump to this location. */
 	uintptr_t gcs_action;      /* [ENCODING(:gl_callsite_enc)]
 	                            * The action to take???
 	                            * When zero, don't perform any action. (continue propagating the exception)
-	                            * Otherwise, this is 1+ a byte offset into the action table?? */
+	                            * Otherwise,  this  is   1+  a   byte  offset  into   the  action   table?? */
 };
 struct ATTR_PACKED gcc_lsda {
 	/* Format the the GCC LanguageSpecificData pointed to by `unwind_fde_struct::f_lsdaaddr' */
@@ -101,7 +101,7 @@ struct ATTR_PACKED gcc_lsda {
 	u8              gl_typetab_enc;  /* Encoding used for fields in the type-table (One of `DW_EH_PE_*') */
 	dwarf_uleb128_t gl_typetab_off;  /* [exists_if(gl_typetab_enc != DW_EH_PE_omit)]
 	                                  * Offset from the next field to the start of the types
-	                                  * table used for matching exception types. */
+	                                  * table   used   for    matching   exception    types. */
 	u8              gl_callsite_enc; /* Encoding used for fields in the call-site table (One of `DW_EH_PE_*') */
 	dwarf_uleb128_t gl_callsite_siz; /* The size of the call-site table (in bytes) */
 	/* -- This is where the callsite table goes. */
@@ -112,7 +112,7 @@ struct ATTR_PACKED gcc_lsda {
 #endif
 
 
-/* Unwind personality function integration to allow for exception handling.
+/* Unwind personality function  integration to allow  for exception  handling.
  * Note that most of the stuff required during linking is actually implemented
  * as part of libc.so, rather than libunwind.so! */
 
@@ -133,7 +133,7 @@ typedef int _Unwind_Action; /* Set of `_UA_*' */
 #define _UA_SEARCH_PHASE  1   /* First phase: Search for a handler */
 #define _UA_CLEANUP_PHASE 2   /* First phase: Unwind up to some handler (execute finally blocks) */
 #define _UA_HANDLER_FRAME 4   /* Set alongside `_UA_CLEANUP_PHASE' when the frame containing
-                               * the handler from `_UA_SEARCH_PHASE' has been reached. */
+                               * the  handler  from  `_UA_SEARCH_PHASE'  has  been  reached. */
 #define _UA_FORCE_UNWIND  8   /* ??? Force unwinding ??? */
 #define _UA_END_OF_STACK  16  /* Set if unwinding has become impossible. */
 

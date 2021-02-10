@@ -48,7 +48,7 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 #endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 	/* Perform an arithmetic `modrm.mi_reg' with the given `rhs' as the right-hand-side
-	 * operand, and `modrm.RM' as the left-hand-side. The operation size is described
+	 * operand, and `modrm.RM' as the  left-hand-side. The operation size is  described
 	 * as the pairing of the other arguments, which must be one of:
 	 *            bwlq   BWLQ   Nbytes   Nbits
 	 *    8-bit   b      B      1        8

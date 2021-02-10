@@ -39,7 +39,7 @@
 #define __F_SETOWN            8    /* [pid_t arg] Set owner (process receiving SIGIO). */
 #define __F_GETOWN            9    /* [void arg] Get owner (process receiving SIGIO).
                                     * @return: * : The PID of the process (warning: the PID may not
-                                    *              fit into an int and -EOVERFLOW may be returned) */
+                                    *              fit into an int and -EOVERFLOW may be  returned) */
 #define __F_SETSIG            10   /* [int signo] Set number of signal to be sent. */
 #define __F_GETSIG            11   /* [void arg] Get number of signal to be sent.
                                     * @return: * : One of `SIG*' */
@@ -59,7 +59,7 @@
 /*      __F_                  1028  * ... */
 /*      __F_                  1029  * ... */
 #define __F_DUPFD_CLOEXEC     1030 /* [void arg] Duplicate file descriptor with close-on-exit set.
-                                    * @[fd_t return]: * : A new FD for the same kernel object. */
+                                    * @[fd_t return]: * :  A new  FD for the  same kernel  object. */
 #define __F_SETPIPE_SZ        1031 /* [unsigned int arg] Set pipe buffer size (in bytes). */
 #define __F_GETPIPE_SZ        1032 /* [void arg] Get pipe buffer size (in bytes).
                                     * @return: * : The buffer size (in bytes) */
@@ -86,7 +86,7 @@
 #define __F_SEAL_SHRINK       0x0002 /* Prevent the file's size from being truncated */
 #define __F_SEAL_GROW         0x0004 /* Prevent the file's size from being increased */
 #define __F_SEAL_WRITE        0x0008 /* Prevent any modifications to the file's contents.
-                                      * If writable memory mappings exist, trying to set
+                                      * If  writable memory mappings exist, trying to set
                                       * this flag fails with TODO:EXCEPTION_FOR_EBUSY */
 #define __F_SEAL_FUTURE_WRITE 0x0010 /* Same as `F_SEAL_WRITE', but pre-existing, writable
                                       * memory mappings continue to work. */
@@ -110,9 +110,9 @@
 #if __KOS_VERSION__ >= 300
 #define __AT_SYMLINK_REGULAR   0x2000 /* Treat symbolic links similar to like regular files and throw an `ERROR_FS_TOO_MANY_LINKS' error during the first encounter. */
 #define __AT_CHANGE_CTIME      0x0200 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
-                                       * (when not equal to `UTIME_OMIT') is used to override the file creation timestamp.
-                                       * NOTE: Passing this flag when the 3rd timespec isn't set to `UTIME_OMIT' requires
-                                       *       that the calling thread be holding the `CAP_SYS_TIME' permission and be the
+                                       * (when not equal to  `UTIME_OMIT') is used to  override the file creation  timestamp.
+                                       * NOTE: Passing this flag when the 3rd  timespec isn't set to `UTIME_OMIT'  requires
+                                       *       that the calling thread be holding the `CAP_SYS_TIME' permission and be  the
                                        *       owner of the file in question, or to be holding the `CAP_FOWNER' permission.
                                        *       Less permissions are required when `UTIME_NOW' is passed, in which case
                                        *      `CAP_SYS_TIME' is not required (similarly how having `CAP_FOWNER', or being
@@ -120,23 +120,23 @@
                                        *       replacing the original)
                                        * NOTE: This flag is used to implement full compatibility with NT's SetFileTime function. */
 #define __AT_READLINK_REQSIZE  0x0200 /* For use with `freadlinkat' and friends.
-                                       * Rather than following unix semantics and returning the amount of
-                                       * copied bytes with no indication of whether or not everything was
-                                       * copied, return the ~required~ buffer size (including a terminating
+                                       * Rather  than following  unix semantics  and returning  the amount of
+                                       * copied bytes with  no indication  of whether or  not everything  was
+                                       * copied, return the ~required~  buffer size (including a  terminating
                                        * NUL-character that normally wouldn't be copied either) to user-space
-                                       * (which may be more than the specified buffer size, which should be
+                                       * (which may be more than the  specified buffer size, which should  be
                                        * reallocated to fit in successive calls)
-                                       * Additionally, as already mentioned, a trailing NUL-character is
-                                       * appended to the link text, ensuring that a valid C-style string
+                                       * Additionally, as already  mentioned, a  trailing NUL-character  is
+                                       * appended  to the link  text, ensuring that  a valid C-style string
                                        * can be read so long as the provided buffer was of sufficient size. */
 #define __AT_REMOVEREG        0x04000 /* Explicitly allow removing anything that unlink() removes. (Default;
                                        * Set in addition to `AT_REMOVEDIR' to implement `remove()' semantics
                                        * as an atomic kernel operation, removing any race condition that the
-                                       * alternative of `if (unlink(x) && errno == EISDIR) rmdir(x)' would
+                                       * alternative  of  `if (unlink(x) && errno == EISDIR) rmdir(x)' would
                                        * introduce). */
 #if __KOS_VERSION__ >= 400
 #define __AT_ALTPATH         0x200000 /* For `frealpath4' / `frealpathat': the specified path should
-                                       * be printed as the reverse of the `AT_DOSPATH' flag:
+                                       * be  printed  as  the  reverse  of  the  `AT_DOSPATH'  flag:
                                        *  - 0                      : in:UNIX  out:UNIX
                                        *  - AT_DOSPATH             : in:DOS   out:DOS
                                        *  - AT_ALTPATH             : in:UNIX  out:DOS
@@ -148,12 +148,12 @@
 #define __AT_REMOVEMNT        0x80000 /* Used internally by the kernel: Delete a mounting point. (Userspace must use `unmount()') */
 #endif /* __USE_KOS_KERNEL */
 #endif /* __KOS_VERSION__ < 300 */
-#define __AT_DOSPATH         0x100000 /* Interpret '\\' as '/', and ignore casing during path resolution.
-                                       * Additionally, recognize `<LETTER>:'-style drive prefixes, as well
+#define __AT_DOSPATH         0x100000 /* Interpret '\\'  as  '/',  and ignore  casing  during  path  resolution.
+                                       * Additionally,  recognize  `<LETTER>:'-style  drive  prefixes,  as  well
                                        * as make use of per-drive working directories, as well as drive-relative
                                        * path names that start with a leading slash.
                                        * Basically, when set: perform the system call in DOS-compatibility mode.
-                                       * HINT: This flag can be specified with the `fsmode()' system call. */
+                                       * HINT:  This  flag can  be specified  with  the `fsmode()'  system call. */
 #endif /* __KOS__ */
 
 
@@ -161,10 +161,10 @@
 #define __AT_FDCWD  (-100) /* The current working directory. */
 #ifdef __KOS__
 #define __AT_FDROOT (-101) /* Same as `__AT_FDCWD' but sets the filesystem root
-                            * (using this, you can `chroot()' with 'dup2()'!) */
+                            * (using this, you  can `chroot()' with  'dup2()'!) */
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
- * and their meaning is context-sensible. */
+ * and their  meaning is  context-sensible. */
 #define __AT_THIS_TASK     (-180)
 #define __AT_THIS_MMAN     __AT_THIS_TASK /* DEPRECATED */
 #define __AT_THIS_STACK    __AT_THIS_TASK /* DEPRECATED */
@@ -177,8 +177,8 @@
 #if __KOS_VERSION__ >= 300
 /* DOS Drive root / current-working paths.
  * These are special file descriptors that can be written to using `dup2()',
- * where they expect to receive either a FILE or PATH descriptor.
- * Once set, these paths describe the root-paths of DOS's drives:
+ * where   they  expect  to  receive  either  a  FILE  or  PATH  descriptor.
+ * Once  set,  these  paths  describe   the  root-paths  of  DOS's   drives:
  * >> // Force DOS filesystem semantics for all filesystem operations.
  * >> struct fsmask mask = {0,0};
  * >> mask = fsmode(mask);
@@ -208,22 +208,22 @@
  * >>
  * NOTES:
  *   - Setting the root-path of a drive will not update the drive working directories of processes sharing VFS.
- *     With that in mind, you should not re-mount a DOS drive as a sub-directory of where
- *     it was located before then, unless you first unshared your VFS (using `CLONE_NEWNS').
- *     Allowing a program's current working directory to be located outside the associated
+ *     With  that  in   mind,  you   should  not   re-mount  a   DOS  drive   as  a   sub-directory  of   where
+ *     it  was   located  before   then,  unless   you   first  unshared   your  VFS   (using   `CLONE_NEWNS').
+ *     Allowing  a   program's   current   working   directory   to   be   located   outside   the   associated
  *     drive causes weak undefined behavior. In KOS this means:
  *       - `xfdname()' will not produce the correct path
  *       - Relative path names still operate on the old directory
  *       - Navigating into parent directories is no longer restricted (except by `chroot()')
  *       - Manually navigating into a portion of the new drives mounting point fixes the problem.
  *   - DOS drive mounting points are beneath UNIX mounting points, in that they don't
- *     actually mount a superblock to some filesystem location, but rather mirror a
- *     filesystem path, meaning that DOS drives can be thought of as the equivalent
+ *     actually mount a superblock to some  filesystem location, but rather mirror  a
+ *     filesystem  path, meaning that DOS drives can  be thought of as the equivalent
  *     of the `dfd' argument of `*at' system calls:
  *     >> open("C:\\foo.txt"); // Same as `openat(AT_FDDRIVE_ROOT('C'), "foo.txt")'
- *     If `mount()' is used to create a new (real) mounting point, it will appear
- *     in all DOS drives that are mounting the location where the mount happened,
- *     or any location further up the tree immediately (it's the same data object
+ *     If `mount()' is used to create a  new (real) mounting point, it will  appear
+ *     in  all DOS drives that are mounting  the location where the mount happened,
+ *     or  any location further up the tree  immediately (it's the same data object
  *     internally; DOS drives are merely aliasing regular paths; aka. `O_PATH')
  *   - To ~unmount~ (quote-unquote) a DOS drive, simply close() the associated root file descriptor:
  *     >> // Unmount `C:' (also closes the associated FDCWD descriptor)
@@ -233,9 +233,9 @@
  *     >> close(AT_FDDRIVE_CWD('C'));
  *     >> // Same as:
  *     >> dup2(AT_FDDRIVE_ROOT('C'),AT_FDDRIVE_CWD('C'));
- *   - Symbolic links are evaluated the same as any user-provided path.
+ *   - Symbolic links  are evaluated  the same  as any  user-provided  path.
  *     If a symbolic link starts with a '/' or '\\' character, the remainder
- *     of its text is relative to the first DOS drive mounting point
+ *     of its  text  is relative  to  the  first DOS  drive  mounting  point
  *     encountered while walking up the chain of parent directories. */
 #define __AT_FDDRIVE_CWD(drivechar)  ((-350) + ((drivechar) - 'A'))
 #define __AT_FDDRIVE_ROOT(drivechar) ((-300) + ((drivechar) - 'A'))

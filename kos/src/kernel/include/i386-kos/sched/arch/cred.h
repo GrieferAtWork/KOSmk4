@@ -27,7 +27,7 @@ DECL_BEGIN
 /* Return true if the calling thread is allowed to modify EFLAGS.IOPERM */
 #define cred_allow_hwio() 1 /* TODO */
 
-/* Mask of eflags bits that a user-space process is allowed to modify.
+/* Mask of eflags bits that a user-space process is allowed to  modify.
  * Attempting to set any non-masked EFLAGS bit will cause an exception:
  *    E_INVALID_ARGUMENT_BAD_VALUE:
  *        E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER:

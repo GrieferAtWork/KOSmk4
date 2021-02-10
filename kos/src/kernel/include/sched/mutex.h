@@ -75,7 +75,7 @@ NOTHROW(KCALL mutex_tryacquire)(struct mutex *__restrict self) {
 #define mutex_tryacquire_after_failure mutex_tryacquire
 
 /* Same as `mutex_acquire()', but it's unlikely that
- * the lock can be acquired without blocking. */
+ * the   lock  can  be  acquired  without  blocking. */
 #define mutex_acquire_unlikely \
 	mutex_acquire /* TODO: Implement using connect+test, rather than test+connect+test */
 
@@ -99,7 +99,7 @@ NOTHROW(KCALL mutex_acquire_nx)(struct mutex *__restrict self,
 
 /* Release a lock from a given mutex.
  * @return: true:  A waiting thread was signaled.
- * @return: false: Either no thread was signaled, or the
+ * @return: false: Either no  thread was  signaled, or  the
  *                 lock remains held by the calling thread. */
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(KCALL mutex_release)(struct mutex *__restrict self) {

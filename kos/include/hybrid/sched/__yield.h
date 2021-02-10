@@ -80,7 +80,7 @@ typedef int errno_t;
 #ifndef __task_yield_defined
 #define __task_yield_defined 1
 /* Yield the remainder of the caller's quantum to the next
- * scheduled task (no-op if no task to switch to exists).
+ * scheduled task (no-op if no task to switch to  exists).
  * HINT: All registers but EAX are preserved across a call to this function.
  * @return: -EOK:       Another task was executed before this function returned.
  * @return: -EAGAIN:    There was no other task to switch to. */

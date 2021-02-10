@@ -39,7 +39,7 @@
 	__NAMESPACE_INT_SYM ____intellisense_altint< __NAMESPACE_INT_SYM UID, allow_int_ops, T >
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 
-/* Allow the use of Ta and Tb in integer expressions (except for shift and compare operations)
+/* Allow the use  of Ta  and Tb  in integer  expressions (except  for shift  and compare  operations)
  * NOTE: For this purpose, `Ta' is only allowed on the left-hand-side and `Tb' only on the right one. */
 #define __HYBRID_ALTINT_COMPAT(Ta, Tb)            \
 	extern "C++" {                                \

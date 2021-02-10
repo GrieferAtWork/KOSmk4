@@ -40,7 +40,7 @@ typedef __IOPORT_T port_t;
 #define VGA_VRAM_SIZE 0x01000
 
 
-/* macro for composing an 8-bit VGA register
+/* macro  for  composing an  8-bit  VGA register
  * index and value into a single 16-bit quantity */
 #define VGA_OUT16VAL(v, r) (((v) << 8) | (r))
 

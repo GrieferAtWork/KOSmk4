@@ -78,21 +78,3 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 
 	})
 END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

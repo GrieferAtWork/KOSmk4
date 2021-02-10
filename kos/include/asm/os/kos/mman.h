@@ -57,7 +57,7 @@
                                *       some portion of the section containing the root-fork
                                *       system call has been mapped as writable.
                                *    >> rootfork() fails when any page in the calling section (.text)
-                               *       isn't part of a root-module, isn't fully mapped, was
+                               *       isn't  part  of  a  root-module,  isn't  fully  mapped,   was
                                *       re-mapped somewhere else, or been made writable at any point. */
 #endif /* __KOS_VERSION__ < 300 */
 #endif /* __KOS_VERSION__ < 400 */
@@ -81,12 +81,12 @@
 #define __MAP_POPULATE         0x00008000 /* Populate (prefault) pagetables. */
 #define __MAP_NONBLOCK         0x00010000 /* Do not block on IO. */
 #define __MAP_STACK            0x00020000 /* Allocation is for a stack.
-                                           * NOTE: KOS uses this flag to determine where
+                                           * NOTE: KOS  uses  this  flag  to  determine  where
                                            *       automatic memory mappings are allocated at. */
 #define __MAP_SYNC             0x00000000 /* XXX: Implement me? */
 #define __MAP_HUGETLB          0x00040000 /* Create huge page mapping. */
 /*efine __MAP_                 0x00080000  * ... */
-#define __MAP_FIXED_NOREPLACE  0x00100000 /* Don't override existing mappings when `MAP_FIXED' is passed.
+#define __MAP_FIXED_NOREPLACE  0x00100000 /* Don't  override  existing mappings  when `MAP_FIXED'  is passed.
                                            * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
 #define __MAP_UNINITIALIZED    0x04000000 /* For anonymous mmap, memory could be uninitialized. */
 #define __MAP_HUGE_SHIFT       26
@@ -96,13 +96,13 @@
 #define __MAP_AUTOMATIC        0x00000000 /* Use sharing behavior specified by `PROT_SHARED'. */
 #if __KOS_VERSION__ >= 400
 #define __MAP_DONT_MAP         0x20000000 /* Don't actually map memory, but test the waters of a memory
-                                           * location hasn't already been mapped, or locate a suitably
+                                           * location hasn't already been mapped, or locate a  suitably
                                            * large free memory range.
                                            * This flag is usually followed by another call that sets
                                            * the `MAP_FIXED_NOREPLACE' flag. */
 #define __MAP_NOASLR           0x40000000 /* Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
 #define __MAP_OFFSET64_POINTER 0x80000000 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
-                                           * unsigned integer that should actually be used as offset. */
+                                           * unsigned  integer  that  should  actually  be  used  as   offset. */
 #endif /* __KOS_VERSION__ >= 400 */
 #endif /* __KOS__ */
 

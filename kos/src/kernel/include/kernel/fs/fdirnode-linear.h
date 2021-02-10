@@ -38,12 +38,12 @@ DECL_BEGIN
 
 /* Pre-defined directory access helper node for linear directories.
  * A linear directory is one that simply divides the directory data
- * into chunks of either fixed- or variable-length segments, where
- * one (or multiple) such segments make up a file entry.
- * As such, linear directories have the following characteristics:
+ * into chunks of either fixed- or variable-length segments,  where
+ * one  (or  multiple)  such  segments   make  up  a  file   entry.
+ * As  such, linear directories have the following characteristics:
  *   - Linear time search
  *   - Linearly ordered directory entry enumeration
- *   - In-stream positions of files do not change, unless a file is
+ *   - In-stream  positions of files do not change, unless a file is
  *     deleted, or a new file is created. In both cases, the in-file
  *     positions of any unrelated directory entry is not altered.
  * Using this, a filesystem may provide a low-level readdir() function
@@ -51,16 +51,16 @@ DECL_BEGIN
  * directory stream.
  *
  * NOTE: Filesystem-level operator tables _must_ use the provided
- *       operators for `ldno_lookup' and `ldno_enum'
+ *       operators    for    `ldno_lookup'    and     `ldno_enum'
  *
- * As far as implementation goes, `ldno_readdir' is lazily called when
+ * As far as  implementation goes, `ldno_readdir'  is lazily called  when
  * trying to load more directory entries. For this purpose, that function
- * will be called iteratively by `ldno_lookup' to find the file it is
- * looking for, whilst caching all entires that it wasn't looking for
- * within a hash-map stored within the directory object. When the end
- * of the directory file is reached, then the last-read file offset is
- * set to `(pos_t)-1', and `ldno_readdir' will not be called again
- * (tough it may still be getting called by another thread in case
+ * will  be called  iteratively by `ldno_lookup'  to find the  file it is
+ * looking for, whilst  caching all  entires that it  wasn't looking  for
+ * within a hash-map  stored within  the directory object.  When the  end
+ * of  the directory file  is reached, then the  last-read file offset is
+ * set to  `(pos_t)-1',  and  `ldno_readdir' will  not  be  called  again
+ * (tough  it  may still  be  getting called  by  another thread  in case
  * multiple accesses were being made at the same time)
  *
  * Enumeration works the same, except that it will only stop once all
@@ -94,26 +94,26 @@ struct flindirnode_ops {
 	 *       All of these operators must somehow interact with the directory
 	 *       cache, and there are 2 ways to go about this:
 	 *  - Add lower-level operators that replace those mentioned, and have
-	 *    all flindirnode objects use the same callbacks for the original
+	 *    all flindirnode objects use the same callbacks for the  original
 	 *    operators, which in turn call the more-lower-level ones
 	 *  - Provide a set of functions that must be called by fs-specific
 	 *    implementations of the original operators. In this case, also
 	 *    provide examples of how to wrap functions properly.
 	 * I feel like the later is the only ~true~ way we can go, since a filesystem
-	 * should still be able to construct custom sub-classes of `flindirent', and
+	 * should  still be able to construct custom sub-classes of `flindirent', and
 	 * such a system would simply be more flexible in general...
 	 *
 	 * NOPE! Dumb it down to where the filesystem must specify: */
 
 	/* [0..1][lock(READ(self->ldn_dat.ldd_flock))]
 	 * Skip unused portions of the directory file. Unused here means
-	 * that such portions may be used when creating new files. */
+	 * that  such  portions may  be  used when  creating  new files. */
 	WUNUSED NONNULL((1)) pos_t
 	(KCALL *ldno_skipfree)(struct flindirnode *__restrict self, pos_t start);
 
 	/* [1..1][lock(READ(self->ldn_dat.ldd_flock))]
-	 * Read a directory entry from `*pentry_pos'. The caller will have
-	 * ensured that `*pentry_pos' doesn't point at free space. If the
+	 * Read a directory entry from `*pentry_pos'. The caller will  have
+	 * ensured that `*pentry_pos' doesn't point  at free space. If  the
 	 * end of the directory has been reached, return `NULL'. Otherwise,
 	 * return a new entry and update `*pentry_pos' to point to its end. */
 	WUNUSED NONNULL((1, 2)) REF struct flindirent *
@@ -128,9 +128,9 @@ struct flindirnode_ops {
 struct flindirenum {
 	struct fdirenum_ops const *lde_ops; /* [1..1][const] Operators. */
 	REF struct flindirnode    *lde_dir; /* [1..1][const] Source directory.
-	                                     * Note that this field also holds a reference to
+	                                     * Note that  this field  also holds  a reference  to
 	                                     * the `ldn_dat.ldd_norehash' counter, such that said
-	                                     * counter is decremented when this enumerator is
+	                                     * counter  is  decremented when  this  enumerator is
 	                                     * destroyed. */
 	size_t                     lde_;
 	/* TODO: position index data */
@@ -176,7 +176,7 @@ struct flindirnode
 
 
 /* Default callback for `flindirnode_ops::ldno_destory'
- * If overwritten, sub-classes _must_ invoke this one! */
+ * If  overwritten, sub-classes _must_ invoke this one! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL flindirnode_destroy)(struct flindirnode *__restrict self);
 

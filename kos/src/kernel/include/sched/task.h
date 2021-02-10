@@ -68,9 +68,9 @@ DECL_BEGIN
 /*      TASK_F             __UINT32_C(0x00004000)  * ... */
 /*      TASK_F             __UINT32_C(0x00008000)  * ... */
 #define TASK_FVFORK        __UINT32_C(0x00010000) /* [lock(CLEAR_ONCE(THIS_TASK))] This is a child-after-vfork() thread.
-                                                   * When set, this causes exec() to create a new VM, rather than clear
-                                                   * an existing one, alongside both exec() and task_exit() causing the
-                                                   * thread to broadcast `THIS_TASKPID->tp_changed' after clearing this
+                                                   * When set, this causes exec() to create a new VM, rather than  clear
+                                                   * an existing one, alongside both exec() and task_exit() causing  the
+                                                   * thread  to broadcast `THIS_TASKPID->tp_changed' after clearing this
                                                    * flag following a successful exec(), or a call to task_exit() */
 #define TASK_FUSERPROCMASK __UINT32_C(0x00020000) /* [lock(READ(ATOMIC), WRITE(THIS_TASK))] Task has a `userprocmask'. (s.a. `this_userprocmask_address') */
 #define TASK_FUSERPROCMASK_AFTER_VFORK \
@@ -137,7 +137,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct task, t_refcnt, task_destroy)
 /* Generic prototype for the main-function of a kernel thread. */
 typedef void (KCALL *thread_main_t)();
 
-/* Setup `thread' to become a kernel-space thread
+/* Setup  `thread'  to become  a  kernel-space thread
  * calling `thread_main' with the provided arguments.
  * TODO: Re-design this function so we don't leak uninitialized tasks through the VM
  * >> void KCALL kernel_main(char *a, char *b) {
@@ -157,20 +157,20 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 
 
 #define TASK_START_FNORMAL   0x0000 /* Normal task startup flags. */
-#define TASK_START_FHIGHPRIO 0x0001 /* Attempt to start the task with high priority, essentially
+#define TASK_START_FHIGHPRIO 0x0001 /* Attempt to start  the task with  high priority,  essentially
                                      * meaning that when preemption was enabled when `task_start()'
-                                     * was called, and `thread' is scheduled for execution on the
-                                     * same CPU as the calling thread, then `thread' will receive
+                                     * was called, and `thread' is  scheduled for execution on  the
+                                     * same CPU as the calling  thread, then `thread' will  receive
                                      * its first quantum before `task_start()' returns. */
 #ifdef __CC__
-/* Start executing the given task on the CPU it has been assigned.
+/* Start executing  the  given task  on  the  CPU it  has  been  assigned.
  * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU.
  * @return: * : Always re-returns `thread' */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags);
 
 /* Default flags used for `task_start()'
- * These can be controlled by /proc:
+ * These can  be  controlled  by  /proc:
  *  - TASK_START_FHIGHPRIO == /proc/sys/kernel/sched_child_runs_first */
 DATDEF unsigned int task_start_default_flags;
 
@@ -195,8 +195,8 @@ DATDEF struct task _bootidle; /* The idle thread for the boot CPU */
 /* [const] VM node referring to the kernel stack of the current thread.
  * WARNING: These structures for `_boottask' and `_bootidle' are not actually part of the kernel VM!
  * WARNING: You cannot assume that your stack-pointer is always located within `THIS_KERNEL_STACK',
- *          as KOS may use special, arch-specific stacks to deal with certain CPU exceptions that
- *          require execution on a separate stack (such as the #DF-stack on x86)
+ *          as KOS may use special, arch-specific stacks  to deal with certain CPU exceptions  that
+ *          require  execution   on   a  separate   stack   (such   as  the   #DF-stack   on   x86)
  *          To determine available/used stack memory, use the function below.
  */
 DATDEF ATTR_PERTASK struct vm_node const this_kernel_stacknode;
@@ -208,10 +208,10 @@ DATDEF ATTR_PERTASK struct vm_node const this_kernel_stackguard;
 #define THIS_KERNEL_STACK      (&PERTASK(this_kernel_stacknode))
 #define THIS_KERNEL_STACK_PART (&PERTASK(this_kernel_stackpart))
 
-/* Return some rough estimates for the available/used stack memory.
+/* Return some  rough estimates  for  the available/used  stack  memory.
  * `get_stack_avail()' is usually called prior to `alloca()' in order to
- * ensure that sufficient memory remains available after the allocation
- * was made. (for example: the max CFI remember-stack size is directly
+ * ensure that sufficient memory remains available after the  allocation
+ * was made. (for example: the  max CFI remember-stack size is  directly
  * determined by the amount of available stack memory) */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL get_stack_avail)(void);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL get_stack_inuse)(void);
@@ -231,23 +231,23 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * =============================================================================
  * -> Used to implement everything else there is about scheduling. */
 
-/* Enter a sleeping state and return once being woken (true), or
+/* Enter  a  sleeping state  and return  once  being woken  (true), or
  * once the given `abs_timeout' (which must be global) expires (false)
  * NOTES:
  *   - Special values for `abs_timeout' are:
  *     - KTIME_NONBLOCK (or anything `< ktime()'): Essentially does the same as task_yield()
  *     - KTIME_INFINITE:                           Never times out
  *   - Even if the caller has disabled preemption prior to the call,
- *     it will be re-enabled once this function returns.
+ *     it   will   be   re-enabled  once   this   function  returns.
  *   - This function is the bottom-most (and still task-level) API
- *     for conserving CPU cycles using preemption, in that this
+ *     for conserving CPU  cycles using preemption,  in that  this
  *     function is even used to implement `task_waitfor()'.
  *     The functions used to implement this one no longer work on tasks, but on CPUs!
  *   - If the thread is transferred to a different CPU while sleeping, a sporadic
- *     wakeup will be triggered, causing `task_sleep()' to return `true'.
- *   - When this function returns as the result of a timeout, then you may
- *     act as though that `ktime() > abs_timeout' (but note that this isn't
- *     actually an invariant, as your task may have been moved to a different
+ *     wakeup  will  be  triggered,  causing  `task_sleep()'  to  return  `true'.
+ *   - When this function  returns as the  result of a  timeout, then you  may
+ *     act as though  that `ktime() > abs_timeout' (but  note that this  isn't
+ *     actually an invariant, as your task may have been moved to a  different
  *     CPU after waking up, at which point `ktime()' may have a slight offset)
  * The proper way of using this function is as follows:
  * >> while (SHOULD_WAIT()) { // Test some condition for which to wait
@@ -274,24 +274,24 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
 FUNDEF __BOOL NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Force sleep until `abs_timeout' has passed. Any sporadic interrupts are
- * handled by simply continuing to sleep, until a timeout event happens. */
+ * handled by simply continuing to  sleep, until a timeout event  happens. */
 #define task_sleep_until(abs_timeout) \
 	do {                              \
 	} while (task_sleep(abs_timeout))
 
 #define TASK_WAKE_FNORMAL   0x0000 /* Normal wake-up flags. */
 #define TASK_WAKE_FWAITFOR  0x1000 /* When sending an IPI to a different CPU, wait for that CPU to acknowledge
-                                    * having received the IPI, rather than allowing the IPI to be delivered
+                                    * having  received the IPI,  rather than allowing the  IPI to be delivered
                                     * asynchronously. */
 #define TASK_WAKE_FHIGHPRIO 0x4000 /* The wake-up has high priority. - Yield to the target thread
-                                    * when preemption was enabled, before returning at the start
+                                    * when preemption was enabled, before returning at the  start
                                     * of a new quantum. */
 
 
 /* Re-schedule the given `thread' if it was unscheduled (entered a sleeping state).
  * Using this function, a ~sporadic interrupt~ is implemented.
  * If the thread hasn't been unscheduled, this function is a no-op.
- * NOTE: This function is used in the implementation of `sig_send'
+ * NOTE: This function is used in the implementation of  `sig_send'
  * @param: flags:  Set of `TASK_WAKE_F*'
  * @return: true:  The task was woken, or wasn't sleeping.
  * @return: false: The given task has terminated. */
@@ -299,21 +299,21 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_wake)(struct task *__restrict thread,
                          unsigned int flags DFL(TASK_WAKE_FNORMAL));
 
-/* Wake `thread' while impersonating `caller', where `caller' must some
- * running thread from the calling CPU. - This function is used to wake
+/* Wake `thread' while impersonating  `caller', where `caller' must  some
+ * running  thread from the calling CPU. -  This function is used to wake
  * up waiting threads during task exit, where at the point where the exit
- * status is broadcast, the exiting thread (THIS_TASK) can no longer be
- * used to send signals (since `task_wake()' has to look at things such
- * as the prev/next thread within the scheduler ring, which would have
- * already become invalid at that point, since the true calling thread
+ * status is broadcast, the exiting  thread (THIS_TASK) can no longer  be
+ * used to send signals (since `task_wake()'  has to look at things  such
+ * as  the prev/next thread  within the scheduler  ring, which would have
+ * already  become invalid at  that point, since  the true calling thread
  * could no longer be considered apart of the scheduler ring)
  *
  * When calling this function, the caller must ensure that their current
  * CPU will no change, which can be done most easily by simply disabling
  * preemption, or setting the `TASK_FKEEPCORE' flag.
  *
- * The given `caller' is used when `thread' is running on `THIS_CPU',
- * in which case `thread' will be re-scheduled in relation to `caller',
+ * The given `caller'  is used  when `thread' is  running on  `THIS_CPU',
+ * in which case `thread' will  be re-scheduled in relation to  `caller',
  * where-as the regular `task_wake()' does this re-scheduling in relation
  * to `THIS_TASK'
  *
@@ -326,13 +326,13 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 
 /* Terminate the calling thread immediately.
  * WARNING: Do not call this function to terminate a thread.
- *          It would work, but exception handlers would not
- *          get unwound and resources would be leaked.
- *          If you wish to exit your current thread, just
+ *          It  would work, but exception handlers would not
+ *          get  unwound  and  resources  would  be  leaked.
+ *          If you wish  to exit your  current thread,  just
  *          throw an `E_EXIT_THREAD' error instead.
- * This function is called by the unhandled exception handler
- * when it encounters an `E_EXIT_THREAD' error, or when exception
- * data cannot be propagated to userspace in the event of an
+ * This  function  is  called  by  the  unhandled  exception  handler
+ * when it  encounters an  `E_EXIT_THREAD' error,  or when  exception
+ * data  cannot  be  propagated  to  userspace  in  the  event  of an
  * interrupt throwing some error, whilst originating from user-space.
  * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
  *                   This argument is ignored for kernel-threads.
@@ -351,8 +351,8 @@ NOTHROW(FCALL task_exit)(union wait status) {
 #endif /* __cplusplus */
 
 
-/* Pause execution for short moment, allowing other CPU cores to catch up.
- * This function is similar to `task_yield()', but intended to be used for
+/* Pause  execution for short  moment, allowing other CPU  cores to catch up.
+ * This  function is similar  to `task_yield()', but intended  to be used for
  * helping synchronization between multiple cores. - If no such functionality
  * exists on the host system, this is a no-op. */
 #ifndef CONFIG_NO_SMP
@@ -371,18 +371,18 @@ FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyiel
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyield_or_pause)(void);
 #endif /* __CC__ */
 #define TASK_TRYYIELD_SUCCESS             0x0000 /* Successfully yielded execution to another thread (guarantied to be ZERO(0)). */
-#define TASK_TRYYIELD_PREEMPTION_DISABLED 0x0001 /* Yielding now is impossible because preemption is disabled.
-                                                  * When `task_tryyield_or_pause()' was used, and the kernel has configured
+#define TASK_TRYYIELD_PREEMPTION_DISABLED 0x0001 /* Yielding   now   is   impossible   because   preemption   is   disabled.
+                                                  * When `task_tryyield_or_pause()' was used, and the kernel has  configured
                                                   * itself for multiple cores, `task_pause()' will be executed in this case. */
-#define TASK_TRYYIELD_NO_SUCCESSOR        0x0002 /* There is no other task to which one could yield.
-                                                  * If the kernel has configured itself for multiple cores,
-                                                  * `task_pause()' instruction was called in this case (regardless
+#define TASK_TRYYIELD_NO_SUCCESSOR        0x0002 /* There   is   no  other   task   to  which   one   could  yield.
+                                                  * If  the  kernel  has  configured  itself  for  multiple  cores,
+                                                  * `task_pause()'  instruction was called in this case (regardless
                                                   * of `task_tryyield()' or `task_tryyield_or_pause()' being used). */
 
 
 #ifdef __CC__
 /* Yield the remainder of the calling thread's current quantum
- * to allow another thread to start running prematurely.
+ * to  allow  another  thread  to  start  running prematurely.
  * @throw: E_WOULDBLOCK_PREEMPTED: Preemption has been disabled. */
 #ifndef __task_yield_defined
 #define __task_yield_defined 1

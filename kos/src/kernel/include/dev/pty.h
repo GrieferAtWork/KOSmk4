@@ -36,8 +36,8 @@
 DECL_BEGIN
 
 /* PTY device numbers.
- * NOTE: These must only be used for drivers allocated by `openpty()'.
- *       Any other sub-system making use of, or extending upon PTY
+ * NOTE: These must only  be used for  drivers allocated by  `openpty()'.
+ *       Any other  sub-system  making  use of,  or  extending  upon  PTY
  *       terminal drivers must implement its own device numbering system.
  * NOTE: To register a pty master/slave pair for `openpty()', use `pty_register' below.
  */

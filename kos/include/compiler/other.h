@@ -40,7 +40,7 @@
 #endif /* __assembler+0 != 0 */
 #endif
 
-/* Both `__ASSEMBLER__' and `__ASSEMBLY__'
+/* Both  `__ASSEMBLER__'  and `__ASSEMBLY__'
  * are our general-purpose detection macros. */
 #ifdef __ASSEMBLY__
 #ifndef __ASSEMBLER__

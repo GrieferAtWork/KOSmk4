@@ -319,7 +319,7 @@ __DECL_BEGIN
 
 
 /* >> void VECTOR_TRUNC(VECTOR l, FUNCTIONS f = VECTOR_FUNCTIONS);
- * Try to release unused memory from the given VECTOR `l' */
+ * Try  to  release  unused  memory  from  the  given  VECTOR  `l' */
 #define VECTOR_TRUNC(...)                       __HYBRID_SEQ_VECTOR_TRUNC((__VA_ARGS__))
 #define __HYBRID_SEQ_VECTOR_TRUNC(args)         __PP_CAT2(__HYBRID_SEQ_VECTOR_TRUNC_IMPL, __HYBRID_PP_VA_NARGS args) args
 #define __HYBRID_SEQ_VECTOR_TRUNC_IMPL1(l)      __HYBRID_SEQ_VECTOR_TRUNC_IMPL2(l, VECTOR_FUNCTIONS)
@@ -389,7 +389,7 @@ __DECL_BEGIN
 #define __HYBRID_SEQ_VECTOR_ALLOC_IMPL7(l, f)   (__HYBRID_PP_BUBBLE_GET(f, 6)((l).v_elem) / __HYBRID_VECTOR_ELEMSIZE(l))
 
 /* >> size_t VECTOR_SIZE(VECTOR l);
- * Returns the used vector size. */
+ * Returns the  used  vector  size. */
 #define VECTOR_SIZE(l) ((l).v_size)
 
 /* Vector element access. */

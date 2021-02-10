@@ -148,12 +148,12 @@ struct cfientry_sections {
 #define cfientry_sections_as_di_debuginfo_cu_parser_sections_t(self) ((di_debuginfo_cu_parser_sections_t *)&(self)->ds_debug_loc_start)
 
 struct cfientry {
-	unwind_getreg_t ce_regget;     /* [1..1][const] Callback for reading out the value of a register.
+	unwind_getreg_t ce_regget;     /* [1..1][const]  Callback for  reading out  the value  of a register.
 	                                * This function is provided by the caller, and should return register
-	                                * values as they'd appear at the position where the request is made
-	                                * from. This function is then used internally to perform the initial
-	                                * step of unwinding to the current function's call-site, at which
-	                                * point libcfientry(3) will make an attempt to reverse-engineer the
+	                                * values as they'd appear at the  position where the request is  made
+	                                * from.  This function is then used internally to perform the initial
+	                                * step  of unwinding  to the  current function's  call-site, at which
+	                                * point libcfientry(3) will make  an attempt to reverse-engineer  the
 	                                * values of requested registers. */
 	union {
 		void const *ce_regget_arg;  /* [?..?][const] Argument passed to `ce_regget'. */
@@ -178,26 +178,26 @@ struct cfientry {
 	di_debuginfo_location_t            ce_subprogram_frame_base; /* [valid_if(ce_module)] Frame base expression of the sub-program containing `ce_modrelpc'. */
 	di_debuginfo_compile_unit_simple_t cr_cu;                    /* [valid_if(ce_module)] Information on the containing compilation unit information. */
 
-	/* Unwind register information: These descriptors override register values
+	/* Unwind  register information: These descriptors override register values
 	 * for the purpose of masking registers with new values as they'd appear at
 	 * the respective call-sites following a call to `unwind(3)'
-	 * As such, any arbitrary register from the call-site of the function containing
-	 * an DW_OP_entry_value instruction is contained here-in, and is mainly intended
+	 * As such, any arbitrary register from  the call-site of the function  containing
+	 * an DW_OP_entry_value instruction is contained  here-in, and is mainly  intended
 	 * to be used for evaluating expression of `DW_AT_GNU_call_site_value' and friends
-	 * which are found from .debug_info of the module found at the PC-register (who's
+	 * which are found from .debug_info of the module found at the PC-register  (who's
 	 * value should also be apart of this vector of overrides)
 	 * As such, `DW_OP_entry_value' is evaluated by:
 	 *   - unwind(3) with modified registers written to entries in `ce_unwind_regv'
 	 *   - Execute code from the DW_OP_entry_value-block
-	 *   - Register accesses first check if the requested register can be found
+	 *   - Register  accesses first check  if the requested  register can be found
 	 *     as part of the `ce_unwind_regv' vector. If it's inside, use that value.
 	 *   - If the register cannot be found, scan .debug_info for call-site parameter
-	 *     information on that register, and (if found) use that info.
+	 *     information  on   that  register,   and  (if   found)  use   that   info.
 	 *   - Memory accesses are always dispatched by searching for call-site parameter
 	 *     information. */
 	size_t                                          ce_unwind_regc;  /* # of register overrides found. */
-	COMPILER_FLEXIBLE_ARRAY(struct unwind_register, ce_unwind_regv); /* [ce_unwind_regc] Vector of register overrides.
-	                                                                  * Note that this vector is ascendingly sorted by
+	COMPILER_FLEXIBLE_ARRAY(struct unwind_register, ce_unwind_regv); /* [ce_unwind_regc] Vector  of  register   overrides.
+	                                                                  * Note  that  this vector  is ascendingly  sorted by
 	                                                                  * an entry's `ur_regno', meaning you can use bsearch
 	                                                                  * to find a specific entry within. */
 };
@@ -232,7 +232,7 @@ NOTHROW_NCX(CC cfientry_fini)(struct cfientry *__restrict self) {
 }
 
 /* Lookup the register override entry for `dw_regno'
- * If no such entry exists, return `NULL' */
+ * If  no   such   entry   exists,   return   `NULL' */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) struct unwind_register *
 NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
                               unwind_regno_t dw_regno) {
@@ -244,12 +244,12 @@ NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
 	return NULL;
 }
 
-/* Read the contents of a register after unwinding. When the value of `dw_regno'
- * wasn't specified by unwind information, then return its contents as they are
+/* Read the  contents of  a register  after unwinding.  When the  value of  `dw_regno'
+ * wasn't  specified  by unwind  information,  then return  its  contents as  they are
  * at the moment. iow: check `ce_unwind_regv', and if that doesn't mention `dw_regno',
  * simply forward the request to `arg->ce_regget'.
  * This function is used to facilitate register access inside of call-site parameter
- * expressions found in `DW_TAG_GNU_call_site_parameter:DW_AT_GNU_call_site_value'. */
+ * expressions found in  `DW_TAG_GNU_call_site_parameter:DW_AT_GNU_call_site_value'. */
 PRIVATE NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *arg,
                                               unwind_regno_t dw_regno,
@@ -302,7 +302,7 @@ NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
 	             self->ce_sections.ds_debug_ranges_end);
 }
 
-/* Parse attributes of `self' in order to fill in `range'
+/* Parse attributes of `self' in order to fill in  `range'
  * Optionally, also parse frame-base location information.
  * @return: * : One of `DEBUG_INFO_ERROR_*' */
 PRIVATE NONNULL((1, 2)) unsigned int
@@ -361,7 +361,7 @@ err:
 
 
 /* Try to locate the relevant `DW_TAG_GNU_call_site' component,
- * where the caller has already loaded up the parser to point
+ * where the caller has already  loaded up the parser to  point
  * at the initial DW_TAG_compile_unit element of the (probably)
  * correct CU.
  * @return: * : One of `CFIENTRY_LOCATE_CALLSITE_*' */
@@ -403,7 +403,7 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
 		ERROR(err_function_not_found);
 
 	/* At this point, we know that we (should be) within the correct CU.
-	 * With this in mind, scan for DW_TAG_subprogram entries, and check
+	 * With this in mind, scan for DW_TAG_subprogram entries, and  check
 	 * for one that contains the module-relative-pc we're looking for. */
 	while (self->ce_parser.dup_child_depth > cu_depth) {
 		if (self->ce_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
@@ -473,14 +473,14 @@ err_function_not_found:
  * Also map each of these sections into memory, filling in section range pointers.
  * Sections that can't be loaded are simply set to `NULL'.
  *
- * Finally, initialize and navigate the debug information parser to point
+ * Finally, initialize and navigate the  debug information parser to  point
  * after the attributes of `DW_TAG_GNU_call_site' component that represents
- * the expected return address, meaning that the caller may then proceed
- * to load child-DW_TAG_GNU_call_site_parameter components by saving the
+ * the  expected return address,  meaning that the  caller may then proceed
+ * to load  child-DW_TAG_GNU_call_site_parameter components  by saving  the
  * current parser position for later, and calling
- * `libdi_debuginfo_cu_parser_nextchild()' in order to load the first of a
+ * `libdi_debuginfo_cu_parser_nextchild()' in order to  load the first of  a
  * variable number of should-be `DW_TAG_GNU_call_site_parameter'-components.
- * 
+ *
  * @return: UNWIND_SUCCESS:        Success.
  * @return: UNWIND_OPTIMIZED_AWAY: The necessary information doesn't exist. */
 PRIVATE NONNULL((1)) unsigned int
@@ -562,7 +562,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 				goto noinfo_fail_module_sections;
 		} else {
 			/* This can happen if the .debug_aranges section is missing.
-			 * In this case, scan _all_ CUs for the call-site function. */
+			 * In this case, scan _all_ CUs for the call-site  function. */
 			reader = self->ce_sections.ds_debug_info_start;
 			for (;;) {
 				error = libdi_debuginfo_cu_parser_loadunit(&reader, self->ce_sections.ds_debug_info_end,
@@ -595,7 +595,7 @@ noinfo_fail:
 }
 
 #ifdef __GNUC__
-/* GCC claims that "length" in the below function is uninitialized, when
+/* GCC  claims  that  "length" in  the  below function  is  uninitialized, when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -688,14 +688,14 @@ copy_bits(void *__restrict dst_base, unsigned int dst_bit_offset,
 
 
 #ifdef __GNUC__
-/* GCC claims that "expr_length" in the below function is uninitialized, when
+/* GCC claims that "expr_length" in  the below function is uninitialized,  when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif /* __GNUC__ */
 
 /* @param: deref_expression_result: When true, dereference the expression result, and
- *                                  copy the pointed-to memory contents into `dst' */
+ *                                  copy the  pointed-to memory  contents into  `dst' */
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restrict self,
                                                         di_debuginfo_location_t const *__restrict location,
@@ -776,7 +776,7 @@ again_runexpr:
 		}
 		return error;
 	} else if (error == UNWIND_EMULATOR_NO_RETURN_VALUE && !deref_expression_result) {
-		/* If we're not supposed to deref the result, it's OK if the
+		/* If we're not  supposed to  deref the  result, it's  OK if  the
 		 * expression didn't leave anything within the top stack-element. */
 		return  UNWIND_SUCCESS;
 	}
@@ -849,7 +849,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	self = (struct cfientry *)arg;
 
 	/* First up: Check if the register can be found as part of unwind information.
-	 *           It it can, then pretty much all of the hard work's already been
+	 *           It  it can, then pretty much all  of the hard work's already been
 	 *           done and we can just read from there. */
 	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		/* Found it! */
@@ -859,20 +859,20 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	}
 
 	/* Can't find register information from unwind data. As such, check
-	 * if we can find information about the requested register as part
+	 * if  we can find information about the requested register as part
 	 * of call-site parameter information. */
 
 	/* #1: Lazily load .debug_info (and related sections) for the module
 	 *     currently loaded at `CFI_UNWIND_REGISTER_PC' (which should be
 	 *     the value of one of the entries of `ce_unwind_regv')
-	 * #2: Search for the DW_TAG_subprogram entry containing the call-site
+	 * #2: Search  for  the DW_TAG_subprogram  entry containing  the call-site
 	 *     program counter, and scan that component for `DW_TAG_GNU_call_site'
-	 *     with a `DW_AT_location'-attribute that matches the register
+	 *     with  a  `DW_AT_location'-attribute   that  matches  the   register
 	 *     expression currently being described by `dw_regno'.
-	 *     Once found, load a different attribute `DW_AT_GNU_call_site_value'
+	 *     Once found, load  a different attribute  `DW_AT_GNU_call_site_value'
 	 *     from that same `DW_TAG_GNU_call_site'-component, which then contains
-	 *     a CFI-expression that can be evaluated in order to calculate the
-	 *     value that the requested register had at the time of the current
+	 *     a CFI-expression that  can be  evaluated in order  to calculate  the
+	 *     value  that the  requested register had  at the time  of the current
 	 *     function being called.
 	 *     NOTE: Register access from inside of this expression is performed
 	 *           through use of `after_unwind_getreg()'. */
@@ -914,7 +914,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 				/* Check if `location' references the register that we're looking for. */
 				if (is_cfi_expression_a_simple_register_push(self, &location, dw_regno)) {
 					self->ce_parser.dup_cu_info_pos = saved_dip;
-					/* Found it! -> Evaluate the call-site-value expression,
+					/* Found  it! -> Evaluate the call-site-value expression,
 					 * and write the expression result into the `dst' buffer. */
 					return evaluate_call_site_expression(self, &call_site_value,
 					                                     dw_regno, dst, deref_result);
@@ -927,8 +927,8 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 		}
 	}
 	/* Return `UNWIND_OPTIMIZED_AWAY' at this point!
-	 * NOTE: Only return this error if we didn't find a `DW_TAG_GNU_call_site'
-	 *       tag for the given PC-location, because no such tag exists.
+	 * NOTE: Only return this  error if we  didn't find a  `DW_TAG_GNU_call_site'
+	 *       tag  for  the  given  PC-location,  because  no  such  tag   exists.
 	 *       Anything else should cause some other error to be returned, instead! */
 	self->ce_parser.dup_cu_info_pos = saved_dip;
 	return UNWIND_OPTIMIZED_AWAY;
@@ -1017,9 +1017,9 @@ cfi_entry_init_setreg(void *arg,
 
 
 /* Initialize the given cfientry controller `self' by performing an `unwind_for_debug(3)'
- * from the point-of-view of the register state described by `regget' and `regget_arg'.
- * The caller must check if all registers overrides could be allocated, as this function
- * will simply set `self->ce_unwind_regc' to the exact # of overrides required, but will
+ * from the point-of-view of the register  state described by `regget' and  `regget_arg'.
+ * The  caller must check if all registers overrides could be allocated, as this function
+ * will simply set `self->ce_unwind_regc' to the exact # of overrides required, but  will
  * only fill in the first `self->_ce_unwind_rega' of them! */
 PRIVATE WUNUSED ATTR_NOINLINE NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC cfientry_init)(struct cfientry *__restrict self,
@@ -1046,7 +1046,7 @@ NOTHROW_NCX(CC cfientry_init)(struct cfientry *__restrict self,
 /* Worker-function for emulating instruction in entry-value context.
  * @param: unwind_rega:      The # of slots to allocate for unwind register overrides.
  * @param: preq_unwind_rega: When `_UNWIND_TOO_FEW_UNWIND_REGISTER_OVERRIDE_SLOTS' is
- *                           returned, write-back the # of required into this slot. */
+ *                           returned, write-back the #  of required into this  slot. */
 PRIVATE WUNUSED ATTR_NOINLINE NONNULL((1)) unsigned int
 NOTHROW_NCX(CC run_entry_value_emulator)(unwind_emulator_t *__restrict self,
                                          size_t unwind_rega,
@@ -1109,12 +1109,12 @@ done:
 }
 
 
-/* Run a sequence of DW_OP_* instructions as though they were being
- * invoked at the start of the current function. After this, any
- * stack-value left on the internal stack of `self' that was pushed
- * by the given instruction stream, wasn't there before, and refers
+/* Run  a sequence of  DW_OP_* instructions as  though they were being
+ * invoked  at  the start  of the  current  function. After  this, any
+ * stack-value  left on the  internal stack of  `self' that was pushed
+ * by the given  instruction stream, wasn't  there before, and  refers
  * to a register location, will be replaced with a stack-local R-value
- * copy of that location, thus ensuring that any register accessed is
+ * copy  of that location, thus ensuring that any register accessed is
  * loaded by-value
  *
  * NOTE: This function will preserve and restore the original values of:

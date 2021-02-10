@@ -31,7 +31,7 @@
  * Or the one-liner:
  * $ deemon -F kos/src/libc/magic/errno.c kos/src/libc/libc/compat.h kos/src/libc/libc/errno-convert-cyg.c kos/src/libc/libc/errno-convert-dos.c kos/src/libc/libc/sys_errlist.def
  *
- * Also note that generate_headers.dee will have to be re-run, though
+ * Also note that generate_headers.dee will  have to be re-run,  though
  * it will be executed automatically because `magic/errno.c' is touched
  * by the above. */
 

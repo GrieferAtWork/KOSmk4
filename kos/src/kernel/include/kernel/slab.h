@@ -45,24 +45,24 @@ DECL_BEGIN
 /* Slab allocators.
  *  - Used by kmalloc() for very small, but efficient allocations (< HEAP_MINSIZE)
  *  - Uses the same mechanism as corebase, in that memory is allocated in pages,
- *    but then handed out in very small, fixed-length segments that are tracked
+ *    but then handed out in very small, fixed-length segments that are  tracked
  *    via a bitset within the page.
  *  - Each slab has its own chain of in-use pages (that still contain unused segments)
  *  - All slabs share 2 small pools of pages that are entirely free (usually up to 3)
  *    - When a new page is required for allocation, they are taken from the pools
  *    - One pool is for locked pages, while the other is for swap-capable ones.
- *  - Memory is freed by loading the page address of a pointer, where meta-data
+ *  - Memory is freed  by loading  the page address  of a  pointer, where  meta-data
  *    including the size of segments within that page is stored, as well as a bitset
  *    describing which segments have been allocated.
  *  - Once a slab page contains no further in-use segments, it is added to the pool
- *    of free pages. If the pool would then exceed its limit, the oldest free page
+ *    of  free pages. If the pool would then exceed its limit, the oldest free page
  *    is released to the core.
  *  - Slab allocators are used for all allocations `>= HEAP_ALIGNMENT' and `<= SLAB_MAXSIZE'
  *  - Assuming 4-byte alignment, and a `SLAB_MAXSIZE' of `20'
  *    bytes, this makes 5 slab variants: 4, 8, 12, 16, 20
- *  - Since slab-memory cannot be realloc()'ed, by default only kmalloc()
- *    will allocate slab memory, while krealloc() will only ever allocate
- *    actual heap memory. However, krealloc(SLAB_PTR) still works, but will
+ *  - Since slab-memory cannot  be realloc()'ed, by  default only  kmalloc()
+ *    will allocate slab  memory, while krealloc()  will only ever  allocate
+ *    actual heap memory. However, krealloc(SLAB_PTR) still works, but  will
  *    never re-return SLAB_PTR (i.e. inplace_realloc), unless the block size
  *    didn't change (and even then: it's not guarantied to do so) */
 
@@ -86,15 +86,15 @@ struct slab {
 	WEAK u16      s_free;  /* Amount of free segments in this slab. */
 #endif /* __SIZEOF_POINTER__ < 8 */
 	/* A bitset of allocated segments goes here (every segment has `SLAB_SEGMENT_STATUS_BITS'
-	 * consecutive status bits in within this bitset, that form an integer that is one of
+	 * consecutive  status bits in  within this bitset, that  form an integer  that is one of
 	 * `SLAB_SEGMENT_STATUS_*').
 	 * Note that the bitset works with whole words (uintptr_t),
-	 * so-as to ensure that the following segment vector is
+	 * so-as to  ensure that  the following  segment vector  is
 	 * pointer-aligned. */
 
-	/* When `HEAP_ALIGNMENT > __SIZEOF_POINTER__', there exists some
+	/* When  `HEAP_ALIGNMENT > __SIZEOF_POINTER__',  there  exists   some
 	 * unused padding here to ensure that the vector is properly aligned. */
-	/* Actual segment data goes here, following the initialization rules of
+	/* Actual segment data goes here, following the initialization rules  of
 	 * `SLAB_FCALLOC' for 0, and undefined/DEBUGHEAP_NO_MANS_LAND otherwise. */
 };
 
@@ -120,7 +120,7 @@ struct slab {
 #define _SLAB_SEGMENT_STATUS_BITSET(self) ((uintptr_t *)((struct slab *)(self) + 1))
 
 /* Return the word(index), mask, and shift for the
- * index'th segment within the status bitset. */
+ * index'th  segment  within  the  status  bitset. */
 #define _SLAB_SEGMENT_STATUS_MASK(index) ((uintptr_t)SLAB_SEGMENT_STATUS_MASK << _SLAB_SEGMENT_STATUS_SHFT(index))
 #if SLAB_SEGMENT_STATUS_BITS == 2
 #define _SLAB_SEGMENT_STATUS_WORD(index) ((index) / (__SIZEOF_POINTER__ * 4))
@@ -206,10 +206,10 @@ struct slab {
  * one past the greatest (CONFIG_SLAB_GROWS_UPWARDS) address that was
  * ever allocated for slab memory.
  * Since slab allocations don't carry any meta-data, they are actually
- * identified by their address, meaning that we need to keep track of
+ * identified by their address, meaning that we need to keep track  of
  * the max range of pointers associated with the slab allocator.
  * NOTE: This value starts out as `KERNEL_SLAB_INITIAL', and is only
- *       ever extended in one direction, based on the slab growth
+ *       ever extended in  one direction, based  on the slab  growth
  *       direction. */
 DATDEF void *kernel_slab_break;
 

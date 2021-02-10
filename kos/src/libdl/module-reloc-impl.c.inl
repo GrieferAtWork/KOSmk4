@@ -138,9 +138,9 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			                                    &src_module))
 				goto err;
 			if unlikely(dst_sym->st_size != src_size) {
-				/* Special handling for symbols exported by the RTLD module itself.
+				/* Special  handling  for  symbols  exported   by  the  RTLD  module   itself.
 				 * Since builtin symbols don't have size information associated with themself,
-				 * we ignore import sizes and solely rely on whatever the hosted application
+				 * we ignore import sizes and solely  rely on whatever the hosted  application
 				 * is telling us to be expecting. */
 				if (src_size == 0 && src_module == &dl_rtld_module)
 					src_size = dst_sym->st_size;
@@ -148,7 +148,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
 					       self->dm_filename, self->dm_elf.de_dynstr + dst_sym->st_name,
 					       dst_sym->st_info, src_size, src_module->dm_filename);
-					/* NOTE: When `src_size' is ZERO(0), then always copy the size information
+					/* NOTE: When `src_size' is  ZERO(0), then always  copy the size  information
 					 *       that is expected by the hosted module (though still emit the warning
 					 *       in this case) */
 					if (!src_size || src_size > dst_sym->st_size)
@@ -299,7 +299,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				goto err;
 			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
 			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
-			 *        or `movq %fs:symbol, %rax' (x86_64), so we need to have
+			 *        or  `movq %fs:symbol, %rax'  (x86_64), so  we need  to have
 			 *       `symbol' evaluate to its position within the static TLS segment. */
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				/* Symbol points to a module that isn't apart of the static TLS segment.
@@ -327,7 +327,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				goto err;
 			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
 			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
-			 *        or `movq %fs:symbol, %rax' (x86_64), so we need to have
+			 *        or  `movq %fs:symbol, %rax'  (x86_64), so  we need  to have
 			 *       `symbol' evaluate to its position within the static TLS segment. */
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				/* Symbol points to a module that isn't apart of the static TLS segment.

@@ -118,7 +118,7 @@ DECL_BEGIN
 #define PAE_IS_2MIB_ALIGNED(addr) (((addr) & __UINT32_C(0x001fffff)) == 0)
 
 /* Return the in-page offset of a regular pointer mapping,
- * or one that has been mapped within a 2MiB page. */
+ * or  one  that  has  been  mapped  within  a  2MiB page. */
 #define PAE_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(__CCAST(uintptr_t)(ptr) & 0xfff))
 #define PAE_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(__CCAST(uintptr_t)(ptr) & 0x1fffff))
 
@@ -203,8 +203,8 @@ union pae_pdir_e3 {
 	u64                      p_word;     /* Mapping data. */
 	PHYS union pae_pdir_e2 (*p_e2)[512]; /* [MASK(PAE_PAGE_FVECTOR)][owned][const]
 	                                      * [valid_if(PAE_PAGE_FPRESENT)]
-	                                      * _Physical_ pointer to a level #2 paging vector. 
-	                                      * NOTE: Even though `PAE_PAGE_FPRESENT' is needed for validity,
+	                                      * _Physical_ pointer to a level #2 paging vector.
+	                                      * NOTE: Even  though `PAE_PAGE_FPRESENT' is needed for validity,
 	                                      *       it may be assumed that that flag is _always_ set for all
 	                                      *       E3 entries existing in any given PAE-page-directory */
 	struct ATTR_PACKED {
@@ -308,7 +308,7 @@ typedef u64 pae_pagedir_pushval_t;
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
- * controller itself, which must be aligned and sized
+ * controller itself, which  must be  aligned and  sized
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTDEF NONNULL((1)) void FCALL
 pae_pagedir_init(VIRT struct pae_pdir *__restrict self)
@@ -343,10 +343,10 @@ NOTHROW(FCALL pae_pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 
 /* Set a mapping hint for pages apart of the given virtual memory range.
- * Mapping hints are overwritten once a page has been mapped, and when
+ * Mapping hints are overwritten once a  page has been mapped, and  when
  * not specified, will default to `NULL'.
  * Their main purpose is to be accessible through atomic means, allowing
- * them to be used by the PAGE_FAULT handler, while still ensuring that
+ * them to be used by the PAGE_FAULT handler, while still ensuring  that
  * access remains non-blocking. */
 INTDEF NOBLOCK void
 NOTHROW(FCALL pae_pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -373,9 +373,9 @@ NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                u16 perm);
 
 /* Special variants of `pagedir_mapone()' that should be used to
- * temporary override the mapping of a single, prepared page.
- * These functions are mainly intended for use with `this_trampoline_page', allowing
- * each thread to push/pop its trampoline page, with doing so actually being an atomic
+ * temporary override the  mapping of a  single, prepared  page.
+ * These functions are  mainly intended for  use with `this_trampoline_page',  allowing
+ * each  thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
@@ -403,7 +403,7 @@ NOTHROW(FCALL pae_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
- *       can perform the task without needing to allocate more memory! */
+ *       can perform the task without  needing to allocate more  memory! */
 INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmap_userspace)(void);
 INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmap_userspace_nosync)(void);
 

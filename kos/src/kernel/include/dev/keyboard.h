@@ -80,9 +80,9 @@ struct keyboard_device;
 struct keyboard_device_ops {
 	/* [0..1] Set which leds are currently lit.
 	 * @param: new_leds: Set of `KEYBOARD_LED_*'
-	 * NOTE: The keyboard driver itself shouldn't update the LED state
-	 *       when it notices the user pressing one of the locking keys.
-	 *       Instead, this operator is called once a locking key is read,
+	 * NOTE: The keyboard  driver  itself  shouldn't update  the  LED  state
+	 *       when it  notices the  user pressing  one of  the locking  keys.
+	 *       Instead,  this operator is  called once a  locking key is read,
 	 *       thus ensuring that what the OS sees as the active key modifiers
 	 *       is in sync with the LEDs visible on the keyboard, even at times
 	 *       of some major lag. */
@@ -106,7 +106,7 @@ struct keyboard_device
 	struct keyboard_device_ops kd_ops;        /* [const] Keyboard device operators. */
 	struct keyboard_buffer     kd_buf;        /* Keyboard input buffer. */
 	WEAK uintptr_t             kd_flags;      /* Keyboard operation flags (set of `KEYBOARD_DEVICE_FLAG_*').
-	                                           * NOTE: When changed, you must broadcast `kd_buf.kb_avail' */
+	                                           * NOTE: When  changed, you  must broadcast  `kd_buf.kb_avail' */
 	struct atomic_rwlock       kd_map_lock;   /* Lock for `kd_map' */
 	struct keymap              kd_map;        /* [lock(kd_map_lock)][owned(kfree(.km_ext))] Keyboard key translation map. */
 	size_t                     kd_map_extsiz; /* [lock(kd_map_lock)] Size (in bytes) of `kd_map::km_ext' */
@@ -116,7 +116,7 @@ struct keyboard_device
 	struct mutex               kd_leds_lock;  /* Lock for updating `kd_leds' */
 	uintptr_t                  kd_leds;       /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
 	struct tty_device_awref    kd_tty;        /* [0..1] Weak reference to a connected TTY (used for encoding keyboard
-	                                           * input with `ansitty_translate()', when an ansitty is connected) */
+	                                           * input  with  `ansitty_translate()',  when an  ansitty  is connected) */
 };
 
 
@@ -132,11 +132,11 @@ FUNDEF NONNULL((1)) void KCALL keyboard_device_pollconnect(struct character_devi
 FUNDEF NONNULL((1)) poll_mode_t KCALL keyboard_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 
 /* Initialize/finalize the given keyboard device.
- * NOTE: Drivers that override the `ct_fini' operator of a given keyboard
+ * NOTE: Drivers that override  the `ct_fini' operator  of a given  keyboard
  *       must ensure that `keyboard_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by keyboard,
- *       get initialized by `keyboard_device_init()', and should not be
+ *       get  initialized by `keyboard_device_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl
@@ -146,7 +146,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *
                                                         struct keyboard_device_ops const *__restrict ops);
 FUNDEF NOBLOCK void NOTHROW(KCALL keyboard_device_fini)(struct keyboard_device *__restrict self);
 
-/* Add a given key to the keyboard user-input buffer.
+/* Add a given key to the keyboard user-input  buffer.
  * NOTE: The caller must not pass `KEY_NONE' for `key'
  * @return: true:  Successfully added the key.
  * @return: false: The buffer is already full and the key was not added. */

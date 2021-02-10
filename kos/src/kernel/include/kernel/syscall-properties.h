@@ -48,7 +48,7 @@ DECL_BEGIN
 
 /* Invoke `callback(table_index, __VA_ARGS__)' for `sysno'
  * Note that `table_index' is a preprocessor-time literal suitable for token concat!
- * If `sysno' isn't apart of any defined table, invoke `error' instead. */
+ * If   `sysno'  isn't  apart   of  any  defined   table,  invoke  `error'  instead. */
 #if __NRFEAT_SYSCALL_TABLE_COUNT == 3
 #define __kernel_syscall_withtable(sysno, error, callback, ...)         \
 	(__KERNEL_SYSCALL_ISTABLE0(sysno)                                   \
@@ -133,7 +133,7 @@ NOTHROW(KCALL __kernel_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base
 	__kernel_syscall_regcnt(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
 
 /* Check if a given system call `sysno' has a double-wide return
- * value (i.e. the return value is passed in 2 registers) */
+ * value (i.e.  the  return  value is  passed  in  2  registers) */
 #define kernel_syscall_doublewide(sysno) \
 	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_doublewide_impl, sysno)
 #define __kernel_syscall_doublewide_impl(table, sysno) \

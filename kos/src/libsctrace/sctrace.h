@@ -36,8 +36,8 @@
 
 DECL_BEGIN
 
-/* Get a description of the system call described by `sc_info' in `desc'
- * This is the main function used to access the system call description
+/* Get a description  of the  system call  described by  `sc_info' in  `desc'
+ * This  is  the main  function used  to access  the system  call description
  * database for the purpose of doing things such as printing a representation
  * of a system call invocation.
  * @return: true:  The system call was recognized, and `desc' was filled accordingly.
@@ -46,11 +46,11 @@ INTDEF NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
                               struct sc_desc *__restrict desc);
 
-/* Print the representation of a given system call argument
+/* Print the representation of a given system call  argument
  * value, given both its `argtype' (one of `*'), and `value'
  * WARNING: Depending on `argtype', an exception may be thrown
  *          if the system call invoker has passed some invalid
- *          argument to a system call (i.e. a faulty pointer
+ *          argument to a system  call (i.e. a faulty  pointer
  *          when a structure pointer or string was expected) */
 INTDEF NONNULL((1)) ssize_t CC
 libsc_printvalue(pformatprinter printer, void *arg,

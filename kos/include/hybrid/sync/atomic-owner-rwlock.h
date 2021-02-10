@@ -94,7 +94,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_read_nx)(struct atom
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_write_nx)(struct atomic_owner_rwlock *__restrict __self);
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
-/* Same as `atomic_owner_rwlock_trywrite()', but allow for the assumption to
+/* Same as `atomic_owner_rwlock_trywrite()',  but allow for  the assumption  to
  * be made that the calling thread isn't already holding a write-lock to `self' */
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_trywrite_r)(struct atomic_owner_rwlock *__restrict __self);
 __LOCAL void (atomic_owner_rwlock_write_r)(struct atomic_owner_rwlock *__restrict __self);
@@ -107,13 +107,13 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_write_r_nx)(struct a
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_tryupgrade)(struct atomic_owner_rwlock *__restrict __self);
 
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
- *       may have been held temporarily, meaning that the caller should
+ *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
 __LOCAL __ATTR_WUNUSED __BOOL (atomic_owner_rwlock_upgrade)(struct atomic_owner_rwlock *__restrict __self);
 
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
- *       no lock may have been held temporarily, meaning that the caller should
+ *       no lock may have been held  temporarily, meaning that the caller  should
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */

@@ -48,7 +48,7 @@
 
 DECL_BEGIN
 
-/* Automatically select jcc and setcc condition
+/* Automatically  select  jcc  and  setcc   condition
  * representation based on the preceding instruction. */
 #undef CONFIG_AUTOSELECT_JCC
 #if 1
@@ -98,13 +98,13 @@ struct instruction {
 #define IF_X64   0x8000 /* Only match in 64-bit mode */
 	u16  i_flags;    /* Instruction flags (set of `IF_*'). */
 	u8   i_opcode;   /* Instruction opcode. */
-	char i_repr[13]; /* Instruction representation (name + ["\t" + operands])
-	                  * Note that some flag combinations also make use the first
-	                  * byte for additional representation. Also note that when
+	char i_repr[13]; /* Instruction  representation  (name  +   ["\t" + operands])
+	                  * Note that some flag combinations  also make use the  first
+	                  * byte for additional  representation. Also  note that  when
 	                  * the first character of the actual representation is a `?',
-	                  * then the following 2 bytes represent an unsigned offset
-	                  * into `longops_repr', to where the actual representation
-	                  * can be found. The representation is always terminated by
+	                  * then the following  2 bytes represent  an unsigned  offset
+	                  * into `longops_repr',  to where  the actual  representation
+	                  * can be found. The  representation is always terminated  by
 	                  * a '\0' (NUL) character. */
 };
 #define _OP_VEX_B02(noevex, wig, w, ll) BINSTR_000##noevex##wig##w##ll
@@ -127,35 +127,35 @@ struct instruction {
 
 
 /* Instruction operand type encodings
- * Each operand (usually) consists of a single ASCII character that
- * describes how and what is printed in order to represent the operand.
- * The final representations of some operands may depend on specific
- * prefix bytes or the value of the instruction's (optional) modr/m.
+ * Each  operand  (usually)  consists  of  a  single  ASCII  character that
+ * describes  how and  what is printed  in order to  represent the operand.
+ * The final  representations  of  some operands  may  depend  on  specific
+ * prefix bytes  or  the  value of  the  instruction's  (optional)  modr/m.
  * Also note that in order to fully determine the length of an instruction,
- * operands must also be decoded, as operands also contain information
- * about immediate bytes (that are consumed as they are encountered)
+ * operands must  also be  decoded, as  operands also  contain  information
+ * about immediate  bytes  (that  are consumed  as  they  are  encountered)
  * An instruction representation `i_repr' is encoded as:
  *   #1: "X...":
  *       The first byte of the representation is used for instruction matching when:
  *       `(i_flags & IF_BYTE2) == IF_BYTE2 || (i_flags & IF_VEX) == IF_VEX'
- *       If this is the case, then the first byte of `repr' is consumed and all
- *       of the following encode/decode steps operate as `repr = i_repr + 1'
+ *       If this is  the case, then  the first byte  of `repr' is  consumed and  all
+ *       of   the  following  encode/decode  steps  operate  as  `repr = i_repr + 1'
  *   #2: OPC_LONGREPR + "<O1><O2>":
  *       The actual representation is stored at `longops_repr + UNALIGNED_GET16((u16 *)(repr + 1))'
- *       This is done to overcome the 12 (12+NUL=13) character limit for encoding
+ *       This   is   done  to   overcome   the  12   (12+NUL=13)   character  limit   for  encoding
  *       a mnemonic and its operands.
  *       If the first character of `repr' was `OPC_LONGREPR', then all of the following
- *       encode/decode steps operate using the string found in `longops_repr'
+ *       encode/decode  steps  operate  using   the  string  found  in   `longops_repr'
  *   #3: This is where the ~actual~ representation can be found, which is one of:
  *       - "<mnemonic>\0"
  *       - "<mnemonic>\t<operands...>\0"
- *       With `mnemonic' being the name of the instruction, and `operands'
- *       being a tightly packed string made up of `OP_*', where each macro
+ *       With  `mnemonic' being  the name  of the  instruction, and `operands'
+ *       being  a tightly  packed string made  up of `OP_*',  where each macro
  *       expands to represent (usually) one operand (but note the few optional
- *       operands such as `OP_SAE' and `OP_ER', as well as the few macros
+ *       operands such as  `OP_SAE' and  `OP_ER', as  well as  the few  macros
  *       that encode multiple operands).
  *       Additionally, each operand from `operands' can be `OP_ESC("...")',
- *       where `...' is an inlined string that will be printed in place of
+ *       where `...' is an inlined string that will be printed in place  of
  *       the operand's representation. The prefix/suffix of this expression
  *       is selected based on the first character of `...':
  *         - `%': DISASSEMBLER_FORMAT_REGISTER_(PREFIX|SUFFIX)
@@ -370,8 +370,8 @@ struct instruction {
 
 
 
-/* Smaller encodings for a couple of fixed register operands.
- * While all of these could be implemented with `OP_ESC()', this
+/* Smaller  encodings  for  a  couple  of  fixed  register   operands.
+ * While  all  of these  could  be implemented  with  `OP_ESC()', this
  * format uses much less memory, allowing `i_repr' to be much smaller. */
 #define OP_ST0     OP_SHORT "0" /* %st(0) */
 #define OP_ST1     OP_SHORT "1" /* %st(1) */
@@ -4007,7 +4007,7 @@ PRIVATE struct instruction const ops_0f38[] = {
 	                                                                                                * EVEX.512.f3.0f38.W0 22 /r vpmovsqb xmm1/m64{k1}{z}, zmm2 */
 
 	I(0x22, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 1, 0), LO_VPMOVSXBQ)), /* EVEX.128.66.0f38.WIG 22 /r vpmovsxbq xmm1{k1}{z}, xmm2/m16
-	                                                                                     * EVEX.256.66.0f38.WIG 22 /r vpmovsxbq ymm1{k1}{z}, xmm2/m32 
+	                                                                                     * EVEX.256.66.0f38.WIG 22 /r vpmovsxbq ymm1{k1}{z}, xmm2/m32
 	                                                                                     * EVEX.512.66.0f38.WIG 22 /r vpmovsxbq zmm1{k1}{z}, xmm2/m64 */
 	I(0x22, IF_66|IF_MODRM,        "pmovsxbq\t" OP_RM128_XMM OP_RXMM),                  /*             66 0f 38 22 /r pmovsxbq xmm1, xmm2/m16 */
 
@@ -4535,7 +4535,7 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0x96, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_VFMADDSUB132PS)), /* EVEX.128.66.0f38.W0 96 /r vfmaddsub132ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
 	                                                                                          * EVEX.256.66.0f38.W0 96 /r vfmaddsub132ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
 	                                                                                          * EVEX.512.66.0f38.W0 96 /r vfmaddsub132ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
-	
+
 	I(0x97, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 1), LO_VFMSUBADD132PD)), /* EVEX.128.66.0f38.W1 97 /r vfmsubadd132pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
 	                                                                                          * EVEX.256.66.0f38.W1 97 /r vfmsubadd132pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
 	                                                                                          * EVEX.512.66.0f38.W1 97 /r vfmsubadd132pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
@@ -4573,7 +4573,7 @@ PRIVATE struct instruction const ops_0f38[] = {
 	I(0xa6, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 0), LO_VFMADDSUB213PS)), /* EVEX.128.66.0f38.W0 a6 /r vfmaddsub213ps xmm1{k1}{z}, xmm2, xmm3/m128/m32bcst
 	                                                                                          * EVEX.256.66.0f38.W0 a6 /r vfmaddsub213ps ymm1{k1}{z}, ymm2, ymm3/m256/m32bcst
 	                                                                                          * EVEX.512.66.0f38.W0 a6 /r vfmaddsub213ps zmm1{k1}{z}, zmm2, zmm3/m512/m32bcst{er} */
-	
+
 	I(0xa7, IF_66|IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0_LIG(0, 0, 1), LO_VFMSUBADD213PD)), /* EVEX.128.66.0f38.W1 a7 /r vfmsubadd213pd xmm1{k1}{z}, xmm2, xmm3/m128/m64bcst
 	                                                                                          * EVEX.256.66.0f38.W1 a7 /r vfmsubadd213pd ymm1{k1}{z}, ymm2, ymm3/m256/m64bcst
 	                                                                                          * EVEX.512.66.0f38.W1 a7 /r vfmsubadd213pd zmm1{k1}{z}, zmm2, zmm3/m512/m64bcst{er} */
@@ -5329,7 +5329,7 @@ PRIVATE struct instruction const ops_3dnow[] = {
 /*	I(0x05, IF_MODRM, "tfmuld.Rx TFd,TFs1,TFs2"), */
 /*	I(0x06, IF_MODRM, "tfdivs.Rx TFd,TFs1,TFs2"), */
 /*	I(0x07, IF_MODRM, "tfdivd.Rx TFd,TFs1,TFs2"), */
- 
+
 	I(0x0c, IF_MODRM, "pi2fw\t" OP_RM64_MM OP_RMM),
 	I(0x0d, IF_MODRM, "pi2fd\t" OP_RM64_MM OP_RMM),
 

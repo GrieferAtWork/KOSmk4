@@ -37,12 +37,12 @@ DATDEF ATTR_PERCPU struct tss thiscpu_x86_tss;
 
 /* Mapping for the currently used I/O permissions bitmap
  * Lazily updated to always be mapped to the calling thread's `THIS_X86_IOPERM_BITMAP'
- * WARNING: Accessing this array is _only_ allowed while preemption is disabled, or
- *          the TASK_FKEEPCORE flag is set. Accessing this array at any other time
+ * WARNING: Accessing  this  array is  _only_ allowed  while  preemption is  disabled, or
+ *          the  TASK_FKEEPCORE  flag is  set.  Accessing this  array  at any  other time
  *          may lead to a kernel panic within the pagefault handler (note that user-space
- *          accessing this array will simply be dismissed since user-space isn't allowed
+ *          accessing  this array will simply be dismissed since user-space isn't allowed
  *          to access kernel-space structures in any case)
- *          Also note that in case of a write-access, if the calling thread doesn't already
+ *          Also  note that in case of a write-access, if the calling thread doesn't already
  *          have its own IOB allocated, accessing this vector will lazily allocate said IOB,
  *          meaning that write-access may also cause `E_BADALLOC' and `E_WOULDBLOCK'. */
 DATDEF ATTR_PERCPU u8 thiscpu_x86_iob[65536 / 8];
@@ -95,9 +95,9 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  * NOTE: The entire ioperm bitmap needs exactly 2 pages of memory:
  *   - 0x10000 (65536) ports / 8 bits-per-byte -> 0x2000 (8192) bytes
  *     8192 bytes / 4096 bytes-per-page == 2 pages
- *   - According to intel specs, the processor may access +1 additional
+ *   - According to intel  specs, the processor  may access +1  additional
  *     byte past the end of the ioperm bitmap which is expected to contain
- *     all 1-bits. As such, the 2 ioperm bitmaps must be followed by some
+ *     all 1-bits. As such, the 2 ioperm bitmaps must be followed by  some
  *     data page, who's first byte is a constant 0xff.
  *
  * With all of this in mind, the TSS in memory looks like this:
@@ -131,7 +131,7 @@ DATDEF ATTR_PERCPU struct mpart const thiscpu_x86_dfstackpart;
 
 #ifndef __x86_64__
 /* A special task segment that is linked to the #DF (Double Fault)
- * exception of each CPU, allowing the kernel to still perform do
+ * exception  of each CPU, allowing the kernel to still perform do
  * exception handling when in an extraordinarily broken state (and
  * possibly even recover)
  * This is (e.g.) how the kernel is able to deal with Stack Overflows

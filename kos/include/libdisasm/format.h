@@ -58,9 +58,9 @@ struct disassembler;
 /* Print prefix/suffix strings for various target-specific components.
  *  -> Intended for encoding ANSI-TTY color codes in order to allow for syntax highlighting
  * @param: format_option: The format string being requested (one of `DISASSEMBLER_FORMAT_*')
- * @return: * :  The sum of return values from calls to `self->d_printer',
- *               or a negative value if an error occurred while printing,
- *               or alternatively `0' in case `disasm_print()' and friends
+ * @return: * :  The sum of return  values from calls to  `self->d_printer',
+ *               or a negative  value if an  error occurred while  printing,
+ *               or  alternatively `0' in  case `disasm_print()' and friends
  *               were used to print output, rather than the printer callback
  *               itself directly. */
 typedef __ATTR_NONNULL((1)) __ssize_t

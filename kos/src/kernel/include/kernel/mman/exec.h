@@ -35,15 +35,15 @@ DECL_BEGIN
 
 struct execargs; /* from <kernel/execabi.h> */
 
-/* Load an executable binary into a temporary, emulated mman.
+/* Load  an  executable   binary  into  a   temporary,  emulated   mman.
  * If this succeeds, clear all of the mappings from the given `ea_mman',
- * and replace them with the contents of the temporary, emulated mman
- * (such that the entire process of mapping the new contents is always
- * able to either seamlessly restore the old memory mappings, or not
+ * and  replace them with  the contents of  the temporary, emulated mman
+ * (such that the entire process of  mapping the new contents is  always
+ * able to either  seamlessly restore  the old memory  mappings, or  not
  * even touch them at all upon error)
  * -> This function is used to implement the exec() family of system calls
- *    in such that exec() is always able to allow the calling program to
- *    handle load errors (at least so long as those errors aren't caused
+ *    in  such that exec() is always able  to allow the calling program to
+ *    handle load errors (at least so  long as those errors aren't  caused
  *    by the executable's initialization, such as missing libraries)
  * NOTE: Upon successful return, all threads using `ea_mman' (excluding
  *       the caller themself if they are using the mman, too) will have

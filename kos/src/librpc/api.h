@@ -24,7 +24,7 @@
 
 #include <librpc/api.h>
 
-#define CC    LIBRPC_CC
-#define VCC   LIBRPC_VCC
+#define CC  LIBRPC_CC
+#define VCC LIBRPC_VCC
 
 #endif /* !GUARD_LIBRPC_API_H */

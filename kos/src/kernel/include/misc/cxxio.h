@@ -27,6 +27,8 @@
 #ifdef __CC__
 DECL_BEGIN
 
+/* TODO: Get rid of this header. - I don't think it's even used anywhere! */
+
 #ifndef __cplusplus
 #error "C++ I/O is only availble in C++ (obviously)"
 #endif

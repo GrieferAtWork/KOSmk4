@@ -27,16 +27,16 @@
  *  - __ARCH_PAGEMASK
  *  - __ARCH_PAGESIZE
  *  - __ARCH_PAGESHIFT
- * Where `__ARCH_PAGEMASK == __ARCH_PAGESIZE - 1'
+ * Where   `__ARCH_PAGEMASK == __ARCH_PAGESIZE - 1'
  * Where `__ARCH_PAGESIZE == 1 << __ARCH_PAGESHIFT'
  * and   `__ARCH_PAGESHIFT == CTZ(__ARCH_PAGESIZE)'
  *
- * These macros _must_ be defined in kernel-mode (#ifdef __KERNEL__), but are
- * entirely optional in user-space (user-space should instead use the portable
+ * These  macros _must_ be  defined in kernel-mode  (#ifdef __KERNEL__), but are
+ * entirely optional in user-space (user-space  should instead use the  portable
  * <unistd.h> function `getpagesize()' as replacement for `__ARCH_PAGESIZE' when
  * that macro isn't defined)
- * -> As such, `__ARCH_PAGESIZE' should _only_ be defined for user-space when the
- *    page-size has a hard, fixed, constant value for any possible configuration
+ * -> As such, `__ARCH_PAGESIZE' should _only_  be defined for user-space when  the
+ *    page-size  has a hard,  fixed, constant value  for any possible configuration
  *    of the target architecture (an example of this might be i386 and x86_64 where
  *    the pagesize is always `4096' bytes, and the shift consequently `12' bits) */
 

@@ -40,9 +40,9 @@ struct video_device;
 struct video_device_ops {
 	/* [1..1] Enumerate available display formats for the given video device.
 	 * @param: offset: The number of leading formats to skip (for consecutive
-	 *                 calls to query supported formats in chunks)
+	 *                 calls  to   query   supported   formats   in   chunks)
 	 * @return: * : The number of returned video format descriptors.
-	 *              This is always `<= limit' and always `== limit'
+	 *              This  is always `<= limit' and always `== limit'
 	 *              if there may be more formats. */
 	size_t (KCALL *vdf_listfmt)(struct video_device *__restrict self,
 	                            USER CHECKED struct vd_format *fmt,
@@ -50,7 +50,7 @@ struct video_device_ops {
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 	/* [1..1] Get/Set the current video format.
-	 * NOTE: When `VIDEO_CODEC_NONE' is used/returned as codec, the video device
+	 * NOTE: When `VIDEO_CODEC_NONE' is used/returned as codec, the video  device
 	 *       is set to terminal mode, an optional mode allowing the display to be
 	 *       used as an ansi tty mode.
 	 * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC: [vdf_setfmt] ... */
@@ -59,12 +59,12 @@ struct video_device_ops {
 	void (KCALL *vdf_setfmt)(struct video_device *__restrict self, USER CHECKED struct vd_format const *fmt)
 			THROWS(E_SEGFAULT, E_IOERROR, E_INVALID_ARGUMENT_BAD_VALUE, ...);
 
-	/* [0..1] Get/Set the current video palette (used for VIDEO_CODEC_HASPAL())
+	/* [0..1] Get/Set   the   current   video   palette   (used   for   VIDEO_CODEC_HASPAL())
 	 * NOTE: These ops are mandatory if the device supports any palette-driven video formats.
 	 * NOTE: When called while a non-palette-based video mode is used, or when `codec' doesn't
-	 *       match the actual current video format, the behavior is weakly undefined, in that
-	 *       something may still happen, nothing may happen, but whatever happens, these
-	 *       functions will still return normally with everything left in a consistent state.
+	 *       match the actual current video format, the behavior is weakly undefined, in  that
+	 *       something  may  still happen,  nothing may  happen,  but whatever  happens, these
+	 *       functions will still return normally with everything left in a consistent  state.
 	 * @param: pal: [vdf_setpal] When NULL, set the default palette for the current video mode. */
 	void (KCALL *vdf_getpal)(struct video_device *__restrict self, vd_codec_t codec,
 	                         USER CHECKED struct vd_palette *pal)
@@ -96,9 +96,9 @@ video_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd
 
 
 /* Initialize a given video device.
- * NOTE: `ops->ato_output' must be set to NULL when calling this function.
+ * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
- *       is done dynamically when the ANSI TTY is connected to the output
+ *       is done dynamically when the ANSI  TTY is connected to the  output
  *       channel of a `struct tty_device'
  * This function initializes the following operators:
  *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!

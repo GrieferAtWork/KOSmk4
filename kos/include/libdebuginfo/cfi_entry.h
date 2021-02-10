@@ -31,12 +31,12 @@ __DECL_BEGIN
 
 struct unwind_emulator_struct;
 
-/* Run a sequence of DW_OP_* instructions as though they were being
- * invoked at the start of the current function. After this, any
- * stack-value left on the internal stack of `self' that was pushed
- * by the given instruction stream, wasn't there before, and refers
+/* Run  a sequence of  DW_OP_* instructions as  though they were being
+ * invoked  at  the start  of the  current  function. After  this, any
+ * stack-value  left on the  internal stack of  `self' that was pushed
+ * by the given  instruction stream, wasn't  there before, and  refers
  * to a register location, will be replaced with a stack-local R-value
- * copy of that location, thus ensuring that any register accessed is
+ * copy  of that location, thus ensuring that any register accessed is
  * loaded by-value
  *
  * NOTE: This function will preserve and restore the original values of:

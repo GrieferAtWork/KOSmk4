@@ -23,6 +23,6 @@
 #include <hybrid/compiler.h>
 #include <libvideo/codec/api.h>
 
-#define CC   LIBVIDEO_CODEC_CC
+#define CC LIBVIDEO_CODEC_CC
 
 #endif /* !GUARD_LIBVIDEO_CODEC_API_H */

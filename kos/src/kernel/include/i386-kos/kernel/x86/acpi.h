@@ -138,9 +138,9 @@ DATDEF size_t acpi_sdt_count;  /* Length of the vector `((ACPISDTHeader *)acpi_r
 /* Lookup an ACPI table and store its contents in `buf', and return the number of required bytes
  * Note however that in the event of `return > buflen', data will have still been written to the
  * given buffer, leading up to `buflen'. Seperately, in the event of `return < buflen', any data
- * that could not be derived from the SDT table will be initialized as all ZEROes.
- * Also note that the caller is required to ensure that `buflen >= sizeof(ACPISDTHeader)'
- * @param: ptableaddr: When non-NULL, filled with the physical base
+ * that  could  not  be  derived  from  the  SDT  table  will  be  initialized  as  all  ZEROes.
+ * Also  note  that  the caller  is  required to  ensure  that `buflen >= sizeof(ACPISDTHeader)'
+ * @param: ptableaddr: When  non-NULL, filled with the physical base
  *                     address of the found SDT header upon success.
  * @return: 0: Failed to find the ACPI table.
  * @return: *: Same as `((ACPISDTHeader *)buf)->rsdp_length' */

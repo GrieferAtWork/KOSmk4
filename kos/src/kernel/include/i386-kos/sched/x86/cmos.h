@@ -85,7 +85,7 @@ DATDEF struct x86_cmos_struct x86_cmos;
 
 /* Get/Set NMI (non-maskable interrupt) being enabled
  * These interrupts should normally be enabled in all situations,
- * and should only be disabled momentarily, and when absolutely
+ * and should only be  disabled momentarily, and when  absolutely
  * necessary.
  * Also note that NMI enable/disable is controlled globally, and
  * not, say, per-CPU!

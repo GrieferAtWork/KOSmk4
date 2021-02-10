@@ -36,8 +36,8 @@ DECL_BEGIN
 
 
 #ifndef FIND_SPECIFIC_ADDRESS
-/* Load the next_chunk eh_frame function descriptor from `*peh_frame_reader', which
- * must either be a pointer to the start of the `.eh_frame' section, or be the
+/* Load the  next_chunk  eh_frame  function  descriptor  from  `*peh_frame_reader',  which
+ * must  either  be  a  pointer  to  the start  of  the  `.eh_frame'  section,  or  be the
  * value written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
@@ -55,7 +55,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t const **__restrict peh_frame_reader
                                       uint8_t sizeof_address)
 #else /* !FIND_SPECIFIC_ADDRESS */
 /* Same as `unwind_fde_load()', but quickly search for and return the
- * FDE descriptor containing the given `absolute_pc' text address.
+ * FDE descriptor containing  the given  `absolute_pc' text  address.
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTERN NONNULL((1, 2, 4)) unsigned int

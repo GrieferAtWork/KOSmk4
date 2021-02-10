@@ -37,7 +37,7 @@ struct icpustate;
 struct scpustate;
 struct fcpustate;
 
-/* Dump a traceback for the given cpu state.
+/* Dump   a  traceback  for  the  given  cpu  state.
  * Tracebacks are printed using `addr2line_printf()' */
 FUNDEF ssize_t FCALL print_traceback(__pformatprinter printer, void *arg, unsigned int n_skip DFL(0));
 FUNDEF ssize_t FCALL print_traceback_ucpustate(__pformatprinter printer, void *arg, struct ucpustate const *__restrict state, unsigned int n_skip DFL(0));

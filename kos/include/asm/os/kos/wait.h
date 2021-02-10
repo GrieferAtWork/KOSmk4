@@ -32,7 +32,7 @@
 #define __WCONTINUED   0x00000008 /* Report continued child. */
 #if defined(__KOS__) && __KOS_VERSION__ >= 300 && __KOS_VERSION__ < 400
 #define __WONLYTHREADS 0x00008000 /* Only wait for children created within the current
-                                   * process, and with the `CLONE_THREAD' flag set. */
+                                   * process, and  with the  `CLONE_THREAD' flag  set. */
 #endif /* __KOS__ && __KOS_VERSION__ >= 300 && __KOS_VERSION__ < 400 */
 #define __WNOWAIT      0x01000000 /* Don't reap, just poll status. */
 #define __WNOTHREAD    0x20000000 /* Don't wait on children of other threads in this group */

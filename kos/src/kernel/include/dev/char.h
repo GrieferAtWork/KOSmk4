@@ -96,25 +96,25 @@ struct character_device_type {
 			THROWS(...);
 
 	/* [0..1] Optional callback that is invoked when the device is opened by user-space.
-	 * @param: hand: [in|out] Upon input, this handle describes the already-initialized
-	 *                        handle that will be made available to user-space. This callback
+	 * @param: hand: [in|out] Upon   input,  this  handle  describes  the  already-initialized
+	 *                        handle that will be made available to user-space. This  callback
 	 *                        is allowed to modify that handle, however it must also take care
-	 *                        to account for the fact that `hand->h_data' must contain a
+	 *                        to  account  for the  fact  that `hand->h_data'  must  contain a
 	 *                        reference both on entry and exit!
 	 * HINT: `hand' is initialized as follows upon entry:
 	 * >> hand->h_type = HANDLE_TYPE_CHARACTERDEVICE;
 	 * >> hand->h_mode = ...; // Depending on o-flags passed to open(2).
 	 * >> hand->h_data = incref(self);
 	 * NOTE: `h_data' is reference on entry (when modified, you must
-	 *       `decref_nokill(self)' and assign `incref(new_obj)') */
+	 *       `decref_nokill(self)'  and  assign   `incref(new_obj)') */
 	NONNULL((1, 2)) void (KCALL *ct_open)(struct character_device *__restrict self,
 	                                      struct handle *__restrict hand);
 };
 
 #define CHARACTER_DEVICE_FLAG_NORMAL  0x0000 /* Normal flags. */
 #define CHARACTER_DEVICE_FLAG_WEAKREG 0x0001 /* [const] The device is weakly registered within the character device tree.
-                                              * This means that the character device tree does not hold a reference
-                                              * to the device, and that the device will automatically be removed from
+                                              * This  means  that the  character device  tree does  not hold  a reference
+                                              * to  the device,  and that the  device will automatically  be removed from
                                               * the character device tree once all other references go away. */
 
 struct character_device {
@@ -133,7 +133,7 @@ struct character_device {
 	REF struct inode            *cd_devfs_inode; /* [lock(WRITE_ONCE)][0..1] Device INode under /dev, or NULL if not created */
 #endif /* !WANT_CHARACTER_DEVICE_NEXTLINK */
 	REF struct directory_entry  *cd_devfs_entry; /* [lock(WRITE_ONCE)][1..1][valid_if(cd_devfs_inode)] Directory entry under /dev */
-	char                         cd_name[16];    /* [const] Name of the device (auto-generated when unset during device registration)
+	char                         cd_name[16];    /* [const] Name of the device (auto-generated  when unset during device  registration)
 	                                              * This is the name by which the device can be discovered within the `/dev' directory. */
 };
 
@@ -159,21 +159,21 @@ character_device_alloc(struct driver *__restrict owner,
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */
 #define character_device_devno(self) ((self)->cd_devlink.a_vaddr)
 
-/* Lookup a character device associated with `devno' and return a reference to it.
+/* Lookup  a character device associated with `devno'  and return a reference to it.
  * When no character device is associated that device number, return `NULL' instead. */
 FUNDEF WUNUSED REF struct character_device *KCALL
 character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK);
 
 /* Same as `character_device_lookup()', but return `NULL'
- * if the lookup would have caused an exception. */
+ * if   the  lookup  would   have  caused  an  exception. */
 FUNDEF WUNUSED REF struct character_device *
 NOTHROW(KCALL character_device_lookup_nx)(dev_t devno);
 
 /* Lookup a character device, given its `name`, with is its default filename
- * as will appear in the /dev/ directory, and may optionally be prefixed
+ * as  will appear  in the /dev/  directory, and may  optionally be prefixed
  * by a string `/dev/' that is stripped before comparison.
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
- * an encoding that is always attempted first by attempting to decode the
+ * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
  * >> character_device_lookup_name("3:64");      // MKDEV(3, 64)
  * >> character_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
@@ -192,7 +192,7 @@ character_device_lookup(USER CHECKED char const *name)
 #endif /* __cplusplus */
 
 
-/* Unregister the given character-device from the character-device-id tree, as well as
+/* Unregister  the given character-device from the character-device-id tree, as well as
  * removing its auto-generated entry from `/dev' (should that entry have been created).
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
@@ -208,7 +208,7 @@ character_device_register(struct character_device *__restrict self, dev_t devno)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
-/* Automatically register the given character-device, assigning it an auto-generated device ID.
+/* Automatically   register  the  given   character-device,  assigning  it   an  auto-generated  device  ID.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
  * NOTE: When empty, `cd_name' will be set to
  *       `"%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) % (MAJOR(devno),MINOR(devno))'
@@ -247,8 +247,8 @@ character_device_ioctl(struct character_device *__restrict self,
 		THROWS(...);
 
 /* Invoke the `ct_mmap' operator fails to fill in `*pdatablock_fspath'
- * and/or `*pdatablock_fsname', then this function will automatically
- * make fill in these pointers through use of `self->cd_devfs_entry',
+ * and/or  `*pdatablock_fsname', then this function will automatically
+ * make fill in these pointers through use of  `self->cd_devfs_entry',
  * as well as `superblock_find_mount_from_vfs(&devfs, THIS_VFS)' */
 FUNDEF NONNULL((1, 2)) void KCALL
 character_device_mmap(struct character_device *__restrict self,

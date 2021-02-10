@@ -35,8 +35,8 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* Helper macros to (safely) convert between different types of
- * flags used throughout the memory management system. Note that
+/* Helper macros  to (safely)  convert between  different types  of
+ * flags used throughout  the memory management  system. Note  that
  * for this purpose, most flags with identical meaning are designed
  * to also share identical numerical values. */
 
@@ -191,7 +191,7 @@ DECL_BEGIN
 
 
 /* Evaluates to non-zero if `after' is more restrictive than `before',
- * in that at least one of the permissions from `before' is no longer
+ * in that at least one of the permissions from `before' is no  longer
  * apart of `after'. */
 #define mnodeflags_prot_more_restrictive(before, after) \
 	((((before) & ~(after)) & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) != 0)

@@ -33,24 +33,24 @@
 DECL_BEGIN
 
 /* The max # of pages which may be allocated for the purpose of
- * describing the mappings required for the physical identity
+ * describing  the mappings required  for the physical identity
  * mapping.
- * Because the identity area is as large as it is (64TiB), one
- * would need an insane amount of page table vectors (128 * 512
- * pages in total) in order to describe the entire region using
- * only 2MiB pages (when 1GiB pages are available, this problem
- * would become manageable since we'd only need 128 pages to
- * describe the entire are, which also means that this entire
+ * Because the identity area is as  large as it is (64TiB),  one
+ * would need an insane amount of page table vectors (128 *  512
+ * pages  in total) in order to describe the entire region using
+ * only 2MiB pages (when 1GiB pages are available, this  problem
+ * would  become manageable  since we'd  only need  128 pages to
+ * describe the entire  are, which also  means that this  entire
  * mechanism doesn't actually end up being used when this config
  * is found to be possible at runtime)
- * Anyways: In order to limit the memory consumption of the phys.
+ * Anyways: In  order  to limit  the  memory consumption  of  the phys.
  *          identity area, at most `CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC'
- *          E1+E2 vectors (and thereby physical pages) can ever be
- *          allocated at the same time. When another E1 vector needs
- *          to be allocated at a point when there are already this
- *          many vectors in use, all identity mappings are deleted,
- *          and the one currently being accessed will get mapped
- *          (all of this happens lazily during #PF handling, except
+ *          E1+E2 vectors  (and thereby  physical  pages) can  ever  be
+ *          allocated at the  same time. When  another E1 vector  needs
+ *          to be  allocated at  a point  when there  are already  this
+ *          many vectors  in use,  all identity  mappings are  deleted,
+ *          and the  one  currently  being  accessed  will  get  mapped
+ *          (all of  this happens  lazily during  #PF handling,  except
  *          the physical memory available for this purpose is allocated
  *          during early boot) */
 #ifndef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
@@ -59,10 +59,10 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-/* Ensure that the given `addr', which must be located
+/* Ensure that the  given `addr', which  must be  located
  * inside of [KERNEL_PHYS2VIRT_MIN, KERNEL_PHYS2VIRT_MAX]
- * is mapped against its designated physical address.
- * This function is called from within the #PF handler
+ * is  mapped  against its  designated  physical address.
+ * This function is  called from within  the #PF  handler
  * when a kernel-originating fault happens for an address
  * within that range.
  * NOTE: When called before `x86_initialize_phys2virt64()',
@@ -70,11 +70,11 @@ DECL_BEGIN
  *       this function is unconditionally NOTHROW! */
 FUNDEF NOBLOCK NOPREEMPT void KCALL x86_phys2virt64_require(void *addr);
 
-/* A special VM node (that isn't linked to any backing data part,
+/* A  special VM  node (that isn't  linked to any  backing data part,
  * and is thus a so-called ~reserved~ memory mapping), but is checked
- * for by the #PF handler, where it indicates an access made to the
+ * for  by the #PF handler, where it  indicates an access made to the
  * physical identity area.
- * Separately, this node's presence within the kernel VM prevents
+ * Separately, this node's  presence within the  kernel VM  prevents
  * anything else from being mapped into the physical identity range. */
 DATDEF struct mnode x86_phys2virt64_node;
 

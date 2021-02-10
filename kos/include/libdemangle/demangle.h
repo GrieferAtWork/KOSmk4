@@ -31,11 +31,11 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 /* Print the demangled form of the given `mangled_name'
- * This function will automatically (try to) detect the mangling used
+ * This function will automatically (try to) detect the mangling  used
  * to encode type information in `mangled_name', but will re-print the
  * given `mangled_name' if the detection was unsuccessful.
  * Other than that, this function behaves like any other format-printer
- * compatible API, returning the sum of all callbacks, or the first
+ * compatible API, returning  the sum  of all callbacks,  or the  first
  * negative return value upon error. */
 typedef __ssize_t
 (LIBDEMANGLE_CC *PDEMANGLE)(__pformatprinter printer, void *arg,

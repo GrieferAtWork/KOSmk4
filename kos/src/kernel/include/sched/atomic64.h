@@ -28,18 +28,18 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-/* An API for 64-bit atomics that defines a u64+atomic_rwlock data structure,
+/* An API for  64-bit atomics  that defines a  u64+atomic_rwlock data  structure,
  * where the lock is used when the host doesn't support the cmpxchg8b instruction
  * on i386, always uses the lock when the host never supports 64-bit atomics, and
- * doesn't even define the lock, and always just defines the raw 64-bit value if
- * the host always supports 64-bit atomics (such as on x86_64)
+ * doesn't  even define the lock, and always just defines the raw 64-bit value if
+ * the   host   always   supports   64-bit   atomics   (such   as   on    x86_64)
  * These are 3 configuration modes:
  *   - CONFIG_ATOMIC64_SUPPORT_NEVER:
  *         64-bit atomics are never supported and always have to be emulated
  *   - CONFIG_ATOMIC64_SUPPORT_ALWAYS:
  *         64-bit atomics are always supported and never have to be emulated
  *   - CONFIG_ATOMIC64_SUPPORT_DYNAMIC:
- *         64-bit atomic operations must go through api functions that
+ *         64-bit atomic operations must  go through api functions  that
  *         dynamically get re-written based on native support determined
  *         at runtime.
  */

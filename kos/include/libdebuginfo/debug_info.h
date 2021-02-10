@@ -150,7 +150,7 @@ typedef struct di_debuginfo_cu_parser_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
 	__byte_t const *cps_debug_loc_start;    /* [0..1][const] `.debug_loc' start
-	                                         * NOTE: When set equal to `cps_debug_loc_end', location list expression
+	                                         * NOTE: When  set equal to `cps_debug_loc_end', location list expression
 	                                         *       cannot be used and will appear as though they weren't present at
 	                                         *       all. */
 	__byte_t const *cps_debug_loc_end;      /* [0..1][const] `.debug_loc' end */
@@ -159,7 +159,7 @@ typedef struct di_debuginfo_cu_parser_sections_struct {
 	__byte_t const *_cps_pad[2];            /* ... */
 	__byte_t const *cps_debug_str_start;    /* [0..1][const] `.debug_str' start
 	                                         * NOTE: When set equal to `cps_debug_str_end', strings referring to
-	                                         *       this section will be returned as `???' (3 question marks) */
+	                                         *       this section will be returned  as `???' (3 question  marks) */
 	__byte_t const *cps_debug_str_end;      /* [0..1][const] `.debug_str' end */
 } di_debuginfo_cu_parser_sections_t;
 
@@ -205,7 +205,7 @@ typedef struct di_debuginfo_cu_parser_struct {
 #ifndef __di_debuginfo_location_t_defined
 #define __di_debuginfo_location_t_defined 1
 /* NOTE: The user-interface API for this type is exported
- *       by `libunwind', rather than `libdebuginfo'! */
+ *       by  `libunwind',  rather  than   `libdebuginfo'! */
 typedef struct di_debuginfo_location_struct {
 	__byte_t const *l_expr;  /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
 	__byte_t const *l_llist; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
@@ -237,15 +237,15 @@ typedef struct di_debuginfo_location_struct {
 		else
 
 
-/* Given a pointer to the start of a debug_info CU (or a pointer to the start
+/* Given  a pointer to the start of a  debug_info CU (or a pointer to the start
  * of the .debug_info section), as well as the start & end of the .debug_abbrev
- * section, initialize the given debuginfo CU parser structure `result', and
+ * section, initialize the  given debuginfo CU  parser structure `result',  and
  * advance `*pdebug_info_reader' to the start of the next unit.
  * NOTE: Upon success (return == DEBUG_INFO_ERROR_SUCCESS), the caller is responsible for
  *       finalizing the given `abbrev' through use of `debuginfo_cu_abbrev_fini(abbrev)',
  *       once the associated parser `result' is no longer being used.
  * @param: first_component_pointer: A pointer to the first component to load, or `NULL'
- *                                  to simply load the first component following the
+ *                                  to simply load  the first  component following  the
  *                                  start of the associated CU descriptor.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
@@ -291,9 +291,9 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_skipform)(di_debuginfo_cu_pars
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Start a new component.
- * NOTE: Prior to calling of these functions, you may assign `self->dup_cu_info_pos' to
- *       the starting address of the next component to-be read. - Valid values for this
- *       are usually returned by `debuginfo_cu_parser_getref()', and can be found in some
+ * NOTE: Prior to calling  of these  functions, you may  assign `self->dup_cu_info_pos'  to
+ *       the starting address of  the next component  to-be read. -  Valid values for  this
+ *       are usually returned by `debuginfo_cu_parser_getref()',  and can be found in  some
  *       of the structures initialized by the `debuginfo_cu_parser_loadattr_*()' functions.
  * @return: true: ...
  * @return: false: [debuginfo_cu_parser_next] All components have been parsed.
@@ -310,7 +310,7 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debug
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
- * debug information start location of the next componet within `*pdip' */
+ * debug information start location of  the next componet within  `*pdip' */
 typedef __ATTR_NONNULL((1, 2)) __BOOL
 /*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_NEXT_WITH_DIP)(di_debuginfo_cu_parser_t *__restrict self,
                                                                         __byte_t const **__restrict pdip);
@@ -321,7 +321,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
-/* Skip the attributes of the current component (must be called if not
+/* Skip the attributes  of the  current component  (must be  called if  not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*') */
 typedef __ATTR_NONNULL((1)) void (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_SKIPATTR)(di_debuginfo_cu_parser_t *__restrict self);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
@@ -333,7 +333,7 @@ typedef struct di_debuginfo_block_struct {
 	__size_t        b_size; /* Block length (in bytes) */
 } di_debuginfo_block_t;
 
-/* Load the current debug information as an attribute encoded as
+/* Load the current debug information as an attribute encoded  as
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
  *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
@@ -645,7 +645,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_
 typedef struct di_debuginfo_compile_unit_struct {
 	/* For `DW_TAG_compile_unit'
 	 * NOTE: This TAG is followed by a tree/sequence of child-nodes containing information
-	 *       about the individual components that make up this compilation unit.
+	 *       about  the  individual  components  that  make  up  this  compilation   unit.
 	 *       These components are enumerated as follows:
 	 * >> __uintptr_t cu_depth = parser.dup_child_depth;
 	 * >> if (debuginfo_cu_parser_nextchild(&parser)) {
@@ -661,10 +661,10 @@ typedef struct di_debuginfo_compile_unit_struct {
 	__uintptr_t           cu_addr_base; /* Base address for `DW_OP_addrx' offsets (s.a. `DW_AT_addr_base') */
 	__uintptr_t           cu_stmt_list; /* Offset into `.debug_line' (to-be used with `debugline_loadunit')
 	                                     * to this CU's address-to-line data blob.
-	                                     * If unknown, set to `(__uintptr_t)-1' (but always assume undefined
+	                                     * If unknown,  set to  `(__uintptr_t)-1' (but  always assume  undefined
 	                                     * if this offset points past- or at the end of the .debug_line section) */
 	char const           *cu_name;      /* [0..1] Name of the compilation unit. */
-	char const           *cu_comp_dir;  /* [0..1] Path to the compiler base directory (prepended before filenames,
+	char const           *cu_comp_dir;  /* [0..1] Path to  the compiler  base  directory (prepended  before  filenames,
 	                                     * this is essentially the getcwd() of the compiler when the CU was assembled). */
 } di_debuginfo_compile_unit_t;
 #define di_debuginfo_compile_unit_as_simple(self) ((di_debuginfo_compile_unit_simple_t *)&(self)->cu_ranges)
@@ -708,7 +708,7 @@ typedef struct di_debuginfo_inlined_subroutine_struct {
 	                                         * >> } */
 	di_debuginfo_ranges_t is_ranges;        /* Program counter ranges. */
 	__uintptr_t           is_call_file;     /* Call source file index (used with the addr2line program pointed
-	                                         * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
+	                                         * to by the associated CU's  `cu_stmt_list') (or 0 if  undefined) */
 	__uintptr_t           is_call_line;     /* Call source line number (or 0 if undefined) */
 	__uintptr_t           is_call_column;   /* Call source column offset (or 0 if undefined) */
 } di_debuginfo_inlined_subroutine_t;
@@ -723,7 +723,7 @@ typedef struct di_debuginfo_type_struct {
 	char const           *t_name;          /* [0..1] Name of the type. */
 	char const           *t_rawname;       /* [0..1] Raw (linkage) name of the type. */
 	__uintptr_t           t_decl_file;     /* Call source file index (used with the addr2line program pointed
-	                                        * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
+	                                        * to by the associated CU's  `cu_stmt_list') (or 0 if  undefined) */
 	__uintptr_t           t_decl_line;     /* Call source line number (or 0 if undefined) */
 	__uintptr_t           t_decl_column;   /* Call source column offset (or 0 if undefined) */
 	__uintptr_t           t_sizeof;        /* Size of this type (in bytes) (or 0 if undefined) */
@@ -734,7 +734,7 @@ typedef struct di_debuginfo_type_struct {
 
 typedef struct di_debuginfo_member_struct {
 	/* For `DW_TAG_member' */
-	__byte_t const       *m_type;           /* [0..1] Pointer to the debug_info for the member's type (which is one of `DW_TAG_*_type').
+	__byte_t const       *m_type;           /* [0..1] Pointer  to  the  debug_info  for  the  member's  type  (which  is  one  of   `DW_TAG_*_type').
 	                                         * To load this structure, create a copy of your parser and assign this pointer to it's `dup_cu_info_pos'
 	                                         * field. Afterwards, call `debuginfo_cu_parser_next()' to load the pointed-to component. */
 	char const           *m_name;           /* [0..1] Name of the member. */
@@ -802,7 +802,7 @@ typedef __ATTR_NONNULL((2)) __ssize_t
 
 
 /* Print the C/C++-like representation of a given value, given DWARF debug information
- * about its typing, where `parser' must have been set up to have already loaded the
+ * about  its typing, where `parser' must have been  set up to have already loaded the
  * given `type' component for the given data blob:
  * >> di_debuginfo_variable_t var;
  * >> ... // Load `var'

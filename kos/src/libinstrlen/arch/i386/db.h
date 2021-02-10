@@ -54,7 +54,7 @@ DECL_BEGIN
 
 
 #ifndef __x86_64__
-/* 64-bit operand aren't used outside of 64-bit mode, so we can just alias the
+/* 64-bit operand aren't used outside  of 64-bit mode, so  we can just alias  the
  * 16-/32-/64-bit immediate operand instruction type with the 16-/32-bit variant! */
 #define I_248 I_24
 #endif /* !__x86_64__ */

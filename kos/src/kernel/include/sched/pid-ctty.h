@@ -44,9 +44,9 @@ LOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty_of(struct task *__re
 LOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread);
 
 
-/* The character device made available under /dev/ttybase_device
+/* The  character  device made  available  under /dev/ttybase_device
  * This device implements all operators as direct aliasing callbacks
- * to the TTY character device addressable through `task_getctty()' */
+ * to  the TTY character device addressable through `task_getctty()' */
 DATDEF struct character_device dev_tty;
 
 #ifndef __INTELLISENSE__

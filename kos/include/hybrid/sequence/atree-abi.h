@@ -103,7 +103,7 @@ ATREE_NOTHROW(ATREE_CALL ATREE(tryinsert_at))(T **__restrict proot, T *__restric
                                               ATREE_LEVEL_T addr_level);
 
 /* Similar to 'addrtree_tryinsert', but causes undefined behavior
- * if the key range covered by the given leaf already existed. */
+ * if  the key range  covered by the  given leaf already existed. */
 ATREE_FUN __ATTR_UNUSED void
 ATREE_NOTHROW(ATREE_CALL ATREE(insert_at))(T **__restrict proot, T *__restrict newleaf,
                                            ATREE_SEMI_T(Tkey) addr_semi,
@@ -115,7 +115,7 @@ ATREE_NOTHROW(ATREE_CALL ATREE(pinsert_at))(T **__restrict proot, T *__restrict 
                                             ATREE_LEVEL_T *paddr_level);
 
 /* Returns the old '*proot' and replaces it with either its min, or max branch.
- * Special handling is performed to determine the perfect match when
+ * Special  handling  is  performed  to   determine  the  perfect  match   when
  * '*proot' has both a min and a max branch. */
 ATREE_FUN __ATTR_NONNULL((1)) __ATTR_UNUSED T *
 ATREE_NOTHROW(ATREE_CALL ATREE(pop_at))(T **__restrict proot,
@@ -136,7 +136,7 @@ ATREE_NOTHROW(ATREE_CALL ATREE(rremove_at))(T **__restrict proot,
 
 /* Locate the leaf associated with a given `key'.
  * @return: ATREE_NULL: No leaf associated with the given `key'.
- * NOTE: 'plocate_at' will update 'addr_semi' and 'addr_level'. */
+ * NOTE:  'plocate_at' will update 'addr_semi' and 'addr_level'. */
 ATREE_FUN __ATTR_UNUSED T *
 ATREE_NOTHROW(ATREE_CALL ATREE(locate_at))(T *root, Tkey key,
                                            ATREE_SEMI_T(Tkey) addr_semi,
@@ -148,7 +148,7 @@ ATREE_NOTHROW(ATREE_CALL ATREE(plocate_at))(T **__restrict proot, Tkey key,
 
 /* Locate the first leaf overlapping with the given range.
  * @return: ATREE_NULL: No leaf is overlapping with the given range.
- * NOTE: 'prlocate_at' will update 'addr_semi' and 'addr_level'. */
+ * NOTE:  'prlocate_at'  will update  'addr_semi'  and 'addr_level'. */
 ATREE_FUN __ATTR_UNUSED T *
 ATREE_NOTHROW(ATREE_CALL ATREE(rlocate_at))(T *root, Tkey key_min, Tkey key_max,
                                             ATREE_SEMI_T(Tkey) addr_semi,
@@ -305,16 +305,16 @@ got_it:
 		              ATREE_NODE_MIN(iter) >= addr_semi,
 		              "But that would mean we are overlapping...");
 #endif /* !ATREE_SINGLE */
-		/* Override a given branch with a new node.
-		 * This is a pretty complicated process, because we
+		/* Override  a  given   branch  with   a  new   node.
+		 * This  is a pretty  complicated process, because we
 		 * can't simply shift the entire tree down one level.
-		 * >> Some of the underlying branches may have been
+		 * >> Some  of the underlying branches may have been
 		 *    perfect fits before (aka. addr_semi-fits), yet
-		 *    if we were to shift them directly, they would
-		 *    reside in invalid and unexpected locations,
+		 *    if we were to shift them directly, they  would
+		 *    reside  in  invalid and  unexpected locations,
 		 *    causing the entire tree to break.
 		 * >> Instead we must recursively re-insert_at all
-		 *    underlying branches, even though that might
+		 *    underlying branches, even though that  might
 		 *    seem extremely inefficient. */
 		newleaf->N_NODEPATH.a_min = ATREE_NULL;
 		newleaf->N_NODEPATH.a_max = ATREE_NULL;
@@ -412,16 +412,16 @@ got_it:
 		              ATREE_NODE_MIN(iter) >= addr_semi,
 		              "But that would mean we are overlapping...");
 #endif /* !ATREE_SINGLE */
-		/* Override a given branch with a new node.
-		 * This is a pretty complicated process, because we
+		/* Override  a  given   branch  with   a  new   node.
+		 * This  is a pretty  complicated process, because we
 		 * can't simply shift the entire tree down one level.
-		 * >> Some of the underlying branches may have been
+		 * >> Some  of the underlying branches may have been
 		 *    perfect fits before (aka. addr_semi-fits), yet
-		 *    if we were to shift them directly, they would
-		 *    reside in invalid and unexpected locations,
+		 *    if we were to shift them directly, they  would
+		 *    reside  in  invalid and  unexpected locations,
 		 *    causing the entire tree to break.
 		 * >> Instead we must recursively re-insert_at all
-		 *    underlying branches, even though that might
+		 *    underlying branches, even though that  might
 		 *    seem extremely inefficient. */
 		newleaf->N_NODEPATH.a_min = ATREE_NULL;
 		newleaf->N_NODEPATH.a_max = ATREE_NULL;
@@ -521,16 +521,16 @@ got_it:
 		              ATREE_NODE_MIN(iter) >= *paddr_semi,
 		              "But that would mean we are overlapping...");
 #endif /* !ATREE_SINGLE */
-		/* Override a given branch with a new node.
-		 * This is a pretty complicated process, because we
+		/* Override  a  given   branch  with   a  new   node.
+		 * This  is a pretty  complicated process, because we
 		 * can't simply shift the entire tree down one level.
-		 * >> Some of the underlying branches may have been
+		 * >> Some  of the underlying branches may have been
 		 *    perfect fits before (aka. addr_semi-fits), yet
-		 *    if we were to shift them directly, they would
-		 *    reside in invalid and unexpected locations,
+		 *    if we were to shift them directly, they  would
+		 *    reside  in  invalid and  unexpected locations,
 		 *    causing the entire tree to break.
 		 * >> Instead we must recursively re-insert_at all
-		 *    underlying branches, even though that might
+		 *    underlying branches, even though that  might
 		 *    seem extremely inefficient. */
 		newleaf->N_NODEPATH.a_min = ATREE_NULL;
 		newleaf->N_NODEPATH.a_max = ATREE_NULL;
@@ -599,7 +599,7 @@ ATREE_IMP __ATTR_UNUSED T *
 ATREE_NOTHROW(ATREE_CALL ATREE(locate_at))(T *root, Tkey key,
                                            ATREE_SEMI_T(Tkey) addr_semi,
                                            ATREE_LEVEL_T addr_level) {
-	/* addr_semi is the center point splitting the max
+	/* addr_semi  is the center point splitting the max
 	 * ranges of the underlying sb_min/sb_max branches. */
 	while (root != ATREE_NULL) {
 #if ATREE_DEBUG
@@ -666,7 +666,7 @@ ATREE_NOTHROW(ATREE_CALL ATREE(plocate_at))(T **__restrict proot, Tkey key,
 	T *root;
 	ATREE_SEMI_T(Tkey) addr_semi = *paddr_semi;
 	ATREE_LEVEL_T addr_level = *paddr_level;
-	/* addr_semi is the center point splitting the max
+	/* addr_semi  is the center point splitting the max
 	 * ranges of the underlying sb_min/sb_max branches. */
 	while ((root = *proot) != ATREE_NULL) {
 #if ATREE_DEBUG
@@ -740,7 +740,7 @@ ATREE_IMP __ATTR_UNUSED T *
 ATREE_NOTHROW(ATREE_CALL ATREE(rlocate_at))(T *root, Tkey key_min, Tkey key_max,
                                             ATREE_SEMI_T(Tkey) addr_semi,
                                             ATREE_LEVEL_T addr_level) {
-	/* addr_semi is the center point splitting the max
+	/* addr_semi  is the center point splitting the max
 	 * ranges of the underlying sb_min/sb_max branches. */
 	while (root != ATREE_NULL) {
 #if ATREE_DEBUG
@@ -818,7 +818,7 @@ ATREE_NOTHROW(ATREE_CALL ATREE(prlocate_at))(T **__restrict proot, Tkey key_min,
 	T *root;
 	ATREE_SEMI_T(Tkey) addr_semi = *paddr_semi;
 	ATREE_LEVEL_T addr_level = *paddr_level;
-	/* addr_semi is the center point splitting the max
+	/* addr_semi  is the center point splitting the max
 	 * ranges of the underlying sb_min/sb_max branches. */
 	while ((root = *proot) != ATREE_NULL) {
 #if ATREE_DEBUG
@@ -922,7 +922,7 @@ again:
 	{
 		/* Found a matching entry!
 		 * NOTE: Since the caller already split branches
-		 *       near borders, we are allowed to simply
+		 *       near  borders, we are allowed to simply
 		 *       update this entire branch! */
 #ifdef ATREE_SINGLE
 		if ((result->mm_min == ATREE_NULL) || ATREE_NODE_ADDR(root) < result->mm_min_min) {
@@ -990,4 +990,3 @@ __DECL_END
 #undef T
 #undef Tkey
 #undef ATREE
-

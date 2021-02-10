@@ -79,10 +79,10 @@ struct json_parser {
 	char const  *jp_end;      /* Input data end */
 	char const  *jp_pos;      /* Current position within input data */
 	unsigned int jp_encoding; /* [valid_if(jp_pos > jp_start)] Input encoding (One of `JSON_ENCODING_*')
-	                           * The used encoding is automatically determined when parsing starts. */
-	/* NOTE: You may have noticed that this parser is stateless, that is: it doesn't keep
-	 *       track of a stack of object vs. array scopes, meaning that when any kind of
-	 *       scope is exited, the token used for this (whether it be `]' or `}') isn't
+	                           * The used  encoding is  automatically  determined when  parsing  starts. */
+	/* NOTE: You may have noticed that this parser  is stateless, that is: it doesn't  keep
+	 *       track  of a stack  of object vs. array  scopes, meaning that  when any kind of
+	 *       scope is exited,  the token used  for this (whether  it be `]'  or `}')  isn't
 	 *       actually taken into consideration, leading to the consequence that this parser
 	 *       may accept json that would normally be considered to be malformed:
 	 * >> {
@@ -92,10 +92,10 @@ struct json_parser {
 	 * >>         "type": "demo_type"
 	 * >>     ]
 	 * >> ]
-	 * As such, this is a known bug that can be considered as wont-fix, as doing so
-	 * would involve having to introduce a heap-based approach to keeping track of
-	 * active Json scopes, when the dependency on a heap wouldn't (and isn't) actually
-	 * a requirement for proper execution. (Not depending on a heap allows this library
+	 * As such, this  is a  known bug that  can be  considered as wont-fix,  as doing  so
+	 * would  involve  having to  introduce  a heap-based  approach  to keeping  track of
+	 * active Json scopes, when  the dependency on a  heap wouldn't (and isn't)  actually
+	 * a  requirement for proper execution. (Not depending  on a heap allows this library
 	 * to function entirely portable, as well as be entirely freestanding with absolutely
 	 * 0 hard ABI/library dependencies)
 	 * However, when using `json_decode()' for parsing json text, this problem doesn't
@@ -105,13 +105,13 @@ struct json_parser {
 };
 
 /* Initialize a json parser with the given piece of in-memory json.
- * NOTE: This function automatically detects the encoding (one of `JSON_ENCODING_*')
- *       of the given input, as specified by the Json specs, meaning you don't have
+ * NOTE: This function automatically detects  the encoding (one of  `JSON_ENCODING_*')
+ *       of the given input, as  specified by the Json  specs, meaning you don't  have
  *       to concern yourself with the details on how to supply input to this function.
  * @param: start: Pointer to the start of json input data (usually points to a c-string)
  * @param: end:   Pointer to the first byte past the end of json input data (usually equal
  *                to `strend(start)', though note that the input string doesn't need to be
- *                NUL-terminated. - Only bytes `x' with `x >= start && x < end' will ever
+ *                NUL-terminated. - Only bytes `x' with `x >= start && x < end' will  ever
  *                be accessed) */
 typedef __ATTR_NONNULL((1, 2, 3)) void
 (LIBJSON_CC *PJSON_PARSER_INIT)(struct json_parser *__restrict __self,
@@ -157,7 +157,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_rewind)(struct json_parser *__restrict __se
 
 /* Advance the parser to the next object member or array index
  * @return: JSON_ERROR_OK:    The parser now points at the first token after the `,'
- *                            following previous object memory/array index.
+ *                            following   previous   object   memory/array    index.
  *                            Should that token be a `}' or `]', `JSON_ERROR_NOOBJ'
  *                            will be returned instead.
  * @return: JSON_ERROR_NOOBJ: The end of the current object/array was reached.
@@ -174,12 +174,12 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_next)(struct json_parser *__restrict __self
  * @return: JSON_ERROR_OK:    The parser now points at the start of the previous object member/array index.
  * @return: JSON_ERROR_NOOBJ: The start of the current object/array was reached.
  *                            In this case, the position of the parser depends on `leave_object':
- *                            leave_object == true: The parser now points at either:
+ *                            `leave_object == true':  The   parser   now   points   at   either:
  *                               - The `{' or `[' token if the inner object/array was an array index
  *                               - The start of the member name `"foo":{...}' if the inner
  *                                 object/array was an object member
- *                            leave_object == false: The parser still points at the start of
- *                                                   the first member of the inner object/array.
+ *                            `leave_object == false': The  parser  still points  at the  start of
+ *                                                     the first member of the inner object/array.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 typedef __ATTR_NONNULL((1)) int
 (LIBJSON_CC *PJSON_PARSER_PREV)(struct json_parser *__restrict __self,
@@ -203,10 +203,10 @@ LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_entero
 LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_enterarray)(struct json_parser *__restrict __self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
-/* Skip the remainder of the current object/array and parse until after the following `,'
+/* Skip the remainder of the  current object/array and parse  until after the following  `,'
  * If that token doesn't exist, or is followed by another closing token, stop parsing there.
- * @return: JSON_ERROR_OK:  The parser now points at the first token after the `,'
- *                          following the previous object. - If that `,' does not exist,
+ * @return: JSON_ERROR_OK:  The  parser  now  points at  the  first token  after  the `,'
+ *                          following  the previous object. - If that `,' does not exist,
  *                          the parser exists at the `}' or `]' that is taking its place.
  * @return: JSON_ERROR_EOF: The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
@@ -233,7 +233,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_state)(struct json_parser *__restrict __sel
 
 /* Search for the given key within the current object.
  * The given key is searched in both forward, and backward direction, starting
- * at the current parser location. - If the key exists multiple times, it is
+ * at the current parser location. - If  the key exists multiple times, it  is
  * undefined which of these locations will be referenced upon return.
  * @return: JSON_ERROR_OK:     The parser now points after the `:' following the matching key's name.
  * @return: JSON_ERROR_NOOBJ:  The given `key' wasn't found (The position of `self' remains unchanged)
@@ -249,15 +249,15 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_findkey)(struct json_parser *__restrict __s
                                               __size_t __keylen);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
-/* Goto the `index'th' array element before returning `JSON_ERROR_OK'
+/* Goto  the  `index'th'  array element  before  returning `JSON_ERROR_OK'
  * The parser is rewound to the start of the current array before skipping
  * exactly `index' elements, thus causing that element to end up selected.
- * NOTE: If the intend is to enumerate array elements, it is more efficient
+ * NOTE: If  the intend is  to enumerate array elements,  it is more efficient
  *       to rewind to the start of the array with `json_parser_rewind()', then
  *       proceeding to use `json_parser_next()' to iterate elements.
- * @return: JSON_ERROR_OK:    The parser was now advanced to the `index'th array element.
+ * @return: JSON_ERROR_OK:    The parser was now advanced  to the `index'th array  element.
  *                            In this case, the parser points at the start of that element.
- * @return: JSON_ERROR_NOOBJ: The end of the array has been reached before, or when `index'
+ * @return: JSON_ERROR_NOOBJ: The end  of  the array  has  been  reached before,  or  when  `index'
  *                            elements had been skipped. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 typedef __ATTR_NONNULL((1)) int
@@ -270,7 +270,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_findindex)(struct json_parser *__restrict _
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Check if the current parser token (which should be a string) is equal to `str'
- * @return: JSON_ERROR_OK:     The previous token is was a string that was equal to `str'
+ * @return: JSON_ERROR_OK:     The  previous  token  is  was  a   string  that  was  equal  to   `str'
  *                             In this case the parser now points at the first token after the string.
  * @return: JSON_ERROR_NOTEQ:  The string isn't equal to `str'.
  *                             In this case the parser now points at the first token after the string.
@@ -288,14 +288,14 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_eqstring)(struct json_parser *__restrict __
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Parse a Json string and print its contents to `printer'
- * @return: JSON_ERROR_OK:     Success. - The sum of all calls to `*printer' is stored in `*pprinter_result'
+ * @return: JSON_ERROR_OK:     Success. - The sum  of all calls to  `*printer' is stored in  `*pprinter_result'
  *                             In this case the parser points at the first token after an optional trailing `,'
  *                             NOTE: Should the token following the string be a `:', the parser will point at
  *                                   that location instead.
- * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a string token.
+ * @return: JSON_ERROR_NOOBJ:  The  parser  didn't  point at  a  string token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYSERR: An invocation of `printer' returned a negative value (stored in `*pprinter_result').
- *                             In this case the position of the parser is revered to the start of the string.
+ *                             In this case  the position  of the parser  is revered  to the start  of the  string.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 typedef __ATTR_NONNULL((1, 2, 4)) int
 (LIBJSON_CC *PJSON_PARSER_PRINTSTRING)(struct json_parser *__restrict __self,
@@ -309,13 +309,13 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_printstring)(struct json_parser *__restrict
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* A somewhat hacky variant of `libjson_parser_printstring()', which replaces the source
- * string in-line (thus modifying the source string) with its utf-8 encoded variant.
+ * string  in-line (thus  modifying the source  string) with its  utf-8 encoded variant.
  * This is done by re-encoding the string using a special extension syntax token that is
- * specifically designed to be able to hold a NUL-terminated utf-8 string token:
+ * specifically designed  to  be able  to  hold  a NUL-terminated  utf-8  string  token:
  * BEFORE:  \"foo\\nbar\"
  * AFTER:   \0foo\nbar\0\0
  * NOTE: If the source input uses a multi-byte format, the leading \0's width matches
- *       that format's width, while the remainder of the string always follows UTF-8
+ *       that format's width, while the remainder of the string always follows  UTF-8
  * NOTE: Another special encoding also exists for an empty string:
  * BEFORE:  \"\"
  * AFTER:   \1\1 -- Additional \1 characters may follow
@@ -337,11 +337,11 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_getstring)(struct json_parser *__restrict _
 /* Decode a Json number and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The number is stored in `*presult'
  *                             In this case the parser points at the first token after the number
- * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
+ * @return: JSON_ERROR_NOOBJ:  The  parser  didn't  point at  a  number token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_RANGE:  The encoded value does not fit into the given type.
- *                             NOTE: Not returned by `json_parser_getfloat()'!
+ *                             NOTE:  Not  returned  by  `json_parser_getfloat()'!
  *                             In this case `*presult' is filled with the truncated
  *                             integer value, and the parser points at the first token after the number */
 typedef __ATTR_NONNULL((1, 2)) int
@@ -378,7 +378,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_getfloat)(struct json_parser *__restrict __
 /* Decode a Json boolean and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The value is stored in `*presult'
  *                             In this case the parser points at the first token after an optional trailing `,'
- * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a true/false token.
+ * @return: JSON_ERROR_NOOBJ:  The  parser didn't point at a true/false token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 typedef __ATTR_NONNULL((1, 2)) int
@@ -393,7 +393,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_getbool)(struct json_parser *__restrict __s
 /* Decode a Json null-value
  * @return: JSON_ERROR_OK:     Success.
  *                             In this case the parser points at the first token after an optional trailing `,'
- * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a `null' token.
+ * @return: JSON_ERROR_NOOBJ:  The  parser  didn't  point at  a  `null' token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 typedef __ATTR_NONNULL((1)) int

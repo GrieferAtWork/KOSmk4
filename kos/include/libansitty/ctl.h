@@ -54,7 +54,7 @@
 #endif /* !ANSITTY_CL_LIGHT_GRAY */
 
 
-/* Helper macros for constructors ANSITTY control sequences
+/* Helper  macros  for  constructors  ANSITTY  control  sequences
  * All of these strings are pre-fixed by `AC_*' (AnsiControl_xxx)
  * Example:
  * >> printf("a" AC_CUF("%d") "b\n", 7);
@@ -412,7 +412,7 @@
 #define AC_DEFCOLOR _AC_SGR("39;49")
 
 /* Helper macros for displaying some given text in some custom
- * color, before reverting the default color afterwards. */
+ * color,  before  reverting  the  default  color  afterwards. */
 #define AC_WITHCOLOR(fg, bg, text) AC_COLOR(fg, bg) text AC_DEFCOLOR
 #define AC_WITHFG(color, text)     AC_FG(color) text AC_FGDEF
 #define AC_WITHBG(color, text)     AC_BG(color) text AC_BGDEF

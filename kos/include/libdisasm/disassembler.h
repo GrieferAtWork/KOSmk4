@@ -49,10 +49,10 @@ enum {
 #define DISASSEMBLER_TARGET_I386    DISASSEMBLER_TARGET_I386    /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
 #define DISASSEMBLER_TARGET_X86_64  DISASSEMBLER_TARGET_X86_64  /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define DISASSEMBLER_TARGET_UNKNOWN 0x0000 /* Unknown target */
-#define DISASSEMBLER_TARGET_8086    0x8086 /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_I386    0x0386 /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_X86_64  0x8664 /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_UNKNOWN 0     /* Unknown target */
+#define DISASSEMBLER_TARGET_8086    32902 /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_I386    902   /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_X86_64  34404 /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -75,15 +75,15 @@ __DECL_BEGIN
 
 struct disassembler;
 
-/* Optional user-callback for printing the name/address of a symbol.
- * Used to print the operands of instructions taking text pointers as
+/* Optional user-callback  for  printing  the name/address  of  a  symbol.
+ * Used to  print the  operands of  instructions taking  text pointers  as
  * operands and (if provided) may be used to print the name of the nearest
  * symbol, as well as the offset from that symbol (if non-zero).
  * @param: self:        The associated disassembler.
  * @param: symbol_addr: The absolute address of the symbol (already offset by `d_baseoff')
- * @return: * :         The sum of return values from calls to `self->d_printer',
- *                      or a negative value if an error occurred while printing,
- *                      or alternatively `0' in case `disasm_print()' and friends
+ * @return: * :         The sum of return  values from calls to  `self->d_printer',
+ *                      or a negative  value if an  error occurred while  printing,
+ *                      or  alternatively `0' in  case `disasm_print()' and friends
  *                      were used to print output, rather than the printer callback
  *                      itself directly. */
 typedef __ATTR_NONNULL((1)) __ssize_t
@@ -96,16 +96,16 @@ struct disassembler {
 	__pformatprinter       d_printer;  /* [1..1][const] The printer used to output disassembly text. */
 	void                  *d_arg;      /* [const] Argument passed to `d_printer'. */
 	__ssize_t              d_result;   /* Sum of all calls to `d_printer' (When negative, don't print anymore) */
-	diasm_symbol_printer_t d_symbol;   /* [0..1][const] An optional callback for printing symbol names.
+	diasm_symbol_printer_t d_symbol;   /* [0..1][const]  An optional callback  for printing symbol names.
 	                                    * When `NULL', the library will try to make use of `dladdr()' for
-	                                    * the same purpose, but will default to printing symbol operands
+	                                    * the same purpose, but will default to printing symbol  operands
 	                                    * as the ordinal value of their absolute address. */
 	diasm_print_format_t   d_format;   /* [0..1][const] An optional callback for inserting format strings. */
 	__UINTPTR_HALF_TYPE__  d_target;   /* Disassembler target (One of `DISASSEMBLER_TARGET_*'). */
 	__UINTPTR_HALF_TYPE__  d_flags;    /* Disassembler flags (Set of `DISASSEMBLER_F*'). */
-	__UINTPTR_HALF_TYPE__  d_maxbytes; /* The max number of instruction bytes to output onto a single line.
+	__UINTPTR_HALF_TYPE__  d_maxbytes; /* The max number of instruction bytes to output onto a single  line.
 	                                    * When ZERO(0), use a target-specific default value, but ignore this
-	                                    * option completely when the `DISASSEMBLER_FNOBYTES' flag was set,
+	                                    * option  completely when the  `DISASSEMBLER_FNOBYTES' flag was set,
 	                                    * in which case instruction bytes aren't printed at all. */
 	__UINTPTR_HALF_TYPE__  d_pad0;      /* ... */
 	void                  *d_pad1[4];   /* ... */
@@ -241,7 +241,7 @@ disasm_print_until(struct disassembler *__restrict self,
                    void const *endpc);
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
-/* Disassemble a single instruction line, following formatting rules specified
+/* Disassemble a single  instruction line, following  formatting rules  specified
  * by `DISASSEMBLER_F*', potentially printing multiple lines of the instruction's
  * bytes don't all fit into a single line (s.a. `').
  * @return: * : The sum of all printer callbacks ever executed with `self'
@@ -262,7 +262,7 @@ disasm_print_line_nolf(struct disassembler *__restrict self);
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
 /* Disassemble a single instruction, including its mnemonic, and all operands.
- * This function does not include any prefix, nor does it append a trailing.
+ * This  function does not include any prefix,  nor does it append a trailing.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 typedef __ATTR_NONNULL((1)) __ssize_t
@@ -301,7 +301,7 @@ disasm_default_maxbytes(__UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_C
 #ifndef __INTELLISENSE__
 
 /* Fix cyclic dependency when the local implementation of `format_vprintf'
- * includes this header in order to provide support for `%[disasm]' */
+ * includes this  header  in  order to  provide  support  for  `%[disasm]' */
 #ifdef __local_format_vprintf_defined
 __NAMESPACE_LOCAL_BEGIN /* Forward-definition. */
 __LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3, 4)) __SSIZE_TYPE__

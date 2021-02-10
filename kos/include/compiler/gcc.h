@@ -230,7 +230,7 @@
 #if defined(__clang__) || !defined(__DARWIN_NO_LONG_LONG)
 #define __COMPILER_HAVE_LONGLONG
 #endif /* __clang__ || !__DARWIN_NO_LONG_LONG */
-/* For whatever reason, g++ refuses to allow trivially
+/* For   whatever  reason,  g++  refuses  to  allow  trivially
  * constructible+copyable+etc. classes within unnamed structs:
  *     https://stackoverflow.com/questions/39069799/rules-for-anonymous-aggregates
  * So be careful when using them, and use `__COMPILER_HAVE_TRANSPARENT_NONCLASS'
@@ -597,7 +597,7 @@
 #define __ATTR_VISIBILITY(vis)    __attribute__((__visibility__(vis)))
 
 /* Same as the *_P-less variants, however these should be used for function
- * typedefs, since some compilers don't allow these kinds of attributes on
+ * typedefs,  since some compilers don't allow these kinds of attributes on
  * those. */
 #define __ATTR_LEAF_P   __ATTR_LEAF
 #define __ATTR_PURE_P   __ATTR_PURE
@@ -715,12 +715,12 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #ifndef __LONGLONG
 #ifdef __CC__
 /* If long-long is fully supported without the need for __extension__,
- * then simply define __[U]LONGLONG as macros, rather than typedefs,
+ * then simply define __[U]LONGLONG  as macros, rather than  typedefs,
  * since the later seems to unconditionally create a DIE (debug-info),
- * which would cause debug info to be bloated for _every_ source file
+ * which would cause debug info to be bloated for _every_ source  file
  * unconditionally...
  * Ugh... I should have never looked at what actually ends up inside
- *        of gcc debug info. - Sooooo much unnecessary bloat! */
+ *        of gcc  debug  info.  -  Sooooo  much  unnecessary  bloat! */
 #if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L)
 #define __LONGLONG  long long
 #define __ULONGLONG unsigned long long
@@ -858,9 +858,9 @@ __extension__ typedef unsigned long long __ulonglong_t;
 /* Compiler has the gcc-ncx-builtin bug:
  * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96985
  *
- * As work-around, libc functions that gcc/g++ considers to be nothrow/noexcept
+ * As  work-around,  libc functions  that  gcc/g++ considers  to  be nothrow/noexcept
  * must be declared with extern "C++" linkage when compiling with non-call-exceptions
- * enabled, else the compiler will believe them to be unable to throw exceptions,
+ * enabled, else the  compiler will believe  them to be  unable to throw  exceptions,
  * when in actuality they are _very_ _much_ able to do exactly that! */
 #define __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 #endif /* !__INTELLISENSE__ */
@@ -873,7 +873,7 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 
 /* `__builtin_types_compatible_p()' isn't consistently defined by g++.
- * So to prevent problems with that, simply re-implement it using a
+ * So  to prevent problems  with that, simply  re-implement it using a
  * macro alongside C++ templates. */
 extern "C++" {
 namespace __intern {
@@ -891,5 +891,3 @@ template<class __T1, class __T2> struct __gcc_types_compatible:
 #undef __builtin_types_compatible_p
 #define __builtin_types_compatible_p(...) (::__intern::__gcc_types_compatible< __VA_ARGS__ >::__val)
 #endif /* __cplusplus */
-
-

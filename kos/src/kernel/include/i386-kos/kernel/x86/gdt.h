@@ -73,13 +73,13 @@ LOCAL void KCALL set_user_fsbase(uintptr_t value) {
 }
 
 LOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
-	/* We must read the KERNEL_GS_BASE MSR here, as it
+	/* We must  read the  KERNEL_GS_BASE MSR  here, as  it
 	 * currently contains the effective user-space GS-base */
 	return (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE);
 }
 
 LOCAL void KCALL set_user_gsbase(uintptr_t value) {
-	/* We must write the KERNEL_GS_BASE MSR here, as it
+	/* We must write  the KERNEL_GS_BASE MSR  here, as  it
 	 * currently contains the effective user-space GS-base */
 	__wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)value);
 }
@@ -94,7 +94,7 @@ LOCAL void KCALL update_user_gsbase(void) {
 
 #else /* __x86_64__ */
 
-/* The per-task values with which the `SEGMENT_USER_FSBASE' and
+/* The  per-task values with which the `SEGMENT_USER_FSBASE' and
  * `SEGMENT_USER_GSBASE' segments are populated during scheduler
  * preemption. */
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_fsbase;

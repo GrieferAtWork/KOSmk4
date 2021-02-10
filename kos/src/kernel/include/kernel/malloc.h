@@ -40,11 +40,11 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL slab_free)(void *__restrict ptr);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags);
 
 /* Allocate slab memory for fixed sizes.
- * If the allocation is impossible (as can happen when no free
- * slab pages are available, and mapping more is either impossible
+ * If  the  allocation  is  impossible  (as  can  happen  when  no  free
+ * slab  pages  are available,  and  mapping more  is  either impossible
  * due to a VM collision, or due to insufficient memory), return `NULL'.
  * In the later case, the caller should fall back to using kmalloc(), or
- * simply call the equivalent `slab_kmalloc*' function, with will do so
+ * simply call the equivalent `slab_kmalloc*' function, with will do  so
  * automatically. */
 #define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)                                                 \
 	FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_malloc##sz)(gfp_t flags); \
@@ -361,13 +361,13 @@ NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 #ifdef __CC__
 
 /* Trace a given address range `base...+=num_bytes' for the purposes
- * of having that range checked during GC memory leak detection.
+ * of  having that  range checked  during GC  memory leak detection.
  * @param: base:      Base-address of the range that should be traced. If not aligned
  *                    by at least `sizeof(void *)', the actual range that will end up
- *                    being traced will be truncated to start at the next properly
+ *                    being  traced will be  truncated to start  at the next properly
  *                    aligned location.
  * @param: num_bytes: The # of bytes to trace. If not aligned by at least `sizeof(void *)',
- *                    the actual range being traced will be truncated to end at the next
+ *                    the actual range being  traced will be truncated  to end at the  next
  *                    lower, and properly aligned location.
  * @param: gfp:       Set of:
  *                     - GFP_NOLEAK:  Don't consider this range as a leak if it can't be reached
@@ -380,29 +380,29 @@ kmalloc_trace(void *base, size_t num_bytes, gfp_t gfp, unsigned int tb_skip DFL(
 	THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `kmalloc_trace()', but don't throw an exception. If the operation fails,
- * rather than re-returning `base', `NULL' will be returned instead. */
+ * rather  than   re-returning   `base',   `NULL'   will   be   returned   instead. */
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
                                 gfp_t gfp, unsigned int tb_skip DFL(0));
 
 /* Find the trace-block that `ptr' is apart of and remove it.
- * If no such block exists, the kernel will panic.
- * For this purpose, `CEIL_ALIGN(ptr, sizeof(void *))' must
- * point somewhere into an address range that has previously
+ * If  no  such   block  exists,  the   kernel  will   panic.
+ * For this  purpose, `CEIL_ALIGN(ptr, sizeof(void *))'  must
+ * point somewhere into an address range that has  previously
  * been registered by `kmalloc_trace()'.
  * NOTE: When `ptr' is `NULL', then this function does nothing. */
 FUNDEF NOBLOCK void
 NOTHROW(KCALL kmalloc_untrace)(void *ptr);
 
 /* Similar to `kmalloc_untrace()', but explicitly untrace only the given address range.
- * Just like `kmalloc_trace()', this function will truncate the given address range
+ * Just like `kmalloc_trace()',  this function  will truncate the  given address  range
  * to have it start/end at a pointer-aligned byte boundary.
- * This function will then try to truncate the internal descriptor(s) used for the given
+ * This function will then try  to truncate the internal  descriptor(s) used for the  given
  * address range (which is allowed to span multiple prior invocations of `kmalloc_trace()',
- * so-long as no gaps exist between individually traced ranges), and if this fails (which
- * can happen when this function would have to carve out a chunk from the middle of some
- * pre-existing trace-node), that node will be changed such that the given range is marked
- * as untraced, which will prevent the kernel from accessing its contents during GC scans.
+ * so-long as no gaps exist between individually  traced ranges), and if this fails  (which
+ * can happen when this function would  have to carve out a  chunk from the middle of  some
+ * pre-existing  trace-node), that node will be changed such that the given range is marked
+ * as  untraced, which will prevent the kernel from accessing its contents during GC scans.
  * In practice though, you shouldn't need to concern yourself with this behavior. */
 FUNDEF NOBLOCK void
 NOTHROW(KCALL kmalloc_untrace_n)(void *base, size_t num_bytes);
@@ -414,20 +414,20 @@ NOTHROW(KCALL kmalloc_untrace)(void *base, size_t num_bytes) ASMNAME("kmalloc_un
 } /* extern "C++" */
 #endif /* __cplusplus */
 
-/* Return the traceback stored inside of the debug descriptor of `ptr'.
- * When `ptr' is `NULL', or debug-malloc is disabled, then this function
+/* Return the  traceback stored  inside of  the debug  descriptor of  `ptr'.
+ * When `ptr' is  `NULL', or  debug-malloc is disabled,  then this  function
  * will simply return with `0'. Otherwise, `CEIL_ALIGN(ptr, sizeof(void *))'
- * must point into a currently traced data-block, and if it doesn't, then
+ * must  point into a  currently traced data-block, and  if it doesn't, then
  * this function will trigger a kernel panic. (unless the kernel has already
  * been poisoned, in which case it'll simply return `0')
  * When `ptr' is a SLAB-pointer, this function will also always return `0'
  * @param: tb:     Buffer to-be filled with traceback PC-locations pointer.
  * @param: buflen: Available buffer length in `tb' (# of allocated entries; not bytes)
- * @param: p_alloc_roottid: When non-NULL, store the root-namespace TID of the thread
+ * @param: p_alloc_roottid: When non-NULL, store  the root-namespace TID  of the  thread
  *                          that originally allocated the block of `ptr' (when allocated
  *                          by a kernel thread, TID=0 will be returned)
  * @return: * :    The total number of traceback PC-locations available for `ptr'
- *                 When `> buflen', not all locations were written to `*tb', and
+ *                 When `> buflen', not all locations were written to `*tb',  and
  *                 the caller should re-attempt the call with more space. */
 FUNDEF NOBLOCK size_t
 NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
@@ -437,13 +437,13 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
  * been modified (which can accidentally happen as the result of programming
  * errors, such as array over-/under-runs)
  * If inconsistencies are found, the kernel will panic.
- * s.a. `heap_validate()' and `heap_validate_all()' */
+ * s.a.  `heap_validate()'  and   `heap_validate_all()' */
 FUNDEF NOBLOCK void NOTHROW(KCALL kmalloc_validate)(void);
 
 /* Search for leaked heap memory, dump them to the system log, and return the
  * total number of leaked blocks.
  * Note that to do what it does, this function has to temporarily elevate the
- * calling thread to super-override status (s.a. <sched/scheduler.h>)
+ * calling  thread  to   super-override  status  (s.a.   <sched/scheduler.h>)
  * This function is the combination of:
  *     kmalloc_leaks_collect() +
  *     kmalloc_leaks_print(printer: &syslog_printer, arg: SYSLOG_LEVEL_RAW) +

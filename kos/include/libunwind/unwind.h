@@ -32,8 +32,8 @@
 #include "cfi.h"
 #include "eh_frame.h"
 
-/* High-level API functions for (optionally cached) queries
- * on FDE descriptors associated with arbitrary addresses.
+/* High-level  API   functions   for   (optionally   cached)   queries
+ * on   FDE   descriptors   associated   with   arbitrary   addresses.
  * NOTE: The internally kept FDE cache is cleared by `dlclearcaches()'
  */
 
@@ -73,11 +73,11 @@ typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
 
 
 
-/* Lookup FDE information associated with a given program counter position.
+/* Lookup FDE information  associated with a  given program counter  position.
  * Using integration with KOS's DL extension APIs, this function automatically
- * accesses the `.eh_frame' sections of the module associated with the given
- * address, as well as keep track of a lazily allocated address-tree of FDE
- * caches for quick (O(1)) repeated access to an FDE located within a known
+ * accesses the `.eh_frame' sections of  the module associated with the  given
+ * address, as well as  keep track of a  lazily allocated address-tree of  FDE
+ * caches for quick (O(1))  repeated access to an  FDE located within a  known
  * function. */
 typedef __ATTR_NONNULL((2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_FIND)(void const *__absolute_pc,
@@ -90,10 +90,10 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void const *__absolute_pc,
 
 
 /* Top-level function for unwinding the specific register state, automatically
- * locating the associated FDE entry, before using it to unwind the specified
+ * locating the associated FDE entry, before using it to unwind the  specified
  * register state.
  * NOTE: The given `ABSOLUTE_PC' should point _to_ or _into_ the instruction that
- *       should be unwound; Not after it. - i.e. range checking is done as:
+ *       should be  unwound; Not  after it.  - i.e.  range checking  is done  as:
  *       `ABSOLUTE_PC >= start && ABSOLUTE_PC < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL((2, 4)) unsigned int

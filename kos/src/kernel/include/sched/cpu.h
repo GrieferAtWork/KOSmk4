@@ -39,30 +39,30 @@ DECL_BEGIN
 /* NOTE: When talking about a CPU having `work left to be done', what is meant one of these:
  *  - The CPU is hosting at least 1 thread (that isn't its IDLE thread)
  *    as part of the active chain of running tasks.
- *  - The CPU is hosting at least 1 thread with the KEEPCORE flag set, regardless
+ *  - The CPU is hosting at least 1  thread with the KEEPCORE flag set,  regardless
  *    of which state that thread may be in (may the thread be sleeping, or running) */
 
 #define CPU_STATE_DREAMING       0x0000 /* The CPU is fast asleep
                                          *  - Only used by secondary cores
                                          *  - Preemptive interrupts are disabled
-                                         *  - Outside interrupts are not responded to, except
+                                         *  - Outside interrupts  are not  responded to,  except
                                          *    for when running on the boot CPU, where Preemption
                                          *    will remain enabled when `__hlt()' is called. */
 #define CPU_STATE_FALLING_ASLEEP 0x0001 /* The CPU is currently falling asleep.
-                                         *  - Preemption is disabled, but `cpu_deepwake()'
+                                         *  - Preemption  is   disabled,  but   `cpu_deepwake()'
                                          *    should not stop the CPU before it has fully fallen
-                                         *    asleep, or has woken up again after noticing that
+                                         *    asleep, or has woken up again after noticing  that
                                          *    there is still work left to be done.
                                          *  - This is a transitional state used to describe an
-                                         *    idling CPU that is currently checking if it is
+                                         *    idling CPU that is  currently checking if it  is
                                          *    allowed to fall asleep.
                                          *  - During this state, preemptive interrupts are disabled,
-                                         *    alongside other CPU-specific machinery being turned
+                                         *    alongside  other  CPU-specific machinery  being turned
                                          *    off in order to save power. */
 #define CPU_STATE_RUNNING        0x0002 /* The CPU is fully up and running, hosting any number of threads. */
 #define CPU_STATE_GETTING_UP     0x0003 /* An INIT IPI is being / has been send to the CPU, and the
-                                         * core is currently in the process of startup up.
-                                         * This state is transitioned to `CPU_STATE_RUNNING' at the end of
+                                         * core  is  currently  in  the  process  of  startup   up.
+                                         * This state is transitioned to `CPU_STATE_RUNNING' at the end  of
                                          * the internal CPU initialization phase (the i386 variant of which
                                          * is implemented in `arch/i386/sched/smp32.S') */
 
@@ -78,8 +78,8 @@ struct cpu {
 #endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0 */
 #ifndef CONFIG_NO_SMP
 	WEAK pagedir_phys_t c_pdir; /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
-	                             * The currently used page directory. When `vm_sync()' is called,
-	                             * this field is checked for all configured CPUs, and if equal to
+	                             * The currently used  page directory. When  `vm_sync()' is  called,
+	                             * this  field is checked  for all configured CPUs,  and if equal to
 	                             * the VM that is being synced, our CPU will receive an IPI, telling
 	                             * us that we need to (possibly partially) invalidate our VM caches.
 	                             * s.a. `vm_sync()', `pagedir_sync_smp_p()', `pagedir_sync()' */
@@ -92,13 +92,13 @@ struct cpu {
 #define __realtime_defined 1
 /* Returns the current real time derived from the current CPU time.
  * WARNING: KOS only gives a best-effort guaranty for this function
- *          in terms of consistency when it comes to the calling
+ *          in terms of  consistency when it  comes to the  calling
  *          thread being moved to a different CPU.
  *          There is a chance that minor inconsistencies in terms
  *          of exact nano-second values returned by this function
  *          when the calling thread is moved.
- * However, it is guarantied that (so long as `settimeofday()' isn't
- * called), calling this function repeatedly from the threads hosted
+ * However, it is guarantied that (so long as `settimeofday()'  isn't
+ * called), calling this function repeatedly from the threads  hosted
  * by the same CPU will _always_ return values such that later values
  * are >= earlier values. */
 FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
@@ -110,9 +110,9 @@ DATDEF unsigned int const cpu_count;
 #ifndef CONFIG_NO_SMP
 /* Number of CPUs with a state set to `CPU_STATE_RUNNING'
  * This value is incremented when a cpu changes state to `CPU_STATE_RUNNING'
- * as the result of a call to `cpu_wake()' when an INIT IPI is used, and is
- * decremented when a cpu changes state to `CPU_STATE_DREAMING'.
- * Because the BOOT CPU can never dream, this value is always `>= 1'! */
+ * as  the result of a call to `cpu_wake()' when an INIT IPI is used, and is
+ * decremented   when   a   cpu  changes   state   to  `CPU_STATE_DREAMING'.
+ * Because  the  BOOT CPU  can  never dream,  this  value is  always `>= 1'! */
 DATDEF unsigned int cpu_online_count;
 #else /* !CONFIG_NO_SMP */
 #define cpu_online_count 1
@@ -251,19 +251,19 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 #define cpu_setmman(current_mm) cpu_setmman_ex(THIS_CPU, current_mm)
 
 /* Return the set of CPUs that are currently mapped to make use of `self'
- * Note that the returned set of CPUs is only a (possibly inconsistent)
+ * Note that the returned set of  CPUs is only a (possibly  inconsistent)
  * snapshot, with the only guaranties being that:
  *   - If a CPU is apart of the returned cpuset, that CPU has at one point
  *     made use of the given page directory `self'.
- *   - If a CPU is not apart of the returned cpuset, that CPU may have since
+ *   - If  a CPU is  not apart of the  returned cpuset, that  CPU may have since
  *     switched its pdir to the given one. Note however that during this switch,
- *     additional things may have also happened, such as the CPU invaliding
- *     its TLB cache (where is function is meant to be used to calculate the
- *     bounding set of CPUs that (may) need to have their page directories
+ *     additional things  may have  also happened,  such as  the CPU  invaliding
+ *     its TLB cache (where  is function is  meant to be  used to calculate  the
+ *     bounding  set  of CPUs  that (may)  need to  have their  page directories
  *     invalidated)
  * WARNING: This function does not include special handling for when `self'
- *          is the kernel VM. In this case, the caller must implement a
- *          dedicated code-path that behaves as though this function had
+ *          is  the kernel  VM. In this  case, the caller  must implement a
+ *          dedicated code-path that  behaves as though  this function  had
  *          returned a completely filled cpuset. */
 #if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
 FUNDEF NOBLOCK NONNULL((2)) void
@@ -295,7 +295,7 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 
 
 /* Enter deep-sleep mode on the given CPU.
- * In deep-sleep mode, no interrupts are fired and no code is executed.
+ * In deep-sleep mode, no interrupts are  fired and no code is  executed.
  * Essentially, the CPU is offline, and can only be re-enabled by another
  * core calling `cpu_deepwake()' on the core.
  * NOTES:
@@ -303,23 +303,23 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
  *    - When called, it is checked if there are other running tasks.
  *      If there are, simply switch to the next one.
  *      If there are none that can continue execution, `__hlt()', but
- *      don't disable preemption, thus checking again periodically.
- *      If there are none at all, disable preemptive interrupts, as
- *      well as other hardware-specific machinery to reduce power
+ *      don't disable preemption,  thus checking again  periodically.
+ *      If there are none at  all, disable preemptive interrupts,  as
+ *      well  as  other hardware-specific  machinery to  reduce power
  *      consumption, before entering deep-sleep mode.
  *    - The BOOT cpu cannot be shut down in this manner, as it is
  *      responsible for handling interrupts.
- *      When called by the BOOT cpu's IDLE thread, the function will
- *      instead check if other threads should be run, before disabling
+ *      When  called  by the  BOOT cpu's  IDLE  thread, the  function will
+ *      instead  check if  other threads  should be  run, before disabling
  *      preemptive interrupts and waiting for the next hardware interrupt,
- *      in the mean time tracking how much time has passed before then in
- *      order to update the global jiffies counter (which is identical to
+ *      in the mean time tracking how much time has passed before then  in
+ *      order  to update the global jiffies counter (which is identical to
  *      the counter of the boot CPU)
- *      After a hardware interrupt occurred, the process is repeated, in
+ *      After a hardware interrupt occurred,  the process is repeated,  in
  *      that the function will check for new tasks that may have shown up.
  *    - This function returns once DEEP-SLEEP ends, and the IDLE task should
- *      execute again for the first time since the last DEEP-SLEEP.
- *      For this purpose, the CPU can be woken by a call to `cpu_wake()'
+ *      execute  again  for  the  first  time  since  the  last  DEEP-SLEEP.
+ *      For this purpose,  the CPU can  be woken by  a call to  `cpu_wake()'
  * Implementation-wise, this function will:
  *   #1 Disable preemption
  *   #2 Transition from `CPU_STATE_RUNNING' to `CPU_STATE_FALLING_ASLEEP'
@@ -328,15 +328,15 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
  *   #4 Serve all pending IPI callbacks (s.a. `cpu_sendipi()')
  *#endif
  *   #5 Check for other running tasks
- *      #5.1 If there are some, unschedule the IDLE thread and yield to the first
+ *      #5.1 If there are some, unschedule the IDLE thread and yield to the  first
  *           In this case, this function will return the next time the IDLE thread
  *           will get re-scheduled.
  *   #6 Check for sleeping tasks with the KEEPCORE flag
  *      #6.1 If there are any, re-enable preemption and wait for the next
- *           preemptive interrupt before going back to step #1
- *   #7 Disable preemptive interrupts on secondary cores,
+ *           preemptive   interrupt   before  going   back  to   step  #1
+ *   #7 Disable preemptive interrupts on secondary  cores,
  *      or the boot core if no secondary cores are online.
- *   #8 Hand over all tasks still hosted by the CPU to another one (with the
+ *   #8 Hand over all  tasks still  hosted by  the CPU  to another  one (with  the
  *      fallback hand-over target being the boot-cpu, as it can never fall asleep)
  *   #9 Disable other per-cpu hardware components to save power
  *  --- Secondary cores:
@@ -346,41 +346,41 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
  *   #10 Halt execution until the next interrupt.
  *   #11 Disable preemption
  *   #12 Re-enable per-cpu hardware components disabled in step #9
- *   #13 If disabled in step #7, re-enable preemptive interrupts
+ *   #13 If disabled in  step #7, re-enable preemptive  interrupts
  *   #14 Got back to step #2
  */
 FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
 
 #ifndef CONFIG_NO_SMP
 /* MUST ONLY BE CALLED FROM AN IDLE TASK!
- * This function does the following:
+ * This  function  does  the   following:
  * >> FORCPU(me, thiscpu_idle).t_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
  * >> ATOMIC_WRITE(caller->c_state, CPU_STATE_DREAMING);
  * >> PREEMPTION_DEEPHALT();
  * NOTE: Do not call this function directly. - Use `cpu_deepsleep()' instead,
- *       and even then: Only call that function from an IDLE task.
+ *       and   even  then:  Only  call  that  function  from  an  IDLE  task.
  * NOTE: When this function returns, preemption will have been re-enabled
- *       as the result of another CPU calling `cpu_wake()' on `caller'
- * NOTE: This function must not be called by the BOOT CPU!
+ *       as the result  of another CPU  calling `cpu_wake()' on  `caller'
+ * NOTE:  This  function  must  not  be  called  by  the  BOOT CPU!
  * With this, it is the arch-dependent portion of `cpu_deepsleep()'
- * that performs the actual deep-sleep on a multi-core system. */
+ * that performs  the actual  deep-sleep  on a  multi-core  system. */
 FUNDEF NOPREEMPT void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
 
-/* Check if IPIs are pending to be executed by the calling CPU,
- * returning `true' if this is the case, or `false' it not.
+/* Check  if IPIs are  pending to be executed  by the calling CPU,
+ * returning  `true'  if  this is  the  case, or  `false'  it not.
  * In order to serve any pending IPIs, preemption must be enabled. */
 FUNDEF NOBLOCK WUNUSED NOPREEMPT bool
 NOTHROW(FCALL arch_cpu_hwipi_pending_nopr)(void);
 
-/* Check if there are any non-interrupting software-based IPIs pending.
+/* Check  if  there   are  any  non-interrupting   software-based  IPIs   pending.
  * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
 FUNDEF NOBLOCK WUNUSED NOPREEMPT NONNULL((1)) bool
 NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me);
 
 /* Wake up a CPU, regardless of which ever state it may be in, potentially
- * not even waking it at all, but simply sending an IPI, such that sooner
+ * not  even waking it at all, but simply sending an IPI, such that sooner
  * or later it will check its chain of pending task (`FORCPU(target, thiscpu_sched_pending)'),
- * causing it to load all threads found within that chain, so-as to allow
+ * causing  it   to   load   all  threads   found   within   that  chain,   so-as   to   allow
  * those tasks to continue running on it.
  * On X86, this function is implemented as:
  * >> for (;;) {
@@ -428,7 +428,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
 
 /* Service pending IPIs (must be called after a manual switch to the RUNNING state)
- * The general sequence of setting `CPU_STATE_RUNNING' looks like this:
+ * The  general   sequence  of   setting  `CPU_STATE_RUNNING'   looks  like   this:
  * >>again:
  * >>    PREEMPTION_DISABLE();
  * >>    ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
@@ -451,7 +451,7 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
  * >>        PREEMPTION_ENABLE();
  * >>        goto again;
  * >>    }
- * This sequence is required, since cpu_wake() which is used to deliver IPI requests
+ * This  sequence is required, since cpu_wake() which  is used to deliver IPI requests
  * to cpus in a state other than `CPU_STATE_RUNNING' (in order to allow for deep-sleep
  * wake-ups), will not trigger an IPI interrupt if there are any sw-based IPIs pending */
 FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_ipi_service_nopr)(void);
@@ -466,15 +466,15 @@ FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_ipi_service_nopr)(void);
 #ifndef CONFIG_NO_SMP
 struct icpustate;
 /* Callback for an asynchronous IPI executed by some target CPU.
- * IPIs can be handled (and thus executed) any time execution
+ * IPIs can be  handled (and thus  executed) any time  execution
  * in a target CPU has preemption enabled.
- * Note however that IPIs are very restricted in what they can actually
- * do when it comes to write-access. The poster-child example for the use
+ * Note however that  IPIs are  very restricted  in what  they can  actually
+ * do  when it comes  to write-access. The poster-child  example for the use
  * of an IPI is the TLB shoot down used by paging to invalidate old mappings
  * on other cores before associated paging data can safely be freed.
  * NOTE: IPIs are always executed with preemption disabled. - And even though
- *       IPIs are allowed to re-enable preemption, please note that doing so
- *       may lead to one IPI callback being interrupted by another.
+ *       IPIs  are allowed to re-enable preemption, please note that doing so
+ *       may  lead  to  one  IPI  callback  being  interrupted  by   another.
  *       Also note that preemption is always enabled where `state' points to,
  *       unless the `CPU_IPI_FNOINTR' flag was set then the request was made.
  * @param: args: The arguments alongside which the IPI was scheduled.
@@ -491,32 +491,32 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 #define CPU_IPI_MODE_ISSPECIAL(x)     (__CCAST(uintptr_t)(x) >= CPU_IPI_MODE_SPECIAL_MIN)
 
 /* Directly yield execution to `PERCPU(thiscpu_sched_current)'. The caller is responsible
- * to deal with time accounting, preferably via use of the `sched_intern_*' API.
- * This is mainly used to quickly cause a thread woken by `task_wake()'
- * to resume execution when it was hosted by a different CPU before then. */
+ * to deal  with  time  accounting,  preferably via  use  of  the  `sched_intern_*'  API.
+ * This   is   mainly  used   to   quickly  cause   a   thread  woken   by  `task_wake()'
+ * to  resume  execution   when  it  was   hosted  by  a   different  CPU  before   then. */
 #define CPU_IPI_MODE_SWITCH_TASKS     (__CCAST(struct icpustate *)(-1))
 
 
 
 #define CPU_IPI_FNORMAL   0x0000 /* Normal IPI delivery flags. */
-#define CPU_IPI_FWAKEUP   0x0001 /* FLAG: Wake up the target CPU if it is currently in deep-sleep mode.
-                                  * When this flag isn't given, broadcasting IPIs to some set to CPUs,
-                                  * as can be done with `cpu_sendipi_cpuset()', `cpu_broadcastipi()',
-                                  * as well as `cpu_broadcastipi_notthis()' is guarantied to be atomic,
+#define CPU_IPI_FWAKEUP   0x0001 /* FLAG: Wake up  the target CPU  if it is  currently in deep-sleep  mode.
+                                  * When this flag  isn't given,  broadcasting IPIs  to some  set to  CPUs,
+                                  * as  can  be  done  with  `cpu_sendipi_cpuset()',  `cpu_broadcastipi()',
+                                  * as well  as `cpu_broadcastipi_notthis()'  is guarantied  to be  atomic,
                                   * in the sense that any CPU that isn't in deep by the time the associated
                                   * function returns will have received the IPI.
-                                  * This in turns allows you to restrict execution of IPIs to only the
+                                  * This in  turns  allows  you to  restrict  execution  of IPIs  to  only  the
                                   * set of CPUs considered to be on-line, allowing the efficient implementation
-                                  * of single-core sub-systems that only need to interrupt CPUs that aren't
+                                  * of single-core sub-systems  that only  need to interrupt  CPUs that  aren't
                                   * already off-line.
                                   * s.a. `cpu_isrunning()' */
 #define CPU_IPI_FNOINTR   0x0002 /* FLAG: The IPI may be executed when preemption is disabled.
                                   *       When this flag is set, sending a non-blocking IPI to
                                   *       one self is allowed. */
 #define CPU_IPI_FWAITFOR  0x1000 /* Wait for the target CPU to acknowledge having received the IPI,
-                                  * rather than allowing the IPI to be delivered asynchronously. */
+                                  * rather than allowing  the IPI to  be delivered  asynchronously. */
 
-/* Check if `self' is running, and sending an IPI without `CPU_IPI_FWAKEUP' should succeed.
+/* Check if  `self' is  running, and  sending  an IPI  without `CPU_IPI_FWAKEUP'  should  succeed.
  * Note however the race condition where a CPU might stop running before/after this check is made. */
 #define cpu_isrunning(self) (__hybrid_atomic_load((self)->c_state, __ATOMIC_ACQUIRE) == CPU_STATE_RUNNING)
 
@@ -528,8 +528,8 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 
 
 /* WARNING: Sending IPIs with preemption disabled is possible, but when sending
- *          more than `CPU_IPI_BUFFER_SIZE / cpu_count' IPIs in a row, without
- *          re-enabling preemption between any of them may lead to a situation
+ *          more  than `CPU_IPI_BUFFER_SIZE / cpu_count' IPIs in a row, without
+ *          re-enabling  preemption between any of them may lead to a situation
  *          where no further IPIs can be sent to some target CPU.
  */
 
@@ -537,15 +537,15 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 #ifdef __CC__
 #ifndef CONFIG_NO_SMP
 /* Send an IPI to a specific target CPU.
- * The sync-variant will wait for the IPI to be acknowledged and completed before continuing,
+ * The  sync-variant will wait for the IPI to be acknowledged and completed before continuing,
  * which is quite the expensive operation, as it requires a second follow-up IPI by the target
  * cpu, which is used for confirming the completion of an IPI.
  * @return: true:  IPI delivery successful.
- * @return: false: The IPI could not be scheduled because the target
+ * @return: false: The IPI could not be scheduled because the  target
  *                 CPU is offline, and `CPU_IPI_FWAKEUP' was not set.
  * @return: false: The target CPU's IPI buffer is full.
  *                 This can happen if the target cpu has disabled preemption,
- *                 following which at least `CPU_IPI_BUFFER_SIZE' other IPIs
+ *                 following  which at least `CPU_IPI_BUFFER_SIZE' other IPIs
  *                 had been sent to it.
  * @return: false: The target CPU's is the caller's and `CPU_IPI_FNOINTR' isn't set. */
 FUNDEF NOBLOCK NONNULL((1, 2, 3)) bool
@@ -573,7 +573,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCO
 FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_idlemain)(void);
 
 /* >> void NOTHROW(KCALL func(void));
- * A function that is invoked in order to allow the kernel to self-optimize
+ * A function that  is invoked in  order to allow  the kernel to  self-optimize
  * whenever there is nothing else to do, before falling asleep (these functions
  * are invoked by the IDLE thread). */
 #define DEFINE_IDLE_JOB(func) \
@@ -582,14 +582,14 @@ FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_idlemain)(void);
 
 /* Save the current CPU context and store it in `caller->s_state'.
  * Then, switch context to `PERCPU(thiscpu_sched_current)' and continue by executing it.
- * NOTE: Preemption must be disabled before this function may be called!
+ * NOTE:   Preemption   must  be   disabled  before   this   function  may   be  called!
  * NOTE: Upon return, preemption will have been re-enabled! */
 FUNDEF NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL cpu_run_current_and_remember_nopr)(struct task *__restrict caller);
 
 /* Similar to `cpu_run_current_and_remember_nopr()',
- * but don't remember the caller's context.
- * This function is used to implement `task_exit()'
+ * but  don't   remember   the   caller's   context.
+ * This  function is used to implement `task_exit()'
  * NOTE: Preemption must be disabled before this function may be called! */
 FUNDEF NOPREEMPT ATTR_NORETURN void
 NOTHROW(FCALL cpu_run_current_nopr)(void);
@@ -599,24 +599,24 @@ NOTHROW(FCALL cpu_run_current_nopr)(void);
  * @param: mode: One of `IDLE_JOB_MODE_*' */
 typedef NOBLOCK void /*NOTHROW*/ (FCALL *idle_job_t)(void *arg, unsigned int mode);
 #define IDLE_JOB_MODE_SERVICE 0x0000 /* Service the IDLE job now. */
-#define IDLE_JOB_MODE_CANCEL  0x0001 /* The IDLE job was canceled after when the CPU decided
-                                      * that too much time has already passed since the job
+#define IDLE_JOB_MODE_CANCEL  0x0001 /* The IDLE job  was canceled after  when the CPU  decided
+                                      * that  too much  time has  already passed  since the job
                                       * being scheduled, and whatever it may have been intended
-                                      * to accomplish probably won't make any sense to prolong
+                                      * to accomplish probably won't make any sense to  prolong
                                       * even further.
-                                      * In this case, the function should simply perform cleanup
-                                      * on the given `arg', which is likely a call to `decref()',
+                                      * In this  case,  the  function  should  simply  perform  cleanup
+                                      * on  the  given `arg',  which is  likely  a call  to `decref()',
                                       * acompanying a prior use of `cpu_schedule_idle_job_and_incref()' */
 
-/* Optional functions to schedule / delete jobs that should be executed
+/* Optional functions to schedule /  delete jobs that should be  executed
  * by the current CPU's IDLE thread the next time there is nothing to do.
  * NOTE: These functions should be used for the purposes of _HINTS_ _ONLY_!
- *       The kernel is not actually required to implement them, and when
- *       defined as no-ops that simply return `false', kernel operations
+ *       The  kernel is not  actually required to  implement them, and when
+ *       defined as no-ops  that simply return  `false', kernel  operations
  *       must be the same as otherwise!
- * `cpu_schedule_idle_job_and_incref' is the same as `cpu_schedule_idle_job()',
+ * `cpu_schedule_idle_job_and_incref'  is  the same  as `cpu_schedule_idle_job()',
  * but if the request succeeds (return == true), atomically increment a `refcnt_t'
- * field found at `arg + refcnt_offset', thus allowing the job-function to take
+ * field found at  `arg + refcnt_offset', thus allowing  the job-function to  take
  * and inherit a reference to some object on which to operate.
  * @param: job:    The job to perform.
  * @param: arg:    The argument to pass to `job' when it should be executed.
@@ -632,7 +632,7 @@ FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL cpu_schedule_idle_job_and_incref)
 /* Delete a previously schedule IDLE job before it can be serviced.
  * @return: true:  The job was unscheduled, and invoked with `IDLE_JOB_MODE_CANCEL'
  * @return: false: Either the job was never scheduled, or has already been serviced
- *                 when the CPU had some down-time between now and a prior call to
+ *                 when the CPU had some down-time between now and a prior call  to
  *                `cpu_schedule_idle_job*()' */
 FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL cpu_delete_idle_job)(idle_job_t job, void *arg);
 

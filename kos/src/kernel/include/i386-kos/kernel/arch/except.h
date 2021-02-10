@@ -36,7 +36,7 @@ struct kcpustate;
  * HINT: `.cfi_personality 0, <some-function-implemented-as-dwarf_perso_t>'
  * HINT: The `lsda' argument is the `lsda-value' in `.cfi_lsda 0, <lsda-value>'
  * NOTE: The PC-register of `state' is set to point _AFTER_ the instruction
- *       that caused/propagated an exception (aka. the return address)
+ *       that  caused/propagated  an  exception (aka.  the  return address)
  * @param: fde:  The FDE pointing to @this personality function.
  * @param: lsda: A pointer to the LanguageSpecificDAta specified within the FDE.
  * @return: * :  One of `DWARF_PERSO_*' */
@@ -99,16 +99,16 @@ struct x86_asm_except_entry {
 	__UINTPTR_TYPE__ ee_mask;  /* Catch mask, or (uintptr_t)-1 to catch anything */
 };
 
-/* A helpful, predefined personality function that is meant to be used for assembly
+/* A helpful, predefined  personality function  that is meant  to be  used for  assembly
  * function which need to be able to handle exceptions in a fairly user-friendly manner.
  * NOTE: In order to define handlers, make use of the macros defined above.
- * NOTE: When the handler is entered, callee-clobber registers may have been clobbered
- *       if the exception was thrown by a called function that didn't encode CFI instrumentation
- *       for preserving those registers. All other registers have the same value as they would
+ * NOTE: When   the  handler  is   entered,  callee-clobber  registers   may  have  been  clobbered
+ *       if the exception was thrown  by a called function  that didn't encode CFI  instrumentation
+ *       for preserving those  registers. All other  registers have  the same value  as they  would
  *       have had after a throwing function had returned normally, or before a throwing instruction
  *       had been invoked (with the obvious exception of `%eip')
  *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
- *       which are recognized as adjustments for `%esp' and are applied prior to execution
+ *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
  *       or the specified handler. */
 FUNDEF unsigned int
 NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,

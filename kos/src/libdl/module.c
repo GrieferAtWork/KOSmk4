@@ -131,23 +131,23 @@ DlModule_Destroy(DlModule *__restrict self) {
 		size_t fini_array_size     = 0;
 		for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
 			switch (self->dm_dynhdr[i].d_tag) {
-	
+
 			case DT_NULL:
 				goto done_dyntag;
-	
+
 			case DT_FINI:
 				fini_func = (uintptr_t)self->dm_dynhdr[i].d_un.d_ptr;
 				break;
-	
+
 			case DT_FINI_ARRAY:
 				fini_array_base = (uintptr_t *)(self->dm_loadaddr +
 				                                self->dm_dynhdr[i].d_un.d_ptr);
 				break;
-	
+
 			case DT_FINI_ARRAYSZ:
 				fini_array_size = (size_t)self->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
 				break;
-	
+
 			default: break;
 			}
 		}
@@ -257,7 +257,7 @@ DlModule_GetFd(DlModule *__restrict self) {
 		if unlikely(E_ISERR(result))
 			goto err;
 		/* Make sure to only use big file descriptor indices, so-as
-		 * to prevent use of reserved file numbers, as used by the
+		 * to  prevent use of reserved file numbers, as used by the
 		 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */
 		result    = reopen_bigfd(result);
 		newresult = ATOMIC_CMPXCH_VAL(self->dm_file, -1, result);
@@ -272,7 +272,7 @@ err:
 	                       self->dm_filename);
 }
 
-/* Lazily allocate if necessary, and return the vector of section headers for `self'
+/* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
  * NOTE: On success, this function guaranties that the following fields have been initialized:
  *  - self->dm_shnum
  *  - self->dm_elf.de_shoff
@@ -398,7 +398,7 @@ err:
 	return NULL;
 }
 
-/* Lazily calculates and returns the # of symbols in `de_dynsym_tab'
+/* Lazily calculates  and  returns  the #  of  symbols  in  `de_dynsym_tab'
  * NOTE: This function may only be called with `de_dynsym_tab' is non-NULL!
  * @return: * : The # of symbols in `de_dynsym_tab'
  * @return: 0 : Error (dlerror() was modified) */
@@ -416,7 +416,7 @@ DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
 		} else if (self->dm_elf.de_gnuhashtab) {
 			ElfW(GnuHashTable) const *ht;
 			ElfW(Word) const *buckets, *chains;
-			/* GNU hash tables are a bit more complicated, since we need to
+			/* GNU hash tables are a bit more complicated, since we need  to
 			 * find the symbol with the greatest index, then add +1 to that. */
 			ht      = self->dm_elf.de_gnuhashtab;
 			buckets = (ElfW(Word) const *)(ht->gh_bloom + ht->gh_bloom_size);
@@ -425,14 +425,14 @@ DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
 			while ((chains[result - ht->gh_symoffset] & 1) == 0)
 				++result;
 		} else {
-			/* Lastly, we can figure out the # of symbols by looking
-			 * as section headers. We only do this as a last resort,
-			 * since the presence of section headers isn't actually
+			/* Lastly,  we can figure out the # of symbols by looking
+			 * as  section headers. We only do this as a last resort,
+			 * since  the presence of  section headers isn't actually
 			 * something that would be necessary to parse in a normal
-			 * ELF binary, and as such KOS's libdl tries to make as
+			 * ELF binary, and as such  KOS's libdl tries to make  as
 			 * few demands about its behavior as possible.
 			 * Also: Section headers don't get loaded into memory by
-			 *       default, so accessing them carries the risk of
+			 *       default,  so accessing them carries the risk of
 			 *       causing some kind of I/O or NOMEM error. */
 			ElfW(Shdr) *sh;
 			sh = DlModule_ElfGetShdrs(self);
@@ -442,11 +442,11 @@ DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
 				size_t i, count;
 				modrel_dynsym = ((ElfW(Addr))self->dm_elf.de_dynsym_tab -
 				                 self->dm_loadaddr);
-				/* Find the section header that contains `.dynsym'.
-				 * We could look at section names here, or even just
-				 * search for a section that starts with `modrel_dynsym'.
-				 * However to minimize our expectations on what section
-				 * headers are actually present, simply assume that we're
+				/* Find   the   section   header   that   contains   `.dynsym'.
+				 * We  could  look  at  section   names  here,  or  even   just
+				 * search  for  a  section  that  starts  with `modrel_dynsym'.
+				 * However   to  minimize  our  expectations  on  what  section
+				 * headers  are  actually  present,  simply  assume  that we're
 				 * looking for a `SHF_ALLOC' section containing `modrel_dynsym' */
 				count = self->dm_shnum;
 				for (i = 0; i < count; ++i) {

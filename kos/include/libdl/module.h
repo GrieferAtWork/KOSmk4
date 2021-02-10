@@ -77,11 +77,11 @@ struct dlsection {
 	__REF DlModule      *ds_module;      /* [0..1][ref_if(!(ds_flags & DLSECTION_FLAG_OWNED))]
 	                                      * Pointer to the module (or NULL if section data is owned, and the module was destroyed) */
 	__REF DlSection     *ds_dangling;    /* [0..1][lock(ds_module->dm_sections_lock))] Chain of dangling sections.
-	                                      * NOTE: Set to `(REF DlSection *)-1' if the section isn't dangling. */
+	                                      * NOTE: Set  to `(REF DlSection *)-1'  if  the section  isn't  dangling. */
 	uintptr_half_t       ds_flags;       /* [const] Section flags (Set of `ELF_DLSECTION_FLAG_*') */
 	uintptr_half_t       ds_index;       /* [const] Index of this section. */
 	void                *ds_cdata;       /* [0..ds_csize][lock(WRITE_ONCE)][owned_if(!= ds_data)]
-	                                      * Decompressed section data. (or same as `ds_data' if section isn't compressed)
+	                                      * Decompressed section data.  (or same  as `ds_data' if  section isn't  compressed)
 	                                      * NOTE: Set to `(void *)-1' when decompressed section data hasn't been loaded, yet.
 	                                      * NOTE: A section is compressed when `ds_flags & SHF_COMPRESSED' */
 	size_t               ds_csize;       /* [const][lock(WRITE_ONCE)][valid_if(ds_cdata)] Decompressed section size. */
@@ -209,7 +209,7 @@ struct dlmodule {
 	uintptr_t                 dm_loadaddr;     /* [const] Load address of the module. */
 	char                     *dm_filename;     /* [1..1][owned] Name of the executable binary file (absolute path). */
 	ElfW(Dyn) const          *dm_dynhdr;       /* [0..dm_elf.de_dyncnt][const] Vector of dynamic ELF definition entries.
-	                                            * WARNING: This field is ELF-only! Other module formats must keep this
+	                                            * WARNING: This field is ELF-only! Other  module formats must keep  this
 	                                            *          field set to NULL (it only has to be ~here~ because of binary
 	                                            *          compatibility with GNU's `struct link_map') */
 	DLIST_ENTRY(dlmodule)     dm_modules;      /* [lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
@@ -222,16 +222,16 @@ struct dlmodule {
 	size_t                    dm_tlsmsize;   /* [>= dm_tlsfsize] In-member size of this module's TLS template image (or 0 if no TLS is defined). */
 	size_t                    dm_tlsalign;   /* [valid_if(dm_tlsmsize != 0)] Minimum alignment required for this module's TLS segment. */
 	ptrdiff_t                 dm_tlsstoff;   /* [valid_if(!= 0)] Offset added to the TLS pointer to access this module's static TLS segment.
-	                                          * NOTE: Only modules loaded by the initial application are part of the static TLS segment.
+	                                          * NOTE:  Only modules loaded  by the initial application  are part of  the static TLS segment.
 	                                          *    -> All other modules loaded thereafter have their TLS segments lazily loaded on first access. */
 	/* WARNING: TLS Initializers/Finalizers are _NOT_ invoked for modules apart of the static TLS image! */
 	void                    (*dm_tls_init)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS initializer. */
 	void                    (*dm_tls_fini)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
 	void                     *dm_tls_arg;    /* [?..?][const] Argument passed to `dm_tls_init' / `dm_tls_fini' */
 
-	/* All of the above was just so that `dltlsalloc()' doesn't
+	/* All  of  the  above  was  just  so  that  `dltlsalloc()' doesn't
 	 * have to allocate the full DlModule structure. The rest following
-	 * below is what should be considered the actual module structure. */
+	 * below is what should be considered the actual module  structure. */
 	__WEAK refcnt_t           dm_refcnt;     /* Reference counter. */
 
 	/* Module global binding. */

@@ -321,7 +321,7 @@ __DECL_BEGIN
 #define EMU86_OPCODE_BASE0f3a      0x0300
 
 /* May appear in exceptions (map is in range of [8,31])
- * NOTE: Tiny opcodes in this range are _NOT_ returned by `emu86_opcode_decode()'!
+ * NOTE: Tiny opcodes in this range are _NOT_ returned by  `emu86_opcode_decode()'!
  *       To handle XOP opcodes, you must handle the `0x8f' opcode instead, and have
  *       the case of modrm.mi_reg != 0 be used for processing XOP opcodes. */
 #define EMU86_OPCODE_BASEXOP(map) (0xe000 | (((map)/* & 0x1f*/) << 8))
@@ -360,7 +360,7 @@ typedef __uint32_t emu86_opflags_t;
  * @return: * :   A pointer to the first byte past the opcode's ID
  * @param: popcode: Filled with the opcode's number
  * @param: pflags:  [in(EMU86_F_BITMASK)|out] Opcode flags.
- *                  NOTE: The caller should have previously initialized flags
+ *                  NOTE: The caller should  have previously initialized  flags
  *                        through use of `emu86_opflagsof_*()', or by explicity
  *                        setting `EMU86_F_BITMASK' */
 typedef __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t *

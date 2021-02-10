@@ -35,7 +35,7 @@
 
 
 /* Re-use the implementation from libunwind.so, but re-compile
- * with `DEBUG_FRAME' to get .debug_frame support. */
+ * with   `DEBUG_FRAME'   to    get   .debug_frame    support. */
 #define DEBUG_FRAME 1
 #ifndef __INTELLISENSE__
 #define FIND_SPECIFIC_ADDRESS

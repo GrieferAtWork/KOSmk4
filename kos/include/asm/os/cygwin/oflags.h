@@ -41,7 +41,7 @@
 #define __O_EXLOCK     0x0000100 /* ??? */
 #define __O_CREAT      0x0000200 /* If missing, create a new file */
 #define __O_TRUNC      0x0000400 /* Truncate (clear) the named file if it already exists,
-                                  * and `O_WRONLY' or `O_RDWR' access is specified. */
+                                  * and  `O_WRONLY'  or  `O_RDWR'  access  is  specified. */
 #define __O_EXCL       0x0000800 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
                                   * exception if the file already exists. */
 #define __O_NBIO       0x0001000 /* Do not block when trying to read data that hasn't been written, yet. */
@@ -54,11 +54,11 @@
 #define __O_TEXT       0x0020000 /* ??? */
 #define __O_CLOEXEC    0x0040000 /* Close the file during exec() */
 #define __O_DIRECT     0x0080000 /* ??? */
-#define __O_NOFOLLOW   0x0100000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
+#define __O_NOFOLLOW   0x0100000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception when  the
                                   * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
                                   * is given, in which case the link itself is opened. */
 #define __O_DIRECTORY  0x0200000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
-                                  * path component of an open() system call turns out to be something other than a directory. */
+                                  * path component of  an open()  system call turns  out to  be something other  than a  directory. */
 #define __O_EXECSRCH   0x0400000 /* ??? */
 #define __O_TMPFILE    0x0800000 /* Open a temporary file */
 #define __O_NOATIME    0x1000000 /* Don't update last-accessed time stamps. */

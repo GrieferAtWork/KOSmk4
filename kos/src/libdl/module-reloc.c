@@ -410,7 +410,7 @@ again_search_globals_module:
 		}
 
 		/* Lastly: Check if the module itself has a valid definition,
-		 *         or if the module allows for weak definitions... */
+		 *         or if the  module allows  for weak  definitions... */
 		symbol = self->dm_elf.de_dynsym_tab + symid;
 		if (symbol->st_shndx != SHN_UNDEF)
 			goto got_local_symbol;
@@ -441,7 +441,7 @@ done:
 #define LAZY_TRACE 1
 #endif
 
-/* Assert that the offset/info fields of relocation descriptors are at the
+/* Assert  that the offset/info fields of relocation descriptors are at the
  * same location, regardless if the relocation has, or hasn't got an addend */
 STATIC_ASSERT(offsetof(Elf32_Rel, r_offset) == offsetof(Elf32_Rela, r_offset));
 STATIC_ASSERT(offsetof(Elf64_Rel, r_offset) == offsetof(Elf64_Rela, r_offset));

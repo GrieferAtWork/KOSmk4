@@ -69,7 +69,7 @@ libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_palette *palette);
 
 /* Return the preferred video format.
- * If possible, this format will match the format used by the host's graphics card.
+ * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
 INTDEF ATTR_RETNONNULL WUNUSED struct video_format const *CC libvideo_preferred_format(void);

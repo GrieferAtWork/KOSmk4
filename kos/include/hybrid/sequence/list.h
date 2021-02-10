@@ -133,7 +133,7 @@
  *    (in O(x))
  *
  * NOTE: [foo]-arguments are optional and may be omitted when `__HYBRID_LIST_RESTRICT_API'
- *       is disabled, and sufficient compiler/preprocessor-support is available. */
+ *       is   disabled,   and  sufficient   compiler/preprocessor-support   is  available. */
 
 
 #define __HYBRID_Q_KEY(key, item)     (item)->key

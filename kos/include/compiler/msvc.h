@@ -358,7 +358,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 
 
 #if !defined(__INTELLISENSE__)
-/* This works, but may be very expensive because I've got a feeling
+/* This works, but may be very  expensive because I've got a  feeling
  * that all of these ~comments~ must be passed via the commandline... */
 #define __REDIRECT_PP_STR2(x) #x
 #define __REDIRECT_PP_STR(x) __REDIRECT_PP_STR2(x)
@@ -504,8 +504,8 @@ extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __built
 #endif /* !__builtin_va_copy */
 
 #if defined(__INTELLISENSE__) && defined(__cplusplus)
-/* Help detect invalid argument count that can easily be caused by copying the `va_start'
- * source line and replacing `start' with `end' without removing the section argument.
+/* Help detect invalid  argument count that  can easily  be caused by  copying the  `va_start'
+ * source line  and  replacing `start'  with  `end'  without removing  the  section  argument.
  * (The following hack causes the second argument red in such use cases to be underlined red). */
 #undef __builtin_va_end
 void __builtin_va_end(__builtin_va_list &__ap);

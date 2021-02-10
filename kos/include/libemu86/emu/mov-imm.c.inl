@@ -74,7 +74,7 @@ case EMU86_OPCODE_ENCODE(0xc6):
 #ifndef EMU86_EMULATE_XTEST_NO_FALLBACK_BRANCH
 		pc += 1; /* imm8 */
 		/* Since we emulate transactions by always choosing the fallback-branch,
-		 * we must emulate this instruction as a no-op, since that's what it's
+		 * we must emulate this instruction as  a no-op, since that's what  it's
 		 * supposed to behave as whenever not inside of a transaction. */
 		goto done;
 #else /* !EMU86_EMULATE_XTEST_HAVE_FALLBACK_BRANCH */
@@ -182,10 +182,10 @@ case EMU86_OPCODE_ENCODE(0xc7):
 		EMU86_EMULATE_RETURN_AFTER_XBEGIN(REAL_IP() + offset);
 		__builtin_unreachable();
 #else /* EMU86_EMULATE_RETURN_AFTER_XBEGIN */
-		/* We don't actually implement proper transaction support.
-		 * Instead, what we do is behave like an implementation that
+		/* We  don't  actually   implement  proper  transaction   support.
+		 * Instead,  what  we do  is  behave like  an  implementation that
 		 * doesn't have support for any kind of transactional instruction,
-		 * such that we immediately branch to the fallback branch, whilst
+		 * such that we immediately branch to the fallback branch,  whilst
 		 * also clearing %eax to `_XABORT_FAILED' */
 		EMU86_SETIPREG(REAL_IP() + offset);
 		EMU86_SETEAX(_XABORT_FAILED);

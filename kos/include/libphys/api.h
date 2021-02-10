@@ -23,21 +23,21 @@
 #include <__stdinc.h>
 #include <hybrid/host.h>
 
-/* Simple wrapper library for facilitating access to physical
- * memory from user-space. Note that in order to be able to
+/* Simple  wrapper library for facilitating access to physical
+ * memory  from user-space. Note  that in order  to be able to
  * use this library, your program needs sufficient permissions
  * to be allowed to used /dev/mem
  *
- * NOTE: For simplicity, API functions do not include return values
- *       for the purpose of error checking. Instead, when physical
+ * NOTE: For simplicity, API  functions do not  include return  values
+ *       for the  purpose of  error checking.  Instead, when  physical
  *       memory access isn't possible, then API functions will instead
- *       leave `errno' as it was set by the underlying system call,
- *       which will usually be `EACCES' or `EPERM', and turn writes
- *       into no-ops, and reads into acting as though all physical
+ *       leave  `errno' as it  was set by  the underlying system call,
+ *       which will usually  be `EACCES' or  `EPERM', and turn  writes
+ *       into  no-ops, and  reads into  acting as  though all physical
  *       memory was made up of 0-bytes.
  *       The only exception to this rule is `mmapphys', which will
  *       return with a permissions-error set.
- * Also note that upon success, none of the API functions will ever
+ * Also note that upon success, none of the API functions will  ever
  * modify `errno', meaning that you might also check for errors via:
  * >> errno = EOK;
  * >> pokephysl(0x12345, 42);

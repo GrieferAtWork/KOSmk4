@@ -41,11 +41,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 DECL_BEGIN
 
 /* Print the demangled form of the given `mangled_name'
- * This function will automatically (try to) detect the mangling used
+ * This function will automatically (try to) detect the mangling  used
  * to encode type information in `mangled_name', but will re-print the
  * given `mangled_name' if the detection was unsuccessful.
  * Other than that, this function behaves like any other format-printer
- * compatible API, returning the sum of all callbacks, or the first
+ * compatible API, returning  the sum  of all callbacks,  or the  first
  * negative return value upon error. */
 INTERN NONNULL((1, 3)) ssize_t CC
 libdm_demangle(pformatprinter printer, void *arg,

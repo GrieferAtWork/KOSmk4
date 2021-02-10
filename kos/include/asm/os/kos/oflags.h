@@ -38,7 +38,7 @@
                                        * do not attempt to assign the newly opened file as terminal, even when
                                        * `isatty(open(...))' would be true. */
 #define __O_TRUNC           0x0000200 /* Truncate (clear) the named file if it already exists,
-                                       * and `O_WRONLY' or `O_RDWR' access is specified. */
+                                       * and  `O_WRONLY'  or  `O_RDWR'  access  is  specified. */
 #define __O_APPEND          0x0000400 /* Always append data to the end of the file */
 #define __O_NONBLOCK        0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
 #define __O_SYNC            0x0001000 /* ??? */
@@ -51,8 +51,8 @@
 #define __O_LARGEFILE       0x0008000 /* Ignored... */
 #endif /* !__KOS__ */
 #define __O_DIRECTORY       0x0010000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
-                                       * path component of an open() system call turns out to be something other than a directory. */
-#define __O_NOFOLLOW        0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
+                                       * path component of  an open()  system call turns  out to  be something other  than a  directory. */
+#define __O_NOFOLLOW        0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception when  the
                                        * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
                                        * is given, in which case the link itself is opened. */
 #define __O_NOATIME         0x0040000 /* Don't update last-accessed time stamps. */
@@ -62,10 +62,10 @@
 #ifdef __KOS__
 #define __O_CLOFORK         0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #define __O_SYMLINK         0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
-                                       * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
+                                       * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
                                        *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
-#define __O_DOSPATH         0x4000000 /* Interpret '\\' as '/', and ignore casing during path resolution.
-                                       * Additionally, recognize DOS mounting points, and interpret leading
+#define __O_DOSPATH         0x4000000 /* Interpret  '\\'  as  '/',  and   ignore  casing  during  path   resolution.
+                                       * Additionally,   recognize  DOS  mounting   points,  and  interpret  leading
                                        * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
 #define __O_ANYTHING __O_SYMLINK
 #endif /* __KOS__ */

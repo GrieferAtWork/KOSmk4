@@ -63,9 +63,9 @@
 #endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT */
 
 /* When `EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP' is defined, don't use the BSWAP()
- * functions from `<hybrid/byteswap.h>'. This should be configured when
- * libemu86 is being used to emulate instructions not supported by the
- * host, in which case it couldn't very well use the instructions it's
+ * functions    from    `<hybrid/byteswap.h>'.   This    should   be    configured   when
+ * libemu86   is   being   used   to   emulate   instructions   not   supported   by  the
+ * host,  in   which   case  it   couldn't   very   well  use   the   instructions   it's
  * trying to emulate. */
 #if !defined(EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP) || 1
 #include <hybrid/byteswap.h>
@@ -112,12 +112,12 @@ __DECL_BEGIN
 #endif /* !__KERNEL__ */
 #endif /* !EMU86_EMULATE_CONFIG_CHECKUSER */
 
-/* Enable permission/usage/register checks for instructions that could 
- * only ever result in `EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()'
+/* Enable permission/usage/register checks  for instructions that  could
+ * only ever result in  `EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()'
  * Without this, such instructions may instead be handled as though they
  * were unknown.
  * WARNING: Some instructions may still not be checked unless the option
- *          `EMU86_EMULATE_CONFIG_ONLY_MEMORY' is defined to `0' */
+ *          `EMU86_EMULATE_CONFIG_ONLY_MEMORY'   is   defined   to   `0' */
 #ifndef EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_EMULATE_CONFIG_CHECKERROR 0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKERROR */
@@ -126,45 +126,45 @@ __DECL_BEGIN
  * As an exception to this, support for certain instructions can be re-enabled
  * explicitly using other config options.
  * This is mainly intended to implement the #UD and #GP exception handlers in
- * order to  */
+ * order to */
 #ifndef EMU86_EMULATE_CONFIG_ONLY_CHECKERROR
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 0
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR */
 
-/* Don't necessarily include basic instructions that _only_ ever result in
- * an unsupported instruction case in the only-check-error configuration.
+/* Don't  necessarily include  basic instructions  that _only_  ever result in
+ * an  unsupported  instruction  case in  the  only-check-error configuration.
  * This means that no additional code is generated for (e.g.) `add $imm8, %al'
- * when configured for `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR'
- * This option is ignored when `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR == 0' */
+ * when       configured       for      `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR'
+ * This option  is  ignored  when  `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR == 0' */
 #ifndef EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 0
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC */
 
 /* Check that the `lock' prefix is only used by one of the white-listed lock-able instructions.
  * Enabling this option matches hardware behavior, but adds a small amount of overhead to every
- * instruction that gets emulated. Disabling this option causes a lock prefix to be ignored by
+ * instruction  that gets emulated. Disabling this option causes a lock prefix to be ignored by
  * instructions that don't actually support it */
 #ifndef EMU86_EMULATE_CONFIG_CHECKLOCK
 #define EMU86_EMULATE_CONFIG_CHECKLOCK 1
 #endif /* !EMU86_EMULATE_CONFIG_CHECKLOCK */
 
 
-/* Ignore the `lock' prefix in individual instructions, which will instead always operate
+/* Ignore  the `lock'  prefix in individual  instructions, which will  instead always operate
  * identical to how they would when no `lock'-prefix would have been given. Note however that
- * this option does not affect `EMU86_EMULATE_CONFIG_CHECKLOCK', meaning that when that
- * option is enabled, the emulator will still ensure that only certain instruction are
+ * this  option  does not  affect  `EMU86_EMULATE_CONFIG_CHECKLOCK', meaning  that  when that
+ * option is  enabled, the  emulator will  still  ensure that  only certain  instruction  are
  * allowed to make use of `lock' prefixes.
  * Note however that this does _NOT_ affect instructions that use the `lock' prefix to
- * alter their actual behavior in some way other than becoming atomic. */
+ * alter   their   actual  behavior   in  some   way   other  than   becoming  atomic. */
 #ifndef EMU86_EMULATE_CONFIG_IGNORE_LOCK
 #define EMU86_EMULATE_CONFIG_IGNORE_LOCK 0
 #endif /* !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
 
 
-/* Accept the `lock' prefix for various instructions where hardware doesn't
- * normally support this. However support can be augmented by enabling this
+/* Accept the  `lock' prefix  for various  instructions where  hardware  doesn't
+ * normally support  this. However  support can  be augmented  by enabling  this
  * option as part of the #UD handler, alongside enabling emulation of individual
- * instruction affected by this (NOTE: By default, KOS is _NOT_ configured to
+ * instruction  affected by this  (NOTE: By default, KOS  is _NOT_ configured to
  * do this) */
 
 /* Accept the `lock' prefix for the rol/ror/rcl/rcr/shl/shr/sal/sar instructions. */
@@ -185,16 +185,16 @@ __DECL_BEGIN
 
 /* Allow use of `stac' and `clac' from user-space (by having the instruction
  * enable/disable the EFLAGS.AC bit as normal). Technically, this isn't done
- * on real hardware, since the instruction pair was introduced to allow a
- * kernel to temporarily enable/disable the effects of `CR4_SMAP' (which
+ * on  real hardware, since  the instruction pair was  introduced to allow a
+ * kernel to  temporarily enable/disable  the effects  of `CR4_SMAP'  (which
  * causes any kernel-access to pages marked with the U-bit to generate a #PF
  * so-long as `CR4.SMAP == true && EFLAGS.AC == true')
  * However, EFLAGS.AC also has meaning in user-space, where it can be used
- * to enable/disable AlignmentChecking (hence the name AC), causing any
+ * to enable/disable AlignmentChecking  (hence the name  AC), causing  any
  * unaligned memory access to trigger a #AC fault.
- * Furthermore, regardless of this these instructions being allowed to be
- * executed outside of ring #0, ring #3 already has the ability to set/clear
- * the EFLAGS.AC bit freely, as that bit can be modified by `popf'.
+ * Furthermore, regardless  of  this  these instructions  being  allowed  to  be
+ * executed outside of  ring #0, ring  #3 already has  the ability to  set/clear
+ * the  EFLAGS.AC  bit  freely,  as  that   bit  can  be  modified  by   `popf'.
  * s.a. the implementation of `__stac()' / `__clac()' in <i386-kos/asm/intrin.h> */
 #ifndef EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC
 #define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC 1
@@ -841,10 +841,10 @@ __DECL_BEGIN
 #endif /* !EMU86_EMULATE_CONFIG_WANT_XOP */
 
 
-/* Enable support for rdfsbase/rdgsbase/wrfsbase/wrgsbase
+/* Enable support for  rdfsbase/rdgsbase/wrfsbase/wrgsbase
  * in 32-bit and 16-bit modes (with the instructions using
- * the 32-bit registers in both execution modi)
- * s.a. `EMU86_SETFSBASE()' and `EMU86_SETGSBASE()' */
+ * the  32-bit   registers   in   both   execution   modi)
+ * s.a.   `EMU86_SETFSBASE()'   and    `EMU86_SETGSBASE()' */
 #ifndef EMU86_EMULATE_CONFIG_FSGSBASE_32BIT
 #ifdef __KOS__
 #define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT 1
@@ -855,8 +855,8 @@ __DECL_BEGIN
 
 
 /* Define to `1' to have `xchg' require a lock prefix in order to be considered atomic.
- * Real hardware always has xchg behave as atomic, regardless of the presence of an
- * optional lock-prefix, however this also makes it impossible to implement non-atomic
+ * Real hardware always has  xchg behave as  atomic, regardless of  the presence of  an
+ * optional  lock-prefix, however this also makes it impossible to implement non-atomic
  * xchg in VIO. (though VIO is default configured to still match the hardware standard,
  * meaning that this is only a convenience option that isn't actually ever altered) */
 #ifndef EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK
@@ -910,11 +910,11 @@ __DECL_BEGIN
 #define EMU86_EMULATE_ARGS struct icpustate *__restrict _state
 #endif /* !EMU86_EMULATE_ARGS */
 
-/* Hint at a spin-loop that may not necessarily break on its own.
- * This is placed in `do { READ(); } while (!ATOMIC_CMPXCH());'
- * loops after the every time that the `ATOMIC_CMPXCH()' fails.
- * For kernel-space, this should contain a call to `task_serve()'
- * in order to allow the calling thread to be terminated in the
+/* Hint at a spin-loop that may not necessarily break on its  own.
+ * This is  placed  in  `do { READ(); } while (!ATOMIC_CMPXCH());'
+ * loops after the  every time that  the `ATOMIC_CMPXCH()'  fails.
+ * For kernel-space, this should contain a call to  `task_serve()'
+ * in  order to allow  the calling thread to  be terminated in the
  * event that the backing memory is set-up to return random values
  * for every invocation. */
 #ifndef EMU86_EMULATE_LOOPHINT
@@ -1046,10 +1046,10 @@ __DECL_BEGIN
 #define _EMU86_GETOPCODE_RMREG()  EMU86_OPCODE()
 #endif /* !E_ILLEGAL_INSTRUCTION_X86_OPCODE */
 
-/* Return in the event of an unrecognized instruction.
+/* Return  in  the  event  of  an  unrecognized  instruction.
  * HINT: Additionally, you may use the following expressions:
  *     - REAL_START_IP()               Evaluates to the starting IP of the faulting
- *                                     instruction (i.e. the fault address)
+ *                                     instruction   (i.e.   the   fault   address)
  *     - op_flags                      Set of `EMU86_F_*'
  *     - _EMU86_GETOPCODE()            The absolute opcode of the faulting instruction
  *     - _EMU86_GETOPCODE_RMREG()      The absolute opcode of the faulting instruction (with accounting for `MODRM.REG')
@@ -1090,7 +1090,7 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()       ... */
 /* #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG() ... */
 
-/* Throw an exception indicative of a privileged instruction
+/* Throw  an exception indicative  of a privileged instruction
  * Only used when `EMU86_EMULATE_CONFIG_CHECKUSER' is enabled. */
 /* #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()       ... */
 /* #define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG() ... */
@@ -1112,13 +1112,13 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK()       ... */
 /* #define EMU86_EMULATE_RETURN_UNEXPECTED_LOCK_RMREG() ... */
 
-/* Unexpected value for `op_flags & EMU86_F_VEX_LL_M'
+/* Unexpected  value  for   `op_flags & EMU86_F_VEX_LL_M'
  * defaults to `EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()' */
 /* #define EMU86_EMULATE_RETURN_UNEXPECTED_VEX_LL()       ... */
 /* #define EMU86_EMULATE_RETURN_UNEXPECTED_VEX_LL_RMREG() ... */
 
 /* Instruction isn't supported due to some missing hardware feature.
- * Used by the implementations of `cmpxchg8b' and `cmpxchg16b' when
+ * Used by the implementations of `cmpxchg8b' and `cmpxchg16b'  when
  * no way of performing the operation was configured. */
 /* #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       ... */
 /* #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() ... */
@@ -1128,11 +1128,11 @@ __DECL_BEGIN
 
 
 /* An optional, special return expression to be evaluated following
- * an `sti' instruction that turned on EFLAGS.IF (may be used to
- * implement special handling in order to delay interrupt checks
+ * an  `sti' instruction that  turned on EFLAGS.IF  (may be used to
+ * implement special handling  in order to  delay interrupt  checks
  * until after the next instruction)
  * NOTE: This expression mustn't return normally! (but should
- *       normally contain a `THROW()' or `return' statement) */
+ *       normally  contain a `THROW()' or `return' statement) */
 /* #define EMU86_EMULATE_RETURN_AFTER_STI() ... */
 
 /* Same as `EMU86_EMULATE_RETURN_AFTER_STI()', but used for vm86 instead. */
@@ -1141,7 +1141,7 @@ __DECL_BEGIN
 
 
 /* An optional, special return expression to be evaluated following
- * an `hlt' instruction (with #IF=0 or #IF=1 respectively)
+ * an   `hlt'  instruction  (with   #IF=0  or  #IF=1  respectively)
  * When not defined, `hlt' will simply return normally.
  * See also: `EMU86_EMULATE_RETURN_AFTER_HLT_VM86()' when vm86 is supported. */
 /* #define EMU86_EMULATE_RETURN_AFTER_HLT_IF0() ... */
@@ -1150,14 +1150,14 @@ __DECL_BEGIN
 
 
 /* Define this (and don't enable `EMU86_EMULATE_CONFIG_ONLY_MEMORY')
- * to enable emulation of `int', `int3', `into' and `int1' */
+ * to  enable  emulation  of   `int',  `int3',  `into'  and   `int1' */
 /* #define EMU86_EMULATE_RETURN_AFTER_INT(intno) ... */
 
 
 
 /* Return handlers for `syscall' and `sysenter'
  * These hooks should be defined within the #UD handler in
- * kernel-space to emulate the expected behavior is the
+ * kernel-space to emulate  the expected  behavior is  the
  * instruction had actually been supported. */
 /* #define EMU86_EMULATE_RETURN_AFTER_SYSCALL() ... */
 /* #define EMU86_EMULATE_RETURN_AFTER_SYSENTER() ... */
@@ -1186,7 +1186,7 @@ __DECL_BEGIN
 
 
 
-/* Do what should be done in order to handle
+/* Do what  should be  done in  order to  handle
  * the `bound' instruction failing on 16-/32-bit */
 #ifndef EMU86_EMULATE_THROW_BOUNDERR
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
@@ -1216,10 +1216,10 @@ __DECL_BEGIN
 /* #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, offset, regval, regval2) ... */
 
 
-/* Throw an exception as the result of `addr' being non-canonical in 64-bit mode.
+/* Throw an  exception as  the result  of `addr'  being non-canonical  in 64-bit  mode.
  * Note that for normal memory accesses, an address is not checked for being canonical.
  * However, certain instructions (such as wr(fs|gs)base) have an explicit except-branch
- * that gets called whenever a non-canonical address is passed. This exception handler
+ * that gets called whenever a non-canonical address is passed. This exception  handler
  * will then be used these (few) cases.
  * s.a. `EMU86_VALIDATE_CANONICAL()' */
 //#if CONFIG_LIBEMU86_WANT_64BIT
@@ -1229,7 +1229,7 @@ __DECL_BEGIN
 
 
 
-/* Allow E_DIVIDE_BY_ZERO to be rethrown natively, rather than having
+/* Allow E_DIVIDE_BY_ZERO to  be rethrown natively,  rather than  having
  * to be handled by use of `EMU86_EMULATE_THROW_DIVIDE_ERROR[B|W|L|Q]()'
  * In case the aforementioned macros only ever throw the same exception,
  * this can get rid of unnecessary bloat. */
@@ -1277,10 +1277,10 @@ __DECL_BEGIN
 #endif /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
 #endif /* !EMU86_EMULATE_GETOPFLAGS */
 
-/* Translate a memory address to its real counterpart.
+/* Translate  a  memory   address  to   its  real   counterpart.
  * This macro is invoked prior to any kind of memory access made
  * by hosted code, and can be used to implement software paging,
- * or some kind of addend added to any kind of memory access. */
+ * or  some kind of  addend added to any  kind of memory access. */
 #ifndef EMU86_EMULATE_TRANSLATEADDR
 #define EMU86_EMULATE_TRANSLATEADDR_IS_NOOP 1
 #ifdef __INTELLISENSE__
@@ -1300,10 +1300,10 @@ __DECL_BEGIN
 #error "Cannot emulate vm86 together with 64-bit support!"
 #endif /* EMU86_EMULATE_CONFIG_VM86 && CONFIG_LIBEMU86_WANT_64BIT */
 
-/* These functions are used only when emulating an instruction for vm86
+/* These functions are used only  when emulating an instruction for  vm86
  * They are _not_ used by libvm86 (which is a full realmode emulator that
- * doesn't actually make use of vm86, so-as to also work on x86_64!)
- * These functions are used by  */
+ * doesn't actually make  use of  vm86, so-as  to also  work on  x86_64!)
+ * These functions are used by */
 #if EMU86_EMULATE_CONFIG_VM86
 #ifndef EMU86_EMULATE_VM86_GETIF
 #define EMU86_EMULATE_VM86_GETIF() 0
@@ -1531,15 +1531,15 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 
 
 /* An optional override for the method used to read the TSC when read
- * from user-space via `__rdmsr(IA32_TIME_STAMP_COUNTER)' (which is
+ * from user-space via  `__rdmsr(IA32_TIME_STAMP_COUNTER)' (which  is
  * emulated as one of the white-listed MSRs that can actually be read
  * from user-space under KOS), or `__rdtscp()'
- * A different method is used for this in order to allow instruction
- * emulation to use the native `__rdtsc()' for this method, such that in
+ * A  different  method is  used  for this  in  order to  allow instruction
+ * emulation  to use the  native `__rdtsc()' for this  method, such that in
  * its absence the instruction emulator will fault into itself recursively,
- * at which point `EMU86_EMULATE_RDTSC()' will be used to emulate the
- * recursive use-case, such that `EMU86_EMULATE_RDTSC()' may use some
- * different method to implement some kind of cycle counter (such as
+ * at  which  point `EMU86_EMULATE_RDTSC()'  will  be used  to  emulate the
+ * recursive  use-case,  such  that  `EMU86_EMULATE_RDTSC()'  may  use some
+ * different  method  to  implement some  kind  of cycle  counter  (such as
  * APIC counters, or something similar). */
 #if !defined(EMU86_EMULATE_RDTSC_INDIRECT) && defined(EMU86_EMULATE_RDTSC)
 #define EMU86_EMULATE_RDTSC_INDIRECT() EMU86_EMULATE_RDTSC()
@@ -1563,7 +1563,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 
 
 /* Get the value of `CR4.UMIP', which when enabled causes the following
- * instructions to trigger a #GP when executed from user-space:
+ * instructions  to  trigger  a  #GP  when  executed  from  user-space:
  *   - sldt
  *   - str
  *   - sgdt
@@ -1585,13 +1585,13 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #endif /* !EMU86_GETCR4_UMIP */
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_GETCR4_UMIP */
 
-/* CR4.DE -- When disabled, read/write to/from %dr4 and %dr5 actually use %dr6 and %dr7
+/* CR4.DE -- When disabled, read/write to/from %dr4 and %dr5 actually use %dr6 and  %dr7
  *           When enabled, such reads/writes actually affect the proper registers (which
- *           can be provided with `EMU86_EMULATE_(RD|WR)DR(4|5)'), or cause a call to
+ *           can be provided  with `EMU86_EMULATE_(RD|WR)DR(4|5)'), or  cause a call  to
  *           `EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER()' with the actually used
  *           register ID.
  * NOTE: To prevent leaking the state of CR4.DE to user-space via exceptions (attempting
- *       to access %dr4 would otherwise (correctly) cause an exception with %dr6), the
+ *       to access %dr4 would otherwise (correctly)  cause an exception with %dr6),  the
  *       state of CR4.DE is always handled as though it was 1 (i.e. don't re-route debug
  *       register indices) when `EMU86_ISUSER()' evaluates to true. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_GETCR4_DE)
@@ -1611,7 +1611,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 
 
 /* CR4.TSD -- When enabled, user-space isn't allowed to access to `IA32_TIME_STAMP_COUNTER',
- *            either via rdmsr, rdtsc or rdtscp, all of which will instead call to:
+ *            either via  rdmsr,  rdtsc  or rdtscp,  all  of  which will  instead  call  to:
  *            >> EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
  *            >>                                                  X86_REGISTER_MSR, IA32_TIME_STAMP_COUNTER, 0, 0) */
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_GETCR4_TSD)
@@ -1955,7 +1955,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
  * @param: reading:   [type(bool)]   A read is being performed.
  * @param: writing:   [type(bool)]   A write is being performed.
  * NOTE: Both `reading' and `writing' may be `true', in which case
- *       the instruction would have performed a read+modify+write
+ *       the  instruction would have performed a read+modify+write
  *       or read+write operation.
  * WARNING: The given address range will not have been user-verified
  *          when this macro is called! */
@@ -1975,14 +1975,14 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 	EMU86_SETFLAGS((EMU86_GETFLAGS() & (mask)) | (value))
 #endif /* !EMU86_MSKFLAGS */
 
-/* Get/set the program counter (IP/EIP/RIP) register (including CS.BASE)
- * Note that `EMU86_GETPCPTR() == EMU86_SEGADDR(EMU86_GETCSBASE(), EMU86_GETIPREG())'  */
+/* Get/set   the   program   counter   (IP/EIP/RIP)   register   (including  CS.BASE)
+ * Note that `EMU86_GETPCPTR() == EMU86_SEGADDR(EMU86_GETCSBASE(), EMU86_GETIPREG())' */
 #ifndef EMU86_GETPCPTR
 #define EMU86_GETPCPTR()  (byte_t *)icpustate_getpc(_state)
 #define EMU86_SETPCPTR(v) icpustate_setpc(_state, (__uintptr_t)(v))
 #endif /* !EMU86_GETPCPTR */
 
-/* Same as `EMU86_SETPCPTR()', but don't account for
+/* Same  as   `EMU86_SETPCPTR()',  but   don't  account   for
  * segment offsets, but simply set the raw %(e|r)ip register. */
 #ifndef EMU86_GETIPREG
 #define EMU86_GETIPREG()  (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETPCPTR()
@@ -2182,8 +2182,8 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #define EMU86_EMULATE_OUTL(portno, value) do { outl(portno, value); } __WHILE0
 #ifdef __KERNEL__
 /* Define these to allow for some minor optimizations, when it is known
- * that in/out emulation can never throw an exception (Note that this
- * isn't the case for user-space, where use of these instructions can
+ * that in/out emulation can never  throw an exception (Note that  this
+ * isn't the case for user-space,  where use of these instructions  can
  * result in an `E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE' exception) */
 #define EMU86_EMULATE_IN_IS_NOEXCEPT 1
 #define EMU86_EMULATE_OUT_IS_NOEXCEPT 1
@@ -2750,7 +2750,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 		if (!EMU86_F_HASSEG(op_flags)) {
 			reg = EMU86_R_DS;
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
-			/* When no segment override is given, and `modrm->mi_rm' is
+			/* When  no  segment  override  is  given,  and  `modrm->mi_rm'  is
 			 * either ESP or EBP, then %ss must be used; else %ds must be used. */
 			if (modrm->mi_rm == EMU86_R_BP || modrm->mi_rm == EMU86_R_SP)
 				reg = EMU86_R_SS;
@@ -3311,7 +3311,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 	/* Invoke all necessary callbacks for read/write access to memory
-	 * who's address has been derived  */
+	 * who's address has been derived */
 #ifndef EMU86_READ_USER_MEMORY
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 #define EMU86_READ_USER_MEMORY(addr, num_bytes)       \
@@ -3722,14 +3722,14 @@ case EMU86_OPCODE_ENCODE(0xff):
 
 
 #if HAVEOP(EMU86_EMULATE_CONFIG_WANT_CMPXCHG)
-	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is
+	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare  AL with r/m8.  If equal, ZF is  set and r8 is
 	 *                                    loaded into r/m8. Else, clear ZF and load r/m8 into AL */
 case EMU86_OPCODE_ENCODE(0x0fb0):
-	/* 0F B1 /r      CMPXCHG r/m16,r16    Compare AX with r/m16. If equal, ZF is set and r16 is
+	/* 0F B1 /r      CMPXCHG r/m16,r16    Compare  AX with  r/m16. If equal,  ZF is set  and r16 is
 	 *                                    loaded into r/m16. Else, clear ZF and load r/m16 into AX.
-	 * 0F B1 /r      CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is
+	 * 0F B1 /r      CMPXCHG r/m32,r32    Compare  EAX with  r/m32. If equal,  ZF is set  and r32 is
 	 *                                    loaded into r/m32. Else, clear ZF and load r/m32 into EAX.
-	 * 0F B1 /r      CMPXCHG r/m64,r64    Compare RAX with r/m64. If equal, ZF is set and r64 is
+	 * 0F B1 /r      CMPXCHG r/m64,r64    Compare  RAX with  r/m64. If equal,  ZF is set  and r64 is
 	 *                                    loaded into r/m64. Else, clear ZF and load r/m64 into RAX. */
 case EMU86_OPCODE_ENCODE(0x0fb1):
 	goto checklock_modrm_memory;
@@ -3739,9 +3739,9 @@ case EMU86_OPCODE_ENCODE(0x0fb1):
 
 #if HAVEOP(EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B)
 	/*         0F C7 /1 CMPXCHG8B m64      Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX
-	 *                                     into m64. Else, clear ZF and load m64 into EDX:EAX.
+	 *                                     into  m64.  Else,  clear  ZF  and  load  m64  into EDX:EAX.
 	 * REX.W + 0F C7 /1 CMPXCHG16B m128    Compare RDX:RAX with m128. If equal, set ZF and load RCX:RBX
-	 *                                     into m128. Else, clear ZF and load m128 into RDX:RAX. */
+	 *                                     into m128.  Else,  clear  ZF and  load  m128  into  RDX:RAX. */
 case EMU86_OPCODE_ENCODE(0x0fc7):
 	goto checklock_modrm_memory;
 #define NEED_checklock_modrm_memory
@@ -3977,10 +3977,10 @@ checklock_modrm_memory_parsed:
 #ifndef __INTELLISENSE__
 #ifdef EMU86_EMULATE_IMPL_HEADER
 /* Allow the user to specify a custom header that gets included for
- * the purpose of defining actually emulated instructions, thus
- * allowing the user to restrict the set of instructions being
+ * the  purpose  of defining  actually emulated  instructions, thus
+ * allowing the  user to  restrict the  set of  instructions  being
  * emulated.
- * This is used by the KOS kernel #UD handler in order to emulate
+ * This is used by  the KOS kernel #UD  handler in order to  emulate
  * certain instructions which may not be supported by the real host,
  * without pulling in a large number of instructions that are always
  * expected to have native support. */
@@ -4927,7 +4927,7 @@ return_unexpected_prefix:;
 
 
 	/* Instruction isn't supported due to some missing hardware feature,
-	 * due to the current execution mode, or due to how libemu86 was
+	 * due  to the  current execution mode,  or due to  how libemu86 was
 	 * configured. */
 	__IF0 {
 #ifdef NEED_return_unsupported_instruction_rmreg

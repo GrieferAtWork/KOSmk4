@@ -96,8 +96,8 @@ DECL_BEGIN
  *       However, LD will refuse to link `R_X86_64_32' or `R_X86_64_32S'
  *       relocations in ~shared libraries~ (drivers)
  *       So instead we use a 64-bit relocation of which we know that the
- *       upper 32-bit will always be 0 (because the driver will always
- *       be mapped above `0xffffffff80000000'), and have those upper 32
+ *       upper 32-bit will always be  0 (because the driver will  always
+ *       be mapped above `0xffffffff80000000'), and have those upper  32
  *       0-bits overflow into the `bp_wrong' field (which doesn't matter
  *       since that field has to be initialized as 0 anyways...) */
 #define __predict_dotrace(section, expr, expected)      \

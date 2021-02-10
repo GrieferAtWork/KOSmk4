@@ -110,7 +110,7 @@ NOTHROW(CC next_packet)(struct pb_packet *__restrict self) {
 	for (p = self->pb_rptr; p != self->pb_wptr; p = next_packet(p))
 
 /* Check if there are packets from the current buffer that
- * are used externally any may not be realloc()'ed. */
+ * are  used  externally  any  may  not  be  realloc()'ed. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(CC are_packets_from_the_current_buffer_in_use)(struct pb_buffer const *__restrict self) {
 	struct pb_packet *p;
@@ -134,18 +134,18 @@ NOTHROW(CC are_packets_from_the_current_buffer_in_use)(struct pb_buffer const *_
  * NOTES:
  *   - All of the packet's struct fields will have already been filled in by this function.
  *   - It is weakly undefined when a packet that was started before another was committed
- *     will be read. It may happen before, but it may also happen after.
- *   - The only guaranty in concerns to packet read order is that packets that are
+ *     will  be  read.   It  may   happen  before,  but   it  may   also  happen   after.
+ *   - The  only guaranty in concerns to packet read order is that packets that are
  *     generated linearly by the same thread will always be read in that same order
  *     in relation to each other.
  *   - Similarly, a packet that for which `pb_buffer_endwrite_commit()' was caled before
- *     the call to `pb_buffer_startwrite()' of another packet will always be read
+ *     the  call  to  `pb_buffer_startwrite()' of  another  packet will  always  be read
  *     before that other packet.
  * @return: * : Pointer to the packet's descriptor. Once the caller has finished filling
  *              in the packet's contents, they must use `pb_buffer_endwrite_commit()' in
  *              order to make the packet available for being read.
  *              In case that packet initialization should fail, `pb_buffer_endwrite_abort()'
- *              may be called to undo what was previously done by this function.
+ *              may  be  called  to  undo  what  was  previously  done  by  this   function.
  *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
  *                    >> void *pb_packet_payload(struct pb_packet *);
  *                    >> void *pb_packet_ancillary(struct pb_packet *);
@@ -252,9 +252,9 @@ allocate_buffer_extension:
 				goto again_locked;
 			}
 		}
-		/* NOTE: The following can happen even when `HEAP_REALLOC_UNX' is defined,
-		 *       since another thread may have previously been reading from a packet
-		 *       of the current buffer (s.a. `are_packets_from_the_current_buffer_in_use'
+		/* NOTE: The  following  can  happen  even  when  `HEAP_REALLOC_UNX'  is  defined,
+		 *       since  another  thread may  have previously  been  reading from  a packet
+		 *       of the current buffer (s.a.  `are_packets_from_the_current_buffer_in_use'
 		 *       above), but has since finished reading by calling `lib_pb_buffer_canread'
 		 *       That last call doesn't acquire any locks, so we must deal with the chance
 		 *       that the read-pointer has changed in the mean time! */
@@ -296,15 +296,15 @@ allocate_buffer_extension:
 		self->pb_bend = (byte_t *)HEAPPTR_BASE(buf) + HEAPPTR_SIZE(buf);
 		goto again_locked;
 	}
-	/* NOTE: We're allowed to modify the pointer to the next packet to-be read,
-	 *       since we've already checked if anyone is using one of the unread
+	/* NOTE: We're allowed to modify the pointer  to the next packet to-be  read,
+	 *       since  we've already  checked if anyone  is using one  of the unread
 	 *       packets from our current buffer (and noone is, and if someone wanted
 	 *       to do so, they'd first have to acquire `lock()', which we're already
 	 *       holding!) */
 #ifndef __OPTIMIZE_SIZE__
 	if ((byte_t *)self->pb_rptr > self->pb_bbas &&
 	    (byte_t *)self->pb_rptr <= self->pb_bend) {
-		/* Try to shift unread packets downwards,
+		/* Try  to  shift  unread  packets  downwards,
 		 * so-as to reclaim buffer space near the top. */
 		size_t reclaim, used;
 		reclaim       = (size_t)((byte_t *)self->pb_rptr - (byte_t *)self->pb_bbas);
@@ -434,7 +434,7 @@ NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
                                          struct pb_packet *__restrict packet) {
 	ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_DISCARD);
 	if (trylock()) {
-		/* Optional: Try to reclaim unused packet memory, if the one
+		/* Optional: Try to reclaim unused packet memory, if the  one
 		 *           being discarded is still the most recent packet. */
 		if (self->pb_wptr == (struct pb_packet *)((byte_t *)packet + packet->p_total)) {
 			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
@@ -469,18 +469,18 @@ NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
  * >> #endif
  * >> }
  * Note that with this design, recursive- or parallel read operations
- * aren't allowed (which also wouldn't really make much sense, since
+ * aren't allowed (which also wouldn't really make much sense,  since
  * packets are meant to be read in order, alongside the guaranty that
  * any packet will only ever be read once).
- * However, due to things such as VIO, there is a good chance that a
- * malicious program might cause a recursive read operation to be
- * performed. (i.e. recv(2) is called with a VIO-buffer, who's write
- * callbacks will invoke recv(2) again). If this happens, then the
- * second call to recv(2) will block indefinitely, and the malicious
+ * However, due to things such as VIO,  there is a good chance that  a
+ * malicious program  might cause  a recursive  read operation  to  be
+ * performed. (i.e. recv(2) is called  with a VIO-buffer, who's  write
+ * callbacks  will invoke  recv(2) again).  If this  happens, then the
+ * second call to recv(2) will  block indefinitely, and the  malicious
  * program will be soft-locked (but can still be CTRL+C'd, so it's ok)
  *
  * @return: * :   A pointer to a read-handle for the packet that is next-in-line to-be received.
- *                This handle must be released by a call to one of the pb_buffer_read_[end/...]
+ *                This handle must be released by a call to one of the  pb_buffer_read_[end/...]
  *                functions.
  * @return: NULL: No unread packet is available at the moment, or the most recent packet is
  *                currently being read. */
@@ -533,11 +533,11 @@ unlock_and_return_NULL:
 
 
 
-/* Truncate the packet from which the caller is currently reading by updating
+/* Truncate the packet from which the  caller is currently reading by  updating
  * its base-pointer, acting as though the first `bytes_to_consume' bytes of the
  * packet weren't actually apart of its payload.
- * This can be called any number of times, though the caller must always ensure
- * that `bytes_to_consume <= packet->p_payload', and that the returned pointer
+ * This  can be called any number of times, though the caller must always ensure
+ * that `bytes_to_consume <= packet->p_payload', and  that the returned  pointer
  * becomes the new handle that must be used for reading from the current packet:
  * >> struct pb_packet *packet;
  * >> packet = pb_buffer_startread(self);
@@ -561,7 +561,7 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 	uint16_t new_packet_offset;
 	/* NOTE: This function has to be careful to maintain a valid packet header
 	 *       at the original location of the packet (that is: `self->pb_rptr')
-	 *       at all times. Otherwise, some other thread may think that we're
+	 *       at all times. Otherwise, some  other thread may think that  we're
 	 *       not actually still reading from a packet!
 	 * For this purpose, we must ensure the following invariants:
 	 *    - self->pb_rptr->p_total != 0;
@@ -570,15 +570,15 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 	 *                                                 buffer_control_packet or
 	 *                                                 equal_to(self->pb_wptr)>
 	 *
-	 * Because of these invariants, there needs to be a `p_payoff' pointer, since
-	 * otherwise we'd have no way of consuming less than `PB_PACKET_HEADER_SIZE'
-	 * bytes of payload data from any packet, since trying to create a new packet
-	 * header that overlaps with the old header would mean that we'd be overwriting
+	 * Because  of these invariants,  there needs to be  a `p_payoff' pointer, since
+	 * otherwise  we'd have  no way  of consuming  less than `PB_PACKET_HEADER_SIZE'
+	 * bytes of payload data from  any packet, since trying  to create a new  packet
+	 * header that overlaps with the old header would mean that we'd be  overwriting
 	 * parts of the old header, potentially corruption the requirements of the above
 	 * invariant.
-	 * Without the last invariant, we could have used a static fake-packet that
-	 * just contained the p_total and p_state fields, but we must actually ensure
-	 * that the chain of packets pointed-to by `pb_rptr' can be read by anyone that is
+	 * Without the  last  invariant,  we  could have  used  a  static  fake-packet  that
+	 * just  contained  the p_total  and  p_state fields,  but  we must  actually ensure
+	 * that  the chain of packets pointed-to by `pb_rptr'  can be read by anyone that is
 	 * holding a lock to `self->pb_lock' (which is made use of in pb_buffer_startwrite).
 	 */
 	assert(packet == self->pb_rptr);
@@ -607,7 +607,7 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 	/* Account for all of the memory that just became unused. */
 	ATOMIC_FETCHSUB(self->pb_used, new_packet_offset);
 
-	/* Update the current read-pointer to keep on
+	/* Update the  current read-pointer  to keep  on
 	 * pointing at the header of the current packet. */
 #ifdef NDEBUG
 	ATOMIC_WRITE(self->pb_rptr, result);
@@ -631,7 +631,7 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 
 
 
-/* End reading the current packet, and discard the packet from the data stream.
+/* End reading the  current packet, and  discard the packet  from the data  stream.
  * The next call to `pb_buffer_startread()' will return NULL or a different packet. */
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
@@ -648,18 +648,18 @@ NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
 	ATOMIC_FETCHSUB(self->pb_used, total);
 
 	/* At this point, the buffer's `pb_rptr' still points to our packet, meaning that
-	 * we still have an effective lock on `pb_buffer_startread()'. We release that
-	 * locked by atomically moving the read-header forward to the next packet to-be
-	 * read, which will simultaneously bring the buffer as a whole into a consistent
+	 * we  still have an  effective lock on  `pb_buffer_startread()'. We release that
+	 * locked by atomically moving the read-header  forward to the next packet  to-be
+	 * read, which will simultaneously bring the buffer as a whole into a  consistent
 	 * state. */
 	ATOMIC_FETCHADD(self->pb_rptr_uint, total);
 
 	/* Because we've moved the read-pointer ahead, `self->pb_rptr->p_state' should now
-	 * have changed away from `PB_PACKET_STATE_READING'. In the event that there are
-	 * more packets to-be read, it will be `PB_PACKET_STATE_READABLE', in which case
+	 * have changed away from `PB_PACKET_STATE_READING'.  In the event that there  are
+	 * more packets to-be read, it  will be `PB_PACKET_STATE_READABLE', in which  case
 	 * we have to broadcast the packet-state-changed-signal. In case there are no more
-	 * packets, `self->pb_rptr == self->pb_wptr', in which case we wouldn't actually
-	 * have to broadcast the state-changed signal. However, we do so anyways since we
+	 * packets,  `self->pb_rptr == self->pb_wptr', in which  case we wouldn't actually
+	 * have to broadcast the state-changed signal. However, we do so anyways since  we
 	 * have no way of reading from `pb_wptr' without introducing a race condition, and
 	 * as with all signals, no harm is done by sending spurious signals. */
 	pb_buffer_psta_broadcast(self);
@@ -738,8 +738,8 @@ NOTHROW(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
 	if unlikely(self->pb_used + total_size >= self->pb_limt) {
 		/* Packet would be too large.
 		 *
-		 * However, if it's only too large because the buffer was closed,
-		 * we must still indicate that writing is possible (and the caller
+		 * However,  if it's only  too large because  the buffer was closed,
+		 * we must still indicate that  writing is possible (and the  caller
 		 * must deal with the case of an attempted write after having closed
 		 * the buffer) */
 		result = self->pb_limt == 0;

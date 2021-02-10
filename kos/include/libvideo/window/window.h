@@ -82,7 +82,7 @@ struct video_window {
 };
 
 
-/* Create and return a new window, or return NULL and set `errno'
+/* Create  and  return a  new window,  or return  NULL and  set `errno'
  * NOTE: The preferred video format is determined by the window server.
  * @param: title:      Initial window title (or `NULL' to default to the `readlink("/proc/self/exe")')
  * @param: pos_x:      Initial X position of the new window's top-left corner
@@ -108,8 +108,8 @@ video_window_destroy(struct video_window *__restrict window);
 
 
 
-/* Adjust a window position/size such that previously referring to a window's
- * content area, the addition of decoration will adjust the window's position
+/* Adjust a  window  position/size  such  that previously  referring  to  a  window's
+ * content area,  the  addition  of  decoration will  adjust  the  window's  position
  * and size such that a newly created window will have IN(<args...>) as content area.
  * NULL may be passed for arguments that can be ignored. */
 LIBVIDEO_WINDOW_DECL void LIBVIDEO_WINDOW_CC

@@ -107,7 +107,7 @@ typedef struct {
 
 
 
-/* Given a pointer to the start of a debug_line CU (or a pointer to the start of
+/* Given a pointer to the start of a  debug_line CU (or a pointer to the start  of
  * the .debug_line section), initialize the given debugline CU structure `result',
  * and advance `*preader' to the start of the next unit:
  * >> #define _KOS_SOURCE 1
@@ -159,7 +159,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t const **__restrict pr
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
-/* Scan the given .debug_line unit `self' for information related to the given
+/* Scan the given .debug_line unit `self'  for information related to the  given
  * `module_relative_pc', and store that information into `*result' upon success.
  * @param: module_relative_pc: The starting address of the instruction to scan for.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...

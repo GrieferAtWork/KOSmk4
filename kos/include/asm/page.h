@@ -23,7 +23,7 @@
 /* DO NOTE REMOVE THIS FILE!
  *
  * It, and its contents are here for compatibility
- * with older versions of GLibc on linux!
+ * with  older   versions  of   GLibc  on   linux!
  *
  * Some (old) 3rd party code may exist that directly
  * includes this file.
@@ -33,10 +33,10 @@
  *    #define PAGE_SHIFT __ARCH_PAGESHIFT  (likely)
  *    #define PAGE_MASK  __ARCH_PAGEMASK   (likely)
  *
- * The original headers (supposedly, as I can't actually
- * find a proper instance of this header, due to an ambiguity
- * with an internal linux kernel header of the same name)
- * defines these macros unconditionally, however due to
+ * The  original  headers  (supposedly,  as  I  can't  actually
+ * find a proper instance of  this header, due to an  ambiguity
+ * with  an  internal linux  kernel  header of  the  same name)
+ * defines  these  macros   unconditionally,  however  due   to
  * portability concerns, we can only define them conditionally!
  *
  * One example of a 3rd party program that references this header is:

@@ -341,7 +341,7 @@ typedef union ATTR_PACKED {
 
 
 
-/* Invoke VIO callbacks, automatically substituting operators for one-another.
+/* Invoke  VIO  callbacks, automatically  substituting operators  for one-another.
  * If an operation is impossible, these functions will throw a SEGFAULT exception. */
 INTERN NONNULL((1)) u8 CC
 libvio_readb(struct vioargs *__restrict args, vio_addr_t addr) {
@@ -1506,7 +1506,7 @@ INTERN NONNULL((1)) void CC
 libvio_xchwithvio(struct vioargs *__restrict args,
                   vio_addr_t offset,
                   __USER __CHECKED void *oldbuf,
-                  __USER __CHECKED void const *newbuf, 
+                  __USER __CHECKED void const *newbuf,
                   size_t num_bytes, bool atomic)
 		__THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)

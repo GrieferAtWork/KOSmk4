@@ -112,22 +112,22 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 			args.va_acmap_offset = (vio_addr_t)req.uq_mapoffs;
 			switch (req.uq_opcode) {
 #define FORCE_ATOMIC() ((req.uq_reqflags & UVIO_REQUEST_FLAG_ATOMIC) != 0)
-		
+
 			case UVIO_OPCODE_READB:
 				resp.rb.ur_result = libvio_readb(&args, req.uq_addr);
 				resp_size = sizeof(resp.rb);
 				break;
-	
+
 			case UVIO_OPCODE_READW:
 				resp.rw.ur_result = libvio_readw(&args, req.uq_addr);
 				resp_size = sizeof(resp.rw);
 				break;
-	
+
 			case UVIO_OPCODE_READL:
 				resp.rl.ur_result = libvio_readl(&args, req.uq_addr);
 				resp_size = sizeof(resp.rl);
 				break;
-	
+
 			case UVIO_OPCODE_READQ:
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 				resp.rq.ur_result = libvio_readq(&args, req.uq_addr);
@@ -137,22 +137,22 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 				resp_size = sizeof(resp.rq);
 				break;
-	
+
 			case UVIO_OPCODE_WRITEB:
 				libvio_writeb(&args, req.uq_addr, req.uq_args[0].ura_b);
 				resp_size = sizeof(resp.r);
 				break;
-	
+
 			case UVIO_OPCODE_WRITEW:
 				libvio_writew(&args, req.uq_addr, req.uq_args[0].ura_w);
 				resp_size = sizeof(resp.r);
 				break;
-	
+
 			case UVIO_OPCODE_WRITEL:
 				libvio_writel(&args, req.uq_addr, req.uq_args[0].ura_l);
 				resp_size = sizeof(resp.r);
 				break;
-	
+
 			case UVIO_OPCODE_WRITEQ:
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 				libvio_writeq(&args, req.uq_addr, req.uq_args[0].ura_q);
@@ -399,7 +399,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 #undef FORCE_ATOMIC
 			default: {
 				/* Unknown request (shouldn't happen...)
-				 * Respond with an empty response */
+				 * Respond  with   an   empty   response */
 				resp_size = sizeof(resp.r);
 			}	break;
 
@@ -464,21 +464,21 @@ err0:
 /* vio_create(3):
  * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
  * >>                 size_t initial_size, oflag_t flags);
- * Create an mmap(2)able VIO object where memory accesses
+ * Create  an mmap(2)able VIO object where memory accesses
  * made to the object are serviced by dispatching them via
  * the given `ops' table.
  * The returned file descriptor mustn't be deleted by `close(2)',
  * but rather through use of `vio_destroy(3)'.
- * Note that callbacks in `ops' may be invoked in the context
- * of a different thread than the one that performed the memory
+ * Note  that callbacks in  `ops' may be  invoked in the context
+ * of  a different thread than the one that performed the memory
  * access. Also note that the returned `fd_t' can be shared with
  * other processes, but still function as expected. (when shared
  * with a different process, that process should once again make
- * use of `close(2)' for cleanup, rather than `vio_destroy(3)')
+ * use  of `close(2)' for cleanup, rather than `vio_destroy(3)')
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK'
  * @param: cookie:       A cookie pointer that is available as `args->va_cookie'
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This size may be altered at a later point in time
+ *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
 INTERN WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(CC libvio_create)(struct vio_operators const *ops, void *cookie,

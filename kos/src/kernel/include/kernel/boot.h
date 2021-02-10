@@ -43,14 +43,14 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_late)(void)
 
 /* Allocate an set a new mman for /bin/init during booting.
  * This function is used to assign a new mman for the initial user-space process,
- * so-as not to launch that process in the context of the special `mman_kernel',
+ * so-as not to launch that process in the context of the special  `mman_kernel',
  * which shouldn't contain mappings for anything user-space related. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_user_mman)(void);
 
-/* Initialize (link, relocation & initialize) all drivers
+/* Initialize (link, relocation  & initialize) all  drivers
  * loaded via the kernel commandline as bootloader modules.
- * This is done as a separate step from the actual loading
- * of drivers so-as to allow for inter-driver dependencies
+ * This  is done as a separate step from the actual loading
+ * of  drivers so-as to allow for inter-driver dependencies
  * to be resolved correctly. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_loaded_drivers)(void);
 
@@ -73,7 +73,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_selftest)(void);
 #endif /* CONFIG_SELFTEST */
 
 /* Update the given cpu state to start executing /bin/init, or whatever
- * was passed as argument in a `init=...' kernel commandline option. */
+ * was passed as  argument in a  `init=...' kernel commandline  option. */
 INTDEF FREE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state);
 

@@ -61,7 +61,7 @@ DATDEF struct task *dbg_current;
 
 /* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
  *        Set to non-NULL before `dbg_active' becomes `true', and set
- *        to `NULL' before `dbg_active' becomes `false' */
+ *        to   `NULL'    before    `dbg_active'    becomes    `false' */
 DATDEF struct cpu *const dbg_cpu;
 
 /* DBG register access level:
@@ -76,7 +76,7 @@ DATDEF struct cpu *const dbg_cpu;
  *                 up/undo v        |
  *                        DBG_REGLEVEL_VIEW
  */
-#define DBG_REGLEVEL_EXIT 0 /* The register state to-be loaded when exiting debugger mode.
+#define DBG_REGLEVEL_EXIT 0 /* The register state to-be loaded when exiting debugger  mode.
                              * When `dbg_current == THIS_TASK', same as `DBG_REGLEVEL_ORIG' */
 #define DBG_REGLEVEL_TRAP 1 /* The register state passed to `dbg_enter_r()', or `DBG_REGLEVEL_EXIT'. */
 #define DBG_REGLEVEL_ORIG 2 /* The register state loaded by `dbg_current' when it resumes. */
@@ -135,7 +135,7 @@ NOTHROW(KCALL dbg_setregp)(unsigned int level, uintptr_half_t cfi_regno, uintptr
 /* Get/set a register, given its (arch-specific) name
  * NOTE: When `return > buflen', then
  *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname: The register was not written.
+ *       dbg_setregbyname:  The  register   was  not   written.
  * @return: * : The required buffer size, or 0 when `name' isn't recognized. */
 FUNDEF size_t NOTHROW(KCALL dbg_getregbyname)(unsigned int level, char const *__restrict name, size_t namelen, void *__restrict buf, size_t buflen);
 FUNDEF size_t NOTHROW(KCALL dbg_setregbyname)(unsigned int level, char const *__restrict name, size_t namelen, void const *__restrict buf, size_t buflen);
@@ -168,30 +168,30 @@ FUNDEF ATTR_PURE WUNUSED pagedir_phys_t NOTHROW(KCALL dbg_getpagedir)(void);
 FUNDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pdir);
 
 /* [default(true)]
- * Allow managed memory access to be performed by `dbg_(read|write)memory'
- * and friends. What this means is that (so-long as the kernel hasn't been
+ * Allow managed memory access to be performed by  `dbg_(read|write)memory'
+ * and friends. What this means is that (so-long as the kernel hasn't  been
  * poisoned, and this field is set to `true' (which is is during a debugger
- * reset)) the below functions can be used to load lazy memory mappings,
- * and initiate the regular copy-on-write semantics expected by high-level
- * memory access, and as would also be done if the access was being done
+ * reset))  the below functions  can be used to  load lazy memory mappings,
+ * and initiate the regular copy-on-write semantics expected by  high-level
+ * memory access, and as would  also be done if  the access was being  done
  * directly, rather than through the below functions.
- * This in turn is mainly useful when debugging user-space programs, where
- * this functionality allows one to view memory that hasn't been accessed
+ * This  in turn is mainly useful when debugging user-space programs, where
+ * this functionality allows one to  view memory that hasn't been  accessed
  * by the user-space program, yet, or was at one point off-loaded into swap
- * memory. But note that this field is ignored once the kernel has been
- * poisoned, as this kind of functionality may cause the debugger memory
- * primitives to call into possibly faulty kernel code (such as possibly
+ * memory. But note  that this field  is ignored once  the kernel has  been
+ * poisoned,  as this kind  of functionality may  cause the debugger memory
+ * primitives  to call into  possibly faulty kernel  code (such as possibly
  * faulty disk drivers).
- * Also note that VIO memory is _never_ dispatched while in debugger mode,
- * not even when accessed directly. Instead, any VIO region will instead
- * result in a SEGFAULT, with the exception of the userkern segment, which
- * simply acts as though it didn't exist, allowing pass-through access to
+ * Also note that VIO memory is _never_ dispatched while in debugger  mode,
+ * not  even when accessed  directly. Instead, any  VIO region will instead
+ * result in a SEGFAULT, with the exception of the userkern segment,  which
+ * simply acts as though it  didn't exist, allowing pass-through access  to
  * the actual kernel (meaning that when passed a kernel-space address, then
  * the below functions will instead read/write memory to/from kernel-space) */
 DATDEF bool dbg_memory_managed;
 
 /* Get/set memory in the context of `dbg_current'
- * NOTE: These functions will not make use of copy-on-write or lazy memory allocations,
+ * NOTE: These functions will not make use  of copy-on-write or lazy memory  allocations,
  *       but will instead indicate an error, or (in when `force' is true), write directly
  *       to the physical memory backing of the underlying page directory.
  * @return: * : The number of trailing bytes that could not be copied. */

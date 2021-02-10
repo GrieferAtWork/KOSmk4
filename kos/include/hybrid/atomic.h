@@ -90,11 +90,11 @@
 #define ATOMIC_INC(x)                         OATOMIC_INC(x, __ATOMIC_SEQ_CST)
 #define ATOMIC_DEC(x)                         OATOMIC_DEC(x, __ATOMIC_SEQ_CST)
 
-/* Simplified atomic read/write functions that only guaranty correct ordering
- * of reads/writes respectively,  as well as that reads and writes are always
- * completed as a whole (i.e. reading a 64-bit value is always done in a single
- * instruction,  preventing the possibility of some part of a value changing
- * after it had already been read,  but before all other parts were read as well) */
+/* Simplified atomic read/write  functions that only  guaranty correct  ordering
+ * of  reads/writes respectively,  as well as  that reads and  writes are always
+ * completed  as a whole (i.e. reading a 64-bit value is always done in a single
+ * instruction, preventing  the possibility  of some  part of  a value  changing
+ * after it had already been read, but before all other parts were read as well) */
 #define ATOMIC_READ(x)     OATOMIC_LOAD(x, __ATOMIC_ACQUIRE)
 #define ATOMIC_WRITE(x, v) OATOMIC_STORE(x, v, __ATOMIC_RELEASE)
 

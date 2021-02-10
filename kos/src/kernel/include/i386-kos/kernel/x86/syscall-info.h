@@ -43,7 +43,7 @@
 DECL_BEGIN
 
 /* Retrieve RPC system call information, given the user-space
- * CPU-state that was used to perform the system call. */
+ * CPU-state that  was  used  to  perform  the  system  call. */
 
 #ifdef __cplusplus
 extern "C++" {
@@ -204,8 +204,8 @@ LOCAL NONNULL((1, 2)) void
 NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_info *__restrict self,
                                                           struct ucpustate const *__restrict state) {
 	unsigned int argc;
-	/* NOTE: By being a program counter from user-space, PC
-	 *       is implicitly checked by the fact that user-space
+	/* NOTE: By  being  a program  counter from  user-space, PC
+	 *       is  implicitly checked by the fact that user-space
 	 *       will have invoked the instruction from user-space. */
 	USER CHECKED byte_t *pc;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;

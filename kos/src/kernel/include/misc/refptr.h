@@ -27,6 +27,8 @@
 #ifdef __CC__
 DECL_BEGIN
 
+/* TODO: Get rid of this header. - I don't think it's even used anywhere! */
+
 #ifndef __cplusplus
 #error "refptr<T> is only availble in C++"
 #endif

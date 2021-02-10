@@ -171,7 +171,7 @@ case EMU86_OPCODE_ENCODE(0x0f1c): {
 #if EMU86_EMULATE_CONFIG_WANT_CLDEMOTE
 	case 0:
 		/* NP 0F 1C /0     CLDEMOTE m8     Hint to hardware to move the cache line containing m8 to a more
-		 *                                 distant level of the cache without writing back to memory. */
+		 *                                 distant level  of the  cache without  writing back  to  memory. */
 #ifdef EMU86_EMULATE_CLDEMOTE
 		EMU86_EMULATE_CLDEMOTE(MODRM_MEMADDR());
 #endif /* EMU86_EMULATE_CLDEMOTE */

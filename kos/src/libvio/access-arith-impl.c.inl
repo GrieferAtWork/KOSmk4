@@ -103,4 +103,3 @@ FUNC(q)(struct vioargs *__restrict args, vio_addr_t addr, u64 value, bool atomic
 #undef DEFINE_VIO_NAME
 
 DECL_END
-

@@ -140,14 +140,14 @@ DECL_BEGIN
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Emulate the execution of a system call.
- * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
- *       will reset the kernel-space stack to `state', and immediately return
+ * NOTE: `syscall_emulate_r()'   is  the  same  as  `syscall_emulate()',  however
+ *       will  reset the  kernel-space stack  to `state',  and immediately return
  *       to userspace after the system call has returned (or unwind any exception
- *       that was thrown by the system call, also dealing with the possibility
- *       of RPC function handling, as well as system call restarting)
- *       Note this variant will _NOT_ unwind the caller's stack, and should
- *       therefor only be used when no cleanup has to be performed within the
- *       calling thread! (if this doesn't apply, `syscall_emulate()' should
+ *       that  was thrown by  the system call, also  dealing with the possibility
+ *       of  RPC  function   handling,  as  well   as  system  call   restarting)
+ *       Note  this  variant will  _NOT_ unwind  the  caller's stack,  and should
+ *       therefor only be  used when no  cleanup has to  be performed within  the
+ *       calling  thread!  (if  this  doesn't  apply,  `syscall_emulate()' should
  *       be used instead) */
 #ifndef __syscall_emulate_defined
 #define __syscall_emulate_defined 1

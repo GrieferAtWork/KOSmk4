@@ -60,7 +60,7 @@ struct socket_node /* S_ISSOCK */
 {
 	/* Unix domain socket file (virtual-only; non-persistent file)
 	 * NOTE: INode objects of this type are bound to `struct unix_socket'
-	 *       objects as part of `bind(2)' with `struct sockaddr_un'
+	 *       objects  as  part  of  `bind(2)'  with  `struct sockaddr_un'
 	 * s.a. <network/unix-socket.h>:struct unix_socket */
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 	struct inode       s_node; /* [OVERRIDE(.i_filemode,[S_ISSOCK(.)])]

@@ -54,7 +54,7 @@ struct dtls_extension {
 	LLRBTREE_NODE(struct dtls_extension) te_tree;   /* [lock(:ts_exlock)] R/B-tree node. */
 	union {
 		DlModule                        *te_module;   /* [0..1][lock(:ts_exlock)] The module itself.
-		                                               * The least significant bit of this is used
+		                                               * The  least significant bit  of this is used
 		                                               * to indicate if this leaf is red of black! */
 		uintptr_t                        te_redblack; /* Red/black status bit at bit#0 */
 	};
@@ -104,7 +104,7 @@ PRIVATE struct tls_segment_list static_tls_list = LIST_HEAD_INITIALIZER(static_t
 /* Minimum alignment of the static TLS segment. */
 PRIVATE size_t static_tls_align = COMPILER_ALIGNOF(struct tls_segment);
 
-/* Total size of the static TLS segment (including the `struct tls_segment' descriptor)
+/* Total  size   of  the   static  TLS   segment  (including   the  `struct tls_segment'   descriptor)
  * NOTE: The segment base itself is then located at `p + static_tls_size - sizeof(struct tls_segment)' */
 PRIVATE size_t static_tls_size = sizeof(struct tls_segment);
 PRIVATE size_t static_tls_size_no_segment = 0;
@@ -150,7 +150,7 @@ DlModule_InitStaticTLSBindings(void) {
 	DlModule *iter;
 	ptrdiff_t endptr = 0;
 	/* Assign static TLS offsets to all currently loaded modules.
-	 * NOTE: Since we've yet to invoke a user-defined code (other than IFUNC selectors),
+	 * NOTE: Since we've yet to invoke a  user-defined code (other than IFUNC  selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread
 	 *       are currently running, meaning we don't have to do any sort of lock for this! */
 	DlModule_AllList_FOREACH(iter) {
@@ -305,8 +305,8 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) {
 
 
 /* Allocate/Free a static TLS segment
- * These functions are called by by libc in order to safely create a new thread, such that
- * all current and future modules are able to store thread-local storage within that thread.
+ * These functions are  called by  by libc  in order to  safely create  a new  thread, such  that
+ * all current and  future modules are  able to  store thread-local storage  within that  thread.
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
@@ -425,43 +425,43 @@ err_badptr:
 
 /* DL-based TLS memory management API.
  * These functions may be used to dynamically allocate TLS memory that works everywhere where
- * ATTR_THREAD-based TLS memory also works. - However using these functions, TLS memory can
- * be allocated dynamically at runtime (behaving the same as a call to dlopen() loading a
+ * ATTR_THREAD-based  TLS memory also works. - However  using these functions, TLS memory can
+ * be  allocated dynamically at  runtime (behaving the same  as a call  to dlopen() loading a
  * module containing a TLS segment would).
  * @param: NUM_BYTES:      The size of the TLS segment (in bytes)
  * @param: MIN_ALIGNMENT:  The minimum alignment requirements for the TLS segment base address.
  * @param: TEMPLATE_DATA:  Base address of an initialization template.
- *                         The first `TEMPLATE_SIZE' bytes of any per-thread data segment
+ *                         The first `TEMPLATE_SIZE' bytes  of any per-thread data  segment
  *                         that gets allocated will be initialized to the contents of these
  *                         values before `PERTHREAD_INIT' is optionally invoked in order to
  *                         perform additional initialization.
- * @param: TEMPLATE_SIZE:  The size of `TEMPLATE_DATA' in bytes, indicating the number of
+ * @param: TEMPLATE_SIZE:  The size of `TEMPLATE_DATA' in bytes, indicating the number  of
  *                         leading bytes within the TLS segment that should be pre-defined
  *                         to mirror the contents of `TEMPLATE_DATA' at the time of a call
- *                         to this function (`TEMPLATE_DATA' need not remain valid or
+ *                         to this  function (`TEMPLATE_DATA'  need  not remain  valid  or
  *                         accessible after this function returns)
  *                         Any memory after `TEMPLATE_SIZE', but before `NUM_BYTES' is initialized
- *                         to all ZEROes, however `TEMPLATE_SIZE' must not be greater than
+ *                         to  all  ZEROes,  however  `TEMPLATE_SIZE'  must  not  be  greater than
  *                        `NUM_BYTES', and if it is, this function returns `NULL' and sets
  *                        `dlerror()' accordingly.
  * @param: PERTHREAD_INIT: An optional callback that will be invoked on a per-thread basis
  *                         in order to perform additional initialization of the associated
  *                         TLS segment within the associated thread.
  *                         This function will be called upon first access of the segment
- *                         within the thread using the data (s.a. `dltlsaddr()')
+ *                         within   the  thread  using  the  data  (s.a.  `dltlsaddr()')
  *                         @param: ARG:  The value of `PERTHREAD_CALLBACK_ARG' passed to `dltlsalloc'
  *                         @param: BASE: The base address of the associated segment within the calling
- *                                       thread (same as the return value of `dltlsaddr()')
+ *                                       thread   (same   as  the   return  value   of  `dltlsaddr()')
  * @param: PERTHREAD_FINI: An optional callback that behaves similar to `PERTHREAD_INIT',
- *                         but called by `pthread_exit()' or any other thread finalizer
+ *                         but called by `pthread_exit()'  or any other thread  finalizer
  *                        (more specifically: by `dltlsfreeseg()') within any thread that
  *                         has been seen using the associated segment, and causing it to
  *                         be allocated and initialized for that thread.
  * @param: PERTHREAD_CALLBACK_ARG: A user-specified argument passed to the init/fini callbacks.
  * @return: * :            An opaque handle for the newly created TLS segment.
  *                         This handle may be used in future calls to `dltlsaddr()', and can be
- *                         destroyed (causing all threads that had previously allocated the
- *                         segment to delete it and optionally invoke finalizer callbacks) by
+ *                         destroyed (causing  all threads  that had  previously allocated  the
+ *                         segment to delete it and  optionally invoke finalizer callbacks)  by
  *                         passing it to `dltlsfree()'
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 INTERN WUNUSED DlModule *DLFCN_CC
@@ -524,8 +524,8 @@ libdl_dltlsfree(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;
 	DlModule_RemoveTLSExtension(self);
-	/* Wait for other threads to complete finalization (which may happen
-	 * if they began to do so, just before this function got called)
+	/* Wait for other threads to  complete finalization (which may  happen
+	 * if  they  began to  do so,  just before  this function  got called)
 	 * s.a. `libdl_dltlsfreeseg()' doing a DlModule_TryIncref() to prevent
 	 *       modules from unloading while TLS finalizers contained within
 	 *       get invoked. */

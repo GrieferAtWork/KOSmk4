@@ -51,7 +51,7 @@ struct unlockinfo;
 #endif /* !MAP_FIXED && __MAP_FIXED */
 
 /* [valid_if(MAP_FIXED)]
- * Don't override existing mappings when `MAP_FIXED' is passed.
+ * Don't  override  existing mappings  when `MAP_FIXED'  is passed.
  * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
 #if !defined(MAP_FIXED_NOREPLACE) && defined(__MAP_FIXED_NOREPLACE)
 #define MAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
@@ -64,27 +64,27 @@ struct unlockinfo;
 #endif /* !MAP_32BIT && __MAP_32BIT */
 
 /* [valid_if(!MAP_FIXED)]
- * Try to return an address `return + num_bytes <= addr' (but also allow returning anything else)
- * If neither this flag, nor `MAP_GROWSUP' is given, try to return an address that is close to `addr'  */
+ * Try  to return  an address `return + num_bytes <= addr'  (but also allow  returning anything else)
+ * If neither this flag, nor `MAP_GROWSUP' is given, try to return an address that is close to `addr' */
 #if !defined(MAP_GROWSDOWN) && defined(__MAP_GROWSDOWN)
 #define MAP_GROWSDOWN __MAP_GROWSDOWN
 #endif /* !MAP_GROWSDOWN && __MAP_GROWSDOWN */
 
 /* [valid_if(!MAP_FIXED)]
- * Try to return an address `return >= addr' (but also allow returning anything else)
- * If neither this flag, nor `MAP_GROWSDOWN' is given, try to return an address that is close to `addr'  */
+ * Try   to   return  an   address   `return >= addr'  (but   also   allow  returning   anything  else)
+ * If neither this flag, nor `MAP_GROWSDOWN' is given, try to return an address that is close to `addr' */
 #if !defined(MAP_GROWSUP) && defined(__MAP_GROWSUP)
 #define MAP_GROWSUP __MAP_GROWSUP
 #endif /* !MAP_GROWSUP && __MAP_GROWSUP */
 
 /* [valid_if(!MAP_FIXED)] Allocate stack memory:
  *  - When neither `MAP_GROWSDOWN' nor `MAP_GROWSZO' was given, use the proper
- *    stack growth direction (`#ifdef __ARCH_STACK_GROWS_DOWNWARDS') instead.
+ *    stack growth direction (`#ifdef __ARCH_STACK_GROWS_DOWNWARDS')  instead.
  *  - The default for `addr' is `mman_getunmapped_user_stkbase' instead of
  *    `mman_getunmapped_user_defbase'
- *  - Try to leave a gap of at least 1 page between the returned, and some
+ *  - Try  to leave a gap of at least  1 page between the returned, and some
  *    adjacent memory mapping. (preventing 1 thread's stack from overflowing
- *    onto the stack of another thread, rather than crashing immediately)  */
+ *    onto the stack of another thread, rather than crashing immediately) */
 #if !defined(MAP_STACK) && defined(__MAP_STACK)
 #define MAP_STACK __MAP_STACK
 #endif /* !MAP_STACK && __MAP_STACK */
@@ -103,7 +103,7 @@ struct unlockinfo;
 
 
 /* Check if the initial search should only be performed above/below.
- * When both of these are false, the initial search is performed in
+ * When both of these are false, the initial search is performed  in
  * in both directions. */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 #define MMAN_GETUNMAPPED_ISBELOW(x) ((x) & (MAP_GROWSDOWN | MAP_STACK))
@@ -117,56 +117,56 @@ struct unlockinfo;
 
 /* The lowest (user-space) address that might ever be automatically
  * selected for mapping by `mman_getunmapped()'. Note that the user
- * may still employ `MAP_FIXED' to overrule this limit,
+ * may   still   employ   `MAP_FIXED'  to   overrule   this  limit,
  * allowing them to mmap anywhere (in user-space)
  * When `addr' is less than this value, it will be clamped to be equal
- * to this value. Furthermore, attempting to search for free memory
+ * to this value.  Furthermore, attempting to  search for free  memory
  * mappings below this address always fails.
  *
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
 DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
 
-/* Default base address for user-space memory mappings. When trying to
- * find an unmapped area within a user-space mman, the FIXED flag isn't
+/* Default  base  address  for  user-space   memory  mappings.  When  trying   to
+ * find an  unmapped  area  within  a  user-space  mman,  the  FIXED  flag  isn't
  * given, and the given hint-address is less than `mman_getunmapped_user_minaddr'
- * then MAX(mman_getunmapped_user_minaddr, mman_getunmapped_user_defbase)
+ * then     MAX(mman_getunmapped_user_minaddr,     mman_getunmapped_user_defbase)
  * will be used as initial hint instead.
  * Afterwards, the actual address to-be returned will be calculated normally.
- * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
+ * By   default,   this   variable   is   set   to  `KERNEL_VMHINT_USER_HEAP' */
 DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
 
 /* Same as `mman_getunmapped_user_defbase', but used
- * instead when the `MAP_STACK' flag is given. */
+ * instead  when  the  `MAP_STACK'  flag  is  given. */
 DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_getunmapped()'
  * NOTE: _ONLY_ use this always force the `MAP_NOASLR' flag to
  *       be set, thus allowing you to force-disable ASLR system-wide. Using this
- *       for other flags does what you'd think, but the results would probably
+ *       for other flags does what you'd  think, but the results would  probably
  *       be catastrophic.
  *       Also note that modifications to this variable must be done atomically! */
 DATDEF unsigned int mman_getunmapped_extflags;
 
 
-/* Try to find a suitable, unmapped address range. Note that this function never
+/* Try to find a suitable, unmapped address range. Note that this function  never
  * throws an exception, but also doesn't allow for use of `MAP_FIXED'. Attempting
- * to pass that flag is simply ignored, and the function acts as though that bit
+ * to  pass that flag is simply ignored, and the function acts as though that bit
  * hadn't actually been set.
  * @param: self:      The mman in which to create the mapping. For this purpose,
- *                    any mman other than `mman_kernel' will always cause an
- *                    error when trying to map to a kernel-space address.
+ *                    any mman  other than  `mman_kernel' will  always cause  an
+ *                    error when trying to  map to a kernel-space  address.
  *                    NOTE: The caller must be holding a lock to this mman!
  * @param: addr:      A hint for where to search for free memory.
- * @param: num_bytes: The min. number of bytes that should not already be in use,
- *                    starting at the returned address. For this purpose, you may
- *                    assume that this function actually guaranties that at least
+ * @param: num_bytes: The min. number of bytes that  should not already be in  use,
+ *                    starting at the returned address.  For this purpose, you  may
+ *                    assume that this function  actually guaranties that at  least
  *                    `CEIL_ALIGN(num_bytes, PAGESIZE)' bytes are available, unless
  *                    `MAP_FIXED' was used
  * @param: min_alignment: The minimum alignment of the return value. Note that no matter
- *                    what is passed for this value, the actual return value will always
- *                    be aligned by at least the size of a single page. If this argument
- *                    isn't a pointer-of-2, then the alignment guarantied for the return
+ *                    what is passed for this value, the actual return value will  always
+ *                    be  aligned by at least the size of a single page. If this argument
+ *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Unknown flags are silently ignored.
@@ -177,42 +177,42 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self, void *addr,
                                  size_t num_bytes, unsigned int flags,
                                  size_t min_alignment DFL(PAGESIZE));
 /* Given a `struct mnode **p_tree_root', try to find a free uesr-space location.
- * Don't use this function. - It's a kind-of hacky work-around to allow for the
+ * Don't  use this function. - It's a kind-of hacky work-around to allow for the
  * use of `mman_findunmapped()' in implementing `mbuilder_findunmapped()' */
 #define mman_findunmapped_in_usertree(p_tree_root, ...) \
 	mman_findunmapped(COMPILER_CONTAINER_OF(p_tree_root, struct mman, mm_mappings), __VA_ARGS__)
 
 
 /* Similar to `mman_findunmapped()', but never return `MAP_FAILED', and automatically split
- * mem-nodes at the resulting min/max bounds when `MAX_FIXED' w/o `MAP_FIXED_NOREPLACE' is
- * used, and another mapping already existed at the specified location. If this cannot be
- * done without blocking, release all locks, do the split while not holding any locks, and
- * return `MAP_FAILED', indicative of the caller needing to re-acquire
+ * mem-nodes  at the resulting min/max bounds when `MAX_FIXED' w/o `MAP_FIXED_NOREPLACE' is
+ * used, and another mapping already existed at  the specified location. If this cannot  be
+ * done  without blocking, release all locks, do the split while not holding any locks, and
+ * return   `MAP_FAILED',    indicative   of    the    caller   needing    to    re-acquire
  * locks and re-attempt the call.
  * @param: self:      The mman in which to create the mapping. For this purpose,
- *                    any mman other than `mman_kernel' will always cause an
- *                    error when trying to map to a kernel-space address.
+ *                    any mman  other than  `mman_kernel' will  always cause  an
+ *                    error when trying to  map to a kernel-space  address.
  *                    NOTE: The caller must be holding a lock to this mman!
  * @param: addr:      A hint for where to search for free memory.
- * @param: num_bytes: The min. number of bytes that should not already be in use,
- *                    starting at the returned address. For this purpose, you may
- *                    assume that this function actually guaranties that at least
+ * @param: num_bytes: The min. number of bytes that  should not already be in  use,
+ *                    starting at the returned address.  For this purpose, you  may
+ *                    assume that this function  actually guaranties that at  least
  *                    `CEIL_ALIGN(num_bytes, PAGESIZE)' bytes are available, unless
  *                    `MAP_FIXED' was used
  * @param: min_alignment: The minimum alignment of the return value. Note that no matter
- *                    what is passed for this value, the actual return value will always
- *                    be aligned by at least the size of a single page. If this argument
- *                    isn't a pointer-of-2, then the alignment guarantied for the return
+ *                    what is passed for this value, the actual return value will  always
+ *                    be  aligned by at least the size of a single page. If this argument
+ *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
- *                    Additionally, `MAP_FIXED' and `MAP_FIXED_NOREPLACE' are accepted.
+ *                    Additionally,   `MAP_FIXED'   and  `MAP_FIXED_NOREPLACE'   are  accepted.
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Locks had to be released, but another attempt might succeed.
- *                                  Reacquire all required locks, and re-attempt the call.
+ *                                  Reacquire  all  required  locks,  and  re-attempt  the call.
  * @throws: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to locate a suitably large address
- *                                                  range that fits the given constraints.
- * @throws: E_BADALLOC_ADDRESS_ALREADY_EXISTS:      Both `MAP_FIXED' and `MAP_FIXED_NOREPLACE'
+ *                                                  range  that  fits the  given constraints.
+ * @throws: E_BADALLOC_ADDRESS_ALREADY_EXISTS:      Both  `MAP_FIXED'  and   `MAP_FIXED_NOREPLACE'
  *                                                  were given, and a pre-existing mapping already
  *                                                  exists within the given address range. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *FCALL

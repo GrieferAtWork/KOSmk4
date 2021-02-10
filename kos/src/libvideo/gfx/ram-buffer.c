@@ -46,8 +46,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "ram-buffer.h"
 
 /* libstdc++ #undef's min/max (ugh... I'll really have to replace
- * that library with my own version of it at one point).
- * But we want them as macros, so include this at the end... */
+ * that  library  with  my  own  version  of  it  at  one point).
+ * But we want  them as  macros, so  include this  at the  end... */
 #include <minmax.h>
 
 DECL_BEGIN
@@ -578,13 +578,13 @@ rambuffer_gfx_select_gfxops(struct video_gfx *__restrict self) {
 
 	/* TODO: Add optimizations for same-codec blits */
 	/* TODO: Add optimizations `vc_linefill()' and `vc_linecopy()'
-	 * NOTE: `vc_linecopy()' can only be used when no blending might ever
-	 *       be required during same-codec blit operations. This can be
-	 *       determined by the combination of `blendmode', as well as the
+	 * NOTE: `vc_linecopy()' can only  be used when  no blending might  ever
+	 *       be required  during same-codec  blit  operations. This  can  be
+	 *       determined by the  combination of `blendmode',  as well as  the
 	 *       selected video codec/palette (e.g. with generic alpha-blending,
 	 *       a palette-based codec, and a palette with all colors specifying
-	 *       an alpha-channel set to 255, `vc_linecopy()' can still be used
-	 *       as though `GFX_BLENDINFO_OVERRIDE' was given (at least for
+	 *       an alpha-channel set to 255, `vc_linecopy()' can still be  used
+	 *       as  though  `GFX_BLENDINFO_OVERRIDE'  was given  (at  least for
 	 *       same-codec blit operations)) */
 
 	/* Select the best matching GFX operations V-table */

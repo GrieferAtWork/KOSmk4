@@ -54,7 +54,7 @@ DECL_BEGIN
 struct user_except_handler {
 	uintptr_t                     ueh_mode;    /* Handler mode (One of `EXCEPT_HANDLER_MODE_*' + set of `EXCEPT_HANDLER_FLAG_*') */
 	USER CHECKED except_handler_t ueh_handler; /* [valid_if(EXCEPT_HANDLER_FLAG_SETHANDLER)] Handler entry point */
-	USER CHECKED void            *ueh_stack;   /* Handler stack (or `EXCEPT_HANDLER_SP_CURRENT' when not set)
+	USER CHECKED void            *ueh_stack;   /* Handler stack  (or `EXCEPT_HANDLER_SP_CURRENT'  when not  set)
 	                                            * NOTE: This pointer also doubles as the user-space sigaltstack! */
 };
 
@@ -75,8 +75,8 @@ DATDEF ATTR_PERTASK struct user_except_handler this_user_except_handler;
  *     >>             error_printf("...");
  *     >>     }
  *     >> }
- * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
- * the given `ctid' to be used as the initial value for `this_tid_address', while the
+ * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will  cause
+ * the given `ctid' to be used as  the initial value for `this_tid_address', while  the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
 DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
@@ -87,113 +87,113 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
 /* A system call and ABI for a user-space-controlled sigprocmask() using
  * this, user-space could block/unblock signals without having to do any
  * system calls in case where no signal arrived in the mean time, and in
- * the case where a signal did arrive in the mean time, only 1 system
+ * the case where a signal  did arrive in the  mean time, only 1  system
  * call (`sys_sigmask_check(2)') would be required.
  *
  * Purpose:
  *    - A lot of kernel-space code makes use of `PREEMPTION_PUSHOFF()' / `PREEMPTION_POP()'
  *      in order to ensure reentrancy for small sections of code. The equivalent user-space
  *      API for this is `sigprocmask()', however that function is anything but efficient in
- *      what it does, having to unconditionally employ a system call when used, and
+ *      what  it  does, having  to  unconditionally employ  a  system call  when  used, and
  *      furthermore, that system call isn't the fastest one out there, either.
- *    - Solve this problem by designing a sigprocmask() function that can be implemented
+ *    - Solve this problem by designing a sigprocmask() function that can be  implemented
  *      entirely within the confines of user-space (only needing to perform a system call
  *      in the scenario where a (potentially) pending signal has become unmask)
  *
  * Notes:
- *    - The race condition caused by the thread exiting, and its reaper destroying the
+ *    - The race condition caused  by the thread exiting,  and its reaper destroying  the
  *      backing memory of the userprocmask structure is solved by merging this new system
  *      call with the exiting `set_tid_address(2)' API, which already solves this problem
- *      by requiring that the backing storage of the TID address may only be freed once
+ *      by  requiring that the backing storage of the  TID address may only be freed once
  *      the kernel has written `0' to the TID address.
- *    - The `pm_sigsize' field must not be changed by user-space. The kernel only guaranties that
+ *    - The `pm_sigsize' field must not be changed  by user-space. The kernel only guaranties  that
  *      it will check that field once (during the initial call to `sys_set_userprocmask_address()')
- *      If the field is altered at any point after that, the kernel will most likely just ignore
+ *      If the field is altered at  any point after that, the  kernel will most likely just  ignore
  *      that change, continuing to work under the assumption of the original value.
  *    - When the kernel needs to modify a thread's signal mask, this is handled by:
  *       - In the case of calling a signal handler with a non-empty `sigaction::sa_mask',
- *         the kernel will load the `pm_sigmask' pointer, and or' the pointed-to signal
- *         set with `sigaction::sa_mask'. Note though that this could only happen when
- *         `*pm_sigmask' contained any 0-bits before, meaning that an all-1s signal mask
+ *         the kernel will load the `pm_sigmask'  pointer, and or' the pointed-to  signal
+ *         set  with `sigaction::sa_mask'. Note  though that this  could only happen when
+ *         `*pm_sigmask'  contained any 0-bits before, meaning that an all-1s signal mask
  *         will never be modified in this case.
  *       - A call to the actual `sys_sigprocmask(2)' system call (_NOT_ the libc variant
  *         described further below).
  *         In this case, rather than modifying its own, original signal mask, the kernel
  *         will instead load the `pm_sigmask' point, and apply the same modifications it
- *         would have applied to the thread's internal (kernel-space) signal mask the
+ *         would  have applied to  the thread's internal  (kernel-space) signal mask the
  *         signal set pointed-to by user-space.
  *
  * Semantics:
  *
- *    - When using `sys_set_userprocmask_address(2)', the pointed-to `struct userprocmask'
- *      structure must have thread-local storage duration (that is: may not be destroyed
- *      until _after_ the thread that called `sys_set_userprocmask_address()' has exited,
- *      or until another call to `sys_set_userprocmask_address(2)' that assigned a different
+ *    - When  using  `sys_set_userprocmask_address(2)', the  pointed-to `struct userprocmask'
+ *      structure must have  thread-local storage  duration (that  is: may  not be  destroyed
+ *      until _after_  the thread  that called  `sys_set_userprocmask_address()' has  exited,
+ *      or until another call to `sys_set_userprocmask_address(2)' that assigned a  different
  *      address, or disabled USERPROCMASK by passing NULL, or a call to `set_tid_address(2)',
  *      which will also disable USERPROCMASK)
  *
- *    - Kernel-space checks for is-signal-masked are only ever performed in the context of the
- *      thread in question itself. When some other thread wishes to know if a userprocmask'd
- *      thread is masking some signal, they must simply assume that the thread isn't, and send
- *      an RPC that should confirm this for them. This is required, due to the indirection of
- *      the `pm_sigmask' field, which allows user-space to switch between signal mask pointers,
- *      rather than having to copy around signal sets as a whole. Also, this is required to
- *      ensure that modifications made by libc's sigprocmask() are applied atomically for all
+ *    - Kernel-space  checks for is-signal-masked are only ever  performed in the context of the
+ *      thread in question itself.  When some other  thread wishes to  know if a  userprocmask'd
+ *      thread  is masking some signal, they must simply  assume that the thread isn't, and send
+ *      an RPC that should confirm  this for them. This is  required, due to the indirection  of
+ *      the `pm_sigmask' field, which allows user-space to switch between signal mask  pointers,
+ *      rather than having  to copy around  signal sets as  a whole. Also,  this is required  to
+ *      ensure  that modifications made  by libc's sigprocmask() are  applied atomically for all
  *      signals, rather than individually for each signal (which would result in race conditions
- *      when unmasking one signal triggers a signal handler that would get executed in an
+ *      when  unmasking  one signal  triggers a  signal handler  that would  get executed  in an
  *      inconsistent context)
- *      As such, user-space making use of userprocmask somewhat increases the overhead needed
- *      for raising signals, however given that signals in general aren't something that is
+ *      As such, user-space making use of userprocmask somewhat increases the overhead  needed
+ *      for raising signals, however  given that signals in  general aren't something that  is
  *      done by programs with the intend of using them for performance-critical purposes, this
  *      is completely acceptable.
  *
  *    - During a (successful) call to exec(), userprocmask-mode is disabled, the same way it
- *      would also be disabled from user-space calling `sys_set_userprocmask_address(NULL)'
- *      As such, the final contents of `pm_sigmask' from the thread calling exec() will be
- *      loaded into the kernel's internal (legacy) sigprocmask buffer, such that the signal
- *      mask itself is inherited by a new process the same way it would be if userprocmask
+ *      would  also be disabled from user-space calling `sys_set_userprocmask_address(NULL)'
+ *      As such, the final contents of `pm_sigmask'  from the thread calling exec() will  be
+ *      loaded into the kernel's internal (legacy) sigprocmask buffer, such that the  signal
+ *      mask  itself is inherited by a new process  the same way it would be if userprocmask
  *      hadn't been using by the original process.
  *
  *    - During a call to fork() or clone() (w/o CLONE_VM), the parent thread's
- *      TASK_FUSERPROCMASK attribute is inherited unconditionally.
+ *      TASK_FUSERPROCMASK    attribute    is    inherited    unconditionally.
  *
- *    - During a call to clone(CLONE_VM), where the parent is a userprocmask thread,
+ *    - During a call to clone(CLONE_VM), where the parent is a userprocmask  thread,
  *      prior to clone() returning in either the parent or child, the parent thread's
- *      user-space `pm_sigmask' is copied into the kernel-space buffer of the child
+ *      user-space `pm_sigmask' is copied into  the kernel-space buffer of the  child
  *      thread, while the child thread will start with TASK_FUSERPROCMASK=0.
  *
- *    - During a vfork(2), where the parent thread has the TASK_FUSERPROCMASK
+ *    - During a vfork(2),  where the parent  thread has the  TASK_FUSERPROCMASK
  *      attribute set, the parent's process's `pm_sigmask' will be copied into a
- *      temporary kernel-space buffer prior to starting the child thread. Then,
+ *      temporary kernel-space buffer prior to starting the child thread.  Then,
  *      until the child thread indicates that it has successfully called exec(2)
- *      or _Exit(2), the parent thread's TASK_FUSERPROCMASK attribute is
- *      cleared, and the internal kernel-space signal mask is set to block all
- *      signals (except SIGKILL and SIGSTOP), thus mirroring the behavior of
+ *      or   _Exit(2),  the  parent  thread's  TASK_FUSERPROCMASK  attribute  is
+ *      cleared, and the internal kernel-space signal  mask is set to block  all
+ *      signals  (except SIGKILL  and SIGSTOP),  thus mirroring  the behavior of
  *      vfork() without userprocmask.
- *      The child thread is started with the `TASK_FUSERPROCMASK' attribute set,
+ *      The  child  thread is  started  with the  `TASK_FUSERPROCMASK'  attribute set,
  *      which will be cleared the normal way once the child performs a successful call
- *      to either exec(2) or _Exit(2), at which pointer the process will once again
+ *      to either exec(2) or  _Exit(2), at which pointer  the process will once  again
  *      wake up.
  *      Back in the parent process, the kernel will now perform 2 copy operations:
  *       - memcpy(orig_pm_sigmask, &saved_sigmask, sizeof(sigset_t));
  *       - THIS_USERPROCMASK_POINTER->pm_sigmask = orig_pm_sigmask;
  *      Where `THIS_USERPROCMASK_POINTER' is the pointer that the parent thread originally
- *      passed to `sys_set_userprocmask_address()', `orig_pm_sigmask' was the value of
- *      `THIS_USERPROCMASK_POINTER->pm_sigmask' prior to the child process being started,
- *      and `saved_sigmask' were the contents of `*orig_pm_sigmask' prior to the child
+ *      passed  to  `sys_set_userprocmask_address()', `orig_pm_sigmask'  was the  value of
+ *      `THIS_USERPROCMASK_POINTER->pm_sigmask'  prior to the child process being started,
+ *      and `saved_sigmask' were  the contents  of `*orig_pm_sigmask' prior  to the  child
  *      process being started.
  *
- *    - During a vfork(2), where the parent thread didn't have then `TASK_FUSERPROCMASK'
- *      attribute set, but the child process performs a call to `sys_set_userprocmask_address()'
+ *    - During  a  vfork(2),  where  the  parent  thread  didn't  have  then `TASK_FUSERPROCMASK'
+ *      attribute  set, but the child process performs a call to `sys_set_userprocmask_address()'
  *      before eventually performing a successful call to exec(2) or exit(2), the parent thread's
- *      TLS state (which at this point is assumed to be shared with the child process) is fixed
+ *      TLS state (which at this point is assumed  to be shared with the child process) is  fixed
  *      up to indicate that `sys_set_userprocmask_address()' had yet to be called in its context.
  *      This is done by having the vfork child do `THIS_USERPROCMASK_POINTER->pm_sigmask = NULL',
  *      thus indicating to the parent thread that `sys_set_userprocmask_address(2)' wasn't called
  *      yet.
  *      For this purpose, the kernel will set a thread flag `TASK_FUSERPROCMASK_AFTER_VFORK' when
- *      a call `sys_set_userprocmask_address(<not-NULL>)' is performed by a thread that doesn't
- *      already have the `TASK_FUSERPROCMASK' attribute set, but does have the `TASK_FVFORK'
+ *      a call `sys_set_userprocmask_address(<not-NULL>)' is performed  by a thread that  doesn't
+ *      already have  the `TASK_FUSERPROCMASK'  attribute set,  but does  have the  `TASK_FVFORK'
  *      attribute set.
  *
  *
@@ -308,12 +308,12 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     return 0;
  * >> }
  *
- * Additionally, libc can expose a pair of new, better-optimized signal mask
- * functions that can be used to directly set the address of the used signal
+ * Additionally, libc can  expose a  pair of new,  better-optimized signal  mask
+ * functions that can be  used to directly  set the address  of the used  signal
  * mask, allowing a program to pre-define/initialize a number of special-purpose
- * signal masks, which it can then switch to/from, with the only remaining
+ * signal  masks,  which it  can then  switch to/from,  with the  only remaining
  * overhead being the checking for pending signals
- * 
+ *
  * >> // New user-space function:
  * >> sigset_t *getsigmaskptr(void) {
  * >>     return mymask.pm_sigmask;

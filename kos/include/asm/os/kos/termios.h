@@ -62,7 +62,7 @@
 #define __IUCLC    __UINT32_C(0x00000200) /* Map uppercase characters to lowercase on input (requires `IEXTEN'). */
 #define __IXON     __UINT32_C(0x00000400) /* Enable support for `VSTOP' to disable TTY output transmission. */
 #define __IXANY    __UINT32_C(0x00000800) /* Any input character has the behavior of `VSTART' */
-#define __IXOFF    __UINT32_C(0x00001000) /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared.
+#define __IXOFF    __UINT32_C(0x00001000) /* Status  bit  for   `VSTOP'  /   `VSTART':  Don't   transmit  pending   TTY  output   until  this   bit  is   cleared.
                                            * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
 #define __IMAXBEL  __UINT32_C(0x00002000) /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when the queue is empty and a delete character is received) */
 #define __IUTF8    __UINT32_C(0x00004000) /* Input is UTF8 */
@@ -182,32 +182,32 @@
 #define __ISIG      __UINT32_C(0x00000001) /* When any of the characters INTR, QUIT, SUSP, or DSUSP are received, generate the corresponding signal. */
 #define __ICANON    __UINT32_C(0x00000002) /* Enable canonical mode */
 #define __XCASE     __UINT32_C(0x00000004) /* If ICANON is also set, terminal is uppercase only. Input is converted to lowercase,
-                                            * except for characters preceded by \. On output, uppercase characters are preceded
+                                            * except for characters preceded by \.  On output, uppercase characters are  preceded
                                             * by \ and lowercase characters are converted to uppercase. */
 #define __ECHO      __UINT32_C(0x00000008) /* Echo input characters */
 #define __ECHOE     __UINT32_C(0x00000010) /* If ICANON is also set, the VERASE character erases the preceding input character, and VWERASE erases the preceding word */
 #define __ECHOK     __UINT32_C(0x00000020) /* If ICANON is also set, the VKILL character erases the current line */
-#define __ECHONL    __UINT32_C(0x00000040) /* If ICANON is also set, echo the NL character even if ECHO is not set
+#define __ECHONL    __UINT32_C(0x00000040) /* If   ICANON  is  also  set,  echo  the  NL  character  even  if  ECHO  is  not  set
                                             * NOTE: for this purpose, the NL character(s) recognized are '\n', `VEOL' and `VEOL2' */
 #define __NOFLSH    __UINT32_C(0x00000080) /* Disable flushing the input and output queues when generating signals for the INT, QUIT, and SUSP characters */
 #define __TOSTOP    __UINT32_C(0x00000100) /* Send the SIGTTOU signal to the process group of a background process which tries to write to its controlling terminal */
 #define __ECHOCTL   __UINT32_C(0x00000200) /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
-                                            * START, and STOP are echoed as ^X, where X is the character with ASCII code
-                                            * 0x40 greater than the special character. For example, character 0x08 (BS)
+                                            * START,  and STOP are echoed as ^X, where  X is the character with ASCII code
+                                            * 0x40  greater than the  special character. For  example, character 0x08 (BS)
                                             * is echoed as ^H */
 #define __ECHOPRT   __UINT32_C(0x00000400) /* This bit is like ECHOE, enables display of the ERASE character in a way that
-                                            * is geared to a hardcopy terminal. When you type the ERASE character, a `\'
-                                            * character is printed followed by the first character erased. Typing the
-                                            * ERASE character again just prints the next character erased. Then, the
-                                            * next time you type a normal character, a `/' character is printed
+                                            * is geared to a hardcopy terminal. When  you type the ERASE character, a  `\'
+                                            * character is  printed followed  by the  first character  erased. Typing  the
+                                            * ERASE  character  again just  prints the  next  character erased.  Then, the
+                                            * next  time  you  type  a  normal  character,  a  `/'  character  is  printed
                                             * before the character echoes. */
 #define __ECHOKE    __UINT32_C(0x00000800) /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
 #define __FLUSHO    __UINT32_C(0x00001000) /* Output is being flushed. This flag is toggled by typing the DISCARD character */
 /*      __          __UINT32_C(0x00002000)  * ... */
 #define __PENDIN    __UINT32_C(0x00004000) /* ??? */
 #define __IEXTEN    __UINT32_C(0x00008000) /* Enable implementation-defined input processing. This flag, as
-                                            * well as ICANON must be enabled for the special characters
-                                            * EOL2, LNEXT, REPRINT, WERASE to be interpreted, and for the
+                                            * well  as ICANON  must be  enabled for  the special characters
+                                            * EOL2, LNEXT, REPRINT, WERASE to  be interpreted, and for  the
                                             * IUCLC flag to be effective */
 #define __EXTPROC   __UINT32_C(0x00010000) /* Skip handling of: `PARMRK', `ECHO' and `IXON'+`IXANY', as well as `c_cc[*]' */
 /*      __          __UINT32_C(0x00020000)  * ... */
@@ -216,9 +216,9 @@
 #define __IERASING  __UINT32_C(0x00100000) /* Status bit for `ECHOPRT' */
 #define __IXCASEING __UINT32_C(0x00200000) /* Status bit for `XCASE' (the previous character was \) */
 #define __IEOFING   __UINT32_C(0x00400000) /* Status bit for a pending `VEOF' character
-                                            * When set, the next time input is attempted to be read from the TTY,
+                                            * When  set,  the next  time input  is attempted  to be  read from  the TTY,
                                             * and the operation would have blocked, read(2) instead returns immediately,
-                                            * thus indicating an END-OF-FILE within the TTY. (shell programs usually
+                                            * thus  indicating an  END-OF-FILE within  the TTY.  (shell programs usually
                                             * interpret this as the user wishing to logout) */
 #define __IESCAPING __UINT32_C(0x00800000) /* Status bit for `VLNEXT': The next input character is escaped. */
 /*      __          __UINT32_C(0x01000000)  * ... */

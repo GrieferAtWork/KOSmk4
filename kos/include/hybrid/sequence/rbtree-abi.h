@@ -21,7 +21,7 @@
 /* NOTE: This implementation is derived from information found on Wikipedia:
  *       https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
  * The implementation used when `RBTREE_LEFT_LEANING' is defined is based
- * on that same article, as well as the following sources:
+ * on   that   same  article,   as   well  as   the   following  sources:
  *  - https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
  *  - https://github.com/sebastiencs/red-black-tree/blob/master/rbtree.c
  */
@@ -129,14 +129,14 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
 #endif /* RBTREE_WANT_RLOCATE */
 
 /* Insert the given node into the given tree. The caller must ensure
- * that no already-existing node overlaps with the given `node' */
+ * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_DECL __ATTR_NONNULL((1, 2)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
                                          RBTREE_T *__restrict node);
 
 #ifdef RBTREE_WANT_TRYINSERT
 /* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
- * when some other node already exists that is overlapping with `node' */
+ * when  some other node already exists that is overlapping with `node' */
 RBTREE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
 RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
                                             RBTREE_T *__restrict node);
@@ -166,13 +166,13 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 /* Return the next node with a key-range located below `node'
- * If no such node exists, return `RBTREE_NULL' instead.
+ * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
 RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node);
 
 /* Return the next node with a key-range located above `node'
- * If no such node exists, return `RBTREE_NULL' instead.
+ * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
 RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node);
@@ -338,7 +338,7 @@ __DECL_END
 #elif defined(RBTREE_ASSERT_IS_NOOP)
 #define RBTREE_NDEBUG
 #elif 1 /* Default RB-tree internal debug checks enabled:
-         *   0: Perform debug checks by default (very slot, and add O(N) to pretty much every operation)
+         *   0:  Perform debug checks by default (very slot, and add O(N) to pretty much every operation)
          *   1: Disable internal debug checks by default (operations take their promised lengths of time)
          */
 #define RBTREE_NDEBUG
@@ -375,7 +375,7 @@ __DECL_BEGIN
 
 #ifndef RBTREE_NDEBUG
 /* @param: cur_black_nodes: The # of black nodes already encountered (excluding self)
- * @param: exp_black_nodes: The # of black nodes expected when NIL is reached.
+ * @param: exp_black_nodes: The # of black nodes expected when NIL is  reached.
  *                          For this purpose, the NIL-nodes themself (which are
  *                          technically also black) are also counted. */
 __PRIVATE __ATTR_NONNULL((1)) void
@@ -571,7 +571,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_insert_impl))(RBTREE_T *root,
 }
 
 /* Insert the given node into the given tree. The caller must ensure
- * that no already-existing node overlaps with the given `node' */
+ * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
                                          RBTREE_T *__restrict node) {
@@ -631,7 +631,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_tryinsert_impl))(RBTREE_T *root,
 
 
 /* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
- * when some other node already exists that is overlapping with `node' */
+ * when  some other node already exists that is overlapping with `node' */
 RBTREE_IMPL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
 RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
                                             RBTREE_T *__restrict node) {
@@ -826,7 +826,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 }
 
 /* TODO: RBTREE(remove) and RBTREE(rremove) can be implemented more efficiently
- *       for left-leaning RBTREEs by merging the node lookup with building the
+ *       for  left-leaning RBTREEs by merging the node lookup with building the
  *       parent-path to that same node. */
 
 #else /* RBTREE_LEFT_LEANING */
@@ -970,7 +970,7 @@ again:
 			 *       node:RED
 			 *
 			 * ... and fix-up the parent of `grandparent', which now
-			 *     takes the place of `node', of the potentially
+			 *     takes  the  place of  `node', of  the potentially
 			 *     out-of-place RED node having to be fixed.
 			 */
 			RBTREE_SETBLACK(parent);
@@ -1032,7 +1032,7 @@ again:
 }
 
 /* Insert the given node into the given tree. The caller must ensure
- * that no already-existing node overlaps with the given `node' */
+ * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
                                          RBTREE_T *__restrict node) {
@@ -1058,7 +1058,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
 
 #ifdef RBTREE_WANT_TRYINSERT
 /* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
- * when some other node already exists that is overlapping with `node' */
+ * when  some other node already exists that is overlapping with `node' */
 RBTREE_IMPL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
 RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
                                             RBTREE_T *__restrict node) {
@@ -1164,9 +1164,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 	lhs = RBTREE_GETLHS(node);
 	rhs = RBTREE_GETRHS(node);
 	RBTREE_ASSERT((RBTREE_GETPAR(node) == RBTREE_NULL) == (*proot == node));
-	/* Find the node with which to replace the given `node'.
+	/* Find the  node with  which to  replace the  given  `node'.
 	 * This this purpose, when our node what 2 non-NULL children,
-	 * then we must replace `node' with either the MAX-node from
+	 * then we must replace `node' with either the MAX-node  from
 	 * `lhs', or the MIN-node from `rhs' */
 	if (lhs != RBTREE_NULL && rhs != RBTREE_NULL) {
 		RBTREE_T *replacement;
@@ -1180,7 +1180,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 			replacement = RBTREE_GETLHS(replacement);
 #endif
 		/* At this point we know that `node_to_remove' has <= 2
-		 * child nodes, so when we call ourselves recursively,
+		 * child  nodes, so when we call ourselves recursively,
 		 * we know that we won't get here again. */
 		(RBTREE(removenode)(proot, replacement));
 
@@ -1385,7 +1385,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
 
 #if defined(RBTREE_WANT_PREV_NEXT_NODE) || defined(RBTREE_WANT_MINMAXLOCATE)
 /* Return the next node with a key-range located below `node'
- * If no such node exists, return `RBTREE_NULL' instead.
+ * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
@@ -1397,7 +1397,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 	result = RBTREE_GETLHS(node);
 	if (result == RBTREE_NULL) {
 		/* Keep going up until we reach the ROOT (NULL),
-		 * or reach a parent via its RHS-child-branch. */
+		 * or reach a  parent via its  RHS-child-branch. */
 		for (;;) {
 			result = RBTREE_GETPAR(node);
 			if (result == RBTREE_NULL)
@@ -1415,7 +1415,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 }
 
 /* Return the next node with a key-range located above `node'
- * If no such node exists, return `RBTREE_NULL' instead.
+ * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
@@ -1427,7 +1427,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node) {
 	result = RBTREE_GETRHS(node);
 	if (result == RBTREE_NULL) {
 		/* Keep going up until we reach the ROOT (NULL),
-		 * or reach a parent via its LHS-child-branch. */
+		 * or reach a  parent via its  LHS-child-branch. */
 		for (;;) {
 			result = RBTREE_GETPAR(node);
 			if (result == RBTREE_NULL)
@@ -1484,7 +1484,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 		 * Imagine minkey=9, maxkey=25
 		 * - Right now, `root' is `13'
 		 * - The expected min-node is `11', and
-		 *   the expected max-node is `25'
+		 *   the  expected  max-node  is   `25'
 		 *
 		 * As such, we can find the min-node:
 		 *   >> MIN_NODE = root;
@@ -1507,7 +1507,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 		 *   >>     }
 		 *   >>     break;
 		 *   >> }
-		 * To find the max-node, we do the same,
+		 * To  find the max-node, we do the same,
 		 * but with mirrored LHS/RHS and MIN/MAX. */
 		min_node = root;
 		for (;;) {
@@ -1550,7 +1550,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 			break;
 		}
 		/* Because the min/max-range may be spread across different sub-trees,
-		 * we must still check for the case where the predecessor/successor
+		 * we must still  check for the  case where the  predecessor/successor
 		 * the min/max node continues to be in-bounds! */
 		for (;;) {
 			iter = RBTREE(prevnode)(min_node);

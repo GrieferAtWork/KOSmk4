@@ -238,7 +238,7 @@ NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
 		++bl_count[num_bits];
 	}
 	/* Calculate the codes for each symbol (as documented in the DEFLATE specs,
-	 * which can be found here: https://www.w3.org/Graphics/PNG/RFC-1951)
+	 * which  can  be  found  here:   https://www.w3.org/Graphics/PNG/RFC-1951)
 	 * Note however that minor modifications have been made. */
 	code = 0;
 	next_code[1] = 0;
@@ -271,9 +271,9 @@ NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
 }
 
 
-/* Perform a (very) slow find operation to determine the correct tree entry
- * for decoding the given compressed code. When NULL is returned, the caller
- * should either re-try the find operation with more bits (so-long as the
+/* Perform a (very) slow find operation  to determine the correct tree  entry
+ * for decoding the given compressed code. When NULL is returned, the  caller
+ * should  either re-try  the find operation  with more bits  (so-long as the
  * given `compressed_bits' doesn't exceed `tree->zr_maxlen'), or give up once
  * the max number of addressible bits has been reached. (in which case a data
  * error should be reported) */
@@ -339,16 +339,16 @@ STATIC_ASSERT(sizeof(struct zlib_treeent) == __SIZEOF_ZLIB_TREEENT);
 
 
 /* DONT REMOVE THIS!
- * This line ensures that state=1 isn't being used in `libzlib_reader_read',
+ * This line ensures that state=1 isn't being used in  `libzlib_reader_read',
  * since that state is treated special, as it indicates a graceful EOF state,
  * as well as state=2 be used to point after the header loading portion. */
 enum { _counter_spin = __COUNTER__, _counter_spin2 = __COUNTER__ };
 
 
-/* Same as `zlib_reader_read()', but read from a
+/* Same  as   `zlib_reader_read()',  but   read  from   a
  * specific `pos', rather than from the current position.
  * WARNING: This function is rather slow and should not be used unless absolutely necessary!
- *          If possible, you should always use `zlib_reader_read()' instead!
+ *          If    possible,   you   should    always   use   `zlib_reader_read()'   instead!
  * NOTE: This function makes sure not to clobber the reader's previous state. */
 PRIVATE WUNUSED NONNULL((1)) ssize_t CC
 zlib_reader_pread(struct zlib_reader *__restrict self,
@@ -381,7 +381,7 @@ zlib_window_write(struct zlib_window *__restrict self,
  * If an error occurs during this operation, return one of `ZLIB_ERROR_*'
  * @param: buf :           The destination buffer, or `NULL' if data should be skipped.
  * @return: > 0 :          The actual number of decompressed bytes.
- * @return: 0 :            End of input stream, or want more input data.
+ * @return: 0 :            End  of  input  stream,  or  want  more  input   data.
  *                         You may check for the former using `zlib_reader_eof()'
  * @return: ZLIB_ERROR_* : Deflate error. */
 INTERN WUNUSED NONNULL((1)) ssize_t CC
@@ -425,7 +425,7 @@ case 2:
 			                             (u16)self->zlib_reader_zr_bitbyte(3) << 8)))
 				YIELD_FOREVER(ZLIB_ERROR_BAD_RAW_CHECKSUM);
 			/* Copy a total of `self->zr_count' bytes of data directly from the input data stream.
-			 * Since source data isn't actually compressed, we can just directly copy bytes over. */
+			 * Since source data isn't actually compressed, we can just directly copy bytes  over. */
 			while (self->zr_count) {
 				size_t copybytes;
 				copybytes = (size_t)(self->zr_inend - self->zr_incur);
@@ -566,8 +566,8 @@ case 2:
 				PRIVATE u16 const length_base[31] = {
 					3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
 					35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258,
-					0, 0 /* These last 2 aren't defined by the standard.
-					      * By using `0' for them, we can detect them as an error.
+					0, 0 /* These   last   2   aren't  defined   by   the  standard.
+					      * By using `0' for them, we  can detect them as an  error.
 					      * HINT: These would belong to symbol codes `286' and `287' */
 				};
 				/* # of additional bits used to extend the copy-length. */
@@ -657,10 +657,10 @@ decode_symbol_nocache:
 				if unlikely(!length)
 					YIELD_FOREVER(ZLIB_ERROR_BAD_LENGTH);
 again_check_buf_for_repeat:
-				/* Repeat data that isn't already contained within the output buffer.
+				/* Repeat data that isn't already  contained within the output  buffer.
 				 * Doing this is somewhat more complex, since it requires us to either:
 				 *  - Make use of a sliding window (which would have to 32K bytes large)
-				 *  - Rewind the inflate stream to the location that should be copied.
+				 *  - Rewind the inflate stream to  the location that should be  copied.
 				 *    Though this method requires that the input data blob be continuous */
 				if (self->zr_window &&
 				    distance <= self->zr_window->zw_used) {
@@ -678,7 +678,7 @@ again_check_buf_for_repeat:
 					goto save_distance_and_length_and_yield;
 				}
 				assert(bufsize != 0);
-				/* Check for the simple case: The data to-be
+				/* Check  for  the  simple  case:  The  data to-be
 				 * repeated is apart of the current output buffer. */
 				if (distance <= decompressed_bytes && buf) {
 					byte_t const *src;
@@ -745,9 +745,9 @@ save_distance_and_length_and_yield:
 					obo = self->zr_offset + decompressed_bytes;
 					if unlikely(distance > obo) {
 						/* The target location is located out-of-bounds.
-						 * XXX: This could also happen when the user has fed us with
-						 *      a secondary input data blob, in which case we should
-						 *      indicate an out-of-memory error when we don't have a
+						 * XXX: This could also  happen when  the user has  fed us  with
+						 *      a  secondary input  data blob,  in which  case we should
+						 *      indicate an  out-of-memory error  when we  don't have  a
 						 *      window (which would mean that we were unable to allocate
 						 *      one at some point in the past) */
 						YIELD_FOREVER(ZLIB_ERROR_OOB_DISTANCE);
@@ -810,14 +810,14 @@ done:
 }
 
 
-/* Feed the given ZLIB reader another blob of compressed data.
- * This function must be called to continue decompression after
+/* Feed the given ZLIB reader  another blob of compressed  data.
+ * This function must be called to continue decompression  after
  * `zlib_reader_read()' returned 0 with a non-empty buffer size,
  * and `zlib_reader_eof(self)' also returning false.
  * WARNING: In order for `feed' to function properly, the reader
- *          must have access to a sliding window buffer.
+ *          must   have  access  to  a  sliding  window  buffer.
  *          Otherwise, you must ensure that the compressed data
- *          blob is already complete from the get-go. */
+ *          blob   is   already  complete   from   the  get-go. */
 INTERN NONNULL((1)) void CC
 libzlib_reader_feed(struct zlib_reader *__restrict self,
                     void const *blob, size_t blob_size) {
@@ -846,7 +846,7 @@ libzlib_reader_setpos(struct zlib_reader *__restrict self,
                       uintptr_t pos) {
 	ssize_t result;
 	/* Check if the given `pos' lies within the current block, in which
-	 * case we won't have to walk through all compressed data prior to
+	 * case we won't have to walk through all compressed data prior  to
 	 * the current `pos'. */
 	if (pos > self->zr_offset) {
 		result = libzlib_reader_read(self, NULL, pos - self->zr_offset);
@@ -904,7 +904,7 @@ again_setpos:
 			/* Read from (possibly) 2 locations:
 			 * >> PREAD(self->zr_index, buf, self->zr_count);
 			 * >> PREAD(pos, buf + self->zr_count, bufsize - self->zr_count);
-			 * The second read will be performed later by our caller. */
+			 * The  second  read  will  be  performed  later  by  our caller. */
 			bufsize = self->zr_count; /* Truncate to the first read */
 			pos = self->zr_index; /* Resume at the saved position. */
 			self->zr_flags &= ~(_ZLIB_READER_PFLAG_LINEARREPEAT |
@@ -918,10 +918,10 @@ err:
 	return result;
 }
 
-/* Same as `zlib_reader_read()', but read from a
+/* Same  as   `zlib_reader_read()',  but   read  from   a
  * specific `pos', rather than from the current position.
  * WARNING: This function is rather slow and should not be used unless absolutely necessary!
- *          If possible, you should always use `zlib_reader_read()' instead!
+ *          If    possible,   you   should    always   use   `zlib_reader_read()'   instead!
  * NOTE: This function makes sure not to clobber the reader's previous state. */
 PRIVATE WUNUSED NONNULL((1)) ssize_t CC
 zlib_reader_pread(struct zlib_reader *__restrict self,

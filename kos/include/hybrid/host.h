@@ -100,13 +100,13 @@
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
 #endif /* !... */
 
-/* The native PAGE size of the hosting arch (if known to be constant)
- * Note that on some architectures, this value is not fixed, but is a
+/* The native PAGE size of the hosting arch (if known to be  constant)
+ * Note that on some architectures, this value is not fixed, but is  a
  * run- or compile-time option of the hosting kernel and should not be
- * assumed to be a compile-time constant by user-space processes.
- * This macro should only be defined in cases where this is _not_ the
+ * assumed to  be a  compile-time  constant by  user-space  processes.
+ * This macro should only be defined in cases where this is _not_  the
  * case, and the PAGE size _is_ a fixed, architecture-defined constant
- * that cannot be changed. Otherwise, this macro mustn't get defined! */
+ * that cannot be changed. Otherwise, this macro mustn't get  defined! */
 #ifndef __ARCH_PAGESIZE
 #ifdef PAGESIZE
 #define __ARCH_PAGESIZE PAGESIZE

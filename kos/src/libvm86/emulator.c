@@ -62,7 +62,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		(*self->vr_intr)(self, intno);
 	} else {
 		/* Make `base' volatile, so the compiler can't be bothered by it possibly being
-		 * NULL (which is actually what we want it to be in this very special case, as
+		 * NULL  (which is actually what we want it to be in this very special case, as
 		 * the realmode IDT is located at address 0!) */
 		uint16_t *volatile base = (uint16_t *)0;
 		uint16_t *sp, cs, ip;

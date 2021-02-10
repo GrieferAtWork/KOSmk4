@@ -30,43 +30,43 @@
 __SYSDECL_BEGIN
 
 /* User-space thread Remote Procedure Calls
- * Using these, user-space can deliver custom interrupts to arbitrary threads
+ * Using these, user-space  can deliver custom  interrupts to arbitrary  threads
  * which may then be used to execute custom code, or even terminate the targeted
  * thread.
- * For this purpose, the kernel defines a set of system calls that may be used
+ * For  this purpose, the kernel defines a set of system calls that may be used
  * as cancellation points for synchronous RPCs, whilst asynchronous RPCs may be
  * serviced anytime.
- * WARNING: Synchronous are only checked when the target thread is about to
- *          perform some a low-level blocking operation such as acquiring an
- *          already locked mutex. - They are however not checked if a mutex
+ * WARNING: Synchronous  are only checked  when the target  thread is about to
+ *          perform some a low-level blocking  operation such as acquiring  an
+ *          already  locked mutex. -  They are however not  checked if a mutex
  *          wasn't locked already, or if the target thread was able to perform
  *          its current operation without blocking!
- *          However, if the target thread was already blocking when the RPC was
- *          scheduled, it will stop blocking and service the RPC immediately.
- *          Unrelated to this, the target thread may also manually check for
- *          pending, synchronous RPCs by calling the `rpc_service()' system call.
- *          Additionally, when it comes to system calls, only a specific sub-set
- *          of calls can actually be used to service user-level RPCs, meaning that
+ *          However,  if the  target thread was  already blocking when  the RPC was
+ *          scheduled,  it  will stop  blocking  and service  the  RPC immediately.
+ *          Unrelated  to  this,  the target  thread  may also  manually  check for
+ *          pending, synchronous RPCs by  calling the `rpc_service()' system  call.
+ *          Additionally,  when it comes  to system calls,  only a specific sub-set
+ *          of calls can actually be used to service user-level RPCs, meaning  that
  *          calls such as close() or munmap() are guarantied to complete atomically
  *          without being interruptible by synchronous RPCs.
  *          This set of system calls is also known as those marked as [cp] (Cancellation Points).
  * HINT: Any function that may (under circumstances) service synchronous RPCs
  *       is declared as `__NOTHROW_RPC' (or [rpc], et.al.)
  *
- * To allow for maximum flexibility, irregardless of what state a targeted thread
+ * To allow for maximum flexibility, irregardless of what state a targeted  thread
  * may be in at the time when an RPC gets serviced, low-level RPC invocations must
- * define a small program that describes how the state of the interrupted thread
+ * define  a small program that describes how  the state of the interrupted thread
  * should be modified before an interrupt routine is invoked. */
 
 
 
 /* Opcodes used to describe how to transform the environment of a
- * target thread in order to be able to service some custom RPC.
- * NOTE: Modifications made by such a program are atomic in regards
+ * target thread in order to be able to service some custom  RPC.
+ * NOTE: Modifications made by such a program are atomic in  regards
  *       to normal user-space code execution, as well as other RPCs.
  * NOTE: These opcodes intentionally aren't anywhere near turing-complete,
- *       mainly because they're only intended for limited transformations
- *       that should be performed in order to schedule arbitrary RPC
+ *       mainly  because they're only intended for limited transformations
+ *       that  should  be performed  in  order to  schedule  arbitrary RPC
  *       callbacks, whilst allowing for any or no assumptions at all being
  *       made on the target thread's state.
  * Upon program start, `i = 0' and `newreg' is a mirror copy of `oldreg'
@@ -209,28 +209,28 @@ __SYSDECL_BEGIN
  *   - USER_RPC_SYNC_INTERRUPT_NONSYS: RPC_SCHEDULE_SYNC|RPC_SCHEDULE_FLAG_NONSYSCALL
  */
 #define RPC_SCHEDULE_SYNC               0x0000 /* [S] Schedule the RPC as synchronous (Only allow S-flags; disallow A-flags).
-                                                * NOTE: Only synchronous RPCs may return by means other than directly returning to
+                                                * NOTE: Only synchronous RPCs may return by means other than directly returning  to
                                                 *       the interrupted location. - I.e. Only synchronous RPCs may throw exception!
                                                 * Also: Be aware that while in the context of another thread, you should respect that
-                                                *       thread's expectations of the severity of modifications made to globals by
+                                                *       thread's expectations of  the severity  of modifications made  to globals  by
                                                 *       certain function, as well as their reach.
                                                 *       For example: You probably shouldn't clobber `errno', or load/unload libraries,
-                                                *                    or make similarly drastic changes the global program state.
-                                                *       However, in theory, you are allowed to perform (most) blocking operations based
-                                                *       on assumption that since it was a blocking operation that allowed the RPC to
+                                                *                    or make  similarly  drastic  changes the  global  program  state.
+                                                *       However, in theory, you are allowed to perform (most) blocking operations  based
+                                                *       on assumption that since  it was a  blocking operation that  allowed the RPC  to
                                                 *       be serviced, the program is in a state where (most) blocking is possible without
-                                                *       running the risk of causing a dead-lock (though still be careful in regards to
-                                                *       things like recursive- or atomic locks, as well as preventing combinations of
-                                                *       locks that were never meant to interact with- or be combined with each other). */
+                                                *       running the risk of causing a dead-lock  (though still be careful in regards  to
+                                                *       things  like recursive- or  atomic locks, as well  as preventing combinations of
+                                                *       locks that were never meant to interact  with- or be combined with each  other). */
 #define RPC_SCHEDULE_ASYNC              0x0001 /* [A] Schedule the RPC as asynchronous (Only allow A-flags; disallow S-flags).
-                                                * NOTE: An asynchronous RPC should never do anything that may potentially block.
+                                                * NOTE: An  asynchronous  RPC  should never  do  anything that  may  potentially block.
                                                 *       This excludes operations that could only feasibly block whilst in kernel-space,
-                                                *       meaning that pretty much every system call is still allowed, though pretty
+                                                *       meaning that pretty  much every  system call  is still  allowed, though  pretty
                                                 *       much all user-space functions aren't. */
 #define RPC_SCHEDULE_FLAG_NOINTERRUPT   0x0002 /* [A] Don't force the target to return to user-space (don't throw
-                                                * an `E_INTERRUPT_USER_RPC' to unwind kernel-space execution) */
-#define RPC_SCHEDULE_FLAG_NONSYSCALL    0x0002 /* [S] Allow synchronous RPCs to be serviced for reasons other
-                                                * than RPC_REASON_SYSCALL. - This can e.g. happen when the target
+                                                * an `E_INTERRUPT_USER_RPC'  to  unwind  kernel-space  execution) */
+#define RPC_SCHEDULE_FLAG_NONSYSCALL    0x0002 /* [S] Allow  synchronous  RPCs  to  be  serviced  for  reasons   other
+                                                * than RPC_REASON_SYSCALL.  - This  can e.g.  happen when  the  target
                                                 * thread accesses VIO memory, or a memory-mapped file needs to acquire
                                                 * a blocking lock in order to be able to load data from disk. */
 /*      RPC_SCHEDULE_FLAG_              0x0004 /* ... */
@@ -238,9 +238,9 @@ __SYSDECL_BEGIN
 /*      RPC_SCHEDULE_FLAG_              0x0010 /* ... */
 #define RPC_SCHEDULE_FLAG_WAITFORSTART  0x0020 /* [A|S] Blocking wait for the RPC to reach a state of being able to start.
                                                 * NOTE: If the target terminates before servicing can start, `rpc_schedule_ex()'
-                                                *       will return to indicate that the target thread has terminated. */
+                                                *       will  return  to  indicate  that  the  target  thread  has   terminated. */
 #define RPC_SCHEDULE_FLAG_STATUSFUTEX   0x0040 /* [A|S] Allow the program to define a futex pointer to which the pointer-sized
-                                                * RPC state will be written, as one of the `RPC_STATUS_*' constants. */
+                                                * RPC  state  will  be  written,  as  one  of  the  `RPC_STATUS_*'  constants. */
 /*      RPC_SCHEDULE_FLAG_              0x0080 /* ... */
 #define RPC_SCHEDULE_FLAG_SYSRESTART    0x0100 /* [A|S] Always restart interrupted system calls (Always indicate `RPC_REASON_SYSCALL' as reason for system calls).
                                                 * This flag behaves identical to the `SA_RESTART' flag for signal handlers. */
@@ -248,7 +248,7 @@ __SYSDECL_BEGIN
 /*      RPC_SCHEDULE_FLAG_              0x0400 /* ... */
 /*      RPC_SCHEDULE_FLAG_              0x0800 /* ... */
 #define RPC_SCHEDULE_FLAG_WAITSMPACK    0x1000 /* [A|S] In an SMP environment, wait for the target's CPU to acknowledge a potential IPI. */
-#define RPC_SCHEDULE_FLAG_DONTWAKE      0x2000 /* [A|S] Don't trigger a sporadic wake-up of the target thread (don't force the target to
+#define RPC_SCHEDULE_FLAG_DONTWAKE      0x2000 /* [A|S] Don't trigger a  sporadic wake-up of  the target  thread (don't force  the target  to
                                                 * begin a quantum when IDLE before, but keep it idle until something else causes an wake-up).
                                                 * Note that a sporadic wake-up is likely to not be noticeable from user-space. */
 #define RPC_SCHEDULE_FLAG_HIGHPRIO      0x4000 /* [A|S] Schedule the RPC with high priority (if the target is hosted by the same
@@ -261,14 +261,14 @@ __SYSDECL_BEGIN
 #define RPC_STATUS_SERVICED      0x0001 /* SUCCESS: The RPC has been successfully serviced. */
 #define RPC_STATUS_TERMINATED    0x0002 /* ERROR:   The target thread has terminated before the RPC could be serviced.
                                          * NOTE: This status is only set if the target terminates _after_ `rpc_schedule_ex()'
-                                         *       has returned indicating success. - Not when `rpc_schedule_ex()' already
-                                         *       indicated that the target has terminated, and also not if the target
+                                         *       has returned  indicating success.  -  Not when  `rpc_schedule_ex()'  already
+                                         *       indicated that  the  target has  terminated,  and  also not  if  the  target
                                          *       terminates after servicing of the RPC has begun. */
 /* Special error return codes. */
 #define RPC_STATUS_BADPROGRAM    0x8000 /* The given program contains an illegal/unknown instruction */
 #define RPC_STATUS_BADARGUMENTS  0x8001 /* Attempted to load a register with an invalid value (e.g. CS = KERNEL_CS) */
 #define RPC_STATUS_BADPOINTER    0x8002 /* The program or arguments pointer is faulty within the context of the VM of `target'
-                                         * NOTE: With the exception of `RPC_SCHEDULE_FLAG_STATUSFUTEX', both the `program',
+                                         * NOTE: With  the exception of  `RPC_SCHEDULE_FLAG_STATUSFUTEX', both the `program',
                                          *       as well as the `arguments' and `arguments[i]' pointers need to be valid both
                                          *       within the context of the VM of the calling thread, as well as the VM of the
                                          *       targeted thread. */
@@ -287,7 +287,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 /* >> rpc_service(2)
  * Service RPC callbacks (user-space variant of the kernel-space `task_serve()')
- * @return:  1: At least 1 RPC callback was serviced. (though this may
+ * @return:  1: At least 1 RPC callback  was serviced. (though this  may
  *              have been a kernel-level RPC that didn't actually affect
  *              user-space)
  * @return:  0: No RPC callbacks were served.
@@ -324,12 +324,12 @@ rpc_schedule_ex(__pid_t target, __syscall_ulong_t flags,
 
 /* >> rpc_schedule(3)
  * Portable wrapper for `rpc_schedule_ex()'
- * Schedule a simple RPC for execution on a given `target' thread.
- * The scheduled RPC assumes that `target' has a valid stack, while
- * taking a `callback' to-be invoked, which itself will take `argc'
- * pointer-sized arguments from the variable argument list of this
+ * Schedule a  simple RPC  for execution  on a  given `target'  thread.
+ * The scheduled RPC  assumes that  `target' has a  valid stack,  while
+ * taking  a `callback'  to-be invoked,  which itself  will take `argc'
+ * pointer-sized arguments  from the  variable  argument list  of  this
  * function. (When `RPC_SCHEDULE_FLAG_STATUSFUTEX' is given, `callback'
- * takes `argc - 1' arguments, with the first variable argument being
+ * takes `argc - 1' arguments, with  the first variable argument  being
  * a pointer to the status futex)
  * HINT: This function is entirely implemented using `rpc_schedule_ex()'
  * HINT: On i386, the RPC program used by this function is:
@@ -351,8 +351,8 @@ rpc_schedule_ex(__pid_t target, __syscall_ulong_t flags,
  *       >> [stftx %arg[3]]
  *       >> psh  %arg[(3|4) + n...]
  *       >> resume                           RPC_PROGRAM_OP_resume
- *       When `callback' returns, an internal wrapper is called that will restore
- *       registers, as well as optionally restart an interrupted system call,
+ *       When  `callback' returns, an  internal wrapper is  called that will restore
+ *       registers, as  well  as  optionally restart  an  interrupted  system  call,
  *       depending on the reason code loaded into `%ebx', before restoring registers
  *       using the data pointed to by `%ebp'
  *       With all of this in mind, the register state when librpc's internal RPC
@@ -375,7 +375,7 @@ rpc_schedule_ex(__pid_t target, __syscall_ulong_t flags,
  * @param: flags:    RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
  * @param: callback: The callback to invoke
  * @param: argc:     The number of arguments to-be passed to `callback'
- * @param: ...:      Arguments passed to `callback', potentially preceded by
+ * @param: ...:      Arguments passed to  `callback', potentially preceded  by
  *                   the status futex when the `RPC_SCHEDULE_FLAG_STATUSFUTEX'
  *                   flag was set.
  * @return: 1:  The specified `target' thread has already terminated.

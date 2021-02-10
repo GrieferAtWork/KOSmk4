@@ -32,7 +32,7 @@
 #define CONFIG_EMULOCK_HAVE_CMPXCHL 1
 #define CONFIG_EMULOCK_HAVE_CMPXCHQ 1
 /* No 16-bit atomic instruction is defined
- * for i386, so no need to emulate it! */
+ * for  i386,  so no  need to  emulate it! */
 #endif /* !__x86_64__ */
 
 
@@ -54,11 +54,11 @@ DECL_BEGIN
 
 #ifdef __CC__
 /* Definitions for emulating lock-prefixed instructions in software
- * Mainly intended to be used when the hardware doesn't lock some
- * specific lock instruction, at which point we'll try to emulate
- * it in software (mainly effects `cmpxchg8b' on i386, and
+ * Mainly intended to be used  when the hardware doesn't lock  some
+ * specific lock instruction, at which  point we'll try to  emulate
+ * it  in  software  (mainly  effects  `cmpxchg8b'  on  i386,   and
  * `cmpxchg16b' on x86_64)
- * NOTE: The given `pstate' is used if the behavior is emulated using
+ * NOTE: The  given `pstate' is used if the behavior is emulated using
  *       a VIO operation, as well as a descriptor for figuring out how
  *       exactly an E_SEGFAULT exception should be thrown (if any) */
 

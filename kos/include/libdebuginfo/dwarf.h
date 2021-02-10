@@ -25,7 +25,7 @@
 #include <hybrid/__unaligned.h>
 
 /* NOTE: The DWARF implementation here is based on information gathered
- *       from binutils, but mostly from the online specifications
+ *       from  binutils,  but  mostly  from  the  online specifications
  *       "http://www.dwarfstd.org/doc/DWARF4.pdf", section 6.2
  *
  * SOURCES:

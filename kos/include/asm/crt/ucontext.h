@@ -22,7 +22,7 @@
 
 #include <__crt.h>
 
-/* Define the macro `__CRT_SUPPORTS_UCONTEXT' if the linked libc is guarantied
+/* Define the macro `__CRT_SUPPORTS_UCONTEXT' if the linked libc is  guarantied
  * to implement `getcontext()', `setcontext()' and `swapcontext()', without any
  * of these functions ever being able to return with errno=ENOSYS */
 #undef __CRT_SUPPORTS_UCONTEXT

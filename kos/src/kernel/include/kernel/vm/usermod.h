@@ -44,10 +44,10 @@ DECL_BEGIN
 
 #if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
 /* Elf32_Chdr and Elf64_Chdr aren't the same, and `driver_section_cdata()',
- * which we're currently using to implement `usermod_section_cdata()' only
+ * which  we're currently using to implement `usermod_section_cdata()' only
  * uses native-sized compressed section headers!
  * -> In a configuration where both would be needed, the above 2 functions need
- *    custom implementations, and we can't just re-use the implementation used
+ *    custom implementations, and we can't just re-use the implementation  used
  *    for driver sections! */
 #undef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
 #else /* USERMOD_TYPE_ELF32 && USERMOD_TYPE_ELF64 */
@@ -77,7 +77,7 @@ struct usermod_section {
 	byte_t       _us_pad3[__SIZEOF_POINTER__ - 4]; /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
 	void         *us_cdata;   /* [0..us_csize][lock(WRITE_ONCE)][owned_if(!= us_data)]
-	                           * Decompressed section data. (or same as `us_data' if section isn't compressed)
+	                           * Decompressed section data.  (or same  as `us_data' if  section isn't  compressed)
 	                           * NOTE: Set to `(void *)-1' when decompressed section data hasn't been loaded, yet.
 	                           * NOTE: A section is compressed when `ds_flags & SHF_COMPRESSED' */
 	size_t        us_csize;   /* [lock(WRITE_ONCE)][valid_if(ds_cdata)] Decompressed section size. */
@@ -95,7 +95,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct usermod_section, us_refcnt, usermod_section_des
  * NOTE: The caller must ensure that raw section data of `self' has been loaded,
  *       as in `self->us_data != (void *)-1'!
  * @return: * : A blob of `self->us_csize' (after the caller) bytes of memory,
- *              representing the section's decompressed memory contents. */
+ *              representing  the  section's  decompressed  memory   contents. */
 FUNDEF ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
 usermod_section_cdata(struct usermod_section *__restrict self,
                       gfp_t gfp DFL(GFP_NORMAL))
@@ -151,7 +151,7 @@ struct usermod {
 	REF struct path            *um_fspath;    /* [0..1][const] Optional mapping path */
 	REF struct directory_entry *um_fsname;    /* [0..1][const] Optional mapping name */
 	struct mman                *um_vm;        /* [1..1][const] The associated VM. Warning: not a reference!
-	                                           * If the VM is destroyed, this pointer will be dangling! */
+	                                           * If  the VM  is destroyed,  this pointer  will be dangling! */
 	REF struct usermod         *um_next;      /* [0..1][lock(INTERNAL(um_vm))] Next usermod object. */
 	uintptr_t                   um_modtype;   /* [const] Module type (one of `USERMOD_TYPE_*') */
 	union {
@@ -179,7 +179,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct usermod, um_refcnt, usermod_destroy)
 #define USERMOD_SECTION_LOCK_FINDEX  0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
 #define USERMOD_SECTION_LOCK_FNODATA 0x0002 /* Do not lock section data into kernel memory, unless it was already loaded before. */
 
-/* Lock a named section of a given usermod into
+/* Lock a  named section  of a  given usermod  into
  * memory and return a descriptor for that section.
  * @throws: E_SEGFAULT: Only here because `name' is USER
  * @return: * :   Reference to the section descriptor.
@@ -202,13 +202,13 @@ FUNDEF NONNULL((1)) void KCALL usermod_load_elf_shstrtab(struct usermod *__restr
 
 
 /* Find the user-space module that resides at the given address.
- * NOTE: After the kernel has been poisoned, this function can no longer be used
+ * NOTE: After the kernel has been poisoned, this function can no longer be  used
  *       to load new user-space modules, but can only be used to access ones that
  *       were already in-cache.
- *       This is done as a safety measure, since loading additional user-space
- *       module descriptors requires the use of filesystem and disk I/O, which
+ *       This is  done as  a safety  measure, since  loading additional  user-space
+ *       module descriptors  requires the  use of  filesystem and  disk I/O,  which
  *       is something that simply goes too far when the system is already unstable.
- * @param: addr_must_be_executable: Unless a know module already exists for the given
+ * @param: addr_must_be_executable: Unless a  know  module  already exists  for  the  given
  *                                  address, fail unless the backing VM node is executable.
  *                                  Should be set to true if you believe that `addr' should
  *                                  be a program counter position.
@@ -233,15 +233,15 @@ vm_getusermod_above(struct mman *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Return the first usermod object that has a starting load start address greater than `prev'
- * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (USER void *)0)'.
+ * When `prev'  is  NULL,  behave the  same  as  `vm_getusermod_above(self, (USER void *)0)'.
  * If no module exists that matches this criteria, return `NULL' instead. */
 FUNDEF REF struct usermod *FCALL
 vm_getusermod_next(struct mman *__restrict self,
                    struct usermod *prev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Same as `vm_getusermod()', but automatically determine the VM to which `addr' belongs.
- * When the kernel was configured with the builtin debugger enabled, this function will
+/* Same as  `vm_getusermod()',  but  automatically  determine  the  VM  to  which  `addr'  belongs.
+ * When  the  kernel  was  configured  with  the  builtin  debugger  enabled,  this  function  will
  * check if the builtin debugger is enabled, and if so, lookup `addr' in `task_getvm(dbg_current)'.
  * Otherwise, `THIS_MMAN' will always searched for `addr' instead. */
 #ifdef CONFIG_HAVE_DEBUGGER
@@ -260,7 +260,7 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
 /* Clear out all unused usermod objects from `self' and
- * return non-zero if the cache wasn't already empty. */
+ * return  non-zero if the  cache wasn't already empty. */
 FUNDEF NOBLOCK size_t
 NOTHROW(FCALL vm_clear_usermod)(struct mman *__restrict self);
 
@@ -272,8 +272,8 @@ NOTHROW(FCALL vm_clear_usermod)(struct mman *__restrict self);
  * @return: < 0:   Stop enumeration and have `vm_enumusermod()' immediately re-return this value. */
 typedef ssize_t (KCALL *vm_enumusermod_callback_t)(void *cookie, struct usermod *__restrict um);
 
-/* Enumerate all user-space modules that may be mapped within `self'
- * Modules are (generally) enumerated in ascending order, based on
+/* Enumerate all user-space  modules that may  be mapped within  `self'
+ * Modules are  (generally) enumerated  in  ascending order,  based  on
  * their `um_loadstart' values. Note though that while you may optimize
  * for this case, do not rely on this actually being the case!
  * @param: cb:     Callback to-be invoked for every user-module found.

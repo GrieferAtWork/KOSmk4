@@ -205,7 +205,7 @@ DlModule_OpenFilename(char const *__restrict filename,
 	if unlikely(E_ISERR(fd))
 		goto err; /* No error on file-access-failure! */
 	/* Make sure to only use big file descriptor indices, so-as
-	 * to prevent use of reserved file numbers, as used by the
+	 * to  prevent use of reserved file numbers, as used by the
 	 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */
 	fd     = reopen_bigfd(fd);
 	result = DlModule_OpenFd(fd, mode);
@@ -339,7 +339,7 @@ again:
 	}
 #ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
 	/* Check if the filename ends with `.<number>'.
-	 * If so, strip that number and try again. */
+	 * If  so,  strip  that number  and  try again. */
 	if (filenamelen && isdigit(filename[filenamelen - 1])) {
 		do {
 			--filenamelen;
@@ -629,9 +629,9 @@ DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
 				result->dm_loadend = end;
 		}
 	}
-	/* Use a dedicated system call for mapping the library into memory.
+	/* Use  a  dedicated   system  call   for  mapping  the   library  into   memory.
 	 * This functionality could technically be implemented via `MAP_FIXED_NOREPLACE',
-	 * however using this method, we leave it entirely up to the kernel to decide
+	 * however using this method,  we leave it  entirely up to  the kernel to  decide
 	 * how it is going to map the library, and more importantly: where. */
 	{
 		void *libbase;
@@ -733,7 +733,7 @@ err:
 
 
 
-/* Find the DL module mapping the specified file.
+/* Find  the  DL   module  mapping   the  specified   file.
  * If no such module is loaded, `NULL' is returned instead. */
 INTERN WUNUSED NONNULL((1))
 REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC

@@ -112,12 +112,12 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 		                           (char *)sections->ds_strtab_start))
 			result->al_rawname = (char *)sections->ds_strtab_start + name_offset;
 	}
-	/* Special case: The kernel core doesn't include its internal `.symtab' as part of its binary
-	 *               image. This, combined with the fact that the kernel uses a custom protocol for
+	/* Special case: The  kernel  core doesn't  include  its internal  `.symtab'  as part  of  its binary
+	 *               image. This, combined  with the  fact that  the kernel  uses a  custom protocol  for
 	 *               declaring its exported symbols requires special handling if the caller is requesting
 	 *               information about the core itself.
 	 *               In this case, we can use the driver-api function `driver_symbol_at()', which includes
-	 *               special handling for reversing the names of public functions exported by the kernel
+	 *               special  handling for reversing the names of  public functions exported by the kernel
 	 *               core (However, this doesn't work for private/internal functions...)
 	 * TODO: A similar special case should exist for `libdl.so'! */
 #ifdef __KERNEL__
@@ -262,7 +262,7 @@ again_cu_component:
 				 * >> inline __attribute__((always_inline)) void inline_function2(void) {
 				 * >> 	inline_function();
 				 * >> }
-				 * >> 
+				 * >>
 				 * >> extern __attribute__((visibility("hidden"))) void *test_function(void) {
 				 * >> 	void *result;
 				 * >> 	__asm__ __volatile__("mov %1, %0" : "=g" (result) : "r" (&&foo));
@@ -386,7 +386,7 @@ fill_result_sp_any_cu:
 				if (level == 0) {
 					if (inline_recursion > 1) {
 						/* Top-level source information (aka. return information about the top-most
-						 * inline function). NOTE: Re-use the SP-loader code, but override the SP
+						 * inline function). NOTE: Re-use the  SP-loader code, but override the  SP
 						 * values to instead refer to information about the inline function. */
 						if (!innermost_is_subprogram ||
 						    (self->dup_cu_info_pos = innermost_is_subprogram,
@@ -403,23 +403,23 @@ fill_result_sp_any_cu:
 					goto fill_result_sp;
 				}
 				/* Request for source information about an inline function call-site.
-				 * For this, we must gather information from 2 locations:
-				 *   The addr2line file/line/col information must be taken from the
+				 * For  this,   we  must   gather  information   from  2   locations:
+				 *   The  addr2line  file/line/col  information   must  be  taken  from   the
 				 *   first inline function encountered after `(inline_recursion - level) - 1'
-				 *   others have been skipped, where it is specified through the inline
+				 *   others  have  been skipped,  where it  is  specified through  the inline
 				 *   call-site-location attributes.
 				 *   The addr2line name/decl information must be taken from the
 				 *   first inline function encountered after `(inline_recursion - level) - 2'
-				 *   others have been skipped, where it is available through the SP pointed
-				 *   to by the information. - However, when `level == inline_recursion - 1',
-				 *   this information must instead be taken directly from the original `SP'!
+				 *   others have been skipped, where it  is available through the SP  pointed
+				 *   to  by the information. - However, when `level == inline_recursion - 1',
+				 *   this  information must instead be taken directly from the original `SP'!
 				 */
 				inline_recursion = (inline_recursion - level) - 1;
-				/* `inline_recursion' now specifies the number of inline functions to skip
+				/* `inline_recursion' now  specifies the  number of  inline functions  to  skip
 				 * before the one containing the call-site source location information required
-				 * to fill in the file/line/col information of the result is reached.
-				 * Additionally, when `inline_recursion == 1', the then-loaded inline function
-				 * must be loaded into `sp', since it is the one from where the call actually
+				 * to  fill  in  the  file/line/col  information  of  the  result  is  reached.
+				 * Additionally,  when `inline_recursion == 1', the then-loaded inline function
+				 * must  be loaded into `sp', since it is  the one from where the call actually
 				 * happens. */
 
 				/* Rewind to the start of child components of this sub-program. */
@@ -473,8 +473,8 @@ fill_result_sp_any_cu:
 					}
 				}
 				/* At this point, the resulting file/line/col information
-				 * is available via the call-site fields of `is', while
-				 * information about the containing function is stored
+				 * is available via the  call-site fields of `is',  while
+				 * information about  the containing  function is  stored
 				 * within `sp' */
 				result->al_linediscr = 0;
 				result->al_rawname   = sp.sp_rawname;
@@ -541,15 +541,15 @@ err_corrupt:
 }
 
 /* Analyze data from the given `sections' to locate source-level information about `module_relative_pc'.
- * @param: sections: The mapping locations for the different debug sections associated with the program.
+ * @param: sections: The mapping locations for the different debug sections associated with the  program.
  *                   This structure must be initialized with available section information by the caller,
- *                   although for minimal functionality, only the .debug_line section is required.
- *                   Note however that other sections are mandatory (and recommended) in order to
+ *                   although for  minimal  functionality,  only the  .debug_line  section  is  required.
+ *                   Note however  that  other sections  are  mandatory  (and recommended)  in  order  to
  *                   provide full support of available features.
- * @param: level:    Inline function indirection depth for the location to query.
- *                   Level #0 always refers to the exact source location, as retrievable
- *                   via the .debug_line program, while all levels greater than this refer
- *                   to the call-sites of inlined functions found at that location.
+ * @param: level:    Inline  function  indirection  depth   for  the  location  to   query.
+ *                   Level  #0 always refers  to the exact  source location, as retrievable
+ *                   via  the .debug_line program, while all levels greater than this refer
+ *                   to  the  call-sites  of  inlined  functions  found  at  that location.
  *                   Alternatively, you may also pass `DEBUG_ADDR2LINE_LEVEL_SOURCE', which
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
@@ -568,8 +568,8 @@ err_corrupt:
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully retrieved information.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either no information is known about `module_relative_pc',
  *                                    or the given `level >= OUT(result->al_levelcnt)', and also
- *                                    isn't equal to `DEBUG_ADDR2LINE_LEVEL_SOURCE', where
- *                                    `result->al_levelcnt' is set to 0 if no information is
+ *                                    isn't  equal  to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
+ *                                    `result->al_levelcnt' is set  to 0 if  no information  is
  *                                    known at all, or whatever the total number of information
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
@@ -627,7 +627,7 @@ err_nodata:
 						if (error == DEBUG_INFO_ERROR_NOLEVEL)
 							goto err_nodata;
 						/* If the CU doesn't contain information and we're not supposed to try
-						 * hard, trust the contents of the .debug_aranges section and assume
+						 * hard, trust the contents of  the .debug_aranges section and  assume
 						 * that no information for the specified address exists. */
 						if (error == DEBUG_INFO_ERROR_NOFRAME &&
 						    !(flags & DEBUG_ADDR2LINE_FTRYHARD))
@@ -661,7 +661,7 @@ err_nodata:
 		}
 
 		/* If there were no corruptions, and we're not supposed to try hard,
-		 * fail now so we don't have to scan every single addr2line CU. */
+		 * fail now so  we don't  have to  scan every  single addr2line  CU. */
 		if (!has_corruptions && !(flags & DEBUG_ADDR2LINE_FTRYHARD))
 			goto err_nodata_nolevel;
 	}
@@ -797,7 +797,7 @@ INTERN_CONST STRINGSECTION char const secname_dynstr[]        = ".dynstr";
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
  * >> These functions are simply light-weight wrappers around `library_locksection()',
- *    taking the job of locking debug information sections into memory off of
+ *    taking the  job  of  locking  debug information  sections  into  memory  off  of
  *    the user. */
 INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,

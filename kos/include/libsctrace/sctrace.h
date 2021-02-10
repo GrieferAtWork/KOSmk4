@@ -52,8 +52,8 @@ struct sc_desc {
 
 struct rpc_syscall_info;
 
-/* Get a description of the system call described by `sc_info' in `desc'
- * This is the main function used to access the system call description
+/* Get a description  of the  system call  described by  `sc_info' in  `desc'
+ * This  is  the main  function used  to access  the system  call description
  * database for the purpose of doing things such as printing a representation
  * of a system call invocation.
  * @return: true:  The system call was recognized, and `desc' was filled accordingly.
@@ -67,11 +67,11 @@ __NOTHROW_NCX(LIBSCTRACE_CC sc_getdesc)(struct rpc_syscall_info const *__restric
                                         struct sc_desc *__restrict desc);
 #endif /* LIBSCTRACE_WANT_PROTOTYPES */
 
-/* Print the representation of a given system call argument
+/* Print the representation of a given system call  argument
  * value, given both its `argtype' (one of `*'), and `value'
  * WARNING: Depending on `argtype', an exception may be thrown
  *          if the system call invoker has passed some invalid
- *          argument to a system call (i.e. a faulty pointer
+ *          argument to a system  call (i.e. a faulty  pointer
  *          when a structure pointer or string was expected) */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBSCTRACE_CC *LPSC_PRINTVALUE)(__pformatprinter printer, void *arg,

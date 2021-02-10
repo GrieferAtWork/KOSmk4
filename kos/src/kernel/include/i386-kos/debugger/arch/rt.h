@@ -56,7 +56,7 @@ DECL_BEGIN
  *                a carbon copy of `x86_idt', though with a couple of changes made
  *                to allow the handling of HID-related interrupts.
  *  - %gdtr:      Always points to `x86_dbggdt', where `x86_dbggdt' is a carbon
- *                copy of the unmodified base-state of the original GDT.
+ *                copy of  the  unmodified  base-state  of  the  original  GDT.
  *  - %ds:        Always `SEGMENT_USER_DATA_RPL'
  *  - %es:        Always `SEGMENT_USER_DATA_RPL'
  *  - %fs:        Always [i386:`SEGMENT_KERNEL_FSBASE', x86_64:`SEGMENT_USER_DATA_RPL']
@@ -70,7 +70,7 @@ DECL_BEGIN
  *
  *  - THIS_TASK:  Points to the task-structure of the thread that running on the CPU
  *                chosen to host the debugger. If during debugger entry, it is found
- *                that this pointer would be invalid, or unset, this will point to
+ *                that this pointer would be invalid,  or unset, this will point  to
  *                `FORCPU(THIS_CPU, thiscpu_idle)' instead.
  *
  *  - THIS_TASK->t_cpu->c_override: Set to `THIS_TASK'
@@ -83,9 +83,9 @@ DECL_BEGIN
  *    debugger mode is exited.
  *
  *  - While in debugger mode, `dbg_active' is non-zero.
- *    Care is taken that no secondary CPU will see this value being
- *    non-zero while debugger mode is being entered on another CPU.
- *    As such, any code can check this global, where a non-zero value
+ *    Care  is taken that  no secondary CPU will  see this value being
+ *    non-zero while debugger  mode is being  entered on another  CPU.
+ *    As such, any code can check this global, where a non-zero  value
  *    means that the kernel is in debugger mode, and that the checking
  *    thread is the one and only debugger control thread.
  *
@@ -103,7 +103,7 @@ DECL_BEGIN
 
 struct task;
 
-/* Arch-specific backups for context data of
+/* Arch-specific backups for  context data  of
  * the current thread whilst in debugger mode. */
 #ifndef CONFIG_NO_SMP
 struct x86_dbg_cpuammend {
@@ -172,12 +172,12 @@ struct x86_dbg_exitstate_struct {
 #ifdef __x86_64__
 	u64              de_kernel_gsbase; /* The debugger exit kernel %gs.base
 	                                    * NOTE: This the %gs.base value used if the debugger returns
-	                                    *       to kernel-space. If it returns to user-space, then
+	                                    *       to  kernel-space. If it  returns to user-space, then
 	                                    *       `de_state.fcs_sgbase.sg_gsbase' is used instead.
 	                                    * NOTE: This field should always equal `THIS_TASK', as all
 	                                    *       kernel code is allowed to assume that the %gs.base
 	                                    *       register always points to the current thread.
-	                                    * This register can be accessed as `%kernel_gs.base' in
+	                                    * This  register can be accessed as `%kernel_gs.base' in
 	                                    * expressions, and the `r' command will display it as an
 	                                    * error if it does not equal `THIS_TASK' */
 #endif /* __x86_64__ */
@@ -187,8 +187,8 @@ DATDEF struct x86_dbg_exitstate_struct x86_dbg_exitstate;
 
 
 /* 1 + the LAPIC ID of the CPU currently holding the debugger lock.
- * This value is used with `lock cmpxchgw' to describe the primary
- * lock used to ensure that only a single thread can ever be the
+ * This value is used with `lock cmpxchgw' to describe the  primary
+ * lock used to ensure  that only a single  thread can ever be  the
  * controller of debugger mode. */
 DATDEF WEAK u16 x86_dbg_owner_lapicid;
 
@@ -222,7 +222,7 @@ NOTHROW(FCALL dbg_onstack)(void) {
 /* Get/set a register, given its ID
  * NOTE: When `return > buflen', then
  *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname: The register was not written.
+ *       dbg_setregbyname:  The  register   was  not   written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
  * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
  * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
@@ -236,7 +236,7 @@ FUNDEF bool
 NOTHROW(KCALL x86_dbg_setregbyidp)(unsigned int level, unsigned int regno, uintptr_t value);
 
 /* Return the ID (one of `X86_REGISTER_*' from <asm/registers.h>,
- * or one of `X86_DBGREGISTER_*') from a given register name.
+ * or one  of `X86_DBGREGISTER_*')  from a  given register  name.
  * @return: X86_REGISTER_NONE: Unknown register. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(KCALL x86_dbg_regfromname)(char const *__restrict name, size_t namelen);
@@ -258,9 +258,11 @@ enum {
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define X86_DBGREGISTER_FEXCEPTREGISTER X86_DBGREGISTER_FEXCEPTREGISTER /* FLAG: Lookup the register in the thread's exception-context. */
+#define X86_DBGREGISTER_FEXCEPTREGISTER X86_DBGREGISTER_FEXCEPTREGISTER /* FLAG: Lookup the register in the thread's exception-context.
+                                                                         *       Written as `%x.eax' or `%except.eax' */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define X86_DBGREGISTER_FEXCEPTREGISTER 0x80000000 /* FLAG: Lookup the register in the thread's exception-context. */
+#define X86_DBGREGISTER_FEXCEPTREGISTER 2147483648 /* FLAG: Lookup the register in the thread's exception-context.
+                                                    *       Written as `%x.eax' or `%except.eax' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

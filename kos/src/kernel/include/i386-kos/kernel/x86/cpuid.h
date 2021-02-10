@@ -194,7 +194,7 @@ DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 
 
 /* Same as above, but for the current CPU (whereas
- * the macros above are only for the boot CPU) */
+ * the macros  above are  only for  the boot  CPU) */
 #define X86_THISCPU_HAVE_SYSENTER      (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP)
 #ifdef __x86_64__
 #define X86_THISCPU_HAVE_SYSCALL       (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL)

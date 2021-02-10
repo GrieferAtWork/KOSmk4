@@ -35,16 +35,16 @@ DECL_BEGIN
 
 struct task;
 
-/* NOTE: The read capabilities of this new R/W-lock primitive are
+/* NOTE: The read capabilities  of this new  R/W-lock primitive  are
  *       fairly expensive due to the reason that all threads holding
- *       read-locks must be tracked in order to properly handle
+ *       read-locks must  be tracked  in  order to  properly  handle
  *       write-after-read recursion.
- *       For that reason, using a `mutex' (which would be equivalent
+ *       For that reason, using a `mutex' (which would be  equivalent
  *       to an rwlock that is only ever be used in write-lock), might
  *       be the better solution. */
 
 /* Recursive, shared/mutually exclusive synchronization primitive
- * NOTE: This one must be capable of dealing with:
+ * NOTE:  This   one   must   be   capable   of   dealing   with:
  * >> rwlock_read(x);
  * >> rwlock_read(x);  // Secondary read lock does not count to the total number of reading threads.
  * >> rwlock_write(x); // Upgrade lock by changing to a state that prevents new threads from being added,
@@ -67,9 +67,9 @@ struct task;
 
 #define RWLOCK_MODE_FREADING   0x00 /* MODE: ZERO, One or more threads are holding read locks. */
 #define RWLOCK_MODE_FUPGRADING 0x01 /* MODE: A reader is being upgraded to a writer, or
-                                     *       a writer is attempting to acquire a lock.
-                                     *       New readers must wait until the rwlock
-                                     *       has returned to `RWLOCK_MODE_FREADING'
+                                     *       a  writer is attempting to acquire a lock.
+                                     *       New  readers  must wait  until  the rwlock
+                                     *       has  returned  to   `RWLOCK_MODE_FREADING'
                                      *       before acquiring a shared lock. */
 #define RWLOCK_MODE_FWRITING   0x02 /* MODE: The rwlock is being owned
                                      *       exclusively by a single thread. */
@@ -100,8 +100,8 @@ struct rwlock {
 				                          * Indirection/Recursion of the exclusive lock. */
 				WEAK u16 rw_scnt;        /* [valid_if(rw_mode == RWLOCK_MODE_FREADING)]
 				                          * The total number of individual reader threads.
-				                          * NOTE: Read-recursion is tracked internally
-				                          *       using a per-thread hash-vector of R/W-lock
+				                          * NOTE: Read-recursion    is    tracked   internally
+				                          *       using a per-thread  hash-vector of  R/W-lock
 				                          *       structures to which that thread is currently
 				                          *       holding a READ/WRITE lock. */
 			};
@@ -112,8 +112,8 @@ struct rwlock {
 				                          * Indirection/Recursion of the exclusive lock. */
 				WEAK u16 rw_scnt;        /* [valid_if(rw_mode == RWLOCK_MODE_FREADING)]
 				                          * The total number of individual reader threads.
-				                          * NOTE: Read-recursion is tracked internally
-				                          *       using a per-thread hash-vector of R/W-lock
+				                          * NOTE: Read-recursion    is    tracked   internally
+				                          *       using a per-thread  hash-vector of  R/W-lock
 				                          *       structures to which that thread is currently
 				                          *       holding a READ/WRITE lock. */
 			};
@@ -125,9 +125,9 @@ struct rwlock {
 		};
 	};
 	struct sig           rw_chmode;      /* Signal boardcast when `rw_mode' is downgraded (write -> read / write -> none).
-	                                      * (Usually connected to threads calling `rwlock_read' or `rwlock_write') */
+	                                      * (Usually   connected  to  threads  calling  `rwlock_read'  or  `rwlock_write') */
 	struct sig           rw_unshare;     /* Signal sent to a single thread when `rw_scnt' recursion drops to ZERO(0).
-	                                      * (Usually connected to the thread that is calling `rwlock_upgrade()') */
+	                                      * (Usually connected  to the  thread  that is  calling  `rwlock_upgrade()') */
 	struct task         *rw_xowner;      /* [valid_if(rw_mode == RWLOCK_MODE_FWRITING)]
 	                                      * [lock(rw_xowner == THIS_TASK)]
 	                                      * Exclusive owner of this R/W lock. */
@@ -192,16 +192,16 @@ FUNDEF ATTR_PURE WUNUSED uintptr_t NOTHROW(FCALL rwlock_reading_any)(void);
 #ifdef __INTELLISENSE__
 /* Try to acquire a shared/exclusive lock, or try to
  * atomically (non-locking) upgrade a shared to an exclusive lock.
- * NOTE: When `rwlock_tryread()' fails to allocate a read-lock because the
+ * NOTE: When  `rwlock_tryread()'  fails  to  allocate  a  read-lock  because  the
  *       calling thread is already holding at least `CONFIG_TASK_STATIC_READLOCKS'
- *       read-locks to other rwlock objects, `kmalloc_nx()' with `GFP_ATOMIC'
+ *       read-locks  to  other  rwlock objects,  `kmalloc_nx()'  with `GFP_ATOMIC'
  *       is called to allocate additional read-lock structure.
- *       Should this also fail, `rwlock_tryread()' will acquire a write-lock
+ *       Should this also fail,  `rwlock_tryread()' will acquire a  write-lock
  *       that should still be released by either calling `rwlock_endread()' or
  *      `rwlock_end()'. Acquisition of this write-lock is identical to a call
  *       to `rwlock_trywrite()'.
- *    -> If your code requires you to only be holding a read-lock,
- *       use `rwlock_tryread_readonly()' instead, which will not
+ *    -> If your  code  requires  you  to only  be  holding  a  read-lock,
+ *       use   `rwlock_tryread_readonly()'   instead,   which   will   not
  *       return `false' after a failure to `kmalloc_nx()' a new read-lock,
  *       rather than attempting to acquire a write-lock instead. */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_tryread)(struct rwlock *__restrict self);
@@ -247,18 +247,18 @@ NOTHROW(FCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __INTELLISENSE__
-/* Blocking-acquire a shared/exclusive lock.
+/* Blocking-acquire   a   shared/exclusive   lock.
  * NOTE: These functions clobber task connections.
  * @throw: * :                An exception was thrown by an RPC callback.
  * @throw: E_INTERRUPT:       The calling thread was interrupted.
  * @throw: E_BADALLOC:       [rwlock_read] Failed to allocate a read-descriptor.
  * @throw: __E_RETRY_RWLOCK: [rwlock_write]
  *                            The parallel-upgrade deadlock was detected and the calling
- *                            thread was chosen to unwind their stack, calling
+ *                            thread  was  chosen   to  unwind   their  stack,   calling
  *                           `rwlock_endread()' or `rwlock_end()' until one of the
  *                            two functions returns `true', in which case said function
- *                            should jump back to the code that was originally used
- *                            to acquire a read-lock further up the execution tree.
+ *                            should  jump back  to the  code that  was originally used
+ *                            to acquire  a read-lock  further up  the execution  tree.
  *                            See the section on `parallel-upgrade' above.
  * @return: true:  The operation was successful.
  * @return: false: The given timeout has expired. */
@@ -311,19 +311,19 @@ NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self,
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __INTELLISENSE__
-/* An advanced variant of `rwlock_write()' which makes use of
- * the RETRY_RWLOCK mechanism to quickly acquire a write lock.
- * The difference between this and the regular write, is that
- * this function will explicitly go and hunt down threads that
- * are holding read-locks on `self', scheduling RPC callbacks
+/* An advanced variant of  `rwlock_write()' which makes use  of
+ * the RETRY_RWLOCK mechanism to quickly acquire a write  lock.
+ * The difference between this and  the regular write, is  that
+ * this function will explicitly go and hunt down threads  that
+ * are  holding read-locks on  `self', scheduling RPC callbacks
  * in their context and throwing `__E_RETRY_RWLOCK' with `self'
  * as associated r/w-lock.
- * This way, the calling thread is guarantied to be able to
+ * This  way, the calling thread is guarantied to be able to
  * eventually acquire a write-lock, even if there were other
- * threads holding read locks, which were also waiting for
+ * threads holding read locks,  which were also waiting  for
  * some other kind of lock.
- * The `abs_timeout' only comes into effect when the r/w-lock
- * was already in write-mode, but the owner was some thread
+ * The `abs_timeout' only comes into effect when the  r/w-lock
+ * was already in  write-mode, but the  owner was some  thread
  * other than the calling thread. In this case, a regular wait
  * will still be performed, and the function behaves just like
  * the regular `rwlock_timedwrite()'.
@@ -334,8 +334,8 @@ NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self,
  *                         thread was chosen to unwind their stack, calling
  *                        `rwlock_endread()' or `rwlock_end()' until one of the
  *                         two functions returns `true', in which case said function
- *                         should jump back to the code that was originally used
- *                         to acquire a read-lock further up the execution tree.
+ *                         should  jump back  to the  code that  was originally used
+ *                         to acquire  a read-lock  further up  the execution  tree.
  *                         See the section on `parallel-upgrade' above.
  * @return: true:  Successfully acquire a write lock.
  * @return: false: The given timeout has expired. */
@@ -365,11 +365,11 @@ rwlock_write_aggressive(struct rwlock *__restrict self,
  * @return: false:           The given timeout has expired. (a read-lock is still being held)
  * @return: true:            Successfully upgraded the lock. (you're now holding a write-lock)
  * @throw: __E_RETRY_RWLOCK: The parallel-upgrade deadlock was detected and the calling
- *                           thread was chosen to unwind their stack, calling
+ *                           thread  was  chosen   to  unwind   their  stack,   calling
  *                          `rwlock_endread()' or `rwlock_end()' until one of the
  *                           two functions returns `true', in which case said function
- *                           should jump back to the code that was originally used
- *                           to acquire a read-lock further up the execution tree.
+ *                           should  jump back  to the  code that  was originally used
+ *                           to acquire  a read-lock  further up  the execution  tree.
  *                           See the section on `parallel-upgrade' above.
  *                          (a read-lock is still being held) */
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool FCALL
@@ -411,15 +411,15 @@ NOTHROW(FCALL rwlock_upgrade_nx)(struct rwlock *__restrict self,
 #ifdef __INTELLISENSE__
 /* Downgrade a write-lock to a read-lock.
  * NOTE: When multiple write-locks are being held recursively,
- *       this function does nothing and previous, recursive
- *       write-locks will remain active and keep the caller
+ *       this function  does nothing  and previous,  recursive
+ *       write-locks will remain  active and  keep the  caller
  *       the lock's exclusive write-owner.
  * @return: true:  Successfully downgraded the R/W-lock
  * @return: false: Failed to allocate a read-lock descriptor (a write-lock was kept). */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) bool
 NOTHROW(FCALL rwlock_downgrade)(struct rwlock *__restrict self);
 
-/* Same as `rwlock_downgrade()', but use use `GFP_NORMAL' and
+/* Same  as  `rwlock_downgrade()',  but  use  use  `GFP_NORMAL' and
  * `kmalloc()' in order to allocate a missing read-lock descriptor. */
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) void FCALL
 rwlock_downgrade_readonly(struct rwlock *__restrict self)
@@ -447,13 +447,13 @@ rwlock_downgrade_readonly(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 
 #ifdef __INTELLISENSE__
 /* Release a shared/exclusive lock, or automatically the kind of lock last acquired.
- * NOTE: It is preferred that `rwlock_endwrite' or `rwlock_endread' are used
+ * NOTE: It is preferred that `rwlock_endwrite' or `rwlock_endread' are  used
  *       to release locks. Not only because they are faster, but also because
- *       they allow for better detection of invalid uses, when it is known
+ *       they  allow for better  detection of invalid uses,  when it is known
  *       at runtime if the end of a read, or a write-lock is intended.
  * @return: false: The lock was released.
  * @return: true:  After another thread needed to upgrade `self', the calling
- *                 thread's own attempt to upgrade the same lock was halted
+ *                 thread's own attempt to upgrade  the same lock was  halted
  *                 by throwing an `__E_RETRY_RWLOCK' exception.
  *                 This is usually returned when called from a FINALLY-block.
  * >> again:

@@ -66,7 +66,7 @@ INTDEF NONNULL((1)) ssize_t CC
 libda_disasm_print_until(struct disassembler *__restrict self,
                          void const *endpc);
 
-/* Disassemble a single instruction line, following formatting rules specified
+/* Disassemble a single  instruction line, following  formatting rules  specified
  * by `DISASSEMBLER_F*', potentially printing multiple lines of the instruction's
  * bytes don't all fit into a single line (s.a. `').
  * @return: * : The sum of all printer callbacks ever executed with `self'
@@ -79,7 +79,7 @@ INTDEF NONNULL((1)) ssize_t CC
 libda_disasm_print_line_nolf(struct disassembler *__restrict self);
 
 /* Disassemble a single instruction, including its mnemonic, and all operands.
- * This function does not include any prefix, nor does it append a trailing.
+ * This  function does not include any prefix,  nor does it append a trailing.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 INTDEF NONNULL((1)) ssize_t CC

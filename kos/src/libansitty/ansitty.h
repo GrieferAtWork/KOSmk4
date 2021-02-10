@@ -36,7 +36,7 @@ DECL_BEGIN
 
 /* Initialize the given ANSI TTY
  * After calling this function, the caller is still responsible
- * to initialize at the very least `self->at_ops.ato_putc'. */
+ * to  initialize  at the  very  least `self->at_ops.ato_putc'. */
 INTDEF NONNULL((1, 2)) void CC
 libansitty_init(struct ansitty *__restrict self,
                 struct ansitty_operators const *__restrict ops);
@@ -56,7 +56,7 @@ INTDEF NONNULL((1)) ssize_t FORMATPRINTER_CC
 libansitty_printer(void *arg, char const *data, size_t datalen);
 
 /* Translate a given unicode input character `ch' (which should originate form
- * the keyboard) into the sequence of bytes mandated by the code page that is
+ * the  keyboard) into the sequence of bytes mandated by the code page that is
  * currently being used by the ansitty.
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
@@ -67,7 +67,7 @@ NOTHROW_NCX(CC libansitty_translate)(struct ansitty *__restrict self,
                                      char32_t ch);
 
 /* Encode the representation of a misc. keyboard key `key' with `mod',
- * and finalize encoding of certain keyboard characters after already
+ * and finalize encoding of certain keyboard characters after  already
  * having been translated through the keymap.
  * @param: self: The ANSITTY to use (or `NULL' to use default settings)
  * @param: key:  The keyboard key (one of `KEY_*' from <kos/keyboard.h>; e.g. `KEY_UP')

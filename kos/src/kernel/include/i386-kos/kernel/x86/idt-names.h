@@ -37,7 +37,7 @@
  *    Depending on `IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)'
  *  - 0x20 - 0x2f: x86_handle_ms_fastfail  (Same as `0x00 - 0x1f')
  *  - 0x81 - 0xed + 0xf1 - 0xff: kernel_isr_generic_00h
- *    This is a C-function defined declared as either:
+ *    This  is a C-function defined declared as either:
  *    >> void FCALL kernel_isr_generic_00h(void);
  */
 

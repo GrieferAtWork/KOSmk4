@@ -132,9 +132,9 @@ PRIVATE_FUNCTION(librpc_schedule_rpc_entry)
 	pushl %ebp
 
 	/* Define register restore rules for CFI
-	 * This gets a bit complicated, since we need to introduce 2-layer indirection
+	 * This  gets a  bit complicated, since  we need to  introduce 2-layer indirection
 	 * due to the fact that there we've used EBP as base register up until this point,
-	 * however now need to re-assign that register because it's used to pass system
+	 * however now need to  re-assign that register because  it's used to pass  system
 	 * call arguments...
 	 */
 
@@ -216,12 +216,12 @@ END(librpc_schedule_rpc_entry)
 
 /* >> rpc_schedule(3)
  * Portable wrapper for `rpc_schedule_ex()'
- * Schedule a simple RPC for execution on a given `target' thread.
- * The scheduled RPC assumes that `target' has a valid stack, while
- * taking a `callback' to-be invoked, which itself will take `argc'
- * pointer-sized arguments from the variable argument list of this
+ * Schedule a  simple RPC  for execution  on a  given `target'  thread.
+ * The scheduled RPC  assumes that  `target' has a  valid stack,  while
+ * taking  a `callback'  to-be invoked,  which itself  will take `argc'
+ * pointer-sized arguments  from the  variable  argument list  of  this
  * function. (When `RPC_SCHEDULE_FLAG_STATUSFUTEX' is given, `callback'
- * takes `argc - 1' arguments, with the first variable argument being
+ * takes `argc - 1' arguments, with  the first variable argument  being
  * a pointer to the status futex)
  * HINT: This function is entirely implemented using `rpc_schedule_ex()'
  * HINT: On i386, the RPC program used by this function is:
@@ -243,8 +243,8 @@ END(librpc_schedule_rpc_entry)
  *       >> [stftx %arg[3]]
  *       >> psh  %arg[(3|4) + n...]
  *       >> resume                           RPC_PROGRAM_OP_resume
- *       When `callback' returns, an internal wrapper is called that will restore
- *       registers, as well as optionally restart an interrupted system call,
+ *       When  `callback' returns, an  internal wrapper is  called that will restore
+ *       registers, as  well  as  optionally restart  an  interrupted  system  call,
  *       depending on the reason code loaded into `%ebx', before restoring registers
  *       using the data pointed to by `%ebp'
  *       With all of this in mind, the register state when librpc's internal RPC
@@ -267,7 +267,7 @@ END(librpc_schedule_rpc_entry)
  * @param: flags:    RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
  * @param: callback: The callback to invoke
  * @param: argc:     The number of arguments to-be passed to `callback'
- * @param: ...:      Arguments passed to `callback', potentially preceded by
+ * @param: ...:      Arguments passed to  `callback', potentially preceded  by
  *                   the status futex when the `RPC_SCHEDULE_FLAG_STATUSFUTEX'
  *                   flag was set.
  * @return: 1:  The specified `target' thread has already terminated.

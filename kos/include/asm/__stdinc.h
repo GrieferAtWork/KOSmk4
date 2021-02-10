@@ -21,6 +21,6 @@
 #define _ASM___STDINC_H 1
 
 /* Included by <__stdinc.h>. - May be used by architectures to define
- * arch-specific overrides that should apply to _all_ source files. */
+ * arch-specific overrides that should  apply to _all_ source  files. */
 
 #endif /* !_ASM___STDINC_H */

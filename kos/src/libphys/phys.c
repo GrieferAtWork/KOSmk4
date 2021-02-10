@@ -179,7 +179,7 @@ touch_all_pages(void const *src, size_t num_bytes) {
 		return;
 	for (;;) {
 		/* Force a read from the pointed-to memory location, thus
-		 * causing a SEGFAULT if any of those pages are faulty. */
+		 * causing a SEGFAULT if any  of those pages are  faulty. */
 		__asm__ __volatile__("" : : "r" (*(byte_t const *)src) : "memory");
 		if (num_bytes <= pagesize)
 			break;
@@ -228,10 +228,10 @@ NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
  * Memory is always mapped as `PROT_READ | PROT_WRITE'.
  *
  * The returned memory block should be unmapped as `munmapphys(return, num_bytes)'
- * The caller need not concern themself with the alignment of `addr' and/or
- * `num_bytes', as this function will automatically CEIL_ALIGN the requested
- * address range to contain whole pages, and later adjusted the returned
- * pointed to account for a potential in-page alignment offset of `addr'
+ * The  caller  need not  concern  themself with  the  alignment of  `addr' and/or
+ * `num_bytes', as  this  function  will automatically  CEIL_ALIGN  the  requested
+ * address  range  to  contain  whole  pages,  and  later  adjusted  the  returned
+ * pointed  to  account  for  a  potential  in-page  alignment  offset  of  `addr'
  * This adjustment will later be undone automatically by `munmapphys(3)'
  *
  * @return: * :         Base address of the newly created memory mapping.
@@ -239,11 +239,11 @@ NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
 INTERN NOBLOCK void *
 NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes) {
 	void *result;
-	/* NOTE: As an extension, KOS's mmap(2) system call automatically does
-	 *       all of the in-page-offset alignment when it has been given an
-	 *       unaligned file-offset or fixed based address. - It will only
-	 *       error out of a fixed address is given, and its in-page offset
-	 *       differs from that used by the file position. However, since we
+	/* NOTE: As an  extension, KOS's  mmap(2) system  call automatically  does
+	 *       all of the  in-page-offset alignment  when it has  been given  an
+	 *       unaligned file-offset  or fixed  based address.  - It  will  only
+	 *       error  out of  a fixed address  is given, and  its in-page offset
+	 *       differs  from that used  by the file  position. However, since we
 	 *       only pass a fixed file position, that case can never happen here. */
 	WITHMEM((result = mmap64(NULL, num_bytes, PROT_READ | PROT_WRITE,
 	                         MAP_SHARED | MAP_FILE, dev_mem,
@@ -255,7 +255,7 @@ NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes) {
 INTERN NOBLOCK void
 NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes) {
 	/* For now, this is a simple wrapper, but in the future, a cache of
-	 * recently used physical memory location may be added to libphys,
+	 * recently used physical memory location may be added to  libphys,
 	 * at which point this function would be used to mark cache entires
 	 * as no-longer-in-use. */
 	munmap(base, num_bytes);

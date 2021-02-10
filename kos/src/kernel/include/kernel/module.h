@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 /* Convenience hybrid-api to implement a dynamic, compatibility-
- * api between `struct driver' and `struct usermod', as well as
+ * api  between `struct driver' and `struct usermod', as well as
  * their related types. */
 
 #include <kernel/driver.h>
@@ -149,9 +149,9 @@ NOTHROW(module_section_getcdata_nx)(module_section_t *__restrict self,
                                     module_type_t typ,
                                     gfp_t gfp);
 
-/* Lookup the module that is loaded at `addr', returning a reference
+/* Lookup  the module that is loaded at `addr', returning a reference
  * to it, and storing its typing in `result_typ'. If no module exists
- * at the specified `addr', `result_typ' is undefined, and `NULL'
+ * at the  specified `addr',  `result_typ' is  undefined, and  `NULL'
  * is returned. */
 NOBLOCK WUNUSED REF module_t *
 module_ataddr(void const *addr, module_type_t &result_typ)
@@ -161,7 +161,7 @@ module_ataddr(void const *addr, module_type_t &result_typ)
 NOBLOCK WUNUSED REF module_t *
 NOTHROW(module_ataddr_nx)(void const *addr, module_type_t &result_typ);
 
-/* Same as `module_ataddr()', but only check for drivers. Also
+/* Same as `module_ataddr()', but  only check for drivers.  Also
  * note that this function doesn't throw any exceptions, either! */
 NOBLOCK WUNUSED REF module_t *
 NOTHROW(module_ataddr_nouser)(void const *addr);
@@ -185,7 +185,7 @@ NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_getloadend)(module_t const
 NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) struct vm *
 NOTHROW(module_vm)(module_t const *__restrict self, module_type_t typ);
 
-/* Lock a section into memory, returning a reference to it upon
+/* Lock a section into memory,  returning a reference to it  upon
  * success, or `NULL' if no section exists with the given `name'.
  * The returned section has the same `module_type_t' as `typ'
  * @param: flags: Set of `MODULE_LOCKSECTION_*' */

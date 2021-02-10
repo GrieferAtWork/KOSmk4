@@ -36,12 +36,12 @@
 #define __O_CLOEXEC      0x00080 /* Close the file during exec() */
 #define __O_CREAT        0x00100 /* If missing, create a new file */
 #define __O_TRUNC        0x00200 /* Truncate (clear) the named file if it already exists,
-                                  * and `O_WRONLY' or `O_RDWR' access is specified. */
+                                  * and  `O_WRONLY'  or  `O_RDWR'  access  is  specified. */
 #define __O_EXCL         0x00400 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
                                   * exception if the file already exists. */
 #define __O_SHORT_LIVED  0x01000 /* Ignored */
-#define __O_OBTAIN_DIR   0x02000 /* Similar to `O_DIRECTORY' (while `O_DIRECTORY' requires that the
-                                  * named file be a directory, this flag will _allow_ it to be one)
+#define __O_OBTAIN_DIR   0x02000 /* Similar to `O_DIRECTORY'  (while `O_DIRECTORY'  requires that  the
+                                  * named file be a  directory, this flag will  _allow_ it to be  one)
                                   * However, when it comes to the use-cases, this flag usually ends up
                                   * being used in the same places. */
 #define __O_TEXT         0x04000 /* ??? */

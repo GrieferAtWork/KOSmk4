@@ -32,7 +32,7 @@
 #define CONFIG_NO_VBOXGDB 1
 #elif defined(__i386__) || defined(__x86_64__)
 /* VirtualBox can only emulate x86 machines, so there's no point
- * in try to support vboxgdb when targeting anything else! */
+ * in try  to  support  vboxgdb when  targeting  anything  else! */
 #define CONFIG_VBOXGDB 1
 #else /* ... */
 #define CONFIG_NO_VBOXGDB 1
@@ -50,7 +50,7 @@ DECL_BEGIN
 #ifdef CONFIG_VBOXGDB
 
 /* Trap into the vboxgdb sub-system by sending a command "%{vboxgdb:<name>}",
- * and entering the vbox step-loop until the vbox debugger indicates that
+ * and entering the  vbox step-loop  until the vbox  debugger indicates  that
  * execution should be resumed.
  * This function returns once vboxgdb tells it to do so.
  * @param: name: The name of the trap. (one of `VBOXGDB_TRAP_*') */

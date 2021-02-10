@@ -26,7 +26,7 @@ EMU86_INTELLISENSE_BEGIN(movdir64b) {
 
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_MOVDIR64B
 case EMU86_OPCODE_ENCODE(0x0f38f8): {
-	/* 66 0F 38 F8 /r     MOVDIR64B r16/r32/r64, m512     Move 64-bytes as direct-store with guaranteed 64-byte
+	/* 66 0F 38 F8 /r     MOVDIR64B r16/r32/r64, m512     Move  64-bytes as direct-store with guaranteed 64-byte
 	 *                                                    write atomicity from the source memory operand address
 	 *                                                    to destination memory address specified as offset to
 	 *                                                    ES segment in the register operand. */
@@ -43,8 +43,8 @@ case EMU86_OPCODE_ENCODE(0x0f38f8): {
 	EMU86_UNSUPPORTED_MEMACCESS(dstaddr, 64, false, true);
 
 	/* We sadly don't have any way of emulating this instruction...
-	 * The problem is that it would require us to somehow provide a 512-bit atomic
-	 * write (or better yet: 512-bit atomic cmpxchg) method which we simply don't
+	 * The  problem is that it would require us to somehow provide a 512-bit atomic
+	 * write (or better yet: 512-bit atomic  cmpxchg) method which we simply  don't
 	 * have. So the best we can do is check for error conditions, before indicating
 	 * that the instruction simply isn't supported... */
 	(void)dstaddr;

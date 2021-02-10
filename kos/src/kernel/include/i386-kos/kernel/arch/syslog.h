@@ -38,7 +38,7 @@ DATDEF struct syslog_sink x86_default_syslog_sink;
 #define ARCH_DEFAULT_SYSLOG_SINK (&x86_default_syslog_sink)
 
 /* Raw, low-level write the given data to the default x86 system log.
- * The write is performed atomically in respect to other calls to
+ * The write is  performed atomically  in respect to  other calls  to
  * this function. */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
 x86_syslog_write(char const *__restrict data,

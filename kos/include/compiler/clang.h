@@ -742,15 +742,15 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
 
 #ifdef __clang_tidy__
-/* I don't know if the proper clang really supports this, but clang-tidy keeps on
+/* I don't know if the  proper clang really supports  this, but clang-tidy keeps  on
  * being a d1ck, telling me "initialization of flexible array member is not allowed"
- * WHEN GCC FULLY ALLOWS ME TO DO THIS, AND IT PROBABLY ALSO HAVING SOME OPTION TO
+ * WHEN  GCC FULLY ALLOWS ME TO DO THIS,  AND IT PROBABLY ALSO HAVING SOME OPTION TO
  * ALLOW THIS TO BE DONE!!!! */
 #undef __COMPILER_FLEXIBLE_ARRAY
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #undef __UNUSED
 #define __UNUSED(x) x __attribute__((__unused__))
-/* Disable this, so clang-tidy doesn't think that function like memcpy() cannot
+/* Disable  this, so clang-tidy doesn't think that function like memcpy() cannot
  * be made to be noexcept. - We only want warnings when calling functions marked
  * as THROWS() being called by those marked as NOTHROW(). */
 #undef __NO_NON_CALL_EXCEPTIONS
@@ -847,4 +847,3 @@ template<class T1, class T2> struct ____INTELLISENSE_sametype:
 #define __builtin_types_compatible_p(...) 1
 #endif /* !__cplusplus */
 #endif /* !__has_builtin(__builtin_types_compatible_p) */
-

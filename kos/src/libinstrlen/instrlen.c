@@ -47,7 +47,7 @@ DECL_BEGIN
 
 #ifdef __KERNEL__
 /* In kernel-space, also catch `E_WOULDBLOCK', as may be thrown by accessing
- * memory that hasn't been loaded while preemption was disabled (since the
+ * memory that hasn't been loaded  while preemption was disabled (since  the
  * kernel would not be allowed to block in such a scenario) */
 #define WAS_SEGFAULT() (was_thrown(E_SEGFAULT) || was_thrown(E_WOULDBLOCK))
 #else /* __KERNEL__ */
@@ -85,7 +85,7 @@ NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
 #endif /* !ARCH_HAVE_INSTRUCTION_LENGTH */
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
- * assuming that `pc' points to the start of another instruction.
+ * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
@@ -116,7 +116,7 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 }
 #elif defined(ARCH_INSTRUCTION_MAXLENGTH)
 /* # of instructions to back-track in order to verify that
- * some given instruction point fits into the instruction
+ * some  given instruction point fits into the instruction
  * stream described by surrounding instructions. */
 #ifndef LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE
 #define LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE 16
@@ -185,7 +185,7 @@ find_shorter_instructions:
 done_backtrack:
 	if (lowest_iter >= (byte_t const *)pc)
 		return NULL; /* No base-reference found... */
-	/* Find the start of the first instruction that
+	/* Find  the  start  of the  first  instruction that
 	 * ends at `>= pc', but starts at `>= rev_iter_curr' */
 	iter = lowest_iter;
 	for (;;) {
@@ -207,7 +207,7 @@ done_backtrack:
 
 
 /* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
- * Other exceptions are propagated normally (which could happen due to VIO access emulation)
+ * Other  exceptions are propagated normally (which could  happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
 #ifndef ARCH_HAVE_INSTRUCTION_SUCC_NX
 INTERN ATTR_PURE WUNUSED byte_t *

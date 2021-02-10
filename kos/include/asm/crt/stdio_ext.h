@@ -23,7 +23,7 @@
 #include <__crt.h>
 
 #define __FSETLOCKING_QUERY    0 /* Query current state of the locking status. */
-#define __FSETLOCKING_INTERNAL 1 /* The library protects all uses of the stream functions, except for
+#define __FSETLOCKING_INTERNAL 1 /* The library protects  all uses  of the stream  functions, except  for
                                   * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
 #define __FSETLOCKING_BYCALLER 2 /* The user will take care of locking.
                                   * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */

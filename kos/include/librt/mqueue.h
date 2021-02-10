@@ -51,12 +51,12 @@
 __DECL_BEGIN
 
 
-/* Establish connection between a process and a message queue NAME and
- * return message queue descriptor or (mqd_t)-1 on error. OFLAGS determines
- * the type of access used. If O_CREAT is on OFLAGS, the third argument is
+/* Establish  connection  between  a process  and  a message  queue  NAME and
+ * return message queue descriptor or  (mqd_t)-1 on error. OFLAGS  determines
+ * the type of access used.  If O_CREAT is on  OFLAGS, the third argument  is
  * taken as a `mode_t', the mode of the created message queue, and the fourth
- * argument is taken as `struct mq_attr *', pointer to message queue
- * attributes. If the fourth argument is NULL, default attributes are used. */
+ * argument  is  taken  as  `struct mq_attr *',  pointer  to  message   queue
+ * attributes. If the fourth argument  is NULL, default attributes are  used. */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) mqd_t
 /*__NOTHROW_NCX*/(__LIBRT_VCC *PMQ_OPEN)(char const *__restrict __name, __oflag_t __oflags, ...);
 
@@ -92,7 +92,7 @@ typedef __ATTR_NONNULL((2)) int
 /*__NOTHROW_NCX*/(__LIBRT_CC *PMQ_SEND)(mqd_t __mqdes, char const *__msg_ptr,
                                         __size_t __msg_len, unsigned int __msg_prio);
 
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 typedef __ATTR_NONNULL((2, 5)) __ssize_t
 /*__NOTHROW_RPC*/(__LIBRT_CC *PMQ_TIMEDRECEIVE)(mqd_t __mqdes, char *__restrict __msg_ptr,
@@ -100,13 +100,13 @@ typedef __ATTR_NONNULL((2, 5)) __ssize_t
                                                 struct __timespec32 const *__restrict __abs_timeout);
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 typedef __ATTR_NONNULL((2, 5)) int
 /*__NOTHROW_RPC*/(__LIBRT_CC *PMQ_TIMEDSEND)(mqd_t __mqdes, char const *__msg_ptr,
                                              __size_t __msg_len, unsigned int __msg_prio,
                                              struct __timespec32 const *__abs_timeout);
 
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 typedef __ATTR_NONNULL((2, 5)) __ssize_t
 /*__NOTHROW_RPC*/(__LIBRT_CC *PMQ_TIMEDRECEIVE64)(mqd_t __mqdes, char *__restrict __msg_ptr,
@@ -114,7 +114,7 @@ typedef __ATTR_NONNULL((2, 5)) __ssize_t
                                                   struct __timespec64 const *__restrict __abs_timeout);
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 typedef __ATTR_NONNULL((2, 5)) int
 /*__NOTHROW_RPC*/(__LIBRT_CC *PMQ_TIMEDSEND64)(mqd_t __mqdes, char const *__msg_ptr,
                                                __size_t __msg_len, unsigned int __msg_prio,
@@ -124,12 +124,12 @@ typedef __ATTR_NONNULL((2, 5)) int
 
 
 #ifdef LIBRT_WANT_PROTOTYPES
-/* Establish connection between a process and a message queue NAME and
- * return message queue descriptor or (mqd_t)-1 on error. OFLAGS determines
- * the type of access used. If O_CREAT is on OFLAGS, the third argument is
+/* Establish  connection  between  a process  and  a message  queue  NAME and
+ * return message queue descriptor or  (mqd_t)-1 on error. OFLAGS  determines
+ * the type of access used.  If O_CREAT is on  OFLAGS, the third argument  is
  * taken as a `mode_t', the mode of the created message queue, and the fourth
- * argument is taken as `struct mq_attr *', pointer to message queue
- * attributes. If the fourth argument is NULL, default attributes are used. */
+ * argument  is  taken  as  `struct mq_attr *',  pointer  to  message   queue
+ * attributes. If the fourth argument  is NULL, default attributes are  used. */
 #ifndef __mq_open_defined
 #define __mq_open_defined 1
 __LIBRT_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) mqd_t
@@ -189,7 +189,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_send)(mqd_t __mqdes, char const *__msg_ptr,
                                   __size_t __msg_len, unsigned int __msg_prio);
 #endif /* !__mq_send_defined */
 
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 #ifndef __mq_timedreceive_defined
 #define __mq_timedreceive_defined 1
@@ -200,7 +200,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedreceive)(mqd_t __mqdes, char *__restrict __msg_
 #endif /* !__mq_timedreceive_defined */
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 #ifndef __mq_timedsend_defined
 #define __mq_timedsend_defined 1
 __LIBRT_DECL __ATTR_NONNULL((2, 5)) int
@@ -209,7 +209,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedsend)(mqd_t __mqdes, char const *__msg_ptr,
                                        struct __timespec32 const *__abs_timeout);
 #endif /* !__mq_timedsend_defined */
 
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 #ifndef __mq_timedreceive64_defined
 #define __mq_timedreceive64_defined 1
@@ -220,7 +220,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedreceive64)(mqd_t __mqdes, char *__restrict __ms
 #endif /* !__mq_timedreceive64_defined */
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 #ifndef __mq_timedsend64_defined
 #define __mq_timedsend64_defined 1
 __LIBRT_DECL __ATTR_NONNULL((2, 5)) int

@@ -86,11 +86,11 @@ opt.append("-Os");
 
 DECL_BEGIN
 
-/* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
+/* Emulate  the instruction pointed-to  by `self->vea_args.va_state' and dispatch
  * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' by dispatching
  * it using the VIO callback table.
  * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
- * which may be placed at a different address than it was upon entry.
+ * which may  be  placed  at  a  different address  than  it  was  upon  entry.
  * This function is intended to be called from a page fault handler. */
 INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
 
@@ -196,7 +196,7 @@ union word64 {
 	((addr) <= (self)->vea_ptrhi && ((byte_t *)(addr) + (num_bytes)-1) >= (byte_t *)(self)->vea_ptrlo)
 
 /* Read VIO memory with a partial overlap between `addr...+=num_bytes',
- * and the VIO address range `self->vea_ptrlo...self->vea_ptrhi' */
+ * and  the  VIO   address  range   `self->vea_ptrlo...self->vea_ptrhi' */
 PRIVATE NONNULL((1)) void CC
 libviocore_read_with_partial_overlap(struct vio_emulate_args *__restrict self,
                                      __USER __UNCHECKED void const *addr,
@@ -230,7 +230,7 @@ libviocore_read_with_partial_overlap(struct vio_emulate_args *__restrict self,
 }
 
 /* Write VIO memory with a partial overlap between `addr...+=num_bytes',
- * and the VIO address range `self->vea_ptrlo...self->vea_ptrhi' */
+ * and   the   VIO  address   range  `self->vea_ptrlo...self->vea_ptrhi' */
 PRIVATE NONNULL((1)) void CC
 libviocore_write_with_partial_overlap(struct vio_emulate_args *__restrict self,
                                       __USER __UNCHECKED void *addr,
@@ -266,7 +266,7 @@ libviocore_write_with_partial_overlap(struct vio_emulate_args *__restrict self,
 }
 
 /* Read `VIO memory with a partial overlap between `addr...+=num_bytes',
- * and the VIO address range `self->vea_ptrlo...self->vea_ptrhi' into
+ * and the  VIO address  range `self->vea_ptrlo...self->vea_ptrhi'  into
  * `oldbuf', before copying `newbuf' into the overlap-area.
  * NOTE: `oldbuf' and `newbuf' are not allowed to overlap, or be the same! */
 PRIVATE NONNULL((1)) void CC
@@ -1705,7 +1705,7 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 
 #endif /* !__x86_64__ */
 #else /* __KERNEL__ */
-/* If the base of any of these segments wasn't 0, then this library
+/* If  the base of any of these  segments wasn't 0, then this library
  * couldn't even work (since C expects a flat address space, and this
  * library is written in C) */
 #define EMU86_GETSEGBASE_IS_NOOP_ES 1
@@ -2171,7 +2171,7 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_EMULATE_CONFIG_WANT_LSL 1
 
 
-/* Implementations of the P-mode instructions that
+/* Implementations of  the  P-mode  instructions  that
  * must be enabled due to being able to access memory. */
 #define EMU86_EMULATE_SLDT()              __sldt()
 #define EMU86_EMULATE_LLDT(segment_index) __lldt(segment_index)

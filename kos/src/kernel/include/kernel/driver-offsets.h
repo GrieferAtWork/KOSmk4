@@ -20,9 +20,9 @@
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_OFFSETS_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_OFFSETS_H 1
 
-/* WARNING: If offsets from this file are changed, then you must touch
+/* WARNING: If offsets from  this file  are changed, then  you must  touch
  *          /kos/misc/magicemulator/_vboxgdbkos.dee, as that file includes
- *          this one but may not get re-compiled once this one changes. */
+ *          this  one but may  not get re-compiled  once this one changes. */
 
 
 /* Offsets into `struct driver' (on 32-bit machines) */

@@ -49,7 +49,7 @@ struct fpustate;
 
 /* [0..1] The task associated with the current FPU register contents, or NULL if none.
  * NOTE: When accessing this field, preemption must be disabled, as
- *       this field affects the behavior of task state switches. */
+ *       this field affects  the behavior of  task state  switches. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_THISCPU_FPUTHREAD
 DATDEF ATTR_PERCPU struct task *thiscpu_fputhread;
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_THISCPU_FPUTHREAD */
@@ -71,7 +71,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict sel
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE */
 
 /* Ensure that `this_fpustate' has been allocated, allocating
- * and initializing it now if it hasn't already. */
+ * and   initializing   it   now   if   it   hasn't  already. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_INIT
 FUNDEF void KCALL fpustate_init(void) THROWS(E_BADALLOC);
 FUNDEF WUNUSED __BOOL NOTHROW(KCALL fpustate_init_nx)(void);
@@ -85,12 +85,12 @@ FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_save)(void);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVE */
 
 /* Similar to `fpustate_save()', but save the state of whichever thread is
- * currently holding the active FPU context. - When called, this function
- * will ensure that the most-up-to-date FPU context is written to memory,
- * and will be read back from memory the next time that thread (if any)
+ * currently  holding the active FPU context. - When called, this function
+ * will  ensure that the most-up-to-date FPU context is written to memory,
+ * and will be read back  from memory the next  time that thread (if  any)
  * performs another FPU operation.
- * The main purpose of this function is to aid in implementing FPU support
- * in debuggers, where this function is called when suspending execution of
+ * The main purpose  of this function  is to aid  in implementing FPU  support
+ * in  debuggers, where this  function is called  when suspending execution of
  * the associated CPU, after which the debugger can read/write FPU information
  * for any thread by simply looking at `FORTASK(thread, this_fpustate)' */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVECPU
@@ -98,7 +98,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVECPU */
 
 
-/* Load / Save the FPU context of the calling thread to/from the given `state'
+/* Load / Save the FPU context of  the calling thread to/from the given  `state'
  * If no FPU state had yet to be allocated when `fpustate_loadfrom()' is called,
  * a new state will be allocated before returning. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_LOADFROM

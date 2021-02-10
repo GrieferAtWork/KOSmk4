@@ -49,7 +49,7 @@ FUNDEF NOBLOCK void
 NOTHROW(KCALL swap_free)(swappage_t start, physpagecnt_t num_pages);
 
 /* Issue asynchronous comments to read/write physical memory to/from SWAP.
- * NOTE: By default, swap reads/writes are performed using DMA, which
+ * NOTE: By default, swap reads/writes are performed using DMA,  which
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
 FUNDEF void (KCALL swap_read)(swapaddr_t start, physaddr_t buffer, size_t num_bytes);

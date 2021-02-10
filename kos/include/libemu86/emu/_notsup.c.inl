@@ -608,7 +608,7 @@ if (SEE_rdwr_opcodes) {
 	 * >> VEX+LL=2    foo zmm/m512, zmm, zmm
 	 * >>             foo mm/m64, mm
 	 * Some only exist when 66h, F2h or F3h is given, but the those prefixes don't
-	 * change the general behavior of how the opcode is encoded or behaves. */
+	 * change  the  general behavior  of  how the  opcode  is encoded  or behaves. */
 #define SSE_OPERAND_SIZE_IN_BYTES()                                          \
 	(!(op_flags & (EMU86_F_HASEVEX | EMU86_F_66))                            \
 	 ? 8 /* MM */                                                            \
@@ -729,8 +729,8 @@ case 0x0f77: {
 
 case 0x0faa:
 	/* 0F AA     RSM     Resume operation of interrupted program. */
-	/* NOTE: RSM is only allowed from system management mode.
-	 *       Since libemu86 is not designed to emulate that environment,
+	/* NOTE: RSM   is   only   allowed   from   system   management  mode.
+	 *       Since libemu86 is not  designed to emulate that  environment,
 	 *       this instruction is considered privileged from every context. */
 	goto return_privileged_instruction;
 #define NEED_return_privileged_instruction

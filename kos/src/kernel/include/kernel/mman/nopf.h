@@ -32,12 +32,12 @@ DECL_BEGIN
 #ifndef CONFIG_VM_ARCH_DEFINES_MEMCPY_NOPF
 /* Copy memory from `src' to `dst', but stop if any sort of #PF happens,
  * regardless of that #PF being handable or not (aka: load-on-access, or
- * copy-on-write will never be triggered by this function, and the same
+ * copy-on-write  will never be triggered by this function, and the same
  * also goes for VIO)
- * This function can be used to copy user-space memory whilst holding an
+ * This function can be used to copy user-space memory whilst holding  an
  * atomic lock, allowing the caller to handle the PF by handling the next
  * data byte/word/etc. individually after releasing the atomic lock, thus
- * allowing a necessary #PF to run its course without the caller holding
+ * allowing a necessary #PF to run its course without the caller  holding
  * an atomic lock.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
@@ -89,7 +89,7 @@ NOTHROW(KCALL memeq_ku_nopf)(KERNEL void const *kernel_buffer,
 
 #ifndef CONFIG_VM_ARCH_DEFINES_WRITEBWLQ_NOPF
 /* Try to write `value' into a possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return  `true'  on   success,  `false'  on   error */
 LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr, u8 value) {
 	return memcpy_nopf(addr, &value, 1) == 0;
 }

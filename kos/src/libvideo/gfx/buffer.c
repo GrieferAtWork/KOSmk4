@@ -53,7 +53,7 @@ DECL_BEGIN
 
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
- *       which may not necessarily use the given, or default `codec' and `palette'
+ *       which may not necessarily use the  given, or default `codec' and  `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
@@ -100,7 +100,7 @@ screen_pal_destroy(struct video_palette *__restrict self) {
 PRIVATE struct video_rambuffer *screen_buffer = NULL;
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
- * Note that screen buffer access is only granted to ROOT and the window server */
+ * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_screen(void) {
 	fd_t driver;
@@ -176,7 +176,7 @@ err:
 PRIVATE struct video_format preferred_video_format;
 
 /* Return the preferred video format.
- * If possible, this format will match the format used by the host's graphics card.
+ * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
 INTERN ATTR_RETNONNULL WUNUSED struct video_format const *CC
@@ -222,7 +222,7 @@ INTERN WUNUSED fd_t LIBVIDEO_GFX_CC libvideo_driver(void) {
 	if (result >= 0)
 		goto done;
 	/* Only use stdin as fallback!
-	 * By default, we should check for environment variables,
+	 * By  default, we should  check for environment variables,
 	 * as well as try to make use of `/dev/video', which should
 	 * be the default video driver. */
 	result = STDIN_FILENO;

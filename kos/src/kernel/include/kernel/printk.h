@@ -43,7 +43,7 @@ DECL_BEGIN
  * >> printk(KERN_DEBUG "Hello %s!\n", "World");
  * Same as:
  * >> format_printf(&syslog_printer, SYSLOG_LEVEL_DEBUG, "Hello %s!\n", "World");
- * HINT: These functions can safely be called from _any_ context! */
+ * HINT:  These   functions   can   safely  be   called   from   _any_   context! */
 FUNDEF NOBLOCK ssize_t (VCALL printk)(char const *__restrict format, ...);
 FUNDEF NOBLOCK ssize_t (KCALL vprintk)(char const *__restrict format, __builtin_va_list args);
 #endif /* __CC__ */

@@ -83,7 +83,7 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 typedef int /*__NOTHROW_NCX*/(__LIBRT_CC *PAIO_CANCEL)(__fd_t __fildes, struct __aiocb32 *__aiocbp);
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 typedef __ATTR_NONNULL((1)) int
 /*__NOTHROW_RPC*/(__LIBRT_CC *PAIO_SUSPEND)(struct __aiocb32 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
                                             struct __timespec32 const *__restrict __timeout);
@@ -117,7 +117,7 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 typedef int /*__NOTHROW_NCX*/(__LIBRT_CC *PAIO_CANCEL64)(__fd_t __fildes, struct __aiocb64 *__aiocbp);
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 typedef __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBRT_CC *PAIO_SUSPEND64)(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
                                           struct __timespec32 const *__restrict __timeout);
@@ -127,13 +127,13 @@ typedef __ATTR_NONNULL((2)) int
 /*__NOTHROW_NCX*/(__LIBRT_CC *PAIO_FSYNC64)(int __operation, struct __aiocb64 *__aiocbp);
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 typedef __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBRT_CC *PAIO_SUSPENDT64)(struct __aiocb32 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
                                            struct __timespec64 const *__restrict __timeout);
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 typedef __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBRT_CC *PAIO_SUSPEND64T64)(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
                                              struct __timespec64 const *__restrict __timeout);
@@ -191,7 +191,7 @@ __LIBRT_DECL int __NOTHROW_NCX(__LIBRT_CC aio_cancel)(__fd_t __fildes, struct __
 #endif /* !__aio_cancel_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspend_defined
 #define __aio_suspend_defined 1
 __LIBRT_DECL __ATTR_NONNULL((1)) int
@@ -250,7 +250,7 @@ __NOTHROW_NCX(__LIBRT_CC aio_cancel64)(__fd_t __fildes, struct __aiocb64 *__aioc
 #endif /* !__aio_cancel64_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspend64_defined
 #define __aio_suspend64_defined 1
 __LIBRT_DECL __ATTR_NONNULL((1)) int
@@ -266,7 +266,7 @@ __NOTHROW_NCX(__LIBRT_CC aio_fsync64)(int __operation, struct __aiocb64 *__aiocb
 #endif /* !__aio_fsync64_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspendt64_defined
 #define __aio_suspendt64_defined 1
 __LIBRT_DECL __ATTR_NONNULL((1)) int
@@ -275,7 +275,7 @@ __NOTHROW_RPC(__LIBRT_CC aio_suspendt64)(struct __aiocb32 const *const __list[],
 #endif /* !__aio_suspendt64_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspend64t64_defined
 #define __aio_suspend64t64_defined 1
 __LIBRT_DECL __ATTR_NONNULL((1)) int

@@ -146,7 +146,3 @@ BEGIN_CP(swiss)
 	MAP(0x7d, 0x00fc)
 	MAP(0x7e, 0x00fb)
 END_CP(swiss)
-
-
-
-

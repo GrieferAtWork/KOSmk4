@@ -236,7 +236,7 @@
 #define __PRIVATE_TOSTOP  0
 #endif /* !__TOSTOP */
 #endif /* !__PRIVATE_TOSTOP */
-#define __TTYDEF_LFLAG                                                         \
+#define __TTYDEF_LFLAG                                                       \
 	(__PRIVATE_ECHO | __PRIVATE_ICANON | __PRIVATE_ISIG |                    \
 	 __PRIVATE_IEXTEN | __PRIVATE_ECHOE | __PRIVATE_ECHOKE |                 \
 	 __PRIVATE_ECHOCTL | /* These last two, linux doesn't enable by default, \

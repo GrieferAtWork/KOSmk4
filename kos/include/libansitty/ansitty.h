@@ -48,7 +48,7 @@
  * keyboard:
  *   - The keyboard always sends \r
  *   - There doesn't seem to be a way to change this besides using custom key maps.
- *     This behavior can also be observed on linux by analyzing keyboard data sent
+ *     This behavior can also be observed on linux by analyzing keyboard data  sent
  *     after putting a terminal into cfmakeraw()-mode
  * termios:
  *   - '\r' (from keyboard):
@@ -57,18 +57,18 @@
  *     - 0:     Forward '\r' characters unchanged (s.a. `cfmakeraw()')
  *   - '\n' (from keyboard):
  *     - INLCR: Convert into '\r'  (Cleared by ansitty:"\ec" and "\e[20l"; Set by ansitty:"\e[20h")
- *       - I don't really know why this flag exists, since it seems like it would imply
+ *       - I  don't really know why this flag exists, since it seems like it would imply
  *         there may be some keyboard/tty combinations where the return-key sends a '\n'
- *         character, however even despite this, using CTRL+J will always trigger this
+ *         character, however even despite this,  using CTRL+J will always trigger  this
  *         flag, since that key combination will also send a '\n' character
  *       - Note that it was this flag which always confused me into thinking that '\n'
- *         may be what a keyboard should send, but this causes problems with at least
+ *         may  be what a keyboard should send, but this causes problems with at least
  *         a hand full of programs:
  *          - The <Enter-File-Name> dialog of `nano' doesn't accept '\n' as confirmation
- *            input and instead responds with a BELL, indicating that the input is not
+ *            input  and instead responds with a BELL,  indicating that the input is not
  *            accepted.
  *          - However other programs (like the `busybox' commandline) will work just fine
- *            regardless of the keyboard sending '\r' or '\n' (although it may also just
+ *            regardless of the keyboard sending '\r' or '\n' (although it may also  just
  *            be using either `INLCR' or `ICRNL' to unify input for either behavior)
  *   - '\r' (from application / for ansitty):
  *     - ONLRET:      Ignore '\r' characters
@@ -84,7 +84,7 @@
  *     - After "\e[20h":
  *       - Forwarded as unchanged (default)
  *     - After "\e[20l":
- *       - Emulated as same-column line-feed by using the SETCURSOR()
+ *       - Emulated as same-column  line-feed by  using the  SETCURSOR()
  *         operation after posting a \n-character to the display driver.
  *       - This mode really shouldn't be used, but exists for compatibility
  * display:
@@ -142,7 +142,7 @@
 #define ANSITTY_CL_DEFAULT \
 	ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK)
 
-/* Sequence that can be printed at any time to reset the ANSI driver to its default
+/* Sequence that can  be printed at  any time to  reset the ANSI  driver to its  default
  * state, where it accepts regular text input for immediate display, with all attributes
  * and special coloration disabled.
  * Explanation:
@@ -172,7 +172,7 @@
 #define ANSITTY_MODE_MOUSEON_WITHMOTION 0x0002 /* Report motion of pressed buttons. */
 #define ANSITTY_MODE_MOUSEON_MASK       0x0003 /* Mask for the MOUSEON mode. */
 #define ANSITTY_MODE_NOLINEWRAP         0x0004 /* FLAG: Writing past the end of a line will not wrap to the next line.
-                                                *       When set, characters written past line-endings are discarded. */
+                                                *       When  set, characters written past line-endings are discarded. */
 #define ANSITTY_MODE_HIDECURSOR         0x0008 /* FLAG: Don't show the cursor. */
 #define ANSITTY_MODE_NEWLINE_CLRFREE    0x0010 /* FLAG: CR and LF should fill trailing cells with space characters. */
 
@@ -207,30 +207,30 @@ struct termios;
 
 struct ansitty_operators {
 	/* [1..1] Output a single unicode character.
-	 * This also includes the control control characters `BEL,LF,CR,TAB,BS'
-	 * Note that LF should be interpreted as next-line w/o carriage-return,
-	 * as the LF=CRLF behavior should be implemented using `ONLCR'. Note however
-	 * that LF not resetting the carriage is not mandatory in controlled situations.
+	 * This   also   includes   the  control   control   characters  `BEL,LF,CR,TAB,BS'
+	 * Note  that  LF   should  be  interpreted   as  next-line  w/o   carriage-return,
+	 * as  the  LF=CRLF  behavior should  be  implemented using  `ONLCR'.  Note however
+	 * that  LF not resetting  the carriage is not  mandatory in controlled situations.
 	 * libansitty won't care as to what is the actual behavior, however some user-space
-	 * programs using the terminal may depend on LF not resetting the carriage when
-	 * the terminal is in `cfmakeraw()' mode (such as busybox:hexedit)
+	 * programs using the  terminal may depend  on LF not  resetting the carriage  when
+	 * the   terminal   is   in   `cfmakeraw()'   mode   (such   as    busybox:hexedit)
 	 * In practice, this means:
 	 *  - Ansitty drivers should implement LF as not resetting CURSOR.X,
-	 *    and so should any other component that feeds input through a
+	 *    and so should any other  component that feeds input through  a
 	 *    configurable `libtermios' layer.
 	 *  - However, the kernel's builtin debugger implements LF as implying
-	 *    CURSOR.X=0, mainly since this is the expected behavior in most
-	 *    cases, and also because `dbg_printf()' doesn't feed through the
+	 *    CURSOR.X=0, mainly since this is  the expected behavior in  most
+	 *    cases, and also because `dbg_printf()' doesn't feed through  the
 	 *    libtermios layer that would normally translate LF->CRLF.
 	 */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
 	                               __CHAR32_TYPE__ ch);
 	/* [0..1] Set the position of the cursor.
-	 * NOTE: The given `x' and `y' must be clamped to COLUMNS-1/ROWS-1, meaning
+	 * NOTE: The given `x'  and `y'  must be clamped  to COLUMNS-1/ROWS-1,  meaning
 	 *       that `(*ato_setcursor)(tty, (ansitty_coord_t)-1, (ansitty_coord_t)-1)'
-	 *       places the cursor at its greatest possible position in both X and Y.
-	 * @param: update_hw_cursor: When true, also update the hardware cursor.
+	 *       places  the cursor at its greatest possible  position in both X and Y.
+	 * @param: update_hw_cursor: When true,  also update  the hardware  cursor.
 	 *                           Otherwise, the position of the hardware cursor
 	 *                           should be left unchanged. */
 	__ATTR_NONNULL((1))
@@ -245,8 +245,8 @@ struct ansitty_operators {
 	                                    ansitty_coord_t ppos[2]);
 	/* [0..1] Returns the size of the terminal.
 	 * NOTE: When implementing this function, you are _required_ never to fill
-	 *       in either psize[0] or psize[1] with ZERO(0). Doing so will cause
-	 *       undefined behavior (such as `DIVIDE_BY_ZERO') errors in places
+	 *       in  either psize[0] or psize[1] with ZERO(0). Doing so will cause
+	 *       undefined behavior (such  as `DIVIDE_BY_ZERO')  errors in  places
 	 *       where it may be impossible to handle them.
 	 * @param: psize[0]: Number of cells in X (width/columns).
 	 * @param: psize[1]: Number of cells in Y (height/rows). */
@@ -254,10 +254,10 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_getsize)(struct ansitty *__restrict self,
 	                                  ansitty_coord_t psize[2]);
 	/* [0..1] Copy the contents of cells starting at CURSOR into cells at
-	 *        CURSOR+dst_offset (added together such that values beyond
+	 *        CURSOR+dst_offset (added together  such that values  beyond
 	 *        the left/right border of the screen will wrap around to the
 	 *        end/start of the prev/next line).
-	 *        The number of cells to-be copied is given by `count'
+	 *        The  number of  cells to-be  copied is  given by `count'
 	 *        When `count' would overflow past the end of the display,
 	 *        it must be clamped before being used. */
 	__ATTR_NONNULL((1))
@@ -293,7 +293,7 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self, unsigned int mode);
 	/* [0..1] Set the current text color.
 	 * Called whenever a different color is selected.
-	 * @param: color: ==  */
+	 * @param: color: == */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setcolor)(struct ansitty *__restrict self,
 	                                   __uint8_t color);
@@ -303,14 +303,14 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setattrib)(struct ansitty *__restrict self,
 	                                    __uint16_t new_attrib);
-	/* [0..1] Set the current tty mode.
+	/* [0..1] Set  the  current  tty   mode.
 	 * Called whenever the tty mode changes.
 	 * @param: new_ttymode: == self->at_ttymode */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setttymode)(struct ansitty *__restrict self,
 	                                     __uint16_t new_ttymode);
 	/* [0..1] Set the scroll region (s.a. `ato_scroll()')
-	 * Called whenever the scroll region changes.
+	 * Called   whenever   the  scroll   region  changes.
 	 * @param: start_line: == self->at_scroll_sl
 	 * @param: end_line:   == self->at_scroll_el */
 	__ATTR_NONNULL((1))
@@ -324,15 +324,15 @@ struct ansitty_operators {
 	/* [0..1] Output `data' to the slave process (`write(amaster, data, datalen)';
 	 *        amaster from <pty.h>:openpty, or alternatively identical to keyboard
 	 *        input).
-	 *        Certain control sequences produce response strings that are then
+	 *        Certain control  sequences produce  response strings  that are  then
 	 *        passed to string function in order to become readable by the issuing
 	 *        process. */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
 	                                 void const *data, __size_t datalen);
 	/* [0..1] Turn LEDs on/off, such that NEW_LEDS = (OLD_LEDS & mask) | flag.
-	 * For this purpose, both mask and flag are bitsets of LEDs enumerated
-	 * from 0 to 3 (yes: that's 4 leds, and I don't know what that 4'th led
+	 * For  this purpose,  both mask and  flag are bitsets  of LEDs enumerated
+	 * from 0 to 3 (yes:  that's 4 leds, and I  don't know what that 4'th  led
 	 * is all about...)
 	 * However, linux defines them like this:
 	 *   0x01: KEYBOARD_LED_SCROLLLOCK
@@ -349,7 +349,7 @@ struct ansitty_operators {
 	 *      The return value for this case doesn't matter and is ignored.
 	 *  - newios != NULL:
 	 *      Compare the current IOS state with `oldios'
-	 *      If they differ, leave `oldios' undefined, and return `false'
+	 *      If they differ,  leave  `oldios'  undefined,  and  return  `false'
 	 *      If they match, set `newios' as the new IOS state and return `true'
 	 */
 	__ATTR_NONNULL((1, 2))
@@ -368,7 +368,7 @@ struct ansitty {
 	struct ansitty_operators  at_ops;         /* [const] ANSI TTY operators. */
 	__uint8_t                 at_color;       /* Selected color index (0xf0: bg; 0x0f: fg). */
 	__uint8_t                 at_defcolor;    /* Default color index (usually `ANSITTY_CL_DEFAULT').
-	                                           * This index is used when `\ec' is encountered */
+	                                           * This  index  is  used  when  `\ec'  is  encountered */
 	__uint16_t                ANSITTY_INTERNAL(at_ttyflag); /* Internal TTY mode flags. */
 	__uint16_t                at_ttymode;     /* TTY mode (Set of `ANSITTY_MODE_*') */
 	__uint16_t                at_attrib;      /* Text mode attributes (set of `ANSITTY_ATTRIB_*'). */
@@ -432,7 +432,7 @@ ansitty_printer(void *arg, char const *data, __size_t datalen);
 #define ANSITTY_TRANSLATE_BUFSIZE 8
 
 /* Translate a given unicode input character `ch' (which should originate form
- * the keyboard) into the sequence of bytes mandated by the code page that is
+ * the  keyboard) into the sequence of bytes mandated by the code page that is
  * currently being used by the ansitty.
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
@@ -450,7 +450,7 @@ __NOTHROW_NCX(LIBANSITTY_CC ansitty_translate)(struct ansitty *__restrict self,
 
 
 /* Encode the representation of a misc. keyboard key `key' with `mod',
- * and finalize encoding of certain keyboard characters after already
+ * and finalize encoding of certain keyboard characters after  already
  * having been translated through the keymap.
  * @param: self: The ANSITTY to use (or `NULL' to use default settings)
  * @param: key:  The keyboard key (one of `KEY_*' from <kos/keyboard.h>; e.g. `KEY_UP')

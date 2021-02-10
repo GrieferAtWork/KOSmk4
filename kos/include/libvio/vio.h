@@ -72,7 +72,7 @@ struct vioargs {
 	struct vio_operators const *va_ops;          /* [1..1][== va_file->db_type->dt_vio] */
 	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
 	vio_addr_t                  va_acmap_offset; /* VIO file offset at `va_acmap_page' (== mmap:offset). */
-	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU state at the time of the access
+	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU  state at the  time of the  access
 	                                              * being made (or `NULL' when accessed through other means). */
 #ifdef __KERNEL__
 #ifdef CONFIG_USE_NEW_VM
@@ -97,9 +97,9 @@ vio_addr_t vioargs_vioaddr(struct vioargs const *__restrict self, void *virtaddr
 #endif /* !__INTELLISENSE__ */
 
 #ifndef __KERNEL__
-/* Return a pointer to the modifiable CPU state of the thread that
+/* Return  a pointer to  the modifiable CPU state  of the thread that
  * is requesting the memory access. If the thread is currently inside
- * of kernel-space (such that its CPU state cannot be accessed),
+ * of kernel-space  (such that  its CPU  state cannot  be  accessed),
  * return `NULL' instead. */
 typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) vio_cpustate_t *
 /*__NOTHROW_NCX*/ (LIBVIO_CC *PVIOARGS_GETSTATE)(struct vioargs *__restrict self);
@@ -120,13 +120,13 @@ __NOTHROW_NCX(LIBVIO_CC vioargs_getstate)(struct vioargs *__restrict self);
 
 struct vio_operators {
 	/* VIO callbacks (`addr' is always relative to the data-block)
-	 * NOTE: For unrecognized addresses, VIO should throw
+	 * NOTE:  For   unrecognized  addresses,   VIO  should   throw
 	 *      `E_SEGFAULT_NOTREADABLE' / `E_SEGFAULT_NOTWRITABLE' exceptions.
 	 * NOTE: Call operators are allowed to assume that the given `addr' has ~natural~ alignment:
 	 *       f_byte:  No assumptions may be made
-	 *       f_word:  Can assume that `addr' is a multiple of `2' (aka. `(addr & 1) == 0')
-	 *       f_dword: Can assume that `addr' is a multiple of `4' (aka. `(addr & 3) == 0')
-	 *       f_qword: Can assume that `addr' is a multiple of `8' (aka. `(addr & 7) == 0')
+	 *       f_word:  Can assume that  `addr' is a multiple  of `2' (aka. `(addr & 1) == 0')
+	 *       f_dword: Can assume that `addr' is  a multiple of `4' (aka.  `(addr & 3) == 0')
+	 *       f_qword: Can assume that `addr' is  a multiple of `8' (aka.  `(addr & 7) == 0')
 	 *       f_xword: Can assume that `addr' is a multiple of `16' (aka. `(addr & 15) == 0')
 	 */
 	struct {
@@ -223,9 +223,9 @@ struct vio_operators {
 	} vo_xor;
 
 	/* [0..1]
-	 * Invoked as the result of the user attempting to call into VIO memory.
+	 * Invoked as the result of the user attempting to call into VIO  memory.
 	 * When this operator is called, `regs' will have already been updated to
-	 * point to the instruction following the call instruction that was used
+	 * point  to the instruction following the call instruction that was used
 	 * to execute VIO memory.
 	 * USER:
 	 * >> void *vio_base;
@@ -328,21 +328,21 @@ struct vio_operators {
 /* vio_create(3):
  * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
  * >>                 size_t initial_size, oflag_t flags);
- * Create an mmap(2)able VIO object where memory accesses
+ * Create  an mmap(2)able VIO object where memory accesses
  * made to the object are serviced by dispatching them via
  * the given `ops' table.
  * The returned file descriptor mustn't be deleted by `close(2)',
  * but rather through use of `vio_destroy(3)'.
- * Note that callbacks in `ops' may be invoked in the context
- * of a different thread than the one that performed the memory
+ * Note  that callbacks in  `ops' may be  invoked in the context
+ * of  a different thread than the one that performed the memory
  * access. Also note that the returned `fd_t' can be shared with
  * other processes, but still function as expected. (when shared
  * with a different process, that process should once again make
- * use of `close(2)' for cleanup, rather than `vio_destroy(3)')
+ * use  of `close(2)' for cleanup, rather than `vio_destroy(3)')
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK'
  * @param: cookie:       A cookie pointer that is available as `args->va_cookie'
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This size may be altered at a later point in time
+ *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 /*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_CREATE)(struct vio_operators const *ops, void *cookie,

@@ -59,11 +59,11 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy
 
 
 /* Return the best-matching pixel for a given color.
- * For the purpose of determining the best match, this algorithm
- * leans towards emphasizing colors best viewed by the human eye,
+ * For  the purpose  of determining  the best  match, this algorithm
+ * leans towards emphasizing  colors best viewed  by the human  eye,
  * thus producing the best-looking results for those bipedal fellas.
  * NOTE: This function may lazily allocate `self->vp_cache', meaning
- *       that once used, the caller is responsible to eventually
+ *       that once  used, the  caller is  responsible to  eventually
  *       cleanup that field using `free(self->vp_cache)'. */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t
 (LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_GETPIXEL)(struct video_palette *__restrict self, video_color_t color);

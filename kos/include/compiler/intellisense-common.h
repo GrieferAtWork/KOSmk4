@@ -335,9 +335,9 @@ template<> struct ____INTELLISENSE_promote<unsigned long long> { typedef unsigne
 
 #pragma pack(push,1)
 /* Used to implement endian-specific integers capable of
- * emitting warnings when attempted to be used as
- * regular integers without prior casting using the.
- * (le|be)swap_(16|32|64) functions from <byteswap.h>
+ * emitting  warnings  when  attempted  to  be  used  as
+ * regular  integers  without prior  casting  using the.
+ * (le|be)swap_(16|32|64)  functions  from  <byteswap.h>
  * >> Again: Only meant to highlight usage errors in visual studio. */
 template<int endian,class __T> class ____intellisense_endianint {
 	__T __v;

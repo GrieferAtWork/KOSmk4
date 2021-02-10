@@ -72,17 +72,17 @@ struct dbg_entry_info {
 DATDEF bool dbg_active;
 #endif /* !__dbg_active_defined */
 
-/* The default debugger main entry function.
- * This function is used as entry when `dbg()' is
+/* The  default  debugger   main  entry   function.
+ * This function is used  as entry when `dbg()'  is
  * called, or the `info' of `dbg_enter()' is `NULL' */
 FUNDEF void KCALL dbg_main(uintptr_t show_welcome);
 
 /* Exit debugger mode (same as returning from a `dbg_entry_t' function) */
 FUNDEF ATTR_NORETURN void KCALL dbg_exit(void);
 
-/* A special debugger entry function that can be used to quickly enter
+/* A special debugger entry function that can be used to quickly  enter
  * debugger mode at an arbitrary code location, and greet the user with
- * a CLI-based interface for querying the system state.
+ * a    CLI-based   interface   for    querying   the   system   state.
  * NOTE: This function preserves _all_ registers! */
 FUNDEF void KCALL dbg(void);
 
@@ -176,16 +176,16 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_en
 
 
 /* Extended set of conditions for which the kernel should switch to debugger-mode.
- * NOTE: Where these overlap with `KERNEL_DEBUGTRAP_ON_*', debug traps
+ * NOTE: Where these  overlap with  `KERNEL_DEBUGTRAP_ON_*', debug  traps
  *       will be triggered instead of the builtin debugger being entered.
- * e.g.: When both `KERNEL_DEBUGTRAP_ON_COREDUMP' and `KERNEL_DEBUG_ON_COREDUMP'
- *       are enabled, only a debug trap will be generated upon a coredump, but
+ * e.g.: When  both   `KERNEL_DEBUGTRAP_ON_COREDUMP'  and   `KERNEL_DEBUG_ON_COREDUMP'
+ *       are  enabled,  only a  debug  trap will  be  generated upon  a  coredump, but
  *       the builtin debugger will only be entered when `KERNEL_DEBUGTRAP_ON_COREDUMP'
  *       isn't set, or `kernel_debugtrap_enabled() == false'
- * Also note that certain conditions _always_ cause the builtin debugger to be entered,
- * possibly even if a debug trap was generated before then. Such conditions include
+ * Also note that certain conditions _always_ cause the builtin debugger to be  entered,
+ * possibly even if  a debug  trap was generated  before then.  Such conditions  include
  * assertion checks/failures, stack segment faults, unhandled exceptions, and of course,
- * calls to `kernel_panic()' and `dbg()' or kernel-space instruction breakpoints (int3) */
+ * calls to `kernel_panic()' and `dbg()' or kernel-space instruction breakpoints  (int3) */
 #define KERNEL_DEBUG_ON_COREDUMP          0x0008
 #define KERNEL_DEBUG_ON_KERNEL_BREAKPOINT 0x0040
 #define KERNEL_DEBUG_ON_USER_BREAKPOINT   0x0080

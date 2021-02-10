@@ -24,7 +24,7 @@
  * Always-include, wrapper header to re-configure Visual Studio's
  * Intellisense into something as much conforming to what the GCC
  * compiler does, as possible.
- * >> This header is never included by any production code,
+ * >> This header  is  never  included by  any  production  code,
  *    only ever included through the nmake forced include option,
  *    and functions defined here are never implemented.
  *   (So there's no need to go looking for them...)
@@ -77,7 +77,7 @@
 #elif defined(_WIN32) || defined(WIN32) || \
       defined(_WIN64) || defined(WIN64)
 /* Assume hosted CYGWIN development mode.
- * NOTE: Hosted MSVC mode doesn't need be handled here, as in
+ * NOTE: Hosted MSVC mode doesn't need be handled here, as  in
  *       that case, this header should not be included at all! */
 #   define unix       1
 #   define __unix     1

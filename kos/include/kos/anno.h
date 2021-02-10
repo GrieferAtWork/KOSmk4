@@ -33,27 +33,28 @@
 #define __WEAK          /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid. */
 #define __REF           /* Annotation for reference holders/transfers.
                          * When used on a struct-field/local/global variable: Reference storage
-                         * When used on a return type: The function returns a reference
+                         * When used on a return  type:  The   function  returns  a   reference
                          * When used on an argument: The function inherited a reference (but look out for `inherit(<condition>)' annotations) */
 #define __REF_IF(x)     /* Same as `__REF', but only when `x' is true. */
 #define __NOBLOCK       /* Annotation for functions that are guarantied to never block,
                          * making them safe to-be called from any asynchronous context. */
 #define __NOBLOCK_IF(x) /* Same as `__NOBLOCK', but only when `x' is true. */
 #define __NOPREEMPT     /* Annotation for functions that may only be called with preemption disabled. */
-#define __NOCONNECT     /* Annotation for functions which may only be called when the calling
+#define __NOCONNECT     /* Annotation for  functions which  may only  be called  when the  calling
                          * thread isn't already connected to a signal. (only affects kernel-space) */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __THROWS(...)   /* Annotation for the set of error codes/classes/sub-classes that may be thrown by a function.
-                         * You may include `...' as a possible error code to indicate that the function
-                         * is also allowed to throw any other kind of exception, usually indicative of
-                         * the function following a path that includes a call to `task_serve()'
-                         * Note however that this is merely for documentation purposes, as well as to
-                         * document the ~expected~ error codes (e.g. anything that can throw E_SEGFAULT
-                         * usually does so by accessing user-space memory, which also implies access to
-                         * VIO callbacks, and the fact that VIO is also allowed to throw arbitrary exceptions,
-                         * meaning that technically speaking, `E_SEGFAULT' would also imply `...').
-                         * Any function that isn't `__NOTHROW()' is still always allowed to throw any error
-                         * that isn't apart of the `__THROWS()' set. */
+#define __THROWS(...)   /* Annotation for the set of error codes/classes/sub-classes that may be thrown
+                         * by a function.
+                         * You may include `...' as a possible  error code to indicate that the  function
+                         * is also allowed to  throw any other kind  of exception, usually indicative  of
+                         * the  function  following  a  path  that  includes  a  call  to  `task_serve()'
+                         * Note however that  this is merely  for documentation purposes,  as well as  to
+                         * document the ~expected~ error codes  (e.g. anything that can throw  E_SEGFAULT
+                         * usually does so by accessing user-space  memory, which also implies access  to
+                         * VIO callbacks,  and the  fact that  VIO  is also  allowed to  throw  arbitrary
+                         * exceptions, meaning that technically  speaking, `E_SEGFAULT' would also  imply
+                         * `...'). Any function that isn't `__NOTHROW()' is still always allowed to throw
+                         * any error that isn't apart of the `__THROWS()' set. */
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define __THROWS(e...)  /* ... */
 #endif /* ... */
@@ -61,7 +62,7 @@
 
 
 #if defined(__clang_tidy__) && defined(__cplusplus)
-/* This forces warnings in clang-tidy, if a THROWS-annotated
+/* This  forces  warnings  in  clang-tidy,  if  a THROWS-annotated
  * function is called from another function annotated as NOTHROW()
  * s.a. `bugprone-exception-escape' */
 #undef __THROWS

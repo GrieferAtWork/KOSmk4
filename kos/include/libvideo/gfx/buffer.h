@@ -79,18 +79,18 @@ struct video_buffer_ops {
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: blendmode: Pixel blending mode for graphics operations targeting this buffer.
-	 *                    This argument should be constructed using `GFX_BLENDINFO()'.
-	 *                    Usually, you will want to use `GFX_BLENDINFO_ALPHA' as blending mode
+	 *                    This  argument  should  be  constructed  using  `GFX_BLENDINFO()'.
+	 *                    Usually, you will want to use `GFX_BLENDINFO_ALPHA' as blending  mode
 	 *                    when you wish to make use of alpha-blending. However, if you know for
-	 *                    certain that alpha-blending isn't required, graphics performance can
-	 *                    be improved by passing `GFX_BLENDINFO_OVERRIDE' in order to prevent
+	 *                    certain  that alpha-blending isn't required, graphics performance can
+	 *                    be improved by passing  `GFX_BLENDINFO_OVERRIDE' in order to  prevent
 	 *                    any overhead that would normally incur from blending operations.
 	 * @param: flags:     Set of `VIDEO_GFX_F*'
 	 * @param: colorkey:  A specific color that should always return fully opaque when read
-	 *                    To disable colorkey-ing, simply pass some color with ALPHA=0 (or
+	 *                    To disable colorkey-ing, simply pass some color with ALPHA=0  (or
 	 *                    alternatively, just pass `0' (which would be one such color))
-	 * @param: clip:      When non-NULL, specify a clip-rect to which drawing should be restricted.
-	 *                    All canvas coords will be relative to this rectangle, and and attempt to
+	 * @param: clip:      When non-NULL, specify  a clip-rect  to which drawing  should be  restricted.
+	 *                    All canvas coords  will be  relative to this  rectangle, and  and attempt  to
 	 *                    access a pixel outside this rect will be a no-op / appear to be fully opaque. */
 	__ATTR_NONNULL((1, 2)) void
 	(LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
@@ -100,7 +100,7 @@ struct video_buffer_ops {
 	                             struct video_buffer_rect const *__clip);
 
 	/* Clip the given `GFX', given a set of coords relative to the current clip state `GFX',
-	 * and store the newly created GFX context in `*RESULT' (note that `GFX' and `RESULT'
+	 * and store the newly created  GFX context in `*RESULT'  (note that `GFX' and  `RESULT'
 	 * may be identical for this purpose!) */
 	__ATTR_NONNULL((1, 2)) void
 	(LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
@@ -246,7 +246,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
- *       which may not necessarily use the given, or default `codec' and `palette'
+ *       which may not necessarily use the  given, or default `codec' and  `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
 typedef __ATTR_WUNUSED __REF struct video_buffer *
@@ -259,14 +259,14 @@ video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
- * Note that screen buffer access is only granted to ROOT and the window server */
+ * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
 typedef __ATTR_WUNUSED __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Return the preferred video format.
- * If possible, this format will match the format used by the host's graphics card.
+ * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
 typedef __ATTR_WUNUSED __ATTR_RETNONNULL struct video_format const *(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);

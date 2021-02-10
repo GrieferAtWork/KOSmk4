@@ -41,9 +41,9 @@
  *     O(llrb.prevnode) = N/A
  *       llrb.memory    = (2 * sizeof(void *) + C)*N + 1BIT*N
  *
- * Or in order words: Run times for both variants of red-black trees
- * grow logarithmically, with left-leaning trees having a slightly
- * slower insert/remove function (the removenode() function also has
+ * Or in order words: Run times for both variants of red-black  trees
+ * grow logarithmically, with  left-leaning trees  having a  slightly
+ * slower  insert/remove function (the removenode() function also has
  * to compare keys of nodes to-be removed, meaning that this function
  * also becomes slower when comparing keys is slow)
  */

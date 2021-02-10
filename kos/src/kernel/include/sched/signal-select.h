@@ -47,21 +47,21 @@ struct sig_select_context {
 		struct sig_completion *ssc_compl;  /* [1..1][valid_if(SIG_SELECT_TYPE_COMPLETION)] Completion descriptor. */
 	};
 	unsigned int    ssc_wakeflags; /* [out_opt] Task wakeup flags used when waking up a thread (set of `TASK_WAKE_F*')
-	                                * By default, this field is initialized to `TASK_WAKE_FNORMAL' (but may or may
+	                                * By  default, this  field is initialized  to `TASK_WAKE_FNORMAL' (but  may or may
 	                                * not be re-initialized between multiple invocations of the selector callback) */
 	struct task    *ssc_caller;    /* [1..1][const] The calling thread. */
 };
 
 /* Select which signal (if any) should be send to the target described by `context'
- * WARNING: This function is invoked while internal SMP-locks are held, meaning that
+ * WARNING: This  function is invoked  while internal SMP-locks  are held, meaning that
  *          this function mustn't do anything that is unsafe while holding an SMP-lock.
  * @return: * :   The signal (~ala sig_altsend()) that should be send to this target.
  * @return: NULL: Don't send any signal to this target. */
 typedef NOBLOCK NOPREEMPT NONNULL((2)) struct sig *
 /*NOTHROW*/ (FCALL *sig_send_selector_t)(void *cookie, struct sig_select_context *__restrict context);
 
-/* Send a signal to the oldest (and preferably non-poll-based) connection of
- * `self' for which `selector' returns non-NULL. Connections are enumerated
+/* Send  a signal to the oldest (and preferably non-poll-based) connection of
+ * `self' for which `selector'  returns non-NULL. Connections are  enumerated
  * twice from oldest to most recent, only including non-poll-based during the
  * first pass, and only including poll-based ones during the second pass.
  * @param: self:     The signal which should be sent.
@@ -86,7 +86,7 @@ NOTHROW(FCALL sig_send_select)(struct sig *__restrict self,
 #define SIG_SEND_SELECT_NOTARGET 0 /* No target could be found. */
 #define SIG_SEND_SELECT_SUCCESS  1 /* Success */
 #define SIG_SEND_SELECT_ALREADY  2 /* Success, but the target was a thread-connection
-                                    * which already had a signal delivered to it in
+                                    * which already had a  signal delivered to it  in
                                     * the past. */
 
 

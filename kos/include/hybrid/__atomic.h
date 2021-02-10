@@ -761,7 +761,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL void
 __NOTHROW_NCX(__impl_hybrid_atomic_signal_fence)(int __order) {
 	/* Fallback: Emit compiler barriers to implement atomic signal fencing.
 	 * HINT: If available, compiler barriers are implemented using intrinsic
-	 *       signal fences, meaning that they are literally the same thing.
+	 *       signal fences, meaning that they are literally the same  thing.
 	 * e.g.: When hosted by msvc, stuff like `_ReadWriteBarrier()' will appear below. */
 	if (__order >= __ATOMIC_ACQ_REL)
 		__COMPILER_BARRIER();

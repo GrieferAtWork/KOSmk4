@@ -34,10 +34,10 @@
  * A (from the outside) simple utility library that only has 4 functions:
  *
  * Save whatever the current display mode might be, such that it can
- * be restored at a later point in time using `vga_state_load()'
- * This includes extended VGA modes, such as VESA, and the like, as
- * well as the contents of display memory (at least those that may
- * be modified by text-mode font data, as well as text memory; s.a.
+ * be  restored at  a later  point in  time using `vga_state_load()'
+ * This includes extended VGA modes, such as VESA, and the like,  as
+ * well as the contents of display  memory (at least those that  may
+ * be modified by text-mode font data, as well as text memory;  s.a.
  * the function `vga_state_text()' below)
  *  - unsigned int vga_state_save(struct vga_state *self);
  *
@@ -48,7 +48,7 @@
  *  - void vga_state_fini(struct vga_state *self);
  *
  * Force the display into 80x25, ANSI-compliant text-mode. The VGA
- * buffer itself can be found in physical memory at 0xb8000
+ * buffer itself  can  be  found in  physical  memory  at  0xb8000
  *  - unsigned int vga_state_text(void);
  *
  * unsigned int-return values are one of `VGA_STATE_ERROR_*'

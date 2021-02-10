@@ -1179,12 +1179,12 @@ INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__r
 
 
 /* Same as `DEFINE_HANDLE_REFCNT_FUNCTIONS', but include dedicated weak referencing support
- * in terms of `weakincref()' and friends. The regular `DEFINE_HANDLE_REFCNT_FUNCTIONS()'
- * will implement those functions in terms of the regular reference counter, such that
- * anyone holding a weak reference is actually holding a regular reference. This behavior
- * is ok in most cases, however objects which can exist as handles and could be made to
- * form reference loops should only ever store weak references to other handles, and
- * should themself have a dedicated weakref mechanism. One example of such an object
+ * in terms of `weakincref()'  and friends. The regular  `DEFINE_HANDLE_REFCNT_FUNCTIONS()'
+ * will implement those  functions in  terms of the  regular reference  counter, such  that
+ * anyone  holding a weak reference is actually  holding a regular reference. This behavior
+ * is ok in most  cases, however objects which  can exist as handles  and could be made  to
+ * form reference  loops should  only ever  store  weak references  to other  handles,  and
+ * should themself  have a  dedicated weakref  mechanism.  One example  of such  an  object
  * is `struct epoll_controller' * */
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(name, T)            \
 	INTERN NOBLOCK WUNUSED NONNULL((1)) refcnt_t                                \

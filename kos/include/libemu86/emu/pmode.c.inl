@@ -367,7 +367,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
      (EMU86_EMULATE_CONFIG_WANT_MONITOR && defined(EMU86_EMULATE_MONITOR)))
 #define EMU86_EMULATE_HAVE_MONITOR
 			case 0:
-				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware and
+				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware  and
 				 *                          activates the monitor. The address range should be a write-back
 				 *                          memory caching type. The address is DS:RAX/EAX/AX. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
@@ -399,7 +399,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #define EMU86_EMULATE_HAVE_MWAIT
 			case 1:
 				/* 0F 01 C9     MWAIT     A hint that allows the processor to stop instruction execution
-				 *                        and enter an implementation-dependent optimized state until
+				 *                        and enter  an implementation-dependent  optimized state  until
 				 *                        occurrence of a class of events. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 				if (EMU86_ISUSER()) {
@@ -501,7 +501,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				if (op_flags & (EMU86_F_f2 | EMU86_F_f3 | EMU86_F_66))
 					goto return_unexpected_prefix_rmreg;
 #define NEED_return_unexpected_prefix_rmreg
-				/* 0F 01 CF     ENCLS     This instruction is used to execute privileged Intel SGX leaf
+				/* 0F 01 CF     ENCLS     This instruction is  used to execute  privileged Intel SGX  leaf
 				 *                        functions that are used for managing and debugging the enclaves. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 				if (EMU86_ISUSER()) {
@@ -531,7 +531,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #ifndef EMU86_EMULATE_HAVE_MONITOR
 #define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 			case 0:
-				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware and
+				/* 0F 01 C8     MONITOR     Sets up a linear address range to be monitored by hardware  and
 				 *                          activates the monitor. The address range should be a write-back
 				 *                          memory caching type. The address is DS:RAX/EAX/AX. */
 #endif /* !EMU86_EMULATE_HAVE_MONITOR */
@@ -540,7 +540,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
 			case 1:
 				/* 0F 01 C9     MWAIT     A hint that allows the processor to stop instruction execution
-				 *                        and enter an implementation-dependent optimized state until
+				 *                        and enter  an implementation-dependent  optimized state  until
 				 *                        occurrence of a class of events. */
 #endif /* !EMU86_EMULATE_HAVE_MWAIT */
 #undef EMU86_EMULATE_HAVE_MWAIT
@@ -559,7 +559,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #ifndef EMU86_EMULATE_HAVE_ENCLS
 			case 7:
 #define EMU86_EMULATE_HAVE_0F01_1_FALLBACK
-				/* 0F 01 CF     ENCLS     This instruction is used to execute privileged Intel SGX leaf
+				/* 0F 01 CF     ENCLS     This instruction is  used to execute  privileged Intel SGX  leaf
 				 *                        functions that are used for managing and debugging the enclaves. */
 #endif /* !EMU86_EMULATE_HAVE_ENCLS */
 #undef EMU86_EMULATE_HAVE_ENCLS
@@ -729,7 +729,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			case 5: /* 0F 01 D5     XEND       Specifies the end of an RTM code region. */
 				/* XEND is supposed to RAISE a #GP(0) when executed outside of a transaction
 				 * Since we always choose the fallback-branch, this instruction should never
-				 * be encountered during normal execution, and as such is considered to be
+				 * be encountered during normal execution, and  as such is considered to  be
 				 * unsupported (during said normal execution) */
 #if !defined(EMU86_EMULATE_XTEST_IS_ONE) && !defined(EMU86_EMULATE_XTEST_IS_ZERO)
 				if (EMU86_EMULATE_XTEST())
@@ -1182,7 +1182,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 				/* Allow the privisioning of `EMU86_EMULATE_RDTSCP()'
 				 * in order to prevent a race condition when the hosting CPU changes
-				 * between reading its performance counter, and its ID. */
+				 * between   reading   its   performance   counter,   and   its  ID. */
 #ifdef EMU86_EMULATE_RDTSCP
 				{
 					u64 tsc;

@@ -86,7 +86,7 @@ BUILTIN_GLOBALS_ENUMERATE(DECLARE_INTERN_OVERRIDE)
 #undef DECLARE_INTERN_OVERRIDE
 
 
-/* Define our own private variants of a couple of functions
+/* Define our own private variants of a couple of  functions
  * that aren't already automatically substituted in headers. */
 INTDEF NONNULL((2)) ssize_t CC
 preadall(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset);
@@ -126,10 +126,10 @@ INTDEF DlModule dl_rtld_module;
 
 LOCAL NONNULL((1)) void CC
 DlModule_AddToGlobals(DlModule *__restrict self) {
-	/* XXX: This right here is a O(n) operation for something that
+	/* XXX: This right here is a O(n) operation for something  that
 	 *      could also be done in O(1) when using other list types.
 	 *      However, all list types currently defined in <hybrid/sequence/list.h>
-	 *      that offer O(1) INSERT_TAIL, would also require a static initializer
+	 *      that offer O(1) INSERT_TAIL, would also require a static  initializer
 	 *      that contains a relocation... */
 	LIST_INSERT_TAIL(&DlModule_GlobalList, self, dm_globals);
 }
@@ -157,7 +157,7 @@ INTDEF struct atomic_owner_rwlock DlModule_LoadLock;
 INTDEF char *dl_library_path;
 
 /* Open a DL Module.
- * @return: NULL: Failed to open the module. (no error is set if the file could not be found
+ * @return: NULL: Failed to open the module.  (no error is set if  the file could not be  found
  *                in a call to one of `DlModule_OpenFilename' or `DlModule_OpenFilenameInPath') */
 INTDEF WUNUSED REF DlModule *DLFCN_CC
 DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode);
@@ -219,7 +219,7 @@ DlModule_ElfVerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
 INTDEF WUNUSED NONNULL((1)) fd_t CC
 DlModule_GetFd(DlModule *__restrict self);
 
-/* Lazily allocate if necessary, and return the vector of section headers for `self'
+/* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
  * NOTE: On success, this function guaranties that the following fields have been initialized:
  *  - self->dm_shnum
  *  - self->dm_elf.de_shoff
@@ -240,7 +240,7 @@ INTDEF WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_ElfGetSection(DlModule *__restrict self,
                        char const *__restrict name);
 
-/* Lazily calculates and returns the # of symbols in `de_dynsym_tab'
+/* Lazily calculates  and  returns  the #  of  symbols  in  `de_dynsym_tab'
  * NOTE: This function may only be called with `de_dynsym_tab' is non-NULL!
  * @return: * : The # of symbols in `de_dynsym_tab'
  * @return: 0 : Error (dlerror() was modified) */
@@ -248,10 +248,10 @@ INTDEF WUNUSED NONNULL((1)) size_t CC
 DlModule_ElfGetDynSymCnt(DlModule *__restrict self);
 
 /* Return a pointer to the Elf_Sym object assigned with `name'.
- * WARNING: The returned symbol may not necessarily be defined by `self'.
+ * WARNING: The returned symbol  may not necessarily  be defined by  `self'.
  *          This function merely returns the associated entry from `.dynsym'
  * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
- *       case of the error is the result of a corrupted hash table. */
+ *       case of the error is the  result of a corrupted hash  table. */
 INTDEF ElfW(Sym) const *CC
 DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
                            char const *__restrict name,
@@ -259,7 +259,7 @@ DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
                            uintptr_t *__restrict phash_gnu);
 #define DLMODULE_GETLOCALSYMBOL_HASH_UNSET ((uintptr_t)-1)
 
-/* Find the DL module mapping the specified file.
+/* Find  the  DL   module  mapping   the  specified   file.
  * If no such module is loaded, `NULL' is returned instead.
  * @return: NULL: No such module exists (NOTE: No error was set in this case!) */
 INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
@@ -302,8 +302,8 @@ INTDEF void *LIBCCALL libdl___tls_get_addr(void);
 struct tls_segment;
 
 /* Allocate/Free a static TLS segment
- * These functions are called by by libc in order to safely create a new thread, such that
- * all current and future modules are able to store thread-local storage within that thread.
+ * These functions are  called by  by libc  in order to  safely create  a new  thread, such  that
+ * all current and  future modules are  able to  store thread-local storage  within that  thread.
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
@@ -313,7 +313,7 @@ INTDEF ATTR_MALLOC WUNUSED struct tls_segment *DLFCN_CC libdl_dltlsallocseg(void
 INTDEF NONNULL((1)) int DLFCN_CC libdl_dltlsfreeseg(struct tls_segment *ptr);
 
 /* Return a pointer to the base of the given module's
- * TLS segment, as seen form the calling thread.
+ * TLS  segment,  as  seen form  the  calling thread.
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
@@ -322,43 +322,43 @@ libdl_dltlsbase(DlModule *__restrict self);
 
 /* DL-based TLS memory management API.
  * These functions may be used to dynamically allocate TLS memory that works everywhere where
- * ATTR_THREAD-based TLS memory also works. - However using these functions, TLS memory can
- * be allocated dynamically at runtime (behaving the same as a call to dlopen() loading a
+ * ATTR_THREAD-based  TLS memory also works. - However  using these functions, TLS memory can
+ * be  allocated dynamically at  runtime (behaving the same  as a call  to dlopen() loading a
  * module containing a TLS segment would).
  * @param: NUM_BYTES:      The size of the TLS segment (in bytes)
  * @param: MIN_ALIGNMENT:  The minimum alignment requirements for the TLS segment base address.
  * @param: TEMPLATE_DATA:  Base address of an initialization template.
- *                         The first `TEMPLATE_SIZE' bytes of any per-thread data segment
+ *                         The first `TEMPLATE_SIZE' bytes  of any per-thread data  segment
  *                         that gets allocated will be initialized to the contents of these
  *                         values before `PERTHREAD_INIT' is optionally invoked in order to
  *                         perform additional initialization.
- * @param: TEMPLATE_SIZE:  The size of `TEMPLATE_DATA' in bytes, indicating the number of
+ * @param: TEMPLATE_SIZE:  The size of `TEMPLATE_DATA' in bytes, indicating the number  of
  *                         leading bytes within the TLS segment that should be pre-defined
  *                         to mirror the contents of `TEMPLATE_DATA' at the time of a call
- *                         to this function (`TEMPLATE_DATA' need not remain valid or
+ *                         to this  function (`TEMPLATE_DATA'  need  not remain  valid  or
  *                         accessible after this function returns)
  *                         Any memory after `TEMPLATE_SIZE', but before `NUM_BYTES' is initialized
- *                         to all ZEROes, however `TEMPLATE_SIZE' must not be greater than
+ *                         to  all  ZEROes,  however  `TEMPLATE_SIZE'  must  not  be  greater than
  *                        `NUM_BYTES', and if it is, this function returns `NULL' and sets
  *                        `dlerror()' accordingly.
  * @param: PERTHREAD_INIT: An optional callback that will be invoked on a per-thread basis
  *                         in order to perform additional initialization of the associated
  *                         TLS segment within the associated thread.
  *                         This function will be called upon first access of the segment
- *                         within the thread using the data (s.a. `dltlsaddr()')
+ *                         within   the  thread  using  the  data  (s.a.  `dltlsaddr()')
  *                         @param: ARG:  The value of `PERTHREAD_CALLBACK_ARG' passed to `dltlsalloc'
  *                         @param: BASE: The base address of the associated segment within the calling
- *                                       thread (same as the return value of `dltlsaddr()')
+ *                                       thread   (same   as  the   return  value   of  `dltlsaddr()')
  * @param: PERTHREAD_FINI: An optional callback that behaves similar to `PERTHREAD_INIT',
- *                         but called by `pthread_exit()' or any other thread finalizer
+ *                         but called by `pthread_exit()'  or any other thread  finalizer
  *                        (more specifically: by `dltlsfreeseg()') within any thread that
  *                         has been seen using the associated segment, and causing it to
  *                         be allocated and initialized for that thread.
  * @param: PERTHREAD_CALLBACK_ARG: A user-specified argument passed to the init/fini callbacks.
  * @return: * :            An opaque handle for the newly created TLS segment.
  *                         This handle may be used in future calls to `dltlsaddr()', and can be
- *                         destroyed (causing all threads that had previously allocated the
- *                         segment to delete it and optionally invoke finalizer callbacks) by
+ *                         destroyed (causing  all threads  that had  previously allocated  the
+ *                         segment to delete it and  optionally invoke finalizer callbacks)  by
  *                         passing it to `dltlsfree()'
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 INTDEF WUNUSED DlModule *DLFCN_CC
@@ -381,12 +381,12 @@ INTDEF NONNULL((1)) int DLFCN_CC libdl_dltlsfree(DlModule *self);
 
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
- *       passed to `dltlsalloc()' will be called by this function upon the first use of
- *       that segment within each individual thread, also causing the finalizer to be
+ *       passed  to `dltlsalloc()' will be called by this function upon the first use of
+ *       that  segment within each  individual thread, also causing  the finalizer to be
  *       enqueued for invocation when the calling thread exits.
  * WARNING: The order in which TLS finalizers are invoked is entirely UNDEFINED!
- * NOTE: the given `TLS_HANDLE' may also be a module handle, as returned by `dlopen()',
- *       in which case this function returns a pointer to the TLS segment of that module for
+ * NOTE: the  given  `TLS_HANDLE' may  also  be a  module  handle, as  returned  by `dlopen()',
+ *       in which case this function  returns a pointer to the  TLS segment of that module  for
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
@@ -394,7 +394,7 @@ INTDEF WUNUSED NONNULL((1)) void *__DLFCN_DLTLSADDR_CC
 libdl_dltlsaddr(DlModule *self);
 
 /* Same as `dltlsaddr()', but used to lookup a TLS block relative to a given `TLS_SEGMENT',
- * where the later was previously allocated using `dltlsallocseg()'. This function allows
+ * where the later was previously  allocated using `dltlsallocseg()'. This function  allows
  * the caller to get a pointer to the TLS data of another thread, and is used to initialize
  * the `pthread_self()' of a newly created thread from within `pthread_create()'.
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE'
@@ -408,18 +408,18 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg);
  * and return NULL if the module doesn't have a TLS segment. */
 INTDEF WUNUSED NONNULL((1)) void *CC DlModule_TryGetTLSAddr(DlModule *__restrict self);
 
-/* Enumerate all loaded modules, as well as information about them.
+/* Enumerate all loaded modules, as  well as information about  them.
  * Enumeration stops when `*CALLBACK' returns a non-zero value, which
- * will then also be returned by this function. Otherwise, `0' will
+ * will then also be returned  by this function. Otherwise, `0'  will
  * be returned after all modules have been enumerated. */
 INTDEF int DLFCN_CC libdl_iterate_phdr(__dl_iterator_callback callback, void *arg);
 
-/* Invoke the static initializers of all currently loaded modules.
- * This is called late during initial module startup once the initial
- * set of libraries, + the initial application have been loaded.
+/* Invoke the  static initializers  of  all currently  loaded  modules.
+ * This is called late during  initial module startup once the  initial
+ * set of  libraries,  +  the initial  application  have  been  loaded.
  * Note that initializers are invoked in reverse order of those modules
- * appearing within `DlModule_AllList', meaning that the primary
- * application's __attribute__((constructor)) functions are invoked
+ * appearing   within  `DlModule_AllList',  meaning  that  the  primary
+ * application's  __attribute__((constructor))  functions  are  invoked
  * _AFTER_ those from (e.g.) libc. */
 INTDEF void CC DlModule_RunAllStaticInitializers(void);
 
@@ -472,8 +472,8 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) DlSection *FCALL dlsec_builtin(char const 
 INTDEF WUNUSED ATTR_CONST DlSection *FCALL dlsec_builtin_index(size_t sect_index);
 INTDEF WUNUSED ATTR_CONST char const *FCALL dlsec_builtin_name(size_t sect_index);
 
-/* Return the address of a function `name' that is required by the RTLD core
- * and must be defined by one of the loaded libraries. - If no such function
+/* Return the address of a function `name'  that is required by the RTLD  core
+ * and  must be defined by one of the  loaded libraries. - If no such function
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL
@@ -483,7 +483,7 @@ dl_require_global(char const *__restrict name);
 INTDEF bool sys_debugtrap_disabled;
 
 /* [0..1][ATOMIC(APPEND)] Chain of registered DL extensions.
- * NOTE: Once registered, a DL extension cannot be deleted! */
+ * NOTE: Once registered, a DL extension cannot be  deleted! */
 INTDEF struct dlmodule_format *dl_extensions;
 
 /* Lazily initialize and return the libdl core ops V-table. */

@@ -20,7 +20,6 @@
 #ifndef _ASM_PKEY_H
 #define _ASM_PKEY_H 1
 
-
 /*
  * >> #define __ARCH_HAVE_PKEY
  * Defined if the architecture supports protection keys.

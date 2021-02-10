@@ -164,7 +164,7 @@ struct video_font_ops *CC libvideo_tlft_getops(void) {
 
 
 
-/* Returns `(__REF struct video_font *)-1' if not a tlft file.
+/* Returns `(__REF struct video_font *)-1'  if not  a tlft  file.
  * Upon success, the mmap-ed region `base...+=size' is inherited. */
 INTERN WUNUSED NONNULL((1)) __REF struct video_font *CC
 libvideo_font_tryopen_tlft(void *base, size_t size) {

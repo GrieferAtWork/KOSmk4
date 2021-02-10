@@ -106,13 +106,13 @@
 #endif /* !MAP_NONBLOCK && __MAP_NONBLOCK */
 
 /* Allocation is for a stack.
- * NOTE: KOS uses this flag to determine where
+ * NOTE: KOS  uses  this  flag  to  determine  where
  *       automatic memory mappings are allocated at. */
 #if !defined(MAP_STACK) && defined(__MAP_STACK)
 #define MAP_STACK __MAP_STACK
 #endif /* !MAP_STACK && __MAP_STACK */
 
-/* Don't override existing mappings when `MAP_FIXED' is passed.
+/* Don't  override  existing mappings  when `MAP_FIXED'  is passed.
  * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
 #if !defined(MAP_FIXED_NOREPLACE) && defined(__MAP_FIXED_NOREPLACE)
 #define MAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
@@ -123,7 +123,7 @@
 #define MAP_NOASLR __MAP_NOASLR
 #endif /* !MAP_NOASLR && __MAP_NOASLR */
 
-/* Kernel-only mmap flag: Set the `MNODE_F_MPREPARED' node flag,
+/* Kernel-only mmap flag:  Set the  `MNODE_F_MPREPARED' node  flag,
  * and ensure that the backing page directory address range is kept
  * prepared for the duration of the node's lifetime. */
 #define MAP_PREPARED 0x00000080
@@ -159,22 +159,22 @@ DATDEF struct mfile mfile_zero;     /* Zero-initialized, anonymous memory. */
  * @param: hint:          s.a. `mman_findunmapped'
  * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
  * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED' (Other bits are silently ignored)
- *                        Additionally, the following flags may be set to customize the behavior of how
- *                        a suitable address is located (s.a. `mman_findunmapped()' for more info):
+ *                        Additionally,  the   following   flags   may  be   set   to   customize  the   behavior   of   how
+ *                        a  suitable   address  is   located  (s.a.   `mman_findunmapped()'  for   more   info):
  *                        `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE'
  * @param: file:          The file that is being mapped.
  * @param: file_fspath:   Optional mapping path (only used for memory->disk mapping listings)
  * @param: file_fsname:   Optional mapping name (only used for memory->disk mapping listings)
  * @param: file_pos:      Offset into the file being mapped, of where the mapping should start.
- *                        If this value isn't page-aligned, then its sub-page offset is added
- *                        to the return value eventually returned by this function.
- *                        But that that when `MAP_FIXED' flag is also set, then the sub-page
- *                        offset of `hint' will be silently ignored, meaning that in this case
+ *                        If this value isn't page-aligned,  then its sub-page offset is  added
+ *                        to  the   return  value   eventually  returned   by  this   function.
+ *                        But  that that when  `MAP_FIXED' flag is also  set, then the sub-page
+ *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
  * @param: min_alignment: s.a. `mman_findunmapped'
- * @return: * : The effective mapping base at which `file->DATA.BYTES[file_pos]' can be found,
+ * @return: * : The effective mapping  base at which  `file->DATA.BYTES[file_pos]' can be  found,
  *              unless `num_bytes' was given as `0', in which case the return value is undefined,
- *              but arguably valid (e.g. will be a user-/kernel-space location as it would have
+ *              but  arguably valid (e.g. will be a  user-/kernel-space location as it would have
  *              been when `num_bytes' was non-zero). */
 FUNDEF NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
@@ -191,11 +191,11 @@ mman_map(struct mman *__restrict self,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 
 
-/* Same as `mman_map()', but only allow pages entirely contained within
+/* Same as `mman_map()', but only allow pages entirely contained  within
  * the file-relative address range `file_map_minaddr...file_map_maxaddr'
- * to be mapped. Attempting to map file contents beyond this range will
+ * to be mapped. Attempting to map file contents beyond this range  will
  * instead result in `&mfile_zero' getting mapped instead.
- * This function is mainly used to restrict access to raw physical memory
+ * This function is mainly used to  restrict access to raw physical  memory
  * when user-space is allowed to directly mmap() device ram, but the driver
  * want's to prevent user-space from mapping more than the physical address
  * ranges actually associated with a device. */
@@ -216,10 +216,10 @@ mman_map_subrange(struct mman *__restrict self,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 
 
-/* Same as `mman_map()', but instead of actually mapping something, leave the
+/* Same  as  `mman_map()',  but  instead  of  actually  mapping  something,  leave the
  * address range as empty (but possibly prepared), making it a reserved address range.
  * @param: flags: Set of `MAP_PREPARED' (Other bits are silently ignored)
- *                Additionally, the usual bits relating to `mman_findunmapped()' are accepted:
+ *                Additionally,  the  usual   bits  relating  to   `mman_findunmapped()'  are   accepted:
  *                `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE' */
 FUNDEF NONNULL((1)) void *KCALL
 mman_map_res(struct mman *__restrict self,
@@ -232,22 +232,22 @@ mman_map_res(struct mman *__restrict self,
 
 
 /* Flags for `mman_unmap()' and `mman_protect()' */
-#define MMAN_UNMAP_FAULTIFUNUSED 0x0001 /* Throw an `E_SEGFAULT_UNMAPPED' exception with the lowest address of
-                                         * the first segment of memory apart of the given range that isn't mapped
+#define MMAN_UNMAP_FAULTIFUNUSED 0x0001 /* Throw an  `E_SEGFAULT_UNMAPPED' exception  with  the lowest  address  of
+                                         * the  first segment of memory apart of  the given range that isn't mapped
                                          * to some node that's allowed to be unmapped. This check is done such that
-                                         * it happens before any memory may get unmapped, meaning that when given,
-                                         * the function will only succeed when the entire range can be unmapped at
-                                         * once, and fail with an E_SEGFAULT otherwise. When not set, unmapped
+                                         * it happens before any memory may get unmapped, meaning that when  given,
+                                         * the function will only succeed when the entire range can be unmapped  at
+                                         * once, and  fail with  an E_SEGFAULT  otherwise. When  not set,  unmapped
                                          * portions of the given address range are silently ignored. */
-#define MMAN_UNMAP_NOSPLIT       0x0002 /* Don't split nodes in order to be able to partially unmap one of them.
+#define MMAN_UNMAP_NOSPLIT       0x0002 /* Don't split nodes in order to be  able to partially unmap one of  them.
                                          * Instead, only unmap whole nodes, or nothing at all. When set, all nodes
                                          * that overlap with the given address address range will be unmapped.
-                                         * NOTE: When this flag isn't given, and an attempt is made to unmap
-                                         *       node with the `MNODE_F_NOSPLIT' flag set, then the node won't
+                                         * NOTE: When  this flag  isn't given, and  an attempt is  made to unmap
+                                         *       node with the `MNODE_F_NOSPLIT' flag  set, then the node  won't
                                          *       be split, but the affected address range is expanded to include
                                          *       that node in its entirety, the same way this would also be done
                                          *       had the `MMAN_UNMAP_NOSPLIT' been given. */
-#define MMAN_UNMAP_NOKERNPART    0x0004 /* Instead of causing kernel panic when attempting to unmap
+#define MMAN_UNMAP_NOKERNPART    0x0004 /* Instead of causing kernel  panic when attempting to  unmap
                                          * a kernel part, simply ignore the request (this flag is set
                                          * when user-space tries to unmap memory) */
 
@@ -282,9 +282,9 @@ mman_protect(struct mman *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 
-/* Sync all changes made to file mappings within the given
+/* Sync  all  changes made  to  file mappings  within  the given
  * address range with on-disk file images. (s.a. `mfile_sync()')
- * NOTE: Memory ranges that aren't actually mapped, aren't mapped
+ * NOTE: Memory ranges that  aren't actually  mapped, aren't  mapped
  *       with WRITE and SHARED, or aren't mapped to write-back files
  *       are simply ignored. */
 FUNDEF void FCALL

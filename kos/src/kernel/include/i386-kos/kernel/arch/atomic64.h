@@ -132,7 +132,7 @@ NOTHROW(atomic64_cmpxch_val)(atomic64_t *__restrict self,
 }
 #else /* __OPTIMIZE__ */
 /* Because gcc refuses to properly compile the inline-assembly wrappers
- * when not building with __OPTIMIZE__, we need to link a C-ABI
+ * when not  building  with  __OPTIMIZE__,  we need  to  link  a  C-ABI
  * compatible wrapper instead. (ugh...) */
 FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(KCALL atomic64_cmpxch_val)(atomic64_t *__restrict self,

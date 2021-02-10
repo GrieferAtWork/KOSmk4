@@ -50,8 +50,8 @@ typedef __physpage_t physpagecnt_t;
 #define PMEMBANK_TYPE_UNDEF      0 /* Undefined memory (Handled identically to `PMEMBANK_TYPE_BADRAM') */
 #define PMEMBANK_TYPE_RAM        1 /* [USE] Dynamic; aka. RAM memory (Main source of memory for `page_malloc') */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#define PMEMBANK_TYPE_PRESERVE   2 /* [USE_LATER_0|MAP] Preserve the original content of this memory until
-                                    * `mem_unpreserve()' is called, at which point the memory will be
+#define PMEMBANK_TYPE_PRESERVE   2 /* [USE_LATER_0|MAP] Preserve  the  original content  of this  memory until
+                                    * `mem_unpreserve()'  is  called,  at  which  point  the  memory  will  be
                                     * transformed into `PMEMBANK_TYPE_RAM', and made available to the physical
                                     * memory allocator. */
 #define PMEMBANK_TYPE_ALLOCATED  3 /* [USE_LATER_1|MAP] Same as 'PMEMBANK_TYPE_RAM', but don't make memory available to `page_malloc' */
@@ -105,25 +105,25 @@ INTDEF FREE void NOTHROW(KCALL minfo_addbank)(physaddr_t start, physaddr_t size,
 /* Construct memory zones from memory info. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void);
 
-/* Relocate `minfo', as well as `mzones' data to a more appropriate location
+/* Relocate `minfo', as well as `mzones'  data to a more appropriate  location
  * after `kernel_initialize_minfo_makezones()' has been called, and the kernel
  * VM has been cleaned from unused memory mappings.
  * Before this function is called, all memory information still resides at a
  * location where its physical address is relative to its virtual, just like
- * any other kernel data. However, since that can literally be anywhere in
- * virtual memory, it can easily (and accidentally) interfere with memory
+ * any other kernel data. However, since  that can literally be anywhere  in
+ * virtual memory, it  can easily (and  accidentally) interfere with  memory
  * layout expectancies of other early-boot systems.
- * Because of this, we try to relocate memory information into higher memory
+ * Because of this, we try to relocate memory information into higher  memory
  * as soon as this becomes possible, thus keeping it from randomly showing up
  * and causing problems for other code. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_relocate)(void);
 
 /* Release all memory previously marked as `PMEMBANK_TYPE_PRESERVE' or
- * `PMEMBANK_TYPE_ALLOCATED', and page_free() all whole pages touched
- * by mappings of type `PMEMBANK_TYPE_PRESERVE' (unless the same page
- * also contains another mapping of type `PMEMBANK_TYPE_ALLOCATED').
- * Afterwards, transform memory information for either type of memory
- * bank into `PMEMBANK_TYPE_RAM', and (when possible) merge adjacent
+ * `PMEMBANK_TYPE_ALLOCATED',  and page_free() all whole pages touched
+ * by mappings of type `PMEMBANK_TYPE_PRESERVE' (unless the same  page
+ * also contains another  mapping of type  `PMEMBANK_TYPE_ALLOCATED').
+ * Afterwards, transform memory information for either type of  memory
+ * bank  into `PMEMBANK_TYPE_RAM', and  (when possible) merge adjacent
  * banks of identical typing. */
 INTDEF FREE void NOTHROW(KCALL minfo_release_preservations)(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
@@ -174,7 +174,7 @@ struct pmem {
 	size_t                  pm_zonec; /* [!0] Amount of memory regions. */
 	struct pmemzone        *pm_last;  /* [1..1][const][== pm_zones[pm_zonec - 1]] A pointer to the last memory zone. */
 	struct pmemzone *const *pm_zones; /* [1..1][const][1..1pm_zonec] Vector of memory zones.
-	                                   * NOTE: Ordered by ascending starting address. */
+	                                   * NOTE:  Ordered  by   ascending  starting   address. */
 };
 
 DATDEF struct pmem mzones;
@@ -194,7 +194,7 @@ NOTHROW(KCALL page_getzone)(physpage_t ptr) {
 
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
- * WARNING: Physical memory cannot be dereferenced prior to being mapped.
+ * WARNING:  Physical   memory   cannot   be  dereferenced   prior   to   being   mapped.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_mallocone)(void);
@@ -211,12 +211,12 @@ FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_malloc)(physpagecnt_t num_p
 #endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 
 
-/* Allocate at least `min_pages', and at most `max_pages',
+/* Allocate  at  least  `min_pages', and  at  most `max_pages',
  * writing the actual number of pages allocated to `res_pages'.
- *  - This function will try to serve the request to allocate `max_pages',
- *    but will prefer to return the first block of free consecutive pages with
+ *  - This function  will try  to serve  the request  to allocate  `max_pages',
+ *    but will prefer to return the first block of free consecutive pages  with
  *    a length of at least `min_pages', thus preventing memory fragmentation by
- *    using up small memory blocks that might otherwise continue going unused.
+ *    using  up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 FUNDEF NOBLOCK WUNUSED NONNULL((3)) physpage_t
@@ -233,8 +233,8 @@ NOTHROW(KCALL page_malloc_at)(physpage_t ptr);
 #define PAGE_MALLOC_AT_NOTFREE   2 /* The specified page has already been allocated. */
 
 #ifdef __CC__
-/* Similar to `page_malloc()' / `page_malloc_part()', but only
- * allocate memory from between the two given page addresses, such
+/* Similar to  `page_malloc()'  /  `page_malloc_part()',  but  only
+ * allocate memory from between the two given page addresses,  such
  * that all allocated pages are located within the specified range.
  * @assume(return == PHYSPAGE_INVALID ||
  *        (return >= min_page &&
@@ -301,11 +301,11 @@ FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_isfree)(physpage_t page);
 
 /* Following a call to one of the `page_malloc()' functions,
- * check if the given `page' contains only zero-bytes.
- * NOTE: This function doesn't actually look at the contents of
+ * check  if  the  given  `page'  contains  only zero-bytes.
+ * NOTE: This function doesn't actually  look at the contents  of
  *       page itself, but rather at what it known about the page.
  * NOTE: Returns `false' when `page_ismapped(page, 1)' is false.
- * HINT: This function is mainly used in order to optimize the
+ * HINT: This  function  is  mainly  used  in  order  to  optimize the
  *       mapping of zero-initialized memory, such that the initializer
  *       will do something like:
  *       >> page = page_malloc(1);

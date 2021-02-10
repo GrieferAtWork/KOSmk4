@@ -97,15 +97,15 @@ DECL_END
 
 DECL_BEGIN
 
-/* A small, helper-type for safely constructing and applying a VM state.
+/* A  small, helper-type for safely constructing and applying a VM state.
  * Mainly intended for constructing a VM state for the purpose of serving
  * an exec() system call.
  * NOTE: This type is meant to be used locally, which is why it doesn't
- *       provide for any sort of locking in and on its own.
+ *       provide  for  any  sort  of   locking  in  and  on  its   own.
  * WARNING: vmb objects are _NOT_ thread-safe! */
 struct vmb {
 	/* NOTE: Any `struct vm_node' pointed to by `vmb' has
-	 *       the following overrides applied to it:
+	 *       the  following  overrides  applied  to   it:
 	 *       [OVERRIDE(.vn_vm,[?..?])]:
 	 *         - The actual VM of the node isn't yet known (obviously)
 	 *       [OVERRIDE(.vn_part,[REF][1..1])]:
@@ -118,7 +118,7 @@ struct vmb {
 	 *           exists where a node's part has been split, causing the node's size
 	 *           to no longer match the part's size.
 	 *           In this case, prior to actually being applied, more nodes are created
-	 *           by `vmb_apply()', in order to ensure that any mapped node results in
+	 *           by `vmb_apply()', in order to ensure that any mapped node results  in
 	 *           a continuous mapping of memory.
 	 */
 	ATREE_HEAD(struct vm_node) v_tree;          /* [0..1] Tree of mapped nodes. */
@@ -163,7 +163,7 @@ NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self);
  * @param: flag:   Set of `VM_NODE_FLAG_*'.
  * @param: data_start_vpage: The memory page index where mapping of `data' starts.
  * @param: guard:  If non-zero, repetition limit for a guard mapping.
- *                 Set to 0 if the mapping should include a guard.
+ *                 Set to 0  if the mapping  should include a  guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 FUNDEF WUNUSED NONNULL((1, 4)) bool KCALL
@@ -200,18 +200,18 @@ vmb_mapat(struct vmb *__restrict self,
 
 
 /* Determine a suitable, free memory location for `num_pages'
- * aligned by a multiple of `min_alignment_in_pages' pages.
+ * aligned by a  multiple of `min_alignment_in_pages'  pages.
  * Search happens as follows:
  *   #1: Search according to `VM_GETFREE_ABOVE/VM_GETFREE_BELOW'
  *       Additionally, check for surrounding nodes which are set
  *       up as GUARD nodes. - If such a node is found, it's size
  *       is considered to have reached its maximum potential for
- *       this purpose (limited by how often `vn_guard' can be
+ *       this purpose (limited  by how often  `vn_guard' can  be
  *       decremented, as well as any other memory mapping it may
  *       run into before then)
  *       If a this process yields only a single candidate, that
  *       candidate is returned as result.
- *       If a this process yields more than 1 candidate, the one chosen
+ *       If  a this  process yields more  than 1 candidate,  the one chosen
  *       depends on `VM_GETFREE_ABOVE / VM_GETFREE_BELOW / VM_GETFREE_ASLR'
  *        - VM_GETFREE_ABOVE: The candidate with the lowest memory address is used
  *        - VM_GETFREE_BELOW: The candidate with the greatest memory address is used
@@ -295,10 +295,10 @@ vmb_map(struct vmb *__restrict self,
 
 
 
-/* Allocate a PEB (Process Environment Block) within the given VMB,
- * initializing its contents with the strings from the given argv+envp pair.
+/* Allocate  a   PEB   (Process   Environment  Block)   within   the   given   VMB,
+ * initializing  its  contents  with the  strings  from the  given  argv+envp pair.
  * This function is called from `vm_exec()' after the remainder of the application,
- * as well as the dynamic linker have already been loaded into memory.
+ * as  well  as  the  dynamic  linker   have  already  been  loaded  into   memory.
  * @param: argc_inject: The number of arguments from `argv_inject' to inject
  *                      at the beginning of the user-space argc/argv vector.
  * @param: argv_inject: Vector of arguments to inject at the beginning of
@@ -404,14 +404,14 @@ NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb const *__restrict self,
 
 struct vm_execinfo_struct;
 
-/* Apply all of the mappings from `self' onto `target', whilst simultaneously deleting
+/* Apply all of the mappings from  `self' onto `target', whilst simultaneously  deleting
  * any memory mapping still present within `target' (except for the kernel-reserve node)
- * This function is guarantied to operate atomically in a way that allows the caller
- * to assume that no memory mappings (or anything else for that matter) changes if the
- * function fails and returns by throwing an error, and that everything happens exactly
+ * This function is guarantied  to operate atomically  in a way  that allows the  caller
+ * to  assume that no memory mappings (or anything  else for that matter) changes if the
+ * function fails and returns by throwing an error, and that everything happens  exactly
  * as intended if it returns normally.
  * @param: self:   The VM Builder object from which to take mappings to-be applied to `target'
- *                 Upon success, the contents of `self' are left undefined and must either be
+ *                 Upon success, the contents of `self' are left undefined and must either  be
  *                 re-initialized, or not be attempted to be finalized.
  * @param: target: The target VM to which to apply the new memory mappings.
  *                 Upon success, this VM will only contain the mappings from `self', with all
@@ -426,7 +426,7 @@ vmb_apply(struct vmb *__restrict self,
           struct vm_execinfo_struct *execinfo DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define VMB_APPLY_AA_NOTHING      0x0000
-#define VMB_APPLY_AA_TERMTHREADS  0x0001 /* Terminate all threads using `target', excluding the caller.
+#define VMB_APPLY_AA_TERMTHREADS  0x0001 /* Terminate  all threads using `target', excluding the caller.
                                           * If the calling thread isn't using `target', simply terminate
                                           * all threads that are using `target' */
 #define VMB_APPLY_AA_SETEXECINFO  0x0002 /* Set the given `execinfo' for the given VM */
@@ -435,9 +435,9 @@ vmb_apply(struct vmb *__restrict self,
 
 /* Overlay mappings from `self' onto `target'
  * This operation is performed atomically, though will fail if `target'
- * already contains mappings at addressed described by `self'.
+ * already   contains  mappings  at   addressed  described  by  `self'.
  * @return: true:  The overlay was successful.
- * @return: false: The given `target' already contains
+ * @return: false: The  given   `target'  already   contains
  *                 mappings with conflicting address ranges. */
 FUNDEF NONNULL((1, 2)) bool KCALL
 vmb_overlay(struct vmb *__restrict self,

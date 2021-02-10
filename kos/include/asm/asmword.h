@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h> /* __SIZEOF_POINTER__ */
 
 /* Helper assembler macros for encoding fixed-width data words in
- * text, as well as module-relative (non-relocated) pointers. */
+ * text,  as  well as  module-relative  (non-relocated) pointers. */
 
 
 __ASM_BEGIN
@@ -67,7 +67,7 @@ __ASM_L(	.1byte __ASM_ARG(\value))
 __ASM_L(.endm)
 
 /* Emit a pointer-sized relocation to `value', offset by `offset',
- * that will become a module-relative pointer at runtime. */
+ * that   will  become  a   module-relative  pointer  at  runtime. */
 __ASM_L(.macro .wordrel value:req, offset=0)
 __ASM_L(	.error 'Not implemented for this architecture')
 __ASM_L(.endm)

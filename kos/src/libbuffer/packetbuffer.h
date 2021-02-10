@@ -37,18 +37,18 @@ DECL_BEGIN
  * NOTES:
  *   - All of the packet's struct fields will have already been filled in by this function.
  *   - It is weakly undefined when a packet that was started before another was committed
- *     will be read. It may happen before, but it may also happen after.
- *   - The only guaranty in concerns to packet read order is that packets that are
+ *     will  be  read.   It  may   happen  before,  but   it  may   also  happen   after.
+ *   - The  only guaranty in concerns to packet read order is that packets that are
  *     generated linearly by the same thread will always be read in that same order
  *     in relation to each other.
  *   - Similarly, a packet that for which `pb_buffer_endwrite_commit()' was caled before
- *     the call to `pb_buffer_startwrite()' of another packet will always be read
+ *     the  call  to  `pb_buffer_startwrite()' of  another  packet will  always  be read
  *     before that other packet.
  * @return: * : Pointer to the packet's descriptor. Once the caller has finished filling
  *              in the packet's contents, they must use `pb_buffer_endwrite_commit()' in
  *              order to make the packet available for being read.
  *              In case that packet initialization should fail, `pb_buffer_endwrite_abort()'
- *              may be called to undo what was previously done by this function.
+ *              may  be  called  to  undo  what  was  previously  done  by  this   function.
  *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
  *                    >> void *pb_packet_payload(struct pb_packet *);
  *                    >> void *pb_packet_ancillary(struct pb_packet *);
@@ -99,18 +99,18 @@ NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
  * >> #endif
  * >> }
  * Note that with this design, recursive- or parallel read operations
- * aren't allowed (which also wouldn't really make much sense, since
+ * aren't allowed (which also wouldn't really make much sense,  since
  * packets are meant to be read in order, alongside the guaranty that
  * any packet will only ever be read once).
- * However, due to things such as VIO, there is a good chance that a
- * malicious program might cause a recursive read operation to be
- * performed. (i.e. recv(2) is called with a VIO-buffer, who's write
- * callbacks will invoke recv(2) again). If this happens, then the
- * second call to recv(2) will block indefinitely, and the malicious
+ * However, due to things such as VIO,  there is a good chance that  a
+ * malicious program  might cause  a recursive  read operation  to  be
+ * performed. (i.e. recv(2) is called  with a VIO-buffer, who's  write
+ * callbacks  will invoke  recv(2) again).  If this  happens, then the
+ * second call to recv(2) will  block indefinitely, and the  malicious
  * program will be soft-locked (but can still be CTRL+C'd, so it's ok)
  *
  * @return: * :   A pointer to a read-handle for the packet that is next-in-line to-be received.
- *                This handle must be released by a call to one of the pb_buffer_read_[end/...]
+ *                This handle must be released by a call to one of the  pb_buffer_read_[end/...]
  *                functions.
  * @return: NULL: No unread packet is available at the moment, or the most recent packet is
  *                currently being read. */
@@ -124,11 +124,11 @@ NOTHROW(CC lib_pb_buffer_startread)(struct pb_buffer *__restrict self);
 #endif /* !__KERNEL__ */
 
 
-/* Truncate the packet from which the caller is currently reading by updating
+/* Truncate the packet from which the  caller is currently reading by  updating
  * its base-pointer, acting as though the first `bytes_to_consume' bytes of the
  * packet weren't actually apart of its payload.
- * This can be called any number of times, though the caller must always ensure
- * that `bytes_to_consume <= packet->p_payload', and that the returned pointer
+ * This  can be called any number of times, though the caller must always ensure
+ * that `bytes_to_consume <= packet->p_payload', and  that the returned  pointer
  * becomes the new handle that must be used for reading from the current packet:
  * >> struct pb_packet *packet;
  * >> packet = pb_buffer_startread(self);
@@ -149,7 +149,7 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
                                           uint16_t bytes_to_consume);
 
 
-/* End reading the current packet, and discard the packet from the data stream.
+/* End reading the  current packet, and  discard the packet  from the data  stream.
  * The next call to `pb_buffer_startread()' will return NULL or a different packet. */
 INTDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,

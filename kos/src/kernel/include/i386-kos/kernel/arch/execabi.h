@@ -49,7 +49,7 @@ DATDEF byte_t execabi_system_rtld32_size[];
 #define execabi_system_rtld32_size ((size_t)execabi_system_rtld32_size)
 #endif /* !__INTELLISENSE__ */
 
-/* A static VM file blob for the building RTLD user-space program.
+/* A static VM file blob  for the building RTLD user-space  program.
  * This is a raw ELF binary blob that is hard-linked into the kernel
  * core, and is mapped via copy-on-write into any user-space process
  * that requests the use of a dynamic linker

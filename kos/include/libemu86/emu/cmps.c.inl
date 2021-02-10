@@ -61,7 +61,7 @@ case EMU86_OPCODE_ENCODE(0xa7):
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPS */
 {
 	/* A6     CMPSB     For legacy mode, compare byte at address DS:(E)SI with byte at address ES:(E)DI;
-	 *                  For 64-bit mode compare byte at address (R|E)SI with byte at address (R|E)DI.
+	 *                  For 64-bit mode compare  byte at address (R|E)SI  with byte at address  (R|E)DI.
 	 *                  The status flags are set accordingly. */
 	byte_t *psi_addr, *pdi_addr;
 #if !EMU86_EMULATE_CONFIG_WANT_CMPS
@@ -101,10 +101,10 @@ do_cmps_save_pointer:
 #if EMU86_EMULATE_CONFIG_WANT_CMPS
 case EMU86_OPCODE_ENCODE(0xa7): {
 	/*         A7     CMPSW     For legacy mode, compare word at address DS:(E)SI with word at address ES:(E)DI;
-	 *                          For 64-bit mode compare word at address (R|E)SI with word at address (R|E)DI.
+	 *                          For 64-bit mode compare  word at address (R|E)SI  with word at address  (R|E)DI.
 	 *                          The status flags are set accordingly.
 	 *         A7     CMPSD     For legacy mode, compare dword at address DS:(E)SI with dword at address ES:(E)DI;
-	 *                          For 64-bit mode compare dword at address (R|E)SI with dword at address (R|E)DI.
+	 *                          For 64-bit mode compare  dword at address (R|E)SI  with dword at address  (R|E)DI.
 	 *                          The status flags are set accordingly.
 	 * REX.W + A7     CMPSQ     Compares quadword at address (R|E)SI with quadword at address (R|E)DI and sets
 	 *                          the status flags accordingly. */

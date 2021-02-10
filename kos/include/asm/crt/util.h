@@ -40,7 +40,7 @@
 
 
 /* If not supported by the CRT, then it's emulated by local headers,
- * meaning that we can unconditionally support _all_ of the flags! */
+ * meaning that we can unconditionally  support _all_ of the  flags! */
 #ifndef __CRT_HAVE_fparseln
 #if (!defined(__FPARSELN_UNESCESC) ||  \
      !defined(__FPARSELN_UNESCCONT) || \

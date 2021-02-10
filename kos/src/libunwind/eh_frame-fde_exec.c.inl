@@ -171,12 +171,12 @@ NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__rest
 
 
 #ifdef EH_FRAME_FDE_EXEC_CFA_STATE
-/* Execute CFA result instruction until `absolute_pc' has been reached,
- * or the entirety of the FDE instruction code has been executed.
+/* Execute CFA  result  instruction  until  `absolute_pc'  has  been  reached,
+ * or   the  entirety  of   the  FDE  instruction   code  has  been  executed.
  * This function is used to fill in CFA result information at a given address,
- * which can then be used to unwind a register result for the purpose of
- * implementing language-level, zero-effort exception support, as well
- * as for generating tracebacks when combined with `libdebuginfo.so'
+ * which can then  be used  to unwind  a register  result for  the purpose  of
+ * implementing  language-level,  zero-effort   exception  support,  as   well
+ * as  for  generating   tracebacks  when   combined  with   `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:
  *      `self->f_pcstart <= absolute_pc && self->f_pcend >= absolute_pc'
  * @param: self:   The FDE to execute in search of `absolute_pc'
@@ -208,11 +208,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
                                             unwind_cfa_state_t *__restrict result,
                                             void const *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
-/* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
+/* Behaves  identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
- * FDE descriptors (though again: use of this is entirely optional; the regular
- * `unwind_fde_exec()' is just as capable of unwinding signal frame descriptors.
- * This function is merely optimized to better restore registers commonly used
+ * FDE  descriptors (though again:  use of this is  entirely optional; the regular
+ * `unwind_fde_exec()' is just as capable  of unwinding signal frame  descriptors.
+ * This function is  merely optimized  to better restore  registers commonly  used
  * within signal frames)
  * @param: self:   The FDE to execute in search of `absolute_pc'
  * @param: result: CFA state descriptor, to-be filled with restore information upon success.
@@ -280,11 +280,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict s
                                                 unwind_cfa_value_t *__restrict result,
                                                 void const *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_CFA_RULE)
-/* Similar to `unwind_fde_exec()', but used to calculate the
- * unwind rule for `dw_regno' at the given text location.
- * This is used to implement unwinding for uncommon registers,
- * since `unwind_fde_exec()' will not already calculate these
- * during the first pass (thus keeping down the memory requirements
+/* Similar  to  `unwind_fde_exec()',   but  used   to  calculate   the
+ * unwind  rule   for  `dw_regno'   at   the  given   text   location.
+ * This  is  used  to  implement  unwinding  for  uncommon  registers,
+ * since  `unwind_fde_exec()'   will  not   already  calculate   these
+ * during the first  pass (thus keeping  down the memory  requirements
  * imposed on the one responsible for allocating `unwind_cfa_state_t')
  * @param: self: The FDE to execute in search of `absolute_pc'
  * @param: rule: The CFA register result controller to-be filled.
@@ -467,7 +467,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 #elif defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 			if (operand == dw_regno) {
 				/* Delete the restore rule, thus causing our caller `libuw_unwind_fde_rule()'
-				 * to re-attempt the call using the init-body `self->f_inittext' */
+				 * to   re-attempt   the   call   using   the   init-body  `self->f_inittext' */
 				rule->cr_rule = DW_CFA_register_rule_undefined;
 			}
 #endif /* ... */
@@ -553,7 +553,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 #elif defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 				if (reg == dw_regno) {
 					/* Delete the restore rule, thus causing our caller `libuw_unwind_fde_rule()'
-					 * to re-attempt the call using the init-body `self->f_inittext' */
+					 * to   re-attempt   the   call   using   the   init-body  `self->f_inittext' */
 					rule->cr_rule = DW_CFA_register_rule_undefined;
 				}
 #endif /* ... */
@@ -575,10 +575,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 #ifdef EH_FRAME_FDE_EXEC_CFA_RULE
 				if (reg == dw_regno) {
 					/* We can't set `DW_CFA_register_rule_undefined', because then the caller
-					 * would assume that we don't know anything about the register, and may
-					 * proceed to ask the init-body (which may potentially know something)
-					 * We don't want that! - Instead, we want the unwinder to simply not
-					 * touch this register at all, which we can do by telling them to simply
+					 * would assume that we don't know  anything about the register, and  may
+					 * proceed to ask  the init-body (which  may potentially know  something)
+					 * We don't want  that! -  Instead, we want  the unwinder  to simply  not
+					 * touch  this register at all, which we can do by telling them to simply
 					 * keep the previous value for this register. */
 					rule->cr_rule = DW_CFA_register_rule_same_value;
 				}

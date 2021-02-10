@@ -50,76 +50,76 @@ DECL_BEGIN
 #ifdef __CC__
 
 
-/* KOS Kernel modules are implemented as shared ELF binaries (libraries)
- * Just like user-space ELF binaries, kernel-space modules (drivers) are
- * allowed to both import and export symbols from other modules (also
- * allowing them to have dependencies on other modules via DT_NEEDED), as
+/* KOS Kernel  modules  are  implemented as  shared  ELF  binaries  (libraries)
+ * Just like  user-space  ELF  binaries,  kernel-space  modules  (drivers)  are
+ * allowed  to  both  import  and  export  symbols  from  other  modules  (also
+ * allowing  them  to have  dependencies on  other  modules via  DT_NEEDED), as
  * well as directly make use of symbols that are exported from the kernel core.
- * To make use of the later, drivers don't need to specify any special
- * dependency, as any symbol lookup will first check if the kernel exports
- * a symbol matching the given name, before moving on to search dependencies,
- * as well as the driver itself for the symbol (during which the kernel will
- * also account for weak symbol declarations) - All symbols exports by the
+ * To make  use  of  the later,  drivers  don't  need to  specify  any  special
+ * dependency, as any  symbol lookup  will first  check if  the kernel  exports
+ * a symbol matching the given name,  before moving on to search  dependencies,
+ * as well as the driver  itself for the symbol  (during which the kernel  will
+ * also account for  weak symbol  declarations) -  All symbols  exports by  the
  * kernel core are non-weak symbols (aka.: Can't be overwritten)
  *
  * Special rules/allowed assumptions:
  *   - All static memory segments defined by a driver are mapped as detached,
- *     pre-faulted, fully initialized, anonymous and locked memory.
+ *     pre-faulted,   fully   initialized,  anonymous   and   locked  memory.
  *     -> This way, future changes made to MAP_SHARED mappings of kernel drivers
- *        will _NOT_ affect the data mapped within the kernel core.
+ *        will   _NOT_  affect   the  data   mapped  within   the  kernel  core.
  *     -> Additionally, this allows drivers to assume that all static data/text
- *        can safely be used without having to worry about segfaults being
- *        triggered like when a user-space application accesses a swapped, or
+ *        can safely  be used  without having  to worry  about segfaults  being
+ *        triggered like when a user-space  application accesses a swapped,  or
  *        not-yet loaded section of memory.
- *     -> All memory marked as `SHT_ALLOC' (found in program headers) is locked,
+ *     -> All memory marked as `SHT_ALLOC'  (found in program headers) is  locked,
  *        though memory that doesn't appear in program headers does not get loaded
  *        during driver initialization (e.g. `.debug_line')
  *   - Inter-driver dependencies (DT_NEEDED) are handled somewhat special:
  *      - Dependency resolution happens in a 2-step process,
- *        where the first step takes the name of the driver
- *        dependency and compares it to the DT_SONAME tags
+ *        where the first step takes the name of the  driver
+ *        dependency  and compares it  to the DT_SONAME tags
  *        of all drivers already loaded.
  *        If the name matches one of them, that driver is used as the dependency
- *      - If no drivers were found during this step, the `DT_NEEDED' name is appended
- *        to each of the driver library paths (s.a. `arref_get(&driver_library_path)')
- *        The resulting string is then used again to search the set of currently
+ *      - If  no drivers were found during this  step, the `DT_NEEDED' name is appended
+ *        to each of the driver library paths (s.a.  `arref_get(&driver_library_path)')
+ *        The resulting  string is  then used  again  to search  the set  of  currently
  *        loaded drivers (this time comparing against the filenames of loaded drivers).
- *      - Lastly, the same set of filesystem strings is used once again, only this
+ *      - Lastly, the same set  of filesystem strings is  used once again, only  this
  *        time together with `vfs_kernel' in order to try and resolve to a filesystem
  *        location, from which the kernel will then attempt to load the driver.
  *   - Unallocated sections (such as e.g.: `.debug_line') are lazily locked into
- *     memory the first time they are used. (though these are _NOT_ mapped with
+ *     memory the first time they are used. (though these are _NOT_ mapped  with
  *     GFP_LOCKED, meaning that optional sections may be swapped at any time)
  *   - Modules are _always_ required to have a `DT_SONAME' tag
  *   - Modules are identified by their `DT_SONAME' tags, where only 1 driver
- *     of any number of modules with the same SONAME tag can ever be loaded
+ *     of  any number of modules with the same SONAME tag can ever be loaded
  *     at once.
  *     To simplify driver identification, it is recommended to re-use
  *     the driver's filename as its `DT_SONAME'
- *   - Module initializers/finalizers should be declared using
- *     __attribute__((constructor)) and __attribute__((destructor))
- *     During construction, the driver linker will invoke all constructor
- *     callbacks in ascending order. If any callback returns by throwing
- *     an error `THROW(*)', all destructors of the driver itself, as well
+ *   - Module   initializers/finalizers    should    be    declared    using
+ *     __attribute__((constructor))     and      __attribute__((destructor))
+ *     During construction, the  driver linker will  invoke all  constructor
+ *     callbacks  in ascending  order. If  any callback  returns by throwing
+ *     an  error `THROW(*)', all  destructors of the  driver itself, as well
  *     as all newly loaded dependencies that aren't used by any other driver
  *     will be invoked.
  *     NOTE: Destructors are also allowed to throw exceptions.
- *   - Driver constructors are allowed (and encouraged) to incref() their
- *     own driver descriptor (s.a. `drv_self') in order to register global
- *     hooks or other kernel components. However, all references created must
+ *   - Driver  constructors  are  allowed   (and  encouraged)  to  incref()   their
+ *     own  driver  descriptor  (s.a.  `drv_self')  in  order  to  register  global
+ *     hooks  or  other kernel  components.  However, all  references  created must
  *     be decref()ed by driver destructors, such that a call to `driver_finalize()'
- *     will be able to unload all global hooks of a driver and allow it to be
+ *     will be able  to unload  all global hooks  of a  driver and allow  it to  be
  *     unloaded once any remaining unaccounted references are lost.
- *   - To safe on space, you are welcome to build modules with `-Wl,--nmagic'
+ *   - To  safe on space,  you are welcome to  build modules with `-Wl,--nmagic'
  *     Because drivers don't use file mappings, their images aren't bound to the
  *     usual restrictions of file->memory mappings.
- *   - dynamic RUNPATH tags are ignored. - The kernel module/library paths
+ *   - dynamic RUNPATH tags  are ignored. -  The kernel module/library  paths
  *     are fixed and can only be changed by explicit kernel control commands,
  *     as well as via the kernel command line during boot.
  *   - Cyclic dependencies are not allowed
  *   - Modules must be relocatable and of type `ET_DYN' (shared library)
  *   - A hand full of special symbols are defined for each loaded driver,
- *     and may be used anywhere inside of that driver where an external
+ *     and may be used anywhere inside  of that driver where an  external
  *     symbol reference may appear:
  *      - `struct driver drv_self'          -- The driver descriptor for that module.
  *      - `byte_t        drv_loadaddr[]'    -- Symbol defined at `_this_driver.d_loadaddr'
@@ -141,11 +141,11 @@ DECL_BEGIN
  *                                             >> DATDEF char drv_argp_nope[];  // NULL
  *                                             Loaded with `sysctl_insmod("my_driver", "foo=bar debug baz=42")'
  *   - Special symbols which may be exported by a driver,
- *     and will be interacted with on special occasions:
+ *     and  will be interacted with on special occasions:
  *      - `PUBLIC NOBLOCK size_t NOTHROW(KCALL drv_clearcache)(void) { ... }'
- *             Try (as in: never throw, or block) to clear global caches, releasing
- *             heap memory as those caches are cleared before returning the total
- *             sum of bytes that were cleared by doing this. (Alternatively, any
+ *             Try (as in: never throw, or block) to clear global caches,  releasing
+ *             heap  memory as those  caches are cleared  before returning the total
+ *             sum of bytes  that were  cleared by doing  this. (Alternatively,  any
  *             non-zero value should be returned if ~some~ kind of optional resource
  *             was released, with 0 being _required_ to be returned when nothing was
  *             freed at all)
@@ -180,19 +180,19 @@ DATDEF size_t /*         */ drv_argc;          /* Driver argument count (== &drv
 DATDEF char /*          */ *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 
 
-/* NOTE: This function may be implemented by individual drivers!
+/* NOTE: This function may  be  implemented  by  individual  drivers!
  *       This isn't a function that is exported by the kernel itself!
- * Try (as in: never throw, or block) to clear global caches, releasing
- * heap memory as those caches are cleared before returning the total
- * sum of bytes that were cleared by doing this. (Alternatively, any
+ * Try (as in: never throw, or block) to clear global caches,  releasing
+ * heap  memory as those  caches are cleared  before returning the total
+ * sum of bytes  that were  cleared by doing  this. (Alternatively,  any
  * non-zero value should be returned if ~some~ kind of optional resource
  * was released, with 0 being _required_ to be returned when nothing was
  * freed at all)
- * This function is called when the kernel has run out of physical or
- * virtual memory, at which point this function's purpose is to try and
- * reclaim resources to allow the kernel to continue operation without
+ * This function is  called when the  kernel has run  out of physical  or
+ * virtual memory, at which point this  function's purpose is to try  and
+ * reclaim resources to  allow the kernel  to continue operation  without
  * (normally) causing an E_BADALLOC exception to be thrown by the caller.
- * @return: * : Some kind of optional resource(s) was/were freed,
+ * @return: * : Some  kind of optional resource(s) was/were freed,
  *              and the caller should re-attempt their allocation.
  * @return: 0 : Nothing could be freed/released (at the moment) */
 FUNDEF NOBLOCK size_t NOTHROW(KCALL drv_clearcache)(void);
@@ -265,7 +265,7 @@ struct driver_section {
 	byte_t               __ds_pad[__SIZEOF_POINTER__ - 4]; /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
 	void                  *ds_cdata;       /* [0..ds_csize][lock(WRITE_ONCE)][owned_if(!= ds_data)]
-	                                        * Decompressed section data. (or same as `ds_data' if section isn't compressed)
+	                                        * Decompressed section data.  (or same  as `ds_data' if  section isn't  compressed)
 	                                        * NOTE: Set to `(void *)-1' when decompressed section data hasn't been loaded, yet.
 	                                        * NOTE: A section is compressed when `ds_flags & SHF_COMPRESSED' */
 	size_t DRIVER_CONST    ds_csize;       /* [const][lock(WRITE_ONCE)][valid_if(ds_cdata)] Decompressed section size. */
@@ -276,7 +276,7 @@ struct driver_section {
  * NOTE: The caller must ensure that raw section data of `self' has been loaded,
  *       as in `self->ds_data != (void *)-1'!
  * @return: * : A blob of `self->ds_csize' (after the caller) bytes of memory,
- *              representing the section's decompressed memory contents. */
+ *              representing  the  section's  decompressed  memory   contents. */
 FUNDEF ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
 driver_section_cdata(struct driver_section *__restrict self,
                      gfp_t gfp DFL(GFP_NORMAL))
@@ -297,9 +297,9 @@ NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self,
 #define DRIVER_FLAG_FINALIZING   0x0040 /* Finalizers (destructors) have been executed / are currently being executed. */
 #define DRIVER_FLAG_FINALIZED    0x0080 /* Finalizers (destructors) have been executed.
                                          * NOTE: By setting this flag, you implicitly inherit a reference
-                                         *       to the associated driver, which you must drop. 
+                                         *       to  the  associated   driver,  which   you  must   drop.
                                          * NOTE: When this flag is set, additional driver sections can no
-                                         *       longer be mapped into memory!*/
+                                         *       longer be mapped into memory! */
 #define DRIVER_FLAG_FINALIZED_C  0x0100 /* INTERNAL: Finalizer callbacks were executed (and dependencies were decref()'ed),
                                          *           but other finalization components are still missing. */
 
@@ -313,9 +313,9 @@ struct driver {
 #define driver_filename_or_name(self) ((self)->d_filename ? (self)->d_filename : (self)->d_name)
 	char const  *DRIVER_CONST d_filename;   /* [0..1][lock(WRITE_ONCE)][owned]
 	                                         * Absolute (relative to `vfs_kernel') filename of the driver,
-	                                         * or `NULL' if the driver was loaded as a multiboot module.
+	                                         * or `NULL' if the driver  was loaded as a multiboot  module.
 	                                         * NOTE: If the filename is needed at a later point in time, the
-	                                         *       kernel will search for a driver file matching `d_name'
+	                                         *       kernel will search for a driver file matching  `d_name'
 	                                         *       within the driver library path list. */
 	REF struct regular_node *DRIVER_CONST
 	                          d_file;       /* [0..1][const] The file-INode from which this driver was loaded, or
@@ -324,10 +324,10 @@ struct driver {
 	size_t       DRIVER_CONST d_argc;       /* [const] # of arguments passed to the driver (# of strings pointed to by `d_argv') */
 	char       **DRIVER_CONST d_argv;       /* [1..1][1..d_argc][const][owned] Driver argument vector (terminated by a NULL-pointer) */
 	uintptr_t                 d_flags;      /* Driver flags (Set of `DRIVER_FLAG_*') */
-	struct task              *d_initthread; /* [?..1] Used internally to identify the thread responsible for an in-progress initialization.
+	struct task              *d_initthread; /* [?..1] Used  internally  to  identify  the  thread  responsible  for  an  in-progress initialization.
 	                                         * This in turn is used to perform special handling when a driver constructor calls `driver_finalize()',
 	                                         * which essentially allows the driver to be unloaded prematurely.
-	                                         * Additionally, this also allows `driver_initialize()' to be called from constructors without
+	                                         * Additionally,  this  also allows  `driver_initialize()' to  be  called from  constructors without
 	                                         * having to be afraid about causing a dead-lock when waiting for one-self to finish initialization. */
 
 	/* Module load location. */
@@ -353,14 +353,14 @@ struct driver {
 	                                         * [if(d_depcnt == 0,[== NULL])][const_if(d_depcnt == 0)]
 	                                         * Vector of driver dependencies.
 	                                         * NOTE: References to drivers in this vector are cleared
-	                                         *       after module finalizers have been executed */
+	                                         *       after  module  finalizers  have  been   executed */
 
 	/* The driver's .dynamic section, and derivatives (.dynsym + .dynstr). */
 	size_t       DRIVER_CONST d_dyncnt;     /* [const] Number of dynamic definition headers. */
 	ElfW(Dyn) const *DRIVER_CONST
 	                          d_dynhdr;     /* [0..d_dyncnt][const] Vector of dynamic definition entries. */
 	ElfW(Sym) const *DRIVER_CONST
-	                          d_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module.
+	                          d_dynsym_tab; /* [0..1][const]  Vector  of  dynamic  symbols  defined  by  this   module.
 	                                         * HINT: If also non-NULL, the number of symbols is `d_hashtab->ht_nchains' */
 	size_t       DRIVER_CONST d_dynsym_cnt; /* [const] Number of dynamic symbols defined by this driver. */
 	ElfW(GnuHashTable) const *DRIVER_CONST
@@ -444,7 +444,7 @@ struct driver_state {
 	/* Descriptor for a lock-less snapshot of the current loaded-driver state. */
 	WEAK refcnt_t           ds_refcnt;   /* Reference counter. */
 	size_t     DRIVER_CONST ds_count;    /* [const] Number of loaded drivers. */
-	/* TODO: The kernel core driver should be included in `driver_get_state()'!
+	/* TODO: The kernel core  driver should be  included in  `driver_get_state()'!
 	 *       There's no reason in having it always be a special case to needlessly
 	 *       complicate code that tries to enumerate loaded drivers! */
 	COMPILER_FLEXIBLE_ARRAY(WEAK REF struct driver *DRIVER_CONST,
@@ -478,9 +478,9 @@ ARREF(driver_library_path_string_arref, driver_library_path_string);
 
 
 /* [1..1] The current driver library path.
- * This path is a ':'-separated list of UNIX-style pathnames
+ * This path  is  a  ':'-separated list  of  UNIX-style  pathnames
  * that are used to resolve dependencies of kernel driver modules.
- * By default, this string is KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
+ * By default, this  string is  KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
 DATDEF struct driver_library_path_string_arref driver_library_path;
 
 
@@ -488,20 +488,20 @@ DATDEF struct driver_library_path_string_arref driver_library_path;
 #define DRIVER_INSMOD_FLAG_NOINIT 0x0001 /* Don't initialize the driver (don't load dependencies, apply relocations, or run initializers).
                                           * When this flag is set, the caller must run `driver_initialize()'
                                           * at some point in the future in order to initialize the driver.
-                                          * NOTE: This flag is mainly intended to allow for inter-driver
-                                          *       dependencies when multiple drivers are loaded from the
-                                          *       bootloader, in which case all drivers must be loaded
+                                          * NOTE: This flag is  mainly intended to  allow for  inter-driver
+                                          *       dependencies when multiple  drivers are  loaded from  the
+                                          *       bootloader, in  which case  all  drivers must  be  loaded
                                           *       first, before they can detect each other as dependencies. */
 
 
-/* Load a new driver into the kernel, either from the
+/* Load  a new  driver into  the kernel,  either from the
  * specified filesystem location, or via a raw data blob.
  * @param: driver_inode:       The INode from which to load the driver.
  * @param: driver_path:        The parent directory path for `driver_inode'
  * @param: driver_dentry:      The directory entry of `driver_inode' within `driver_path'
  * @param: driver_cmdline:     The commandline to-be passed to the driver, or `NULL'
  * @param: pnew_driver_loaded: When non-NULL, write `true' to this pointer when the returned
- *                             driver was just newly loaded. - Otherwise, write `false'.
+ *                             driver was  just newly  loaded. -  Otherwise, write  `false'.
  * @return: * :                A reference to the freshly loaded driver. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct regular_node *__restrict driver_inode,
@@ -520,15 +520,15 @@ driver_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
 
 /* Load a driver as a dependency of another.
  *   #1: When `driver_name' starts with a `/'-character, interpret
- *       it as an absolute filename and search for an existing
- *       driver with that name before using it as a filesystem
- *       location relative to `vfs_kernel' from which to then try
+ *       it  as an  absolute filename  and search  for an existing
+ *       driver  with that  name before  using it  as a filesystem
+ *       location relative to `vfs_kernel' from which to then  try
  *       and load the driver.
  *   #2: Search an existing driver with the name `driver_name'
  *   #3: Using `driver_library_path.get()', search for an existing driver with the
- *       filename `${LIB_PATH}/{driver_name}' (The / only being added if needed)
+ *       filename `${LIB_PATH}/{driver_name}' (The /  only being added if  needed)
  *   #4: Using `driver_library_path.get()', form filesystem names the same
- *       was as already done in STEP #3, but this time use the strings as
+ *       was  as already done in STEP #3, but this time use the strings as
  *       file names relative to `vfs_kernel'
  */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
@@ -569,7 +569,7 @@ NOTHROW(KCALL driver_getname)(struct driver *__restrict self);
 #define driver_getname(self) ((self)->d_name)
 #endif /* !__INTELLISENSE__ */
 
-/* Return the INode/filename of a given driver (which is
+/* Return the  INode/filename  of  a  given  driver  (which  is
  * lazily loaded for drivers loaded via the kernel commandline) */
 FUNDEF WUNUSED NONNULL((1)) struct regular_node *KCALL
 driver_getfile(struct driver *__restrict self)
@@ -579,12 +579,12 @@ driver_getfilename(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
 
 
-/* Lazily allocate if necessary, and return the vector of section headers for `self'
+/* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
  * NOTE: On success, this function guaranties that the following fields have been initialized:
  *  - self->d_shdr
  * @return: * :   Returns `self->d_shdr'
  * @return: NULL: Failed to load the section headers vector (the driver
- *                file wasn't found, or doesn't contain any sections) */
+ *                file  wasn't found, or  doesn't contain any sections) */
 FUNDEF WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getshdrs(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
@@ -592,7 +592,7 @@ driver_getshdrs(struct driver *__restrict self)
 /* Lazily allocate if necessary, and return the section header string table for `self'
  * @return: * :   Returns `self->d_shstrtab'
  * @return: NULL: Failed to load the section headers string table (the driver
- *                file wasn't found, or doesn't contain any sections) */
+ *                file   wasn't  found,  or  doesn't  contain  any  sections) */
 FUNDEF WUNUSED NONNULL((1)) char const *KCALL
 driver_getshstrtab(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
@@ -601,7 +601,7 @@ driver_getshstrtab(struct driver *__restrict self)
  * @return: * :   Returns a pointer to one of `&self->d_shdr[*]'
  * @return: NULL: No section exists that matches the given `name'
  * @return: NULL: Failed to load the section headers string table (the driver
- *                file wasn't found, or doesn't contain any sections) */
+ *                file   wasn't  found,  or  doesn't  contain  any  sections) */
 FUNDEF WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getsection(struct driver *__restrict self,
                   USER CHECKED char const *name)
@@ -610,8 +610,8 @@ driver_getsection(struct driver *__restrict self,
 
 
 /* Initialize the given driver.
- *  #1: Load driver dependencies.
- *  #2: Apply driver relocations.
+ *  #1:  Load  driver  dependencies.
+ *  #2:  Apply  driver  relocations.
  *  #3: Execute driver initializers. */
 FUNDEF NONNULL((1)) __BOOL KCALL
 driver_initialize(struct driver *__restrict self)
@@ -622,14 +622,14 @@ driver_initialize(struct driver *__restrict self)
  *  #1: Execute destructor callbacks.
  *  #2: Decref (and ATOMIC_XCH(NULL)) each module from the dependency vector.
  * NOTE: In case the driver is being finalized right now, wait for another
- *       thread doing the finalization to either complete, or abort.
+ *       thread doing  the  finalization  to either  complete,  or  abort.
  * @return: true:  Successfully finalized the driver.
  * @return: false: The driver had already been finalized (also a success-case). */
 FUNDEF NONNULL((1)) __BOOL KCALL
 driver_finalize(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Destroy all places where the given driver may still be loaded
+/* Destroy all places where the  given driver may still be  loaded
  * globally, including registered devices or object types, as well
  * as task callbacks and interrupt hooks, etc...
  * @return: true:  At least one global hook was cleared.
@@ -643,11 +643,11 @@ driver_clear_globals(struct driver *__restrict self)
 #define DRIVER_DELMOD_FLAG_NORMAL   0x0000 /* Normal delmod flags. */
 #define DRIVER_DELMOD_FLAG_NODEPEND 0x0001 /* Don't try to delete drivers that have dependencies on `self' */
 #define DRIVER_DELMOD_FLAG_FORCE    0x0200 /* Force unload the driver, even if unaccounted references remain
-                                            * WARNING: Doing this may compromise system integrity! */
+                                            * WARNING:   Doing   this  may   compromise   system  integrity! */
 #define DRIVER_DELMOD_FLAG_NONBLOCK 0x0800 /* Don't wait for the driver to fully go away.
-                                            * Instead, the driver will have gone away once it can no longer be
+                                            * Instead, the driver  will have  gone away once  it can  no longer  be
                                             * enumerated. In the event that the driver has a (possibly intentional)
-                                            * reference leak, you must use `KSYSCTL_DRIVER_DELMOD_FFORCE' to
+                                            * reference   leak,  you  must  use  `KSYSCTL_DRIVER_DELMOD_FFORCE'  to
                                             * unload the driver (though doing this is _very_ dangerous) */
 
 
@@ -655,14 +655,14 @@ driver_clear_globals(struct driver *__restrict self)
  * This function will:
  *   - invoke module finalizers (if they haven't been already)
  *   - if (!DRIVER_DELMOD_FLAG_NODEPEND):
- *         Search for other modules make use of `self' through
+ *         Search for other modules  make use of `self'  through
  *         dependencies and finalize all of them such that their
- *         dependency vectors can be cleared, including the
+ *         dependency vectors  can  be  cleared,  including  the
  *         contained references to `self'
  * @param: self:   The driver to try to unload.
  * @param: flags:  Set of `DRIVER_DELMOD_FLAG_*'
  * @return: true:  Successfully unloaded the driver and inherited the reference to `self'
- * @return: false: Failed to unload the driver (there are still unaccounted
+ * @return: false: Failed to  unload  the  driver  (there  are  still  unaccounted
  *                 references to it other than the reference given through `self') */
 FUNDEF NONNULL((1)) __BOOL KCALL
 driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict self,
@@ -674,10 +674,10 @@ driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict s
 #define DRIVER_DELMOD_SUCCESS  0 /* Successfully unloaded the driver. */
 #define DRIVER_DELMOD_UNKNOWN  1 /* The specified driver could not be found. */
 #define DRIVER_DELMOD_INUSE    2 /* The specified driver has unaccounted references.
-                                  * NOTE: in this case, driver finalizers were still executed,
+                                  * NOTE: in  this  case,  driver  finalizers  were  still executed,
                                   *       meaning that in all likelihood, the unaccounted references
-                                  *       stem from another thread currently holding a reference to
-                                  *       the driver, such as when trying to resolve addr2line for
+                                  *       stem from another thread currently holding a reference  to
+                                  *       the driver, such as when  trying to resolve addr2line  for
                                   *       a static pointer apart of the driver's binary image. */
 
 /* Unload a driver from the kernel core.
@@ -709,7 +709,7 @@ driver_delmod(struct inode *__restrict driver_node,
 
 /* Simplified variant of `driver_symbol_ex()'
  * This function returns `NULL' on error, however thus also
- * creates ambiguity for symbols defined as SHN_ABS:0. */
+ * creates ambiguity  for  symbols  defined  as  SHN_ABS:0. */
 FUNDEF WUNUSED NONNULL((1)) void *KCALL
 driver_symbol(struct driver *__restrict self,
               /*in*/ USER CHECKED char const *name,
@@ -717,7 +717,7 @@ driver_symbol(struct driver *__restrict self,
 		THROWS(E_SEGFAULT, ...);
 
 
-/* Lookup a symbol exported from a given driver `self'
+/* Lookup  a  symbol  exported  from  a  given  driver   `self'
  * HINT: This function will also resolve special driver symbols
  * @return: true:  The symbol was found.
  * @return: false: The symbol could not be found. */
@@ -730,20 +730,20 @@ driver_symbol_ex(struct driver *__restrict self,
                  /*in|out*/ uintptr_t *__restrict phash_gnu)
 		THROWS(E_SEGFAULT, ...);
 
-/* Check if the given driver `self' is exporting a symbol that
- * contains the given `driver_relative_address', or it exports a symbol
- * with an undefined size that begins before `driver_relative_address',
+/* Check   if  the  given   driver  `self'  is   exporting  a  symbol  that
+ * contains the  given `driver_relative_address',  or it  exports a  symbol
+ * with  an  undefined size  that begins  before `driver_relative_address',
  * but isn't defined within the SHN_ABS section, nor is followed by another
  * symbol that does have a defined size value.
- * NOTE: This function cannot be used to reverse special driver symbols
+ * NOTE:  This  function cannot  be used  to  reverse special  driver symbols
  * WARNING: This operation in O(n) | n = number of symbols exported by `self'
  * @return: * :                      The NUL-terminated name of the symbol.
  *                                   This pointer is valid as long as `self' isn't unloaded.
- * @return: NULL:                    No public symbol is defined for `driver_relative_address'
- *                                   Note however that the associated symbol may not necessarily
+ * @return: NULL:                    No  public  symbol is  defined  for `driver_relative_address'
+ *                                   Note however that the  associated symbol may not  necessarily
  *                                   have been made public by the associated driver. In this case,
  *                                   it may be possible to determine the symbol name by looking at
- *                                   the driver's debug data (s.a. `<libdebuginfo/addr2line.h>')
+ *                                   the driver's debug  data (s.a.  `<libdebuginfo/addr2line.h>')
  * @param: driver_relative_address:  A module-relative pointer who's associated symbol should be located.
  * @param: psymbol_relative_address: When non-NULL, store the module-relative base address of the found symbol here.
  * @param: psymbol_size:             When non-NULL, store the size of the symbol here, or 0 if undefined. */
@@ -754,7 +754,7 @@ NOTHROW(KCALL driver_symbol_at)(struct driver *__restrict self,
                                 size_t *psymbol_size);
 
 /* Lookup a locally defined ELF symbol within `self'
- * WARNING: This function cannot be used with `&kernel_driver', as
+ * WARNING: This  function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
 FUNDEF WUNUSED NONNULL((1, 3, 4)) ElfW(Sym) const *KCALL
@@ -766,7 +766,7 @@ driver_local_symbol(struct driver *__restrict self,
 #define DRIVER_SYMBOL_HASH_UNSET  ((uintptr_t)-1)
 
 /* Same as `driver_symbol_at()', but returns the ELF symbol
- * WARNING: This function cannot be used with `&kernel_driver', as
+ * WARNING: This  function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
 FUNDEF WUNUSED NONNULL((1)) ElfW(Sym) const *
@@ -813,7 +813,7 @@ driver_local_symbol(struct driver *__restrict self,
 #define DRIVER_SECTION_LOCK_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
 #define DRIVER_SECTION_LOCK_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
                                               * been loaded, then this flag is simply ignored. */
-/* Lock a named section of a given driver into
+/* Lock a  named section  of  a given  driver  into
  * memory and return a descriptor for that section.
  * @throws: E_SEGFAULT: Only here because `name' is USER
  * @return: * :   Reference to the section descriptor.
@@ -839,7 +839,7 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void const *absol
                                struct unwind_fde_struct *__restrict result);
 
 /* Try to clear the FDE cache of the given, or of all loaded drivers.
- * NOTE: Drivers who's caches cannot be locked are skipped.
+ * NOTE:  Drivers  who's  caches   cannot  be  locked  are   skipped.
  * @return: * : The total number of bytes of heap-memory released. */
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL driver_clear_fde_cache)(struct driver *__restrict self);
@@ -848,9 +848,9 @@ NOTHROW(KCALL driver_clear_fde_caches)(void);
 
 /* Invoke cache clear callbacks for each and every globally reachable
  * component within the entire kernel.
- * This function is called when the kernel has run out of physical/virtual
+ * This function is  called when  the kernel  has run  out of  physical/virtual
  * memory, or some other kind of limited, and dynamically allocatable resource.
- * @return: * : At least some amount of some kind of resource was released.
+ * @return: * : At  least some amount of some kind of resource was released.
  *              In this case the caller should re-attempt whatever lead them
  *              to try and clear caches to reclaim resource (usually memory)
  * @return: 0 : Nothing was released/freed.
@@ -863,12 +863,12 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL system_clearcaches)(void);
  * solves the scenario of multiple threads calling `system_clearcaches()' at the
  * same time, in which case resources may only get freed by one thread, with the
  * other thread never getting informed about that fact.
- * In this case, `system_clearcaches()' would normally (and correctly I might add)
+ * In this case,  `system_clearcaches()' would  normally (and correctly  I might  add)
  * return `0' for some threads, since that thread really didn't release any resources.
- * However, the intended use of this function is inform a caller who just failed to
- * allocate some optional resource, that their resource may have become available,
- * and that they should try again (which is something that isn't fulfilled by the
- * regular `system_clearcaches()' in a multi-threaded environment)
+ * However, the intended use of  this function is inform a  caller who just failed  to
+ * allocate some optional  resource, that  their resource may  have become  available,
+ * and that they  should try again  (which is  something that isn't  fulfilled by  the
+ * regular     `system_clearcaches()'     in     a     multi-threaded     environment)
  * That is where this function comes in:
  * >> void *my_alloc_tryhard() {
  * >>     void *result;
@@ -886,14 +886,14 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL system_clearcaches)(void);
  * >>     }
  * >>     return result;
  * >> }
- * WARNING: Do _NOT_ write to `*pversion' after a non-zero value was returned!
- *          In this case, re-attempt your allocation and upon failure, call
- *          `system_clearcaches_s()' again with an unmodified `*pversion' value.
- *          This function makes use of the version number for tracking how many
+ * WARNING: Do  _NOT_ write to  `*pversion' after a  non-zero value was returned!
+ *          In  this  case, re-attempt  your  allocation and  upon  failure, call
+ *          `system_clearcaches_s()'  again with an unmodified `*pversion' value.
+ *          This function makes use of the  version number for tracking how  many
  *          more times the caller is allowed to make an attempt before giving up.
- * @return: * : At least some amount of some kind of resource (may have) been
+ * @return: * : At  least  some amount  of  some kind  of  resource (may  have) been
  *              released by some thread since the last time the function was called.
- *              In this case the caller should re-attempt whatever lead them
+ *              In  this  case  the  caller  should  re-attempt  whatever  lead them
  *              to try and clear caches to reclaim resource (usually memory)
  * @return: 0 : Nothing was released/freed.
  *              In this case, the caller should indicate failure due to
@@ -916,7 +916,7 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL system_trimheaps)(void);
 
 
 /* Try to lookup a driver stored at a given address.
- * If no such driver exists, return NULL */
+ * If   no   such   driver   exists,   return   NULL */
 FUNDEF NOBLOCK WUNUSED REF struct driver *
 NOTHROW(FCALL driver_at_address)(void const *static_pointer);
 
@@ -940,10 +940,10 @@ DATDEF CALLBACK_LIST(void KCALL(struct driver *)) driver_loaded_callbacks;
 DATDEF CALLBACK_LIST(void KCALL(struct driver *)) driver_finalized_callbacks;
 
 /* Callbacks invoked just before a driver is unloaded.
- * WARNING: The given driver has a reference count of 0, which must not
+ * WARNING: The given driver has a reference count of 0, which must  not
  *          be increased by callbacks. However, the actual driver itself
- *          hasn't been destroyed, yet (meaning all of its members are
- *          still as they were just before its reference count dropped
+ *          hasn't been destroyed, yet (meaning  all of its members  are
+ *          still as they were just  before its reference count  dropped
  *          to ZERO)! */
 DATDEF CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *)) driver_unloaded_callbacks;
 

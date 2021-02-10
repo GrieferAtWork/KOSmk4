@@ -106,7 +106,7 @@ libda_disasm_print_until(struct disassembler *__restrict self,
 	return self->d_result;
 }
 
-/* Disassemble a single instruction line, following formatting rules specified
+/* Disassemble a single  instruction line, following  formatting rules  specified
  * by `DISASSEMBLER_F*', potentially printing multiple lines of the instruction's
  * bytes don't all fit into a single line (s.a. `').
  * @return: * : The sum of all printer callbacks ever executed with `self'
@@ -170,7 +170,7 @@ done:
 }
 
 /* Disassemble a single instruction, including its mnemonic, and all operands.
- * This function does not include any prefix, nor does it append a trailing.
+ * This  function does not include any prefix,  nor does it append a trailing.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 INTERN NONNULL((1)) ssize_t CC

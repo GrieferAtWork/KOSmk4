@@ -31,7 +31,7 @@ EMU86_INTELLISENSE_BEGIN(jmp) {
 case EMU86_OPCODE_ENCODE(0xe9): {
 	/* E9 cw    JMP rel16   Jump near, relative, displacement relative to next instruction.
 	 * E9 cd    JMP rel32   Jump near, relative, displacement relative to next instruction.
-	 *                      32-bit displacement sign extended to 64-bits in 64-bit mode. */
+	 *                      32-bit displacement sign  extended to 64-bits  in 64-bit  mode. */
 	EMU86_UREG_TYPE dest_ip;
 	IF_16BIT_OR_32BIT(
 	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {

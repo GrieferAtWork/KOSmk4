@@ -70,12 +70,12 @@ DECL_BEGIN
 
 #ifndef EH_FRAME_CFA_LANDING_APPLY
 #ifdef EH_FRAME_CFA_APPLY
-/* Execute CFA result instruction until `absolute_pc' has been reached,
- * or the entirety of the FDE instruction code has been executed.
+/* Execute CFA  result  instruction  until  `absolute_pc'  has  been  reached,
+ * or   the  entirety  of   the  FDE  instruction   code  has  been  executed.
  * This function is used to fill in CFA result information at a given address,
- * which can then be used to unwind a register result for the purpose of
- * implementing language-level, zero-effort exception support, as well
- * as for generating tracebacks when combined with `libdebuginfo.so'
+ * which can then  be used  to unwind  a register  result for  the purpose  of
+ * implementing  language-level,  zero-effort   exception  support,  as   well
+ * as  for  generating   tracebacks  when   combined  with   `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:
  *      `self->f_pcstart <= absolute_pc && self->f_pcend >= absolute_pc'
  * @param: self:   The FDE to execute in search of `absolute_pc'
@@ -90,11 +90,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_state_t *__restrict result,
                                       void const *absolute_pc)
 #elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
-/* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
+/* Behaves  identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
- * FDE descriptors (though again: use of this is entirely optional; the regular
- * `unwind_fde_exec()' is just as capable of unwinding signal frame descriptors.
- * This function is merely optimized to better restore registers commonly used
+ * FDE  descriptors (though again:  use of this is  entirely optional; the regular
+ * `unwind_fde_exec()' is just as capable  of unwinding signal frame  descriptors.
+ * This function is  merely optimized  to better restore  registers commonly  used
  * within signal frames)
  * @param: self:   The FDE to execute in search of `absolute_pc'
  * @param: result: CFA state descriptor, to-be filled with restore information upon success.
@@ -170,10 +170,10 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
 
 #ifdef EH_FRAME_CFA_APPLY
 /* Apply a given CFA unwind state in order to apply register information from from reg_getter to reg_setter.
- * Note however that only registers with a rule other than `DW_CFA_register_rule_undefined'
+ * Note   however   that   only  registers   with   a  rule   other   than  `DW_CFA_register_rule_undefined'
  * will be applied, meaning that `*reg_setter' will not get invoked for these registers.
  * WARNING: This function will modify `self' in such a manner that repeated calls
- *          require that `self' must be restored to its state prior to a call to
+ *          require  that `self' must be restored to its state prior to a call to
  *          this function before a repeated call can be made!
  * @param: self:        The CFA state to-be used when applying registers
  * @param: absolute_pc: Same value as was previously used to calculate `fde' from `self'
@@ -245,7 +245,7 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 		goto done;
 	/* Apply new register values.
 	 * The order in which this is done should depend
-	 * on the order in which rules were defined:
+	 * on  the  order in  which rules  were defined:
 	 * >> .cfi_XXX  %eax
 	 * >> .cfi_XXX  %ecx
 	 * >> .cfi_XXX  %edx
@@ -403,8 +403,8 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 #ifndef EH_FRAME_CFA_LANDING_APPLY
 	/* Set the new CFA value as content of the SP register. */
 	if (self->cs_cfa.cv_type != UNWIND_CFA_VALUE_UNSET &&
-	    /* Only apply if no other register rule was already defined for SP
-	     * This allows users to satisfy gdb by providing a CFA rule but still
+	    /* Only  apply  if no  other register  rule was  already defined  for SP
+	     * This allows users to  satisfy gdb by providing  a CFA rule but  still
 	     * provide a value for SP by providing an explicit register rule for it. */
 #ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
 	    !has_sp_rule
@@ -414,25 +414,25 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 	    ) {
 		/* Check if we should apply signal frame transformations.
 		 * Note that we only do this if we have a CFA rule and do intend on applying it.
-		 * In any other case, applying sigframe transformation wouldn't make any sense,
+		 * In  any other case, applying sigframe transformation wouldn't make any sense,
 		 * and would even cause problems by interfering with GDB erroring out with:
 		 *   - Backtrace stopped: previous frame inner to this frame (corrupt stack?)
 		 * This can be caused when one frame's return-SP is greater than it's caller,
-		 * which should normally never be the case, but can happen when a custom-SP
+		 * which  should normally never be the case,  but can happen when a custom-SP
 		 * restore rule was defined.
 		 * Right now, GDB allows SP to be any value during unwind when either the called,
 		 * or the calling frame are marked as .cfi_signal_frame.
-		 * In my opinion, this should be loosened a bit to only stop unwinding if the fully
+		 * In  my opinion, this should be loosened a bit to only stop unwinding if the fully
 		 * unwound frame ends up being a carbon copy of a previous frame, rather than always
 		 * failing when SP isn't where GDB would like it to be at.
 		 * Anyways, what you as a KOS developer should take away from this is:
-		 *   - Any custom assembly function that assigns a new ESP from either another
+		 *   - Any custom assembly  function that  assigns a  new ESP  from either  another
 		 *     stack, or somewhere further up the stack must be marked as .cfi_signal_frame
 		 *   - The KOS unwind mechanism will ignore .cfi_def_cfa and .cfi_signal_frame when
-		 *     another rule exists that assigns explicit unwinding behavior for %esp
-		 *   - GDB will _NOT_ working properly unless every function has a CFA rule defined.
+		 *     another rule  exists  that  assigns explicit  unwinding  behavior  for  %esp
+		 *   - GDB  will _NOT_ working properly unless every  function has a CFA rule defined.
 		 *     For this purpose, you can usually use `.cfi_def_cfa %esp, 0', however be warned
-		 *     that the value of this expression is used as the FRAME-ID which GDB uses to
+		 *     that  the value of  this expression is used  as the FRAME-ID  which GDB uses to
 		 *     identify frames, so try to keep its value unique, I guess...
 		 *   - With all of this in mind, a custom register restore function would look like this:
 		 * >>     .cfi_startproc simple

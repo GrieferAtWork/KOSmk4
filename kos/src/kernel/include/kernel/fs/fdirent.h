@@ -38,7 +38,7 @@ struct fdirent_ops {
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/
 	(FCALL *fdo_destroy)(struct fdirent *__restrict self);
 
-	/* [1..1] Open the node associated with this directory entry.
+	/* [1..1] Open the node  associated with  this directory  entry.
 	 * If the entry has already been deleted, return `NULL' instead.
 	 * @param: dir: The directory that contains `self' */
 	WUNUSED NONNULL((1, 2)) REF struct fnode *
@@ -47,10 +47,10 @@ struct fdirent_ops {
 };
 
 struct fdirent {
-	/* Additional fs-specific data usually goes here (iow: at negative offsets,
-	 * such that the filesystem layer will use `container_of()' to access the
+	/* Additional  fs-specific  data  usually  goes  here  (iow:  at  negative  offsets,
+	 * such   that  the  filesystem  layer  will  use  `container_of()'  to  access  the
 	 * container structure). Alternatively, data could also go at `fd_name[fd_namelen]',
-	 * however this is less likely, since doing this would require making use
+	 * however  this  is  less  likely,  since  doing  this  would  require  making  use
 	 * of non-constant struct offsets. */
 	WEAK refcnt_t           fd_refcnt;   /* Reference counter. */
 	struct fdirent_ops const *fd_ops;    /* [1..1][const] Operators. */

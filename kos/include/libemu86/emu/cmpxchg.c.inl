@@ -47,7 +47,7 @@ EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 
 
 case EMU86_OPCODE_ENCODE(0x0fb0): {
-	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is
+	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare  AL with r/m8.  If equal, ZF is  set and r8 is
 	 *                                    loaded into r/m8. Else, clear ZF and load r/m8 into AL */
 	MODRM_DECODE();
 	DEFINE_CMPXCHG_modrm_rm(b, B, 8, 1, EMU86_GETAL())
@@ -56,11 +56,11 @@ case EMU86_OPCODE_ENCODE(0x0fb0): {
 
 
 case EMU86_OPCODE_ENCODE(0x0fb1): {
-	/* 0F B1 /r      CMPXCHG r/m16,r16    Compare AX with r/m16. If equal, ZF is set and r16 is
+	/* 0F B1 /r      CMPXCHG r/m16,r16    Compare  AX with  r/m16. If equal,  ZF is set  and r16 is
 	 *                                    loaded into r/m16. Else, clear ZF and load r/m16 into AX.
-	 * 0F B1 /r      CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is
+	 * 0F B1 /r      CMPXCHG r/m32,r32    Compare  EAX with  r/m32. If equal,  ZF is set  and r32 is
 	 *                                    loaded into r/m32. Else, clear ZF and load r/m32 into EAX.
-	 * 0F B1 /r      CMPXCHG r/m64,r64    Compare RAX with r/m64. If equal, ZF is set and r64 is
+	 * 0F B1 /r      CMPXCHG r/m64,r64    Compare  RAX with  r/m64. If equal,  ZF is set  and r64 is
 	 *                                    loaded into r/m64. Else, clear ZF and load r/m64 into RAX. */
 	MODRM_DECODE();
 	IF_64BIT(if (IS_64BIT()) {

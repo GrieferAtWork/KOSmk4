@@ -48,8 +48,8 @@
 #define MPART_BLOCK_ST_INIT 1 /* Backing memory is currently being initialized.
                                * After transitioning to `LOAD', `mf_initdone' of the associated mem-file is broadcast.
                                * NOTE: A mem-part that contains at least 1 block with this status cannot be off-loaded
-                               *       into swap until the transition to `MPART_BLOCK_ST_LOAD' has been made.
-                               *       This is required because this state is used internally when loading blocks.
+                               *       into  swap  until  the  transition  to  `MPART_BLOCK_ST_LOAD'  has  been  made.
+                               *       This  is required  because this state  is used internally  when loading blocks.
                                * NOTE: This state is also used when syncing changed blocks, as it prevents further
                                *       modifications from being performed. */
 #define MPART_BLOCK_ST_LOAD 2 /* Backing memory has been loaded. */
@@ -65,40 +65,40 @@
 #define MPART_F_LOCKBIT        0x0001 /* Lock-bit for this m-part */
 #define MPART_F_MAYBE_BLK_INIT 0x0002 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
 #define MPART_F_GLOBAL_REF     0x0004 /* [lock(WRITE_ONCE)] `mpart_all_list' holds a reference to this part.
-                                       * When memory is running low, and the kernel tries to unload unused
-                                       * memory parts, it will clear this flag for all parts there are.
-                                       * Also note that this flag is cleared by default when the associated
+                                       * When memory is running low, and  the kernel tries to unload  unused
+                                       * memory parts, it  will clear  this flag  for all  parts there  are.
+                                       * Also note that this flag is cleared by default when the  associated
                                        * file's `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
 /*efine MPART_F_               0x0008  * ... */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
-                                       * The backing block-state bitset exists in-line. */
+                                       * The  backing  block-state bitset  exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
 /*efine MPART_F_               0x0040  * ... */
-#define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag may not be cleared to free up
-                                       * memory. This flag is still cleared when the is being anonymized as the result of
-                                       * a call to `mfile_delete()' or `mfile_makeanon_subrange()'. The only place where
+#define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag  may not be  cleared to free  up
+                                       * memory.  This flag is still cleared when the is being anonymized as the result of
+                                       * a call to `mfile_delete()' or  `mfile_makeanon_subrange()'. The only place  where
                                        * this flag makes a difference, is when the global list of mem-parts is scanned for
-                                       * parts which are no longer in-use, and can be destroyed by deleting their global
-                                       * reference. - This flag is set by default for parts of files that have the
+                                       * parts which are no longer in-use, and  can be destroyed by deleting their  global
+                                       * reference.  -  This flag  is set  by default  for  parts of  files that  have the
                                        * `MFILE_F_PERSISTENT' flag set. */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 #define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
                                        *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
                                        * [valid_if(:mfile::mf_changed != MFILE_PARTS_ANONYMOUS)]
-                                       * Blocks of this part (may) have changed. This flag must be cleared by the
+                                       * Blocks of this  part (may)  have changed.  This flag  must be  cleared by  the
                                        * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_NOSPLIT        0x0400 /* [const] This mem-part cannot be split, and if doing so would be necessary,
                                        *         then the attempt will instead result in kernel panic. Similarly,
-                                       *         this flag also prevents the part from being merged. */
+                                       *         this  flag   also  prevents   the   part  from   being   merged. */
 #define MPART_F_NOMERGE        0x0800 /* [const] Don't allow this mem-part to be merged. */
 #define MPART_F_MLOCK_FROZEN   0x1000 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
 #define MPART_F_MLOCK          0x2000 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the part's state
-                                       * cannot move away from INCORE). Unless `MPART_F_MLOCK_FROZEN' is set, this flag
-                                       * is set whenever this part is mapped by any mem-node that has the MNODE_F_MLOCK
+                                       * cannot move  away from  INCORE). Unless  `MPART_F_MLOCK_FROZEN' is  set, this  flag
+                                       * is set whenever  this part is  mapped by  any mem-node that  has the  MNODE_F_MLOCK
                                        * flag set, and whenever a mem-node with the MNODE_F_MLOCK flag set has is destroyed,
-                                       * or has its MNODE_F_MLOCK flag cleared, all mappings of the mem-part are scanned
-                                       * in search for other locked mappings. If any are found, then this flag will remain
+                                       * or has its  MNODE_F_MLOCK flag cleared,  all mappings of  the mem-part are  scanned
+                                       * in  search for other locked mappings. If any  are found, then this flag will remain
                                        * set. If none are found, then this flag is cleared. */
 #define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
 /*efine MPART_F_               0x8000  * ... */
@@ -223,13 +223,13 @@ struct mpart {
 #endif /* __WANT_MPART_INIT */
 	REF struct mfile             *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
 	                                             * The associated file. (Cannot be altered as long as any `MPART_BLOCK_ST_INIT' blocks exist) */
-	/* WARNING: The following 2 lists may contain already-destroyed nodes.
-	 *          To check if a node has been destroyed, you may check if the
-	 *          pointed-to `mn_mman' was destroyed, since that field normally
-	 *          only contains a weak reference, meaning that if the underlying
+	/* WARNING: The  following  2  lists  may  contain  already-destroyed nodes.
+	 *          To check if  a node  has been destroyed,  you may  check if  the
+	 *          pointed-to `mn_mman' was  destroyed, since  that field  normally
+	 *          only contains a weak reference,  meaning that if the  underlying
 	 *          MMAN got destroyed, then it will have attempted to unbind all of
-	 *          its remaining nodes, and those that it couldn't unbind will
-	 *          have been added to the dead-nodes chain of the associated part. */
+	 *          its remaining  nodes, and  those that  it couldn't  unbind  will
+	 *          have  been added to the dead-nodes chain of the associated part. */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_copy(...)    __VA_ARGS__
 #define MPART_INIT_mp_share(...)   __VA_ARGS__
@@ -245,7 +245,7 @@ struct mpart {
 	union {
 		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
 		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts)
-		                                         * NOTE: For VIO parts, this list entry is initialized as unbound! */
+		                                         * NOTE: For  VIO  parts,  this  list entry  is  initialized  as  unbound! */
 		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
 	};
 #else /* __WANT_MPART__mp_newglobl */
@@ -278,7 +278,7 @@ struct mpart {
 	union {
 		uintptr_t                _mp_static_maxaddr[__SIZEOF_POS_T__ / __SIZEOF_POINTER__];
 		pos_t                     mp_maxaddr;   /* [lock(like(mp_minaddr))][const_if(like(mp_minaddr))]
-		                                         * In-file max address of this part. (NOTE: when 1 is
+		                                         * In-file max address of this  part. (NOTE: when 1  is
 		                                         * added, also aligned like `mp_minaddr' must be) */
 	};
 #else /* __WANT_MPART_INIT && __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
@@ -296,7 +296,7 @@ struct mpart {
 	                                             * In-file starting address of this part.
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
 	pos_t                         mp_maxaddr;   /* [lock(like(mp_minaddr))][const_if(like(mp_minaddr))]
-	                                             * In-file max address of this part. (NOTE: when 1 is
+	                                             * In-file max address of this  part. (NOTE: when 1  is
 	                                             * added, also aligned like `mp_minaddr' must be) */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
 #ifdef __WANT_MPART__mp_dead
@@ -307,10 +307,10 @@ struct mpart {
 		SLIST_ENTRY(REF mpart)    mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
 		                                         *                         !mpart_isanon(self) && MPART_F_CHANGED)]
 		                                         * Per-file chain of mem-parts that have changed.
-		                                         * When the associated file supports the `mo_saveblocks', then
+		                                         * When  the  associated  file  supports  the  `mo_saveblocks', then
 		                                         * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
 		                                         * into its file's `mf_changed' list.
-		                                         * Also note that changed mem-parts are kept alive by the associated
+		                                         * Also note that  changed mem-parts  are kept alive  by the  associated
 		                                         * file, since this list contains references, rather than weak pointers. */
 		SLIST_ENTRY(mpart)       _mp_dead;      /* [lock(ATOMIC)] Chain of dead parts. */
 	};
@@ -321,10 +321,10 @@ struct mpart {
 	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
 	                                             *                         !mpart_isanon(self) && MPART_F_CHANGED)]
 	                                             * Per-file chain of mem-parts that have changed.
-	                                             * When the associated file supports the `mo_saveblocks', then
+	                                             * When  the  associated  file  supports  the  `mo_saveblocks', then
 	                                             * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
 	                                             * into its file's `mf_changed' list.
-	                                             * Also note that changed mem-parts are kept alive by the associated
+	                                             * Also note that  changed mem-parts  are kept alive  by the  associated
 	                                             * file, since this list contains references, rather than weak pointers. */
 #endif /* !__WANT_MPART__mp_dead */
 #ifdef __WANT_MPART_INIT
@@ -345,10 +345,10 @@ struct mpart {
 		uintptr_t                *mp_blkst_ptr; /* [lock(MPART_F_LOCKBIT)][0..1][lock(MPART_F_LOCKBIT || EXISTS(MPART_BLOCK_ST_INIT))]
 		                                         * [valid_if(MPART_ST_HASST && !MPART_F_BLKST_INL)]
 		                                         * NOTE: When set to `NULL', then monitoring the part for changes becomes
-		                                         *       impossible, and the caller should act as though all parts were
+		                                         *       impossible, and the caller should  act as though all parts  were
 		                                         *       using `MPART_BLOCK_ST_CHNG' as their state.
 		                                         *       This is usually only done for parts where write-monitoring
-		                                         *       doesn't really make any sense, such as `mfile_phys'.
+		                                         *       doesn't  really  make  any  sense,  such  as `mfile_phys'.
 		                                         * NOTE: Changing the state of block that used to be `MPART_BLOCK_ST_INIT' to
 		                                         *       anything else may be done atomically, and without holding any locks. */
 		uintptr_t                 mp_blkst_inl; /* [lock(MPART_F_LOCKBIT)]
@@ -362,13 +362,13 @@ struct mpart {
 		 * [lock(MPART_F_LOCKBIT)]
 		 * [const_if(EXISTS(MPART_BLOCK_ST_INIT) || mp_meta->mpm_dmalocks != 0)] */
 
-		/* NOTE: When `mchunkvec' is used, individual chunks are always chosen such
-		 *       that a whole blocks are always contained within a single chunk, even
-		 *       when the size of a block is larger than the size of a page (in which
+		/* NOTE: When `mchunkvec'  is used,  individual chunks  are always  chosen  such
+		 *       that  a whole blocks  are always contained within  a single chunk, even
+		 *       when the size of a  block is larger than the  size of a page (in  which
 		 *       case multiple physical pages are required to represent a single block)! */
 		struct mchunk             mp_mem;       /* [valid_if(MPART_ST_MEM)] Physically allocated memory */
 		struct mchunkvec          mp_mem_sc;    /* [valid_if(MPART_ST_MEM_SC)] Scattered memory */
-		/* NOTE: Unlike mem-data, swap data only contains blocks that have their state set
+		/* NOTE: Unlike  mem-data, swap data  only contains blocks that  have their state set
 		 *       to `MPART_BLOCK_ST_CHNG', meaning that the total number of swap pages equals
 		 *       the ceil-aligned number of pages needed to represent as many blocks as there
 		 *       are MPART_BLOCK_ST_CHNG-entries in the status-bitset.
@@ -377,17 +377,17 @@ struct mpart {
 		 *
 		 * Also note that swap storage should not be used for mem-parts who's file supports
 		 * the `mo_saveblocks' operator. In that case it is still possible to off-load such
-		 * parts into swap, but doing so is pointless. If the intend is to free up unused
-		 * memory, then you should instead write-back modified files (possibly using
-		 * `mpart_lock_acquire_and_setcore_unwrite_sync') and only use swap memory (of
+		 * parts  into swap, but doing so is pointless.  If the intend is to free up unused
+		 * memory, then  you  should  instead write-back  modified  files  (possibly  using
+		 * `mpart_lock_acquire_and_setcore_unwrite_sync') and  only  use  swap  memory  (of
 		 * changed blocks) if the part is still marked as changed.
-		 * Unchanged, but allocated blocks can simply be freed, and you are allowed to
+		 * Unchanged,  but allocated blocks can simply be  freed, and you are allowed to
 		 * assume that any unchanged block can always be re-constructed at a later point
 		 * in time by making use of the `mo_loadblocks' operator.
 		 *
-		 * Also note that parts with the `MPART_F_NOFREE' flag set should never be off-
+		 * Also note that  parts with  the `MPART_F_NOFREE' flag  set should  never be  off-
 		 * loaded into swap: If not only because doing so wouldn't actually free up physical
-		 * memory, doing so might actually cause problems (since `MPART_F_NOFREE' is set
+		 * memory, doing so  might actually  cause problems (since  `MPART_F_NOFREE' is  set
 		 * by special files such as `mfile_phys')
 		 */
 		struct mchunk             mp_swp;       /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
@@ -437,7 +437,7 @@ struct mpart {
 #define mpart_getblockcount(self, file) (size_t)(mpart_getsize(self) >> (file)->mf_blockshift)           /* WARNING: This one requires a lock! */
 
 
-/* Check if `self' is anonymous (that is: `self !in self->mp_file->mf_parts')
+/* Check   if  `self'  is  anonymous  (that  is:  `self !in self->mp_file->mf_parts')
  * Note that as long as you're holding a lock to `self', you may make the assumption:
  *    `(!wasdestroyed(self) && !mpart_isanon(self)) -> !mfile_isanon(self->mp_file)'
  * Even when you're not actually holding a lock to the associated file. */
@@ -539,9 +539,9 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
 /* Low-level mpart APIs                                                 */
 /************************************************************************/
 
-/* Initialize `self->mp_state' and `self->mp_mem' or `self->mp_mem_sc', such
- * that `self' points to exactly `total_pages' pages of physical memory.
- * This function is init-only and doesn't care about locks or the whatever
+/* Initialize  `self->mp_state' and `self->mp_mem' or `self->mp_mem_sc', such
+ * that `self'  points to  exactly `total_pages'  pages of  physical  memory.
+ * This  function is init-only  and doesn't care about  locks or the whatever
  * the given `self' may point to, meaning it should not be called when `self'
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
@@ -551,7 +551,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
 		THROWS(E_BADALLOC);
 
-/* Free backing memory using `page_free()'. When an mchunkvec was used,
+/* Free backing memory using `page_free()'.  When an mchunkvec was  used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mpart_ll_freemem)(struct mpart *__restrict self);
@@ -573,16 +573,16 @@ NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
  * All of these work on the principle:
  *   #1: Check if the wanted condition has already been met
  *       If so, return `true'
- *   #2: Check if we've (additional) data needed to meet the
- *       condition has been given to us by the caller (via
+ *   #2: Check if we've (additional)  data needed to meet  the
+ *       condition  has been  given to  us by  the caller (via
  *       the `data' argument, and as allocated during previous
  *       attempts)
  *   #3: If any (needed) data is missing, try to allocate that data.
- *       Do this using non-except GFP_ATOMIC and other non-blocking
+ *       Do  this using non-except GFP_ATOMIC and other non-blocking
  *       operations.
- *   #4: If data cannot be allocated using non-blocking operations,
- *       release the lock that is held by `self' and re-attempt the
- *       allocation with exception-enabled, blocking operations.
+ *   #4: If  data cannot be allocated using non-blocking operations,
+ *       release  the lock that is held by `self' and re-attempt the
+ *       allocation  with  exception-enabled,  blocking  operations.
  *       Remember the freshly allocated data (so that it may be used
  *       during another attempt) and return `false'
  *   #5: With all required data allocated, and the lock to the
@@ -612,7 +612,7 @@ NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
  *                       undefined(out(data));        (If a `data' argument is present)
  *   - return == false:  mpart_lock_release(self);
  *   - EXCEPT:           mpart_lock_release(self);
- ************************************************************************/
+ *********************************************************************** */
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
@@ -683,14 +683,14 @@ struct mpart_unsharecow_data {
 	 mpart_setcore_data_fini(&(self)->ucd_ucmem))
 
 /* Ensure that `LIST_EMPTY(&self->mp_copy)' (while only considering nodes
- * which may be overlapping with the given address range)
- * NOTE: The caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
+ * which   may   be   overlapping   with   the   given   address   range)
+ * NOTE: The  caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
  *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
- *       the list is still allowed to contain dead nodes that are about to,
+ *       the list is still allowed to contain dead nodes that are about  to,
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
- *       already been destroyed, such that no alive copy-nodes still exist! */
+ *       already been destroyed, such that  no alive copy-nodes still  exist! */
 FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
@@ -702,9 +702,9 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
  * >> LIST_FOREACH (node, &self->mp_share, mn_link)
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS
  * Note that when `!mpart_isanon(self)', any nodes apart of `mp_copy' wouldn't
- * have gotten write-access to begin with (since this requires such a node to
- * create its own private copy of `self'), so it is sufficient to only deny
- * write access to MNODE_F_SHARED-nodes in order to ensure that no memory
+ * have gotten write-access to begin with (since this requires such a node  to
+ * create its own private copy  of `self'), so it  is sufficient to only  deny
+ * write access  to MNODE_F_SHARED-nodes  in order  to ensure  that no  memory
  * mappings exist that may still have write-access! */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_denywrite_or_unlock(struct mpart *__restrict self,
@@ -735,7 +735,7 @@ mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
  *  - mpart_setcore_or_unlock(self, ...)
  *  - mpart_load_or_unlock(self, ...)    // Based on the given address range
  *
- * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be loaded)
  *
@@ -749,7 +749,7 @@ mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
  *  - mpart_setcore_or_unlock(self, ...)
  *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
  *
- * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be unshared/loaded)
  *
@@ -764,7 +764,7 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
  *  - mpart_load_or_unlock(self, ...)        // Based on the given address range
  *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
  *
- * If the given `filepos' isn't contained by `self', then no lock is acquired,
+ * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be unshared/loaded)
  *
@@ -775,15 +775,15 @@ mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
- * are still being held, and that all shared mappings of the given mem-part are
+ * are  still being held, and that all shared mappings of the given mem-part are
  * no longer mapped with write permissions:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link) {
  * >>     mnode_clear_write(node);
  * >> }
- * Note that copy-on-write (i.e. `&self->mp_copy') nodes don't need to be updated.
+ * Note that copy-on-write (i.e. `&self->mp_copy')  nodes don't need to be  updated.
  * But also note that copy-on-write mappings usually prevent each other from gaining
- * write access, simply by co-existing. Furthermore, copy-on-write mappings can't
- * gain write-access to underlying mem-parts if those parts might be accessed from
+ * write access, simply  by co-existing. Furthermore,  copy-on-write mappings  can't
+ * gain write-access to underlying mem-parts if  those parts might be accessed  from
  * the outside world (which is the case when `!mpart_isanon(self)').
  *
  * In other words: The only case where there may still be a node associated with
@@ -793,12 +793,12 @@ mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
  *   >> !LIST_EMPTY(&self->mp_copy) &&               // There is a copy-on-write mapping
  *   >> (LIST_NEXT(LIST_FIRST(&self->mp_copy), mn_link) == NULL) // There is exactly 1 copy-on-write mapping
  * In this case, the node described by `LIST_FIRST(&self->mp_copy)' may still have
- * write-access, and continue to modify the backing memory of `self' after this
+ * write-access,  and continue to  modify the backing memory  of `self' after this
  * function was called.
  *
- * However, the purpose of this function is to be used by `mpart_sync()', where
+ * However, the purpose of  this function is to  be used by `mpart_sync()',  where
  * syncing an anonymous file wouldn't really make much sense (where the file being
- * anonymous is one of the conditions for a writable copy-on-write mapping to
+ * anonymous is one  of the  conditions for  a writable  copy-on-write mapping  to
  * continue to exist) */
 FUNDEF NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
@@ -808,21 +808,21 @@ mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
  * NOTE: The caller is responsible to ensure that mem-part is in a state
  *       where the bitset is valid (iow: `MPART_ST_HASST(self->mp_state)'),
- *       and that `partrel_block_index' is located in-bounds.
+ *       and   that    `partrel_block_index'    is    located    in-bounds.
  * NOTE: The caller must be holding a lock to `self', unless the intend is to
- *       change the state of a block that used to be `MPART_BLOCK_ST_INIT',
- *       in which case `mpart_setblockstate()' may be called without holding
+ *       change the state of a  block that used to be  `MPART_BLOCK_ST_INIT',
+ *       in which case `mpart_setblockstate()' may be called without  holding
  *       a lock to `self'
  *       But also note that after transitioning away from `MPART_BLOCK_ST_INIT',
- *       the caller must broadcast the `mf_initdone' signal of the file that
+ *       the caller must  broadcast the  `mf_initdone' signal of  the file  that
  *       was used to initialize the part.
- * NOTE: When calling `mpart_setblockstate()' to set `MPART_BLOCK_ST_INIT',
+ * NOTE: When  calling  `mpart_setblockstate()'  to  set  `MPART_BLOCK_ST_INIT',
  *       then the caller is also responsible to set the `MPART_F_MAYBE_BLK_INIT'
- *       flag! But note that that flag should _NOT_ be cleared by the one
- *       who originally set it, since other (unrelated) blocks may exist
+ *       flag! But  note that  that flag  should  _NOT_ be  cleared by  the  one
+ *       who  originally  set  it,  since  other  (unrelated)  blocks  may exist
  *       that still make use of the `MPART_BLOCK_ST_CHNG' state!
  * WARNING: These functions are allowed to assume that `mpart_hasblockstate(self)'.
- *          If this cannot be guarantied, then these functions mustn't be called!
+ *          If this cannot be guarantied,  then these functions mustn't be  called!
  * @param: at:  One of `MPART_BLOCK_ST_*'
  * @return: * : *ditto* */
 FUNDEF NOBLOCK ATTR_PURE NONNULL((1)) unsigned int
@@ -836,11 +836,11 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 	((self)->mp_blkst_ptr != __NULLPTR || ((self)->mp_flags & MPART_F_BLKST_INL))
 
 /* Check if the given mem-part contains blocks with `MPART_BLOCK_ST_INIT'.
- * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set, then
+ * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set,  then
  * this function immediately returns `false'.
  * Otherwise, all blocks of the part are searched, and if one is found that
- * uses the `MPART_BLOCK_ST_INIT' state, return `true'. Otherwise, clear
- * the `MPART_F_MAYBE_BLK_INIT' flag and return `false'.
+ * uses the `MPART_BLOCK_ST_INIT'  state, return  `true'. Otherwise,  clear
+ * the    `MPART_F_MAYBE_BLK_INIT'     flag     and     return     `false'.
  * NOTE: The caller must be holding a lock to `self' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self);
@@ -853,23 +853,23 @@ struct mpart_physloc {
 
 /* Load the bounds of the longest consecutive physical memory address range
  * that starts at `partrel_offset', has been populated with meaningful data
- * and contains at least 1 byte (and at most `num_bytes' bytes).
- * Note that `result->mppl_size < num_bytes' for multiple reasons:
+ * and   contains  at  least  1  byte  (and  at  most  `num_bytes'  bytes).
+ * Note  that   `result->mppl_size < num_bytes'   for   multiple   reasons:
  *   - The end of the given mem-part `self' is reached
  *   - Backing physical memory of `self' is scattered, and the next
- *     byte is apart of the next (discontinuous) chunk of memory.
+ *     byte is apart of the  next (discontinuous) chunk of  memory.
  *   - The next block located at the end of the returned range isn't
- *     already loaded in-core. (that is: doesn't have a state that
+ *     already loaded in-core. (that is:  doesn't have a state  that
  *     was set to `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG')
  *
  * NOTE: The caller must be holding a lock to `self'
  * NOTE: The caller is responsible to ensure that `MPART_ST_INMEM(self->mp_state)'
- *       before calling this function. 
- * NOTE: If necessary, the length of the returned range may be truncated in
+ *       before calling this function.
+ * NOTE: If necessary, the  length of  the returned  range may  be truncated  in
  *       order to accommodate the requirements on the state of contained blocks.
  *
  * @return: true:  Success
- * @return: false: Error: At least one accessed block has a state that
+ * @return: false: Error: At least  one accessed  block  has a  state  that
  *                        is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
@@ -880,18 +880,18 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
  * the current state of blocks that are entirely contained within the to-
  * be returned address range.
  *
- * While `mpart_memaddr_for_read()' requires that all blocks that overlap
+ * While  `mpart_memaddr_for_read()' requires that  all blocks that overlap
  * with the returned range have a state of are either `MPART_BLOCK_ST_LOAD'
- * or `MPART_BLOCK_ST_CHNG', this function only requires this for the 0-2
+ * or `MPART_BLOCK_ST_CHNG', this function only  requires this for the  0-2
  * blocks that only partially overlap with the returned range.
  *
  * All of the blocks that fully overlap with the returned range are only
- * required to not have a state set to `MPART_BLOCK_ST_INIT'.
+ * required  to  not   have  a  state   set  to   `MPART_BLOCK_ST_INIT'.
  *
  * @return: true:  Success
- * @return: false: Error: At least one fully accessed block has a state
+ * @return: false: Error: At least one fully accessed block has a  state
  *                        that is `MPART_BLOCK_ST_INIT', or at least one
- *                        of the 0-2 border blocks has a state that is one
+ *                        of the 0-2 border blocks has  a state that is  one
  *                        of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
@@ -901,28 +901,28 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 /* Commit modifications made to the given backing address range.
  * For this purpose, this function:
  *   - Set the state of all blocks that fully overlap with the given
- *     address range to `MPART_BLOCK_ST_CHNG', (after internally
- *     asserting that their old state wasn't `MPART_BLOCK_ST_INIT')
+ *     address range  to  `MPART_BLOCK_ST_CHNG',  (after  internally
+ *     asserting  that their old state wasn't `MPART_BLOCK_ST_INIT')
  *   - Of the 0-2 blocks that only overlap partially with the given
- *     address range, make the following state transitions:
+ *     address  range,  make   the  following  state   transitions:
  *      - MPART_BLOCK_ST_LOAD -> MPART_BLOCK_ST_CHNG
  *      - MPART_BLOCK_ST_CHNG -> MPART_BLOCK_ST_CHNG  (i.e. no-op)
  *      - MPART_BLOCK_ST_INIT: Internal assertion failure
  *      - MPART_BLOCK_ST_NDEF:
  *        - If the partially overlapped block isn't the last (iow: right-most)
- *          block (meaning that the given address range partially overlaps
+ *          block (meaning  that the  given address  range partially  overlaps
  *          with its beginning), then an internal assertion fails.
- *        - If the partially overlapped block _is_ the last block, then
+ *        - If the partially overlapped block _is_ the last block,  then
  *          it's state also remains unaltered, and this function returns
  *          the offset from `partrel_offset' to that block's start.
  *
  * If this function manages change any at least 1 block to `MPART_BLOCK_ST_CHNG'
- * when that block wasn't already marked as such, and if the associated file
- * implements the `mo_saveblocks' operator, then set the MPART_F_CHANGED flag.
- * If that flag wasn't set before, then add a new reference to `self' to the
+ * when that block  wasn't already marked  as such, and  if the associated  file
+ * implements the `mo_saveblocks' operator,  then set the MPART_F_CHANGED  flag.
+ * If  that flag wasn't  set before, then add  a new reference  to `self' to the
  * list of changed parts of the associated file.
  *
- * @return: * : The # of successfully committed bytes.
+ * @return: * : The   #   of  successfully   committed  bytes.
  *              Usually the same as `num_bytes', but see above */
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
@@ -935,7 +935,7 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
  * the containing block has transitioned to one of `MPART_BLOCK_ST_LOAD'
  * or `MPART_BLOCK_ST_CHNG')
  * The given `loc->mppl_size' is a hint as to how many consecutive blocks
- * this function should attempt to load, though it will only ever load a
+ * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
  * block containing `partrel_offset' */
 FUNDEF NONNULL((1, 3)) void FCALL
@@ -945,12 +945,12 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...);
 
-/* Directly return physical backing memory containing the byte `partrel_offset',
- * without looking at the associated block-state at all. The caller is responsible
- * to ensure that `MPART_ST_INMEM(self->mp_state)' before calling this function.
+/* Directly  return  physical  backing  memory  containing  the  byte  `partrel_offset',
+ * without  looking  at the  associated block-state  at all.  The caller  is responsible
+ * to   ensure  that  `MPART_ST_INMEM(self->mp_state)'  before  calling  this  function.
  * NOTE: The caller must be holding a lock to `self' (which is allowed to be a DMA lock)
  * NOTE: This function may also assume that at least the first byte (that
- *       is: the byte described by `partrel_offset') is in-bounds of the
+ *       is: the byte described by `partrel_offset') is in-bounds of  the
  *       given mem-part `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
@@ -960,10 +960,10 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 /* Mark all blocks that overlap with the given address range as CHNG.
  * For this purpose, the caller must ensure that:
  * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
- * If any of the blocks within the given range had yet to be marked as CHNG,
- * and the associated file is not anonymous, and implements the `mo_saveblocks'
- * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
- * then set the `MPART_F_CHANGED' flag and add `self' to the list of changed
+ * If  any  of  the  blocks  within  the  given  range  had  yet  to  be  marked  as  CHNG,
+ * and  the  associated  file  is   not  anonymous,  and  implements  the   `mo_saveblocks'
+ * operator, and  the  `MPART_F_CHANGED'  flag had  yet  to  be set  for  the  given  part,
+ * then  set  the  `MPART_F_CHANGED'   flag  and  add  `self'   to  the  list  of   changed
  * parts of its associated file.
  * NOTE: The caller must be holding a lock to `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -974,13 +974,13 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 
 
 
-/* Split the given mem-part `self' (which should be a member of `file')
- * after `offset' bytes from the start of backing file. For this purpose,
+/* Split  the given mem-part  `self' (which should be  a member of `file')
+ * after `offset' bytes from the start of backing file. For this  purpose,
  * the given `offset' should be `> mpart_getminaddr(self)', and both page-
  * and block-aligned.
- * @return: NULL: The given `offset' is greater than the size of the part
+ * @return: NULL: The  given `offset' is  greater than the  size of the part
  *                at the time the request was made. The caller should handle
- *                this case by re-checking for a missing part, and creating
+ *                this case by re-checking for a missing part, and  creating
  *                that part if it cannot be found.
  * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
 FUNDEF NONNULL((1)) REF struct mpart *FCALL
@@ -1010,13 +1010,13 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
  *   - pagedir_prepare_p(self, addr, size)     (was called)
  *
  * NOTES:
- *   - When mapping blocks not marked as `MPART_BLOCK_ST_CHNG',
+ *   - When  mapping  blocks not  marked  as `MPART_BLOCK_ST_CHNG',
  *     the `PAGEDIR_MAP_FWRITE' perm-flag is automatically cleared.
  *   - When mapping blocks marked as `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT',
- *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD' and `PAGEDIR_MAP_FWRITE' perm-
+ *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD'  and `PAGEDIR_MAP_FWRITE'  perm-
  *     flags are automatically cleared.
  *
- * @return: * : The union of permissions actually applied to all pages.
+ * @return: * : The union of permissions actually applied to all  pages.
  *              This may be used to figure out if write permissions were
  *              actually given to any of the requested pages. */
 FUNDEF NOBLOCK NONNULL((1)) u16
@@ -1035,7 +1035,7 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
                           u16 perm);
 
 /* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
- * matter what the block-status bitset of `self' might say of the matter. */
+ * matter  what the block-status  bitset of `self' might  say of the matter. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
                                   PAGEDIR_PAGEALIGNED void *addr,
@@ -1056,9 +1056,9 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
  *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the
  *    block loader from the associated file if necessary.
  *  - Afterwards, map the associated page to `addr' within
- *    the current page directory, using `perm'.
+ *    the   current   page   directory,   using    `perm'.
  * This function is used to implement handling of hinted
- * mem-nodes when encountered by the #PF handler. */
+ * mem-nodes   when  encountered  by  the  #PF  handler. */
 FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
@@ -1074,14 +1074,14 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 
 /* TODO: =============== BEGIN_DEPRECATED ===============
  *
- * Mem-part read/write functions don't include file-size/read-only/etc. checks.
- * Instead, all code should make use of `mfile_read' and `mfile_write' (etc...).
- * But note that these functions should only be removed from the public interface,
+ * Mem-part read/write  functions  don't  include  file-size/read-only/etc.  checks.
+ * Instead, all code  should make  use of `mfile_read'  and `mfile_write'  (etc...).
+ * But  note that these functions should only  be removed from the public interface,
  * as they're actually used in the implementation of `mfile_read' and `mfile_write'! */
 
 /* Read/write raw data to/from a given mem-part.
  * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
- *              is too small, or if the given `filepos' lies outside of the part's bounds. */
+ *              is too small, or if  the given `filepos' lies  outside of the part's  bounds. */
 FUNDEF NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -1091,7 +1091,7 @@ FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev(struct mpart *__restrict self, 
 FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_p(struct mpart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Same as the above, but these use an intermediate (stack) buffer for transfer.
+/* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
 FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -1100,11 +1100,11 @@ FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_readv(struct mpart *__restri
 FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restrict self, struct aio_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
-/* Perform I/O while holding a lock to `self'. If this isn't possible, then
- * unlock all locks, try to work towards that goal, and return `0'. If a
- * virtual buffer is given, and that buffer cannot be faulted (e.g.: it may
+/* Perform I/O while holding  a lock to `self'.  If this isn't possible,  then
+ * unlock all locks,  try to  work towards  that goal,  and return  `0'. If  a
+ * virtual buffer is given,  and that buffer cannot  be faulted (e.g.: it  may
  * be backed by VIO, or may even be faulty), return `(size_t)-1', after having
- * released all locks, which is indicative that the caller should re-attempt
+ * released all locks, which is  indicative that the caller should  re-attempt
  * the operation with buffered I/O.
  * Locking logic:
  *    IN:                   mpart_lock_acquired(self);
@@ -1142,7 +1142,7 @@ DATDEF struct atomic_lock mpart_all_lock;
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't already
- *       destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
+ *       destroyed,    and    has   the    `MPART_F_GLOBAL_REF'    flag   set. */
 DATDEF struct mpart_list mpart_all_list;
 
 /* TODO: Instead of having a dead- and pending- list, use a single, common lockop list! */
@@ -1154,17 +1154,17 @@ DATDEF struct mpart_list mpart_all_list;
 DATDEF struct mpart_slist mpart_all_dead;
 
 /* [0..n][CHAIN(_mp_newglobl)][lock(ATOMIC)]
- * Similar to `mpart_all_dead', but this is a list of references to parts
+ * Similar  to `mpart_all_dead', but  this is a list  of references to parts
  * that should be added to `mpart_all_list' once the lock becomes available.
  *
- * Because these are references, mpart_destroy() remains NOBLOCK, because
- * by the time a mem-part is destroyed, it is know that it can't be pending
+ * Because  these  are references,  mpart_destroy() remains  NOBLOCK, because
+ * by  the time a mem-part is destroyed, it  is know that it can't be pending
  * to-be added to the global list of parts anymore. (because it being pending
  * would have otherwise prevented it from being destroyed) */
 DATDEF struct REF mpart_slist mpart_all_pending;
 
 /* Add the given mpart `self' to the global list of parts.
- * This function will initialize `self->mp_allparts' */
+ * This  function   will  initialize   `self->mp_allparts' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self);
 

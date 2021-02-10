@@ -29,7 +29,7 @@ EMU86_INTELLISENSE_BEGIN(lods) {
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LODS
 case EMU86_OPCODE_ENCODE(0xac): {
 	/* AC     LODSB     For legacy mode, Load byte at address DS:(E)SI into AL.
-	 *                  For 64-bit mode load byte at address (R)SI into AL. */
+	 *                  For 64-bit mode  load byte  at address  (R)SI into  AL. */
 #if EMU86_EMULATE_CONFIG_WANT_LODS
 	u8 value;
 	EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH64,
@@ -49,9 +49,9 @@ case EMU86_OPCODE_ENCODE(0xac): {
 
 case EMU86_OPCODE_ENCODE(0xad): {
 	/*         AD     LODSW     For legacy mode, Load word at address DS:(E)SI into AX.
-	 *                          For 64-bit mode load word at address (R)SI into AX.
+	 *                          For 64-bit mode  load word  at address  (R)SI into  AX.
 	 *         AD     LODSD     For legacy mode, Load dword at address DS:(E)SI into EAX.
-	 *                          For 64-bit mode load dword at address (R)SI into EAX.
+	 *                          For 64-bit mode  load dword  at address  (R)SI into  EAX.
 	 * REX.W + AD     LODSQ     Load qword at address (R)SI into RAX. */
 #if EMU86_EMULATE_CONFIG_WANT_LODS
 	IF_64BIT(if (IS_64BIT()) {

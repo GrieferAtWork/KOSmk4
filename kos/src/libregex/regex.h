@@ -44,13 +44,13 @@ libregex_matches(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  uintptr_t flags);
 
-/* Same as `regex_matches()', but also store a pointer to the end of
+/* Same as `regex_matches()',  but also  store a  pointer to  the end  of
  * consumed data in `pdataend'. Because input data is formatted in UTF-8,
  * this position would only be equal to `data + return' if all input data
- * was ASCII only, meaning that in the universal case, this function
+ * was ASCII  only, meaning  that in  the universal  case, this  function
  * becomes useful when dealing with unicode data.
  * @param: pdataend:          Upon success (return != 0 && return != (size_t)-1),
- *                            save a pointer to the end of consumed data here.
+ *                            save a pointer  to the end  of consumed data  here.
  * @param: datalen:           Number of bytes (not characters) in data.
  * @param: patternlen:        Number of bytes (not characters) in pattern.
  * @return: * :               Number of characters (not bytes) matched in `data'.
@@ -63,7 +63,7 @@ libregex_matchesptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                     uintptr_t flags);
 
 
-/* Find the first instance matching `pattern' and store the
+/* Find the  first instance  matching  `pattern' and  store  the
  * character indices (not byte offsets) in `*pstart' and `*pend'
  * @return: 1:                Pattern was found.
  * @return: 0:                Pattern not found.

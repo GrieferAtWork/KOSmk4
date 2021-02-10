@@ -24,7 +24,7 @@
 
 
 /* Figure out if we should use libc's implementation of posix_spawn()
- * If not, we must implement _everything_ in headers! */
+ * If    not,   we   must    implement   _everything_   in   headers! */
 #if !(defined(__CRT_HAVE_posix_spawn) &&                       \
       defined(__CRT_HAVE_posix_spawnp) &&                      \
       defined(__CRT_HAVE_posix_spawnattr_init) &&              \
@@ -83,7 +83,7 @@
 #define __POSIX_SPAWN_USEVFORK      0x0040 /* Ignored */
 #ifdef __CRT_KOS
 #define __POSIX_SPAWN_NOEXECERR     0x1000 /* Don't propagate exec() error, and leave the
-                                            * child as unreaped with exit status `127' */
+                                            * child as  unreaped with  exit status  `127' */
 #endif /* __CRT_KOS */
 #elif defined(__CRT_CYG)
 #define __POSIX_SPAWN_RESETIDS      0x0001 /* Perform 2 calls `seteuid(getuid())' and `setegid(getgid())' */

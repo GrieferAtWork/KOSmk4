@@ -40,7 +40,7 @@ struct pipe {
 FUNDEF NOBLOCK void NOTHROW(KCALL pipe_destroy)(struct pipe *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct pipe, p_refcnt, pipe_destroy)
 
-/* The max pipe buffer size which may be set by an unprivileged process.
+/* The  max pipe buffer size which may  be set by an unprivileged process.
  * NOTE: This value can be read/written using `/proc/sys/fs/pipe-max-size' */
 DATDEF size_t pipe_max_bufsize_unprivileged;
 

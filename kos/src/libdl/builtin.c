@@ -232,7 +232,7 @@ libdl_dlopen(char const *filename, int mode) {
 		assert(result->dm_flags & RTLD_NODELETE);
 		/* Don't incref() the returned module for this case:
 		 *   - The main module itself was loaded with `RTLD_NODELETE', meaning
-		 *     that attempts to dlclose() that module are already no-ops to
+		 *     that attempts to  dlclose() that module  are already no-ops  to
 		 *     begin with. */
 		return result;
 	}
@@ -1536,8 +1536,8 @@ libdl_dlinflatesection(DlSection *sect, size_t *psize) {
 			/* Save the results. */
 			ATOMIC_STORE(sect->ds_csize, csize); /* This must be written first! */
 			if unlikely(!ATOMIC_CMPXCH(sect->ds_cdata, (void *)-1, cdata)) {
-				/* Race condition: Some other thread also did the inflate,
-				 * and now we've got the inflated data twice. - Fix this by
+				/* Race condition: Some  other thread also  did the  inflate,
+				 * and now we've got the inflated  data twice. - Fix this  by
 				 * simply deleting our duplicate and using the version that's
 				 * already stored in the section descriptor. */
 				sys_munmap(cdata, csize);
@@ -1674,7 +1674,7 @@ again:
 		size_t i, fini_array_size;
 		uintptr_t fini_func;
 		uintptr_t *fini_array_base;
-		/* Skip finalizers if the module was never
+		/* Skip finalizers  if the  module was  never
 		 * initialized or has already been finalized. */
 		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT /*| RTLD_NODELETE*/)) & RTLD_NOINIT)
 			continue;
@@ -1701,23 +1701,23 @@ again:
 		fini_array_size = 0;
 		for (i = 0; i < mod->dm_elf.de_dyncnt; ++i) {
 			switch (mod->dm_dynhdr[i].d_tag) {
-	
+
 			case DT_NULL:
 				goto done_dyntag;
-	
+
 			case DT_FINI:
 				fini_func = (uintptr_t)mod->dm_dynhdr[i].d_un.d_ptr;
 				break;
-	
+
 			case DT_FINI_ARRAY:
 				fini_array_base = (uintptr_t *)(mod->dm_loadaddr +
 				                                mod->dm_dynhdr[i].d_un.d_ptr);
 				break;
-	
+
 			case DT_FINI_ARRAYSZ:
 				fini_array_size = (size_t)mod->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
 				break;
-	
+
 			default: break;
 			}
 		}
@@ -2002,9 +2002,9 @@ DlModule_IteratePhdr(DlModule *__restrict self,
 }
 
 
-/* Enumerate all loaded modules, as well as information about them.
+/* Enumerate all loaded modules, as  well as information about  them.
  * Enumeration stops when `*CALLBACK' returns a non-zero value, which
- * will then also be returned by this function. Otherwise, `0' will
+ * will then also be returned  by this function. Otherwise, `0'  will
  * be returned after all modules have been enumerated. */
 INTERN int DLFCN_CC
 libdl_iterate_phdr(__dl_iterator_callback callback, void *arg) {
@@ -2149,8 +2149,8 @@ PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
 
 
 /* XXX: The function `dlsym_builtin()' is extremely large (3.41K bytes)!
- *      Instead of implementing it in C, we should use assembly
- *      to make use of `.wordrel' for encoding function pointers! */
+ *      Instead  of  implementing  it  in  C,  we  should  use  assembly
+ *      to make  use  of  `.wordrel'  for  encoding  function  pointers! */
 
 /* Return the address of a builtin function (e.g. `dlopen()') */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) void *FCALL
@@ -2657,8 +2657,8 @@ dlsec_builtin(char const *__restrict name) {
 }
 
 
-/* Return the address of a function `name' that is required by the RTLD core
- * and must be defined by one of the loaded libraries. - If no such function
+/* Return the address of a function `name'  that is required by the RTLD  core
+ * and  must be defined by one of the  loaded libraries. - If no such function
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL

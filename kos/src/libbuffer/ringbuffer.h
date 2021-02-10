@@ -34,8 +34,8 @@ DECL_BEGIN
 
 /* Read data from the given ring buffer.
  * When `ringbuffer_read()' is called, and no data is available, the function
- * will block until data becomes available, or the ringbuffer is closed.
- * NOTE: `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
+ * will block  until data  becomes available,  or the  ringbuffer is  closed.
+ * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()' when trying to acquire `self->rb_lock'
  * @return: * : The number of bytes read. */
 INTDEF __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
@@ -48,15 +48,15 @@ libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 
-/* Same as the read functions above, however `ringbuffer_write()' will block
- * when the ring buffer's size limit has been reached, and the buffer is still
+/* Same  as  the read  functions  above, however  `ringbuffer_write()'  will block
+ * when the ring buffer's  size limit has  been reached, and  the buffer is  still
  * full (and the buffer hasn't been closed), whereas `ringbuffer_write_nonblock()'
  * will not block in that scenario.
  * If the ring buffer is closed before all data could be written, the amount of
- * data (in bytes) that was written before it got closed is returned.
- * `ringbuffer_writesome()' is similar to `ringbuffer_write()', however will
- * return rather than block if some data has already been written, where-as
- * `ringbuffer_write()' will block indefinitely until all data was written, or
+ * data (in  bytes)  that  was  written  before  it  got  closed  is  returned.
+ * `ringbuffer_writesome()' is  similar to  `ringbuffer_write()', however  will
+ * return  rather than  block if some  data has already  been written, where-as
+ * `ringbuffer_write()' will block indefinitely until all data was written,  or
  * the ring buffer was closed.
  * NOTE: `ringbuffer_write_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()' when trying to acquire `self->rb_lock',
@@ -105,7 +105,7 @@ libringbuffer_skipread(struct ringbuffer *__restrict self,
 
 /* A combination of `ringbuffer_unread()' and `ringbuffer_skipread()' that can be used
  * to some-what implement support for SEEK_CUR for ring buffers, where negative values
- * for `offset' will call `ringbuffer_unread()', whilst positive values will call
+ * for `offset'  will call  `ringbuffer_unread()', whilst  positive values  will  call
  * `ringbuffer_skipread()'
  * The return value is always the new total number of read bytes since the last re-size. */
 INTDEF NONNULL((1)) size_t CC

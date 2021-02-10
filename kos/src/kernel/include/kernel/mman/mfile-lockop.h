@@ -49,7 +49,7 @@ struct mfile_postlockop {
 /* Callback prototype for mfile pending locked operations.
  * @return: NULL: Completed.
  * @return: * :   A descriptor for an operation to perform
- *                after the mfile-lock has been released. */
+ *                after the mfile-lock has been  released. */
 typedef NOBLOCK NONNULL((1, 2)) struct mfile_postlockop *
 /*NOTHROW*/ (FCALL *mfile_lockop_callback_t)(struct mfile_lockop *__restrict self,
                                              struct mfile *__restrict file);

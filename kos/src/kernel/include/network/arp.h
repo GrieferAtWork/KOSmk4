@@ -37,9 +37,9 @@ arp_routepacket(struct nic_device *__restrict dev,
                 size_t packet_size);
 
 /* Construct and return a mac address request packet.
- * NOTE: The caller should also make use of `nic_device_requireip()'
+ * NOTE: The caller should  also make  use of  `nic_device_requireip()'
  *       to ensure that the associated network peer descriptor has been
- *       allocated, and that its MAC field will be filled in once the
+ *       allocated, and that its MAC field  will be filled in once  the
  *       named device responds back to the given NIC. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 arp_makemacrequest(struct nic_device *__restrict dev, be32 ip);

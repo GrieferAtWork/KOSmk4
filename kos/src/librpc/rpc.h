@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /* >> rpc_service(2)
  * Service RPC callbacks (user-space variant of the kernel-space `task_serve()')
- * @return:  1: At least 1 RPC callback was serviced. (though this may
+ * @return:  1: At least 1 RPC callback  was serviced. (though this  may
  *              have been a kernel-level RPC that didn't actually affect
  *              user-space)
  * @return:  0: No RPC callbacks were served.
@@ -60,12 +60,12 @@ librpc_schedule_ex(pid_t target, syscall_ulong_t flags,
 
 /* >> rpc_schedule(3)
  * Portable wrapper for `rpc_schedule_ex()'
- * Schedule a simple RPC for execution on a given `target' thread.
- * The scheduled RPC assumes that `target' has a valid stack, while
- * taking a `callback' to-be invoked, which itself will take `argc'
- * pointer-sized arguments from the variable argument list of this
+ * Schedule a  simple RPC  for execution  on a  given `target'  thread.
+ * The scheduled RPC  assumes that  `target' has a  valid stack,  while
+ * taking  a `callback'  to-be invoked,  which itself  will take `argc'
+ * pointer-sized arguments  from the  variable  argument list  of  this
  * function. (When `RPC_SCHEDULE_FLAG_STATUSFUTEX' is given, `callback'
- * takes `argc - 1' arguments, with the first variable argument being
+ * takes `argc - 1' arguments, with  the first variable argument  being
  * a pointer to the status futex)
  * HINT: This function is entirely implemented using `rpc_schedule_ex()'
  * HINT: On i386, the RPC program used by this function is:
@@ -87,8 +87,8 @@ librpc_schedule_ex(pid_t target, syscall_ulong_t flags,
  *       >> [stftx %arg[3]]
  *       >> psh  %arg[(3|4) + n...]
  *       >> resume                           RPC_PROGRAM_OP_resume
- *       When `callback' returns, an internal wrapper is called that will restore
- *       registers, as well as optionally restart an interrupted system call,
+ *       When  `callback' returns, an  internal wrapper is  called that will restore
+ *       registers, as  well  as  optionally restart  an  interrupted  system  call,
  *       depending on the reason code loaded into `%ebx', before restoring registers
  *       using the data pointed to by `%ebp'
  *       With all of this in mind, the register state when librpc's internal RPC
@@ -111,7 +111,7 @@ librpc_schedule_ex(pid_t target, syscall_ulong_t flags,
  * @param: flags:    RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
  * @param: callback: The callback to invoke
  * @param: argc:     The number of arguments to-be passed to `callback'
- * @param: ...:      Arguments passed to `callback', potentially preceded by
+ * @param: ...:      Arguments passed to  `callback', potentially preceded  by
  *                   the status futex when the `RPC_SCHEDULE_FLAG_STATUSFUTEX'
  *                   flag was set.
  * @return: 1:  The specified `target' thread has already terminated.

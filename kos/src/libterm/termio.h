@@ -43,12 +43,12 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
  * @return: >= 0 : The sum of return values from calls to the associated printer
  *                 - The usual rules apply where negative return values are propagated immediately.
  *                 - Data printed when an I/O buffer is flushed is not added to this sum, however
- *                   negative values resulting from this case are propagated none-the-less.
- *                 - In cases where data is written to multiple printers (e.g. terminal_iwrite() w/ ECHO),
- *                   only the return value of the intended printer (in this case `t_iprint') is added to
- *                   the eventually returned sum. - Additionally, in this case, the lower of the return
+ *                   negative values  resulting  from  this case  are  propagated  none-the-less.
+ *                 - In cases where  data is written  to multiple printers  (e.g. terminal_iwrite() w/  ECHO),
+ *                   only the return  value of  the intended  printer (in this  case `t_iprint')  is added  to
+ *                   the  eventually  returned sum.  - Additionally,  in this  case, the  lower of  the return
  *                   value of the original call to `t_iprint' and num_bytes passed to it is used as the number
- *                   of bytes that would be echoed on-screen. (meaning that no characters will get echoed
+ *                   of bytes that  would be echoed  on-screen. (meaning  that no characters  will get  echoed
  *                   that can't be added to the input queue)
  * @return: < 0:   A format-printer returned a negative value
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */

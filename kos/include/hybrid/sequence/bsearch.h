@@ -53,14 +53,14 @@
  * >>     return -1; // Not found
  * >> }
  *
- * BSEARCH is a O(log(N)) search algorithm for pre-sorted arrays, making
- * it optimal in situations where pre-computed arrays must be searched.
+ * BSEARCH  is  a  O(log(N))  search  algorithm  for  pre-sorted  arrays,   making
+ * it  optimal  in  situations  where   pre-computed  arrays  must  be   searched.
  * This macro behaves the same as the libc function `bsearch(3)' / `bsearch_r(3)',
  * however unlike the libc function, this one doesn't require the use of a compare
- * predicate, rather allowing you to implement the entire search function in-line
+ * predicate,  rather allowing you to implement the entire search function in-line
  *
  * Upon success, the statement immediately following this macro will be executed.
- * Upon failure, that same statement is skipped as though pre-fixed by `if(0)'
+ * Upon failure,  that same statement  is skipped as  though pre-fixed by `if(0)'
  *
  * @param: index: [out] The matching vector index (on success; undefined on failure)
  * @param: vector: [in] The vector to-be searched
@@ -71,7 +71,7 @@
 	BSEARCHR(index, vector, count, field, field, key)
 
 
-/* Same as `BSEARCHR()', but on failure, the index where the element
+/* Same as  `BSEARCHR()',  but  on  failure, the  index  where  the  element
  * should have been placed into is stored in `lo' and `hi' (with `lo == hi') */
 #define BSEARCHR_EX(index, lo, hi, vector, count, field_lo, field_hi, key) \
 	for ((lo) = 0, (hi) = (count); (lo) < (hi);)                           \

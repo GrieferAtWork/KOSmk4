@@ -32,13 +32,13 @@
  *         -> Translate any such pending signal into `struct signalfd_siginfo',
  *            after removing it from the signal queue.
  *            Note that the checked domain is always PROCESS and THREAD of the
- *            calling thread, meaning that sharing signalfd handles between
- *            processes does _not_ actually share the pool of polled signals.
- *            This behavior is implied by the linux documentation:
+ *            calling thread, meaning  that sharing  signalfd handles  between
+ *            processes does _not_ actually share the pool of polled  signals.
+ *            This   behavior   is   implied  by   the   linux  documentation:
  *            ```
- *            After a fork(2), the child inherits a copy of the signalfd file
- *            descriptor.  A read(2) from the file descriptor in the child will
- *            return information about signals queued to the child.
+ *            After a fork(2), the child inherits a copy of the signalfd  file
+ *            descriptor. A read(2) from the file descriptor in the child will
+ *            return   information   about  signals   queued  to   the  child.
  *            ```
  *            So in other words: It always polls your own pending signals!
  * poll(): >> task_connect_for_poll(PROCESS->SIGQUEUE->AVAIL);

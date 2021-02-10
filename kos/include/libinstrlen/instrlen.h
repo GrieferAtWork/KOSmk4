@@ -50,7 +50,7 @@ __NOTHROW_NCX(LIBINSTRLEN_CC instruction_length)(void const *pc, instrlen_isa_t 
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
- * assuming that `pc' points to the start of another instruction.
+ * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
@@ -64,7 +64,7 @@ __NOTHROW_NCX(LIBINSTRLEN_CC instruction_pred)(void const *pc, instrlen_isa_t is
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 
 /* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
- * Other exceptions are propagated normally (which could happen due to VIO access emulation)
+ * Other  exceptions are propagated normally (which could  happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *
 (LIBINSTRLEN_CC *PINSTRUCTION_SUCC_NX)(void const *pc, instrlen_isa_t isa);

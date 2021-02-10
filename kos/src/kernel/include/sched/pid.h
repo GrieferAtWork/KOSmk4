@@ -52,7 +52,7 @@ AWREF(task_awref, task);
 
 struct taskpid {
 	/* The `struct taskpid' acts as a sort-of weak
-	 * reference to a task, using a binding:
+	 * reference  to  a  task,  using  a  binding:
 	 *
 	 *  <struct TASK>                   <struct taskpid>
 	 *   THIS_TASKPID[1..1]  <------>   tp_thread[0..1]
@@ -72,8 +72,8 @@ struct taskpid {
 	                                              *    - Chain of sibling threads spawned within the same process
 	                                              *  - In either case, the link may be unbound if `detach()' was called. */
 	REF struct pidns               *tp_pidns;    /* [1..1][const] The associated PID namespace. */
-	COMPILER_FLEXIBLE_ARRAY(upid_t, tp_pids);    /* [const][tp_pidns->pn_indirection + 1] This task's PIDs within all
-	                                              * of the different PID namespaces that were used to bring it forth.
+	COMPILER_FLEXIBLE_ARRAY(upid_t, tp_pids);    /* [const][tp_pidns->pn_indirection + 1] This task's  PIDs within  all
+	                                              * of the different PID namespaces that  were used to bring it  forth.
 	                                              * Usually, this is only 1 (the root PID namespace), which is also the
 	                                              * one who's PID appears in system logs. */
 };
@@ -114,7 +114,7 @@ FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
 
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
- * NOTE: `NULL' (though assume UNDEFINED if the choice comes up) for kernel threads. */
+ * NOTE: `NULL' (though  assume UNDEFINED  if the choice  comes up)  for kernel  threads. */
 DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
 #define THIS_TASKPID PERTASK_GET(this_taskpid)
 #define THIS_PIDNS   (PERTASK_GET(this_taskpid)->tp_pidns)
@@ -129,7 +129,7 @@ struct sigqueue {
 	 *       atomic append operations. */
 	struct sig             sq_newsig; /* Signal send once for every signal that is added to `sq_queue'. */
 	struct sigqueue_entry *sq_queue;  /* [0..1][owned][lock(sq_lock)] List of queued signals.
-	                                   * Set to `SIGQUEUE_SQ_QUEUE_TERMINATED' when the
+	                                   * Set  to   `SIGQUEUE_SQ_QUEUE_TERMINATED'  when   the
 	                                   * thread/process has terminated. */
 #define SIGQUEUE_SQ_QUEUE_TERMINATED ((struct sigqueue_entry *)-1)
 };
@@ -176,11 +176,11 @@ struct taskgroup {
 	                                                      * When this thread terminates, all other threads within the process also die.
 	                                                      * @assume(tg_process == FORTASK(tg_process,this_taskgroup).tg_process)
 	                                                      * NOTE:
-	                                                      *   - When set to `THIS_TASK', the calling thread is a process leader,
-	                                                      *     also meaning that the `tp_siblings' chain within its PID structure
+	                                                      *   - When  set to `THIS_TASK',  the calling thread  is a process leader,
+	                                                      *     also meaning that the `tp_siblings' chain within its PID  structure
 	                                                      *     is set up to form a chain of all other sibling processes within the
 	                                                      *     same process group.
-	                                                      *   - When set to something different, the calling thread is a worker
+	                                                      *   - When  set  to something  different, the  calling  thread is  a worker
 	                                                      *     thread, meaning that the `tp_siblings' chain within its PID structure
 	                                                      *     is apart of a chain of other worker threads.
 	                                                      *   - Any kernel thread is always its own process. */
@@ -193,10 +193,10 @@ struct taskgroup {
 	union {
 #define TASKGROUP_TG_PROC_THREADS_TERMINATED ((REF struct taskpid *)-1)
 		struct taskpid_list      tg_proc_threads;        /* [0..1][lock(tg_proc_threads_lock)][valid_if(tg_process == THIS_TASK)]
-		                                                  * Chain of threads & child processes of this process (excluding the calling (aka. leader) thread)
+		                                                  * Chain  of  threads &  child processes  of this  process  (excluding the  calling (aka.  leader) thread)
 		                                                  * Child processes are removed from this chain, either by being `detach(2)'ed, or by being `wait(2)'ed on.
 		                                                  * NOTE: This chain is set to `TASKGROUP_TG_PROC_THREADS_TERMINATED' once the associated
-		                                                  *       process terminates, in order to prevent any new threads from being added.
+		                                                  *       process  terminates,  in order  to prevent  any new  threads from  being added.
 		                                                  * NOTE: When a thread is detached, the `tg_thread_detached' field is updated */
 #define FOREACH_taskgroup__proc_threads(taskpid_elem, group)                                              \
 	if (((taskpid_elem) = LIST_FIRST(&(group)->tg_proc_threads)) == TASKGROUP_TG_PROC_THREADS_TERMINATED) \
@@ -208,7 +208,7 @@ struct taskgroup {
 #define TASKGROUP_TG_THREAD_DETACHED_TERMINATED 2 /* The thread has terminated */
 		uintptr_t                tg_thread_detached;     /* [valid_if(tg_process != THIS_TASK)] Thread detach state (one of `TASKGROUP_TG_THREAD_DETACHED_*') */
 	};
-	struct sig                   tg_proc_threads_change; /* Broadcast when one of the threads (or child processes) of this process changes state.
+	struct sig                   tg_proc_threads_change; /* Broadcast when one of the  threads (or child processes)  of this process changes  state.
 	                                                      * For this purpose, the changed child has previously set its `tp_status' field to describe
 	                                                      * its new state.
 	                                                      * Also: Broadcasts are performed through `sig_altbroadcast()', with the sender set to the
@@ -216,10 +216,10 @@ struct taskgroup {
 	struct atomic_rwlock         tg_proc_parent_lock;    /* Lock for `tg_proc_parent' */
 	WEAK struct task            *tg_proc_parent;         /* [0..1][const] The parent of this process.
 	                                                      * @assume(tg_proc_parent == FORTASK(tg_proc_parent,this_taskgroup).tg_process)
-	                                                      * In the event that this process has a parent, `THIS_TASKPID->tp_siblings'
-	                                                      * is a link within `tg_proc_parent->tp_thread->tg_proc_threads'.
+	                                                      * In  the event  that this  process has  a parent, `THIS_TASKPID->tp_siblings'
+	                                                      * is    a     link    within     `tg_proc_parent->tp_thread->tg_proc_threads'.
 	                                                      * In the event that the parent process terminates before its child, this field
-	                                                      * gets set to `NULL', at which point `THIS_TASKPID->tp_siblings' is unbound. */
+	                                                      * gets set to `NULL', at  which point `THIS_TASKPID->tp_siblings' is  unbound. */
 	struct atomic_rwlock         tg_proc_group_lock;     /* Lock for `tg_proc_group' */
 	REF struct taskpid          *tg_proc_group;          /* [1..1][lock(tg_proc_group_lock)]
 	                                                      * @assume(tg_proc_procgroup == FORTASK(taskpid_gettask(tg_proc_procgroup), this_taskgroup).tg_proc_procgroup)
@@ -233,7 +233,7 @@ struct taskgroup {
 	struct process_sigqueue      tg_proc_signals;        /* Pending signals that are being delivered to this process. */
 	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
-	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this process group (excluding the calling process)
+	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this  process group (excluding the calling  process)
 	                                                      * NOTE: This list of processes is chained using the `tg_proc_group_siblings' list node. */
 #define KEY__this_taskgroup__tg_proc_group_siblings(thread) \
 	FORTASK(thread, this_taskgroup).tg_proc_group_siblings
@@ -245,7 +245,7 @@ struct taskgroup {
 	                                                      * The session leader of the this process group.
 	                                                      * When set to `THIS_TASKPID', then the calling thread is that leader. */
 	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
-	struct ttybase_device_axref  tg_ctty;                /* [0..1] The controlling terminal (/dev/tty) associated with this session
+	struct ttybase_device_axref  tg_ctty;                /* [0..1] The controlling terminal  (/dev/tty) associated  with this  session
 	                                                      * When non-NULL, `tg_ctty->t_cproc == THIS_TASKPID' (for the session leader) */
 };
 
@@ -255,7 +255,7 @@ DATDEF ATTR_PERTASK struct taskgroup this_taskgroup;
 
 #ifdef __INTELLISENSE__
 /* Returns a pointer to the process associated with the calling/given thread.
- * NOTE: These functions return `NULL' for kernel-space thread! */
+ * NOTE:   These   functions   return   `NULL'   for   kernel-space   thread! */
 WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct task *KCALL task_getprocess(void);
 WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct taskpid *KCALL task_getprocesspid(void);
 WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct task *KCALL task_getprocess_of(struct task const *__restrict thread);
@@ -267,7 +267,7 @@ WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct taskpid *KCALL task_g
 #define task_getprocesspid_of(thread)  FORTASK(task_getprocess_of(thread), this_taskpid)
 #endif /* !__INTELLISENSE__ */
 
-/* Returns a reference to the parent of the calling/given process.
+/* Returns  a  reference  to  the  parent  of  the  calling/given process.
  * If that parent has already terminated and has already been detach(2)ed,
  * or wait(2)ed, return `NULL' instead. */
 LOCAL WUNUSED REF struct task *KCALL task_getprocessparent(void) THROWS(E_WOULDBLOCK);
@@ -311,7 +311,7 @@ LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessgrou
 /* Return a reference to the session leader of the process group of the calling/given thread.
  * NOTE: After the process group leader has died, it's PID implicitly becomes the session leader PID.
  *       This way, code can be simplified since `task_getsessionleaderpid()' always returns non-NULL,
- *       and always returns a dead taskpid once either the current session, or the current process
+ *       and always returns a dead  taskpid once either the current  session, or the current  process
  *       group have exited. */
 LOCAL WUNUSED REF struct task *KCALL task_getsessionleader(void) THROWS(E_WOULDBLOCK);
 LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
@@ -337,7 +337,7 @@ LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_issessionleader)(void);
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread);
 
 
-/* Return the TID (thread id) / PID (process id /
+/* Return  the  TID  (thread  id)  /  PID  (process  id /
  * thread id of the process leader) of the calling thread
  * The returned IDS are either relative to the task's own
  * PID namespace, or to the ROOT pid namespace.
@@ -395,7 +395,7 @@ task_setprocessgroupleader(struct task *thread, struct task *leader,
                            /*OUT,OPT*/ REF struct taskpid **pold_group_leader DFL(__NULLPTR),
                            /*OUT,OPT*/ REF struct taskpid **pnew_group_leader DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
-#define TASK_SETPROCESSGROUPLEADER_SUCCESS 0 /* Successfully added `task_getprocess_of(thread)' to the process group
+#define TASK_SETPROCESSGROUPLEADER_SUCCESS 0 /* Successfully  added   `task_getprocess_of(thread)'  to   the  process   group
                                               * that `leader' is apart of (which is `task_getprocessgroupleader_of(leader)'),
                                               * or make `thread' become its own process group when
                                               * `task_getprocess_of(thread) == task_getprocess_of(leader)' */
@@ -406,11 +406,11 @@ task_setprocessgroupleader(struct task *thread, struct task *leader,
 /* Set the session leader for the process group of the given thread.
  * NOTE: If `task_getprocess_of(thread)' isn't already the leader of its own process group
  *      (`task_isprocessgroupleader_p(task_getprocess_of(thread))' is false), a call to
- *       this function also implies `task_setprocessgroupleader(thread,thread)', meaning
+ *       this  function  also implies  `task_setprocessgroupleader(thread,thread)', meaning
  *       that `task_getprocess_of(thread)' is turned into its own process group before that
  *       group is added to the session of `leader', or made to become a new session
  * @param: pold_group_leader:   When non-NULL store a reference to the old process group leader of `task_getprocess_of(thread)'.
- *                              NOTE: The new process group leader of `thread' is always `task_getprocess_of(thread)',
+ *                              NOTE:  The  new  process  group  leader  of  `thread'  is  always  `task_getprocess_of(thread)',
  *                                    since only the leader of a process group can dictate the associated session.
  * @param: pold_session_leader: When non-NULL store a reference to the old session leader of `task_getprocess_of(thread)'.
  * @param: pnew_session_leader: When non-NULL store a reference to the new session leader of `task_getprocess_of(thread)'.
@@ -421,13 +421,13 @@ task_setsessionleader(struct task *thread, struct task *leader,
                       /*OUT,OPT*/ REF struct taskpid **pold_session_leader DFL(__NULLPTR),
                       /*OUT,OPT*/ REF struct taskpid **pnew_session_leader DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
-#define TASK_SETSESSIONLEADER_SUCCESS 0 /* Successfully added `task_getprocess_of(thread)' (which at that
+#define TASK_SETSESSIONLEADER_SUCCESS 0 /* Successfully   added    `task_getprocess_of(thread)'    (which    at    that
                                          * point is guarantied to be identical to `task_getprocessgroupleader(thread)')
                                          * to the session that `leader' is apart of (which is
                                          * `task_getsessionleader_of(leader)'), or make `thread' become a new session when
                                          * `task_getprocessgroupleader(thread) == task_getprocessgroupleader(leader)' */
 #define TASK_SETSESSIONLEADER_LEADER  1 /* The given `thread' is already the leader of a different session than `leader'.
-                                         * -> Once promoted to a session leader, a process group cannot back out and no longer be one!  */
+                                         * -> Once promoted to a session leader, a process group cannot back out and no longer be one! */
 
 
 
@@ -446,9 +446,9 @@ struct pidns_entry {
 
 struct pidns {
 	WEAK refcnt_t        pn_refcnt;      /* Reference counter. */
-	size_t               pn_indirection; /* [const] Namespace indirection of this PID NS.
-	                                      * This also describes the number of PIDs that a
-	                                      * thread that is added to this namespace will
+	size_t               pn_indirection; /* [const] Namespace indirection  of  this  PID  NS.
+	                                      * This also  describes the  number of  PIDs that  a
+	                                      * thread  that  is  added  to  this  namespace will
 	                                      * gain (+1), from this namespace and all namespaces
 	                                      * that are reachable from `pn_parent'. */
 	REF struct pidns    *pn_parent;      /* [0..1][const]
@@ -470,7 +470,7 @@ struct pidns {
 
 #define PIDNS_FIRST_NONRESERVED_PID 2 /* First PID that isn't reserved. */
 
-/* When `pn_nextpid' >= this value, start recycling PIDs.
+/* When  `pn_nextpid'  >=  this value,  start  recycling PIDs.
  * This value can be controlled via `/proc/sys/kernel/pid_max' */
 DATDEF upid_t pid_recycle_threshold;
 
@@ -555,14 +555,14 @@ FUNDEF WUNUSED NONNULL((1)) REF struct task *
 NOTHROW(KCALL pidns_trylookup_task_locked)(struct pidns *__restrict self, upid_t pid);
 
 
-/* Allocate a `struct taskpid' for `self' (which must not have been
+/* Allocate a `struct taskpid' for `self' (which must not have  been
  * started yet, or have its taskpid already allocated), and register
  * that task within the given pidns `ns'
  * This function should be called after `task_alloc()', but before `task_start()'
- * WARNING: This function may only be called _ONCE_ for each task!
- * @param: ns_pid: The PID to try to assign to `self' within the namespace.
- *                 When ZERO(0), or already in use, sequentially generate IDs
- *                 Also note that this PID is only set for `self' in `ns'.
+ * WARNING:  This   function  may   only  be   called  _ONCE_   for  each   task!
+ * @param: ns_pid: The  PID  to  try to  assign  to `self'  within  the namespace.
+ *                 When ZERO(0),  or already  in  use, sequentially  generate  IDs
+ *                 Also note  that  this PID  is  only  set for  `self'  in  `ns'.
  *                 All underlying namespaces _always_ have their PIDs sequentially
  *                 generated.
  * @return: * : Always re-returns `self' */
@@ -576,7 +576,7 @@ FUNDEF ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 
 /* Initialize the `self' to be a member of the same process which `leader' is apart of.
  * NOTE: This function or `task_setprocess()' may only be called once for any given thread.
- *       Also note that these functions must _NOT_ be called for kernel threads!
+ *       Also  note  that  these  functions  must  _NOT_  be  called  for  kernel  threads!
  * NOTE: This function must be called _AFTER_ `task_setpid(self)' has already been invoked!
  * @return: true:  Successfully initialized `self' as a thread within the same process as `leader'
  * @return: false: The process that `leader' is apart of has already terminated. */
@@ -586,17 +586,17 @@ FUNDEF NONNULL((1, 2)) bool
 		THROWS(E_WOULDBLOCK);
 
 /* Initialize the `self' to be the leader of a new process, using `parent' as leader.
- * When `parent' is `NULL', initialize `self' as a detached process.
+ * When   `parent'   is   `NULL',   initialize   `self'   as   a   detached  process.
  * @param: parent:  The parent of the process
- * @param: group:   A thread apart of some process group that `self' should be apart of.
+ * @param: group:   A thread  apart  of  some process  group  that  `self' should  be  apart  of.
  *                  When `NULL' or equal to `self', initialize `self' as a its own process group.
- *                  In this case, the process group will be set to be apart of the session that
- *                  the given `session' is apart of, or `self' in case `session' is `NULL' or
+ *                  In  this case, the process group will be  set to be apart of the session that
+ *                  the given `session' is  apart of, or  `self' in case  `session' is `NULL'  or
  *                  equal to `self'.
  * @param: session: Some thread apart of the a session that a new process group should be made
  *                  apart of.
  * NOTE: This function or `task_setthread()' may only be called once for any given thread.
- *       Also note that these functions must _NOT_ be called for kernel threads!
+ *       Also note  that  these  functions  must  _NOT_  be  called  for  kernel  threads!
  * NOTE: This function must be called _AFTER_ `task_setpid(self)' has already been invoked! */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) struct task *
 (KCALL task_setprocess)(struct task *__restrict self,

@@ -107,10 +107,10 @@ typedef NONNULL((2, 3)) ssize_t
                                bool annotated);
 
 /* Invoke `cb()' for all traced branches from all drivers, as well as the kernel core.
- * NOTE: Branch enumeration is sorted by individual drivers, in that all branches of
+ * NOTE: Branch  enumeration is sorted  by individual drivers, in  that all branches of
  *       one driver are enumerated before any branch from another driver is enumerated.
  *       The order in which branches of individual drivers are enumerated is undefined,
- *       however any branch will only ever be enumerated once. Similarly, the order in
+ *       however any branch will only ever be enumerated once. Similarly, the order  in
  *       which individual drivers are enumerated is also undefined.
  * @param: cb:    The callback to-be invoked.
  * @param: arg:   Argument passed to `cb()'

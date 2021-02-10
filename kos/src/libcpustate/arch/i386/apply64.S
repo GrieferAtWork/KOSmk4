@@ -100,7 +100,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_scpustate_rsp, libcpu_apply_scpustate_rsp)
 
 .macro wrgs_keepbase reg:req, clobber=%rcx
 #ifdef __KERNEL__
-	/* Special handling required: Must set the new %gs value
+	/* Special handling  required: Must  set  the new  %gs  value
 	 * without trashing `%gs.base'. - Same as `__wrgs_keepbase()' */
 	pushfq
 	cli

@@ -99,7 +99,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 	struct my_struct foo;
 
 	/* Decode json input by use of the codec defined above, and
-	 * store the results in an associated `struct my_struct' */
+	 * store the  results in  an associated  `struct my_struct' */
 	json_parser_init(&parser, json_input, COMPILER_STREND(json_input));
 	memset(&foo, 0xcc, sizeof(foo));
 	error = json_decode(&parser, codec, &foo, NULL);

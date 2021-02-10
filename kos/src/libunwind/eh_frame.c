@@ -48,7 +48,7 @@
 #include <dlfcn.h>
 #endif /* !__KERNEL__ */
 
-/* Relaxed CFA rules aren't currently needed (and as
+/* Relaxed  CFA rules aren't currently needed (and as
  * a matter of fact: aren't anything that you'll find
  * apart of any standard. - I only though this is how
  * CFA was supposed to work at one point...) */
@@ -269,11 +269,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 
 
 
-/* Similar to `unwind_fde_exec()', but used to calculate the
- * unwind rule for `dw_regno' at the given text location.
- * This is used to implement unwinding for uncommon registers,
- * since `unwind_fde_exec()' will not already calculate these
- * during the first pass (thus keeping down the memory requirements
+/* Similar  to  `unwind_fde_exec()',   but  used   to  calculate   the
+ * unwind  rule   for  `dw_regno'   at   the  given   text   location.
+ * This  is  used  to  implement  unwinding  for  uncommon  registers,
+ * since  `unwind_fde_exec()'   will  not   already  calculate   these
+ * during the first  pass (thus keeping  down the memory  requirements
  * imposed on the one responsible for allocating `unwind_cfa_state_t')
  * @param: self:   The FDE to execute in search of `absolute_pc'
  * @param: result: The CFA register result controller to-be filled.
@@ -288,10 +288,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                       unwind_regno_t dw_regno,
                                       void const *absolute_pc) {
 	unsigned int error;
-	/* `libuw_unwind_fde_exec_rule_until()' won't initialize
+	/* `libuw_unwind_fde_exec_rule_until()'  won't  initialize
 	 * the result, so pre-initialize it to an undefined state. */
 	result->cr_rule = DW_CFA_register_rule_undefined;
-	/* Start out by scanning the evaluation-body, as it's most
+	/* Start out by  scanning the evaluation-body,  as it's  most
 	 * likely to contain the unwind rule requested by the caller. */
 	error = libuw_unwind_fde_exec_rule_until(self,
 	                                         self->f_evaltext,
@@ -617,7 +617,7 @@ err_unknown_instruction:
 }
 
 /* Find the end (that is: a pointer after the `DW_CFA_KOS_endcapsule' opcode)
- * of the capsule containing `cfa_reader'. This function accounts for nested
+ * of the capsule containing `cfa_reader'. This function accounts for  nested
  * capsules by essentially search for the first unmatched endcapsule opcode.
  * @return: READ_CFA_INSTRUCTION_ENDCAPSULE: Success
  * @return: * :                              Error */
@@ -677,7 +677,7 @@ NOTHROW_NCX(CC unwind_capsules)(unwind_fde_t const *__restrict self,
 		memcpy(&capsule_start, &capsule_end, sizeof(struct cfa_parser));
 	}
 	/* At this point, we've found the outer-most capsule that `absolute_pc' is apart of.
-	 * With that in mind, if `landingpad_pc' is also apart of this capsule, then we
+	 * With that in  mind, if `landingpad_pc'  is also  apart of this  capsule, then  we
 	 * must narrow down our capsule range:
 	 * >> capsule_start:[
 	 * >>                   [
@@ -698,7 +698,7 @@ NOTHROW_NCX(CC unwind_capsules)(unwind_fde_t const *__restrict self,
 	 * >>                       except_pc
 	 * >>                   ]
 	 * >> capsule_end:  ]
-	 * In this case, we mustn't unwind anything before jumping to `except_pc', which
+	 * In  this case,  we mustn't unwind  anything before jumping  to `except_pc', which
 	 * is a case we can easily detect when ending up with a capsule range that no longer
 	 * includes `absolute_pc' */
 	while ((uintptr_t)landingpad_pc >= capsule_start.cp_pc &&
@@ -718,13 +718,13 @@ no_capsules:
 			if ((uintptr_t)absolute_pc >= capsule_start.cp_pc &&
 			    (uintptr_t)absolute_pc < capsule_end.cp_pc)
 				break; /* Found the next more-inner capsule that contains the exception PC */
-			/* This capsule doesn't contain our exception PC anymore, but that doesn't
+			/* This capsule doesn't  contain our  exception PC anymore,  but that  doesn't
 			 * necessarily mean that there's no sibling capsule that might contain our PC! */
 			memcpy(&capsule_start, &capsule_end, sizeof(struct cfa_parser));
 		}
 	}
-	/* All right! at this point we've found the range of capsules we were looking for,
-	 * such that the exception PC is located within the capsule range, but the landing-pad
+	/* All right! at  this point we've  found the range  of capsules we  were looking  for,
+	 * such  that the exception PC is located within the capsule range, but the landing-pad
 	 * PC is located outside of it. With this in mind, we must now execute CFA instructions
 	 * from within this range in order to build the unwind rule table. */
 	assert((uintptr_t)absolute_pc >= capsule_start.cp_pc &&
@@ -778,16 +778,16 @@ no_capsules:
 			                                            absolute_pc);
 		}
 		/* When `order' is non-zero, then we know that custom rules were defined,
-		 * and as a consequence, later code must apply register transformations.
+		 * and as a consequence, later code must apply register  transformations.
 		 *
 		 * We could technically also just blindly assign `1' (or some other non-
-		 * zero value) here, but since we already have this `order' variable
+		 * zero value) here,  but since  we already have  this `order'  variable
 		 * around, we might as well do better and re-use that one here! */
 		result->cs_has_capsules = order;
 	}
 	return error;
 err:
-	/* If we get here due to a specific instruction, then
+	/* If  we  get here  due  to a  specific  instruction, then
 	 * that instruction wasn't allowed wherever it appeared at. */
 	if (error >= (uintptr_t)-16)
 		error = UNWIND_CFA_ILLEGAL_INSTRUCTION;
@@ -797,11 +797,11 @@ err:
 
 
 
-/* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
- * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
- * exceptions which originates from `ABSOLUTE_PC' within the current cfi-proc.
- * This function is calculates the relative CFI-capsule offset between `ABSOLUTE_PC',
- * and `LANDINGPAD_PC', as well as the GNU-argsize adjustment. Once this is done,
+/* Behaves  similar  to `unwind_fde_exec()',  but must  be used  to calculate  the CFA
+ * for the purpose  of jumping  to a  custom `LANDINGPAD_PC'  as part  of handling  an
+ * exceptions  which  originates  from  `ABSOLUTE_PC'  within  the  current  cfi-proc.
+ * This function is calculates the relative CFI-capsule offset between  `ABSOLUTE_PC',
+ * and `LANDINGPAD_PC', as  well as  the GNU-argsize  adjustment. Once  this is  done,
  * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
  * onto some given register state, which may then be used to resume execution.
  * @param: SELF:   The FDE to execute in search of `__absolute_pc'
@@ -835,10 +835,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
 	        "absolute_pc     = %p\n",
 	        self->f_pcstart, self->f_pcend, absolute_pc);
 	/* First round: Calculate the GNU adjustment, but assume there's not going
-	 *              to be any CFI capsules (at least not for `absolute_pc')
-	 *              If we end up with a non-zero `capsule_recursion' in the
-	 *              end, then we know we have a lot of work ahead of us in
-	 *              order to figure out where exactly what is affected by the
+	 *              to be any  CFI capsules (at  least not for  `absolute_pc')
+	 *              If we end  up with a  non-zero `capsule_recursion' in  the
+	 *              end, then we know  we have a  lot of work  ahead of us  in
+	 *              order  to figure out where exactly what is affected by the
 	 *              capsule. */
 	current_pc = (uintptr_t)self->f_pcstart;
 	while (cfa_reader < cfa_end && current_pc <= (uintptr_t)absolute_pc) {
@@ -1036,7 +1036,7 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
                                unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int error;
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
-	/* Quick check: If no capsules were used, then only
+	/* Quick check: If  no capsules were used, then only
 	 *              apply the LPA (LandingPadAdjustment) */
 	if unlikely(self->cs_has_capsules) {
 		error = _unwind_cfa_landing_apply(&self->cs_state, fde, absolute_pc,

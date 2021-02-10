@@ -27,10 +27,10 @@
 
 #include "cfi.h"
 
-/* The `.eh_frame' section shall contain 1 or more Call Frame Information (CFI) records.
+/* The `.eh_frame' section shall  contain 1 or more  Call Frame Information (CFI)  records.
  * The number of records present shall be determined by size of the section as contained in
- * the section header. Each CFI record contains a Common Information Entry (CIE) record
- * followed by 1 or more Frame Description Entry (FDE) records. Both CIEs and FDEs
+ * the section header.  Each CFI record  contains a Common  Information Entry (CIE)  record
+ * followed  by  1  or more  Frame  Description Entry  (FDE)  records. Both  CIEs  and FDEs
  * shall be aligned to an addressing unit sized boundary. */
 
 
@@ -46,12 +46,12 @@
 #endif /* !... */
 
 
-/* Figure out if libunwind (should) support CFI capsules.
+/* Figure  out  if  libunwind  (should)  support  CFI capsules.
  * Since CFI capsules are a KOS extension, only support them on
- * KOS (for now, though since they don't need kernel support,
- * nothing is stopping other operating system from supporting
+ * KOS (for now, though since  they don't need kernel  support,
+ * nothing  is stopping other  operating system from supporting
  * them as well).
- * Additionally, don't enable them within the KOS kernel, since
+ * Additionally, don't enable them within the KOS kernel,  since
  * capsules add a small amount of overhead to exception handling
  * that isn't actually needed/used within the KOS kernel (though
  * this too can be changed at any point) */
@@ -69,8 +69,8 @@ __DECL_BEGIN
 
 
 /* Index ordering type used for keeping track of the order
- * in which individual registers should be unwound.
- * While not actually specified by the DWARF standard, KOS will
+ * in   which  individual  registers  should  be  unwound.
+ * While not actually specified by  the DWARF standard, KOS  will
  * follow a strict unwind order where register rules defined last
  * will get executed before rules defined earlier. */
 #if SIZEOF_UNWIND_ORDER_INDEX_T == 4
@@ -108,8 +108,8 @@ typedef struct unwind_fde_struct {
 } unwind_fde_t;
 
 
-/* Load the next eh_frame function descriptor from `*PEH_FRAME_READER', which
- * must either be a pointer to the start of the `.eh_frame' section, or be the
+/* Load  the   next  eh_frame   function   descriptor  from   `*PEH_FRAME_READER',   which
+ * must  either  be  a  pointer  to  the start  of  the  `.eh_frame'  section,  or  be the
  * value written back to `*PEH_FRAME_READER' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
@@ -127,7 +127,7 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_fr
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 /* Same as `unwind_fde_load()', but quickly search for and return the
- * FDE descriptor containing the given `ABSOLUTE_PC' text address.
+ * FDE descriptor containing  the given  `ABSOLUTE_PC' text  address.
  * @assume(!return || RESULT->f_pcstart <= ABSOLUTE_PC);
  * @assume(!return || RESULT->f_pcend > ABSOLUTE_PC);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
@@ -154,7 +154,7 @@ typedef struct unwind_cfa_register_struct {
 	union {
 		__byte_t const   *cr_expr;  /* [valid_if(cr_rule == rule_expression || cr_rule == rule_val_expression)]
 		                             * [1..1] Expression.
-		                             * NOTE: This pointer is directed at a `dwarf_uleb128_t',
+		                             * NOTE: This  pointer  is  directed  at  a  `dwarf_uleb128_t',
 		                             *       describing the amount of types that follow immediately
 		                             *       after, containing expression text. */
 		__intptr_t        cr_value; /* [valid_if(cr_rule != rule_expression && cr_rule != rule_val_expression)]
@@ -177,7 +177,7 @@ typedef struct unwind_cfa_value_struct {
 	union {
 		__byte_t const *cv_expr;  /* [valid_if(cv_type == UNWIND_CFA_VALUE_EXPRESSION)][1..1] Expression.
 		                           * NOTE: This pointer is directed at a `uleb128', describing
-		                           *       the amount of types that follow immediately after,
+		                           *       the  amount of types that follow immediately after,
 		                           *       containing expression text. */
 		__intptr_t      cv_value; /* [valid_if(cv_type == UNWIND_CFA_VALUE_REGISTER)]
 		                           * Address offset (added to the value of `cv_reg') */
@@ -195,8 +195,8 @@ typedef struct unwind_cfa_state_struct {
 } unwind_cfa_state_t;
 
 typedef struct unwind_cfa_sigframe_state_struct {
-	/* WARNING: Do not use the members of this struct directly!
-	 *          When libunwind is built with -Os, functions using
+	/* WARNING: Do not  use the  members of  this struct  directly!
+	 *          When  libunwind is built  with -Os, functions using
 	 *          this struct will actually interpret it as though it
 	 *          was a `unwind_cfa_state_t'. */
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0
@@ -229,12 +229,12 @@ typedef struct unwind_cfa_landing_state_struct {
 } unwind_cfa_landing_state_t;
 
 
-/* Execute CFA state instruction until `ABSOLUTE_PC' has been reached,
- * or the entirety of the FDE instruction code has been executed.
+/* Execute CFA  state  instruction  until  `ABSOLUTE_PC'  has  been  reached,
+ * or  the  entirety  of  the   FDE  instruction  code  has  been   executed.
  * This function is used to fill in CFA state information at a given address,
- * which can then be used to unwind a register state for the purpose of
- * implementing language-level, zero-effort exception support, as well
- * as for generating tracebacks when combined with `libdebuginfo.so'
+ * which can then  be used  to unwind  a register  state for  the purpose  of
+ * implementing   language-level,  zero-effort  exception  support,  as  well
+ * as   for  generating  tracebacks   when  combined  with  `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:
  *      `SELF->f_pcstart <= ABSOLUTE_PC && SELF->f_pcend >= ABSOLUTE_PC'
  * @param: SELF:   The FDE to execute in search of `ABSOLUTE_PC'
@@ -257,11 +257,11 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t const *__restrict __sel
 
 
 
-/* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
+/* Behaves  identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
- * FDE descriptors (though again: use of this is entirely optional; the regular
- * `unwind_fde_exec()' is just as capable of unwinding signal frame descriptors.
- * This function is merely optimized to better restore registers commonly used
+ * FDE  descriptors (though again:  use of this is  entirely optional; the regular
+ * `unwind_fde_exec()' is just as capable  of unwinding signal frame  descriptors.
+ * This function is  merely optimized  to better restore  registers commonly  used
  * within signal frames)
  * @param: SELF:   The FDE to execute in search of `__absolute_pc'
  * @param: RESULT: CFA state descriptor, to-be filled with restore information upon success.
@@ -282,11 +282,11 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t const *__restr
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
-/* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
- * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
- * exceptions which originates from `ABSOLUTE_PC' within the current cfi-proc.
- * This function is calculates the relative CFI-capsule offset between `ABSOLUTE_PC',
- * and `LANDINGPAD_PC', as well as the GNU-argsize adjustment. Once this is done,
+/* Behaves  similar  to `unwind_fde_exec()',  but must  be used  to calculate  the CFA
+ * for the purpose  of jumping  to a  custom `LANDINGPAD_PC'  as part  of handling  an
+ * exceptions  which  originates  from  `ABSOLUTE_PC'  within  the  current  cfi-proc.
+ * This function is calculates the relative CFI-capsule offset between  `ABSOLUTE_PC',
+ * and `LANDINGPAD_PC', as  well as  the GNU-argsize  adjustment. Once  this is  done,
  * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
  * onto some given register state, which may then be used to resume execution.
  * @param: SELF:   The FDE to execute in search of `__absolute_pc'
@@ -311,11 +311,11 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_landing_exec)(unwind_fde_t const *__restri
 
 
 
-/* Similar to `unwind_fde_exec()', but used to calculate the
- * unwind rule for `dw_regno' at the given text location.
- * This is used to implement unwinding for uncommon registers,
- * since `unwind_fde_exec()' will not already calculate these
- * during the first pass (thus keeping down the memory requirements
+/* Similar  to  `unwind_fde_exec()',   but  used   to  calculate   the
+ * unwind  rule   for  `dw_regno'   at   the  given   text   location.
+ * This  is  used  to  implement  unwinding  for  uncommon  registers,
+ * since  `unwind_fde_exec()'   will  not   already  calculate   these
+ * during the first  pass (thus keeping  down the memory  requirements
  * imposed on the one responsible for allocating `unwind_cfa_state_t')
  * @param: SELF:   The FDE to execute in search of `ABSOLUTE_PC'
  * @param: RESULT: The CFA register result controller to-be filled.
@@ -357,10 +357,10 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t const *__restrict _
 
 
 /* Apply a given CFA unwind state in order to apply register information from from `REG_GETTER' to `REG_SETTER'.
- * Note however that only registers with a rule other than `DW_CFA_register_rule_undefined'
+ * Note    however   that   only   registers   with   a   rule   other   than   `DW_CFA_register_rule_undefined'
  * will be applied, meaning that `*REG_SETTER' will not get invoked for these registers.
  * WARNING: This function will modify `SELF' in such a manner that repeated calls
- *          require that `SELF' must be restored to its state prior to a call to
+ *          require  that `SELF' must be restored to its state prior to a call to
  *          this function before a repeated call can be made!
  * @param: SELF:        The CFA state to-be used when applying registers
  * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'

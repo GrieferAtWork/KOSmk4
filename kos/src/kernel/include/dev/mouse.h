@@ -89,11 +89,11 @@ struct mouse_device
 	 (self)->cd_type.ct_read == &mouse_device_read)
 
 /* Initialize/finalize the given mouse device.
- * NOTE: Drivers that override the `ct_fini' operator of a given mouse
+ * NOTE: Drivers that override  the `ct_fini' operator  of a given  mouse
  *       must ensure that `mouse_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by mouse,
- *       get initialized by `mouse_device_init()', and should not be
+ *       get  initialized by `mouse_device_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl
@@ -115,7 +115,7 @@ FUNDEF NOBLOCK mouse_packet_t NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mo
 FUNDEF mouse_packet_t KCALL mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK);
 
 /* Generate mouse input packets
- * Note that when generating event packets, the motion
+ * Note  that when generating event packets, the motion
  * packets should always be created before other events */
 FUNDEF bool KCALL mouse_device_motion(struct mouse_device *__restrict self, s32 relx, s32 rely);
 FUNDEF bool KCALL mouse_device_moveto(struct mouse_device *__restrict self, s32 absx, s32 absy);

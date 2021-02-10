@@ -270,18 +270,18 @@ struct cred {
 	WEAK uid_t           c_ruid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real user ID */
 	WEAK gid_t           c_rgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real group ID */
 	WEAK uid_t           c_euid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective user ID
-	                                         * Used to determine permissions for accessing
+	                                         * Used   to   determine   permissions   for   accessing
 	                                         * shared resources (mainly shared memory)
 	                                         * When this field is set, you must also set `c_fsuid' */
 	WEAK gid_t           c_egid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective group ID (s.a. `c_euid') */
-	WEAK uid_t           c_suid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved user ID
-	                                         * When an `S_ISUID' / `S_ISGID' program is executed,
-	                                         * what would have otherwise been `c_euid' / `c_egid'
+	WEAK uid_t           c_suid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved  user  ID
+	                                         * When  an `S_ISUID' / `S_ISGID' program is executed,
+	                                         * what  would have otherwise been `c_euid' / `c_egid'
 	                                         * is stored here (and `c_euid' / `c_egid' will become
 	                                         * the `struct stat::st_uid/st_gid' of the executable) */
 	WEAK gid_t           c_sgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved group ID (s.a. `c_suid') */
 	WEAK uid_t           c_fsuid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem user ID
-	                                         * Used to determine permissions for accessing files */
+	                                         * Used to  determine  permissions  for  accessing  files */
 	WEAK gid_t           c_fsgid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem group ID */
 	size_t               c_ngroups;         /* [lock(c_lock)] # of supplementary group IDs. */
 	gid_t               *c_groups;          /* [0..c_ngroups][owned][lock(c_lock)] Supplementary group IDs.
@@ -294,7 +294,7 @@ struct cred {
 	WEAK struct credcap  c_cap_bounding;    /* [lock(READ(ATOMIC), WRITE(c_lock))] - Caps that can be made permitted by privileged programs
 	                                         *                                     - Caps that can be added to `caps.inheritable' by `capset()' */
 	WEAK struct credcap  c_cap_ambient;     /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that always become permitted in privileged programs
-	                                         * during exec(). Note the invariant that this one is always a subset of permitted & inheritable. */
+	                                         * during exec(). Note  the invariant  that this one  is always  a subset of  permitted &  inheritable. */
 	WEAK uint8_t         c_securebits;      /* [lock(READ(ATOMIC), WRITE(c_lock))] Secure capability bits. (set of `SECBIT_*' from <kos/capability.h>) */
 	WEAK uint8_t         c_no_new_privs;    /* [lock(READ(ATOMIC), WRITE(c_lock))] When non-zero, exec() calls do not  */
 };
@@ -327,7 +327,7 @@ DATDEF struct cred cred_kernel;
 
 
 /* Check if the calling thread has a given capability
- * `capno' (one of `CAP_*' from <kos/capability.h>) */
+ * `capno' (one of  `CAP_*' from  <kos/capability.h>) */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE, __BOOL,
           NOTHROW, FCALL, capable, (syscall_slong_t capno), {
 	return credcap_capable(&THIS_CRED->c_cap_effective, capno);

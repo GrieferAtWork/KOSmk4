@@ -31,7 +31,7 @@ typedef u8 isr_vector_t;
 #endif /* __CC__ */
 
 /* On X86, we have a _lot_ of general purpose ISR vectors available.
- * But to prevent confusion, the following are the ranges that are
+ * But to prevent confusion, the  following are the ranges that  are
  * reserved for special purposes:
  *     0x00 ... 0x1f  -  CPU Exceptions
  *     0x20 ... 0x2f  -  Special interrupts reserved for windows compatibility

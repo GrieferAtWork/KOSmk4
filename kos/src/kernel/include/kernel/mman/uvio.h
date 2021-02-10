@@ -35,56 +35,56 @@
  *  - Go back into libviocore to filter emulated memory accesses pointing into VIO memory
  *  - Dispatch memory accesses via <libvio/access.h>
  *  - Functions from <libvio/access.h> invoke kernel-space operators of the associated
- *    vm_datablock's VIO function table (here, that table is `uvio_operators')
+ *    vm_datablock's  VIO  function  table  (here,  that  table  is  `uvio_operators')
  *  - Functions from `uvio_operators' construct a request that is passed to `uvio_request()'
  *  - `uvio_request()' waits for a request slot to become available
  *  - `uvio_request()' stores the request in `struct uvio::uv_req' and broadcasts `uv_reqmore'
  *  - A dedicated user-space thread created alongside the UVIO object is resumed, such that
  *    a read(2) callback invoked by it on the UVIO object returns the request in the format
- *    of a `struct uvio_request', before changing the request's state to DELIVERED and
+ *    of a  `struct uvio_request', before  changing the  request's state  to DELIVERED  and
  *    broadcasting `struct uvio::uv_reqdlvr'
  *  - User-space parses the returned request and dispatches it once again through a
  *    user-space version of the `struct vio_operators' structure that was passed to
  *    the dedicated thread upon creation.
- *  - The actual user-space VIO callback function performs the request (if no appropriate
- *    callback function was defined, an `E_SEGFAULT' exception is thrown)
- *    Note that the callback is able to invoke special HOP_* callbacks for UVIO objects
- *    in order to read/write execution registers of the instruction that caused the access.
- *    Note however that using this method to modify registers that may still be used during
+ *  - The  actual user-space VIO  callback function performs the  request (if no appropriate
+ *    callback   function   was    defined,   an   `E_SEGFAULT'    exception   is    thrown)
+ *    Note that the  callback is able  to invoke  special HOP_* callbacks  for UVIO  objects
+ *    in order to read/write execution registers of the instruction that caused the  access.
+ *    Note  however that using this method to modify registers that may still be used during
  *    later portions of the emulated instruction's execution causes weak undefined behavior.
  *  - If the user-space VIO callback threw an exception or wasn't defined, that exception
- *    is returned in a `UVIO_OPCODE_EXCEPT' (or `UVIO_OPCODE_EXCEPT_COMPAT') response.
+ *    is returned in  a `UVIO_OPCODE_EXCEPT'  (or `UVIO_OPCODE_EXCEPT_COMPAT')  response.
  *    Otherwise, user-space returns the result of the VIO operator.
  *    In either case, the result is returned by write(2)ing a `struct uvio_response' to
  *    the userviofd file descriptor.
  *  - Kernel-space performs some validation of the written response structure
  *  - The response's result (or exception) is written back to the appropriate slot
- *    from `struct uvio::uv_req', and `uv_reqdone' is broadcast.
+ *    from     `struct uvio::uv_req',     and    `uv_reqdone'     is    broadcast.
  *  - The original faulting thread wakes up (after having previous waited for `uv_reqdone'),
- *    and looks at `struct kernel_uvio_request::kur_status' of its request slot.
+ *    and   looks   at   `struct kernel_uvio_request::kur_status'  of   its   request  slot.
  *  - If the status indicates an exception, that exception is re-thrown (that exception
- *    being the original exception from the user-space VIO callback)
+ *    being   the   original    exception   from   the    user-space   VIO    callback)
  *    Otherwise, the correct VIO result value is returned by `uvio_request()'
  *  - Irregardless of an exception having been thrown, the request slot is marked as
  *    free, and `struct uvio::uv_reqfree' is broadcast.
- *  - In case of an exception, that exception is propagated normally with its fault
- *    address set to the starting address of instruction that caused the original #PF
- *    Otherwise, the return value is passed through to libviocore, which once again
- *    uses libemu86 to store/process that value as appropriate for the instruction
+ *  - In case of an  exception, that exception is  propagated normally with its  fault
+ *    address set to the starting address of instruction that caused the original  #PF
+ *    Otherwise,  the return value  is passed through to  libviocore, which once again
+ *    uses libemu86 to  store/process that  value as appropriate  for the  instruction
  *    that is being emulated. Note that during this phase, additional memory accesses,
  *    including further accesses to VIO memory may occur.
  *
  * NOTES:
- *  - Using this model, it becomes possible for kernel-space to access user-space VIO
- *    memory (which can reasonably happen when user-space passes pointers to VIO memory
- *    to system calls). When this happens, the VIO memory accesses are handled the same
- *    way as they would have been if the accessed had been performed by user-space,
- *    with the only exception that all attempts at accessing the registers of the faulting
- *    thread are denied (or may instead return information about to user-space return
+ *  - Using  this  model, it  becomes  possible for  kernel-space  to access  user-space VIO
+ *    memory (which can  reasonably happen  when user-space  passes pointers  to VIO  memory
+ *    to system calls).  When this happens,  the VIO  memory accesses are  handled the  same
+ *    way  as  they  would have  been  if the  accessed  had been  performed  by user-space,
+ *    with the only exception that all attempts  at accessing the registers of the  faulting
+ *    thread  are  denied (or  may  instead return  information  about to  user-space return
  *    location of the thread performing the memory access; in any case: a kernel-only-thread
  *    accessing user-space VIO (which really shouldn't happen to begin with) _always_ causes
  *    an error when user-space attempts to access its registers)
- *  - A VIO request may be aborted when the faulting thread is interrupted while it is
+ *  - A  VIO request may be aborted when the faulting thread is interrupted while it is
  *    waiting for its request to be serviced. In this case, the service thread is _not_
  *    notified of this event, and the eventual response is silently discarded.
  *
@@ -105,17 +105,17 @@
 #include <libvio/vio.h>
 
 /* Max # of UVIO requests that can be in use at the
- * same time for any given UVIO datablock object. */
+ * same  time for any  given UVIO datablock object. */
 #ifndef CONFIG_UVIO_MAX_PARALLEL_REQUESTS
 #define CONFIG_UVIO_MAX_PARALLEL_REQUESTS 4
 #endif /* !CONFIG_UVIO_MAX_PARALLEL_REQUESTS */
 
 
 /* 255 is the upper limit on how many parallel requests are physically possible
- * This limit is imposed by only 8 bits being available for slot IDs in the
- * user-space UVIO structure `struct uvio_request::uq_reqid' (which, while
- * actually being 16-bit, only has the lower 8 bits available for slot IDs,
- * while the upper 8 bits are used as a version counter that must be matched
+ * This  limit is imposed  by only 8 bits  being available for  slot IDs in the
+ * user-space  UVIO  structure  `struct uvio_request::uq_reqid'  (which,  while
+ * actually being 16-bit,  only has the  lower 8 bits  available for slot  IDs,
+ * while the upper 8 bits  are used as a version  counter that must be  matched
  * in order to reduce the chance of miss-matching aborted requests) */
 #if CONFIG_UVIO_MAX_PARALLEL_REQUESTS > 0xff
 #undef CONFIG_UVIO_MAX_PARALLEL_REQUESTS
@@ -260,7 +260,7 @@ struct kernel_uvio_except {
 
 struct kernel_uvio_request {
 	struct atomic_rwlock  kur_lock;        /* Lock for this request
-	                                        * If a request is aborted, this lock is temporarily acquired
+	                                        * If a request is aborted, this lock is temporarily  acquired
 	                                        * in write-mode to ensure that no other thread is still using
 	                                        * the below pointer, before `kur_args' is cleared to `NULL' */
 	WEAK u32              kur_nextuid_seed;/* [lock(ATOMIC)] Pseudo-random seed for the next `kur_uid' */
@@ -313,7 +313,7 @@ DATDEF struct mfile_ops const uvio_datablock_type;
 DATDEF struct vio_operators const uvio_operators;
 
 /* Construct a new UVIO object.
- * Note that UVIO is derived from `struct mfile', so the returned
+ * Note that UVIO is derived  from `struct mfile', so the  returned
  * object can be stored in a handle slot as `HANDLE_TYPE_DATABLOCK' */
 FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
 
@@ -327,7 +327,7 @@ FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
  *                      [out] First item contains the request result.
  *                            WARNING: copied from user-space; unused bits/bytes
  *                                     must be ignored in this value.
- * @throws: ...:        If user-space returned with `UVIO_OPCODE_EXCEPT',
+ * @throws: ...:        If  user-space  returned  with  `UVIO_OPCODE_EXCEPT',
  *                      that is exception will be re-thrown by this function. */
 FUNDEF NONNULL((1, 4)) void KCALL
 uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,

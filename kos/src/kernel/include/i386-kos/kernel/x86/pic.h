@@ -35,7 +35,7 @@ DECL_BEGIN
 #define X86_INTERRUPT_PIC1_BASE 0xf0
 #define X86_INTERRUPT_PIC2_BASE 0xf8
 
-/* Return the IRQ numbers of hardware interrupt
+/* Return the  IRQ numbers  of hardware  interrupt
  * lines wired either to the master, or slave PIC.
  * @param: i :  The line number (0..7)
  * @return: * : The IRQ number. */
@@ -65,12 +65,12 @@ struct x86_spurious_interrupts {
 };
 
 /* Tracking information about spurious interrupts.
- * >> Useful for detecting faulty software that sends EOI commands at the
+ * >> Useful for detecting faulty software  that sends EOI commands at  the
  *    wrong time, or for tracking problems in hardware, such as line noise. */
 DATDEF ATTR_PERCPU struct x86_spurious_interrupts thiscpu_x86_spurious_interrupts;
 
 
-/* Get/Set the mask of disabled interrupt lines.
+/* Get/Set   the  mask  of  disabled  interrupt  lines.
  * >> `INTNO_PIC1_STMASK()' disables irq_t: 0x20...0x27
  * >> `INTNO_PIC2_STMASK()' disables irq_t: 0x28...0x2f */
 #define X86_PIC1_GTMASK()  inb_p(X86_PIC1_DATA)

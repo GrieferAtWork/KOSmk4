@@ -39,8 +39,8 @@
 DECL_BEGIN
 
 /* Effective kernel version.
- * Usually the same as `KOS_VERSION_CODE', but can be used by
- * modules to detect version differences between what they
+ * Usually the same as `KOS_VERSION_CODE', but can be used  by
+ * modules  to  detect version  differences between  what they
  * were compiled for and what they are actually running under. */
 DATDEF u32 const kernel_version;
 

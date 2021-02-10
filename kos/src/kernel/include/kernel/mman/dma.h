@@ -47,7 +47,7 @@ typedef __BOOL (KCALL *mdma_range_callback_t)(void *cookie, physaddr_t paddr, si
 
 /* Descriptor for a lock held for the purposes of DMA */
 struct mdmalock {
-	REF struct mpart *mdl_part; /* [1..1] The data part to which a DMA-lock is being held.
+	REF struct mpart *mdl_part; /* [1..1] The data  part  to  which a  DMA-lock  is  being  held.
 	                             * This lock will be released via a call to `mpart_dma_dellock()' */
 };
 
@@ -63,7 +63,7 @@ NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
 
 /* Start DMAing on memory within the specified address range.
  * @param: prange:      A callback that is invoked for each affected physical memory range
- *                      Should this callback return `false', all previously acquired DMA
+ *                      Should this callback return  `false', all previously acquired  DMA
  *                      locks are released, and `mman_startdma[v]()' returns `0'
  * @param: cookie:      Cookie-argument passed to `prange' upon execution.
  * @param: lockvec:     Vector of DMA lock slots provided by the caller.
@@ -71,7 +71,7 @@ NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
  * @param: addr:        [mman_startdma] The base address where locking should start.
  * @param: num_bytes:   [mman_startdma] The number of continuous bytes that should be locked.
  * @param: addr_v:      [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
- * @param: for_writing: When true, unshare copy-on-write mappings of associated memory, allowing the
+ * @param: for_writing: When true, unshare copy-on-write mappings  of associated memory, allowing  the
  *                      caller to then write to the acquired memory ranges without accidentally having
  *                      any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: 0 :         `*prange' returned `false'
@@ -93,15 +93,15 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
- * @param: prange:      A callback that is invoked for each affected physical memory range
- *                      Should this callback return `false', enumeration will halt and the
+ * @param: prange:      A  callback that is  invoked for each  affected physical memory range
+ *                      Should this callback  return `false', enumeration  will halt and  the
  *                      function will return the number of previously successfully enumerated
  *                      DMA bytes.
  * @param: cookie:      Cookie-argument passed to `prange' upon execution.
  * @param: addr:        [mman_startdma] The base address where locking should start.
  * @param: num_bytes:   [mman_startdma] The number of continuous bytes that should be locked.
  * @param: addr_v:      [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
- * @param: for_writing: When true, unshare copy-on-write mappings of associated memory, allowing the
+ * @param: for_writing: When true, unshare copy-on-write mappings  of associated memory, allowing  the
  *                      caller to then write to the acquired memory ranges without accidentally having
  *                      any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
@@ -123,7 +123,7 @@ mman_enumdmav(struct mman *__restrict self,
 
 
 /* Stop DMAing by releasing all of the specified DMA locks.
- * NOTE: The caller must ensure that `lockcnt == return(mman_startdma*())', and
+ * NOTE: The  caller  must ensure  that  `lockcnt == return(mman_startdma*())', and
  *       that the specified `lockvec' is either the exact same `lockvec' originally
  *       passed to `mman_startdma[v]()', or an identical memory copy of it. */
 FUNDEF NOBLOCK NONNULL((1)) void

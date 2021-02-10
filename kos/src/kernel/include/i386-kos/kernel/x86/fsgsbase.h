@@ -33,15 +33,15 @@
  *   - wrfsbase
  *   - wrgsbase
  * These instructions are only present when a certain CPUID bit (CPUID_7B_FSGSBASE)
- * is set, but if that bit isn't set, these instruction must be emulated by using
+ * is  set, but if that bit isn't set,  these instruction must be emulated by using
  * certain calls to (rd|wr)msr, which we emulate on x86_64 at runtime by saving the
- * address of every use of these instructions in a big list that gets relocated at
+ * address  of every use of these instructions in a big list that gets relocated at
  * runtime if this CPU feature isn't present.
  * This can be done fairly easily, since the opcode sequence for any of the aforementioned
- * instructions is always 5 bytes (when the operand is 64-bit, which is should always be
- * within the kernel, as a 32-bit operand would mean a truncated result)
- * These 5 bits can then easily be replaced with a call-instruction to a function that
- * emulates the instruction's behavior by simply setting the proper MSR register. */
+ * instructions  is always 5 bytes (when the operand  is 64-bit, which is should always be
+ * within   the   kernel,  as   a   32-bit  operand   would   mean  a   truncated  result)
+ * These  5 bits can  then easily be replaced  with a call-instruction  to a function that
+ * emulates  the  instruction's  behavior  by  simply  setting  the  proper  MSR register. */
 __ASM_BEGIN
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -146,13 +146,13 @@ DECL_BEGIN
  * WARNING: Only the 64-bit variants of these instructions can be patched!
  *          The 32-bit variants cannot.
  * Before using this function, the caller should check that fsgsbase really
- * isn't supported by the host CPU, as indicated by `CPUID_7B_FSGSBASE'
- * @param: real_pc: The real PC that should be used for DISP-offsets.
+ * isn't  supported by  the host  CPU, as  indicated by `CPUID_7B_FSGSBASE'
+ * @param: real_pc: The real  PC that  should  be used  for  DISP-offsets.
  *                  May differ from `pc' when `pc' points into an aliasing
  *                  memory mapping with write-access
  * @return: true:   Successfully patched the given code location.
  * @return: false:  The given code location was already patched,
- *                  or isn't one of the above instructions. */
+ *                  or isn't  one  of  the  above  instructions. */
 FUNDEF NOBLOCK __BOOL
 NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc);
 
