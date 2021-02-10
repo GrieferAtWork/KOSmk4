@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_isastream,hash:CRC-32=0x195903e8]]]*/
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
@@ -153,7 +153,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 }
 /*[[[end:libc_fdetach]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

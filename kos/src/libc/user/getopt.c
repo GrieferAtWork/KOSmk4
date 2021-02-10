@@ -436,7 +436,7 @@ NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int argc,
 	                          1);
 }
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getopt,hash:CRC-32=0xae650c5]]]*/
 /* Return the option character from OPTS just read.  Return -1 when
@@ -538,7 +538,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
 }
 /*[[[end:libc_getopt_long_only]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

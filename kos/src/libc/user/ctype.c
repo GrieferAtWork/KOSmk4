@@ -1302,7 +1302,7 @@ PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype.__ctype_toupper_loc.pointer"
 int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc___ctype_b_loc,hash:CRC-32=0xde267e1c]]]*/
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED uint16_t const **
@@ -1391,7 +1391,7 @@ NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
 }
 /*[[[end:libc__isctype_l]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

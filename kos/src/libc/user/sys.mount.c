@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_mount,hash:CRC-32=0x4b9f2946]]]*/
 /* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
@@ -82,7 +82,7 @@ NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
 }
 /*[[[end:libc_umount2]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

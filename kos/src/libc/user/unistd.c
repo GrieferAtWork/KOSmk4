@@ -84,7 +84,7 @@ NOTHROW(LIBCCALL libc_p_environ)(void) {
 }
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_execve,hash:CRC-32=0x4dda358b]]]*/
 /* >> execve(2)
@@ -3613,7 +3613,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 /*[[[end:libc_ctermid_r]]]*/
 
 
-/*[[[end:implementation]]]*/
+
 
 
 

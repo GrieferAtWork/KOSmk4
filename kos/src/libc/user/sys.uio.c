@@ -33,7 +33,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_process_vm_readv,hash:CRC-32=0x6a2ecd8f]]]*/
 /* >> process_vm_readv(2)
@@ -205,7 +205,7 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pwritev64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

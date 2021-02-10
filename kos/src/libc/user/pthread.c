@@ -392,7 +392,7 @@ err_nomem:
 	return ENOMEM;
 }
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_pthread_create,hash:CRC-32=0xe7278efd]]]*/
 /* >> pthread_create(3)
@@ -3475,7 +3475,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 }
 /*[[[end:libc_pthread_setspecific]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

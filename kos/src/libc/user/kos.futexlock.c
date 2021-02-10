@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlock_impl)(lfutex_t *ulockaddr,
 }
 
 
-/*[[[start:implementation]]]*/
+
 
 
 /*[[[head:libc_lfutexlock,hash:CRC-32=0x50667198]]]*/
@@ -1285,7 +1285,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_allbits64)(lfutex_t *ulockadd
 #endif /* MAGIC:alias */
 /*[[[end:libc_futexlock_timedwaitwhile_allbits64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

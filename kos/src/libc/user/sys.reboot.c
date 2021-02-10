@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_reboot,hash:CRC-32=0x7a5a0c26]]]*/
 /* Reboot or halt the system
@@ -45,7 +45,7 @@ NOTHROW_NCX(LIBCCALL libc_reboot)(__STDC_INT_AS_UINT_T howto)
 }
 /*[[[end:libc_reboot]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

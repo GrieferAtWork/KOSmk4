@@ -59,7 +59,7 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 /*[[[head:libc_lfutex,hash:CRC-32=0xab151a58]]]*/
@@ -1251,7 +1251,7 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 }
 /*[[[end:libc_futex_setspin]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

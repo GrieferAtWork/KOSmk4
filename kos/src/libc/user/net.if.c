@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_if_nametoindex,hash:CRC-32=0x52994efd]]]*/
 /* Convert an interface name to an index, and vice versa */
@@ -83,7 +83,7 @@ NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
 }
 /*[[[end:libc_if_freenameindex]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

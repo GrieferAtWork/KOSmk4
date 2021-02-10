@@ -33,7 +33,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_epoll_create,hash:CRC-32=0x5d5fd124]]]*/
 /* >> epoll_create(2)
@@ -161,7 +161,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_pwait]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

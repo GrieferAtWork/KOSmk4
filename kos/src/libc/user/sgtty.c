@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_gtty,hash:CRC-32=0x4249e775]]]*/
 INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
 }
 /*[[[end:libc_stty]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

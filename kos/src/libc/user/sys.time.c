@@ -38,7 +38,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_gettimeofday,hash:CRC-32=0x87183b24]]]*/
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
@@ -361,7 +361,7 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futimesat64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

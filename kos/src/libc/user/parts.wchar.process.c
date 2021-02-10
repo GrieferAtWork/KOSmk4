@@ -180,7 +180,7 @@ done:
 	return result;
 }
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_wexecv,hash:CRC-32=0xdfb5cd73]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.fs.exec.exec") NONNULL((1, 2)) int
@@ -806,7 +806,7 @@ NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 }
 /*[[[end:libd_wsystem]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -64,7 +64,7 @@ struct lconv current_lconv = {
 };
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setlocale,hash:CRC-32=0xcd2b53e]]]*/
 /* >> setlocale(3)
@@ -175,7 +175,7 @@ NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 }
 /*[[[end:libc_uselocale]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

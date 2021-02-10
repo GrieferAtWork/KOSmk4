@@ -33,7 +33,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_Malloc,hash:CRC-32=0x1d1e4071]]]*/
 INTERN ATTR_SECTION(".text.crt.except.heap.malloc") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *
@@ -152,7 +152,7 @@ INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_
 }
 /*[[[end:libc_Memcdup]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

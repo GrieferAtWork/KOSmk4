@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setmntent,hash:CRC-32=0x3147db9f]]]*/
 /* >> setmntent(3) */
@@ -106,7 +106,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 }
 /*[[[end:libc_endmntent]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

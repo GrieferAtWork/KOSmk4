@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_msgctl,hash:CRC-32=0x4dac60df]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.msg") int
@@ -99,7 +99,7 @@ NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
 }
 /*[[[end:libc_msgsnd]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

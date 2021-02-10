@@ -33,7 +33,7 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_wait,hash:CRC-32=0xec1f862]]]*/
 /* >> wait(2)
@@ -337,7 +337,7 @@ NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid)
 }
 /*[[[end:libc_detach]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

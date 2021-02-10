@@ -38,7 +38,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc__getdcwd,hash:CRC-32=0x887f4d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
@@ -122,7 +122,7 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
 }
 /*[[[end:libc__getdiskfree]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

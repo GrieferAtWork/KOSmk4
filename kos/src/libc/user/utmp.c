@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 /*[[[head:libc_login,hash:CRC-32=0x3f437df7]]]*/
@@ -222,7 +222,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
 }
 /*[[[end:libc_getutline_r]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_adjtimex,hash:CRC-32=0xfff02b48]]]*/
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
@@ -115,7 +115,7 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv)
 #endif /* MAGIC:alias */
 /*[[[end:libc_ntp_gettimex64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

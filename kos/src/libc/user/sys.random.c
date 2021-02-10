@@ -34,7 +34,7 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getrandom,hash:CRC-32=0x17d362f6]]]*/
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
@@ -118,7 +118,7 @@ err:
 }
 /*[[[end:libc_getentropy]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

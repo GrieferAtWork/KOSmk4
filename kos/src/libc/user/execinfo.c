@@ -132,7 +132,7 @@ bool LIBCCALL init_libdebuginfo(void) {
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_backtrace,hash:CRC-32=0x8b224395]]]*/
 /* Create a traceback of up to `SIZE' instruction pointers from
@@ -312,7 +312,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 }
 /*[[[end:libc_backtrace_symbols_fd]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -27,7 +27,7 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_signalfd,hash:CRC-32=0xa6aed542]]]*/
 /* Create a poll(2)-able file descriptor which can be used to wait for the
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd,
 }
 /*[[[end:libc_signalfd]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

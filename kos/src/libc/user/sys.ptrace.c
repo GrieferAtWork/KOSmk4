@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 /*[[[head:libc_ptrace,hash:CRC-32=0xd2da63a1]]]*/
@@ -54,7 +54,7 @@ NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
 }
 /*[[[end:libc_ptrace]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

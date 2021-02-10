@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_ustat,hash:CRC-32=0x6c69c030]]]*/
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) int
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
 }
 /*[[[end:libc_ustat]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 /*[[[start:exports,hash:CRC-32=0x61eff38c]]]*/
 DEFINE_PUBLIC_ALIAS(ustat, libc_ustat);

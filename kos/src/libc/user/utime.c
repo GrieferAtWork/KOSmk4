@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_utime,hash:CRC-32=0xd118af7a]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
@@ -133,7 +133,7 @@ NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futime64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_acct,hash:CRC-32=0xcd3ca374]]]*/
 /* Switch process accounting on and off */
@@ -44,7 +44,7 @@ NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
 }
 /*[[[end:libc_acct]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

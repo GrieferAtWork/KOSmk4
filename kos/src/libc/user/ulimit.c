@@ -36,7 +36,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 /*[[[head:libc_ulimit,hash:CRC-32=0x9b432880]]]*/
@@ -85,7 +85,7 @@ NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd,
 }
 /*[[[end:libc_ulimit]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

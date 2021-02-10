@@ -42,7 +42,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_wttyname,hash:CRC-32=0x197d3063]]]*/
 /* >> ttyname(3)
@@ -1260,7 +1260,7 @@ NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
 }
 /*[[[end:libd_wreadlink]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

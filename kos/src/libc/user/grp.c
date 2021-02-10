@@ -35,7 +35,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getgrgid,hash:CRC-32=0xb6ef74b6]]]*/
 /* >> getgrgid(3), getgrgid_r(3) */
@@ -258,7 +258,7 @@ NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
 }
 /*[[[end:libc_initgroups]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

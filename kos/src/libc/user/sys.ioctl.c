@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 /*[[[head:libc_ioctl,hash:CRC-32=0x8ef74f26]]]*/
@@ -61,7 +61,7 @@ NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
 }
 /*[[[end:libc_ioctl]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

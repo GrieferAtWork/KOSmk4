@@ -34,7 +34,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc__ftime32,hash:CRC-32=0xc2fbf96b]]]*/
 /* Fill in TIMEBUF with information about the current time */
@@ -140,7 +140,7 @@ NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 #endif /* MAGIC:alias */
 /*[[[end:libc_ftime64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

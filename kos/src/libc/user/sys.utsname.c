@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_uname,hash:CRC-32=0x2381c02a]]]*/
 /* >> uname(2)
@@ -48,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
 }
 /*[[[end:libc_uname]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

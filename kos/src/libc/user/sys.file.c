@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_flock,hash:CRC-32=0xcad10774]]]*/
 /* Apply or remove an advisory lock, according to OPERATION, on the file FD refers to */
@@ -46,7 +46,7 @@ NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
 }
 /*[[[end:libc_flock]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

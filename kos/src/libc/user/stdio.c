@@ -1842,7 +1842,7 @@ done:
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc__flushall,hash:CRC-32=0x6230416a]]]*/
 INTERN ATTR_SECTION(".text.crt.application.exit") int
@@ -3562,7 +3562,7 @@ DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);
 DEFINE_INTERN_ALIAS(libc_feof_unlocked, libc_feof);
 DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
-/*[[[end:implementation]]]*/
+
 
 
 

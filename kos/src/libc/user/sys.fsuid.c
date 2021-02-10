@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setfsuid,hash:CRC-32=0xa159ce79]]]*/
 /* >> setfsuid(2)
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 }
 /*[[[end:libc_setfsgid]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

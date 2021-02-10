@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libd_strfmon,hash:CRC-32=0x7435bd4d]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
@@ -107,7 +107,7 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
 }
 /*[[[end:libc_strfmon_l]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

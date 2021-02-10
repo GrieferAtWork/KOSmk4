@@ -26,7 +26,7 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_set_exception_handler,hash:CRC-32=0x8cd5874e]]]*/
 /* Set the exception handler mode for the calling thread.
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(unsigned int *pmode,
 /*[[[skip:libc_except_handler3]]]*/
 /*[[[skip:libc_except_handler4]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

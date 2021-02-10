@@ -36,7 +36,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[skip:libc_valloc]]]*/
 /*[[[skip:libc_realloc_in_place]]]*/
@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr,
 }
 /*[[[end:libc_recallocv]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

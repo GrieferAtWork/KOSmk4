@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libd_semctl,hash:CRC-32=0xc28f7352]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
@@ -122,7 +122,7 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
 }
 /*[[[end:libc_semtimedop]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

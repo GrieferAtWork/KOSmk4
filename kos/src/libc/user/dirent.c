@@ -71,7 +71,7 @@ struct __dirstream {
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_opendir,hash:CRC-32=0x7cf68ebb]]]*/
 /* Open and return a new directory stream for reading, referring to `name' */
@@ -596,7 +596,7 @@ NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
 }
 /*[[[end:libc_kreaddir]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

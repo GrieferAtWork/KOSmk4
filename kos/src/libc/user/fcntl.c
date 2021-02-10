@@ -561,7 +561,7 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lockf64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_lfutexexpr,hash:CRC-32=0xde650e6f]]]*/
 /* >> lfutexexpr(2)
@@ -246,7 +246,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lfutexlockexpr64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

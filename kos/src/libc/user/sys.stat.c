@@ -463,7 +463,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat64)(char const *__restrict filename,
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_mkdir,hash:CRC-32=0xd15b9301]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
@@ -871,7 +871,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 }
 /*[[[end:libd__wstat32]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 
@@ -70,7 +70,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
 /*[[[end:libc_ether_hostton]]]*/
 
 
-/*[[[end:implementation]]]*/
+
 
 
 

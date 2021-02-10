@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_glob,hash:CRC-32=0xe1f0c0eb]]]*/
 /* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
@@ -107,7 +107,7 @@ NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 }
 /*[[[end:libc_globfree64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

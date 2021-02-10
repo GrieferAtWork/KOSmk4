@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_acos,hash:CRC-32=0x13b77ecc]]]*/
 /* Arc cosine of X */
@@ -459,7 +459,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 }
 /*[[[end:libc_lgamma_r]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

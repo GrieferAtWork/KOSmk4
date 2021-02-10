@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc__clearfp,hash:CRC-32=0xeee4346e]]]*/
 INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
@@ -183,7 +183,7 @@ NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 }
 /*[[[end:libc_fpreset]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

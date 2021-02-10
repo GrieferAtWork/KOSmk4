@@ -34,7 +34,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_ioperm,hash:CRC-32=0x3342be26]]]*/
 /* Change I/O port permissions for a specific I/O port range */
@@ -74,7 +74,7 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 }
 /*[[[end:libc_iopl]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

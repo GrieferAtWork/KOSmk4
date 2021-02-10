@@ -798,7 +798,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 }
 /*[[[end:libd__wtmpnam_s]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

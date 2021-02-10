@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setxattr,hash:CRC-32=0x9bbbadf7]]]*/
 /* @param: flags: One of `XATTR_*', or `0' */
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
 }
 /*[[[end:libc_fremovexattr]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

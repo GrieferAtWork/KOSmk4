@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc___h_errno_location,hash:CRC-32=0x907dfeca]]]*/
 /* Function to get address of global `h_errno' variable */
@@ -1191,7 +1191,7 @@ NOTHROW_RPC(LIBCCALL libc_gai_suspend64)(struct gaicb const *const list[],
 #endif /* MAGIC:alias */
 /*[[[end:libc_gai_suspend64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

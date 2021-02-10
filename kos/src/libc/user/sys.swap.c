@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_swapon,hash:CRC-32=0x93b3e652]]]*/
 /* @param swapflags: Set of `SWAP_FLAG_*' */
@@ -56,7 +56,7 @@ NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
 }
 /*[[[end:libc_swapoff]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

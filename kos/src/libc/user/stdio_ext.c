@@ -32,7 +32,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc___fbufsize,hash:CRC-32=0xa7687e05]]]*/
 /* Return the size of the buffer of FP in bytes currently in use by the given stream */
@@ -203,7 +203,7 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *fp,
 }
 /*[[[end:libc___fsetlocking]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

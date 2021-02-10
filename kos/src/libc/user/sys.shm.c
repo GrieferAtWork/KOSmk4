@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_shmctl,hash:CRC-32=0x8db49986]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.shm") int
@@ -91,7 +91,7 @@ NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 }
 /*[[[end:libc_shmdt]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

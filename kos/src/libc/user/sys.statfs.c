@@ -29,7 +29,7 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_statfs,hash:CRC-32=0xa91fc4b1]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((1, 2)) int
@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
 /*[[[end:libc_fstatfs64]]]*/
 
 
-/*[[[end:implementation]]]*/
+
 
 
 #undef statfs

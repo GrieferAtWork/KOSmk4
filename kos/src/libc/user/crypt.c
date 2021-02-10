@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_crypt,hash:CRC-32=0xb8be50d2]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2)) char *
@@ -115,7 +115,7 @@ NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block,
 }
 /*[[[end:libc_encrypt_r]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

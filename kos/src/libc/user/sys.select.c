@@ -44,7 +44,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_select,hash:CRC-32=0x9c2d65fd]]]*/
 INTERN ATTR_SECTION(".text.crt.io.poll") __STDC_INT_AS_SSIZE_T
@@ -155,7 +155,7 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pselect64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

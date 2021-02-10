@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_bindresvport,hash:CRC-32=0x21e9ad94]]]*/
 INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") int
@@ -465,7 +465,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
 }
 /*[[[end:libc_setsourcefilter]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -42,7 +42,7 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_Execv,hash:CRC-32=0x17a5ddde]]]*/
 /* >> execv(3)
@@ -745,7 +745,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 /*[[[skip:libc_FTruncate]]]*/
 /*[[[skip:libc_FSync]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

@@ -35,7 +35,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_poll,hash:CRC-32=0xe87b09d0]]]*/
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
 #endif /* MAGIC:alias */
 /*[[[end:libc_ppoll64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

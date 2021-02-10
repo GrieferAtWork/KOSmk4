@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_timerfd_create,hash:CRC-32=0x4536f53a]]]*/
 /* @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
@@ -107,7 +107,7 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_timerfd_gettime64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

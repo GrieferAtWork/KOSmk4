@@ -190,7 +190,7 @@ err:
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc__access_s,hash:CRC-32=0x467308b4]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
@@ -359,7 +359,7 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 
 
 
-/*[[[end:implementation]]]*/
+
 
 
 #undef _findfirst

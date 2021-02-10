@@ -192,7 +192,7 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 
 
 
-/*[[[start:implementation]]]*/
+
 
 
 PRIVATE ATTR_SECTION(".rodata.crt.random.rand_map") u32 const rand_map[] = {
@@ -2142,7 +2142,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 }
 /*[[[end:libc_freezero]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

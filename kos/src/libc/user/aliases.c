@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setaliasent,hash:CRC-32=0x27a2b301]]]*/
 /* >> setaliasent(3)
@@ -131,7 +131,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 }
 /*[[[end:libc_getaliasbyname_r]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

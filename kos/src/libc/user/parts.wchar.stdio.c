@@ -36,7 +36,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_wremove,hash:CRC-32=0xff46ff3c]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
@@ -222,7 +222,7 @@ done:
 }
 /*[[[end:libd_wpopen]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

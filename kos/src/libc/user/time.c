@@ -54,7 +54,7 @@ NOTHROW_NCX(libd___timezone)(void) {
 }
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_tzset,hash:CRC-32=0x8eab8534]]]*/
 /* Set time conversion information from the TZ environment variable.
@@ -538,7 +538,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 #endif /* MAGIC:alias */
 /*[[[end:libc_timer_settime64]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

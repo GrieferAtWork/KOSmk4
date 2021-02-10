@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getttyent,hash:CRC-32=0xb5fd7cdb]]]*/
 INTERN ATTR_SECTION(".text.crt.database.utmpx") struct ttyent *
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBCCALL libc_endttyent)(void)
 }
 /*[[[end:libc_endttyent]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

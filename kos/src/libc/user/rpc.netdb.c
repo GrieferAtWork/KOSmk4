@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setrpcent,hash:CRC-32=0xfcccd260]]]*/
 INTERN ATTR_SECTION(".text.crt.net.rpc") void
@@ -145,7 +145,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
 }
 /*[[[end:libc_getrpcent_r]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

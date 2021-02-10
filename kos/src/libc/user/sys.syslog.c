@@ -32,7 +32,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_closelog,hash:CRC-32=0x68d099ce]]]*/
 INTERN ATTR_SECTION(".text.crt.system.syslog") void
@@ -87,7 +87,7 @@ NOTHROW_RPC(__FORMATPRINTER_CC libc_syslog_printer)(void *arg,
 }
 /*[[[end:libc_syslog_printer]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

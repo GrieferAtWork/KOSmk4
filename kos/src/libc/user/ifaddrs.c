@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getifaddrs,hash:CRC-32=0x8515e015]]]*/
 /* >> getifaddrs(3) */
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 }
 /*[[[end:libc_freeifaddrs]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

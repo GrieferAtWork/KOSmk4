@@ -31,7 +31,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getcontext,hash:CRC-32=0xb9878af4]]]*/
 #ifndef LIBC_ARCH_HAVE_GETCONTEXT
@@ -159,7 +159,7 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_makecontext]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

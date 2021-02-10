@@ -74,7 +74,7 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_getauxval,hash:CRC-32=0xa44182b5]]]*/
 /* >> getauxval(3)
@@ -215,7 +215,7 @@ not_found:
 }
 /*[[[end:libc_getauxval]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

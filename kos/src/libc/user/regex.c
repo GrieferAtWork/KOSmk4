@@ -116,7 +116,7 @@ err:
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_re_set_syntax,hash:CRC-32=0x1557e442]]]*/
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
@@ -365,7 +365,7 @@ NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
 }
 /*[[[end:libc_regfree]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

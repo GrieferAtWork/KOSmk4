@@ -37,7 +37,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_socket,hash:CRC-32=0xaf9876dc]]]*/
 /* >> socket(2)
@@ -775,7 +775,7 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 }
 /*[[[end:libc_isfdtype]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 

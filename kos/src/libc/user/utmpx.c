@@ -29,7 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_setutxent,hash:CRC-32=0x8152a5f5]]]*/
 /* >> setutxent(3) */
@@ -159,7 +159,7 @@ NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
 }
 /*[[[end:libc_getutmpx]]]*/
 
-/*[[[end:implementation]]]*/
+
 
 
 
