@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ebb1323 */
+/* HASH CRC-32:0x990fc82b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,8 +38,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x, double __y) {
 	 * ====================================================
 	 * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
 	 *
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice 
+	 * Permission  to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice
 	 * is preserved.
 	 * ====================================================
 	 */

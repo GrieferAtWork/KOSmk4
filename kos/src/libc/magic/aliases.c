@@ -21,7 +21,7 @@
 /* (#) Portability: GNU C Library (/inet/aliases.h) */
 }
 
-/* Declare a couple of crt-functions that are _always_ exported by the kernel,
+/* Declare a couple of crt-functions that are _always_ exported by the  kernel,
  * but aren't auto-implemented through libc/auto/[...].c, but rather elsewhere:
  *  - /kos/src/libc/hybrid/...
  *  - /kos/src/kernel/core/... */

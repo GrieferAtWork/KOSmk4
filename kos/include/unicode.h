@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c21409d */
+/* HASH CRC-32:0x123659e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,8 +58,8 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
 #define UNICODE_UTF8_MAXLEN   8   /* == unicode_utf8seqlen[0xff] */
 
 /* The current length of any UTF-8 byte sequence produced by any 32-bit unicode character.
- * While `UNICODE_UTF8_MAXLEN' is the theoretical limit, it allows for up to 42 bits
- * of character digits, while `7' allows for up to `36' bits (`6' would allow `30').
+ * While `UNICODE_UTF8_MAXLEN'  is the  theoretical limit,  it allows  for up  to 42  bits
+ * of character digits,  while `7'  allows for  up to `36'  bits (`6'  would allow  `30').
  * As a consequence, the max number of bytes which may be written by `unicode_writeutf8()'
  * is `UNICODE_UTF8_CURLEN', as it takes a 32-bit unicode character.
  * >> char buf[UNICODE_UTF8_CURLEN];
@@ -561,13 +561,13 @@ __LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_swap_rev(3)
@@ -664,8 +664,8 @@ __LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 	return __hybrid_bswap32(__res);
 }
 /* >> unicode_readutf32_rev(3)
- * Same as `unicode_readutf32', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf32', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
@@ -766,7 +766,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 
 /* >> unicode_writeutf32(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF32_CURLEN' bytes to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF32_CURLEN'   bytes   to  `dst' */
 __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 (__LIBCCALL unicode_writeutf32)(/*utf-32*/ __CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	*__dst++ = __ch;

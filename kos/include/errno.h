@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0ef89b3 */
+/* HASH CRC-32:0x231daf0a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -548,7 +548,7 @@
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 
 #if defined(__USE_KOS_KERNEL) && defined(__ELIMIT)
-/* Helper macros for testing the return values of
+/* Helper  macros  for testing  the return  values of
  * system calls (s.a. <kos/syscalls.h>) in errno-mode */
 #define E_ISOK(x)  (__CCAST(__syscall_ulong_t)(x) <= __CCAST(__syscall_ulong_t)-__ELIMIT)
 #define E_ISERR(x) (__CCAST(__syscall_ulong_t)(x) > __CCAST(__syscall_ulong_t)-__ELIMIT)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84ed7b31 */
+/* HASH CRC-32:0xd5c8012d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -359,10 +359,10 @@ __apped_current_line_and_continue_or_stop:
 				if ((__SIZE_TYPE__)__line_len >= 2 && __delim_continue &&
 				    __linebuf_ptr[(__SIZE_TYPE__)__line_len - 2] == __delim_continue &&
 				    __linebuf_ptr[(__SIZE_TYPE__)__line_len - 1] == '\n') {
-					/* Must keep on scanning (and discarding characters) until after
-					 * the next unescaped line-feed. Note that to prevent additional
+					/* Must keep  on scanning  (and discarding  characters) until  after
+					 * the next  unescaped line-feed.  Note that  to prevent  additional
 					 * heap allocations, we use fgetc() for this, rather than getline(),
-					 * though because of this we must still account for all 3 types of
+					 * though  because of this we must still  account for all 3 types of
 					 * linefeeds that exist.
 					 * HINT: Right now, the previous call to getline() will have left
 					 *       the given `stream' pointed at the first character of the
@@ -422,7 +422,7 @@ __do_increment_lineno_and_break_comment:
 		}
 	}
 __got_result:
-	/* Special case: Nothing was read (this can
+	/* Special case:  Nothing was  read (this  can
 	 * happen if `stream' was at its EOF location) */
 	if __unlikely(!__result) {
 		__result_length = 0;

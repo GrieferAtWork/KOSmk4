@@ -30,7 +30,7 @@ BEGIN
 	}
 
 	/* Disable FPU access for libdl (it's not needed, but would add additional
-	 * overhead for saving FPU registers to varargs functions on x86_64) */
+	 * overhead  for  saving FPU  registers  to varargs  functions  on x86_64) */
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		CC_FLAGS({
 			"-mno-sse",
@@ -92,6 +92,3 @@ BEGIN
 
 
 END
-
-
-

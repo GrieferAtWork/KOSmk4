@@ -825,7 +825,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 	error_code_t code = self->@e_code@;
 	bzero(result, sizeof(*result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
-	 *       Figure 3-27:  Hardware Exceptions and Signals
+	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
 	 *       0   divide error fault             SIGFPE
 	 *       1   single step trap/fault         SIGTRAP
 	 *       2   nonmaskable interrupt          none
@@ -1373,11 +1373,11 @@ void error_rethrow(void);
 %#ifdef __INTELLISENSE__
 %{
 /* Throw a new exception `code', which is either an exception class,
- * an exception code, or an exception-class+sub-class pair, written
+ * an  exception code, or an exception-class+sub-class pair, written
  * as `(class,subclass)', going in hand with the macros defining the
  * various exceptions there are.
  * Following this, up to `EXCEPTION_DATA_POINTERS' optional exception
- * arguments may be provided, which are stored in `e_pointers', with
+ * arguments may be provided, which are stored in `e_pointers',  with
  * any argument not provided simply substituted in with `NULL' / 0. */
 #define THROW THROW
 __ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(error_code_t __code, ...);
@@ -1499,11 +1499,11 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = error_info();
 	if (!(info->@ei_flags@ & @EXCEPT_FINCATCH@)) {
-		/* Not inside of a catch-block (ignore the nesting request)
-		 * This can happen if the caller is only using the nest for
-		 * safety (in case a sub-function needs to be able to handle
-		 * its own exceptions, but may be called from an unaware
-		 * exception handler), or is using more than one nest.
+		/* Not inside of a  catch-block (ignore the nesting  request)
+		 * This can happen if the caller  is only using the nest  for
+		 * safety  (in case a sub-function needs to be able to handle
+		 * its own  exceptions, but  may be  called from  an  unaware
+		 * exception handler),  or  is  using  more  than  one  nest.
 		 * In all of these cases, just ignore the nest, and also make
 		 * it so that the associated `error_nesting_end()' is a no-op */
 		saved->@en_size@ = 0;
@@ -1541,13 +1541,13 @@ void error_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict sa
 	                 "No saved exception in `error_nesting_end()'");
 	if (info->@ei_code@ == @ERROR_CODEOF@(@E_OK@)) {
 		/* No newly thrown exception. (meaning we're currently not propagating
-		 * any exceptions, so we also shouldn't try to set the RETHROW flag!) */
+		 * any exceptions, so we also shouldn't try to set the RETHROW  flag!) */
 restore_saved_exception:
 		memcpy(info, &saved->@en_state@, saved->@en_size@);
 	} else {
-		/* An Exception is currently being handled, and we must prevent that
+		/* An Exception  is currently  being handled,  and we  must prevent  that
 		 * exception from being deleted by an outer `__cxa_end_catch()'. Therefor
-		 * we must set the RETHROW flag to essentially re-throw the merged
+		 * we  must  set  the RETHROW  flag  to essentially  re-throw  the merged
 		 * exception from outside of the inner try-block:
 		 * [ 1] TRY {
 		 * [ 2]     foo();
@@ -1581,12 +1581,12 @@ restore_saved_exception:
 		 * [17]     __cxa_end_catch();                // [11]
 		 * [18] }
 		 *
-		 * We get here from EQ[12], which is followed by EQ[17], which
-		 * would normally delete the exception because it wasn't re-thrown
+		 * We  get  here  from  EQ[12],  which  is  followed  by  EQ[17], which
+		 * would normally  delete the  exception  because it  wasn't  re-thrown
 		 * from anywhere. But if you think of all of the possible constellation
-		 * where this function might be called, in all cases where we know
-		 * that there's currently an active exception (i.e. ei_code != E_OK),
-		 * it's always acceptable to set the RETHROW flag for the outer
+		 * where this function  might be  called, in  all cases  where we  know
+		 * that there's currently an active  exception (i.e. ei_code !=  E_OK),
+		 * it's always  acceptable  to  set  the RETHROW  flag  for  the  outer
 		 * call to `__cxa_end_catch()' (on line EQ[17])
 		 */
 		info->@ei_flags@ |= @EXCEPT_FRETHROW@;
@@ -1603,11 +1603,11 @@ restore_saved_exception:
 
 %{
 #ifdef __cplusplus
-/* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
- *       binary that allows for libc to consider these handlers as `dlexceptaware(3)'
- *       when operating in except-mode #4. However, I am unsure as to how this could
+/* TODO: In user-space, using TRY and EXCEPT should  leave some sort of marker in  the
+ *       binary  that allows for libc to consider these handlers as `dlexceptaware(3)'
+ *       when operating in except-mode #4. However, I  am unsure as to how this  could
  *       be implemented without making some additional tweaks to gcc under KOS, though
- *       that wouldn't even be the first time I had to tweak binutils/gcc for this
+ *       that wouldn't even be  the first time  I had to  tweak binutils/gcc for  this
  *       project... */
 #ifndef __TRY
 #define __TRY    try

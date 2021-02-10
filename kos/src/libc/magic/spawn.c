@@ -83,7 +83,7 @@ __SYSDECL_BEGIN
 
 #ifdef __POSIX_SPAWN_NOEXECERR
 #define POSIX_SPAWN_NOEXECERR_NP __POSIX_SPAWN_NOEXECERR /* Don't propagate exec() error, and leave the
-                                                          * child as unreaped with exit status `127' */
+                                                          * child as  unreaped with  exit status  `127' */
 #endif /* __POSIX_SPAWN_NOEXECERR */
 
 
@@ -167,7 +167,7 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
 [[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>")]]
 [[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>")]]
-[[requires((defined(__POSIX_SPAWN_USE_KOS) && 
+[[requires((defined(__POSIX_SPAWN_USE_KOS) &&
             ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
              ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
               $has_function(read) && $has_function(write) && $has_function(close))) &&
@@ -177,7 +177,7 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
                          [[nullable]] posix_spawn_file_actions_t const *file_actions,
                          [[nullable]] posix_spawnattr_t const *attrp,
                          [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
-@@pp_if defined(__POSIX_SPAWN_USE_KOS) && 
+@@pp_if defined(__POSIX_SPAWN_USE_KOS) &&
         ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
          ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
           $has_function(read) && $has_function(write) && $has_function(close))) &&
@@ -195,9 +195,9 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 	child = vfork();
 	if (child == 0)
 		goto do_exec;
-	/* Check if the vfork() from the child returned success, but left
+	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at some point after vfork() already
+	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
 	result = __libc_geterrno_or(0);
 	if (result != 0) {
@@ -229,7 +229,7 @@ err_without_child:
 		goto err_without_child; /* The fork() itself failed. */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and read() returns ZERO(0)) */
+	 *        closed and  read() returns  ZERO(0)) */
 	close(pipes[1]); /* Close the writer. */
 	temp = read(pipes[0], &result, sizeof(result));
 	close(pipes[0]); /* Close the reader. */
@@ -244,7 +244,7 @@ err_without_child:
 @@pp_endif@@
 err_join_zombie_child:
 	/* Unless the child was already spawned as detached,
-	 * we still have to re-join it, or else it will be
+	 * we still have to re-join  it, or else it will  be
 	 * left dangling as a zombie process! */
 	if (waitpid(child, &status, 0) < 0) {
 @@pp_ifdef EINTR@@
@@ -455,7 +455,7 @@ do_exec:
 		}
 	}
 	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as O_CLOEXEC! */
+	 * closed because it's marked as  O_CLOEXEC! */
 	fexecve(execfd, ___argv, ___envp);
 @@pp_ifdef __POSIX_SPAWN_NOEXECERR@@
 	if (attrp && attrp->@__flags@ & __POSIX_SPAWN_NOEXECERR) {
@@ -469,8 +469,8 @@ do_exec:
 child_error:
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
 		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with our parent process, the error reason
-		 * will have already been written back to our parent's VM, so there's
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
 		 * actually nothing left for us to do, but to simply exit! */
 		;
 @@pp_else@@
@@ -595,7 +595,7 @@ $errno_t posix_spawnp([[nonnull]] pid_t *__restrict pid,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 @@pp_ifdef _WIN32@@
@@ -1037,7 +1037,7 @@ err:
 /* XXX:
  *   - POSIX_SPAWN_NOSIGCHLD_NP
  *   - POSIX_SPAWN_WAITPID_NP
- *   - POSIX_SPAWN_SETSIGIGN_NP 
+ *   - POSIX_SPAWN_SETSIGIGN_NP
  *   - posix_spawnattr_getsigignore_np
  *   - posix_spawnattr_setsigignore_np
  */

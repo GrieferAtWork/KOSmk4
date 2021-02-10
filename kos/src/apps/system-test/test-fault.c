@@ -61,7 +61,7 @@ DECL_BEGIN
 	assertf(((uintptr_t)(a) & (uintptr_t)(mask)) == (uintptr_t)(flag), "%p & %p != %p", \
 	        (uintptr_t)(a), (uintptr_t)(mask), (uintptr_t)(flag))
 
-/* Make sure that accessing both canonical and non-canonical memory locations produces segfaults,
+/* Make sure that accessing both canonical  and non-canonical memory locations produces  segfaults,
  * as well as that accessing memory near the end of the address space is handled correctly as well! */
 
 INTDEF uintptr_t volatile p ASMNAME("_tfp");
@@ -83,7 +83,7 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 		exp_context |= E_SEGFAULT_CONTEXT_NONCANON;
 	TRY {
 		/* Because the way in which exception are generated in kernel-space
-		 * depends on the instruction used, make use of a whole bunch of
+		 * depends  on the instruction  used, make use of  a whole bunch of
 		 * different instructions here! */
 		switch (op) {
 
@@ -402,12 +402,12 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 		if (is_vio) {
-			/* VIO dispatching may try to access multiple surrounding bytes
+			/* VIO dispatching may  try to access  multiple surrounding  bytes
 			 * in order to service the request. Because of this, fault pointer
-			 * may be scattered around the actually accessed location by the
+			 * may be scattered around the  actually accessed location by  the
 			 * max # number of bytes on the data-bus minus 1 */
 			assert_range(error_data()->e_args.e_segfault.s_addr, addr, WORDMASK);
-			/* VIO writes may first perform reads in order to then write-back
+			/* VIO  writes may first perform reads in order to then write-back
 			 * a larger data word (i.e. `pokeb(addr, v)' may be dispatched as:
 			 * >> a.word = peekw(addr & ~1);
 			 * >> a.bytes[addr & 1] = v;
@@ -444,10 +444,10 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 #ifndef __x86_64__
-		/* Special case: The access test for `0xbfffffff' behaves slightly different
+		/* Special case: The access test  for `0xbfffffff'  behaves slightly  different
 		 *               when a memory mapping exists at `0xbffff000' (which can happen
 		 *               randomly as the result of ASLR).
-		 * When this happens, the 4-byte access to `0xbfffffff' will not actually
+		 * When this happens, the 4-byte  access to `0xbfffffff' will not  actually
 		 * fault, before then faulting for real when trying to access `0xc0000000'!
 		 * If this happens, then the error can match what is checked here. */
 		if (addr == (void *)UINT32_C(0xbfffffff)) {
@@ -457,9 +457,9 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 		}
 #endif /* !__x86_64__ */
 		if (is_vio) {
-			/* VIO dispatching may try to access multiple surrounding bytes
+			/* VIO dispatching may  try to access  multiple surrounding  bytes
 			 * in order to service the request. Because of this, fault pointer
-			 * may be scattered around the actually accessed location by the
+			 * may be scattered around the  actually accessed location by  the
 			 * max # number of bytes on the data-bus minus 1 */
 			assert_range(error_data()->e_args.e_segfault.s_addr, addr, WORDMASK);
 		} else {
@@ -479,12 +479,12 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 
 DEFINE_TEST(segfault_special_addresses) {
 	/* Prevent the UKERN segment from interfering. */
-#if 0 /* QEMU appears to emulate _all_ 0x8f instructions as `pop'
-       * (even when `modrm.mi_reg != 0'), so the kernel can't intercept
-       * any exception to emulate the instruction, and %cs:%(r)ip becomes
+#if 0 /* QEMU  appears  to   emulate  _all_  0x8f   instructions  as   `pop'
+       * (even  when  `modrm.mi_reg != 0'),  so the  kernel  can't intercept
+       * any exception to  emulate the instruction,  and %cs:%(r)ip  becomes
        * unaligned since pop:0x8f/0 is shorter than the XOP that is actually
        * hidden within...
-       * ... After investigating the issue, QEMU does appear to simply ignore
+       * ... After  investigating the  issue, QEMU  does appear  to simply ignore
        *     the MODRM.REG field of the 0x8f opcode (and does so unconditionally)
        *     Furthermore a real machine (mine) raises a #UD exception when trying
        *     to execute something like 0x8f/1 (which is what the correct behavior

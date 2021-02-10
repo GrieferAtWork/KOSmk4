@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90e8b0f4 */
+/* HASH CRC-32:0xef2c88f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,11 +51,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_malloc_defined */
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* Possibly "split" a node with two red successors, and/or fix up two red
- * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
+/* Possibly "split" a  node with two  red successors, and/or  fix up two  red
+ * edges  in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
+ * and  GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
  * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not do the split, but must check for two red
+ * ROOTP. MODE is 1 if we need not  do the split, but must check for two  red
  * edges between GPARENTP and ROOTP */
 __LOCAL_LIBC(__maybe_split_for_insert) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__maybe_split_for_insert))(void **__rootp, /*nullable*/ void **__parentp,

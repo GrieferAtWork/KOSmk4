@@ -547,7 +547,7 @@
 #define MSG_CMSG_COMPAT __MSG_CMSG_COMPAT /* [in] Write ancillary data as `struct compat_cmsghdr'   \
                                            * WARNING: No user-space interface accepts this flag!    \
                                            * WARNING: The KOS kernel only uses this flag internally \
-                                           *          when compiled with __ARCH_HAVE_COMPAT */
+                                           *          when    compiled    with     __ARCH_HAVE_COMPAT */
 #else /* __ARCH_HAVE_COMPAT */
 #define MSG_CMSG_COMPAT 0
 #endif /* !__ARCH_HAVE_COMPAT */
@@ -863,7 +863,7 @@ struct cmsghdr *__cmsg_nxthdr([[nonnull]] struct msghdr *mhdr,
 	$byte_t *ctrl_end;
 	/* If the current header is incomplete, then there is no next header.
 	 * XXX: This should really never happen, since `CMSG_FIRSTHDR()' already
-	 *      checks this, however linux also does this check, so... */
+	 *      checks  this,  however  linux   also  does  this  check,   so... */
 	if unlikely(($size_t)cmsg->@cmsg_len@ < __OFFSET_CMSGHDR_DATA)
 		goto eof;
 	/* Walk to the next header */

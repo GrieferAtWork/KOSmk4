@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18c680c1 */
+/* HASH CRC-32:0xc40a6c2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -604,7 +604,7 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 	error_code_t code = self->e_code;
 	libc_bzero(result, sizeof(*result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
-	 *       Figure 3-27:  Hardware Exceptions and Signals
+	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
 	 *       0   divide error fault             SIGFPE
 	 *       1   single step trap/fault         SIGTRAP
 	 *       2   nonmaskable interrupt          none
@@ -1085,11 +1085,11 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
 NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = libc_error_info();
 	if (!(info->ei_flags & EXCEPT_FINCATCH)) {
-		/* Not inside of a catch-block (ignore the nesting request)
-		 * This can happen if the caller is only using the nest for
-		 * safety (in case a sub-function needs to be able to handle
-		 * its own exceptions, but may be called from an unaware
-		 * exception handler), or is using more than one nest.
+		/* Not inside of a  catch-block (ignore the nesting  request)
+		 * This can happen if the caller  is only using the nest  for
+		 * safety  (in case a sub-function needs to be able to handle
+		 * its own  exceptions, but  may be  called from  an  unaware
+		 * exception handler),  or  is  using  more  than  one  nest.
 		 * In all of these cases, just ignore the nest, and also make
 		 * it so that the associated `error_nesting_end()' is a no-op */
 		saved->en_size = 0;
@@ -1121,13 +1121,13 @@ NOTHROW(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting
 	                 "No saved exception in `error_nesting_end()'");
 	if (info->ei_code == ERROR_CODEOF(E_OK)) {
 		/* No newly thrown exception. (meaning we're currently not propagating
-		 * any exceptions, so we also shouldn't try to set the RETHROW flag!) */
+		 * any exceptions, so we also shouldn't try to set the RETHROW  flag!) */
 restore_saved_exception:
 		libc_memcpy(info, &saved->en_state, saved->en_size);
 	} else {
-		/* An Exception is currently being handled, and we must prevent that
+		/* An Exception  is currently  being handled,  and we  must prevent  that
 		 * exception from being deleted by an outer `__cxa_end_catch()'. Therefor
-		 * we must set the RETHROW flag to essentially re-throw the merged
+		 * we  must  set  the RETHROW  flag  to essentially  re-throw  the merged
 		 * exception from outside of the inner try-block:
 		 * [ 1] TRY {
 		 * [ 2]     foo();
@@ -1161,12 +1161,12 @@ restore_saved_exception:
 		 * [17]     __cxa_end_catch();                // [11]
 		 * [18] }
 		 *
-		 * We get here from EQ[12], which is followed by EQ[17], which
-		 * would normally delete the exception because it wasn't re-thrown
+		 * We  get  here  from  EQ[12],  which  is  followed  by  EQ[17], which
+		 * would normally  delete the  exception  because it  wasn't  re-thrown
 		 * from anywhere. But if you think of all of the possible constellation
-		 * where this function might be called, in all cases where we know
-		 * that there's currently an active exception (i.e. ei_code != E_OK),
-		 * it's always acceptable to set the RETHROW flag for the outer
+		 * where this function  might be  called, in  all cases  where we  know
+		 * that there's currently an active  exception (i.e. ei_code !=  E_OK),
+		 * it's always  acceptable  to  set  the RETHROW  flag  for  the  outer
 		 * call to `__cxa_end_catch()' (on line EQ[17])
 		 */
 		info->ei_flags |= EXCEPT_FRETHROW;

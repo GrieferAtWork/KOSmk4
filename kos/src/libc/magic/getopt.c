@@ -89,29 +89,29 @@ enum {
 }%[push_macro @undef { optarg optind opterr optopt option name has_arg flag val }]%{
 
 #ifdef __CRT_HAVE_optarg
-/* For communication from `getopt' to the caller.
+/* For   communication  from  `getopt'  to  the  caller.
  * When `getopt' finds an option that takes an argument,
  * the argument value is returned here.
- * Also, when `ordering' is RETURN_IN_ORDER,
+ * Also,  when  `ordering'  is   RETURN_IN_ORDER,
  * each non-option ARGV-element is returned here. */
 __LIBC char *optarg;
 #endif /* __CRT_HAVE_optarg */
 
 #ifdef __CRT_HAVE_optind
 /* Index in ARGV of the next element to be scanned.
- * - This is used for communication to and from the caller
+ * - This  is  used for  communication  to and  from  the caller
  *   and for communication between successive calls to `getopt'.
  * - On entry to `getopt', zero means this is the first call; initialize.
  * - When `getopt' returns -1, this is the index of the first of
  *   the non-option elements that the caller should itself scan.
- * - Otherwise, `optind' communicates from one call to
+ * - Otherwise,  `optind' communicates from one call to
  *   the next how much of ARGV has been scanned so far. */
 __LIBC __INT32_TYPE__ optind;
 #endif /* __CRT_HAVE_optind */
 
 #ifdef __CRT_HAVE_opterr
 /* Callers store zero here to inhibit the error message
- * `getopt' prints for unrecognized options. */
+ * `getopt'   prints    for    unrecognized    options. */
 __LIBC __INT32_TYPE__ opterr;
 #endif /* __CRT_HAVE_opterr */
 
@@ -120,17 +120,17 @@ __LIBC __INT32_TYPE__ opterr;
 __LIBC __INT32_TYPE__ optopt;
 #endif /* __CRT_HAVE_optopt */
 
-/* Describe the long-named options requested by the application.
- * The LONG_OPTIONS argument to getopt_long or getopt_long_only is a vector
+/* Describe    the   long-named   options   requested   by   the   application.
+ * The  LONG_OPTIONS argument  to getopt_long  or getopt_long_only  is a vector
  * of `struct option' terminated by an element containing a name which is zero.
  * - The field `has_arg' is:
  *     - no_argument       (or 0) if the option does not take an argument,
  *     - required_argument (or 1) if the option requires an argument,
  *     - optional_argument (or 2) if the option takes an optional argument.
  * - If the field `flag' is not NULL, it points to a variable that is set
- *   to the value given in the field `val' when the option is found, but
+ *   to  the value given in the field `val' when the option is found, but
  *   left unchanged if the option is not found.
- * - To have a long-named option do something other than set an `int' to a
+ * - To have a long-named option do something  other than set an `int' to  a
  *   compiled-in constant, such as set a value from `optarg', set the option
  *   's `flag' field to zero and its `val' field to a nonzero value
  *  (the equivalent single-letter option character, if there is one).

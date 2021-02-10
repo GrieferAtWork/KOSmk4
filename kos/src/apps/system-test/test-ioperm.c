@@ -117,10 +117,10 @@ DEFINE_TEST(ioperm_works_correctly) {
 				err(EXIT_FAILURE, "waitpid(%d) failed", cpid);
 		}
 	}
-	/* Make sure that ioperm() continues to work after fork() and preemption
-	 * This part is crucial, since this is where the CPU itself accesses a
+	/* Make  sure that ioperm() continues to work after fork() and preemption
+	 * This part is crucial,  since this is where  the CPU itself accesses  a
 	 * kernel-space structure as-per instruction from user-space (essentially
-	 * meaning that it is user-space that accesses kernel-space memory in a
+	 * meaning that it is user-space  that accesses kernel-space memory in  a
 	 * certain way) */
 	TRY {
 		doio();

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x437d3513 */
+/* HASH CRC-32:0x6abe0204 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,7 @@
 #define IXANY   __IXANY   /* Any input character has the behavior of `VSTART' */
 #endif /* !IXANY && __IXANY */
 #if !defined(IXOFF) && defined(__IXOFF)
-#define IXOFF   __IXOFF   /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared.
+#define IXOFF   __IXOFF   /* Status  bit  for   `VSTOP'  /   `VSTART':  Don't   transmit  pending   TTY  output   until  this   bit  is   cleared.
                            * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
 #endif /* !IXOFF && __IXOFF */
 #if !defined(IMAXBEL) && defined(__IMAXBEL)
@@ -486,7 +486,7 @@
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #if !defined(XCASE) && defined(__XCASE)
 #define XCASE       __XCASE   /* If ICANON is also set, terminal is uppercase only. Input is converted to lowercase,
-                               * except for characters preceded by \. On output, uppercase characters are preceded
+                               * except for characters preceded by \.  On output, uppercase characters are  preceded
                                * by \ and lowercase characters are converted to uppercase. */
 #endif /* !XCASE && __XCASE */
 #endif /* __USE_MISC || __USE_XOPEN */
@@ -500,7 +500,7 @@
 #define ECHOK       __ECHOK   /* If ICANON is also set, the VKILL character erases the current line */
 #endif /* !ECHOK && __ECHOK */
 #if !defined(ECHONL) && defined(__ECHONL)
-#define ECHONL      __ECHONL  /* If ICANON is also set, echo the NL character even if ECHO is not set
+#define ECHONL      __ECHONL  /* If   ICANON  is  also  set,  echo  the  NL  character  even  if  ECHO  is  not  set
                                * NOTE: for this purpose, the NL character(s) recognized are '\n', `VEOL' and `VEOL2' */
 #endif /* !ECHONL && __ECHONL */
 #if !defined(NOFLSH) && defined(__NOFLSH)
@@ -512,16 +512,16 @@
 #ifdef __USE_MISC
 #if !defined(ECHOCTL) && defined(__ECHOCTL)
 #define ECHOCTL     __ECHOCTL /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
-                               * START, and STOP are echoed as ^X, where X is the character with ASCII code
-                               * 0x40 greater than the special character. For example, character 0x08 (BS)
+                               * START,  and STOP are echoed as ^X, where  X is the character with ASCII code
+                               * 0x40  greater than the  special character. For  example, character 0x08 (BS)
                                * is echoed as ^H */
 #endif /* !ECHOCTL && __ECHOCTL */
 #if !defined(ECHOPRT) && defined(__ECHOPRT)
 #define ECHOPRT     __ECHOPRT /* This bit is like ECHOE, enables display of the ERASE character in a way that
-                               * is geared to a hardcopy terminal. When you type the ERASE character, a `\'
-                               * character is printed followed by the first character erased. Typing the
-                               * ERASE character again just prints the next character erased. Then, the
-                               * next time you type a normal character, a `/' character is printed
+                               * is geared to a hardcopy terminal. When  you type the ERASE character, a  `\'
+                               * character is  printed followed  by the  first character  erased. Typing  the
+                               * ERASE  character  again just  prints the  next  character erased.  Then, the
+                               * next  time  you  type  a  normal  character,  a  `/'  character  is  printed
                                * before the character echoes. */
 #endif /* !ECHOPRT && __ECHOPRT */
 #if !defined(ECHOKE) && defined(__ECHOKE)
@@ -536,8 +536,8 @@
 #endif /* __USE_MISC */
 #if !defined(IEXTEN) && defined(__IEXTEN)
 #define IEXTEN      __IEXTEN  /* Enable implementation-defined input processing. This flag, as
-                               * well as ICANON must be enabled for the special characters
-                               * EOL2, LNEXT, REPRINT, WERASE to be interpreted, and for the
+                               * well  as ICANON  must be  enabled for  the special characters
+                               * EOL2, LNEXT, REPRINT, WERASE to  be interpreted, and for  the
                                * IUCLC flag to be effective */
 #endif /* !IEXTEN && __IEXTEN */
 #ifdef __USE_MISC

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf683264 */
+/* HASH CRC-32:0x7a540feb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,10 +36,10 @@
 #include <bits/types.h>
 
 /*
- * Note that the KOS implementations of these functions was written entirely
+ * Note  that the KOS implementations of these functions was written entirely
  * from scratch, only using GLibc's implementation as a reference (which also
  * resulted in me discovering some bugs in GLibc's version that I'm not going
- * to report because at least in my mind, these are just suuuuch _absolute_
+ * to  report because at least in my  mind, these are just suuuuch _absolute_
  * beginner's mistakes...)
  * The function's that I've fixed are:
  *  - argz_add_sep()

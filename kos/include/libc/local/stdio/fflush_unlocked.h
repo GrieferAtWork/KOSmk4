@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc09ad176 */
+/* HASH CRC-32:0x3a8958b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __LOCAL_LIBC(fflush_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush_unlocked))(__FILE *__stream) __THROWS(...) {
-	/* NO-OP (When not implemented by the CRT, assume no
+	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)
 	if (!__stream)

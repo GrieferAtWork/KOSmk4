@@ -394,7 +394,7 @@ PRIVATE struct conf const confs[] = {
 /* clang-format on */
 
 /* Find the configuration name identified by `name'
- * NOTE: If the name isn't found during the first pass, search for it as
+ * NOTE: If the name  isn't found during  the first pass,  search for it  as
  *       long as one of the following prefixes could be removed from `name':
  *       "_POSIX_", "_"
  * If no such configuration name exists, return `NULL' instead. */

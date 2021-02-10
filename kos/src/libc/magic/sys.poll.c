@@ -103,7 +103,7 @@
 
 /* Event types always implicitly polled for.
  * These don't need to be set in `events', but they will appear
- * in `revents' to indicate their respective status condition. */
+ * in  `revents' to indicate their respective status condition. */
 #if !defined(POLLERR) && defined(__POLLERR)
 #define POLLERR  __POLLERR  /* Error condition. */
 #endif /* !POLLERR && __POLLERR */

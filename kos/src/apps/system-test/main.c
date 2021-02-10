@@ -109,7 +109,7 @@ PRIVATE void run_all_tests(void) {
 
 int main(int argc, char *argv[], char *envp[]) {
 	/* A special application who's sole purpose is to perform a series of
-	 * automated system tests to ensure that the various sub-systems of
+	 * automated system tests to ensure  that the various sub-systems  of
 	 * KOS are functioning properly. */
 	(void)argc;
 	(void)argv;

@@ -24,15 +24,15 @@
 #undef NDEBUG
 
 /* System headers are smart enough to define `sys_errlist' not as an external
- * data object, but rather as a direct invocation of its resolver function,
+ * data object, but rather as a  direct invocation of its resolver  function,
  * which in turn would allow its initialization to be delayed until the point
  * of first use.
- * Now that is good an all, but we're not here to have the headers help us
- * write the most optimal code possible. - No: we're here to test the idata
+ * Now that is  good an all,  but we're not  here to have  the headers help  us
+ * write the most optimal  code possible. -  No: we're here  to test the  idata
  * system, meaning that we want these 2 symbols to be linked as actual external
  * data objects.
  * So by pre-defining macros with the these names, we can make the headers think
- * that these symbols have already been defined, thus preventing headers from
+ * that  these symbols have  already been defined,  thus preventing headers from
  * actually defining them! */
 #define sys_errlist DONT_DEFINE_sys_errlist
 #define sys_nerr    DONT_DEFINE_sys_nerr
@@ -57,7 +57,7 @@ extern int sys_nerr;
 DEFINE_TEST(idata) {
 	unsigned int i;
 	/* Make sure that IDATA works when used with
-	 * regularly linked global data objects. */
+	 * regularly  linked  global  data  objects. */
 	for (i = 0; i < (unsigned int)sys_nerr; ++i) {
 		char const *a = sys_errlist[i];
 		char const *b = strerror_s(i);

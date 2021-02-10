@@ -2110,7 +2110,7 @@ NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
 			}
 			return mallptr;
 		}
-		/* Allocate a new block so we can ensure that an
+		/* Allocate a new block so we can ensure that  an
 		 * existing block gets freezero()'ed in all cases */
 		result = calloc(new_elem_count, elem_size);
 		if (result) {

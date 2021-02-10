@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb0a6632 */
+/* HASH CRC-32:0x6c15b230 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,8 +40,8 @@ __LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 		int __difference;
 		void *__item_addr;
 		/* Select the item right-smack in the middle of
-		 * the lower and upper bound for comparison
-		 * Assuming an even distribution, the chance of it being the
+		 * the  lower  and upper  bound  for comparison
+		 * Assuming  an even  distribution, the  chance of  it being the
 		 * intended item should be the greatest there, and will increase
 		 * with every iteration
 		 * Also: This way, the entire algorithm has a worst-case of

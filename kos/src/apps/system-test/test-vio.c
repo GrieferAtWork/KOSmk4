@@ -78,23 +78,23 @@ PRIVATE struct vio_operators const myvio_ops = {
 
 
 /* The problem:
- *     When a mapping exists for BFFFF000-BFFFFFFF, and an access is made
- *     at an address that overlaps with the far end of this address range
- *     (for this purpose, perform a 4-byte access at `BFFFFFFF'), #PF is
+ *     When a mapping exists for  BFFFF000-BFFFFFFF, and an access is  made
+ *     at  an address that overlaps with the  far end of this address range
+ *     (for  this purpose, perform  a 4-byte access  at `BFFFFFFF'), #PF is
  *     triggered with %cr2=C0000000, which in turn results in VIO emulation
  *     being triggered as well. However, vio will then find that the access
- *     is actually happening at `BFFFFFFF', which causes it to not be
- *     dispatched through vio (since only addresses >= C0000000 are always
- *     handled via VIO). As a result, the kernel will re-trigger the same
- *     #PF that originally caused the fault, and after a whole bunch of
+ *     is  actually  happening at  `BFFFFFFF', which  causes  it to  not be
+ *     dispatched through vio (since only addresses >= C0000000 are  always
+ *     handled via VIO). As a result,  the kernel will re-trigger the  same
+ *     #PF  that originally  caused the fault,  and after a  whole bunch of
  *     recursion, the kernel will end up double-faulting.
  * Solution:
- *     In `kos/src/libviocore/arch/i386/viocore.c', all of the range-checking
- *     dispatch functions must handle the case where an address is accessed
+ *     In `kos/src/libviocore/arch/i386/viocore.c', all  of the  range-checking
+ *     dispatch functions must  handle the  case where an  address is  accessed
  *     that is only partially overlapping with VIO. This should then be handled
- *     by performing both a normal memory access, as well as a VIO access.
- *     In the event of such an access being performed in the context of an
- *     atomic operation, the kernel should throw an `E_SEGFAULT_UNALIGNED'
+ *     by performing both  a normal  memory access, as  well as  a VIO  access.
+ *     In the event  of such an  access being  performed in the  context of  an
+ *     atomic  operation,  the  kernel should  throw  an `E_SEGFAULT_UNALIGNED'
  *     exception.
  *
  * This test ensures that this handling is done correctly, alongside
@@ -151,9 +151,9 @@ DEFINE_TEST(vio) {
 	assert(num_vio_read == 1);
 	assert(num_vio_write == 1);
 
-	/* This is where it gets a bit complicated, because we're testing to
-	 * ensure that reading/writing from an unaligned memory address near
-	 * the top/bottom of the VIO range (such that part of the memory that
+	/* This  is where  it gets a  bit complicated, because  we're testing to
+	 * ensure that  reading/writing from  an unaligned  memory address  near
+	 * the top/bottom of the  VIO range (such that  part of the memory  that
 	 * is being accessed isn't actually apart of VIO), still works correctly */
 	{
 		union {
@@ -161,7 +161,7 @@ DEFINE_TEST(vio) {
 			u32 v32;
 		} value;
 		/* This read should yield { 0xff, 0x11, 0x22, 0x33 },
-		 * as well as increment `num_vio_read' by exactly 1. */
+		 * as  well as increment `num_vio_read' by exactly 1. */
 		num_vio_read = BETOH32(0x11223344);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase - 1);
 		assertf(value.v8[0] == 0xff && value.v8[1] == 0x11 &&

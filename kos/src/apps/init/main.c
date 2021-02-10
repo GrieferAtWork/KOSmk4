@@ -75,7 +75,7 @@ PRIVATE void console_sane_ios(void) {
 
 
 /* User-space entry point for /bin/init
- * NOTE: This program is running as PID=1 (i.e. _boottask), which carries
+ * NOTE: This program is running as  PID=1 (i.e. _boottask), which  carries
  *       the `TASK_FCRITICAL' flag, meaning that if this program ever dies,
  *       then the kernel will (intentionally) PANIC! */
 int main(int argc, char *argv[], char *envp[]) {
@@ -139,8 +139,8 @@ done_tmpfs:
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
-	 *       when the ps2 keyboard files are missing from /dev
-	 *       As it stands right now, PS/2 will still create device files,
+	 *       when  the   ps2  keyboard   files  are   missing  from   /dev
+	 *       As  it stands right now, PS/2 will still create device files,
 	 *       even when the devices stem from USB emulation. */
 	ksysctl_insmod("usb-hid", NULL);
 
@@ -169,7 +169,7 @@ done_tmpfs:
 
 		{
 			/* Set our process as the foreground process
-			 * group controlled by /dev/console. */
+			 * group    controlled    by   /dev/console. */
 			pid_t me = 0; /* `0' is an alias for `getpid()' here. */
 			Ioctl(console, TIOCSPGRP, &me);
 		}
@@ -183,8 +183,8 @@ done_tmpfs:
 			close(console);
 	}
 
-	/* Construct the recommended symlinks for devfs.
-	 * Don't do any error checking, since their absence
+	/* Construct  the  recommended  symlinks  for   devfs.
+	 * Don't do any  error checking,  since their  absence
 	 * shouldn't hinder minimal operability of the system. */
 	symlink("/proc/self/fd", "/dev/fd");
 	symlink("/proc/self/fd/0", "/dev/stdin");
@@ -238,8 +238,8 @@ done_tmpfs:
 		        "");
 
 		/* Don't directly exec() busybox.
-		 * Instead, fork()+exec(), then keep on doing so
-		 * whenever busybox dies (such as when the user
+		 * Instead, fork()+exec(),  then keep  on doing  so
+		 * whenever  busybox  dies (such  as when  the user
 		 * presses CTRL+D do trigger an end-of-input event) */
 		cpid = VFork();
 		if (cpid == 0) {
@@ -264,32 +264,32 @@ done_tmpfs:
 		while (waitpid(cpid, NULL, 0) < 0)
 			sched_yield();
 
-		/* Kill anything which may have been left alive by the shell.
+		/* Kill  anything which may  have been left  alive by the shell.
 		 * Note that kill(-1, ...) will never kill a process with pid=1,
-		 * meaning that we (the process with pid=1) won't get killed
+		 * meaning  that we  (the process  with pid=1)  won't get killed
 		 * by this! */
-		/* TODO: Send SIGTERM and wait for a configurable timeout until all
+		/* TODO: Send SIGTERM and  wait for a  configurable timeout until  all
 		 *       processes except for our own have died. Only once the timeout
-		 *       expires with different processes still alive should we send
-		 *       SIGKILL. - That way, other processes still get a chance to
-		 *       perform some cleanup (such as saving data to disk) before
+		 *       expires with different processes  still alive should we  send
+		 *       SIGKILL.  - That way,  other processes still  get a chance to
+		 *       perform  some cleanup  (such as  saving data  to disk) before
 		 *       really going away.
 		 * NOTE: We can't use opendir("/proc") for this, since we mustn't rely
-		 *       on a working procfs (see the procfs init above, which allows
+		 *       on  a working procfs (see the procfs init above, which allows
 		 *       for the insmod() and mount() to fail), meaning we need to use
-		 *       a custom (probably sysctl()-based) function for checking how
+		 *       a  custom (probably sysctl()-based) function for checking how
 		 *       many user-space threads are running on the system */
 		kill(-1, SIGKILL);
 
 		/* Become the foreground process of /dev/console
-		 * In theory this shouldn't be necessary, since the kill() before
-		 * should have gotten rid of any process that could have been holding
-		 * the foreground-process lock before, however just in case the kernel
-		 * decides to have a SIGKILL-broadcast be performed asynchronously, in
-		 * which case the old foreground process may still be alive when we
-		 * clear the console above, we go the safe route and always become the
+		 * In  theory  this  shouldn't  be  necessary,  since  the  kill()   before
+		 * should  have  gotten rid  of any  process that  could have  been holding
+		 * the foreground-process  lock before,  however just  in case  the  kernel
+		 * decides to  have a  SIGKILL-broadcast  be performed  asynchronously,  in
+		 * which case  the  old foreground  process  may  still be  alive  when  we
+		 * clear the console  above, we  go the safe  route and  always become  the
 		 * foreground process once again. - Note however that since we've installed
-		 * a SIG_IGN handler for `SIGTTOU', we still wouldn't get suspended in
+		 * a SIG_IGN  handler for  `SIGTTOU', we  still wouldn't  get suspended  in
 		 * such a scenario, but we'd also be unable to reset the tty... */
 		console_set_fgproc();
 

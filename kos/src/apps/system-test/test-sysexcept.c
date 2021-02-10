@@ -112,8 +112,8 @@ __asm__(
 );
 
 PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
-	/* NOTE: sysenter is emulated by the kernel if unsupported by the CPU,
-	 *       so this should always work. However, when unavailable, that
+	/* NOTE: sysenter  is emulated by the kernel if unsupported by the CPU,
+	 *       so this should  always work. However,  when unavailable,  that
 	 *       emulation is quite slow and expensive, so it's if unavailable,
 	 *       libc would fall back to using int 80h at runtime. */
 	__asm__ __volatile__("std\n\t" /* Enable exceptions */
@@ -161,7 +161,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	 *  - user-space fault
 	 */
 
-	/* The regular exception-enabled,
+	/* The    regular    exception-enabled,
 	 * portable user-space wrapper function */
 	ctest_subtestf("Pipe() works");
 	{
@@ -201,10 +201,10 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		assert_error_code(E_SEGFAULT);
 	}
 
-	/* Also make sure that ukern system calls _can_ work
-	 * Note that these are exception-enabled system calls,
-	 * so if anything went wrong in here, the kernel would
-	 * throw an exception that'd cause libc to trigger a
+	/* Also make sure  that ukern system  calls _can_  work
+	 * Note  that these are exception-enabled system calls,
+	 * so if anything went wrong in here, the kernel  would
+	 * throw an exception  that'd cause libc  to trigger  a
 	 * coredump when it couldn't find an exception handler. */
 	ctest_subtestf("userkern_Syscall(pipe) works");
 	{
@@ -315,7 +315,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		}
 	}
 
-	/* Do something that causes the kernel to throw an
+	/* Do something that causes  the kernel to throw  an
 	 * exception due to performing an illegal operation. */
 	assert_error_code(E_OK);
 	ctest_subtestf("E_DIVIDE_BY_ZERO works");

@@ -64,7 +64,7 @@ enum {
 	FSETLOCKING_QUERY    = __FSETLOCKING_QUERY,    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects all uses of the stream functions, except for
+	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects  all uses  of the stream  functions, except  for
 	                                                * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
@@ -75,17 +75,29 @@ enum {
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __FSETLOCKING_QUERY
 #define FSETLOCKING_QUERY    FSETLOCKING_QUERY    /* Query current state of the locking status. */
-#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for
+#endif /* __FSETLOCKING_QUERY */
+#ifdef __FSETLOCKING_INTERNAL
+#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects  all uses  of the stream  functions, except  for
                                                    * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#endif /* __FSETLOCKING_INTERNAL */
+#ifdef __FSETLOCKING_BYCALLER
 #define FSETLOCKING_BYCALLER FSETLOCKING_BYCALLER /* The user will take care of locking.
                                                    * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
+#endif /* __FSETLOCKING_BYCALLER */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FSETLOCKING_QUERY    0 /* Query current state of the locking status. */
-#define FSETLOCKING_INTERNAL 1 /* The library protects all uses of the stream functions, except for
-                                * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
-#define FSETLOCKING_BYCALLER 2 /* The user will take care of locking.
-                                * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
+#ifdef __FSETLOCKING_QUERY
+#define FSETLOCKING_QUERY    __FSETLOCKING_QUERY    /* Query current state of the locking status. */
+#endif /* __FSETLOCKING_QUERY */
+#ifdef __FSETLOCKING_INTERNAL
+#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL /* The library protects  all uses  of the stream  functions, except  for
+                                                     * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#endif /* __FSETLOCKING_INTERNAL */
+#ifdef __FSETLOCKING_BYCALLER
+#define FSETLOCKING_BYCALLER __FSETLOCKING_BYCALLER /* The user will take care of locking.
+                                                     * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
+#endif /* __FSETLOCKING_BYCALLER */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
@@ -131,7 +143,7 @@ size_t __fpending([[nonnull]] $FILE *fp);
 
 @@Flush all line-buffered files
 /* NOTE: I feel like this is a typo, but that's
- *       the symbol that also exists in GLibC! */
+ *       the  symbol that also exists in GLibC! */
 [[cp_stdio, export_alias("_IO_flush_all_linebuffere")]]
 void _flushlbf();
 

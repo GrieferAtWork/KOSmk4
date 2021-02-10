@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cc9b663 */
+/* HASH CRC-32:0x9ca77a95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -637,8 +637,8 @@ NOTHROW(LIBCCALL libc_pow)(double x,
 	 * ====================================================
 	 * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
 	 *
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice 
+	 * Permission  to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -708,8 +708,8 @@ NOTHROW(LIBCCALL libc_powf)(float x,
 	 * ====================================================
 	 * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
 	 *
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice 
+	 * Permission  to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -788,8 +788,8 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
 	 * ====================================================
 	 * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
 	 *
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice 
+	 * Permission  to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -2138,8 +2138,8 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 	 *
 	 * Developed at SunSoft, a Sun Microsystems, Inc. business.
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice
+	 * Permission  to  use, copy,  modify, and  distribute this
+	 * software is freely  granted, provided  that this  notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -2192,8 +2192,8 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 	 *
 	 * Developed at SunSoft, a Sun Microsystems, Inc. business.
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice
+	 * Permission  to  use, copy,  modify, and  distribute this
+	 * software is freely  granted, provided  that this  notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -2249,8 +2249,8 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 	 *
 	 * Developed at SunSoft, a Sun Microsystems, Inc. business.
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice
+	 * Permission  to  use, copy,  modify, and  distribute this
+	 * software is freely  granted, provided  that this  notice
 	 * is preserved.
 	 * ====================================================
 	 */

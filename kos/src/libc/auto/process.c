@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6851a9b */
+/* HASH CRC-32:0x20343fb1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
                                  pid_t pid,
                                  __STDC_INT_AS_UINT_T action) {
 	/* This one's pretty simple, because it's literally just a waitpid() system call...
-	 * (It even returns the same thing, that being the PID of the joined process...) */
+	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */
 	(void)action;
 	return libc_waitpid(pid, tstat, WEXITED);
@@ -152,7 +152,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32
@@ -333,12 +333,12 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 		if (child < 0)
 			goto err;
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-		/* Check for errors that may have happened in the
+		/* Check for errors that may have happened in  the
 		 * child process _after_ we did the vfork() above. */
 		if (__libc_geterrno_or(0) != 0)
 			goto err_join_zombie_child;
 		/* Success (but still restore the old errno
-		 * since we overwrote it to be 0 above) */
+		 * since  we  overwrote it  to be  0 above) */
 		__libc_seterrno(old_errno);
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 		libc_close(pipes[1]); /* Close the writer. */
@@ -373,9 +373,9 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 		goto do_exec;
 read_child_errors:
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-	/* Check if the vfork() from the child returned success, but left
+	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at some point after vfork() already
+	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
 	if (__libc_geterrno_or(0) != 0)
 		goto err_join_zombie_child;
@@ -387,7 +387,7 @@ read_child_errors:
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and read() returns ZERO(0)) */
+	 *        closed and  read() returns  ZERO(0)) */
 	libc_close(pipes[1]); /* Close the writer. */
 	temp = libc_read(pipes[0], &error, sizeof(error));
 	libc_close(pipes[0]); /* Close the reader. */
@@ -402,7 +402,7 @@ read_child_errors:
 err_join_zombie_child:
 	if (mode != P_DETACH) {
 		/* Unless the child was already spawned as detached,
-		 * we still have to re-join it, or else it will be
+		 * we still have to re-join  it, or else it will  be
 		 * left dangling as a zombie process! */
 		if (libc_waitpid(child, &status, 0) < 0) {
 #ifdef EINTR
@@ -415,12 +415,12 @@ err:
 	return -1;
 do_exec:
 	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as O_CLOEXEC! */
+	 * closed because it's marked as  O_CLOEXEC! */
 	libc_fexecve(execfd, ___argv, ___envp);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 	/* If the exec fails, it will have modified `errno' to indicate this fact.
-	 * And since we're sharing VMs with our parent process, the error reason
-	 * will have already been written back to our parent's VM, so there's
+	 * And since we're sharing VMs with  our parent process, the error  reason
+	 * will have already  been written  back to  our parent's  VM, so  there's
 	 * actually nothing left for us to do, but to simply exit! */
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Write the exec-error back to our parent. */

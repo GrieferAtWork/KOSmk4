@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x836e100f */
+/* HASH CRC-32:0x4232b0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,9 +90,9 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
 	child = libc_vfork();
 	if (child == 0)
 		goto do_exec;
-	/* Check if the vfork() from the child returned success, but left
+	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at some point after vfork() already
+	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
 	result = __libc_geterrno_or(0);
 	if (result != 0) {
@@ -124,7 +124,7 @@ err_without_child:
 		goto err_without_child; /* The fork() itself failed. */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and read() returns ZERO(0)) */
+	 *        closed and  read() returns  ZERO(0)) */
 	libc_close(pipes[1]); /* Close the writer. */
 	temp = libc_read(pipes[0], &result, sizeof(result));
 	libc_close(pipes[0]); /* Close the reader. */
@@ -139,7 +139,7 @@ err_without_child:
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 err_join_zombie_child:
 	/* Unless the child was already spawned as detached,
-	 * we still have to re-join it, or else it will be
+	 * we still have to re-join  it, or else it will  be
 	 * left dangling as a zombie process! */
 	if (libc_waitpid(child, &status, 0) < 0) {
 #ifdef EINTR
@@ -350,7 +350,7 @@ do_exec:
 		}
 	}
 	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as O_CLOEXEC! */
+	 * closed because it's marked as  O_CLOEXEC! */
 	libc_fexecve(execfd, ___argv, ___envp);
 #ifdef __POSIX_SPAWN_NOEXECERR
 	if (attrp && attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
@@ -364,8 +364,8 @@ do_exec:
 child_error:
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with our parent process, the error reason
-		 * will have already been written back to our parent's VM, so there's
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
 		 * actually nothing left for us to do, but to simply exit! */
 		;
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
@@ -479,7 +479,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32

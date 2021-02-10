@@ -31,7 +31,7 @@
  * However, I've seen it as part of djgpp, but I think it has to do with autoconf,
  * and I kind-of like the idea behind this kind of header.
  * Anyways: What can be found below should be fairly self-explanatory.
- * Also: With magic, it's fairly easy to automate this header... */
+ * Also:  With  magic, it's  fairly  easy to  automate  this header... */
 
 #include <features.h>
 
@@ -480,7 +480,7 @@
 #undef STAT_STATFS2_BSIZE
 }%[insert:pp_if($has_function(statfs))]%{
 #define STAT_STATFS2_BSIZE 1 /* Actually requires that statfs() takes 2 arguments,
-                              * and that `struct statfs::f_bsize' exists! */
+                              * and    that    `struct statfs::f_bsize'    exists! */
 }%[insert:pp_endif]%{
 
 #undef HAVE_UTIME_NULL
@@ -590,7 +590,7 @@
 
 
 /* Cygwin also has a header of the same name, so here is
- * an approximation of its contents (adjusted for KOS). */
+ * an  approximation of its contents (adjusted for KOS). */
 #undef __DYNAMIC_REENT__
 #undef __LINUX_ERRNO_EXTENSIONS__
 #define __DYNAMIC_REENT__ 1

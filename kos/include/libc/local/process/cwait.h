@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82b26f74 */
+/* HASH CRC-32:0xd337e533 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 __LOCAL_LIBC(cwait) __pid_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cwait))(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) {
 	/* This one's pretty simple, because it's literally just a waitpid() system call...
-	 * (It even returns the same thing, that being the PID of the joined process...) */
+	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */
 	(void)__action;
 	return __localdep_waitpid(__pid, __tstat, __WEXITED);

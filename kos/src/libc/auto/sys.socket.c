@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x767b56c4 */
+/* HASH CRC-32:0xc5a16d93 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ NOTHROW_NCX(LIBCCALL libc___cmsg_nxthdr)(struct msghdr *mhdr,
 	byte_t *ctrl_end;
 	/* If the current header is incomplete, then there is no next header.
 	 * XXX: This should really never happen, since `CMSG_FIRSTHDR()' already
-	 *      checks this, however linux also does this check, so... */
+	 *      checks  this,  however  linux   also  does  this  check,   so... */
 	if unlikely((size_t)cmsg->cmsg_len < __OFFSET_CMSGHDR_DATA)
 		goto eof;
 	/* Walk to the next header */

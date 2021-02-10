@@ -48,15 +48,15 @@ DECL_BEGIN
 	        "errno = %d (%s)", errno, strerror(errno))
 
 
-/* Procfs has to have special handling for open(2)ing files from
- * the /proc/[pid]/fd/ folder, as doing so mustn't follow normal
- * open rules, where the associated symlink is followed. Instead,
+/* Procfs has to have special  handling for open(2)ing files  from
+ * the /proc/[pid]/fd/ folder, as  doing so mustn't follow  normal
+ * open rules, where the associated symlink is followed.  Instead,
  * an open invocation for one of these files must behave more like
- * a dup(), followed by `fcntl(F_SETFL)' to apply the new oflags
+ * a dup(), followed by `fcntl(F_SETFL)'  to apply the new  oflags
  * that were passed to open().
  *
  * While the regular follow-symlink approach works for ~regular~,
- * named files, anonymous files would still appear as symlinks
+ * named files, anonymous  files would still  appear as  symlinks
  * within /proc/[pid]/fd/, though they can't be opened the normal
  * way because they don't actually have a name.
  *
@@ -74,30 +74,30 @@ DEFINE_TEST(open_anon_inode) {
 	int error;
 	struct stat st;
 
-	/* Check if procfs is actually mounted.
+	/* Check  if  procfs  is  actually   mounted.
 	 * If it isn't, then don't perform this test. */
 	if (lstat("/proc/self/exe", &st) != 0)
 		return;
 
 	/* Pipes exist as anonymous objects in kernel-space.
 	 * -> Reading their symlink will yield something
-	 *    along the lines of `anon_inode:[...]' */
+	 *    along  the  lines  of   `anon_inode:[...]' */
 	error = pipe(rw);
 	ASSERT_ERROR_OK(error == 0);
 	error = close(rw[1]);
 	ASSERT_ERROR_OK(error == 0);
 
-	/* First test: When using one of the fd/xxx files as part of a
+	/* First  test: When using one of the  fd/xxx files as part of a
 	 * path expression, the symlink must still be followed normally,
-	 * and the expression would have to behave more like a call to
+	 * and the expression would have to  behave more like a call  to
 	 * openat():
 	 * >> open("/proc/self/fd/{dfd}/{path}", oflags);
 	 * Same as:
 	 * >> openat(dfd, path, oflags);
-	 * As such, by having the fd's number be followed by a slash,
+	 * As  such, by  having the fd's  number be followed  by a slash,
 	 * we're explicitly dereferencing the symlink (which in this case
-	 * will expand to something like `anon_inode:[reader:pipe:...]`)
-	 * as a path, which must obviously result in a file-not-found
+	 * will expand to something like  `anon_inode:[reader:pipe:...]`)
+	 * as  a path,  which must  obviously result  in a file-not-found
 	 * exception. */
 	sprintf(pathbuf, "/proc/self/fd/%d/", rw[0]);
 	dupres = open(pathbuf, O_RDONLY);
@@ -105,19 +105,19 @@ DEFINE_TEST(open_anon_inode) {
 	ASSERT_ERROR_NOT_OK(dupres != -1, ENOENT);
 
 	/* By passing O_NOFOLLOW, we can explicitly suppress the custom
-	 * follow-last-path-component behavior of procfs fd files, at
-	 * which point we'd once again be trying to open a symlink
-	 * directly. (Note that this call would succeed if we were
-	 * to also pass O_SYMLINK, however at that point this call
-	 * would return a handle to a procfs `struct symlink_node'
-	 * object of type `ProcFS_PerProc_Fd_Entry_Type', rather than
+	 * follow-last-path-component behavior of  procfs fd files,  at
+	 * which point  we'd once  again be  trying to  open a  symlink
+	 * directly. (Note  that this  call would  succeed if  we  were
+	 * to also  pass O_SYMLINK,  however at  that point  this  call
+	 * would  return  a  handle to  a  procfs `struct symlink_node'
+	 * object of type  `ProcFS_PerProc_Fd_Entry_Type', rather  than
 	 * the pointed-to object) */
 	sprintf(pathbuf, "/proc/self/fd/%d", rw[0]);
 	dupres = open(pathbuf, O_RDONLY | O_NOFOLLOW);
 	/* ELOOP is the result of `E_FSERROR_IS_A_SYMBOLIC_LINK' */
 	ASSERT_ERROR_NOT_OK(dupres != -1, ELOOP);
 
-	/* Last case, as well as the actual special case in which
+	/* Last  case, as well as the actual special case in which
 	 * open() must invoke the custom open-callback that exists
 	 * for procfs fd files.
 	 * This is the case where open() must behave as dup() */
@@ -150,7 +150,7 @@ DEFINE_TEST(open_anon_inode) {
 
 		/* Test what had already been mentioned above:
 		 * Use files from `/proc/self/fd/[...]/' to implement the
-		 * equivalent of an `openat()' system call, whilst still
+		 * equivalent  of an `openat()' system call, whilst still
 		 * using the regular `open()'. */
 		dfd = open("/proc/self", O_RDONLY | O_DIRECTORY);
 		ASSERT_ERROR_OK(dfd != -1);
@@ -163,7 +163,7 @@ DEFINE_TEST(open_anon_inode) {
 		error = close(dfd);
 		ASSERT_ERROR_OK(error == 0);
 
-		/* `with_follow' should be the equivalent of `readlink("/proc/self/exe")'
+		/* `with_follow'  should be the equivalent of `readlink("/proc/self/exe")'
 		 * we can check this by comparing it against `expected_with_follow', which
 		 * should be an identical string. */
 		expected_with_follow = dlmodulename(dlopen(NULL, 0));
@@ -172,7 +172,7 @@ DEFINE_TEST(open_anon_inode) {
 		        "%q != %q", with_follow, expected_with_follow);
 
 		/* `without_follow' should simply be a string `/proc/[getpid()]/exe', since
-		 * in this case the final symbolic link `exe' wasn't dereferenced. */
+		 * in  this  case  the  final  symbolic  link  `exe'  wasn't  dereferenced. */
 		sprintf(pathbuf, "/proc/%d/exe", getpid());
 		assertf(strcmp(without_follow, pathbuf) == 0,
 		        "%q != %q", without_follow, pathbuf);

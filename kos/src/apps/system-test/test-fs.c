@@ -210,8 +210,8 @@ PRIVATE void testPath(char const *path) {
 	assertFileText(dfd, "test2", "F2\n");
 
 	/* All right! That worked.
-	 * Finally, try to create a new `test' file.
-	 * The important part here is that a file of
+	 * Finally,  try to create  a new `test' file.
+	 * The important part here  is that a file  of
 	 * the same name already existed at one point! */
 	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
 	assertf(fd != -1, "%s", strerror(errno));
@@ -248,13 +248,13 @@ PRIVATE void testPath(char const *path) {
 		/* Take away write-permissions from the file.
 		 * This verifies that it'll still be possible to unlink()
 		 * a file that doesn't allow write access. Older versions
-		 * of the KOS kernel miss-understood the POSIX specs and
-		 * though that to delete a file, one needed write-access
-		 * to the file itself, rather than to the containing
+		 * of the KOS kernel miss-understood the POSIX specs  and
+		 * though that to delete a file, one needed  write-access
+		 * to the  file itself,  rather  than to  the  containing
 		 * directory.
-		 * NOTE: We only test for this kind of thing when hard-links
+		 * NOTE: We only  test  for  this kind  of  thing  when  hard-links
 		 *       are supposed to be tested, since currently all filesystems
-		 *       that are being tested support POSIX permissions exactly
+		 *       that are being  tested support  POSIX permissions  exactly
 		 *       when, and only when, hard-links are also supported. */
 		error = fchmodat(dfd, "test", 0444, 0);
 		assertf(error == 0, "%s", strerror(errno));
@@ -264,7 +264,7 @@ PRIVATE void testPath(char const *path) {
 		assertf(error == 0, "%s", strerror(errno));
 
 		/* Pre-init the stat structures to account for padding
-		 * fields (that aren't written by the kernel) in the
+		 * fields (that aren't written  by the kernel) in  the
 		 * memcmp() below. */
 		memset(&st1, 0xcc, sizeof(st1));
 		memset(&st2, 0xcc, sizeof(st2));
@@ -327,7 +327,7 @@ DEFINE_TEST(fs) {
 	testPath("/dev");
 
 	/* Make sure the kernel doesn't crash if we try to
-	 * sync any potential modifications made above. */
+	 * sync  any  potential modifications  made above. */
 	sync();
 }
 

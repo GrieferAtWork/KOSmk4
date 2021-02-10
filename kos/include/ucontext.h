@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14477bb2 */
+/* HASH CRC-32:0x823792cb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,7 +128,7 @@ __LIBC __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(uconte
 
 #ifdef __CRT_SUPPORTS_UCONTEXT
 /* Tell the compiler that `setcontext()' will never return normally, though
- * prevent any compiler errors if the caller tries to use the function in
+ * prevent  any compiler errors if the caller  tries to use the function in
  * the context of an integer expression. */
 #define setcontext(ucp) ((setcontext)(ucp), __builtin_unreachable(), 0)
 #endif /* __CRT_SUPPORTS_UCONTEXT */

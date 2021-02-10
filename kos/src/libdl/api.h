@@ -44,15 +44,15 @@
 #define __NO_PRINTF_UNICODE_STRING 1 /* %I16s, %I32s, %Ls */
 #define __NO_SCANF_FLOATING_POINT  1 /* %f, %e, %g, %E, %a */
 
-/* Invoke system calls as inline (NOTE: We don't enable support for
- * i386 sysenter optimizations because this would require linking
- * against parts of the libc source tree, as well as add an unnecessary
- * page-fault when the first system call is invoked. - libdl should have
+/* Invoke  system  calls as  inline (NOTE:  We  don't enable  support for
+ * i386   sysenter  optimizations  because  this  would  require  linking
+ * against  parts of the libc source tree,  as well as add an unnecessary
+ * page-fault when the first system call is invoked. - libdl should  have
  * minimal startup time, and be optimized for size; not performance, both
- * of which are followed more closely by always just using `int 80h') */
+ * of which are  followed more  closely by always  just using  `int 80h') */
 #define __WANT_INLINE_SYSCALLS 1
 
-/* Prevent the global variable `__peb' from being defined prematurely
+/* Prevent the global variable  `__peb' from being defined  prematurely
  * (and breaking the visibility of us exporting that variable for real) */
 #define ____peb_defined 1
 
@@ -63,7 +63,7 @@
 #error "Bad configuration"
 #endif /* __CRT_HAVE_memcpy */
 
-/* Define CRT features which may be exposed in
+/* Define  CRT features which  may be exposed in
  * headers, that we are explicitly implementing. */
 
 /* Functions defined by libdl itself */
@@ -175,11 +175,11 @@
 #endif /* !DLFCN_VCC */
 
 /* TODO: Add a way of extending the RTLD driver with custom executable format
- *       back-ends, such as (once again) allowing PE binaries to be loaded.
- * -> There should be a separate shared librariy `libdl-pe.so' similar to
- *    `libdl.so' that can simply be loaded using `dlopen()' and contains
- *    everything that's necessary to implement dynamic linking of PE binaries.
- *    As such, `DlModule' also needs to be given an optional v-table that can
+ *       back-ends, such as (once again)  allowing PE binaries to be  loaded.
+ * -> There should  be  a  separate shared  librariy  `libdl-pe.so'  similar  to
+ *    `libdl.so'  that  can  simply  be  loaded  using  `dlopen()'  and contains
+ *    everything that's necessary to implement  dynamic linking of PE  binaries.
+ *    As such, `DlModule' also  needs to be given  an optional v-table that  can
  *    be filled with overrides for functions such as dlsym() or dllocksection(). */
 
 #endif /* !GUARD_LIBDL_API_H */

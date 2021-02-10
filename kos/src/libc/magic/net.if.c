@@ -101,7 +101,7 @@ struct if_nameindex {
 
 
 /* The ifaddr structure contains information about one address of an
- * interface.  They are maintained by the different address families,
+ * interface. They are maintained by the different address families,
  * are allocated and attached when an address is set, and are linked
  * together so all addresses for an interface can be located. */
 #ifdef __CC__
@@ -133,11 +133,11 @@ struct ifaddr {
 };
 #endif /* __CC__ */
 
-/* Device mapping structure. I'd just gone off and designed a
+/* Device mapping structure. I'd just gone off and designed  a
  * beautiful scheme using only loadable modules with arguments
  * for driver options and along come the PCMCIA people 8)
  *
- * Ah well. The get() side of this is good for WDSETUP, and it'll be
+ * Ah  well. The get() side of this is good for WDSETUP, and it'll be
  * handy for debugging things. The set side is fine for now and being
  * very small might be worth keeping for clean configuration. */
 
@@ -290,8 +290,8 @@ struct ifreq {
 #define _IOT_ifreq_int    _IOT(_IOTS(char), IFNAMSIZ, _IOTS(int), 1, 0, 0)
 
 
-/* Structure used in SIOCGIFCONF request.  Used to
- * retrieve interface configuration for machine (useful
+/* Structure  used  in   SIOCGIFCONF  request.  Used   to
+ * retrieve interface configuration  for machine  (useful
  * for programs which must know all networks accessible). */
 #ifdef __CC__
 #ifndef __ifconf_defined

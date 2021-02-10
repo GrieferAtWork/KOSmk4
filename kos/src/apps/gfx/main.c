@@ -82,7 +82,7 @@ PRIVATE void enable_graphics_mode(void) {
 	tcsetattr(STDIN_FILENO, TCSADRAIN, &tios);
 	/* Actually do the switch to graphics mode.
 	 * NOTE: The proper way of doing this would be to use `VIDEOIO_SETFORMAT',
-	 *       however then we'd have to decide on which graphics mode to use
+	 *       however  then we'd have  to decide on which  graphics mode to use
 	 *       ourself, rather than simply letting the kernel decide on one. */
 	if (ioctl(driver, KDSETMODE, KD_GRAPHICS) < 0)
 		err(EXIT_FAILURE, "ioctl(KDSETMODE, KD_GRAPHICS) failed");

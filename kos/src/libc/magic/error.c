@@ -208,7 +208,7 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 #ifndef error_print_progname
 #ifdef __CRT_HAVE_error_print_progname
 /* Override for printing the program name.
- * When non-NULL, this function should:
+ * When non-NULL,  this  function  should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s: ", basename(argv[0])); */
 __LIBC void (__LIBKCALL *error_print_progname)(void);
@@ -228,7 +228,7 @@ __LIBC unsigned int error_message_count;
 #ifdef __CRT_HAVE_error_one_per_line
 /* Mode configuration for `error_at_line()'.
  * When non-zero, consecutive calls to `error_at_line()' that pass the same
- * values for `filename' and `line' will not produce the error message.
+ * values for `filename'  and `line'  will not produce  the error  message.
  * The default value is ZERO(0) */
 __LIBC int error_one_per_line;
 #define error_one_per_line error_one_per_line

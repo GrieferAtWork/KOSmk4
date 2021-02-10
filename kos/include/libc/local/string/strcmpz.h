@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b9a81a5 */
+/* HASH CRC-32:0xc332a486 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmpz))(char const *__lhs, char con
 	do {
 		__c1 = *__lhs++;
 		if (!__rhs_len--) {
-			/* Once RHS reaches the end of the string,
+			/* Once  RHS  reaches  the end  of  the string,
 			 * compare the last character of LHS with `NUL' */
 			return (int)((unsigned char)__c1 - '\0');
 		}

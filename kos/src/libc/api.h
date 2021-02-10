@@ -35,14 +35,14 @@
  * to be inlined (as far as possible), rather than being declared as entry points to the
  * libc system call export table (libc also exports all system calls as `sys_*' symbols)
  * NOTE: When optimizing for size, we don't do this, in which case system calls used
- *       by libc library functions get linked against the system call wrappers that
+ *       by libc library functions get linked against the system call wrappers  that
  *       are always exported from libc unconditionally. */
 #define __WANT_INLINE_SYSCALLS
 #endif /* !__OPTIMIZE_SIZE__ */
 
 
-/* Enable access to a variety of header functions normally
- * locked away behind various feature macros (us being libc,
+/* Enable access  to a  variety of  header functions  normally
+ * locked away behind various  feature macros (us being  libc,
  * we obviously want access to anything we intend on defining,
  * so we make our job simple by unlocking everything) */
 #define _KOS_SOURCE             1
@@ -58,8 +58,8 @@
 #define _LARGEFILE_SOURCE       1
 #define __EXTENSIONS__          1
 
-/* Must load headers in 32-bit time/file-offset mode, so-as to prevent
- * any symbol re-directions from happening, which might otherwise screw
+/* Must load headers  in 32-bit time/file-offset  mode, so-as to  prevent
+ * any symbol re-directions from  happening, which might otherwise  screw
  * up libc linkage. - Instead, libc itself must always explicitly specify
  * the *64 variants of functions (e.g. `mmap64()'; `mmap()' is always the
  * 32-bit variant) */
@@ -79,7 +79,7 @@
 #include "crt-features.h" /* Auto-generated file (by generate_headers.dee) */
 #ifndef __KERNEL__
 /* The user-space libc provides exports for defined system calls (by name).
- * As such, these symbols also exists within the libc_* namespace, meaning
+ * As  such, these symbols also exists within the libc_* namespace, meaning
  * that we're allowed to advertise this fact while building libc itself. */
 #include <crt-features/crt-kos-syscalls.h>
 #else /* !__KERNEL__ */
@@ -92,7 +92,7 @@
 #endif /* __KERNEL__ */
 
 /* Delete CRT features for stuff that we don't implement (yet)
- * TODO: Once we do implement this stuff, delete this part! */
+ * TODO: Once we  do implement this  stuff, delete this  part! */
 #undef __CRT_HAVE___ctype_b_loc
 #undef __CRT_HAVE___ctype_tolower_loc
 #undef __CRT_HAVE___ctype_toupper_loc
@@ -110,7 +110,7 @@
 #include <features.h>
 #include <hybrid/compiler.h>
 
-/* We may define a couple of functions that are annotated as deprecated.
+/* We may define a couple of functions that are annotated as  deprecated.
  * As such, prevent potential compiler warnings related to them, as we're
  * actually supposed to use/define them. */
 #undef ATTR_DEPRECATED

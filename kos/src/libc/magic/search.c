@@ -137,7 +137,7 @@ typedef __SIZE_TYPE__ size_t;
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __USE_GNU
 /* Prototype structure for a linked-list data structure. This
- * is the type used by the `insque' and `remque' functions. */
+ * is the type used by  the `insque' and `remque'  functions. */
 struct qelem {
 	struct qelem *q_forw;     /* [0..1] Forward link */
 	struct qelem *q_back;     /* [0..1] Backward link */
@@ -207,7 +207,7 @@ typedef struct entry {
 /* Opaque type for internal use. */
 struct _ENTRY;
 
-/* Family of hash table handling functions. The functions also
+/* Family of hash table  handling functions. The functions  also
  * have reentrant counterparts ending with _r. The non-reentrant
  * functions all work on a signle internal hashing table. */
 
@@ -371,10 +371,10 @@ int hsearch_r(ENTRY item, ACTION action,
 [[impl_prefix(
 @@push_namespace(local)@@
 /* For the used double hash method the table size has to be a prime. To
- * correct the user given table size we need a prime test.  This trivial
+ * correct the user given table size we need a prime test. This trivial
  * algorithm is adequate because
- * a)  the code is (most probably) called a few times per program run and
- * b)  the number is small because the table must fit in the core */
+ * a) the code is (most probably) called a few times per program run and
+ * b)  the  number is  small  because the  table  must fit  in  the core */
 __LOCAL_LIBC(isprime) ATTR_CONST int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int number) {
 	/* no even number will be passed */
@@ -436,8 +436,8 @@ void hdestroy_r(struct hsearch_data *htab) {
 %#endif /* __USE_GNU */
 
 %{
-/* The tsearch routines are very interesting. They make many
- * assumptions about the compiler. It assumes that the first
+/* The tsearch routines are very interesting. They make  many
+ * assumptions about the compiler. It assumes that the  first
  * field in node must be the "key" field, which points to the
  * datum. Everything depends on that. */
 }
@@ -457,11 +457,11 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 [[requires_function(malloc), export_alias("__tsearch")]]
 [[impl_prefix(
 @@push_namespace(local)@@
-/* Possibly "split" a node with two red successors, and/or fix up two red
- * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
+/* Possibly "split" a  node with two  red successors, and/or  fix up two  red
+ * edges  in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
+ * and  GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
  * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not do the split, but must check for two red
+ * ROOTP. MODE is 1 if we need not  do the split, but must check for two  red
  * edges between GPARENTP and ROOTP */
 __LOCAL_LIBC(maybe_split_for_insert) NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp, /*nullable*/ void **parentp,
@@ -806,7 +806,7 @@ typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 @@push_namespace(local)@@
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be
- * called at each node. LEVEL is the level of ROOT in the whole tree */
+ * called at each node. LEVEL  is the level of  ROOT in the whole  tree */
 __LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
 __LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	void *l, *r;
@@ -835,7 +835,7 @@ void twalk([[nullable]] void const *root,
 %{
 #ifdef __USE_GNU
 /* Callback type for function to free a tree node.
- * If the keys are atomic data this function should do nothing.  */
+ * If the keys are atomic data this function should do nothing. */
 #ifndef ____free_fn_t_defined
 #define ____free_fn_t_defined 1
 typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);

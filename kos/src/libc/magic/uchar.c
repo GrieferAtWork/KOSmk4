@@ -140,30 +140,30 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
 
 
 /* The actual uchar-variants of these functions
- * These aren't exposed because they'd be using different calling
- * conventions for individual bindings, where-as these functions
+ * These aren't exposed  because they'd be  using different  calling
+ * conventions  for  individual bindings,  where-as  these functions
  * are actually exported from libc, using both LIBKCALL and LIBDCALL
- * calling conventions, meaning they don't impose the requirement
- * of all of the other uchar-functions, in that they require the
- * caller to deal with the possibility of the calling convention
+ * calling conventions, meaning  they don't  impose the  requirement
+ * of all of  the other  uchar-functions, in that  they require  the
+ * caller  to deal  with the  possibility of  the calling convention
  * changing based on uchar character width.
  * NOTE: The actual requirement of different calling conventions
- *       is the result from the fact that since libc is already
- *       implementing DOS compatibility, it may as well take
- *       advantage of the fact that DOS uses 2-byte wchar_t,
- *       while KOS uses 4-byte. So with that in mind, libc has
- *       to contain 2 versions of every [[wchar]] function, at
+ *       is  the result from the fact that since libc is already
+ *       implementing  DOS  compatibility, it  may as  well take
+ *       advantage of  the fact  that DOS  uses 2-byte  wchar_t,
+ *       while KOS uses 4-byte. So  with that in mind, libc  has
+ *       to contain 2 versions  of every [[wchar]] function,  at
  *       which point it stands to reason to expose both.
- * However, since the 2-byte variants mainly exist to allow for
- * DOS compatibility, they obviously use the calling convention
- * required by DOS, meaning that when linking against them from
- * KOS-mode, their declarations have to reflect this (since it
- * would be too expensive to have 4 variants of every wchar
+ * However, since the 2-byte variants mainly exist to allow  for
+ * DOS  compatibility, they obviously use the calling convention
+ * required by DOS, meaning that when linking against them  from
+ * KOS-mode, their declarations have  to reflect this (since  it
+ * would be  too expensive  to have  4 variants  of every  wchar
  * function, for both wchar-sizes, and both calling conventions)
  *
- * The only exception to this rule are these four functions,
- * which due the fact of being mandated by the C standard, still
- * have to be exported not only by name, but also by be bound to
+ * The only  exception to  this rule  are these  four  functions,
+ * which due the fact of being mandated by the C standard,  still
+ * have  to be exported not only by name, but also by be bound to
  * in headers by-name, _and_ be exposed with a consistent calling
  * convention that matches `LIBCCALL'!
  */

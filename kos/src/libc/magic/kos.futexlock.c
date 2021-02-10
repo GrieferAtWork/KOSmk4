@@ -558,9 +558,9 @@ int futexlock_timedwaitwhile_allbits64([[nonnull]] lfutex_t *ulockaddr, [[nonnul
 %
 %{
 /* Provide overloads for the non-timed functions add an optional `rel_timeout'
- * argument that re-directly to the function's timed variant.
- * Because this overload is purely based on argument count, we can emulate
- * this portably both in C++ and C (using `__HYBRID_PP_VA_OVERLOAD') */
+ * argument   that   re-directly    to   the    function's   timed    variant.
+ * Because  this overload  is purely based  on argument count,  we can emulate
+ * this  portably  both  in   C++  and  C  (using   `__HYBRID_PP_VA_OVERLOAD') */
 #ifdef __cplusplus
 }
 %extern "C++" {

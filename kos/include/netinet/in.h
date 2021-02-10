@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54600985 */
+/* HASH CRC-32:0x85cabf7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@
 #endif /* __USE_GLIBC */
 
 /* TODO: Constants and structs from this header should
- *       be moved into <asm/> and <bits/> headers! */
+ *       be  moved  into <asm/>  and  <bits/> headers! */
 
 /* Integer net address classification macros */
 #define IN_CLASSA(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0x80000000)) == 0)

@@ -67,7 +67,7 @@
 #endif /* __USE_GLIBC */
 
 /* TODO: Constants and structs from this header should
- *       be moved into <asm/> and <bits/> headers! */
+ *       be  moved  into <asm/>  and  <bits/> headers! */
 
 /* Integer net address classification macros */
 #define IN_CLASSA(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0x80000000)) == 0)

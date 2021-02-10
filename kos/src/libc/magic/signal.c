@@ -330,7 +330,7 @@ __SYSDECL_BEGIN
 #if !defined(SA_RESTORER) && defined(__SA_RESTORER)
 #define SA_RESTORER __SA_RESTORER /* A custom signal restore function (`sa_restorer') was given.
                                    * This flag is set by libc, after having filled in the `sa_restorer' field.
-                                   * NOTE: On x86, the kernel assumes that this points to a function:
+                                   * NOTE: On  x86,  the  kernel  assumes that  this  points  to  a  function:
                                    * >> sa_restorer:
                                    * >>     movl   $SYS_sigreturn, %eax
                                    * >>     int    $0x80 */
@@ -960,7 +960,7 @@ enum {
 #define POLL_OUT POLL_OUT /* Output buffers available. */
 #endif /* __POLL_OUT */
 #ifdef __POLL_MSG
-#define POLL_MSG POLL_MSG /* Input message available.   */
+#define POLL_MSG POLL_MSG /* Input message available. */
 #endif /* __POLL_MSG */
 #ifdef __POLL_ERR
 #define POLL_ERR POLL_ERR /* I/O error. */
@@ -979,7 +979,7 @@ enum {
 #define POLL_OUT __POLL_OUT /* Output buffers available. */
 #endif /* __POLL_OUT */
 #ifdef __POLL_MSG
-#define POLL_MSG __POLL_MSG /* Input message available.   */
+#define POLL_MSG __POLL_MSG /* Input message available. */
 #endif /* __POLL_MSG */
 #ifdef __POLL_ERR
 #define POLL_ERR __POLL_ERR /* I/O error. */
@@ -1008,14 +1008,14 @@ enum {
 	SS_ONSTACK    = __SS_ONSTACK,   /* out.flag: Currently executing from the alternate signal stack. */
 #endif /* __SS_ONSTACK */
 #ifdef __SS_DISABLE
-	SS_DISABLE    = __SS_DISABLE,   /* in.flag:  Disable the alternate signal stack. (all other flags are ignored when set)
+	SS_DISABLE    = __SS_DISABLE,   /* in.flag: Disable the alternate signal stack. (all other flags are ignored when set)
 	                                 * out.flag: The alternate signal stack is currently disabled. */
 #endif /* __SS_DISABLE */
 #ifdef __SS_AUTODISARM
-	SS_AUTODISARM = __SS_AUTODISARM /* flag:     Disable the alternate signal stack upon signal handler
-	                                 *           entry by saving its old configuration and disabling it
-	                                 *           by means of `SS_DISABLE', before restoring its prior
-	                                 *           setting once the signal handler returns, thus preventing
+	SS_AUTODISARM = __SS_AUTODISARM /* flag:     Disable  the  alternate signal  stack upon  signal handler
+	                                 *           entry by  saving its  old configuration  and disabling  it
+	                                 *           by  means  of  `SS_DISABLE',  before  restoring  its prior
+	                                 *           setting  once the signal  handler returns, thus preventing
 	                                 *           other signal handlers from recursing onto an in-use stack. */
 #endif /* __SS_AUTODISARM */
 };
@@ -1026,14 +1026,14 @@ enum {
 #define SS_ONSTACK    SS_ONSTACK    /* out.flag: Currently executing from the alternate signal stack. */
 #endif /* __SS_ONSTACK */
 #ifdef __SS_DISABLE
-#define SS_DISABLE    SS_DISABLE    /* in.flag:  Disable the alternate signal stack. (all other flags are ignored when set)
+#define SS_DISABLE    SS_DISABLE    /* in.flag: Disable the alternate signal stack. (all other flags are ignored when set)
                                      * out.flag: The alternate signal stack is currently disabled. */
 #endif /* __SS_DISABLE */
 #ifdef __SS_AUTODISARM
-#define SS_AUTODISARM SS_AUTODISARM /* flag:     Disable the alternate signal stack upon signal handler
-                                     *           entry by saving its old configuration and disabling it
-                                     *           by means of `SS_DISABLE', before restoring its prior
-                                     *           setting once the signal handler returns, thus preventing
+#define SS_AUTODISARM SS_AUTODISARM /* flag:     Disable  the  alternate signal  stack upon  signal handler
+                                     *           entry by  saving its  old configuration  and disabling  it
+                                     *           by  means  of  `SS_DISABLE',  before  restoring  its prior
+                                     *           setting  once the signal  handler returns, thus preventing
                                      *           other signal handlers from recursing onto an in-use stack. */
 #endif /* __SS_AUTODISARM */
 #else /* __COMPILER_PREFERR_ENUMS */
@@ -1041,14 +1041,14 @@ enum {
 #define SS_ONSTACK    __SS_ONSTACK    /* out.flag: Currently executing from the alternate signal stack. */
 #endif /* __SS_ONSTACK */
 #ifdef __SS_DISABLE
-#define SS_DISABLE    __SS_DISABLE    /* in.flag:  Disable the alternate signal stack. (all other flags are ignored when set)
+#define SS_DISABLE    __SS_DISABLE    /* in.flag: Disable the alternate signal stack. (all other flags are ignored when set)
                                        * out.flag: The alternate signal stack is currently disabled. */
 #endif /* __SS_DISABLE */
 #ifdef __SS_AUTODISARM
-#define SS_AUTODISARM __SS_AUTODISARM /* flag:     Disable the alternate signal stack upon signal handler
-                                       *           entry by saving its old configuration and disabling it
-                                       *           by means of `SS_DISABLE', before restoring its prior
-                                       *           setting once the signal handler returns, thus preventing
+#define SS_AUTODISARM __SS_AUTODISARM /* flag:     Disable  the  alternate signal  stack upon  signal handler
+                                       *           entry by  saving its  old configuration  and disabling  it
+                                       *           by  means  of  `SS_DISABLE',  before  restoring  its prior
+                                       *           setting  once the signal  handler returns, thus preventing
                                        *           other signal handlers from recursing onto an in-use stack. */
 #endif /* __SS_AUTODISARM */
 #endif /* !__COMPILER_PREFERR_ENUMS */
@@ -1096,8 +1096,8 @@ typedef struct sigaltstack stack_t;
 #ifndef __std_sig_atomic_t_defined
 #define __std_sig_atomic_t_defined 1
 __NAMESPACE_STD_BEGIN
-/* An integral type that can be modified atomically, without the
- * possibility of a signal arriving in the middle of the operation.  */
+/* An integral type  that can be  modified atomically, without  the
+ * possibility of a signal arriving in the middle of the operation. */
 typedef __SIG_ATOMIC_TYPE__ sig_atomic_t;
 __NAMESPACE_STD_END
 #endif /* !__std_sig_atomic_t_defined */
@@ -1569,14 +1569,14 @@ int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 @@>> getsigmaskptr(3)
 @@Return the current signal mask pointer.
 @@See the documentation of `setsigmaskptr(3)' for
-@@what this function is all about. 
+@@what this function is all about.
 @@@return: * : A pointer to the calling thread's current signal mask
 [[libc, nonnull, wunused, decl_include("<bits/os/sigset.h>")]]
 sigset_t *getsigmaskptr(void);
 
 @@>> setsigmaskptr(3)
 @@Set the current signal mask pointer to `sigmaskptr'
-@@This is a kos-specific function that can be used to 
+@@This is a kos-specific function that can be used to
 @@speed up/replace calls to `sigprocmask()'. But using
 @@this function safely requires knowledge of its underlying
 @@semantics. If you're unsure on those, you should instead
@@ -2586,9 +2586,9 @@ $signo_t __libc_current_sigrtmax() {
 @@@return: EINVAL: Invalid `how'
 [[guard, decl_include("<features.h>", "<bits/os/sigset.h>")]]
 /* NOTE: Aliasing to `sigprocmask' breaks the meaning of return values, but
- *       while not 100% conforming, I don't personally see any problem in
- *       doing it this ways, especially since the only possible error can
- *       only happen as the result of improper API use of an argument that
+ *       while not 100% conforming, I  don't personally see any problem  in
+ *       doing it this ways, especially  since the only possible error  can
+ *       only happen as the result of improper API use of an argument  that
  *       will almost always simply have a fixed, constant value. */
 [[nocrt, alias("pthread_sigmask", "sigprocmask")]]
 $errno_t pthread_sigmask(__STDC_INT_AS_UINT_T how,
@@ -2659,7 +2659,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 %[insert:function(__sigdelset = sigdelset)]
 
 %{
-/* These appear in glibc under these names, however these names collide with
+/* These appear in glibc under these  names, however these names collide  with
  * some escapes in a couple of places, so only define them when we're supposed
  * to emulate glibc as closely as possible. */
 #ifdef __USE_GLIBC

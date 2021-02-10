@@ -48,27 +48,27 @@ typedef __uintptr_t lfutex_t;
 /*
  * `lfutex() and select()' (or `poll()')
  *
- * On KOS, it is fairly simple to use any of the available `LFUTEX_WAIT_*' operations
+ * On  KOS,  it is  fairly simple  to use  any of  the available  `LFUTEX_WAIT_*' operations
  * in conjunction with a call to `poll()' (though note that the `LFUTEX_WAIT_WHILE_CMPXCH()'
- * and `LFUTEX_WAIT_UNTIL_CMPXCH()' operators will possibly modify pointed-to memory in
- * a way that makes repeated polling behave unexpectedly, requiring user-space to take
+ * and `LFUTEX_WAIT_UNTIL_CMPXCH()'  operators will  possibly  modify pointed-to  memory  in
+ * a  way  that makes  repeated polling  behave unexpectedly,  requiring user-space  to take
  * proper care that the behavior will be what is actually intended)
  *
- * Other than this, there exists 2 ways of polling for futex objects
- * in parallel to polling any other type of file descriptor, as well
- * polling for sleeping child processes (either through use of a file
+ * Other  than this, there  exists 2 ways of  polling for futex objects
+ * in  parallel to polling  any other type of  file descriptor, as well
+ * polling for sleeping child processes  (either through use of a  file
  * descriptor created using `TODO:waitfd(pid) (similar to `signalfd()',
- * but may be used to wait for processes in a way that is similar to
+ * but may be used to  wait for processes in a  way that is similar  to
  * the waitpid() function)', or through use of `kpoll()').
  *
- * - Using the `kpoll()' system call, which allows for the use of poll
- *   descriptors that describe any kind of user-space-visible handle on
- *   which a given process can wait (a regular `fd_t' (using `POLLIN|
- *   POLLOUT|...'), a `pid_t' (using `waitpid()'), or an `lfutex_t'
- *   (using any of the `LFUTEX_WAIT_*' operators that are available))
+ * - Using the `kpoll()' system call, which  allows for the use of  poll
+ *   descriptors that describe any kind of user-space-visible handle  on
+ *   which  a given process  can wait (a  regular `fd_t' (using `POLLIN|
+ *   POLLOUT|...'),  a  `pid_t'  (using `waitpid()'),  or  an `lfutex_t'
+ *   (using any of  the `LFUTEX_WAIT_*' operators  that are  available))
  *   When targeting KOS specifically, this is the preferred way of going
- *   about passively waiting for a futex, as it doesn't require the
- *   creation of any additional kernel-space object.
+ *   about passively  waiting for  a futex,  as it  doesn't require  the
+ *   creation     of     any     additional     kernel-space     object.
  *   TODO: Implement the `kpoll()' system call
  *
  * - Using the regular `poll()' / `select()' family of system calls, after
@@ -894,7 +894,7 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_belowequal)(lfutex_t *__uaddr, lfute
 	return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) <= __below_equal_value ? 0 : 1;
 }
 
-/* This one probably isn't that useful, considering that `NEW_VALUE' must only be written
+/* This one probably  isn't that useful,  considering that `NEW_VALUE'  must only be  written
  * just before starting to wait, meaning that we don't actually use that argument since we're
  * not allowed to ever actually wait... */
 /* Check if `futex_waitwhile_cmpxch()' would block
@@ -1003,9 +1003,9 @@ unsigned int futex_setspin(unsigned int new_spin);
 %
 %{
 /* Provide overloads for the non-timed functions add an optional `rel_timeout'
- * argument that re-directly to the function's timed variant.
- * Because this overload is purely based on argument count, we can emulate
- * this portably both in C++ and C (using `__HYBRID_PP_VA_OVERLOAD') */
+ * argument   that   re-directly    to   the    function's   timed    variant.
+ * Because  this overload  is purely based  on argument count,  we can emulate
+ * this  portably  both  in   C++  and  C  (using   `__HYBRID_PP_VA_OVERLOAD') */
 }
 %#ifdef __cplusplus
 %[insert:function(futex_wake = futex_wakeall, externLinkageOverride: "C++")]

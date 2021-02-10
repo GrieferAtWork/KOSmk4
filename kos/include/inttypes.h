@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf33d1a65 */
+/* HASH CRC-32:0xe5dce029 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,10 +231,10 @@ __NAMESPACE_STD_USING(wcstoumax)
 #endif /* !__PRIP_PREFIX */
 
 #ifdef __USE_KOS
-/* printf(): fixed-width pointer (same as `X', but
+/* printf(): fixed-width  pointer  (same  as  `X',  but
  *           with a fixed precision of `ELEM_SIZE * 2',
- *           meaning that a 32-bit pointer would be
- *           printed as C123007, the equivalent of
+ *           meaning  that  a 32-bit  pointer  would be
+ *           printed  as  C123007,  the  equivalent  of
  *           `%.8I32X') */
 #ifdef __PRINP_1
 #define PRIp8         __PRINP_1
@@ -424,7 +424,7 @@ __NAMESPACE_STD_USING(wcstoumax)
 
 /* U-scan command:
  *    Unsigned integer, where the radix is automatically detected,
- *    using the same syntax as a C compiler would accept:
+ *    using  the  same  syntax  as  a  C  compiler  would  accept:
  *       "1234":      Decimal
  *       "0777":      Octal
  *       "0xDEAD":    Hex    (casing is ignored)

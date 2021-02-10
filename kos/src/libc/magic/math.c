@@ -490,8 +490,8 @@ double pow(double x, double y) {
 	 * ====================================================
 	 * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
 	 *
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice 
+	 * Permission  to use, copy, modify, and distribute this
+	 * software is freely granted, provided that this notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -1530,8 +1530,8 @@ double scalb(double x, double fn) {
 	 * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 	 *
 	 * Developed at SunSoft, a Sun Microsystems, Inc. business.
-	 * Permission to use, copy, modify, and distribute this
-	 * software is freely granted, provided that this notice
+	 * Permission  to  use, copy,  modify, and  distribute this
+	 * software is freely  granted, provided  that this  notice
 	 * is preserved.
 	 * ====================================================
 	 */
@@ -2172,7 +2172,7 @@ enum {
 #endif /* ... */
 
 /* Figure out defaults for `float_t' and `double_t' if those
- * havn't already been defined by `<bits/crt/mathdef.h>' */
+ * havn't already  been  defined  by  `<bits/crt/mathdef.h>' */
 #if !defined(__float_t) || !defined(__double_t)
 #if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -2329,7 +2329,7 @@ typedef __double_t double_t;
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
 /* Libstdc++ headers need us to define these as functions when also
  * defining `__CORRECT_ISO_CPP11_MATH_H_PROTO_FP', which we need to
- * do in order to get it to stop re-declaring other functions such
+ * do in order to get it to stop re-declaring other functions  such
  * as `acosh'... *ugh* */
 __NAMESPACE_STD_BEGIN
 extern "C++" {
@@ -2513,7 +2513,7 @@ __NAMESPACE_STD_USING(islessgreater)
 #define MATH_ERRNO     1 /* Errno is set by math functions. */
 #define MATH_ERREXCEPT 2 /* Exceptions are raised by math functions. */
 
-/* By default, all functions support both errno and exception handling.
+/* By   default,   all  functions   support   both  errno   and   exception  handling.
  * In gcc's fast math mode and if inline functions are defined this might not be true. */
 #ifndef __FAST_MATH__
 #define math_errhandling (MATH_ERRNO | MATH_ERREXCEPT)

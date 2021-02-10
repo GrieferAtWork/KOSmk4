@@ -81,8 +81,8 @@ print_usage:
 	cmdline = NULL;
 	if (argc >= 3)
 		cmdline = argv[2];
-	/* TODO: Temporarily re-direct syslog() for this process to stdout
-	 *      (or capture all syslog() messages written by this process
+	/* TODO: Temporarily  re-direct  syslog()  for  this  process  to stdout
+	 *       (or capture  all  syslog()  messages written  by  this  process
 	 *       after this call to `KSysctlInsmod()', and then print everything
 	 *       to stdout) */
 	KSysctlInsmod(name, cmdline);

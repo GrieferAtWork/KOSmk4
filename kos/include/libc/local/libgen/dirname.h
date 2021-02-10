@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0dcb761 */
+/* HASH CRC-32:0x1d83b8fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
 		 * Return "/" in this case! */
 		++__iter;
 	}
-	/* Delete the slash character (or the one after the
+	/* Delete the  slash character  (or  the one  after  the
 	 * slash, if the only character left is a leading slash) */
 	__iter[0] = '\0';
 	return __path;

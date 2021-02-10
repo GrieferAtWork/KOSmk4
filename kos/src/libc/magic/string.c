@@ -42,7 +42,7 @@
 
 
 %(auto_header){
-/* Bind optimized variants of various string functions,
+/* Bind optimized variants  of various string  functions,
  * so those get used when building the automatic portions
  * of libc. */
 #include <optimized/string.h>
@@ -334,7 +334,7 @@ for (local f: funcs) {
 
 
 #ifdef __KERNEL__
-/* The kernel isn't exporting these functions, but they're still
+/* The kernel isn't exporting  these functions, but they're  still
  * used by a couple of function that _are_ exported by the kernel! */
 #ifndef libc_mempmovedownc
 #define libc_mempmovedownc(dst, src, elem_count, elem_size) libc_mempmovedown(dst, src, (elem_count) * (elem_size))
@@ -458,9 +458,9 @@ __NAMESPACE_STD_USING(__forward_size)
  *     would be expected for Byte=1,Word=2,Long=4,Quad=8. The required alignment is
  *     also annotated for arguments.
  *   - On architecture that allow unaligned memory accesses (e.g. x86), the alignment
- *     isn't mandatory, but is still recommended. To determine if the current target
- *     architecture allows for unaligned memory access, and thereby doesn't enforce
- *     the alignment requirements of b/w/l/q string functions, you may test for the
+ *     isn't mandatory, but is still recommended. To determine if the current  target
+ *     architecture allows for unaligned memory  access, and thereby doesn't  enforce
+ *     the alignment requirements of b/w/l/q string  functions, you may test for  the
  *     `__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS' macro from `<hybrid/host.h>'
  *
  * String functions:
@@ -494,7 +494,7 @@ __NAMESPACE_STD_USING(__forward_size)
  *          apart of some posix/unix standard
  *           - `rawmemchr()'
  *   [kos]: The function is kos-specific, or apart of a standard other than
- *          the C standard, or one of the standards implemented by GLibc.
+ *          the C standard, or one  of the standards implemented by  GLibc.
  *           - `strend()' - Not apart of any standard (that I know of) -> KOS-specific
  *           - `strlwr()' - Can also be found in DOS -> DOS-specific, but also provided by KOS
  */
@@ -1111,7 +1111,7 @@ char *basename([[nonnull]] char const *filename)
 	[([[nonnull]] char *filename): char *]
 	[([[nonnull]] char const *filename): char const *]
 {
-	/* char *slash = strrchr(filename, '/');
+	/* char  *slash   =   strrchr(filename,   '/');
 	 * return slash ? slash + 1 : (char *)filename; */
 	char *result = (char *)filename;
 	char *iter   = (char *)filename;
@@ -1410,12 +1410,12 @@ void bcopy([[nonnull]] void const *src,
 %#define __bzero_defined 1
 /* Disable [[crtbuiltin]] because gcc translates `__builtin_bzero()' into a call to `memset()'
  * s.a.: https://gcc.gnu.org/legacy-ml/gcc-bugs/2002-01/msg00511.html
- * While I do understand what is causing GCC to do this, I still cannot let it do this under
- * KOS due to the fact that we're using __CRT_HAVE_* feature test macros that rely on the
+ * While  I do understand what is causing  GCC to do this, I still  cannot let it do this under
+ * KOS due to  the fact  that we're using  __CRT_HAVE_* feature  test macros that  rely on  the
  * compiler not randomly deciding to emit calls to libc function that havn't been white-listed.
- * And while this could be fixed by only calling `__builtin_bzero()' when `__CRT_HAVE_memset'
- * is defined, doing this would still produce sub-optimal code because `memset()' takes 3
- * arguments, while bzero() only takes 2 (and also doesn't have to fill the return register
+ * And while this could be fixed  by only calling `__builtin_bzero()' when  `__CRT_HAVE_memset'
+ * is defined,  doing this  would still  produce sub-optimal  code because  `memset()' takes  3
+ * arguments,  while bzero() only  takes 2 (and also  doesn't have to  fill the return register
  * with any meaningful value)
  * So rather than dealing with that headache, just don't link bzero() against its builtin
  * counterpart! */
@@ -6289,7 +6289,7 @@ int strcmpz([[nonnull]] char const *lhs,
 	do {
 		c1 = *lhs++;
 		if (!rhs_len--) {
-			/* Once RHS reaches the end of the string,
+			/* Once  RHS  reaches  the end  of  the string,
 			 * compare the last character of LHS with `NUL' */
 			return (int)((unsigned char)c1 - '\0');
 		}
@@ -6311,7 +6311,7 @@ int strstartcmp([[nonnull]] char const *str,
 		c2 = *startswith++;
 		if (!c2) {
 			/* When the end of the RHS-string is reached, then we
-			 * know that `str' has `startswith' as a leading
+			 * know  that  `str'  has `startswith'  as  a leading
 			 * prefix. */
 			return 0;
 		}
@@ -6319,11 +6319,11 @@ int strstartcmp([[nonnull]] char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
-	/* The given `str' has a length less than `strlen(startswith)', meaning
+	/* The given `str' has a  length less than `strlen(startswith)',  meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
-	 * which means we must return -1. Note that the NON_NUL is kind-of
-	 * assumed here, since `startswith' may contain only NUL characters
-	 * from here on out, however that is both unlikely, wouldn't even make
+	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
+	 * assumed here,  since  `startswith'  may contain  only  NUL  characters
+	 * from  here on out,  however that is both  unlikely, wouldn't even make
 	 * much sense. */
 	return -1;
 }
@@ -6339,7 +6339,7 @@ int strstartcmpz([[nonnull]] char const *str,
 	do {
 		if (!startswith_len--) {
 			/* When the end of the RHS-string is reached, then we
-			 * know that `str' has `startswith' as a leading
+			 * know  that  `str'  has `startswith'  as  a leading
 			 * prefix. */
 			return 0;
 		}
@@ -6348,11 +6348,11 @@ int strstartcmpz([[nonnull]] char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
-	/* The given `str' has a length less than `startswith_len', meaning
+	/* The  given  `str' has  a  length less  than  `startswith_len', meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
-	 * which means we must return -1. Note that the NON_NUL is kind-of
-	 * assumed here, since `startswith' may contain only NUL characters
-	 * from here on out, however that is both unlikely, wouldn't even make
+	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
+	 * assumed here,  since  `startswith'  may contain  only  NUL  characters
+	 * from  here on out,  however that is both  unlikely, wouldn't even make
 	 * much sense. */
 	return -1;
 }

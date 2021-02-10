@@ -40,31 +40,13 @@ function main(parser: Autom8Parser, none) {
 	parser.newText << enumDeclsText << "/*[[[AUTO]]]*/\n";
 	parser.flushStart = enumEnd + 13;
 	/* Parse enum declarations. */
-	local i = 0;
 	local len = #enumDeclsText;
-	for (;;) {
-		if (i >= len)
-			return;
-		if (enumDeclsText.isspace(i)) {
-			++i;
-			continue;
-		}
-		if (enumDeclsText.startswith("#if", i)) {
-			local eol = enumDeclsText.find("\n", i);
-			if (eol < 0)
-				return;
-			i = eol + 1;
-			continue;
-		}
-		break;
-	}
-	if (!enumDeclsText.startswith("enum", i))
-		return;
-	i += 4;
-	while (i < len && enumDeclsText.isspace(i))
-		++i;
-	if (i >= len || enumDeclsText[i] != "{")
-		return;
+	local i = enumDeclsText.find("enum");
+	if (i < 0)
+		goto done;
+	i = enumDeclsText.find("{", i);
+	if (i < 0)
+		goto done;
 	++i;
 	while (i < len && enumDeclsText.isspace(i))
 		++i;
@@ -186,7 +168,10 @@ function main(parser: Autom8Parser, none) {
 			local enumValueEnd = i;
 			while (enumValueEnd < len) {
 				ch = enumDeclsText[enumValueEnd];
-				if (ch == ",")
+				if (ch in ",\n#")
+					break;
+				if (ch == "/" && (enumValueEnd + 1) < len &&
+				    enumDeclsText[enumValueEnd + 1] in "/*")
 					break;
 				++enumValueEnd;
 				if (ch in "([{") {
@@ -304,7 +289,7 @@ function main(parser: Autom8Parser, none) {
 	printEnumMacros(false);
 	parser.newText << "#else /* __COMPILER_PREFERR_ENUMS */\n";
 	printEnumMacros(true);
-	parser.newText <<
-		"#endif /* !__COMPILER_PREFERR_ENUMS */\n"
-		"/*[[[end]]]*/";
+	parser.newText << "#endif /* !__COMPILER_PREFERR_ENUMS */\n";
+done:
+	parser.newText << "/*[[[end]]]*/";
 }

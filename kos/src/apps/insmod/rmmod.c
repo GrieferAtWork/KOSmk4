@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
 	if (!argc)
 		goto usage;
 	do {
-		/* TODO: Temporarily re-direct syslog() for this process to stdout
-		 *      (or capture all syslog() messages written by this process
+		/* TODO: Temporarily  re-direct  syslog()  for  this  process  to stdout
+		 *       (or capture  all  syslog()  messages written  by  this  process
 		 *       after this call to `KSysctlDelmod()', and then print everything
 		 *       to stdout) */
 		KSysctlDelmod(*argv++, flags);

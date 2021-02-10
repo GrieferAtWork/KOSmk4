@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67506a4a */
+/* HASH CRC-32:0x78c3c09b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@
 
 /* Event types always implicitly polled for.
  * These don't need to be set in `events', but they will appear
- * in `revents' to indicate their respective status condition. */
+ * in  `revents' to indicate their respective status condition. */
 #if !defined(POLLERR) && defined(__POLLERR)
 #define POLLERR  __POLLERR  /* Error condition. */
 #endif /* !POLLERR && __POLLERR */

@@ -105,9 +105,9 @@ DEFINE_TEST(epoll) {
 	EQx32(events[0].events, EPOLLIN);
 	EQu64(events[0].data.u64, 8888);
 
-	/* Without `KP_EPOLL_DELETE_ONESHOT', we must manually delete
+	/* Without `KP_EPOLL_DELETE_ONESHOT', we  must manually  delete
 	 * monitors after they've become dormant. Note that by default,
-	 * this personality is off, but as a kos-specific program, we
+	 * this personality is off, but  as a kos-specific program,  we
 	 * also want to ensure that we can test all cases! */
 	if (!KSysctlGetPersonality(KP_EPOLL_DELETE_ONESHOT))
 		EQd(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
@@ -190,16 +190,16 @@ DEFINE_TEST(epoll_et) {
 
 	/* Because the pipe was already non-empty, the second write should not trigger
 	 * EPOLLET again (although it doing so would technically be allowed, since the
-	 * kernel is allowed to trigger a sporadic signal internally, but knowing how
-	 * the backend of pipes is implemented under KOS, I can say with certainty,
-	 * that at least in the case of pipes, no sporadic signal should be able to
+	 * kernel is allowed to trigger a sporadic signal internally, but knowing  how
+	 * the backend of pipes  is implemented under KOS,  I can say with  certainty,
+	 * that at least in the  case of pipes, no sporadic  signal should be able  to
 	 * happen)
 	 * For reference, look at the internal pipe buffer-backend used by the kernel,
 	 * as implemented in /kos/src/libbuffer/ringbuffer.c
 	 *
-	 * Fun fact: My linux machine (4.4.0-186-generic) sends a second edge-event
-	 *           when I try to run this test, even though the write only further
-	 *           extended an already non-empty pipe, so the is-readable condition
+	 * Fun fact: My linux machine  (4.4.0-186-generic) sends  a second  edge-event
+	 *           when  I try to run this test,  even though the write only further
+	 *           extended an already non-empty pipe, so the is-readable  condition
 	 *           of the monitored file didn't actually become raised, meaning that
 	 *           there wasn't actually an edge to talk about.
 	 */

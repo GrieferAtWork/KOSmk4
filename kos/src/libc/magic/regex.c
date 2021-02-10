@@ -48,8 +48,8 @@
 #include <sys/types.h>
 
 /* NOTE: On KOS, regex is implemented by a dedicated library that gets loaded by libc
- *       once the demand to do so comes up, in order to emulate POSIX and GNU regex
- *       functionality. If you intend on making use of this library, its main header
+ *       once  the demand to do so comes up,  in order to emulate POSIX and GNU regex
+ *       functionality. If you intend on making use of this library, its main  header
  *       can be included as `<libregex/regex.h>' */
 
 
@@ -157,7 +157,7 @@ __LIBC reg_syntax_t re_syntax_options;
 #define REG_ICASE    0x0002 /* == REGEX_FLAG_NOCASE
                              * Ignore casing during matching */
 #define REG_NEWLINE  0x0004 /* == !REGEX_FLAG_MULTILINE
-                             * ^ and $ don't match after/before line-feeds,
+                             * ^ and $  don't match after/before  line-feeds,
                              * but only at the start/end of regex input data. */
 #define REG_NOSUB    0x0008 /* If set:   Only return success/failure in regexec.
                              * If clear: Return success/failure/error in regexec. */
@@ -207,7 +207,7 @@ typedef enum {
 #endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
 #define REG_NOERROR  REG_NOERROR  /* Success. */
 #define REG_NOMATCH  REG_NOMATCH  /* Didn't find a match (for regexec). */
-	/* POSIX */
+/* POSIX */
 #define REG_BADPAT   REG_BADPAT   /* Invalid pattern. */
 #define REG_ECOLLATE REG_ECOLLATE /* Inalid collating element. */
 #define REG_ECTYPE   REG_ECTYPE   /* Invalid character class name. */
@@ -220,7 +220,7 @@ typedef enum {
 #define REG_ERANGE   REG_ERANGE   /* Invalid range end. */
 #define REG_ESPACE   REG_ESPACE   /* Ran out of memory. */
 #define REG_BADRPT   REG_BADRPT   /* No preceding re for repetition op. */
-	/* GNU-specific errors */
+/* GNU-specific errors */
 #define REG_EEND     REG_EEND     /* Premature end. */
 #define REG_ESIZE    REG_ESIZE    /* Compiled pattern bigger than 2^16 bytes. */
 #define REG_ERPAREN  REG_ERPAREN  /* Unmatched ) or \); not returned from regcomp. */
@@ -230,7 +230,7 @@ typedef enum {
 #endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
 #define REG_NOERROR  0  /* Success. */
 #define REG_NOMATCH  1  /* Didn't find a match (for regexec). */
-	/* POSIX */
+/* POSIX */
 #define REG_BADPAT   2  /* Invalid pattern. */
 #define REG_ECOLLATE 3  /* Inalid collating element. */
 #define REG_ECTYPE   4  /* Invalid character class name. */
@@ -243,7 +243,7 @@ typedef enum {
 #define REG_ERANGE   11 /* Invalid range end. */
 #define REG_ESPACE   12 /* Ran out of memory. */
 #define REG_BADRPT   13 /* No preceding re for repetition op. */
-	/* GNU-specific errors */
+/* GNU-specific errors */
 #define REG_EEND     14 /* Premature end. */
 #define REG_ESIZE    15 /* Compiled pattern bigger than 2^16 bytes. */
 #define REG_ERPAREN  16 /* Unmatched ) or \); not returned from regcomp. */
@@ -275,8 +275,8 @@ typedef enum {
 
 #ifdef __CC__
 struct re_pattern_buffer {
-	/* KOS doesn't use any of this stuff. - On KOS, regex expressions are
-	 * evaluated in interpreted mode (aka.: there is no intermediate bytecode)
+	/* KOS doesn't  use any  of this  stuff. -  On KOS,  regex expressions  are
+	 * evaluated in interpreted mode (aka.: there is no intermediate  bytecode)
 	 * However, in the interest of future compatibility, I do reserve the right
 	 * to implement a bytecode sub-system at some point in the future if I find
 	 * sufficient reason to do this. */

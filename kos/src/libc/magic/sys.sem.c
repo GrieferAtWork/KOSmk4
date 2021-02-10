@@ -113,7 +113,7 @@ typedef __TM_TYPE(time) time_t;
 
 }
 
-@@Semaphore control operation.  
+@@Semaphore control operation.
 [[decl_include("<features.h>")]]
 int semctl(int semid,
            __STDC_INT_AS_UINT_T semnum,

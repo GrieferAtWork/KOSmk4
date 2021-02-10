@@ -58,7 +58,7 @@ DEFINE_TEST(fifo) {
 
 	/* Attempting to open the write-end before a read-end must cause ENXIO
 	 * NOTE: This only happens when `O_NONBLOCK' is given. Without the later
-	 *       flag, this operation would block until a reader would open the
+	 *       flag,  this operation would block until a reader would open the
 	 *       fifo */
 	wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK);
 	assert(wr == -1);
@@ -80,7 +80,7 @@ DEFINE_TEST(fifo) {
 	assertf(temp == 3, "%Id\n%s", temp, strerror(errno));
 	assertf(memcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
 
-	/* The fifo should now be empty, but because `wr' is still opened,
+	/* The fifo should now be empty,  but because `wr' is still  opened,
 	 * attempting to read from it should trigger EWOULDBLOCK (or EAGAIN,
 	 * although those 2 are defined as the same error-code under KOS)! */
 	temp = read(rd, buf, 3);
@@ -96,12 +96,12 @@ DEFINE_TEST(fifo) {
 
 	/* Open the fifo for writing once again.
 	 * NOTE: Don't pass O_NONBLOCK this time around, since the presence
-	 *       of our reader (rd) should prevent this from blocking! */
+	 *       of our  reader (rd)  should  prevent this  from  blocking! */
 	wr = open(FIFO_NAME, O_WRONLY);
 	assertf(wr != -1, "%s", strerror(errno));
 
 	/* Trying to read from the FIFO should once again indicate
-	 * EWOULDBLOCK, since there's a writer (once again) */
+	 * EWOULDBLOCK,   since  there's  a  writer  (once  again) */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);
 	assertf(errno == EWOULDBLOCK, "%s", strerror(errno));
@@ -126,7 +126,7 @@ DEFINE_TEST(fifo) {
 	/* Delete the FIFO */
 	assertf(unlink(FIFO_NAME) == 0, "%s", strerror(errno));
 
-	/* Communication should till be possible. - The fifo simply became
+	/* Communication  should till  be possible.  - The  fifo simply became
 	 * anonymous (i.e. more akin to a regular pipe, as created by pipe(2)) */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);

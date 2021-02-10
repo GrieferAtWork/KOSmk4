@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf01ef47 */
+/* HASH CRC-32:0x88db4136 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -210,11 +210,11 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_rethrow)(void) __THROW
 #endif /* ... */
 #ifdef __INTELLISENSE__
 /* Throw a new exception `code', which is either an exception class,
- * an exception code, or an exception-class+sub-class pair, written
+ * an  exception code, or an exception-class+sub-class pair, written
  * as `(class,subclass)', going in hand with the macros defining the
  * various exceptions there are.
  * Following this, up to `EXCEPTION_DATA_POINTERS' optional exception
- * arguments may be provided, which are stored in `e_pointers', with
+ * arguments may be provided, which are stored in `e_pointers',  with
  * any argument not provided simply substituted in with `NULL' / 0. */
 #define THROW THROW
 __ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(error_code_t __code, ...);
@@ -317,11 +317,11 @@ __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_BEGIN_CC error_nesting
 __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("error_nesting_end");
 #endif /* !__error_nesting_end_defined && __CRT_HAVE_error_nesting_end */
 #ifdef __cplusplus
-/* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
- *       binary that allows for libc to consider these handlers as `dlexceptaware(3)'
- *       when operating in except-mode #4. However, I am unsure as to how this could
+/* TODO: In user-space, using TRY and EXCEPT should  leave some sort of marker in  the
+ *       binary  that allows for libc to consider these handlers as `dlexceptaware(3)'
+ *       when operating in except-mode #4. However, I  am unsure as to how this  could
  *       be implemented without making some additional tweaks to gcc under KOS, though
- *       that wouldn't even be the first time I had to tweak binutils/gcc for this
+ *       that wouldn't even be  the first time  I had to  tweak binutils/gcc for  this
  *       project... */
 #ifndef __TRY
 #define __TRY    try

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25310adb */
+/* HASH CRC-32:0xd7582e3e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,12 +176,12 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN2K8
 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' (-ENOTDIR) exception when the
- * final path component of an open() system call turns out to be something other than a directory. */
+ * final path component of  an open() system  call turns out  to be something  other than a  directory. */
 #if !defined(O_DIRECTORY) && defined(__O_DIRECTORY)
 #define O_DIRECTORY __O_DIRECTORY
 #endif /* !O_DIRECTORY && __O_DIRECTORY */
 
-/* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception when
+/* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception  when
  * the final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
  * is given, in which case the link itself is opened. */
 #if !defined(O_NOFOLLOW) && defined(__O_NOFOLLOW)
@@ -200,15 +200,15 @@ __SYSDECL_BEGIN
 #define O_CLOFORK __O_CLOFORK
 #endif /* !O_CLOFORK && __O_CLOFORK */
 
-/* Interpret '\\' as '/', and ignore casing during path resolution.
- * Additionally, recognize DOS mounting points, and interpret leading
+/* Interpret  '\\'  as  '/',  and   ignore  casing  during  path   resolution.
+ * Additionally,   recognize  DOS  mounting   points,  and  interpret  leading
  * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
 #if !defined(O_DOSPATH) && defined(__O_DOSPATH)
 #define O_DOSPATH __O_DOSPATH
 #endif /* !O_DOSPATH && __O_DOSPATH */
 
 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
- * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
+ * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
  *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
 #if !defined(O_SYMLINK) && defined(__O_SYMLINK)
 #define O_SYMLINK __O_SYMLINK
@@ -405,7 +405,7 @@ __SYSDECL_BEGIN
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K) || defined(__USE_BSD)
 /* [void arg] Get owner (process receiving SIGIO).
  * @return: * : The PID of the process (warning: the PID may not
- *              fit into an int and -EOVERFLOW may be returned) */
+ *              fit into an int and -EOVERFLOW may be  returned) */
 #if !defined(F_GETOWN) && defined(__F_GETOWN)
 #define F_GETOWN __F_GETOWN
 #endif /* !F_GETOWN && __F_GETOWN */
@@ -516,7 +516,7 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_NETBSD)
 /* [void arg] Duplicate file descriptor with close-on-exit set.
- * @[fd_t return]: * : A new FD for the same kernel object. */
+ * @[fd_t return]: * :  A new  FD for the  same kernel  object. */
 #if !defined(F_DUPFD_CLOEXEC) && defined(__F_DUPFD_CLOEXEC)
 #define F_DUPFD_CLOEXEC __F_DUPFD_CLOEXEC
 #endif /* !F_DUPFD_CLOEXEC && __F_DUPFD_CLOEXEC */
@@ -541,7 +541,7 @@ __SYSDECL_BEGIN
 #endif /* __USE_KOS */
 
 #if defined(__USE_KOS) || defined(__USE_NETBSD)
-/* [void arg] close all handles >= to the one given
+/* [void arg] close  all  handles  >=  to  the  one  given
  * s.a. https://www.unix.com/man-page/FreeBSD/2/closefrom/ */
 #if !defined(F_CLOSEM) && defined(__F_CLOSEM)
 #define F_CLOSEM __F_CLOSEM
@@ -874,7 +874,7 @@ enum __pid_type {
 #endif /* !F_SEAL_GROW && __F_SEAL_GROW */
 #if !defined(F_SEAL_WRITE) && defined(__F_SEAL_WRITE)
 #define F_SEAL_WRITE        __F_SEAL_WRITE        /* Prevent any modifications to the file's contents.
-                                                   * If writable memory mappings exist, trying to set
+                                                   * If  writable memory mappings exist, trying to set
                                                    * this flag fails with TODO:EXCEPTION_FOR_EBUSY */
 #endif /* !F_SEAL_WRITE && __F_SEAL_WRITE */
 #if !defined(F_SEAL_FUTURE_WRITE) && defined(__F_SEAL_FUTURE_WRITE)
@@ -909,7 +909,7 @@ enum __pid_type {
 #if defined(__USE_ATFILE) || defined(__USE_BSD) || defined(__USE_XOPEN2K8)
 
 /* Special value used to indicate the *at functions
- * should use the current working directory. */
+ * should  use  the   current  working   directory. */
 #if !defined(AT_FDCWD) && defined(__AT_FDCWD)
 #define AT_FDCWD __AT_FDCWD
 #endif /* !AT_FDCWD && __AT_FDCWD */
@@ -947,16 +947,16 @@ enum __pid_type {
 #endif /* __USE_GNU || __USE_KOS_KERNEL */
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-/* Treat symbolic links similar to like regular files and throw
+/* Treat symbolic links similar to  like regular files and  throw
  * an `ERROR_FS_TOO_MANY_LINKS' error during the first encounter. */
 #if !defined(AT_SYMLINK_REGULAR) && defined(__AT_SYMLINK_REGULAR)
 #define AT_SYMLINK_REGULAR __AT_SYMLINK_REGULAR
 #endif /* !AT_SYMLINK_REGULAR && __AT_SYMLINK_REGULAR */
 
 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
- * (when not equal to `UTIME_OMIT') is used to override the file creation timestamp.
- * NOTE: Passing this flag when the 3rd timespec isn't set to `UTIME_OMIT' requires
- *       that the calling thread be holding the `CAP_SYS_TIME' permission and be the
+ * (when not equal to  `UTIME_OMIT') is used to  override the file creation  timestamp.
+ * NOTE: Passing this flag when the 3rd  timespec isn't set to `UTIME_OMIT'  requires
+ *       that the calling thread be holding the `CAP_SYS_TIME' permission and be  the
  *       owner of the file in question, or to be holding the `CAP_FOWNER' permission.
  *       Less permissions are required when `UTIME_NOW' is passed, in which case
  *      `CAP_SYS_TIME' is not required (similarly how having `CAP_FOWNER', or being
@@ -968,14 +968,14 @@ enum __pid_type {
 #endif /* !AT_CHANGE_CTIME && __AT_CHANGE_CTIME */
 
 /* For use with `freadlinkat' and friends.
- * Rather than following unix semantics and returning the amount of
- * copied bytes with no indication of whether or not everything was
- * copied, return the ~required~ buffer size (including a terminating
+ * Rather  than following  unix semantics  and returning  the amount of
+ * copied bytes with  no indication  of whether or  not everything  was
+ * copied, return the ~required~  buffer size (including a  terminating
  * NUL-character that normally wouldn't be copied either) to user-space
- * (which may be more than the specified buffer size, which should be
+ * (which may be more than the  specified buffer size, which should  be
  * reallocated to fit in successive calls)
- * Additionally, as already mentioned, a trailing NUL-character is
- * appended to the link text, ensuring that a valid C-style string
+ * Additionally, as already  mentioned, a  trailing NUL-character  is
+ * appended  to the link  text, ensuring that  a valid C-style string
  * can be read so long as the provided buffer was of sufficient size. */
 #if !defined(AT_READLINK_REQSIZE) && defined(__AT_READLINK_REQSIZE)
 #define AT_READLINK_REQSIZE __AT_READLINK_REQSIZE
@@ -984,14 +984,14 @@ enum __pid_type {
 /* Explicitly allow removing anything that unlink() removes. (Default;
  * Set in addition to `AT_REMOVEDIR' to implement `remove()' semantics
  * as an atomic kernel operation, removing any race condition that the
- * alternative of `if (unlink(x) && errno == EISDIR) rmdir(x)' would
+ * alternative  of  `if (unlink(x) && errno == EISDIR) rmdir(x)' would
  * introduce). */
 #if !defined(AT_REMOVEREG) && defined(__AT_REMOVEREG)
 #define AT_REMOVEREG __AT_REMOVEREG
 #endif /* !AT_REMOVEREG && __AT_REMOVEREG */
 
 /* For `frealpath4' / `frealpathat': the specified path should
- * be printed as the reverse of the `AT_DOSPATH' flag:
+ * be  printed  as  the  reverse  of  the  `AT_DOSPATH'  flag:
  *  - 0                      : in:UNIX  out:UNIX
  *  - AT_DOSPATH             : in:DOS   out:DOS
  *  - AT_ALTPATH             : in:UNIX  out:DOS
@@ -1007,12 +1007,12 @@ enum __pid_type {
 #endif /* !AT_REMOVEMNT && __AT_REMOVEMNT */
 #endif /* __USE_KOS_KERNEL */
 
-/* Interpret '\\' as '/', and ignore casing during path resolution.
- * Additionally, recognize `<LETTER>:'-style drive prefixes, as well
+/* Interpret '\\'  as  '/',  and ignore  casing  during  path  resolution.
+ * Additionally,  recognize  `<LETTER>:'-style  drive  prefixes,  as  well
  * as make use of per-drive working directories, as well as drive-relative
  * path names that start with a leading slash.
  * Basically, when set: perform the system call in DOS-compatibility mode.
- * HINT: This flag can be specified with the `fsmode()' system call. */
+ * HINT:  This  flag can  be specified  with  the `fsmode()'  system call. */
 #if !defined(AT_DOSPATH) && defined(__AT_DOSPATH)
 #define AT_DOSPATH __AT_DOSPATH
 #endif /* !AT_DOSPATH && __AT_DOSPATH */
@@ -1025,7 +1025,7 @@ enum __pid_type {
 
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
- * and their meaning is context-sensible. */
+ * and their  meaning is  context-sensible. */
 #if !defined(AT_THIS_TASK) && defined(__AT_THIS_TASK)
 #define AT_THIS_TASK __AT_THIS_TASK
 #endif /* !AT_THIS_TASK && __AT_THIS_TASK */
@@ -1059,8 +1059,8 @@ enum __pid_type {
 
 /* DOS Drive root / current-working paths.
  * These are special file descriptors that can be written to using `dup2()',
- * where they expect to receive either a FILE or PATH descriptor.
- * Once set, these paths describe the root-paths of DOS's drives:
+ * where   they  expect  to  receive  either  a  FILE  or  PATH  descriptor.
+ * Once  set,  these  paths  describe   the  root-paths  of  DOS's   drives:
  * >> // Force DOS filesystem semantics for all filesystem operations.
  * >> struct fsmask mask = {0,0};
  * >> mask = fsmode(mask);
@@ -1090,22 +1090,22 @@ enum __pid_type {
  * >>
  * NOTES:
  *   - Setting the root-path of a drive will not update the drive working directories of processes sharing VFS.
- *     With that in mind, you should not re-mount a DOS drive as a sub-directory of where
- *     it was located before then, unless you first unshared your VFS (using `CLONE_NEWNS').
- *     Allowing a program's current working directory to be located outside the associated
+ *     With  that  in   mind,  you   should  not   re-mount  a   DOS  drive   as  a   sub-directory  of   where
+ *     it  was   located  before   then,  unless   you   first  unshared   your  VFS   (using   `CLONE_NEWNS').
+ *     Allowing  a   program's   current   working   directory   to   be   located   outside   the   associated
  *     drive causes weak undefined behavior. In KOS this means:
  *       - `xfdname()' will not produce the correct path
  *       - Relative path names still operate on the old directory
  *       - Navigating into parent directories is no longer restricted (except by `chroot()')
  *       - Manually navigating into a portion of the new drives mounting point fixes the problem.
  *   - DOS drive mounting points are beneath UNIX mounting points, in that they don't
- *     actually mount a superblock to some filesystem location, but rather mirror a
- *     filesystem path, meaning that DOS drives can be thought of as the equivalent
+ *     actually mount a superblock to some  filesystem location, but rather mirror  a
+ *     filesystem  path, meaning that DOS drives can  be thought of as the equivalent
  *     of the `dfd' argument of `*at' system calls:
  *     >> open("C:\\foo.txt"); // Same as `openat(AT_FDDRIVE_ROOT('C'), "foo.txt")'
- *     If `mount()' is used to create a new (real) mounting point, it will appear
- *     in all DOS drives that are mounting the location where the mount happened,
- *     or any location further up the tree immediately (it's the same data object
+ *     If `mount()' is used to create a  new (real) mounting point, it will  appear
+ *     in  all DOS drives that are mounting  the location where the mount happened,
+ *     or  any location further up the tree  immediately (it's the same data object
  *     internally; DOS drives are merely aliasing regular paths; aka. `O_PATH')
  *   - To ~unmount~ (quote-unquote) a DOS drive, simply close() the associated root file descriptor:
  *     >> // Unmount `C:' (also closes the associated FDCWD descriptor)
@@ -1115,9 +1115,9 @@ enum __pid_type {
  *     >> close(AT_FDDRIVE_CWD('C'));
  *     >> // Same as:
  *     >> dup2(AT_FDDRIVE_ROOT('C'),AT_FDDRIVE_CWD('C'));
- *   - Symbolic links are evaluated the same as any user-provided path.
+ *   - Symbolic links  are evaluated  the same  as any  user-provided  path.
  *     If a symbolic link starts with a '/' or '\\' character, the remainder
- *     of its text is relative to the first DOS drive mounting point
+ *     of its  text  is relative  to  the  first DOS  drive  mounting  point
  *     encountered while walking up the chain of parent directories. */
 #if !defined(AT_FDDRIVE_CWD) && defined(__AT_FDDRIVE_CWD)
 #define AT_FDDRIVE_CWD(drivechar) __AT_FDDRIVE_CWD(drivechar)
@@ -1448,7 +1448,7 @@ enum __pid_type {
 #endif /* !FCREAT && __O_CREAT */
 #if !defined(FTRUNC) && defined(__O_TRUNC)
 #define FTRUNC  __O_TRUNC  /* Truncate (clear) the named file if it already exists,
-                            * and `O_WRONLY' or `O_RDWR' access is specified. */
+                            * and  `O_WRONLY'  or  `O_RDWR'  access  is  specified. */
 #endif /* !FTRUNC && __O_TRUNC */
 #if !defined(FEXCL) && defined(__O_EXCL)
 #define FEXCL   __O_EXCL   /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'

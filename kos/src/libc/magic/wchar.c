@@ -225,10 +225,10 @@ DEFINE_INTERN_ALIAS(libc_c16rtomb, libd_wcrtomb);
  *    mbrtowc:mbrtoc16:mbrtoc32
  *    wcrtomb:c16rtomb:c32rtomb
  * which are exposed in <uchar.h>, we need to be a little bit
- * more careful when it comes to defining them on a platform
+ * more  careful when it comes to defining them on a platform
  * where the standard DOS calling convention differs from the
  * calling convention used by KOS (e.g. x86-64)
- * 
+ *
  * In this scenario, magic will have already given the symbols:
  *   - LIBDCALL:DOS$mbrtowc:   size_t(wchar16_t *pwc, char const *str, size_t maxlen, mbstate_t *mbs);
  *     LIBDCALL:DOS$mbrtoc16:  ...
@@ -241,13 +241,13 @@ DEFINE_INTERN_ALIAS(libc_c16rtomb, libd_wcrtomb);
  *     LIBKCALL:c32rtomb:      ...
  *     LIBDCALL:DOS$c32rtomb:  ...  (msabi64-generator)
  *
- * However, you can see that this system is still lacking the LIBKCALL
+ * However,  you can  see that this  system is still  lacking the LIBKCALL
  * variants of 2 functions that are only available as LIBDCALL (thus far):
  *     LIBKCALL:mbrtoc16:  ...
  *     LIBKCALL:c16rtomb:  ...
  *
  * And because the msabi64 generator doesn't include special handling for this case,
- * we simply have to manually implement these 2 functions as LIBKCALL wrappers for
+ * we  simply have to manually implement these  2 functions as LIBKCALL wrappers for
  * the associated LIBDCALL functions:
  *
  *     libc_mbrtoc16(...) { return libd_mbrtowc(...); }

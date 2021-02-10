@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x878bb23c */
+/* HASH CRC-32:0x7481ff88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -529,29 +529,29 @@ __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddirf64,(__fd_t __fd
 #define READDIR_SKIPREL  0x4000 /* Skip reading the `.' and `..' directory entries. */
 #define READDIR_WANTEOF  0x8000 /* Minor optimization for `READDIR_MULTIPLE':
                                  * The system is allowed to append an empty directory entry
-                                 * (with `d_namlen = 0' and `d_name[0] = '\0''; other fields are undefined).
+                                 * (with  `d_namlen = 0' and `d_name[0] = '\0''; other fields are undefined).
                                  * If there isn't enough space for such an entry, no such entry will be emit.
-                                 * Since no other directory entry can ever have a length of ZERO(0),
-                                 * this allows user-space to detect end-of-directory without the need
-                                 * of re-invoking the kreaddir() system call and inspecting its return
+                                 * Since no  other  directory  entry  can ever  have  a  length  of  ZERO(0),
+                                 * this  allows  user-space  to  detect  end-of-directory  without  the  need
+                                 * of re-invoking  the  kreaddir()  system call  and  inspecting  its  return
                                  * value for being equal to ZERO(0).
-                                 * However, that check is still required, as this flag may be ignored
-                                 * for no reason immediately apparent (if the EOF entry can't fit into
-                                 * the buffer, there's no way of knowing if there's a missing entry that's
-                                 * supposed to go into the buffer, or if it was actually an EOF entry).
-                                 * Additionally, no eof entry may be written if kreaddir() is invoked
+                                 * However, that  check  is  still  required, as  this  flag  may  be  ignored
+                                 * for no  reason  immediately apparent  (if  the  EOF entry  can't  fit  into
+                                 * the buffer, there's  no way of  knowing if there's  a missing entry  that's
+                                 * supposed  to  go into  the buffer,  or if  it was  actually an  EOF entry).
+                                 * Additionally,  no  eof  entry  may  be  written  if  kreaddir()  is invoked
                                  * on a directory handle who's stream position is at the end of the directory.
-                                 * For usage, see the example below, as well as `READDIR_MULTIPLE_ISEOF()' */
+                                 * For  usage, see  the example  below, as  well as `READDIR_MULTIPLE_ISEOF()' */
 #define READDIR_MODEMASK 0x001f /* Mask for the kreaddir() mode. */
 #define READDIR_FLAGMASK 0xc000 /* Mask of known kreaddir() flags. */
 #define READDIR_MODEMAX  0x0003 /* Mask recognized mode ID. */
-#define READDIR_MULTIPLE 0x0003 /* Read as many directory entries as can fit into the buffer.
-                                 * If at least one entry could be read, return the combined size
+#define READDIR_MULTIPLE 0x0003 /* Read as  many  directory  entries  as can  fit  into  the  buffer.
+                                 * If at least  one entry  could be  read, return  the combined  size
                                  * of all read entries (in bytes) (in this case, `return <= bufsize')
-                                 * If the buffer was too small to contain the next entry,
-                                 * return the required size to house that pending entry,
-                                 * but don't yield it, the same way `READDIR_DEFAULT' wouldn't.
-                                 * To enumerate multiple directories in some buffer, use the
+                                 * If  the  buffer  was  too   small  to  contain  the  next   entry,
+                                 * return  the   required  size   to   house  that   pending   entry,
+                                 * but don't  yield  it,  the same  way  `READDIR_DEFAULT'  wouldn't.
+                                 * To  enumerate  multiple  directories  in  some  buffer,  use   the
                                  * macros below. */
 #ifdef __CC__
 /* READDIR_MULTIPLE buffer helpers:

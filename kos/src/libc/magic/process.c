@@ -418,7 +418,7 @@ intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__rest
 [[cp, export_alias("_cwait"), requires_function(waitpid)]]
 $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
 	/* This one's pretty simple, because it's literally just a waitpid() system call...
-	 * (It even returns the same thing, that being the PID of the joined process...) */
+	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */
 	(void)action;
 	return waitpid(pid, tstat, WEXITED);
@@ -508,7 +508,7 @@ $pid_t spawnvpe(__STDC_INT_AS_UINT_T mode,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 @@pp_ifdef _WIN32@@
@@ -650,12 +650,12 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 		if (child < 0)
 			goto err;
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-		/* Check for errors that may have happened in the
+		/* Check for errors that may have happened in  the
 		 * child process _after_ we did the vfork() above. */
 		if (__libc_geterrno_or(0) != 0)
 			goto err_join_zombie_child;
 		/* Success (but still restore the old errno
-		 * since we overwrote it to be 0 above) */
+		 * since  we  overwrote it  to be  0 above) */
 		__libc_seterrno(old_errno);
 @@pp_else@@
 		close(pipes[1]); /* Close the writer. */
@@ -690,9 +690,9 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 		goto do_exec;
 read_child_errors:
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-	/* Check if the vfork() from the child returned success, but left
+	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at some point after vfork() already
+	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
 	if (__libc_geterrno_or(0) != 0)
 		goto err_join_zombie_child;
@@ -704,7 +704,7 @@ read_child_errors:
 @@pp_else@@
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and read() returns ZERO(0)) */
+	 *        closed and  read() returns  ZERO(0)) */
 	close(pipes[1]); /* Close the writer. */
 	temp = read(pipes[0], &error, sizeof(error));
 	close(pipes[0]); /* Close the reader. */
@@ -719,7 +719,7 @@ read_child_errors:
 err_join_zombie_child:
 	if (mode != P_DETACH) {
 		/* Unless the child was already spawned as detached,
-		 * we still have to re-join it, or else it will be
+		 * we still have to re-join  it, or else it will  be
 		 * left dangling as a zombie process! */
 		if (waitpid(child, &status, 0) < 0) {
 @@pp_ifdef EINTR@@
@@ -732,12 +732,12 @@ err:
 	return -1;
 do_exec:
 	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as O_CLOEXEC! */
+	 * closed because it's marked as  O_CLOEXEC! */
 	fexecve(execfd, ___argv, ___envp);
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
 	/* If the exec fails, it will have modified `errno' to indicate this fact.
-	 * And since we're sharing VMs with our parent process, the error reason
-	 * will have already been written back to our parent's VM, so there's
+	 * And since we're sharing VMs with  our parent process, the error  reason
+	 * will have already  been written  back to  our parent's  VM, so  there's
 	 * actually nothing left for us to do, but to simply exit! */
 @@pp_else@@
 	/* Write the exec-error back to our parent. */

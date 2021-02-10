@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa73f27a5 */
+/* HASH CRC-32:0xf80b1082 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10712,7 +10712,7 @@ enum {
 #endif /* ... */
 
 /* Figure out defaults for `float_t' and `double_t' if those
- * havn't already been defined by `<bits/crt/mathdef.h>' */
+ * havn't already  been  defined  by  `<bits/crt/mathdef.h>' */
 #if !defined(__float_t) || !defined(__double_t)
 #if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -10869,7 +10869,7 @@ typedef __double_t double_t;
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
 /* Libstdc++ headers need us to define these as functions when also
  * defining `__CORRECT_ISO_CPP11_MATH_H_PROTO_FP', which we need to
- * do in order to get it to stop re-declaring other functions such
+ * do in order to get it to stop re-declaring other functions  such
  * as `acosh'... *ugh* */
 __NAMESPACE_STD_BEGIN
 extern "C++" {
@@ -11051,7 +11051,7 @@ __NAMESPACE_STD_USING(islessgreater)
 #define MATH_ERRNO     1 /* Errno is set by math functions. */
 #define MATH_ERREXCEPT 2 /* Exceptions are raised by math functions. */
 
-/* By default, all functions support both errno and exception handling.
+/* By   default,   all  functions   support   both  errno   and   exception  handling.
  * In gcc's fast math mode and if inline functions are defined this might not be true. */
 #ifndef __FAST_MATH__
 #define math_errhandling (MATH_ERRNO | MATH_ERREXCEPT)

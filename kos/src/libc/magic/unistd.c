@@ -439,7 +439,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 @@pp_ifdef _WIN32@@

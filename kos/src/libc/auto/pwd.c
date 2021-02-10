@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1f93e16 */
+/* HASH CRC-32:0x2f23a031 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,7 +212,7 @@ got_all_fields:
 		}
 		/* All right! we've got all of the fields!
 		 * Now to fill in the 2 numeric fields (since those
-		 * might still contain errors that would turn this
+		 * might  still contain errors that would turn this
 		 * entry into a bad line) */
 		if unlikely(!*field_starts[2])
 			goto badline;
@@ -229,7 +229,7 @@ got_all_fields:
 		if unlikely(*iter)
 			goto badline;
 		/* All right! Now to fill in all of the string fields.
-		 * We've already turned all of them into NUL-terminated strings pointing
+		 * We've already turned all of them into NUL-terminated strings  pointing
 		 * into the heap-allocated `dbline' string, however the prototype of this
 		 * function requires that they be pointing into `buffer...+=buflen' */
 		for (i = 0; i < 7; ++i) {

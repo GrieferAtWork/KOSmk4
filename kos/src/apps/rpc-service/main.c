@@ -33,12 +33,12 @@ int main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
 	/* This program was used to test a problem related to exception unwinding
-	 * while inside of `task_serve()' (s.a. `LOG_SEGMENT_INCONSISTENCY()' in
+	 * while  inside of `task_serve()' (s.a. `LOG_SEGMENT_INCONSISTENCY()' in
 	 * `kos/src/kernel/core/arch/i386/except.c')
-	 * -> Start this program and press CTRL+C a couple of times (which will
+	 * -> Start  this program and  press CTRL+C a couple  of times (which will
 	 *    eventually cause an E_INTERRUPT_USER_RPC to be thrown and propagated
-	 *    through `task_serve()', that demonstrateted a design flaw caused by
-	 *    a miss-understanding of how `pushl %<SEGMENT_REGISTER>' works on
+	 *    through `task_serve()', that demonstrateted a design flaw caused  by
+	 *    a  miss-understanding  of how  `pushl %<SEGMENT_REGISTER>'  works on
 	 *    different CPUs)
 	 * (To exit the program, send SIGQUIT using CTRL+\ (or its alias: CTRL+4)) */
 	signal(SIGINT, SIG_IGN);

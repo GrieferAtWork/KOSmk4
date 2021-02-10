@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ec6e59e */
+/* HASH CRC-32:0xcd6e8aa2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1253,9 +1253,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futexlock_timedwaitwhile_allbits64, __FORCELOCAL
 #endif /* __USE_TIME64 */
 
 /* Provide overloads for the non-timed functions add an optional `rel_timeout'
- * argument that re-directly to the function's timed variant.
- * Because this overload is purely based on argument count, we can emulate
- * this portably both in C++ and C (using `__HYBRID_PP_VA_OVERLOAD') */
+ * argument   that   re-directly    to   the    function's   timed    variant.
+ * Because  this overload  is purely based  on argument count,  we can emulate
+ * this  portably  both  in   C++  and  C  (using   `__HYBRID_PP_VA_OVERLOAD') */
 #ifdef __cplusplus
 extern "C++" {
 extern "C++" {

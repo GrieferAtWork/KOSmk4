@@ -147,7 +147,7 @@ void makecontext([[nonnull]] ucontext_t *ucp,
 
 #ifdef __CRT_SUPPORTS_UCONTEXT
 /* Tell the compiler that `setcontext()' will never return normally, though
- * prevent any compiler errors if the caller tries to use the function in
+ * prevent  any compiler errors if the caller  tries to use the function in
  * the context of an integer expression. */
 #define setcontext(ucp) ((setcontext)(ucp), __builtin_unreachable(), 0)
 #endif /* __CRT_SUPPORTS_UCONTEXT */

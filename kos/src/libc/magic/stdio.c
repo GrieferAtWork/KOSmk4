@@ -694,7 +694,7 @@ int fclose([[nonnull]] FILE *__restrict stream);
 [[                                                                           alias(CNL_fflush...)]]
 [[                                                                           alias(CNL_fflush_unlocked...)]]
 int fflush([[nullable]] FILE *stream) {
-	/* NO-OP (When not implemented by the CRT, assume no
+	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
 @@pp_if $has_function(crt_flushall)@@
 	if (!stream)
@@ -1560,7 +1560,7 @@ void setlinebuf([[nonnull]] $FILE *__restrict stream) {
 [[cp_stdio, userimpl, no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_fflush_unlocked...), alias(CNL_fflush...)]]
 int fflush_unlocked([[nullable]] $FILE *stream) {
-	/* NO-OP (When not implemented by the CRT, assume no
+	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
 @@pp_if $has_function(crt_flushall)@@
 	if (!stream)
@@ -2802,11 +2802,11 @@ __STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull]] char const *__restrict format, .
 %
 %#ifdef __USE_LARGEFILE64
 /* I wish I could find some <stdio.h> header that declares these (aside
- * of my own), since I don't really know where exactly to put them.
+ * of my own),  since I don't  really know where  exactly to put  them.
  *
- * For now, it makes sense to encapsulate them behind _LARGEFILE64_SOURCE,
+ * For now, it makes sense to encapsulate them behind  _LARGEFILE64_SOURCE,
  * given that these are the 64-bit variants of fseek() and ftell(), however
- * there may be other _*_SOURCE macros out there that are supposed to do
+ * there may be other  _*_SOURCE macros out there  that are supposed to  do
  * the same (only I can't find them...) */
 %[insert:function(fseek64 = fseeko64)]
 %[insert:function(ftell64 = ftello64)]

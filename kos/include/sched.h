@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a3dcfbd */
+/* HASH CRC-32:0xeffbb537 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,49 +76,49 @@ __SYSDECL_BEGIN
 
 
 /* KOS Interpretation of the `CLONE_DETACHED' and `CLONE_THREAD' flags:
- *   - First off all: Linux's implementation is flawed by design
- *     and includes rare race conditions that have never been
- *     patched and could lead to system calls taking pids, operating
- *     on a thread other than the one intended by the caller.
- *     Additionally, there is no way to circumvent this race condition,
- *     whereas KOS implements a dedicated `detach(2)' system call to
- *     define explicit behavior for dealing with the case resulting in
+ *   - First  off  all:  Linux's   implementation  is  flawed  by   design
+ *     and  includes   rare  race   conditions   that  have   never   been
+ *     patched  and  could lead  to  system calls  taking  pids, operating
+ *     on   a  thread  other   than  the  one   intended  by  the  caller.
+ *     Additionally, there is  no way to  circumvent this race  condition,
+ *     whereas KOS  implements  a  dedicated `detach(2)'  system  call  to
+ *     define  explicit behavior  for dealing  with the  case resulting in
  *     problems on linux (See the second mile-long comment after this one)
  *
  * CLONE_DETACHED:
- *   - This flag is completely DISCONNECTED from `CLONE_THREAD'
- *     and must be passed explicitly to make use of its behavior.
+ *   - This  flag  is  completely  DISCONNECTED  from  `CLONE_THREAD'
+ *     and must be  passed explicitly  to make use  of its  behavior.
  *     Note that on linux, its behavior is implied by `CLONE_THREAD'.
  *     - `CLONE_DETACHED' will prevent the thread from
  *       turning into a zombie once it terminates, allowing
  *       it to reap itself.
  *     - Passing this flag has the safe effect as calling `detach(2)'
- *       with the returned PID immediately after `clone(2)' returns.
+ *       with  the returned PID immediately after `clone(2)' returns.
  *
  * CLONE_THREAD:
  *   - Has _NO_ influence on the behavior of `wait(2)' (unlike in linux)
  *   - Has _NOTHING_ to do with the thread possibly turning into a zombie
- *   - The only thing it does, is control if the thread is added to the
+ *   - The only thing  it does, is  control if  the thread is  added to  the
  *     calling process (if set), or be setup as its own process (if not set)
- *   - Will _NOT_ trigger a posix_signal to be sent to the parent process.
+ *   - Will  _NOT_  trigger a  posix_signal to  be sent  to the  parent process.
  *     Because this is a thread, and thread parents are tracked on a per-process
  *     basis, the parent process mustn't be bothered about this.
  *
  * CLONE_PARENT:
  *   - Setup the new thread as a child of the parent of the calling process,
- *     the same way as it would have been set up if the original fork()-er
- *     that created the calling process had done a second fork() to create
- *     the thread created by the clone() call to which this flag is passed.
- *     On linux, the behavior is the same, but instead of functioning on
- *     a process-parent-basis, it functions on a thread-parent-basis.
- *     It should be noted that KOS does not track thread parents, but
+ *     the same way as it would have  been set up if the original  fork()-er
+ *     that created the calling process had  done a second fork() to  create
+ *     the thread created by the clone() call to which this flag is  passed.
+ *     On  linux, the  behavior is the  same, but instead  of functioning on
+ *     a   process-parent-basis,  it  functions  on  a  thread-parent-basis.
+ *     It  should  be noted  that  KOS does  not  track thread  parents, but
  *     only the parents of whole processes.
  *   - Cannot be used with `CLONE_THREAD'. Attempting to do so anyways will
- *     cause `clone()' to fail with an `E_INVALID_ARGUMENT' exception.
+ *     cause  `clone()'  to  fail with  an  `E_INVALID_ARGUMENT' exception.
  *
  * CSIGNAL:
  *   - The signal number send upon termination of the thread created by clone(2),
- *     to the any thread apart of the process referred to by its `getppid(2)'
+ *     to the any  thread apart of  the process referred  to by its  `getppid(2)'
  *   - When ZERO(0), no signal is sent, but `wait(2)' is _NOT_ affected (unlike in linux)
  *   - _NEVER_ Has any influence on the behavior of `wait(2)' (unlike in linux)
  *   - It doesn't make any difference if `SIGCHLD' is used, or some other signal. (unlike in linux)
@@ -130,12 +130,12 @@ __SYSDECL_BEGIN
  * getpid():
  *   - Returns the TID of the leader of the current process.
  *   - That leader is the first thread that was added to the process,
- *     aka. the thread created by `fork(2)' or `clone(2)' without
+ *     aka. the  thread created  by `fork(2)'  or `clone(2)'  without
  *     the `CLONE_THREAD' flag being passed.
  *
  * getppid():
  *   - Returns what getpid() would return in the thread did the fork(),
- *     clone() without `CLONE_PARENT', or the thread that created the
+ *     clone() without `CLONE_PARENT', or  the thread that created  the
  *     thread that created you using clone() with `CLONE_PARENT'.
  *
  * __WNOTHREAD / __WALL / __WCLONE:
@@ -170,7 +170,7 @@ __SYSDECL_BEGIN
 #endif /* !CLONE_SIGHAND && __CLONE_SIGHAND */
 #if !defined(CLONE_CRED) && defined(__CLONE_CRED)
 #define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
-                                                     * Note that during an exec() credentials are unshared unconditionally. */
+                                                     * Note that  during an  exec()  credentials are  unshared  unconditionally. */
 #endif /* !CLONE_CRED && __CLONE_CRED */
 #if !defined(CLONE_PTRACE) && defined(__CLONE_PTRACE)
 #define CLONE_PTRACE         __CLONE_PTRACE         /* Set if tracing continues on the child. */
@@ -230,19 +230,19 @@ __SYSDECL_BEGIN
 #ifdef __USE_KOS
 /* Value passed for 'CHILD_STACK' to 'clone()':
  * When given, let the kernel decide where and how to allocate a new stack for the child.
- * NOTE: The value was chosen due to the fact that it represents the wrap-around address
+ * NOTE: The value was chosen due to the  fact that it represents the wrap-around  address
  *       that would otherwise cause a STACK_FAULT when attempted to be used with push/pop,
  *       meaning that it can't be used for any other meaningful purpose.
- * HINT: The kernel's auto-generated stack will be automatically configured to either be
- *       a copy of the calling thread's stack (at the same address in case CLONE_VM was passed),
+ * HINT: The   kernel's  auto-generated  stack   will  be  automatically   configured  to  either  be
+ *       a copy of  the calling thread's  stack (at the  same address in  case CLONE_VM was  passed),
  *       or be located at a different address and consist of a pre-mapped portion (e.g.: 4K), as well
- *       as a guard page with the potential of extending the stack some number of times (e.g.: 8)
- *       The stack memory itself will be lazily allocated on access and be pre-initialized
+ *       as a guard page  with the potential of  extending the stack some  number of times (e.g.:  8)
+ *       The  stack  memory  itself  will  be  lazily  allocated  on  access  and  be pre-initialized
  *       to either all ZEROs or a debug constant such as `0xCC'.
- * NOTE: Of course this auto-generated stack will also be automatically
- *       munmap()'ed once the thread exits, meaning it's the perfect solution
+ * NOTE: Of  course   this  auto-generated   stack  will   also  be   automatically
+ *       munmap()'ed  once  the thread  exits,  meaning it's  the  perfect solution
  *       for simple user-space multithreading that doesn't want to use <pthread.h>. */
-/* TODO: KOSmk4 no longer supports automatic user-space stacks, but this
+/* TODO: KOSmk4  no  longer   supports  automatic  user-space   stacks,  but   this
  *       functionality is currently assumed and made use of by `_beginthreadex(3)'.
  *     > Fix this by restricting this constant to __KOS_VERSION__ < 400, and re-write
  *       said function to simply make use of `pthread_create()' */
@@ -292,7 +292,7 @@ __SYSDECL_BEGIN
 #endif /* !__CLONE_IO */
 
 /* Generic set of clone flags implementing behavior
- * that one would expect for a thread or process. */
+ * that one would expect  for a thread or  process. */
 #define CLONE_NEW_THREAD       \
 	(__PRIVATE_CLONE_THREAD |  \
 	 __PRIVATE_CLONE_VM |      \

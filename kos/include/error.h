@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fc88fcf */
+/* HASH CRC-32:0xad2b25cb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifndef error_print_progname
 #ifdef __CRT_HAVE_error_print_progname
 /* Override for printing the program name.
- * When non-NULL, this function should:
+ * When non-NULL,  this  function  should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s: ", basename(argv[0])); */
 __LIBC void (__LIBKCALL *error_print_progname)(void);
@@ -123,7 +123,7 @@ __LIBC unsigned int error_message_count;
 #ifdef __CRT_HAVE_error_one_per_line
 /* Mode configuration for `error_at_line()'.
  * When non-zero, consecutive calls to `error_at_line()' that pass the same
- * values for `filename' and `line' will not produce the error message.
+ * values for `filename'  and `line'  will not produce  the error  message.
  * The default value is ZERO(0) */
 __LIBC int error_one_per_line;
 #define error_one_per_line error_one_per_line

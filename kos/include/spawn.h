@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4018dabd */
+/* HASH CRC-32:0x21c0cf1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __SYSDECL_BEGIN
 
 #ifdef __POSIX_SPAWN_NOEXECERR
 #define POSIX_SPAWN_NOEXECERR_NP __POSIX_SPAWN_NOEXECERR /* Don't propagate exec() error, and leave the
-                                                          * child as unreaped with exit status `127' */
+                                                          * child as  unreaped with  exit status  `127' */
 #endif /* __POSIX_SPAWN_NOEXECERR */
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79888466 */
+/* HASH CRC-32:0x7c577699 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
  * However, I've seen it as part of djgpp, but I think it has to do with autoconf,
  * and I kind-of like the idea behind this kind of header.
  * Anyways: What can be found below should be fairly self-explanatory.
- * Also: With magic, it's fairly easy to automate this header... */
+ * Also:  With  magic, it's  fairly  easy to  automate  this header... */
 
 #include <features.h>
 
@@ -462,7 +462,7 @@
 #undef STAT_STATFS2_BSIZE
 #if (defined(__CRT_HAVE_statfs) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE___statfs) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_statfs64) && defined(__USE_FILE_OFFSET64))
 #define STAT_STATFS2_BSIZE 1 /* Actually requires that statfs() takes 2 arguments,
-                              * and that `struct statfs::f_bsize' exists! */
+                              * and    that    `struct statfs::f_bsize'    exists! */
 #endif /* (__CRT_HAVE_statfs && !__USE_FILE_OFFSET64) || (__CRT_HAVE___statfs && !__USE_FILE_OFFSET64) || (__CRT_HAVE_statfs64 && __USE_FILE_OFFSET64) */
 
 #undef HAVE_UTIME_NULL
@@ -572,7 +572,7 @@
 
 
 /* Cygwin also has a header of the same name, so here is
- * an approximation of its contents (adjusted for KOS). */
+ * an  approximation of its contents (adjusted for KOS). */
 #undef __DYNAMIC_REENT__
 #undef __LINUX_ERRNO_EXTENSIONS__
 #define __DYNAMIC_REENT__ 1

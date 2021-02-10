@@ -18,10 +18,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-/* To modify options on a per-source pasis, paste the
- * following comment at the top of the specific source file.
+/* To  modify  options   on  a  per-source   pasis,  paste   the
+ * following  comment at  the top  of the  specific source file.
  * The contained code is executed using the deemon JIT compiler,
- * where `options' is the same dict as used below to specify
+ * where `options' is  the same  dict as used  below to  specify
  * compiler options. */
 /*[[[magic
 local opt = options.setdefault("GCC.options", []);
@@ -109,7 +109,7 @@ GCC_FLAGS({
 //GCC_FLAGS({ "-fdebug-types-section" }) /* TODO: Play around with this */
 
 /* TODO: Make use of `-fsanitize=alignment' */
-/* TODO: Also enable `-fsanitize-recover' (which would allow the
+/* TODO: Also enable  `-fsanitize-recover'  (which  would  allow  the
  *       `ignore' option of the kernel debugger to function properly) */
 /* TODO: Look into `-fsanitize=kernel-address' */
 
@@ -123,7 +123,7 @@ CC_FLAGS({
 	"-Wno-type-limits",
 
 	/* gcc doesn't understand KOS's printf extensions, so disable Wformat
-	 * Maybe one day I'll add this support to the gcc patch... */
+	 * Maybe   one  day  I'll  add  this  support  to  the  gcc  patch... */
 	"-Wno-format",
 
 	/* For some reason, "Wno-format" disables this, so turn it back on... */
@@ -135,16 +135,16 @@ CC_FLAGS({
 
 	/* cold attribute suggestions are broken at the moment:
 	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93087
-	 * If (and once) they get fixed, and I've updated the
+	 * If (and once) they get  fixed, and I've updated  the
 	 * toolchain, this'll get enabled again. */
 //	"-Wsuggest-attribute=cold",
 
 //	"-Wsuggest-attribute=noreturn", /* Causes warnings about functions with `kernel_panic("TO" "DO")', so nope! */
 
-	/* KOS never assumes _signed_ overflow (only unsigned overflow),
-	 * so turn this warning to max! (most warnings that this causes
-	 * should be fixed by adding appropriate casts to unsigned types,
-	 * since it's usually related to array indices being scaled, with
+	/* KOS  never assumes _signed_  overflow (only unsigned overflow),
+	 * so  turn this warning  to max! (most  warnings that this causes
+	 * should be fixed by adding appropriate casts to unsigned  types,
+	 * since it's usually related to array indices being scaled,  with
 	 * some kind of integer promotion previously causing those indices
 	 * to become signed) */
 	"-Wstrict-overflow=5",

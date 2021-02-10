@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe49b713 */
+/* HASH CRC-32:0x4364e5b9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
-	 * source referenced (see the comment below), but this code is the first thing
-	 * that comes up when you search for `libc qsort public domain'.
+	 * source referenced (see the comment below), but this code is the first  thing
+	 * that    comes   up   when   you   search   for   `libc qsort public domain'.
 	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
 	 *
 	 * Note that I made some modifications, and you should see the linked source for

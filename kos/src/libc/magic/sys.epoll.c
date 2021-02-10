@@ -293,24 +293,24 @@ typedef struct __sigset_struct sigset_t;
  *   Linux behavior:
  *    - `somefd' is automatically removed from `epfd'
  *   KOS behavior:
- *    - `somefd' may or may not be automatically removed from `epfd'.
- *      The actual internal behavior depends on how epfd stores its reference
+ *    - `somefd'  may  or  may  not   be  automatically  removed  from   `epfd'.
+ *      The  actual internal behavior  depends on how  epfd stores its reference
  *      to `somefd'. For this, the KOS kernel has 2 cases: 1 where `epfd' stores
- *      a normal, full reference to `somefd', and one where it stores a weak
- *      reference (such that closing and destroying `somefd' is not prevented
+ *      a normal, full  reference to `somefd',  and one where  it stores a  weak
+ *      reference (such that  closing and destroying  `somefd' is not  prevented
  *      from doing so by being apart of an epoll fd-set)
- *    - Which of these 2 behaviors is used depends on the internal handle type
+ *    - Which of  these 2  behaviors is  used  depends on  the internal  handle  type
  *      associated with `somefd' (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>),
- *      though when which behavior is used is an implementation detail that is
+ *      though  when  which behavior  is  used is  an  implementation detail  that is
  *      subject to change over time.
  *   Recommended behavior for maximum portability:
- *    - As linux documentation already suggests, relying on the auto-removal
- *      behavior of closing monitored files isn't something that ever has to
+ *    - As linux documentation  already suggests, relying  on the  auto-removal
+ *      behavior  of closing monitored  files isn't something  that ever has to
  *      be used and more often than not only introduces unnecessary complexity.
- *      Furthermore, often this behavior can't even be done reliably since a
+ *      Furthermore,  often this behavior  can't even be  done reliably since a
  *      monitored handled may get duplicated by any number of events (including
- *      fork(2) calls made by other threads). As such, explicitly removing
- *      handles from the associated epoll descriptor is always a good idea.
+ *      fork(2) calls  made by  other threads).  As such,  explicitly  removing
+ *      handles from the  associated epoll  descriptor is always  a good  idea.
  *
  */
 

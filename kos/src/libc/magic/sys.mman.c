@@ -101,7 +101,7 @@
  *       some portion of the section containing the root-fork
  *       system call has been mapped as writable.
  *    >> rootfork() fails when any page in the calling section (.text)
- *       isn't part of a root-module, isn't fully mapped, was
+ *       isn't  part  of  a  root-module,  isn't  fully  mapped,   was
  *       re-mapped somewhere else, or been made writable at any point. */
 #if !defined(PROT_CLEAN) && defined(__PROT_CLEAN)
 #define PROT_CLEAN __PROT_CLEAN
@@ -217,7 +217,7 @@
 #endif /* !MAP_NONBLOCK && __MAP_NONBLOCK */
 
 /* Allocation is for a stack.
- * NOTE: KOS uses this flag to determine where
+ * NOTE: KOS  uses  this  flag  to  determine  where
  *       automatic memory mappings are allocated at. */
 #if !defined(MAP_STACK) && defined(__MAP_STACK)
 #define MAP_STACK __MAP_STACK
@@ -246,7 +246,7 @@
 #define MAP_UNINITIALIZED __MAP_UNINITIALIZED
 #endif /* !MAP_UNINITIALIZED && __MAP_UNINITIALIZED */
 
-/* Don't override existing mappings when `MAP_FIXED' is passed.
+/* Don't  override  existing mappings  when `MAP_FIXED'  is passed.
  * Instead, throw an exception `E_BADALLOC_ADDRESS_ALREADY_EXISTS'. */
 #if !defined(MAP_FIXED_NOREPLACE) && defined(__MAP_FIXED_NOREPLACE)
 #define MAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
@@ -254,7 +254,7 @@
 
 #ifdef __USE_KOS_KERNEL
 /* Don't actually map memory, but test the waters of a memory
- * location hasn't already been mapped, or locate a suitably
+ * location hasn't already been mapped, or locate a  suitably
  * large free memory range.
  * This flag is usually followed by another call that sets
  * the `MAP_FIXED_NOREPLACE' flag. */
@@ -263,7 +263,7 @@
 #endif /* !MAP_DONT_MAP && __MAP_DONT_MAP */
 
 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
- * unsigned integer that should actually be used as offset. */
+ * unsigned  integer  that  should  actually  be  used  as   offset. */
 #if !defined(MAP_OFFSET64_POINTER) && defined(__MAP_OFFSET64_POINTER)
 #define MAP_OFFSET64_POINTER __MAP_OFFSET64_POINTER
 #endif /* !MAP_OFFSET64_POINTER && __MAP_OFFSET64_POINTER */
@@ -328,7 +328,7 @@
 #endif /* __USE_GNU */
 
 
-/* DISCLAIMER: Documentation strings for MADV_*, POSIX_MADV_* and MCL_* were
+/* DISCLAIMER: Documentation  strings for MADV_*, POSIX_MADV_* and MCL_* were
  *             taken from glibc /usr/include/i386-linux-gnu/bits/mman-linux.h */
 /* Definitions for POSIX memory map interface.  Linux generic version.
    Copyright (C) 2001-2016 Free Software Foundation, Inc.
@@ -634,7 +634,7 @@ $fd_t shm_open([[nonnull]] char const *name,
 @@pp_if defined(ENOENT) && defined(O_CREAT) && $has_function(mkdir)@@
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
-		 * XXX: This assumes that `headof(__PATH_SHM)' already exists... */
+		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
 		mkdir(__PATH_SHM, 0777);
 		result = open(fullname, oflags, mode);
 	}

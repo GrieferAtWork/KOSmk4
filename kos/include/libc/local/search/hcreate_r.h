@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e443cf3 */
+/* HASH CRC-32:0x5a9971f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,10 +62,10 @@ typedef struct entry {
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* For the used double hash method the table size has to be a prime. To
- * correct the user given table size we need a prime test.  This trivial
+ * correct the user given table size we need a prime test. This trivial
  * algorithm is adequate because
- * a)  the code is (most probably) called a few times per program run and
- * b)  the number is small because the table must fit in the core */
+ * a) the code is (most probably) called a few times per program run and
+ * b)  the  number is  small  because the  table  must fit  in  the core */
 __LOCAL_LIBC(__isprime) __ATTR_CONST int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__isprime))(unsigned int __number) {
 	/* no even number will be passed */

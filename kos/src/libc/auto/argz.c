@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1f60c26 */
+/* HASH CRC-32:0x4e72858e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -270,19 +270,19 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
 		return 0;
 	oldlen = *pargz_len;
 	/* Note that GLibc actually has a bug here that causes it to write `NULL'
-	 * into the given `*pargz' pointer when the allocation fails, instead
-	 * of leaving that pointer in its original state (allowing the caller
-	 * to cleanup the ARGZ array, instead of forcing the array to become
+	 * into  the given  `*pargz' pointer  when the  allocation fails, instead
+	 * of leaving that  pointer in  its original state  (allowing the  caller
+	 * to cleanup the  ARGZ array,  instead of  forcing the  array to  become
 	 * a memory leak)
 	 * -> That bug is fixed here!
-	 * Glibc's version of this:
+	 * Glibc's  version  of this:
 	 * >> *argz = (char *) realloc (*argz, *argz_len + nlen); // <<< Right here!
 	 * >> if (*argz == NULL)
 	 * >>   return ENOMEM;
 	 * As reference that the intended behavior in the ENOMEM-branch is an
-	 * unmodified `*pargz' pointer (or at the very least, a simultaneous
-	 * setting of the `*pargz_len' pointer to ZERO(0)), you may look at
-	 * Glibc's version of `argz_append()', which handles that case as
+	 * unmodified `*pargz' pointer (or at the very least, a  simultaneous
+	 * setting of the `*pargz_len' pointer  to ZERO(0)), you may look  at
+	 * Glibc's version  of `argz_append()',  which handles  that case  as
 	 * leaving all pointers unmodified (just as one should)
 	 */
 	result_string = (char *)libc_realloc(*pargz, (oldlen + (slen + 1)) * sizeof(char));
@@ -384,13 +384,13 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 		return 1;
 #endif /* !EINVAL */
 	}
-	/* Adjust `before' to point to the start of an entry
-	 * Note that GLibc has a bug here that causes it to accessed
+	/* Adjust  `before'  to  point  to  the  start  of  an  entry
+	 * Note that GLibc has a bug here that causes it to  accessed
 	 * memory before `*pargz' when `before' points into the first
 	 * element of the argz vector.
 	 * -> That bug is fixed here!
 	 * As such, GLibc's version would only work when `((char *)malloc(N))[-1] == 0'
-	 * for an arbitrary N that results in `malloc()' returning non-NULL.
+	 * for  an  arbitrary  N  that   results  in  `malloc()'  returning   non-NULL.
 	 * Glibc's version of this:
 	 * >> if (before > *argz)
 	 * >>   while (before[-1]) // <<< Right here!
@@ -447,17 +447,17 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 		return 0; /* no-op */
 	repllen = libc_strlen(with);
 	find_offset = 0;
-	/* I have no idea what the GLibc implementation does here, and I'm not
-	 * quite sure it knows either. - At first I though that this function
-	 * was supposed to only replace entries of an ARGZ string as a whole,
-	 * but now I believe it's just supposed to do replacement of any match
-	 * found. However, GLibc appears to be utterly afraid of using `memmem()'
-	 * for this, and instead opt's to using `argz_next()' to iterate the
-	 * ARGZ vector, and doing `strstr()' on each element, before doing some
-	 * dark voodoo magic with `strndup()', temporary buffers, and god only
-	 * knows why there are even delayed calls to `argz_add()' in there???
-	 * If this implementation doesn't do exactly what GLibc does, don't fault
-	 * me. Every function in this file was originally created as a GLibc
+	/* I have no  idea what the  GLibc implementation does  here, and I'm  not
+	 * quite sure it  knows either.  - At first  I though  that this  function
+	 * was supposed to  only replace  entries of an  ARGZ string  as a  whole,
+	 * but now I  believe it's just  supposed to do  replacement of any  match
+	 * found.  However, GLibc appears to be utterly afraid of using `memmem()'
+	 * for  this,  and instead  opt's to  using  `argz_next()' to  iterate the
+	 * ARGZ  vector, and doing  `strstr()' on each  element, before doing some
+	 * dark  voodoo magic  with `strndup()',  temporary buffers,  and god only
+	 * knows why  there are  even delayed  calls to  `argz_add()' in  there???
+	 * If  this implementation doesn't do exactly what GLibc does, don't fault
+	 * me.  Every  function in  this file  was originally  created as  a GLibc
 	 * extension, so there really isn't any official documentation on intended
 	 * behavior other than GLibc reference implementation.
 	 * Anyways... At least my version is readable... */

@@ -21,7 +21,7 @@
 #define GUARD_APPS_PLAYGROUND_MAIN_C 1
 #define _EVERY_SOURCE 1
 
-/* This program isn't actually meant to do anything. It is however meant to be used
+/* This  program isn't actually meant to do anything.  It is however meant to be used
  * for quickly testing out new features, or checking the behavior of system functions
  * within a live environment. */
 
@@ -102,7 +102,7 @@ DECL_BEGIN
 /* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT' */
 /* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL' */
 /* TODO: Implement `timespec_get()' so that `_GLIBCXX_HAVE_TIMESPEC_GET'
- *       can be detected (__stub_timespec_get currently breaks that) */
+ *       can  be  detected (__stub_timespec_get  currently  breaks that) */
 /* TODO: Add system header <sys/machine.h> */
 /* TODO: Add system header <sys/sdt.h> */
 /* TODO: Add system header <fp.h> */
@@ -283,10 +283,10 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 		pid_t cpid;
 		if (depth == max_depth && !did_trigger) {
 			fd_t lock;
-			/* Kill the entire process group which should contain about a gazillion
+			/* Kill the entire process group  which should contain about a  gazillion
 			 * threads at this point, but use a lock-file to only send a signal once.
 			 *
-			 * This wouldn't actually be necessary, but we want to ensure that a
+			 * This wouldn't actually  be necessary,  but we  want to  ensure that  a
 			 * single signal is enough to reach everyone, even if some of our sibling
 			 * threads are currently in the process of being created. */
 			lock = open(lockfile, O_WRONLY | O_CREAT | O_EXCL, 0644);
@@ -331,7 +331,7 @@ int main_forkbomb(int argc, char *argv[], char *envp[]) {
 	/* Just your traditional fork-bomb
 	 * Use CTRL+C to kill all of the created processes at once.
 	 *
-	 * And with the KOS kernel now implementing a CFS-based scheduler,
+	 * And with the KOS kernel now implementing a CFS-based  scheduler,
 	 * it should be fairly unlikely for the system to become completely
 	 * unresponsive during. */
 	for (;;) {
@@ -586,9 +586,9 @@ debug_printer(void *UNUSED(arg), char const *message, size_t len) {
 
 int main_dprint(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
-	/* XXX: While this ~does~ work to do exactly what it's supposed to do,
+	/* XXX: While this ~does~ work to do  exactly what it's supposed to  do,
 	 *      Visual Studio's MIEngine doesn't seem to understand the protocol
-	 *      that GDB uses to transmit generic, human-readable strings
+	 *      that  GDB  uses  to  transmit  generic,  human-readable  strings
 	 *      As such, this produces the following output:
 	 *          @"a = "
 	 *          @"Value\n"
@@ -604,23 +604,23 @@ int main_dprint(int argc, char *argv[], char *envp[]) {
 	 *          @"This is c"
 	 *          @"\n"
 	 *      And no:  The \n-s in there I did _NOT_ just escape for the visual
-	 *               Those actually appear as-is in the console.
+	 *               Those    actually   appear   as-is   in   the   console.
 	 *      However: When running GDB normally from a console, the text is displayed
 	 *               properly:
-	 *          a = Value
-	 *           for a
-	 *          b = Value for b
-	 *          c = fdadsfasdn
-	 *          d = This is c
+	 *       >>   a = Value
+	 *       >>    for a
+	 *       >>   b = Value for b
+	 *       >>   c = fdadsfasdn
+	 *       >>   d = This is c
 	 * So the problem with this is actually Visual Studio...
 	 * This sucks! You want to know why I added support for message debug traps?
 	 * I added it so that I could output text to the Visual studio output window
-	 * without that annoying `cmd: ' prefix caused by the fact that all output
-	 * currently is piped through magic (which is started by `cmd', hence the
-	 * prefix), and is considered as a side channel by visual studio, and there
-	 * doesn't seem to be a way to prevent the `cmd: ' prefix for those.
-	 * Now why do I care? Well: Because of that prefix, it is impossible for me
-	 * to output file paths in such a way that they become clickable so-as to
+	 * without that annoying `cmd: ' prefix caused  by the fact that all  output
+	 * currently  is piped through  magic (which is started  by `cmd', hence the
+	 * prefix), and is considered as a side channel by visual studio, and  there
+	 * doesn't  seem  to be  a  way to  prevent  the `cmd: '  prefix  for those.
+	 * Now  why do I care? Well: Because of that prefix, it is impossible for me
+	 * to output file paths in  such a way that  they become clickable so-as  to
 	 * allow me to immediately go to the associated source location.
 	 */
 	format_printf(&debug_printer, NULL,
@@ -814,7 +814,7 @@ PRIVATE sigset_t const full_sigset = SIGSET_INIT_FULL;
 PRIVATE void *sigbound_threadmain(void *) {
 	/* Block _all_ signals.
 	 * This function's implementation will also ensure
-	 * that we're using the userprocmask mechanism. */
+	 * that  we're  using the  userprocmask mechanism. */
 	setsigmaskptr((sigset_t *)&full_sigset);
 	for (;;) {
 		printf("sigbound_threadmain(): %d\n", gettid());
@@ -829,18 +829,18 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 
 	/* Block _all_ signals.
 	 * This function's implementation will also ensure
-	 * that we're using the userprocmask mechanism. */
+	 * that  we're  using the  userprocmask mechanism. */
 	setsigmaskptr((sigset_t *)&full_sigset);
 
 	/* Create an additional thread, thus bumping our process's total
-	 * thread count up to 2, which is needed to get the two threads
+	 * thread count up to 2, which is needed to get the two  threads
 	 * the signal used to end up bouncing between. */
 	pthread_create(&pt, NULL, &sigbound_threadmain, NULL);
 
-	/* A test program to test the corner-case detailed in `sigmask_ismasked_in()'
+	/* A test program  to test the  corner-case detailed in  `sigmask_ismasked_in()'
 	 * To trigger the corner-case, press CTRL+C after running `playground sigbounce'
 	 *
-	 * At that point, the kernel will send a signal to our process, which used
+	 * At  that point, the kernel will send a signal to our process, which used
 	 * to keep on bouncing between thread. This was not intended, and has since
 	 * been fixed!
 	 *
@@ -916,15 +916,15 @@ PRIVATE DEF defs[] = {
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall
 	 *   - jmp 0x00007ffffffffffe
 	 * By doing this, the syscall will return to a non-canonical address,
-	 * which is something that normally will cause sysret to #GP with
-	 * user-space registers (this is a known bug in all x86 cpus).
-	 * KOS (should) prevent this by the `testb  $(0), 0(%rcx)' that can
-	 * be found in `/kos/src/kernel/core/arch/i386/syscall/sysret64.S',
-	 * however that check hasn't been tested thus far, and it really
+	 * which is something  that normally  will cause sysret  to #GP  with
+	 * user-space  registers  (this  is a  known  bug in  all  x86 cpus).
+	 * KOS (should) prevent this  by the `testb  $(0), 0(%rcx)' that  can
+	 * be  found  in `/kos/src/kernel/core/arch/i386/syscall/sysret64.S',
+	 * however that  check hasn't  been tested  thus far,  and it  really
 	 * should get tested!
-	 * 
+	 *
 	 * Additionally, add another playground that doing the same, just not
-	 * at that particular address, such that the syscall return address
+	 * at that particular address, such  that the syscall return  address
 	 * isn't mapped into memory, but would still be canonical. Then check
 	 * if the kernel handles this case correctly as well (single-step the
 	 * in-kernel sysret wrapper for this)
@@ -945,7 +945,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	for (i = 0; defs[i].n; ++i) {
 		if (strcmp(defs[i].n, argv[1]) == 0) {
 			/* The `args' program is special, in that we mustn't
-			 * strip the initial `playground' argument from it. */
+			 * strip  the initial `playground' argument from it. */
 			if (strcmp(defs[i].n, "args") != 0) {
 				--argc;
 				++argv;

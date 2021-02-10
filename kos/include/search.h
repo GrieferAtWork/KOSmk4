@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a950597 */
+/* HASH CRC-32:0xcdacaecd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,7 +151,7 @@ typedef __SIZE_TYPE__ size_t;
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __USE_GNU
 /* Prototype structure for a linked-list data structure. This
- * is the type used by the `insque' and `remque' functions. */
+ * is the type used by  the `insque' and `remque'  functions. */
 struct qelem {
 	struct qelem *q_forw;     /* [0..1] Forward link */
 	struct qelem *q_back;     /* [0..1] Backward link */
@@ -199,7 +199,7 @@ typedef struct entry {
 /* Opaque type for internal use. */
 struct _ENTRY;
 
-/* Family of hash table handling functions. The functions also
+/* Family of hash table  handling functions. The functions  also
  * have reentrant counterparts ending with _r. The non-reentrant
  * functions all work on a signle internal hashing table. */
 
@@ -266,8 +266,8 @@ __CDECLARE_VOID(,__NOTHROW_NCX,hdestroy_r,(struct hsearch_data *__htab),(__htab)
 __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL hdestroy_r)(struct hsearch_data *__htab) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy_r))(__htab); })
 #endif /* ... */
 #endif /* __USE_GNU */
-/* The tsearch routines are very interesting. They make many
- * assumptions about the compiler. It assumes that the first
+/* The tsearch routines are very interesting. They make  many
+ * assumptions about the compiler. It assumes that the  first
  * field in node must be the "key" field, which points to the
  * datum. Everything depends on that. */
 #ifdef __CRT_HAVE_tsearch
@@ -326,7 +326,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void __NOT
 #endif /* !... */
 #ifdef __USE_GNU
 /* Callback type for function to free a tree node.
- * If the keys are atomic data this function should do nothing.  */
+ * If the keys are atomic data this function should do nothing. */
 #ifndef ____free_fn_t_defined
 #define ____free_fn_t_defined 1
 typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);

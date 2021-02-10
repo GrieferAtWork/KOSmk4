@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86b94056 */
+/* HASH CRC-32:0x35034a88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@
 #endif /* __USE_GNU */
 
 /* TODO: Constants and structs from this header should
- *       be moved into <asm/> and <bits/> headers! */
+ *       be  moved  into <asm/>  and  <bits/> headers! */
 
 __SYSDECL_BEGIN
 

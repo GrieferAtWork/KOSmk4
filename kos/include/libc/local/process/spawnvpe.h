@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e44a1d4 */
+/* HASH CRC-32:0x270a9726 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnvpe))(__STDC_INT_AS_UINT_T __mod
 	char *__env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32

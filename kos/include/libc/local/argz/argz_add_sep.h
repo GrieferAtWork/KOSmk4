@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb4d8c09 */
+/* HASH CRC-32:0xa7ceaa70 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,19 +92,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 		return 0;
 	__oldlen = *__pargz_len;
 	/* Note that GLibc actually has a bug here that causes it to write `NULL'
-	 * into the given `*pargz' pointer when the allocation fails, instead
-	 * of leaving that pointer in its original state (allowing the caller
-	 * to cleanup the ARGZ array, instead of forcing the array to become
+	 * into  the given  `*pargz' pointer  when the  allocation fails, instead
+	 * of leaving that  pointer in  its original state  (allowing the  caller
+	 * to cleanup the  ARGZ array,  instead of  forcing the  array to  become
 	 * a memory leak)
 	 * -> That bug is fixed here!
-	 * Glibc's version of this:
+	 * Glibc's  version  of this:
 	 * >> *argz = (char *) realloc (*argz, *argz_len + nlen); // <<< Right here!
 	 * >> if (*argz == NULL)
 	 * >>   return ENOMEM;
 	 * As reference that the intended behavior in the ENOMEM-branch is an
-	 * unmodified `*pargz' pointer (or at the very least, a simultaneous
-	 * setting of the `*pargz_len' pointer to ZERO(0)), you may look at
-	 * Glibc's version of `argz_append()', which handles that case as
+	 * unmodified `*pargz' pointer (or at the very least, a  simultaneous
+	 * setting of the `*pargz_len' pointer  to ZERO(0)), you may look  at
+	 * Glibc's version  of `argz_append()',  which handles  that case  as
 	 * leaving all pointers unmodified (just as one should)
 	 */
 	__result_string = (char *)__localdep_realloc(*__pargz, (__oldlen + (__slen + 1)) * sizeof(char));

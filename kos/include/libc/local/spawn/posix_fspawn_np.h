@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfffb9d87 */
+/* HASH CRC-32:0xdeace0ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -863,9 +863,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	__child = __localdep_vfork();
 	if (__child == 0)
 		goto __do_exec;
-	/* Check if the vfork() from the child returned success, but left
+	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at some point after vfork() already
+	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
 	__result = __libc_geterrno_or(0);
 	if (__result != 0) {
@@ -897,7 +897,7 @@ __err_without_child:
 		goto __err_without_child; /* The fork() itself failed. */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and read() returns ZERO(0)) */
+	 *        closed and  read() returns  ZERO(0)) */
 	__localdep_close(__pipes[1]); /* Close the writer. */
 	__temp = __localdep_read(__pipes[0], &__result, sizeof(__result));
 	__localdep_close(__pipes[0]); /* Close the reader. */
@@ -912,7 +912,7 @@ __err_without_child:
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 __err_join_zombie_child:
 	/* Unless the child was already spawned as detached,
-	 * we still have to re-join it, or else it will be
+	 * we still have to re-join  it, or else it will  be
 	 * left dangling as a zombie process! */
 	if (__localdep_waitpid(__child, &__status, 0) < 0) {
 #ifdef __EINTR
@@ -1123,7 +1123,7 @@ __do_exec:
 		}
 	}
 	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as O_CLOEXEC! */
+	 * closed because it's marked as  O_CLOEXEC! */
 	__localdep_fexecve(__execfd, ___argv, ___envp);
 #ifdef __POSIX_SPAWN_NOEXECERR
 	if (__attrp && __attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
@@ -1137,8 +1137,8 @@ __do_exec:
 __child_error:
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 		/* If the exec fails, it will have modified `errno' to indicate this fact.
-		 * And since we're sharing VMs with our parent process, the error reason
-		 * will have already been written back to our parent's VM, so there's
+		 * And since we're sharing VMs with  our parent process, the error  reason
+		 * will have already  been written  back to  our parent's  VM, so  there's
 		 * actually nothing left for us to do, but to simply exit! */
 		;
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */

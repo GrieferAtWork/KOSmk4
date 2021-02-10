@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dd22a3 */
+/* HASH CRC-32:0x75236b45 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,7 +241,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_open))(char const *__name, __ofla
 #if defined(__ENOENT) && defined(__O_CREAT) && (defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)))
 	if (__result < 0 && (__oflags & __O_CREAT) != 0 && __libc_geterrno_or(__ENOENT) == __ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
-		 * XXX: This assumes that `headof(__PATH_SHM)' already exists... */
+		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
 		__localdep_mkdir(__PATH_SHM, 0777);
 		__result = __localdep_open(__fullname, __oflags, __mode);
 	}

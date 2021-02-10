@@ -124,5 +124,3 @@ TODO: Expand generate_headers.dee and magic.dee to:
 	  function. Those files could then be compiled much faster than the larger
 	  combined files, since it'd be possible to directly include only the
 	  relevant function dependencies.
-
-

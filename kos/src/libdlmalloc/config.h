@@ -39,17 +39,17 @@
  *        DL_REGISTER_CACHE(my_cache_free_function)
  *        my_cache_free_function()
  *        locked:free()    <--- Deadlock here
- * NOTE: A proper fix for this would implement a free() that is non-blocking
- *       and reentrant, however dlmalloc cannot be bend to do this for us, so
- *       Another would be enabling `USE_RECURSIVE_LOCKS' and somehow providing
- *       a custom lock implementation that doesn't make use of `pthread_self()'
+ * NOTE: A proper fix  for this  would implement  a free()  that is  non-blocking
+ *       and reentrant, however  dlmalloc cannot be  bend to do  this for us,  so
+ *       Another would be  enabling `USE_RECURSIVE_LOCKS'  and somehow  providing
+ *       a custom lock implementation that  doesn't make use of  `pthread_self()'
  *       (which can't be used since `pthread_self()' itself might call `malloc()'
- *       to allocate the thread-self descriptor of a thread created via direct
- *       invocation of the clone() system call, or via use of a threading API
- *       not built ontop of pthreads). However, given how useful a non-blocking
- *       free function is in kernel-space, it only seems fair that user-space
- *       should eventually get its own hand-written heap implementation that
- *       also contains such a free function, alongside some more neat extension.
+ *       to  allocate the thread-self  descriptor of a  thread created via direct
+ *       invocation of the  clone() system call,  or via use  of a threading  API
+ *       not built ontop of pthreads).  However, given how useful a  non-blocking
+ *       free function is  in kernel-space,  it only seems  fair that  user-space
+ *       should eventually  get its  own  hand-written heap  implementation  that
+ *       also  contains such a free function, alongside some more neat extension.
  */
 #undef USE_RECURSIVE_LOCKS
 #undef LOCK_AT_FORK
@@ -102,7 +102,7 @@
 
 
 /* Configure for a free-standing environment in
- * which system calls are directly invoked. */
+ * which system  calls  are  directly  invoked. */
 #ifdef CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS
 #undef __CRT_FREESTANDING
 #undef __WANT_INLINE_SYSCALLS
@@ -238,7 +238,7 @@ DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
 /* Also create libc-overrides exports
  * -> This allows libc internals to use our malloc functions
  *    if libc happens to be combined with our library within
- *    a static link (such as is the case when building the
+ *    a static link (such as  is the case when building  the
  *    dynamic linker binary blobs) */
 DEFINE_INTERN_ALIAS(libc_malloc, dlmalloc);
 DEFINE_INTERN_ALIAS(libc_free, dlfree);

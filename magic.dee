@@ -202,7 +202,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 	setBinTargetLink(TARGET_ARCH, binTargetName);
 
 	/* To speed up compilation, provide some known-good values
-	 * for standard library paths valid for the KOS toolchain */
+	 * for standard library paths valid for the KOS  toolchain */
 	TARGET.provideToolchainCache(toolchain, TARGET_NAME);
 
 	/* Apply target configurations. */
@@ -443,7 +443,7 @@ _err_unknown_argument:
 	/* Start KOS with the selected emulator (if any). */
 	if (CONFIG_EMULATOR_USED !is none) {
 		/* Driver name without any slashes are automatically
-		 * loaded from the /os/drivers directory. */
+		 * loaded   from    the    /os/drivers    directory. */
 		for (local i, elem: util.enumerate(CONFIG_MULTIBOOT_DRIVERS)) {
 			local name, cmdline = elem...;
 			if ("/" !in name && "\\" !in name) {
@@ -481,19 +481,3 @@ File.Buffer.sync();
 print "DONE";
 AppExit.exit(0);
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

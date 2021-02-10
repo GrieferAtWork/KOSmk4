@@ -64,7 +64,7 @@
 #endif /* __USE_GNU */
 
 /* TODO: Constants and structs from this header should
- *       be moved into <asm/> and <bits/> headers! */
+ *       be  moved  into <asm/>  and  <bits/> headers! */
 
 __SYSDECL_BEGIN
 

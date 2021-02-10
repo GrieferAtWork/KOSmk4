@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5459f222 */
+/* HASH CRC-32:0x4f701c98 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,9 +167,9 @@ __NAMESPACE_STD_USING(__forward_size)
  *     would be expected for Byte=1,Word=2,Long=4,Quad=8. The required alignment is
  *     also annotated for arguments.
  *   - On architecture that allow unaligned memory accesses (e.g. x86), the alignment
- *     isn't mandatory, but is still recommended. To determine if the current target
- *     architecture allows for unaligned memory access, and thereby doesn't enforce
- *     the alignment requirements of b/w/l/q string functions, you may test for the
+ *     isn't mandatory, but is still recommended. To determine if the current  target
+ *     architecture allows for unaligned memory  access, and thereby doesn't  enforce
+ *     the alignment requirements of b/w/l/q string  functions, you may test for  the
  *     `__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS' macro from `<hybrid/host.h>'
  *
  * String functions:
@@ -203,7 +203,7 @@ __NAMESPACE_STD_USING(__forward_size)
  *          apart of some posix/unix standard
  *           - `rawmemchr()'
  *   [kos]: The function is kos-specific, or apart of a standard other than
- *          the C standard, or one of the standards implemented by GLibc.
+ *          the C standard, or one  of the standards implemented by  GLibc.
  *           - `strend()' - Not apart of any standard (that I know of) -> KOS-specific
  *           - `strlwr()' - Can also be found in DOS -> DOS-specific, but also provided by KOS
  */

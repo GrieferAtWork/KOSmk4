@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7d59031 */
+/* HASH CRC-32:0x2ab2bed3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -396,9 +396,9 @@ __NAMESPACE_LOCAL_BEGIN
  *                       NOTE: `flags' is ignored in this mode */
 __LOCAL_LIBC(system_mktemp) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system_mktemp))(unsigned int __what, char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) {
-	/* Selection of random letters which may appear as replacements for XXXXXX
-	 * For this purpose, only use lower-case letters, as well as digits.
-	 * We could also use upper-case letters, but that may not work correctly
+	/* Selection of random letters which  may appear as replacements for  XXXXXX
+	 * For this  purpose,  only  use  lower-case letters,  as  well  as  digits.
+	 * We  could also  use upper-case letters,  but that may  not work correctly
 	 * depending on the calling process running in DOS-mode, or flags containing
 	 * O_DOSPATH... */
 	static char const __letters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -415,7 +415,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system_mktemp))(unsigned int __what, 
 		return __libc_seterrno(1);
 #endif /* !__EINVAL */
 	}
-	/* Calculate an initial, random seed.
+	/* Calculate an  initial,  random  seed.
 	 * For this purpose, try to make use of:
 	 *   - gettimeofday()
 	 *   - gettid() or getpid()
@@ -428,8 +428,8 @@ __again:
 		if (__localdep_gettimeofday64(&__tv, __NULLPTR) == 0) {
 			__seed = (__UINT32_TYPE__)(__tv.tv_sec) ^
 			       (__UINT32_TYPE__)(__tv.tv_sec >> 32) ^
-			       (__UINT32_TYPE__)(__tv.tv_usec << 12); /* The max value is 0xf423f, so shift
-			                                        * that to become `0xf423f000', thus
+			       (__UINT32_TYPE__)(__tv.tv_usec << 12); /* The  max value is 0xf423f, so shift
+			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
 #elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
@@ -439,8 +439,8 @@ __again:
 #if __SIZEOF_TIME_T__ > 4
 			       (__UINT32_TYPE__)(__tv.tv_sec >> 32) ^
 #endif /* __SIZEOF_TIME_T__ > 4 */
-			       (__UINT32_TYPE__)(__tv.tv_usec << 12); /* The max value is 0xf423f, so shift
-			                                        * that to become `0xf423f000', thus
+			       (__UINT32_TYPE__)(__tv.tv_usec << 12); /* The  max value is 0xf423f, so shift
+			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
 #endif /* ... */

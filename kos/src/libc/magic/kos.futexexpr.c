@@ -204,7 +204,7 @@ int lfutexlockexpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
 @@    futexes in conjunction with waiting on other things such as files, see the
 @@    documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
 @@@param: base:          Base pointer added to the `fe_offset' fields of given expressions
-@@@param: exprv:         Vector of expressions for which to check 
+@@@param: exprv:         Vector of expressions for which to check
 @@@param: exprc:         Number of expressions given in `exprv'
 @@@param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
 @@@param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
@@ -254,7 +254,7 @@ int lfutexexpr(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *e
 @@    this topic (lfutex() and select()) at the top of <kos/futex.h>
 @@@param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
 @@@param: base:          Base pointer added to the `fe_offset' fields of given expressions
-@@@param: exprv:         Vector of expressions for which to check 
+@@@param: exprv:         Vector of expressions for which to check
 @@@param: exprc:         Number of expressions given in `exprv'
 @@@param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
 @@@param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'

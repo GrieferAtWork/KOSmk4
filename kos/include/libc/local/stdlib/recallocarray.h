@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7717fbee */
+/* HASH CRC-32:0x8aafe76 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,7 +181,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recallocarray))(void *__mallptr, __SI
 			}
 			return __mallptr;
 		}
-		/* Allocate a new block so we can ensure that an
+		/* Allocate a new block so we can ensure that  an
 		 * existing block gets freezero()'ed in all cases */
 		__result = __localdep_calloc(__new_elem_count, __elem_size);
 		if (__result) {

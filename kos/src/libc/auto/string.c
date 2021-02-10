@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad75eae4 */
+/* HASH CRC-32:0x3446f93f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -561,7 +561,7 @@ NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
  * >> basename(NULL);              // <Undefined behavior> */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
-	/* char *slash = strrchr(filename, '/');
+	/* char  *slash   =   strrchr(filename,   '/');
 	 * return slash ? slash + 1 : (char *)filename; */
 	char *result = (char *)filename;
 	char *iter   = (char *)filename;
@@ -3811,7 +3811,7 @@ NOTHROW_NCX(LIBCCALL libc_strcmpz)(char const *lhs,
 	do {
 		c1 = *lhs++;
 		if (!rhs_len--) {
-			/* Once RHS reaches the end of the string,
+			/* Once  RHS  reaches  the end  of  the string,
 			 * compare the last character of LHS with `NUL' */
 			return (int)((unsigned char)c1 - '\0');
 		}
@@ -3832,7 +3832,7 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str,
 		c2 = *startswith++;
 		if (!c2) {
 			/* When the end of the RHS-string is reached, then we
-			 * know that `str' has `startswith' as a leading
+			 * know  that  `str'  has `startswith'  as  a leading
 			 * prefix. */
 			return 0;
 		}
@@ -3840,11 +3840,11 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
-	/* The given `str' has a length less than `strlen(startswith)', meaning
+	/* The given `str' has a  length less than `strlen(startswith)',  meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
-	 * which means we must return -1. Note that the NON_NUL is kind-of
-	 * assumed here, since `startswith' may contain only NUL characters
-	 * from here on out, however that is both unlikely, wouldn't even make
+	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
+	 * assumed here,  since  `startswith'  may contain  only  NUL  characters
+	 * from  here on out,  however that is both  unlikely, wouldn't even make
 	 * much sense. */
 	return -1;
 }
@@ -3859,7 +3859,7 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
 	do {
 		if (!startswith_len--) {
 			/* When the end of the RHS-string is reached, then we
-			 * know that `str' has `startswith' as a leading
+			 * know  that  `str'  has `startswith'  as  a leading
 			 * prefix. */
 			return 0;
 		}
@@ -3868,11 +3868,11 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
-	/* The given `str' has a length less than `startswith_len', meaning
+	/* The  given  `str' has  a  length less  than  `startswith_len', meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
-	 * which means we must return -1. Note that the NON_NUL is kind-of
-	 * assumed here, since `startswith' may contain only NUL characters
-	 * from here on out, however that is both unlikely, wouldn't even make
+	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
+	 * assumed here,  since  `startswith'  may contain  only  NUL  characters
+	 * from  here on out,  however that is both  unlikely, wouldn't even make
 	 * much sense. */
 	return -1;
 }

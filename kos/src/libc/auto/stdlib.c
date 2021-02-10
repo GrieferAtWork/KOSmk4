@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa13ddfb3 */
+/* HASH CRC-32:0x29f0a873 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,8 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
                         __compar_d_fn_t cmp,
                         void *arg) THROWS(...) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
-	 * source referenced (see the comment below), but this code is the first thing
-	 * that comes up when you search for `libc qsort public domain'.
+	 * source referenced (see the comment below), but this code is the first  thing
+	 * that    comes   up   when   you   search   for   `libc qsort public domain'.
 	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
 	 *
 	 * Note that I made some modifications, and you should see the linked source for
@@ -115,8 +115,8 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 		int difference;
 		void *item_addr;
 		/* Select the item right-smack in the middle of
-		 * the lower and upper bound for comparison
-		 * Assuming an even distribution, the chance of it being the
+		 * the  lower  and upper  bound  for comparison
+		 * Assuming  an even  distribution, the  chance of  it being the
 		 * intended item should be the greatest there, and will increase
 		 * with every iteration
 		 * Also: This way, the entire algorithm has a worst-case of
@@ -1304,9 +1304,9 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
                                          char *template_,
                                          __STDC_INT_AS_SIZE_T suffixlen,
                                          oflag_t flags) {
-	/* Selection of random letters which may appear as replacements for XXXXXX
-	 * For this purpose, only use lower-case letters, as well as digits.
-	 * We could also use upper-case letters, but that may not work correctly
+	/* Selection of random letters which  may appear as replacements for  XXXXXX
+	 * For this  purpose,  only  use  lower-case letters,  as  well  as  digits.
+	 * We  could also  use upper-case letters,  but that may  not work correctly
 	 * depending on the calling process running in DOS-mode, or flags containing
 	 * O_DOSPATH... */
 	static char const letters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -1323,7 +1323,7 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 		return __libc_seterrno(1);
 #endif /* !EINVAL */
 	}
-	/* Calculate an initial, random seed.
+	/* Calculate an  initial,  random  seed.
 	 * For this purpose, try to make use of:
 	 *   - gettimeofday()
 	 *   - gettid() or getpid()
@@ -1336,8 +1336,8 @@ again:
 		if (libc_gettimeofday64(&tv, NULL) == 0) {
 			seed = (uint32_t)(tv.tv_sec) ^
 			       (uint32_t)(tv.tv_sec >> 32) ^
-			       (uint32_t)(tv.tv_usec << 12); /* The max value is 0xf423f, so shift
-			                                        * that to become `0xf423f000', thus
+			       (uint32_t)(tv.tv_usec << 12); /* The  max value is 0xf423f, so shift
+			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
 #elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
@@ -1347,8 +1347,8 @@ again:
 #if __SIZEOF_TIME_T__ > 4
 			       (uint32_t)(tv.tv_sec >> 32) ^
 #endif /* __SIZEOF_TIME_T__ > 4 */
-			       (uint32_t)(tv.tv_usec << 12); /* The max value is 0xf423f, so shift
-			                                        * that to become `0xf423f000', thus
+			       (uint32_t)(tv.tv_usec << 12); /* The  max value is 0xf423f, so shift
+			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
 #endif /* ... */
@@ -1537,7 +1537,7 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 #ifdef __libc_geterrno
 		saved_err = __libc_geterrno();
 #endif /* __libc_geterrno */
-		/* fcntl(F_NEXT) returns the next valid (i.e.
+		/* fcntl(F_NEXT) returns the next valid  (i.e.
 		 * currently open) FD that is >= the given FD. */
 		fd = libc_fcntl(fd, __F_NEXT);
 		if (fd < 0) {

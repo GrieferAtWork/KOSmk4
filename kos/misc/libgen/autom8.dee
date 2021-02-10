@@ -26,8 +26,6 @@
  *               definitions. You may look for usage examples in headers!
  *
  */
-/* TODO: Add an option where this script can be used to un-reflow comments. */
-/* TODO: Don't reflow copyright notices! _Way_ too many changes! */
 // The following special comments are recognized to enabled/disable features:
 // >> /* autom8 reflow-comments off */
 //    Disable comment reflow
@@ -41,25 +39,40 @@
 // >> /* clang-format on */
 //    Alias for: "/* autom8 reflow-comments on */"
 
+#undef HAVE_DEBUG_PRINT
+#if 0
+#define HAVE_DEBUG_PRINT
+#endif
 
 import * from deemon;
 import fs;
 
 global Autom8Parser;
 
+@@Set to @true if comment reflow should be undone.
+@@When given, instead of reflowing spaces evenly, always
+@@assign exact one space-character for every possible position,
+@@thus causing text to flow to the left.
+global OPT_UNDO_REFLOW = false;
+
+function builtinReflowOff(parser: Autom8Parser, none) { parser.commentReflowEnabled = false; }
+function builtinReflowOn(parser: Autom8Parser, none) { parser.commentReflowEnabled = true; }
+
 /* A couple of built-in commands. */
-global BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, string)} = {
-	"deemon" : none,  /* Intentionally ignored: You should still use `deemon -F' for these! */
-	"magic" : none,   /* Magic compiler annotations (used by the KOS build system) */
-	"AUTO" : none,    /* Generic region marker */
-	"start" : none,   /* Generic region start */
-	"begin" : none,   /* Generic region start */
-	"end" : none,     /* Generic region end */
-	"head" : none,    /* Prototype header (in libc/user/ *.c) */
-	"body" : none,    /* Prototype body (in libc/user/ *.c) */
-	"skip" : none,    /* Skip implementation (in libc/user/ *.c) */
-	"impl" : none,    /* Custom implementation (in libc/user/ *.c) */
-	"virtual" : none, /* Seen in "x86-db.h" */
+global final BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, string)} = {
+	"deemon" : none,           /* Intentionally ignored: You should still use `deemon -F' for these! */
+	"magic" : none,            /* Magic compiler annotations (used by the KOS build system) */
+	"AUTO" : none,             /* Generic region marker */
+	"start" : none,            /* Generic region start */
+	"begin" : none,            /* Generic region start */
+	"end" : none,              /* Generic region end */
+	"skip" : none,             /* Skip implementation (in libc/user/ *.c) */
+	"impl" : none,             /* Custom implementation (in libc/user/ *.c) */
+	"virtual" : none,          /* Seen in "x86-db.h" */
+
+	/* Disable comment reflow inside of auto-generated prototypes (in libc/user/ *.c) */
+	"head" : builtinReflowOff, /* Prototype header (in libc/user/ *.c) */
+	"body" : builtinReflowOn,  /* Prototype body (in libc/user/ *.c) */
 };
 
 function getAutom8Command(name: string): none | Callable with (Autom8Parser, string) {
@@ -244,13 +257,15 @@ global final NOREFLOW_LINE_START_MARKERS = ">$&%[]{}";
 
 function reflowTextLine(l: string, width: int): string {
 	l = l.strip();
-	if (#l == width && !containsUnevenSpaces(l))
+	if (#l == width && !containsUnevenSpaces(l) && !OPT_UNDO_REFLOW)
 		return l;
 	if (l && l.first in NOREFLOW_LINE_START_MARKERS)
 		return l;
 	local words = List(splitWords(l));
 	if (#words <= 1)
 		return l;
+	if (OPT_UNDO_REFLOW)
+		return " ".join(words);
 	local textLength = words.each.length + ...;
 	local numSpaces = width - textLength;
 	local spaceLocations = #words - 1;
@@ -288,10 +303,6 @@ function reflowSimpleText(lines: {string...}, lineLength: int): {string...} {
 }
 
 function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string...} {
-#undef HAVE_DEBUG_PRINT
-#if 0
-#define HAVE_DEBUG_PRINT
-#endif
 	if (#lines <= 1)
 		return lines;
 #ifdef HAVE_DEBUG_PRINT
@@ -321,8 +332,10 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			}
 		}
 	}
-	if (commonLineLength !is none)
-		return lines;
+	if (commonLineLength !is none && commonLineLength >= 0) {
+		if (!OPT_UNDO_REFLOW || commonTail)
+			return lines;
+	}
 	if (commonPrefix == commonTail && commonPrefix) {
 		for (local l: lines) {
 			if (l == commonPrefix)
@@ -353,11 +366,13 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 		}
 		if (lineLength >= 0) {
 			innerText = reflowBlockComment(innerText, lineLength);
-			innerText = for (local l: innerText) l.ljust(lineLength);
+			if (commonTail)
+				innerText = for (local l: innerText) l.ljust(lineLength);
 		} else if (commonLineLength !is none) {
 			local adjCommonLength = commonLineLength - (commonPrefixLen + commonTailLen);
 			innerText = reflowBlockComment(innerText, adjCommonLength);
-			innerText = for (local l: innerText) l.ljust(adjCommonLength);
+			if (commonTail)
+				innerText = for (local l: innerText) l.ljust(adjCommonLength);
 		} else {
 			innerText = reflowBlockComment(innerText);
 		}
@@ -613,8 +628,7 @@ function autom8Worker(parser: Autom8Parser,
 				}
 				if (cmd !is none) {
 					commentBody = commentBody[cmdNameEnd:];
-					if (!commentBody || commentBody.isspace(0))
-						cmd(parser, commentBody.lstrip());
+					cmd(parser, commentBody.lstrip());
 				}
 			}
 		} else if ("\n" in commentBody && parser.commentReflowEnabled) {
@@ -746,5 +760,47 @@ function autom8FileWithWildcard(filename: string) {
 	}
 }
 
-for (local x: [...][1:])
+#ifdef __MAIN__
+function usage() {
+	print("Usage: deemon autom8.dee [OPTIONS] [--] FILES...");
+	print("Options:");
+	print("\t-fl --flow-left      Reflow comments to the left");
+	print("\t-fc --flow-center    Reflow comments to evenly spread out spaces (default)");
+	print("\t--help               Show this help");
+}
+
+local argv = [...][1:];
+while (argv && argv.first.startswith("-")) {
+	local arg = argv.popfront();
+	switch (arg) {
+
+	case "-fl":
+	case "--flow-left":
+		OPT_UNDO_REFLOW = true;
+		break;
+
+	case "-fc":
+	case "--flow-center":
+		OPT_UNDO_REFLOW = false;
+		break;
+
+	case "--":
+		goto done_args;
+
+	case "--help":
+		usage();
+		break;
+
+	default:
+		usage();
+		return 1;
+	}
+}
+done_args:
+if (!argv) {
+	usage();
+	return 1;
+}
+for (local x: argv)
 	autom8FileWithWildcard(x);
+#endif /* __MAIN__ */

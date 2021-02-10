@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd67015bb */
+/* HASH CRC-32:0xd46a5c44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 
 DECL_BEGIN
 
-/* Bind optimized variants of various string functions,
+/* Bind optimized variants  of various string  functions,
  * so those get used when building the automatic portions
  * of libc. */
 #include <optimized/string.h>
@@ -321,7 +321,7 @@ for (local f: funcs) {
 
 
 #ifdef __KERNEL__
-/* The kernel isn't exporting these functions, but they're still
+/* The kernel isn't exporting  these functions, but they're  still
  * used by a couple of function that _are_ exported by the kernel! */
 #ifndef libc_mempmovedownc
 #define libc_mempmovedownc(dst, src, elem_count, elem_size) libc_mempmovedown(dst, src, (elem_count) * (elem_size))

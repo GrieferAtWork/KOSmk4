@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f722d90 */
+/* HASH CRC-32:0x2b48f932 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 		 * Return "/" in this case! */
 		++iter;
 	}
-	/* Delete the slash character (or the one after the
+	/* Delete the  slash character  (or  the one  after  the
 	 * slash, if the only character left is a leading slash) */
 	iter[0] = '\0';
 	return path;

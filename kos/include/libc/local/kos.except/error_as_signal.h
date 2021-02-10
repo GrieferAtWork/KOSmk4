@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58b8fe14 */
+/* HASH CRC-32:0xabe5105a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 	__error_code_t __code = __self->e_code;
 	__localdep_bzero(__result, sizeof(*__result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
-	 *       Figure 3-27:  Hardware Exceptions and Signals
+	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
 	 *       0   divide error fault             SIGFPE
 	 *       1   single step trap/fault         SIGTRAP
 	 *       2   nonmaskable interrupt          none

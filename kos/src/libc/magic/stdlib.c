@@ -257,8 +257,8 @@ typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
-	 * source referenced (see the comment below), but this code is the first thing
-	 * that comes up when you search for `libc qsort public domain'.
+	 * source referenced (see the comment below), but this code is the first  thing
+	 * that    comes   up   when   you   search   for   `libc qsort public domain'.
 	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
 	 *
 	 * Note that I made some modifications, and you should see the linked source for
@@ -336,8 +336,8 @@ void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $si
 		int difference;
 		void *item_addr;
 		/* Select the item right-smack in the middle of
-		 * the lower and upper bound for comparison
-		 * Assuming an even distribution, the chance of it being the
+		 * the  lower  and upper  bound  for comparison
+		 * Assuming  an even  distribution, the  chance of  it being the
 		 * intended item should be the greatest there, and will increase
 		 * with every iteration
 		 * Also: This way, the entire algorithm has a worst-case of
@@ -454,7 +454,7 @@ __LONGLONG llabs(__LONGLONG x) {
  *       the associated unescaped types are actually defined in the current scope
  *       in order to work around a g++ bug I've discovered:
  *  When running `g++ -std=c++1z' or `g++ -std=gnu++1z', and `__LIBCCALL' is defined
- *  as non-empty, g++ will see something like this as definition for `div':
+ *  as non-empty,  g++  will  see  something like  this  as  definition  for  `div':
  *  >> static inline
  *  >>     __attribute__((__always_inline__))
  *  >>     __attribute__((__const__))
@@ -466,9 +466,9 @@ __LONGLONG llabs(__LONGLONG x) {
  *  There is nothing work with this declaration, however g++ will generate an error:
  *     ```error: 'int std::div_t' redeclared as different kind of entity```
  *  With the error indicating pointing to the `)' after `div)'
- *  However, changing the declaration to not use `div_t', but `struct __div_struct'
+ *  However,  changing  the declaration  to  not use  `div_t',  but `struct __div_struct'
  *  fixes the problem (NOTE: The problem also goes away if `__attribute__((__stdcall__))'
- *  were to be removed, however we can't do the later since that would break the ABI)
+ *  were to be removed,  however we can't do  the later since that  would break the  ABI)
  *  >> static inline
  *  >>     __attribute__((__always_inline__))
  *  >>     __attribute__((__const__))
@@ -477,10 +477,10 @@ __LONGLONG llabs(__LONGLONG x) {
  *  >>     ...
  *  >> }
  *
- *  g++ seems to think that the first version is trying to declare `div_t' as a
- *  variable with a c++ initializer (remember: you can declare c++ variables
+ *  g++  seems to think that the first version is trying to declare `div_t' as a
+ *  variable with a  c++ initializer  (remember: you can  declare c++  variables
  *  as `int x(42);' instead of `int x = 42;'). A point that is proven even more,
- *  as re-writing the declaration like the following also fixes the problem:
+ *  as re-writing the  declaration like  the following also  fixes the  problem:
  *  >> static inline
  *  >>     __attribute__((__always_inline__))
  *  >>     __attribute__((__const__))
@@ -489,15 +489,15 @@ __LONGLONG llabs(__LONGLONG x) {
  *  >>     ...
  *  >> }
  *
- *  However, this last version also wouldn't work for us, since that would leave
- *  the declaration of `div' vulnerable to `#define div(a, b)' macro overrides
+ *  However, this last  version also wouldn't  work for us,  since that would  leave
+ *  the declaration  of  `div'  vulnerable to  `#define div(a, b)'  macro  overrides
  *  being declared prior to the header being included (which we prevent by declaring
- *  functions such that their names cannot be interpreted by function-like macros
+ *  functions  such that their  names cannot be  interpreted by function-like macros
  *  using the same name)
  *
  *  Honestly: I don't really understand why using the struct-prefixed name (`struct __div_struct')
- *  fixes the problem (Note that when leaving out the `struct' and only writing `__div_struct',
- *  a different error ```error: expected primary-expression before '__attribute__'``` occurs with
+ *  fixes the problem (Note that  when leaving out the  `struct' and only writing  `__div_struct',
+ *  a different error ```error: expected primary-expression before '__attribute__'``` occurs  with
  *  is also incorrect in this scenario), however a work-around is a work-around, and I'm satisfied
  *
  *  For reference, I've created a bug report for this problem here:
@@ -2043,9 +2043,9 @@ $fd_t mkostemps([[nonnull]] char *template_,
 [[impl_include("<hybrid/__overflow.h>")]]
 $fd_t system_mktemp(unsigned int what, [[nonnull]] char *template_,
                     __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags) {
-	/* Selection of random letters which may appear as replacements for XXXXXX
-	 * For this purpose, only use lower-case letters, as well as digits.
-	 * We could also use upper-case letters, but that may not work correctly
+	/* Selection of random letters which  may appear as replacements for  XXXXXX
+	 * For this  purpose,  only  use  lower-case letters,  as  well  as  digits.
+	 * We  could also  use upper-case letters,  but that may  not work correctly
 	 * depending on the calling process running in DOS-mode, or flags containing
 	 * O_DOSPATH... */
 	static char const letters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -2062,7 +2062,7 @@ $fd_t system_mktemp(unsigned int what, [[nonnull]] char *template_,
 		return __libc_seterrno(1);
 @@pp_endif@@
 	}
-	/* Calculate an initial, random seed.
+	/* Calculate an  initial,  random  seed.
 	 * For this purpose, try to make use of:
 	 *   - gettimeofday()
 	 *   - gettid() or getpid()
@@ -2075,8 +2075,8 @@ again:
 		if (gettimeofday64(&tv, NULL) == 0) {
 			seed = (uint32_t)(tv.@tv_sec@) ^
 			       (uint32_t)(tv.@tv_sec@ >> 32) ^
-			       (uint32_t)(tv.@tv_usec@ << 12); /* The max value is 0xf423f, so shift
-			                                        * that to become `0xf423f000', thus
+			       (uint32_t)(tv.@tv_usec@ << 12); /* The  max value is 0xf423f, so shift
+			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
 @@pp_elif $has_function(gettimeofday)@@
@@ -2086,8 +2086,8 @@ again:
 @@pp_if __SIZEOF_TIME_T__ > 4@@
 			       (uint32_t)(tv.@tv_sec@ >> 32) ^
 @@pp_endif@@
-			       (uint32_t)(tv.@tv_usec@ << 12); /* The max value is 0xf423f, so shift
-			                                        * that to become `0xf423f000', thus
+			       (uint32_t)(tv.@tv_usec@ << 12); /* The  max value is 0xf423f, so shift
+			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
 @@pp_endif@@
@@ -2400,7 +2400,7 @@ void *recallocarray(void *mallptr, $size_t old_elem_count,
 			}
 			return mallptr;
 		}
-		/* Allocate a new block so we can ensure that an
+		/* Allocate a new block so we can ensure that  an
 		 * existing block gets freezero()'ed in all cases */
 		result = calloc(new_elem_count, elem_size);
 		if (result) {
@@ -2492,7 +2492,7 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 @@pp_ifdef __libc_geterrno@@
 		saved_err = __libc_geterrno();
 @@pp_endif@@
-		/* fcntl(F_NEXT) returns the next valid (i.e.
+		/* fcntl(F_NEXT) returns the next valid  (i.e.
 		 * currently open) FD that is >= the given FD. */
 		fd = fcntl(fd, __F_NEXT);
 		if (fd < 0) {

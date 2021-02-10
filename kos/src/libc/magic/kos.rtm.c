@@ -50,7 +50,7 @@
 #endif /* !RTM_ABORT_CODE_S && __RTM_ABORT_CODE_S */
 
 /* Helper macro for extracting the abort code (as passed to `rtm_abort()')
- * from a given `rtm_status_t x' when `x & RTM_ABORT_EXPLICIT' is true. */
+ * from a given  `rtm_status_t x' when  `x & RTM_ABORT_EXPLICIT' is  true. */
 #if !defined(RTM_ABORT_CODE) && defined(__RTM_ABORT_CODE_M) && defined(__RTM_ABORT_CODE_S)
 #define RTM_ABORT_CODE(/*rtm_status_t*/ x) \
 	(__CCAST(unsigned int)(((x)&__RTM_ABORT_CODE_M) >> __RTM_ABORT_CODE_S))
@@ -62,7 +62,7 @@
 #define RTM_NOSYS __RTM_NOSYS /* RTM isn't supposed */
 #endif /* !RTM_NOSYS && __RTM_NOSYS */
 
-/* Returned by `rtm_begin()' when RTM was entered successfully.
+/* Returned  by  `rtm_begin()' when  RTM was  entered successfully.
  * NOTE: When this macro isn't defined, then RTM is never supported */
 #if !defined(RTM_STARTED) && defined(__RTM_STARTED)
 #define RTM_STARTED __RTM_STARTED /* RTM was entered */

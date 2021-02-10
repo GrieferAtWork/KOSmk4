@@ -105,12 +105,12 @@ __SYSDECL_BEGIN
  * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
- * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
- *                  Note that this is an exact value, meaning that a NUL-character appearing
+ * @param: DATALEN: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
+ *                  Note  that  this is  an exact  value, meaning  that a  NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
- *                  Usually, the return value is added to a sum of values which is then
+ *                  Usually,  the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
  *                  usual return value used to indicate success is 'DATALEN'. */
 typedef __pformatprinter pformatprinter;

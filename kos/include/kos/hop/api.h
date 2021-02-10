@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fadad6c */
+/* HASH CRC-32:0xdfd8d22d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,10 +37,10 @@
 #define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }
 #else /* __KERNEL__ */
 /* For compatibility, user-space must always write the full 64-bit field,
- * while the kernel will only ever read a size_t-sized field.
+ * while  the  kernel   will  only  ever   read  a  size_t-sized   field.
  * This is required when a 32-bit application is running under a 64-bit kernel,
- * allowing the kernel to not have to look out for user-space running in
- * compatibility mode, but can instead always read the full 64-bit value,
+ * allowing the  kernel to  not have  to  look out  for user-space  running  in
+ * compatibility  mode,  but can  instead always  read  the full  64-bit value,
  * which is simply zero-extended from 32-bit by user-space. */
 #define __HOP_SIZE64_FIELD(name) __uint64_t name
 #endif /* !__KERNEL__ */

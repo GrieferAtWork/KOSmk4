@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef92bb07 */
+/* HASH CRC-32:0xe61f09d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,11 +46,11 @@
 __SYSDECL_BEGIN
 
 #if defined(__USE_POSIX) && defined(__USE_MISC)
-/* Ignore this value. It's just some nonsensical constant here
- * for historic purposes and posix compliance. All functions
+/* Ignore this value. It's  just some nonsensical constant  here
+ * for  historic  purposes and  posix compliance.  All functions
  * found in this header are able to operate on arbitrarily-sized
- * user password database entires, and so should your program,
- * meaning this value is entirely pointless and should actually
+ * user password database entires,  and so should your  program,
+ * meaning this value is entirely pointless and should  actually
  * be considered as INFINITE.
  * Also: there's a `_SC_GETPW_R_SIZE_MAX' which also just returns
  *       this value, so it's just as useless. */

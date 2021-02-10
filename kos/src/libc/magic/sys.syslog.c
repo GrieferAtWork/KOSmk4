@@ -100,8 +100,8 @@
 #endif /* !LOG_MESSAGE && __LOG_INFO */
 #endif /* __USE_KOS */
 
-/* TODO: All of the below has been lifted from KOSmk2/3, but hasn't been
- *       updated to fit what is done on KOSmk4, nor has it been re-checked
+/* TODO: All  of the below  has been lifted from  KOSmk2/3, but hasn't been
+ *       updated to fit what is done on KOSmk4, nor has it been  re-checked
  *       against the codes used by linux (there may be differences here...) */
 
 /* facility codes */

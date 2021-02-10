@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3eaecdd */
+/* HASH CRC-32:0x2fefeb57 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstartcmp))(char const *__str, char
 		__c2 = *__startswith++;
 		if (!__c2) {
 			/* When the end of the RHS-string is reached, then we
-			 * know that `str' has `startswith' as a leading
+			 * know  that  `str'  has `startswith'  as  a leading
 			 * prefix. */
 			return 0;
 		}
@@ -40,11 +40,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstartcmp))(char const *__str, char
 		if __unlikely(__c1 != __c2)
 			return (int)((unsigned char)__c1 - (unsigned char)__c2);
 	} while (__c1);
-	/* The given `str' has a length less than `strlen(startswith)', meaning
+	/* The given `str' has a  length less than `strlen(startswith)',  meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
-	 * which means we must return -1. Note that the NON_NUL is kind-of
-	 * assumed here, since `startswith' may contain only NUL characters
-	 * from here on out, however that is both unlikely, wouldn't even make
+	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
+	 * assumed here,  since  `startswith'  may contain  only  NUL  characters
+	 * from  here on out,  however that is both  unlikely, wouldn't even make
 	 * much sense. */
 	return -1;
 }

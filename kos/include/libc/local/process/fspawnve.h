@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6afa8bbd */
+/* HASH CRC-32:0x7e16429f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -474,12 +474,12 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 		if (__child < 0)
 			goto __err;
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-		/* Check for errors that may have happened in the
+		/* Check for errors that may have happened in  the
 		 * child process _after_ we did the vfork() above. */
 		if (__libc_geterrno_or(0) != 0)
 			goto __err_join_zombie_child;
 		/* Success (but still restore the old errno
-		 * since we overwrote it to be 0 above) */
+		 * since  we  overwrote it  to be  0 above) */
 		__libc_seterrno(__old_errno);
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 		__localdep_close(__pipes[1]); /* Close the writer. */
@@ -514,9 +514,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 		goto __do_exec;
 __read_child_errors:
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-	/* Check if the vfork() from the child returned success, but left
+	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
-	 * child encountered an error at some point after vfork() already
+	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
 	if (__libc_geterrno_or(0) != 0)
 		goto __err_join_zombie_child;
@@ -528,7 +528,7 @@ __read_child_errors:
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and read() returns ZERO(0)) */
+	 *        closed and  read() returns  ZERO(0)) */
 	__localdep_close(__pipes[1]); /* Close the writer. */
 	__temp = __localdep_read(__pipes[0], &__error, sizeof(__error));
 	__localdep_close(__pipes[0]); /* Close the reader. */
@@ -543,7 +543,7 @@ __read_child_errors:
 __err_join_zombie_child:
 	if (__mode != __P_DETACH) {
 		/* Unless the child was already spawned as detached,
-		 * we still have to re-join it, or else it will be
+		 * we still have to re-join  it, or else it will  be
 		 * left dangling as a zombie process! */
 		if (__localdep_waitpid(__child, &__status, 0) < 0) {
 #ifdef __EINTR
@@ -556,12 +556,12 @@ __err:
 	return -1;
 __do_exec:
 	/* When the exec succeeds, the pipe is auto-
-	 * closed because it's marked as O_CLOEXEC! */
+	 * closed because it's marked as  O_CLOEXEC! */
 	__localdep_fexecve(__execfd, ___argv, ___envp);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 	/* If the exec fails, it will have modified `errno' to indicate this fact.
-	 * And since we're sharing VMs with our parent process, the error reason
-	 * will have already been written back to our parent's VM, so there's
+	 * And since we're sharing VMs with  our parent process, the error  reason
+	 * will have already  been written  back to  our parent's  VM, so  there's
 	 * actually nothing left for us to do, but to simply exit! */
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Write the exec-error back to our parent. */

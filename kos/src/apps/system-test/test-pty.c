@@ -48,8 +48,8 @@ DEFINE_TEST(pty_works_correctly) {
 	pid_t cpid;
 	if (openpty(&master, &slave, name, NULL, NULL))
 		err(1, "openpty() failed");
-	/* Make sure that the file indicated by `sys_openpty()' actually exists.
-	 * This file should be apart of the /dev/ filesystem, however POSIX doesn't
+	/* Make  sure that  the file  indicated by  `sys_openpty()' actually exists.
+	 * This file should be apart of the /dev/ filesystem, however POSIX  doesn't
 	 * actually require that it be placed anywhere in particular, so just assert
 	 * that it exists. */
 	if (stat(name, &st) != 0)
@@ -72,8 +72,8 @@ DEFINE_TEST(pty_works_correctly) {
 		err(1, "Wrong data read by master: %$q", sizeof(pty_child_data), buf);
 
 	/* Wait for the child process to exit. - As long as the child is still alive,
-	 * we're still sharing the handles for the slave/master endpoint of the PTY,
-	 * meaning that us close()-ing them below may not actually cause the PTY to
+	 * we're still sharing the handles for the slave/master endpoint of the  PTY,
+	 * meaning  that us close()-ing them below may  not actually cause the PTY to
 	 * be destroyed. */
 	errno = 0;
 	while (waitpid(cpid, NULL, 0) != cpid) {
@@ -86,16 +86,16 @@ DEFINE_TEST(pty_works_correctly) {
 	/* Closing the slave-side will cause the master to always indicate EOF.
 	 * Alternatively, closing the master-side first would cause the slave-side to do the same.
 	 * NOTE: Attempting to read from `master' before closing `slave' would block
-	 *       until `slave' was closed, or until at least one byte of data was
+	 *       until `slave' was closed,  or until at least  one byte of data  was
 	 *       written to `slave' */
 	close(slave);
 	if ((error = read(master, buf, sizeof(buf))) != 0)
 		err(1, "Expected EOF after slave was closed (%Id)", error);
 	close(master);
 
-	/* Make sure that after both the master _and_ slave have been closed, the /dev/
-	 * file (who's existence we've asserted earlier) goes away without any further
-	 * action being required (note that there are a couple of things that not only
+	/* Make  sure that after both the master _and_ slave have been closed, the /dev/
+	 * file (who's existence we've asserted  earlier) goes away without any  further
+	 * action being required (note that there are  a couple of things that not  only
 	 * we, but also some other process could do to prevent the file from going away,
 	 * however, starting out with a clean system state, the file(s) should always go
 	 * away without any additional hassle) */

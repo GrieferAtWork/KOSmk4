@@ -42,11 +42,11 @@
 __SYSDECL_BEGIN
 
 #if defined(__USE_POSIX) && defined(__USE_MISC)
-/* Ignore this value. It's just some nonsensical constant here
- * for historic purposes and posix compliance. All functions
+/* Ignore this value. It's  just some nonsensical constant  here
+ * for  historic  purposes and  posix compliance.  All functions
  * found in this header are able to operate on arbitrarily-sized
- * user password database entires, and so should your program,
- * meaning this value is entirely pointless and should actually
+ * user password database entires,  and so should your  program,
+ * meaning this value is entirely pointless and should  actually
  * be considered as INFINITE.
  * Also: there's a `_SC_GETPW_R_SIZE_MAX' which also just returns
  *       this value, so it's just as useless. */
@@ -342,7 +342,7 @@ got_all_fields:
 		}
 		/* All right! we've got all of the fields!
 		 * Now to fill in the 2 numeric fields (since those
-		 * might still contain errors that would turn this
+		 * might  still contain errors that would turn this
 		 * entry into a bad line) */
 		if unlikely(!*field_starts[2])
 			goto badline;
@@ -359,7 +359,7 @@ got_all_fields:
 		if unlikely(*iter)
 			goto badline;
 		/* All right! Now to fill in all of the string fields.
-		 * We've already turned all of them into NUL-terminated strings pointing
+		 * We've already turned all of them into NUL-terminated strings  pointing
 		 * into the heap-allocated `dbline' string, however the prototype of this
 		 * function requires that they be pointing into `buffer...+=buflen' */
 		for (i = 0; i < 7; ++i) {
