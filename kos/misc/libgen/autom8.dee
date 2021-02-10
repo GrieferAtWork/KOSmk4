@@ -26,6 +26,8 @@
  *               definitions. You may look for usage examples in headers!
  *
  */
+/* TODO: Add an option where this script can be used to un-reflow comments. */
+/* TODO: Don't reflow copyright notices! _Way_ too many changes! */
 // The following special comments are recognized to enabled/disable features:
 // >> /* autom8 reflow-comments off */
 //    Disable comment reflow
@@ -47,10 +49,13 @@ global Autom8Parser;
 
 /* A couple of built-in commands. */
 global BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, string)} = {
-	"begin" : none,
-	"end" : none,
-	"magic" : none,
-	"deemon" : none, /* Intentionally ignored: You should still use `deemon -F' for these! */
+	"deemon" : none,  /* Intentionally ignored: You should still use `deemon -F' for these! */
+	"magic" : none,   /* Magic compiler annotations (used by the KOS build system) */
+	"begin" : none,   /* Generic region start */
+	"end" : none,     /* Generic region end */
+	"head" : none,    /* Prototype header (in libc/user/ *.c) */
+	"body" : none,    /* Prototype body (in libc/user/ *.c) */
+	"virtual" : none, /* Seen in "x86-db.h" */
 };
 
 function getAutom8Command(name: string): none | Callable with (Autom8Parser, string) {
@@ -231,9 +236,13 @@ function shortestPossibleLightLength(l: string): int {
 	return result;
 }
 
+global final NOREFLOW_LINE_START_MARKERS = ">$&%[]{}";
+
 function reflowTextLine(l: string, width: int): string {
 	l = l.strip();
 	if (#l == width && !containsUnevenSpaces(l))
+		return l;
+	if (l && l.first in NOREFLOW_LINE_START_MARKERS)
 		return l;
 	local words = List(splitWords(l));
 	if (#words <= 1)
@@ -275,11 +284,17 @@ function reflowSimpleText(lines: {string...}, lineLength: int): {string...} {
 }
 
 function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string...} {
+#undef HAVE_DEBUG_PRINT
+#if 0
+#define HAVE_DEBUG_PRINT
+#endif
 	if (#lines <= 1)
 		return lines;
-//	print("reflowBlockComment:", lineLength);
-//	for (local l: lines)
-//		print("\t", repr l);
+#ifdef HAVE_DEBUG_PRINT
+	print("reflowBlockComment:", lineLength);
+	for (local l: lines)
+		print("\t", repr l);
+#endif /* HAVE_DEBUG_PRINT */
 	local commonPrefix = none;
 	local commonTail = none;
 	local commonLineLength = -1;
@@ -308,12 +323,19 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 				return lines;
 		}
 	}
+	if (commonLineLength is none)
+		commonTail = "";
 	if ("'" in commonTail)
 		commonTail = commonTail[commonTail.rindex("'")+1:];
+	for (local c: "@-*") {
+		local p = commonPrefix.find(c);
+		if (p >= 0)
+			commonPrefix = commonPrefix[:p];
+	}
 	if (commonPrefix || commonTail) {
 		/* Don't reflow if the common prefix indicates a code-block! */
 		local baseCommonPrefix = commonPrefix.lstrip();
-		if (baseCommonPrefix && baseCommonPrefix.first in ">$&%`[]{}")
+		if (baseCommonPrefix && baseCommonPrefix.first in NOREFLOW_LINE_START_MARKERS)
 			return lines;
 		local commonPrefixLen = #commonPrefix;
 		local commonTailLen   = #commonTail;
@@ -398,6 +420,28 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 				paragraphBlock = [];
 			}
 			result.append(l);
+		} else if (l.first in "-*") {
+			if (paragraphBlock)
+				result.extend(reflowBlockComment(paragraphBlock, lineLength));
+			paragraphBlock = [l];
+		} else if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
+			local i = 2;
+			while (i < #l && l.issymcont(i))
+				++i;
+			while (i < #l && l.isspace(i))
+				++i;
+			if (i < #l && l[i] in ":") {
+				/* Element-tag annotation */
+				if (paragraphBlock)
+					result.extend(reflowBlockComment(paragraphBlock, lineLength));
+				paragraphBlock = [l];
+			} else {
+				if (paragraphBlock) {
+					result.extend(reflowBlockComment(paragraphBlock, lineLength));
+					paragraphBlock = [];
+				}
+				result.append(l);
+			}
 		} else {
 			paragraphBlock.append(l);
 		}
@@ -500,9 +544,11 @@ reflow_normal_block:
 		} else if (currentBlock != lines) {
 			result.extend(reflowBlockComment(currentBlock, lineLength));
 		} else {
-//			print("reflowBlock:", lineLength);
-//			for (local l: currentBlock)
-//				print("\t", repr l);
+#ifdef HAVE_DEBUG_PRINT
+			print("reflowBlock:", lineLength);
+			for (local l: currentBlock)
+				print("\t", repr l);
+#endif /* HAVE_DEBUG_PRINT */
 			local lineLenMin = int.SIZE_MAX;
 			local lineLenMax = 0;
 			for (local l: currentBlock) {
@@ -516,7 +562,7 @@ reflow_normal_block:
 				lineLength = lineLenMax;
 			local lastLine = currentBlock.last;
 			local lastLineLen = #lastLine;
-			if (lastLineLen == lineLenMin ||
+			if ((lastLineLen == lineLenMin && #currentBlock > 2) ||
 			   (lastLineLen <= (lineLength * 3) / 4)) {
 				/* Don't reflow the last line. */
 				currentBlock.popback();
@@ -551,7 +597,7 @@ function autom8Worker(parser: Autom8Parser,
 				local cmdNameEnd = 1;
 				while (cmdNameEnd < #commentBody &&
 				       (commentBody.issymcont(cmdNameEnd) ||
-				        commentBody[cmdNameEnd] in ".:-$_"))
+				        commentBody[cmdNameEnd] in "."))
 					++cmdNameEnd;
 				local cmd;
 				try {
@@ -603,10 +649,13 @@ function autom8Worker(parser: Autom8Parser,
 			}
 			commentLines = reflowBlockComment(commentLines);
 			commentBody = ("\n" + leadingTabs + leadingSpaces + " *").join(commentLines);
-			parser.newText << commentBody.rstrip();
-			if (hasTrailingNewline)
+			parser.newText << commentBody;
+			if (hasTrailingNewline) {
 				parser.newText << "\n" << leadingTabs << leadingSpaces;
 				parser.newText << " ";
+			} else if (!commentBody.endswith(" ")) {
+				parser.newText << " ";
+			}
 			parser.flushStart = parser.commentEnd;
 		} else {
 			commentBody = commentBody.strip();
@@ -680,6 +729,16 @@ function autom8File(filename: string) {
 	}
 }
 
+function autom8FileWithWildcard(filename: string) {
+	if ("*" !in filename)
+		return autom8File(filename);
+	local head = fs.headof(filename);
+	for (local e: fs.query(filename)) {
+		e = fs.joinpath(head, e);
+		if (!fs.stat.isdir(e))
+			autom8File(e);
+	}
+}
 
 for (local x: [...][1:])
-	autom8File(x);
+	autom8FileWithWildcard(x);
