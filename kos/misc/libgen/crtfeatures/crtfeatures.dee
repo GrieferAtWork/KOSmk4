@@ -201,7 +201,7 @@ global final PREDEF_MACROS: {string: CMacro} = Dict({
 	"__FUNCTION__": CMacro("\"\""),
 
 	/* Enable a whole bunch of *_SOURCE macros to expose all
-	 * features without having to worry about these macros
+	 * features  without having to  worry about these macros
 	 * ending up in feature expressions */
 	"_POSIX_C_SOURCE": CMacro("200809L"),
 	"_GNU_SOURCE": CMacro("1"),
@@ -835,7 +835,7 @@ final class CParser {
 				for (local name, defs: allMacroDefinitions) {
 					local fDefs = Dict();
 					for (local cond, mac: defs) {
-						/* Special case: Always ignore a macro itself as
+						/* Special case: Always  ignore  a macro  itself as
 						 *               part of its declaration condition.
 						 * This way, code like this:
 						 * >> #ifndef FOO
@@ -863,10 +863,10 @@ final class CParser {
 						}
 						fDefs[cond] = mac;
 					}
-					/* Check for cases where the same macro definition
-					 * results from multiple, separate pp-conditions.
+					/* Check  for  cases  where  the  same  macro  definition
+					 * results   from   multiple,   separate   pp-conditions.
 					 * If such is the case, then we can merge the definitions
-					 * and potentially optimize their conditions by doing:
+					 * and potentially  optimize their  conditions by  doing:
 					 * >> cond = optimize(a || b); */
 					local fDefs2 = Dict();
 					for (local cond, mac: fDefs) {
@@ -1355,7 +1355,7 @@ do_skip_inner_block:
 						goto do_if_expression_eval;
 					if (cmd == "endif")
 						goto next;
-					/* `#else' after something along the lines
+					/* `#else' after something  along the  lines
 					 * of `#if 0' This is equivalent to `#if 1'! */
 					goto do_parse_inner_block;
 				} else {
@@ -1492,5 +1492,3 @@ next:
 	}
 
 }
-
-

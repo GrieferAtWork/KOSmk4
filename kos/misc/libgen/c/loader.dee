@@ -93,7 +93,7 @@ global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 	"nothrow_rpc_pure"  : "NOTHROW_RPC_PURE",
 
 	/* CP for stdio (because of libio, custom FILE cookies may throw exceptions)
-	 * Used for functions that are already CP in their syscall form. */
+	 * Used  for  functions  that  are   already  CP  in  their  syscall   form. */
 	"cp_stdio"          : "THROWS(...)",
 	/* STDIO functions that may throw because of custom FILE cookies. */
 	"stdio_throws"      : "THROWS(...)",
@@ -224,7 +224,7 @@ continue_typename_expression:
 				tok = self.next();
 			}
 		} else if (tok in "([") {
-			/* Inner variable name: "int (*foo)(int x)"
+			/* Inner  variable  name:   "int (*foo)(int x)"
 			 * Must split into: "int (*", "foo", ")(int x)" */
 			final local PAREN_TABLE = {
 				"(" : ")",
@@ -1770,9 +1770,9 @@ class LoaderContext {
 		/* This directive has a somewhat weird syntax that is the result of its history:
 		 *    '%' '[' 'push_macro' ['(' groups ')'] [@option...] '(' macros... ')' ']'
 		 *    '%' '[' 'push_macro' ['(' groups ')'] [@option...] '{' macros... '}' ']'
-		 *  - Where "macros..." is a space-seperated list of keywords or
+		 *  - Where "macros..." is a space-seperated list of keywords  or
 		 *    C-strings, with ","-tokens in-between simply being ignored.
-		 *  - The only recognized value for @option is the literal token
+		 *  - The only recognized value for @option is the literal  token
 		 *    sequence '@' 'undef', which will cause all pushed macros to
 		 *    be #undef'ed after being pushed
 		 *
@@ -1784,7 +1784,7 @@ class LoaderContext {
 		 * >> };
 		 * >> }
 		 * >> %[push_macro(c, std) @undef { foo bar }]
-		 * Output (in locations "c" and "std"):
+		 * Output  (in  locations   "c"  and   "std"):
 		 * >> #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 		 * >> #pragma push_macro("foo")
 		 * >> #pragma push_macro("bar")
@@ -2680,7 +2680,7 @@ function loadSystemHeaderDefinitions(
 
 			default: {
 				/* Anything else following a %-character is a single-line,
-				 * default target embedded string destined for <string.h> */
+				 * default  target embedded string destined for <string.h> */
 				local textStart = self.tokEnd;
 				local textEnd = self.text.find("\n", textStart, self.end);
 				if (textEnd < 0)
@@ -3305,7 +3305,7 @@ again_parse_annotations:
 						}
 						if (usedCurrentPrototype.returnType !is bound) {
 							/* XXX: Must assert that all prototypes have the same
-							 *      number of arguments, and the same names for
+							 *      number  of arguments, and  the same names for
 							 *      arguments... */
 							usedCurrentPrototype = usedCurrentPrototypes.first.last.first;
 						}
@@ -3453,7 +3453,7 @@ do_handle_alt_variant_of:
 					/* >> [[kernel]]
 					 * Same as:
 					 * >> [[crt_kos_impl_if(1)]]
-					 * Whereas the default for `crt_export_if' is:
+					 * Whereas the default  for `crt_export_if'  is:
 					 * >> [[crt_kos_impl_if(!defined(__KERNEL__)))]]
 					 */
 					if (currentConditions !is none)
@@ -3470,7 +3470,7 @@ do_handle_alt_variant_of:
 					/* >> [[crt_impl_if(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
 					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
 					 * Specify a preprocessor condition that must be met for the function
-					 * to be provided as a libc auto- or user-implementations. */
+					 * to  be  provided   as  a  libc   auto-  or   user-implementations. */
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
 					self.next();
@@ -3574,7 +3574,7 @@ again_skip_annotation_rbracket:
 				}
 				returnTypeEnd = kwdEnd;
 			}
-			/* lastKeyword is the function's name, and the string between
+			/* lastKeyword is  the  function's  name,  and  the  string  between
 			 * returnTypeStart...returnTypeEnd is the (preliminary) return type. */
 			current.name = currentName = lastKeyword;
 			if (tok == ":")
@@ -3602,7 +3602,7 @@ again_skip_annotation_rbracket:
 		}
 
 		/* If the function isn't being exported from libc, then make sure
-		 * that certain attributes that would affect its export behavior
+		 * that certain attributes that would affect its export  behavior
 		 * havn't been set. */
 		if (currentFeatures.crt_noImpl) {
 			if (currentFeatures.crt_kosSection != context.defaultFeatures.crt_kosSection ||
@@ -3688,7 +3688,7 @@ again_skip_annotation_rbracket:
 		}
 
 		/* Right now, `tok == "("', pointing at the '('-character
-		 * before the argument list. So parse that argument list */
+		 * before the argument list. So parse that argument  list */
 		parseArgumentListAndOptionalTrailingReturnType(
 			self, currentPrototype, defaultAttributes,
 			functionArgumentNamesOverride);
@@ -4005,7 +4005,7 @@ got_chkExpr:
 						tok = self.skip(")");
 					}
 					/* Check if we're supposed to automatically deduce
-					 * the name of the underlying base-function. */
+					 * the  name  of  the  underlying   base-function. */
 					if (baseFunctionName is none) {
 						baseFunctionName = gen.getDefaultBaseFunctionName(currentName);
 						if (baseFunctionName is none) {
@@ -4097,10 +4097,10 @@ got_chkExpr:
 							local baseLocalFunction: LocalFunction | none = getBaseLocalFunction();
 							local result: LoaderFunctionImplementation | none;
 							/* Allow the generator to provide a custom callback for
-							 * generating LoaderFunctionImplementation objects for
+							 * generating LoaderFunctionImplementation objects  for
 							 * some given function.
-							 * If the generator doesn't provide such a callback, fall
-							 * back to simply converting the base function's body, and,
+							 * If the generator  doesn't provide such  a callback,  fall
+							 * back to simply converting the base function's body,  and,
 							 * if the base function doesn't have a Local variant, simply
 							 * don't provide a local implementation ourselves. */
 							if (gen.generateLoaderFunctionImplementation !is none) {
@@ -4233,7 +4233,7 @@ got_chkExpr:
 						if (allWcharFunctionsByName.setnew(strWcsFunctionName, wcharFunction))
 							break;
 					}
-					/* Remember the used uchar16/uchar32 system header names
+					/* Remember  the  used   uchar16/uchar32  system  header   names
 					 * This is important for dynamic implementation transformations. */
 					if (wcharFunction.wc_header_uchar.xch(mode, current) !is none) {
 						self.errAt(currentNameTokStart,
@@ -4306,7 +4306,7 @@ got_chkExpr:
 						local xc: XcharImplementation = wcharFunction
 							.getXCharImplementation(currentName, mode);
 						/* Enumerate bindings of the underlying [[wchar]] Function to construct
-						 * new, transformed bindings for our new the Xchar function. */
+						 * new,  transformed  bindings   for  our  new   the  Xchar   function. */
 						local basicBindings = [];
 						local mySize = WCHAR_REPLACEMENT_SIZE[mode];
 						/* Transform bindings to do something akin to the following:
@@ -4382,7 +4382,7 @@ got_chkExpr:
 							} else {
 								/* Scan the different usage cases of __SIZEOF_WCHAR_T__
 								 * XXX: This is imperfect! (See the above comment for
-								 *      what should ~actually~ be happening here!) */
+								 *      what  should  ~actually~ be  happening here!) */
 								local len = #wc_bindCond;
 								local flushStart = 0;
 								local i = 0;
@@ -4472,7 +4472,7 @@ got_chkExpr:
 								if (origCC != replCC) {
 									/* Bind against an external symbol name.
 									 * -> Must also assert (in `myCond') that `origCC' and `replCC'
-									 *    are the same calling conventions at compile-time. */
+									 *    are  the  same   calling  conventions  at   compile-time. */
 									local wcBindingStr = str(wcBinding);
 									local cc1 = replCC, cc2 = origCC;
 									if (cc1 < cc2) {
@@ -4485,7 +4485,7 @@ got_chkExpr:
 										local replacedPrototypes2 = replacedPrototypes;
 										if (origCC in ["LIBCCALL", "LIBCCALL"]) {
 											/* Optimize `replacedPrototypes2' to use `origCC', thus allowing
-											 * their eventual declaration to make use of __CDECLARE, rather
+											 * their eventual declaration to make use of __CDECLARE,  rather
 											 * than having to use __COMPILER_REDIRECT... */
 											replacedPrototypes2 = [];
 											for (local ppCond, protos: replacedPrototypes) {
@@ -4550,7 +4550,7 @@ wc_bind_continue_scan_bindings:
 								usedPrototypes = xc.prototypes;
 							else {
 								/* Check if usedPrototypes uses DEFAULT_CC, and if so: Change
-								 * that to instead make use of `WCHAR_REPLACEMENT_CC[mode]' */
+								 * that to instead  make use of  `WCHAR_REPLACEMENT_CC[mode]' */
 								for (local none, protos: usedPrototypes) {
 									for (local p: protos) {
 										if (p.cc === DEFAULT_CC)
@@ -4918,7 +4918,7 @@ again_lookup_wcsCurrent:
 						}
 						/* Link the Xchar-implementations.
 						 * NOTE: This has to happen delayed, so that everything will be
-						 *       available once the implementation gets generated. */
+						 *       available  once  the  implementation  gets  generated. */
 						currentDosLibraryFunction.bindings.append(createXCharBinding(
 							libc_dosName, currentFeatures.crt_dosImplRequires,
 							"DOS$" + crtName, WCHAR_REPLACEMENT_CHAR16, crt_dosSection));
@@ -5137,11 +5137,11 @@ handle_eq_after_prototype:
 			current.internalName = [] -> getBoundFunction().internalFunctionName;
 			if (currentPrototypes is none) {
 				/* Simple case: Also inherit all prototypes (in which case we can
-				 *              also simply inherit all bindings from the other
+				 *              also  simply inherit all  bindings from the other
 				 *              function) */
 				current.bindings = [] -> getBoundFunction().functionBindings;
 				/* Need to bind @currentPrototypes properly, as it may
-				 * still be used for @(NamespaceBinding)s down below! */
+				 * still  be used for @(NamespaceBinding)s down below! */
 				if (currentFeatures.namespaces) {
 					currentPrototypes = []{
 						local bfun: Function = getBoundFunction();
@@ -5164,22 +5164,22 @@ handle_eq_after_prototype:
 				}
 			} else {
 				/* Difficult case: We must inherit bindings, but override them
-				 *                 with our own, custom list of prototypes! */
+				 *                 with our  own, custom  list of  prototypes! */
 				current.bindings = []{
 					local func = getBoundFunction();
 					for (local otherBind /*: FunctionBinding*/ : func.functionBindings) {
 						if (otherBind.binding is Callable)
 							otherBind.binding = otherBind.binding();
-						/* Special case: For all prototypes that use same-object DEFAULT_CC
+						/* Special case: For  all prototypes that  use same-object  DEFAULT_CC
 						 * as calling convention, we must still inherit the calling convention
-						 * from the bound @otherBind (should there be a single one common to
+						 * from the bound @otherBind (should there  be a single one common  to
 						 * all of them)
 						 * This special case is required to properly deal with differing CCs
-						 * for different bindings, as is the case when the function being
+						 * for  different bindings, as  is the case  when the function being
 						 * bound is a [[wchar]]-function.
 						 * An example for where this behavior is necessary is `_wspawnv(...) = wspawnv',
-						 * which overrides the prototype to change the return type in compliance
-						 * with DOS, but still needs to inherit specific calling conventions for
+						 * which overrides  the  prototype  to  change the  return  type  in  compliance
+						 * with DOS,  but  still  needs  to inherit  specific  calling  conventions  for
 						 * the different binding cases */
 						local usedPrototypes = currentPrototypes;
 						local otherCommonCC = getCommonCCFromPrototypes(
@@ -5253,7 +5253,7 @@ handle_eq_after_prototype:
 				if (currentPrototype.declPrefix)
 					self.errAt(currentNameTokStart, "Optimized function {!r} has a custom declaration prefix {!r}"
 						.format({ currentName, currentPrototype.declPrefix }));
-				/* Optimized functions are written as:
+				/* Optimized functions  are written  as:
 				 * >> memcpyq(dst, src, n_qwords) >>>> {
 				 * >>     ...
 				 * >> }
@@ -5336,7 +5336,7 @@ handle_eq_after_prototype:
 		}
 done_function:
 		if (currentKosLibraryFunction !is none || currentDosLibraryFunction !is none) {
-			/* Assert that no annotations added any special features to the library
+			/* Assert that no annotations added  any special features to the  library
 			 * function in situations where the library function isn't actually being
 			 * used */
 			if (currentKosLibraryFunction.exportSymbolNames || currentDosLibraryFunction.exportSymbolNames)
@@ -5544,21 +5544,3 @@ done_function:
 		result.order_header.insertall(0, context.result_order_headerCPrefix);
 	return result;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

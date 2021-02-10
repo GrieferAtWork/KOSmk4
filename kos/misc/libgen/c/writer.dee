@@ -90,7 +90,7 @@ class CGenerator {
 				}
 			} else {
 				/* XXX: Let the caller write to @fp directly?
-				 *      Though we would still have to keep
+				 *      Though we  would still  have to  keep
 				 *      track of @fpAfterNewline */
 			}
 			result = File.Writer();
@@ -577,7 +577,7 @@ class CWriter {
 			throw Error("#elif after #else");
 		if (ent.encounteredIf1) {
 			/* A universal true-branch was already written.
-			 * Ignore this #elif directive entirely! */
+			 * Ignore  this   #elif   directive   entirely! */
 dont_emit_branch:
 			if (!ent.encounteredIf0) {
 				++m_IfdefDead;
@@ -592,7 +592,7 @@ dont_emit_branch:
 			.optimize(asBool: true, assume: usedAssume);
 		if (condBranch.typ == BRT_CONST && !condBranch.data) {
 			/* Special case: Don't do anything and ignore
-			 * everything until the next #elif or #else */
+			 * everything until the  next #elif or  #else */
 			goto dont_emit_branch;
 		}
 		/* Mark the end of a potential preceding `#if 0` / `#elif 0` branch. */
@@ -651,7 +651,7 @@ dont_emit_branch:
 			ent.printedPrefixes = HashSet();
 			ent.ppAssumeWithCond    = usedAssume.withAssumption(condBranch, true);
 			ent.ppAssumeWithNotCond = usedAssume.withAssumption(condBranch, false);
-			/* Delete the saved condition so that "..."
+			/* Delete  the saved condition so that "..."
 			 * will appear as comment in generated code. */
 			ent.cond = none;
 		} else {
@@ -824,7 +824,7 @@ done:
 		if ("*/" in text) {
 			/* Must use //-style comments (ugh... I don't like those.
 			 * Why? Because those can't be parsed in reverse,
-			 *      where-as / * ... * / can be...) */
+			 *      where-as  /  *   ...  *   /  can   be...) */
 			for (local l: text.splitlines(false)) {
 				l = l.rstrip();
 				if (!l) {
@@ -834,8 +834,8 @@ done:
 				}
 			}
 		} else {
-			/* Print comments that look just like this one does,
-			 * with every line starting with " * ", except for the
+			/* Print comments that  look just like  this one  does,
+			 * with every line starting with " * ", except for  the
 			 * first one, and the trailing * / being appeneded onto
 			 * the last line. */
 			local isFirst = true;
@@ -906,24 +906,3 @@ done:
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

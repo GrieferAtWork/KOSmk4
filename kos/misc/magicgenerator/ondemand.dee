@@ -108,12 +108,3 @@ function updateAutomaticSourcesOnDemand(TARGET_ARCH: string, TARGET: Module) {
 		now = setForceChanged(latest, now);
 	}
 }
-
-
-
-
-
-
-
-
-

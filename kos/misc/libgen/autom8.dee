@@ -1,16 +1,16 @@
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
- * This  software  is  provided  'as-is',  without  any  express  or  implied *
- * warranty. In no  event will  the authors be  held liable  for any  damages *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
  * arising from the use of this software.                                     *
  *                                                                            *
- * Permission is granted  to anyone  to use  this software  for any  purpose, *
- * including  commercial applications,  and to  alter it  and redistribute it *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The  origin of this  software must not be  misrepresented; you must not *
- *    claim  that you wrote  the original software. If  you use this software *
- *    in a product,  an acknowledgement  (see the following)  in the  product *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
  *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
@@ -51,10 +51,14 @@ global Autom8Parser;
 global BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, string)} = {
 	"deemon" : none,  /* Intentionally ignored: You should still use `deemon -F' for these! */
 	"magic" : none,   /* Magic compiler annotations (used by the KOS build system) */
+	"AUTO" : none,    /* Generic region marker */
+	"start" : none,   /* Generic region start */
 	"begin" : none,   /* Generic region start */
 	"end" : none,     /* Generic region end */
 	"head" : none,    /* Prototype header (in libc/user/ *.c) */
 	"body" : none,    /* Prototype body (in libc/user/ *.c) */
+	"skip" : none,    /* Skip implementation (in libc/user/ *.c) */
+	"impl" : none,    /* Custom implementation (in libc/user/ *.c) */
 	"virtual" : none, /* Seen in "x86-db.h" */
 };
 
@@ -317,6 +321,8 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			}
 		}
 	}
+	if (commonLineLength !is none)
+		return lines;
 	if (commonPrefix == commonTail && commonPrefix) {
 		for (local l: lines) {
 			if (l == commonPrefix)
@@ -460,9 +466,9 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			continue;
 		}
 		/* Check if the new line is may shorter than the previous.
-		 * If so, then this line marks the end of a paragraph */
-		local lineLen = #l;
-		local prevLineLen = #currentBlock.last;
+		 * If so,  then this  line marks  the end  of a  paragraph */
+		local lineLen = shortestPossibleLightLength(l);
+		local prevLineLen = shortestPossibleLightLength(currentBlock.last);
 		if (lineLen <= (prevLineLen * 3) / 4) {
 			if (i < numLines-1) {
 				currentBlock.append(l);
@@ -475,7 +481,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 		}
 		if (prevIndent == nspc) {
 			/* If the next line is much longer than the
-			 * previous, then begin another paragraph. */
+			 * previous, then begin another  paragraph. */
 			if (lineLen >= (prevLineLen * 5) / 4)
 				goto reflow_normal_block;
 			currentBlock.append(l);

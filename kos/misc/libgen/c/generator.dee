@@ -342,7 +342,7 @@ function str2wcs_replaceText(
 			continue;
 		if (tok in ["signed", "unsigned"]) {
 			/* Special case: Must not blindly replace "char" after "signed" or "unsigned"
-			 * Instead, replace `[un]signed char' with `wchar_t' as a whole! */
+			 * Instead,   replace   `[un]signed char'   with   `wchar_t'   as   a  whole! */
 			local suStart = self.tokStart;
 			tok = self.next();
 			if (tok != "char")
@@ -593,7 +593,7 @@ function math_generateLoaderFunctionImplementation(
 		noAutoDependencyScanning: bool)
 	: LoaderFunctionImplementation | none
 {
-	/* Math function generators are somewhat special, in that they can ~magically~
+	/* Math function generators are somewhat  special, in that they can  ~magically~
 	 * create implementations where previously there were none. Though in actuality,
 	 * there's really nothing special about it:
 	 * >> acosl(*) %{generate(double2ldouble("acos"))}
@@ -674,7 +674,7 @@ function math_generateLoaderFunctionImplementation(
 			unforcedDependencies:     unforcedDependencies,
 			noAutoDependencyScanning: noAutoDependencyScanning)());
 		/* Also force a dependency on the actual base function (since
-		 * that one's getting invoked from the `callBase` part!) */
+		 * that  one's  getting  invoked from  the  `callBase` part!) */
 		resultDependencies[baseLocalFunction.name] = baseFunction;
 		result.dependencies = resultDependencies;
 		return LoaderFunctionImplementation(
@@ -770,16 +770,3 @@ global generators: {string: Generator} = Dict({
 	"double2float"   : MATH_GENERATORS[0],
 	"double2ldouble" : MATH_GENERATORS[1],
 });
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -734,7 +734,7 @@ class FunctionPrototype {
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
 		if (decl in LIBC_LINKAGE_DECLS) {
 			/* Always use __CASMNAME for anything declared in the context of libc.
-			 * This is required to ensure proper assembly linkage, as well as
+			 * This is  required to  ensure proper  assembly linkage,  as well  as
 			 * symbol visibility when libc.so is including its own headers. */
 			fp << " __CASMNAME";
 			local suffix = "";
@@ -916,7 +916,7 @@ class FunctionPrototype {
 		local myHaveEllipsis = hasEllipsis;
 		local otHaveEllipsis = callToPrototype.hasEllipsis;
 		if (myArgc != otArgc || myHaveEllipsis != otHaveEllipsis) {
-			/* Different # of arguments (shouldn't happen, but can only be dealt with
+			/* Different # of arguments (shouldn't happen, but can only be dealt  with
 			 * by generating a function-like macro, though obviously this macro cannot
 			 * be used in a situation where it's address would have to be taken) */
 			fp << "(";
@@ -966,8 +966,8 @@ class FunctionPrototype {
 			fp << ")\n";
 			return;
 		}
-		/* Same # of arguments, and same ellipsis behavior.
-		 * Assume that a difference in CC is intentional and cast the
+		/* Same   #   of   arguments,   and   same   ellipsis   behavior.
+		 * Assume that a  difference in  CC is intentional  and cast  the
 		 * other function's pointer into the intended prototype's format. */
 		fp << " (*(";
 		returnType.cprint(fp, escapeMode);
@@ -1215,8 +1215,8 @@ class FunctionPrototype {
 						fp, escapeMode, decl, exposedName, assemblyName, isLcl);
 				}
 				/* XXX: This is the one corner-case, where there's no real way
-				 *      of implementing redirections portably... So for now,
-				 *      simply fall through to use the non-portable ASMNAME()
+				 *      of implementing redirections  portably... So for  now,
+				 *      simply  fall through to use the non-portable ASMNAME()
 				 *      notation... */
 			}
 			return cprintDeclarationWithOptionalAsmname(
@@ -1352,10 +1352,10 @@ class FunctionImplementation {
 		/* TODO:
 		 *  - Delete all C/C++-style comments from @result.body
 		 *  - Replace all new-line characters from @result.body with " ",
-		 *    except for those that was followed by an arbitrary amount
-		 *    of whitespace, followed by a "#"-character. However, also
+		 *    except for those that was  followed by an arbitrary  amount
+		 *    of  whitespace, followed by  a "#"-character. However, also
 		 *    make
-		 *  - Replace all instances of multiple consecutive space characters
+		 *  - Replace  all instances of  multiple consecutive space characters
 		 *    with only a single space character, except for those that appear
 		 *    in string-/character-literals
 		 */
@@ -1409,21 +1409,21 @@ class FunctionImplementation {
 				 *     <libc/core/string.h>
 				 *     <libc/local/string/mempcpyc.h>
 				 *
-				 * The local implementation for `mempcpyc()' now won't pull in `mempcpy()',
+				 * The local implementation for `mempcpyc()'  now won't pull in  `mempcpy()',
 				 * since `__local___localdep_mempcpy_defined' is already defined, even though
 				 * the associated function hasn't been declared, yet.
 				 *
 				 * (Temporary) solution:
 				 *     Break the dependency loop in <libc/local/wchar/wcsrtombs.h> by not including
-				 *     <optimized/string.h>, which is done by ignoring fast bindings.
+				 *     <optimized/string.h>,   which   is   done   by   ignoring   fast   bindings.
 				 *
 				 * (Better) solution:
 				 *     Have one <optimized/string/xxx.h> file for every function that provides
 				 *     inline optimizations (possibly auto-generate these files via a separate
 				 *     generator script).
 				 *     That way, `mempcpy()' wouldn't have an implicit dependency on `mempcpyc()',
-				 *     as it is this loop that makes it impossible to form a proper tree of
-				 *     dependencies between <libc/local/...> implementations, <libc/core/...>
+				 *     as it  is this  loop that  makes it  impossible to  form a  proper tree  of
+				 *     dependencies  between  <libc/local/...>  implementations,   <libc/core/...>
 				 *     bindings, and <optimized/...> wrappers.
 				 */
 				ignoreFastBindings:        true
@@ -1643,10 +1643,10 @@ class LocalFunction {
 				callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
 			callToLocalName = "({})".format({ callToLocalName });
 		}
-		/* When only doing partial escaping of declaration, we must still
-		 * do full escaping within call-to-local expressions, since local
+		/* When only doing partial escaping of declaration, we must  still
+		 * do  full escaping within call-to-local expressions, since local
 		 * functions may use types in their declarations (which we in turn
-		 * have to cast our prototypes to), that aren't declared in the
+		 * have  to cast our  prototypes to), that  aren't declared in the
 		 * current header (meaning that their representation must be fully
 		 * escaped) */
 		local callToEscapeMode = escapeMode;
@@ -1956,11 +1956,11 @@ class NamespaceBinding {
 		 * >> __NAMESPACE_FAST_USING_OR_IMPL(<exposedName>, ...) */
 		local cSymbolName = namespace.keyCSymbolName(exposedName);
 		if (cSymbolName == exposedName) {
-			/* The namespace doesn't do any sort of name escape
-			 * (this is the case for the std- and global namespaces)
+			/* The namespace  doesn't  do  any sort  of  name  escape
+			 * (this is the case for the std- and global  namespaces)
 			 * In this case, we can simply do a conditional namespace
-			 * import in C++-mode, and don't have to do anything
-			 * in C-mode (since the symbol will have already been
+			 * import in  C++-mode, and  don't  have to  do  anything
+			 * in C-mode  (since the  symbol will  have already  been
 			 * imported in that case) */
 			if (namespace === STD_NAMESPACE) {
 				/* We can always simply use keyUsing() in this case! */
@@ -2361,7 +2361,7 @@ do_universal_binding:
 				    associatedPrototypes.first.declPrefix ==
 				    usedBinding.functionPrototype.declPrefix) {
 					/* The same prefix will already be printed
-					 * inside of the local-function header. */
+					 * inside of  the  local-function  header. */
 				} else {
 					/* Print declaration prefixes */
 					local oldNs = none;
@@ -2701,13 +2701,13 @@ no_usable_bindings:
 			}
 			if (printDeclarationPrefixes) {
 				/* TODO: Print declaration prefixes common to all bindings,
-				 *       when at least one one binding exists that can get
+				 *       when at least one one binding exists that can  get
 				 *       bound unconditionally. */
 			}
 			if (guardName !is none) {
 				if (#usedBindings == 1) {
 					/* Try to optimize special case: Only 1 binding
-					 * Instead of writing something like this:
+					 * Instead  of  writing  something  like  this:
 					 * >> #ifndef __wcslen_defined
 					 * >> #define __wcslen_defined 1
 					 * >> #if $has_function(wcslen) || defined(__std_wcslen_defined)
@@ -3609,10 +3609,3 @@ class SystemHeader {
 		}
 	}
 }
-
-
-
-
-
-
-

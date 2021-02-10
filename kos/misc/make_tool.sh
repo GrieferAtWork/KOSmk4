@@ -212,7 +212,7 @@ case $TOOL_NAME in
 			cmd cd "$BOCHS_BUILDPATH"
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
-		
+
 		;;
 
 	*)
@@ -220,17 +220,3 @@ case $TOOL_NAME in
 		exit 1
 		;;
 esac
-
-
-
-
-
-
-
-
-
-
-
-
-
-

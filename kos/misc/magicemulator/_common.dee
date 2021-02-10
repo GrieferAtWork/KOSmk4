@@ -356,15 +356,15 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
 			local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
 			return [](data: string | Bytes) {
 				local final MAX_PACKET_SIZE = 512;
-#if 1 /* Technically, this is incorrect. GDB documents that the ~-stream
-       * should be used for "[...] the textual responses to CLI commands"
+#if 1 /* Technically,  this  is  incorrect.  GDB  documents  that  the   ~-stream
+       * should   be   used   for   "[...] the textual responses to CLI commands"
        * https://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stream-Records.html
-       * And that the @-stream should be used for what we're doing, as it
-       * contains "[...] any textual output from the running target".
-       * However, Visual Studio doesn't understand/support the @-stream,
-       * though it does understand (and accept at any point in time), messages
-       * received via the ~-stream (which it displays without any further
-       * processing of the output, and is exactly what we want to achieve) */
+       * And  that  the @-stream  should  be used  for  what we're  doing,  as it
+       * contains             "[...] any textual output from the running target".
+       * However,  Visual   Studio  doesn't   understand/support  the   @-stream,
+       * though  it does understand  (and accept at any  point in time), messages
+       * received  via  the  ~-stream  (which  it  displays  without  any further
+       * processing  of  the output,  and  is exactly  what  we want  to achieve) */
 				local final FORMAT = "~{!r}\n";
 #else
 				local final FORMAT = "@{!r}\n";
@@ -401,7 +401,7 @@ function processKosDebugOutput(
 	local processName = options.get("redirect.stdout");
 	if (processName !is none) {
 		/* Setup the writeStdout function to re-direct itself to inject
-		 * its output into gdb.exe:stdout, such that all future calls
+		 * its output into gdb.exe:stdout,  such that all future  calls
 		 * are simply forwarded to that handle. */
 		writeStdout = [](data) {
 			/* Capture the stdout of `processName' to inject our output into it. */
@@ -643,30 +643,3 @@ done_join:
 		x.close();
 #endif /* CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

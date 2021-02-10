@@ -1656,4 +1656,3 @@
 #pragma define __has_builtin __builtin_GOMP_workshare_task_reduction_unregister
 #endif /* defined(_OPENACC) || defined(_OPENMP) */
 #endif /* __GCC_VERSION_NUM >= 90001 */
-

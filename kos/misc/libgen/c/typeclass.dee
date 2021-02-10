@@ -274,24 +274,3 @@ global knownTypeClasses: {string: string} = Dict({
 	"locale_t"          : "TP",
 	"__locale_t"        : "TP",
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

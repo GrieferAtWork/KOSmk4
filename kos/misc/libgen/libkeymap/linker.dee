@@ -20,7 +20,7 @@
 
 
 /* Compiler for converting keymap definition files into .kmp files,
- * following the KOS proprietary file format for KMP files. */
+ * following  the  KOS  proprietary  file  format  for  KMP  files. */
 
 import * from deemon;
 
@@ -407,22 +407,3 @@ function linkKeymap(fp: File, defs: {int: {int : string}}) {
 	/* Terminate the keymap program sequence */
 	fp.putc(KMP_OP_STOP);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

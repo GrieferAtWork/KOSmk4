@@ -792,10 +792,10 @@ have_non_boolean_in_brt_all:
 				goto again_flatten_all;
 			if (nm1 >= 1) { /* #data >= 2 */
 				/* Check if `assume' contains assumptions
-				 * for sub-expressions from `data':
+				 * for   sub-expressions   from   `data':
 				 * >> foo && bar && foobar
 				 * There may be an assumption `(foo && foobar) == V', which
-				 * would allow us to be optimize ourself to `V && foobar' */
+				 * would allow us to  be optimize ourself to  `V && foobar' */
 				data = eliminateKnownSubExpressions(data, typ, assume);
 			}
 			for (local e: data) {
@@ -909,10 +909,10 @@ have_non_boolean_in_brt_any:
 				goto again_flatten_any;
 			if (nm1 >= 1) { /* #data >= 2 */
 				/* Check if `assume' contains assumptions
-				 * for sub-expressions from `data':
+				 * for   sub-expressions   from   `data':
 				 * >> foo || bar || foobar
 				 * There may be an assumption `(foo || foobar) == V', which
-				 * would allow us to be optimize ourself to `V || foobar' */
+				 * would allow us to  be optimize ourself to  `V || foobar' */
 				data = eliminateKnownSubExpressions(data, typ, assume);
 			}
 			for (local e: data) {
@@ -1080,7 +1080,7 @@ have_non_boolean_in_brt_any:
 					a.data = a.data < b.data ? 1 : 0;
 					return a;
 				} else {
-					/* Swap operands such that the constant always comes
+					/* Swap operands such  that the  constant always  comes
 					 * second. Doing this simplifies further optimizations.
 					 * 10 < x  ->  x > 10  ->  !(x <= 10) */
 					return PPBranch(BRT_NOT, PPBranch(BRT_LE, { b, a })).optimize(true, assume);
@@ -1097,8 +1097,8 @@ have_non_boolean_in_brt_any:
 						return PPBranch(BRT_CONST, 0); /* 0 < 0 && 1 < 0  ->  false */
 					if (bd == 1) {
 						/* a   b
-						 * 0 < 1  ->  true
-						 * 1 < 1  ->  false
+						 * 0 < 1 ->  true
+						 * 1 < 1 -> false
 						 * -> !a */
 						return PPBranch(BRT_NOT, a).optimize(true, assume);
 					}
@@ -1118,7 +1118,7 @@ have_non_boolean_in_brt_any:
 					a.data = a.data <= b.data ? 1 : 0;
 					return a;
 				} else {
-					/* Swap operands such that the constant always comes
+					/* Swap operands such  that the  constant always  comes
 					 * second. Doing this simplifies further optimizations.
 					 * 10 <= x  ->  x >= 10  ->  !(x < 10) */
 					return PPBranch(BRT_NOT, PPBranch(BRT_LO, { b, a })).optimize(true, assume);
@@ -1135,8 +1135,8 @@ have_non_boolean_in_brt_any:
 						return PPBranch(BRT_CONST, 0); /* 0 <= -1 && 1 <= -1  ->  false */
 					if (bd == 0) {
 						/* a    b
-						 * 0 <= 0  ->  true
-						 * 1 <= 0  ->  false
+						 * 0 <= 0 ->  true
+						 * 1 <= 0 -> false
 						 * -> !a */
 						return PPBranch(BRT_NOT, a).optimize(true, assume);
 					}
@@ -1158,7 +1158,7 @@ have_non_boolean_in_brt_any:
 				}
 				if (a.data == 0)
 					return PPBranch(BRT_NOT, b).optimize(true, assume);
-				/* Swap operands such that the constant always comes
+				/* Swap operands such  that the  constant always  comes
 				 * second. Doing this simplifies further optimizations. */
 				local temp = a;
 				a = b;
@@ -1458,8 +1458,8 @@ function _ppParseAfter_cond(self: CParser, base: PPBranch): PPBranch {
 function ppParse(self: string | UserString | CParser | File): PPBranch {
 	if (self !is CParser) {
 #if 1
-		/* Optimizations for a (very) small hand full of expressions
-		 * These appear explicitly since they're often used as placeholder
+		/* Optimizations for  a  (very)  small  hand  full  of  expressions
+		 * These appear explicitly since they're often used as  placeholder
 		 * conditional strings, such as `CWriter.ppElse()' actually calling
 		 * forward to `CWriter.ppElif("1")'. */
 		switch(str(self)) {
@@ -1642,14 +1642,3 @@ assert optimize("(a || b || c) && (a || b) && (b || c)") == "(a || b) && (b || c
 assert optimize("(a && b) || (b && c) || (a && b && c)") == "(a && b) || (b && c)";
 assert optimize("(a && b && c) || (a && b) || (b && c)") == "(a && b) || (b && c)";
 #endif /* __MAIN__ */
-
-
-
-
-
-
-
-
-
-
-

@@ -140,10 +140,10 @@ global final STD_NAMESPACE: Namespace = Namespace(
 		fp << "__NAMESPACE_STD_USING(" << name << ")\n";
 	},
 	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
-		/* Never need an implementation when importing from std!
+		/* Never   need  an  implementation   when  importing  from  std!
 		 * With `__COMPILER_HAVE_BUG_BLOATY_CXX_USING', the std namespace
 		 * is always overlayed ontop of the global namespace, and outside
-		 * of c++, the std namespace never actually does anything! */
+		 * of c++,  the  std  namespace  never  actually  does  anything! */
 		fp << "__NAMESPACE_STD_USING(" << name << ")\n";
 	},
 	keyCSymbolName: functools.identity,
@@ -169,7 +169,3 @@ function getNamespaceByName(name: string | UserString): Namespace {
 		throw;
 	}
 }
-
-
-
-

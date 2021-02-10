@@ -43,4 +43,3 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 install_file /bin/tetris "$EXEPATH"
-

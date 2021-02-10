@@ -87,5 +87,3 @@ continue_outer:
 
 assert optimizePrintf("a%Iub") == "\"a%\" PRIuSIZ \"b\"";
 assert optimizePrintf("a%ub") == "\"a%ub\"";
-
-

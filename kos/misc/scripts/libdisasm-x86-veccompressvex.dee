@@ -120,4 +120,3 @@ for (local l: File.stdin) {
 		currentGroup.append(l);
 	}
 }
-

@@ -70,8 +70,3 @@ function getInt(options: {string: string}, name: string, defl: int): int {
 		return defl;
 	return int(val);
 }
-
-
-
-
-

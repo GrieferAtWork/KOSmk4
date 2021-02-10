@@ -67,17 +67,3 @@ function fixFolder(path: string) {
 fs.chdir(fs.headof((argv from rt)[0]));
 fs.chdir("../../..");
 fixFolder("kos");
-
-
-
-
-
-
-
-
-
-
-
-
-
-

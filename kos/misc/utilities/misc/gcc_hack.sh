@@ -97,6 +97,6 @@ hackgcc_symlink size
 hackgcc_symlink strings
 hackgcc_symlink strip
 
-# Re-export the cross-prefix 
+# Re-export the cross-prefix
 export CROSS_PREFIX="${CROSS_PREFIX}hack-"
 export CROSS_COMPILE="$CROSS_PREFIX"

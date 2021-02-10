@@ -78,4 +78,3 @@ for (local name: defs.keys.sorted()) {
 	for (local cond, mac: variants)
 		print("\t", repr(cond), ": ", repr(mac));
 }
-

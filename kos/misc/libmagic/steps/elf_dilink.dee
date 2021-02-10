@@ -115,13 +115,13 @@ link_again_with_new_guesses:
 					totalDebugSize = offsetAndSize;
 			}
 			/* This prevents infinite loops when increasing the debug-section size
-			 * causes the actual debug-sections to grow to no longer fit, whilst
+			 * causes the actual debug-sections to  grow to no longer fit,  whilst
 			 * decreasing them causes the actual debug-sections to shrink to where
-			 * they would once again fit in a smaller area that is identical to
+			 * they would once again  fit in a smaller  area that is identical  to
 			 * the older size.
-			 * By not going for the size reduction during later passes, we can
+			 * By not going for the size reduction during later passes, we  can
 			 * prevent this, but if the size actually shrunk during a re-build,
-			 * we're still able to optimize for a better size-potential by not
+			 * we're  still able to optimize for a better size-potential by not
 			 * saving `totalDebugSize' in the `*.di_sectsiz' file. */
 			if (totalDebugSize < prevTotalDebugSize)
 				totalDebugSize = prevTotalDebugSize;
@@ -249,12 +249,12 @@ link_again_with_new_guesses:
 				}
 			}
 			/* If the offsets were correct, then find the ELF program header
-			 * responsible for loading debug data from the ELF file.
+			 * responsible  for  loading  debug  data  from  the  ELF  file.
 			 * This header can be identified as:
 			 *   - p_memsz  == totalDebugSize
 			 *   - p_filesz == 0
 			 *   - p_vaddr  == 0
-			 * And if these checks result in multiple matches, we also know
+			 * And if these checks result  in multiple matches, we also  know
 			 * that `KERNEL_CORE_BASE + p_paddr == ADDROF(diLinkStartSymbol)'
 			 *
 			 * Once that program header is found, modify it such that:
@@ -352,5 +352,3 @@ global DILINK: Step = Step(
 	getProducedFiles: LINK_getProducedFiles,
 	tostr: DILINK_tostr,
 );
-
-

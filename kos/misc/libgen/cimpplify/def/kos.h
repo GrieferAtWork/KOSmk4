@@ -35,4 +35,3 @@
 #define __KOS_VERSION__ 400
 #undef __PE__
 #define __ELF__ 1
-

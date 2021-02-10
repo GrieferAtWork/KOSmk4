@@ -761,7 +761,7 @@ parse_if_or_elif_condition:
 					} else {
 						/* @@elif ... encountered
 						 * Act as though the skipped block didn't exist,
-						 * at this elif's condition was replacing the
+						 * at this  elif's condition  was replacing  the
 						 * original if/elif's condition. */
 						goto parse_if_or_elif_condition;
 					}
@@ -834,7 +834,7 @@ parse_if_or_elif_condition:
 handle_numLines_after_pp_directive:
 				flushStart = self.tokEnd;
 				tok = self.skip("@@");
-				/* Even though we do remove directives, we do keep their lines,
+				/* Even though we  do remove  directives, we do  keep their  lines,
 				 * such that #line directives over generated code remain consistent
 				 * with their origins. */
 				local count = self.text.count("\n", skipStart, flushStart);
@@ -844,15 +844,15 @@ handle_numLines_after_pp_directive:
 					numLines -= count;
 					/* Try to skip up to @numLines lines from follow-up text
 					 * -> Figure out the # of new-lines between the current flush-start,
-					 *    and the next of the first token to follow after the directive */
+					 *    and the next of the first token to follow after the  directive */
 					count = self.text.count("\n", flushStart, self.tokEnd);
 					if (count) {
 						if (count <= numLines) {
 							/* Use the end of the last line-feed as the new flush-start */
 							flushStart = self.text.rindex("\n", flushStart, self.tokEnd) + 1;
 						} else {
-							/* There are @count line-feeds in total, but we
-							 * only need to skip the first  @numLines of them! */
+							/* There  are @count line-feeds  in total, but we
+							 * only need to skip the first @numLines of them! */
 							while (numLines) {
 								--numLines;
 								flushStart = self.text.index(
@@ -959,7 +959,7 @@ handle_numLines_after_pp_directive:
 			}
 			flushStart = self.tokEnd;
 			tok = self.skip("@@");
-			/* Even though we do remove directives, we do keep their lines,
+			/* Even though we  do remove  directives, we do  keep their  lines,
 			 * such that #line directives over generated code remain consistent
 			 * with their origins. */
 			{
@@ -1074,7 +1074,7 @@ do_handle_cLanguageTwoWordTypenameKeyword_dollar:
 										goto got_escapedTok;
 								}
 								/* Don't escape keywords after "struct", "union", etc. by default.
-								 * Only escape them if an explicit replacement rule exists! */
+								 * Only escape  them  if  an  explicit  replacement  rule  exists! */
 								escapedTok = keywordEscapes.get(tok);
 								if (escapedTok is none)
 									escapedTok = tok;
@@ -1086,7 +1086,7 @@ do_handle_cLanguageTwoWordTypenameKeyword_dollar:
 									goto got_escapedTok;
 							}
 							/* Don't escape keywords after "struct", "union", etc. by default.
-							 * Only escape them if an explicit replacement rule exists! */
+							 * Only escape  them  if  an  explicit  replacement  rule  exists! */
 							escapedTok = keywordEscapes.get(tok);
 							if (escapedTok !is none)
 								goto got_escapedTok;

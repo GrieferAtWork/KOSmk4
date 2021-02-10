@@ -789,14 +789,3 @@ function compileExpression(arch: string, reg: string | int, text: string, deref_
 	if (!is_first)
 		print ")";
 }
-
-
-
-
-
-
-
-
-
-
-

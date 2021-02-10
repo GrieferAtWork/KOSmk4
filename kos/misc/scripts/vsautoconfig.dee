@@ -30,27 +30,27 @@ import * from deemon;
  * However, sadly I was unable to do that, and this file is part of the work-around:
  *
  *  - Define an External Tool (Tools -> External Tools...):
- *    Title:             `Build Current KOS Project'
+ *    Title:                    `Build Current KOS Project'
  *    Command:           `cmd.exe'
- *    Arguments:         `/c "deemon magic.dee --vcautotargetconfig=$(SolutionDir).vs\ProjectSettings.json --vsgengroup-of=$(ItemPath)"'
+ *    Arguments: `/c "deemon magic.dee --vcautotargetconfig=$(SolutionDir).vs\ProjectSettings.json --vsgengroup-of=$(ItemPath)"'
  *    Initial directory: `$(SolutionDir)..'
  *    Use Output window:       TRUE
  *    Treat output as Unicode: TRUE
  *
- * Now you can assign a keyboard shortcut to this external tool under
+ * Now you  can  assign  a  keyboard  shortcut  to  this  external  tool  under
  *     Tools -> Options -> Environment -> Keyboard -> Tools.ExternalCommand[NN]
- * Where [NN] is the 1-byted index of the external tool you defined before,
- * which can can figure out by counting how many other external tools are defined
+ * Where  [NN]  is  the  1-byted  index  of  the  external  tool  you  defined before,
+ * which can can  figure out by  counting how  many other external  tools are  defined
  * ahead of the KOS-specific one (you can also move around tools to change this index)
  *
- * All of what's said so far works neatly for getting the filename of your current
- * source file, but in order to build something, we also need --target and --config
+ * All of what's  said so  far works  neatly for getting  the filename  of your  current
+ * source file, but  in order to  build something,  we also need  --target and  --config
  * To get those, we parse the `ProjectSettings.json' file passed to `vcautotargetconfig'
- * Using that file, we can figure out the name of the configuration currently selected
+ * Using that file, we can figure out  the name of the configuration currently  selected
  * in visual studio (which is called e.g. `i386-kos (DEBUG)')
  *
- * The only bad part is that visual studio doesn't accept output of this custom command
- * as build output, meaning that errors won't show up in the Error List, and you'll have
+ * The only bad  part is that  visual studio doesn't  accept output of  this custom  command
+ * as build output, meaning  that errors won't show  up in the Error  List, and you'll  have
  * to manually browse the output window for errors. (Which doesn't even have colors, ugh...)
  *
  */
@@ -95,15 +95,3 @@ function parseCurrentVsConfiguration(filename: string): (string,string) {
 	}
 	throw Error("Failed to parse current configuration from " + repr(filename));
 }
-
-
-
-
-
-
-
-
-
-
-
-

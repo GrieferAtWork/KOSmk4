@@ -308,4 +308,3 @@ function main(parser: Autom8Parser, none) {
 		"#endif /* !__COMPILER_PREFERR_ENUMS */\n"
 		"/*[[[end]]]*/";
 }
-

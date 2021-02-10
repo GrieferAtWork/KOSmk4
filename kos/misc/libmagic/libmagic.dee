@@ -94,7 +94,7 @@
  * >> 		),
  * >> 	}
  * >> );
- * I know this doesn't look that straight forward, but remember that you can
+ * I know this doesn't  look that straight forward,  but remember that you  can
  * easily further automate this case by dynamically creating the Group objects.
  */
 
@@ -260,7 +260,7 @@ function getLastModfiedTime(filename: string): time.Time | none {
 				else {
 					try {
 						/* GetFileTime() has a precision of 100 nanoseconds (or 0.1 microseconds)
-						 * However, time.Time() only has microsecond-precision (so this method
+						 * However, time.Time() only  has microsecond-precision  (so this  method
 						 * is 10x more precise) */
 						result = libwin32.GetFileTime(handle)[2];
 					} finally {
@@ -1048,7 +1048,7 @@ function orderGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}): ({Bound
 did_resolve:
 			s.dependencies.insert(dep);
 		}
-		/* Go through required input files one more time and check if
+		/* Go  through required input files one more time and check if
 		 * steps exist that may try to modify those files. - If adding
 		 * those steps as dependencies won't create a loop, do so */
 		for (local f: s.requiredFiles) {
@@ -1063,7 +1063,7 @@ did_resolve:
 			}
 		}
 		for (local f, none: s.allModifiedOutputFiles) {
-			/* Check if modified output files are created by some
+			/* Check if modified output files are created by  some
 			 * other step. - If so, that step becomes a dependency
 			 * of `s' */
 			local dep = fileProducers.get(f);
@@ -1155,7 +1155,7 @@ again:
 again:
 		if (runningSteps) {
 			/* Make sure that no other steps are already running that
-			 * may also be trying to modify any of our in-out files. */
+			 * may  also be trying to modify any of our in-out files. */
 			local mod = s.allModifiedOutputFiles;
 			if (mod) {
 				local io_files = HashSet(mod.each[0]);
@@ -1227,7 +1227,7 @@ search_next_step:
 				}
 			}
 			/* Check if this step needs to be executed.
-			 * This is the case if any of the step's output files
+			 * This  is the case if any of the step's output files
 			 * are missing, or if any of its input files are newer
 			 * that the newest output file. */
 			local lmod = none;
@@ -1408,7 +1408,7 @@ do_reset_step:
 		}
 		if (missingSteps) {
 			/* Must also restart all steps that have
-			 * dependencies on on restarted steps. */
+			 * dependencies on  on restarted  steps. */
 again_search_fin_steps:
 			for (local fin: finishedSteps) {
 				local has_restart_dep = false;
@@ -1540,7 +1540,7 @@ function buildGroupsWithOutputWhitelist(
 	if (outputWhiteList is none)
 		return buildGroups(toolchainsAndGroups, maxParallelSteps);
 	return buildGroupsWithStepFilter(toolchainsAndGroups, [](step: BoundStep) {
-		/* `outputWhiteList' must contain a regex pattern for
+		/* `outputWhiteList'  must contain a regex pattern for
 		 * any of the step's following output file categories:
 		 *   - producedOutputFiles
 		 *   - modifiedOutputFiles
@@ -1598,8 +1598,3 @@ next_step:
 		[](step: BoundStep) -> step.group.name in whiteListGroupNames);
 	return executeBuildSteps(steps, recheck, maxParallelSteps);
 }
-
-
-
-
-

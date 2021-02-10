@@ -53,7 +53,7 @@ function optimizeStringBranch(x: string): string {
 				continue;
 			if (ch.isspace())
 				continue;
-			/* non-symbol, non-space, and non-matching-paren character encountered.
+			/* non-symbol, non-space, and non-matching-paren character  encountered.
 			 * This may be something like `(FOO + 2)', which we don't understand, so
 			 * just don't touch it! */
 			goto done;
@@ -722,6 +722,3 @@ assert optimizePreprocessorExpression(
 	")"
 ")"
 ) == "defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)";
-
-
-

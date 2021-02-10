@@ -76,7 +76,7 @@ function generateAssertions(
 	local knownStructPrefixes: {string: string} = Dict();
 	local callerFile = Traceback()[1].file;
 	structFile = fs.abspath(structFile, fs.headof(callerFile));
-	
+
 	for (local l: File.open(structFile)) {
 		l = l.strip().decode("utf-8");
 		if (l.startswith("#")) {
@@ -279,9 +279,3 @@ got_field:
 			print "/* ... */";
 	}
 }
-
-
-
-
-
-

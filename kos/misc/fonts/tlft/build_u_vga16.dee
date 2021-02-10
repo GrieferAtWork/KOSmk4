@@ -43,8 +43,3 @@ if (bdf is none) {
 local st = try fs.stat("u_vga16.tlft") catch (...) none;
 if (st is none || bdf is none || st.st_mtime < bdf.st_mtime)
 	tlftCompileAndLinkBDF("uni_vga/u_vga16.bdf", "u_vga16.tlft");
-
-
-
-
-

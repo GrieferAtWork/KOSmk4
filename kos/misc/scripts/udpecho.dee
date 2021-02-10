@@ -30,4 +30,3 @@ for (;;) {
 	print("\t", repr data);
 	s.sendto(org, data);
 }
-

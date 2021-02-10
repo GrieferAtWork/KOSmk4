@@ -90,7 +90,7 @@ Name: json-c
 Description: A JSON implementation in C
 Version: $VERSION
 Requires:
-Libs.private: 
+Libs.private:
 Libs: -ljson-c
 Cflags: -I$KOS_ROOT/kos/include/json-c
 EOF

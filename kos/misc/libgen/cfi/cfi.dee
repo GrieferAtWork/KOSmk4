@@ -707,9 +707,3 @@ function encodeSLeb128(value: int): {int...} {
 		yield 0x80 | byte;
 	}
 }
-
-
-
-
-
-

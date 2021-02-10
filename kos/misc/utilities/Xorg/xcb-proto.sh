@@ -62,4 +62,3 @@ Name: XCB Proto
 Description: X protocol descriptions for XCB
 Version: $VERSION
 EOF
-

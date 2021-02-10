@@ -22,7 +22,7 @@ import * from ..c.parser;
 import * from deemon;
 import fs;
 
-/* CimPPlify -- Simply C source code by doing a partial preprocessor pass.
+/* CimPPlify -- Simply C source code by doing a partial preprocessor  pass.
  * For this purpose, you can specify a set of macros that can be assumed to
  * always/never be defined, as well as optionally remove comments. */
 
@@ -890,7 +890,7 @@ parse_if_expression:
 			}
 			local oldDef = config.macros.get(macName);
 			if (oldDef !is none && (type(oldDef) !== type(macDef) || oldDef != macDef)) {
-				/* Don't warn if the old definition was that it was defined as
+				/* Don't warn if the old definition was that it was defined  as
 				 * ~something~, when we now know exactly what it is defined as! */
 				if (oldDef !== true) {
 					text.warnAt(directiveArgsStart,
@@ -961,7 +961,7 @@ class SimpOutputPrinter {
 		 * >> #endif
 		 *
 		 * That last one could be _really_ useful, since a simplified header file often still
-		 * contains declaration-patterns that cannot be optimized away, since they depend on
+		 * contains  declaration-patterns that cannot be optimized away, since they depend on
 		 * feature control macros that are under the control of the including __BASE_FILE__:
 		 *
 		 * >> #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
@@ -1012,7 +1012,7 @@ class SimpOutputPrinter {
 					++start;
 					/* Skip additional (unnecessary) whitespace.
 					 * Unless the original space character was a line-feed,
-					 * don't skip additional line-feeds here, though! */
+					 * don't  skip  additional  line-feeds  here,   though! */
 					while (start < end && (
 							text.isspace(start) && (origSpaceWasLf || !text.islf(start))))
 						++start;
@@ -1170,7 +1170,7 @@ again_parse_if_expression:
 				baseExpr = "defined({})".format({
 					inputText[directiveArgsStart:directiveEnd]
 				});
-				if (directiveName == "ifndef") 
+				if (directiveName == "ifndef")
 					baseExpr = "!" + baseExpr;
 			}
 			local exprAst = simpPpParse(baseExpr, config)
@@ -1220,7 +1220,7 @@ again_parse_if_expression:
 					 * >> #else
 					 * >> ...
 					 * >> #endif
-					 * Same as:
+					 * Same  as:
 					 * >> #if 1
 					 * >> ...
 					 * >> #endif */
@@ -1232,7 +1232,7 @@ again_parse_if_expression:
 					 * >> #elif foo
 					 * >> ...
 					 * >> #endif
-					 * Same as:
+					 * Same  as:
 					 * >> #if foo
 					 * >> ...
 					 * >> #endif */
@@ -1268,7 +1268,7 @@ again_parse_if_expression:
 			local blockKind = ifdefBlocks.last.first;
 			if (blockKind in [IFDEF_BLOCK_DELETED, IFDEF_BLOCK_KEPT_AFTER_ELSE]) {
 				/* We've already printed a #else. As such, we must
-				 * skip everything until the associated #endif */
+				 * skip everything  until  the  associated  #endif */
 				for (;;) {
 					local kind = CParser_SkipPPBlock(input, directiveEnd);
 					if (kind in ["elif", "else"]) {
@@ -1309,7 +1309,7 @@ again_parse_if_expression:
 				ifdefBlocks.append(origIfExpr);
 				origIfExpr = List(origIfExpr.last);
 				if (origIfExpr !is none) {
-					/* The top-most assumption must be added as its negative,
+					/* The top-most assumption must be added as its  negative,
 					 * since it is known to _not_ hold true after an elif/else */
 					usedAssumptions.addAssumption(origIfExpr.popback(), false);
 					for (local a: origIfExpr)
@@ -1326,7 +1326,7 @@ again_parse_if_expression:
 				 * >> #elif 1
 				 * >> ...
 				 * >> #endif
-				 * Emit as:
+				 * Emit  as:
 				 * >> #if foo
 				 * >> #else
 				 * >> ...
@@ -1394,9 +1394,9 @@ next_directive:
 
 #ifdef __MAIN__
 /* TODO: Set-up the GCC toolchain such that it becomes possible to overlay system headers
- *       with these simplified alternatives, such that system headers that have been
- *       simplified for use with GCC are used by default, thus speeding up compilation
- *       by not including unnecessary cross-compiler constructs, or even comments for
+ *       with these  simplified alternatives,  such that  system headers  that have  been
+ *       simplified for use with  GCC are used by  default, thus speeding up  compilation
+ *       by  not including  unnecessary cross-compiler  constructs, or  even comments for
  *       that matter!
  *
  * TODO: Everywhere where we're searching for \n in the input stream, we must also be able
@@ -1406,9 +1406,9 @@ next_directive:
  *       >> #define foo 42 /.*
  *       >>                  * " *./
  *       Because it doesn't understand that the comment continues, and thus thinks that the
- *       next line contains an unterminated string, which then results in a syntax error.
- *       The fix (just like with the escape-line-feed issue) would be to have a dedicated
- *       function to find the end of a line, that then skips escaped linefeeds, as well as
+ *       next  line contains an unterminated string, which  then results in a syntax error.
+ *       The fix (just like with the escape-line-feed  issue) would be to have a  dedicated
+ *       function  to find the end of a line, that then skips escaped linefeeds, as well as
  *       line-feeds that appear inside of multi-line comments.
  */
 

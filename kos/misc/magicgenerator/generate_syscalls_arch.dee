@@ -123,7 +123,7 @@ class SyscallArch {
 /************************************************************************/
 /* Print instructions to set/restore EFLAGS.DF before/after a system call.
  * NOTE: The sysv i386 specs require that EFLAGS.DF=0 during normal user-space
- *       operations, so we the user wants to invoke a system call without
+ *       operations, so we  the user  wants to  invoke a  system call  without
  *       exceptions, additional set-up is required. */
 
 /* CFI code to inject in order to clear EFLAGS.DF upon return */
@@ -588,10 +588,10 @@ function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, s
 	 *       - int 80h
 	 *       - syscall
 	 * Documentation throughout the kernel states that both of these methods
-	 * yield identical results, though one minor detail that is documented
+	 * yield identical results, though one  minor detail that is  documented
 	 * nowhere else is left to use to decide upon:
 	 *       `int 80h' on x86_64 is allowed to clobber %rcx and %r11
-	 * By allowing for this, we can use identical return-paths for both
+	 * By allowing for  this, we  can use identical  return-paths for  both
 	 * invocation methods, by trying to make use of `sysret' in both cases. */
 	fp << "	X86_IRET_BUT_PREFER_SYSRET64\n";
 	fp << "	.cfi_endproc\n";
@@ -746,10 +746,10 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 	}());
 	assert #registerSizeValues == registerCount;
 #if 0 /* Not needed, because we can use 0(%ebp) during addressing, thus forcing
-       * the CPU to dereference a 32-bit pointer, rather than a 64-bit one! */
+       * the  CPU to  dereference a 32-bit  pointer, rather than  a 64-bit one! */
 	if (sysenter && registerCount > 4) {
 		fp << "	movzlq %ebp, %rbp\n";
-		/* NOTE: By zero-extending the user-space EBP, we already
+		/* NOTE: By zero-extending the  user-space EBP, we  already
 		 *       ensured that %rbp doesn't point into kernel-space,
 		 *       as kernelspace on x86_64 only begins after the end
 		 *       of the 32-bit user-code address-space. */
@@ -1111,7 +1111,7 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 	fp << "	.cfi_iret_signal_frame\n";
 	fp << "	.cfi_def_cfa %rsp, 0\n";
 	/* Preserve callee-clobber registers to prevent
-	 * kernel data from leaking into user-space. */
+	 * kernel  data  from leaking  into user-space. */
 	fp << "	pushq_cfi_r %rcx\n";
 	fp << "	pushq_cfi_r %rdx\n";
 	fp << "	pushq_cfi_r %rsi\n";
@@ -1159,7 +1159,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, 
 	fp << "	.cfi_iret_signal_frame\n";
 	fp << "	.cfi_def_cfa %rsp, 0\n";
 	/* Preserve callee-clobber registers to prevent
-	 * kernel data from leaking into user-space. */
+	 * kernel  data  from leaking  into user-space. */
 	fp << "	pushq_cfi_r %rcx\n";
 	fp << "	pushq_cfi_r %rdx\n";
 	fp << "	pushq_cfi_r %rsi\n";
@@ -1187,7 +1187,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, 
 	}
 	fp << "	popq_cfi_r %rcx\n";
 	/* We can just use `sysret' as a drop-in replacement for `sysexit', since
-	 * `sysret' doesn't clobber any 32-bit registers that `sysexit' doesn't
+	 * `sysret' doesn't clobber any  32-bit registers that `sysexit'  doesn't
 	 * also clobber! */
 	fp << "	X86_IRET_BUT_PREFER_SYSRET32\n";
 	fp << "	.cfi_endproc\n";
@@ -1438,17 +1438,17 @@ global ARCH: {string: SyscallArch} = {
 		platformArch: "i386",
 		platformSuffix: "64",
 		platformSyscallCompatArch: {
-			/* Define a header containing a listing of all 64-bit system calls that
+			/* Define  a header containing  a listing of all  64-bit system calls that
 			 * should also be implemented as aliases for specific 32-bit system calls.
 			 * e.g.: The declaration `DEFINE_SYSCALL0(uid_t, getuid) { ... }' should is
-			 *       expanded at compile-time to also contain the following on x86_64:
+			 *       expanded at compile-time to also contain the following on  x86_64:
 			 *       >> DEFINE_PUBLIC_ALIAS(sys32_setuid32, sys_setuid);
 			 *       >> DEFINE_PUBLIC_ALIAS(sys32_setuid, sys_setuid);
 			 * As such, `syscall3264-compat.h' contains the following definition:
 			 * >> #define __NR3264COMPAT_setuid   2(setuid32,setuid)
 			 * Or in more general terms (with 2 being the number of aliases):
 			 * >> #define __NR3264COMPAT_<sys_mysyscall>   2(<sys32_firstalias>,<sys32_secondalias>)
-			 * NOTE: In the case of functions such as `sys32_setuid` (which take a 16-bit
+			 * NOTE: In the case  of functions  such as  `sys32_setuid` (which  take a  16-bit
 			 *       argument), the underlying system call wrapper will (usually) have already
 			 *       truncated the argument (s.a. `__x86_asm32_int80_setuid', which contains a
 			 *       line `movzwq %bx, %rdi`).
@@ -1496,5 +1496,3 @@ global ARCH: {string: SyscallArch} = {
 //		},
 //	),
 };
-
-

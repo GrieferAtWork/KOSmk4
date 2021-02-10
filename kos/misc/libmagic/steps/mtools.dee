@@ -139,7 +139,7 @@ final local function MCOPY_run(self: BoundStep): {Waitable...} {
 			mmdCache[diskname] = knownDirs = HashSet();
 		local output: string = MCOPY_getOutputFilename(options, input);
 		/* Make sure that all directories leading up
-		 * to the file to-be created created exist */
+		 * to the file  to-be created created  exist */
 		MMD(self, knownDirs, output.rpartition("/")[0]);
 		/* Copy the actual file onto the disk. */
 		mtoolsInvoke(self, "mcopy", {
@@ -221,18 +221,3 @@ function findDiskFileOrigin(groups: {Group...}, diskFile: string): string | none
 	}
 	return none;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

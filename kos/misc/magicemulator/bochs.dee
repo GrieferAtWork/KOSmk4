@@ -196,6 +196,3 @@ got_bios:
 		throw;
 	}
 }
-
-
-

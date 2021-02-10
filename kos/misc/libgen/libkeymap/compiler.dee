@@ -39,7 +39,3 @@ function compileKeymap(infile: string, outfile: string) {
 		}
 	}
 }
-
-
-
-

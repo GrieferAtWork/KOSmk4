@@ -286,22 +286,3 @@ handle_single_case:
 	if (isPrimaryCommonCC)
 		print "#endif /*",parentCommonCC,"*/";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

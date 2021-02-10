@@ -245,10 +245,10 @@ function structDriverGetFilename(structDriverAddr: int): string {
 }
 
 function structDriverGdbSegmentAddress(structDriverAddr: int): int {
-	/* One would expect that GDB wants `d_loadaddr', but that is incorrect.
-	 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~ correct.
+	/* One   would  expect  that   GDB  wants  `d_loadaddr',   but  that  is  incorrect.
+	 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~  correct.
 	 * But what GDB actually wants is the absolute address of the first segment, meaning
-	 * we need to adjust the driver load address for the sub-page offset of the segment
+	 * we  need to adjust the driver load address for the sub-page offset of the segment
 	 * with the lowest vaddr offset. */
 	local d_loadstart = vmReadCachedMemoryWord(FIELD("loadstart"), SIZEOF_POINTER);
 	local d_phnum     = vmReadCachedMemoryWord(FIELD("phnum"), 2);
@@ -296,20 +296,3 @@ function printLibraryList(): string {
 	fp << "</library-list>";
 	return fp.string;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

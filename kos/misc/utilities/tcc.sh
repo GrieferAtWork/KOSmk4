@@ -75,4 +75,3 @@ install_file /usr/$TARGET_LIBPATH/$TARGET_NAME-libtcc1.a "$OPTPATH/$TARGET_NAME-
 install_file /usr/$TARGET_LIBPATH/crt0S.o                "${KOS_ROOT}/bin/${TARGET_NAME}-kos/$TARGET_LIBPATH/crt0S.o"
 install_file /usr/$TARGET_LIBPATH/crt0.o                 "${KOS_ROOT}/bin/${TARGET_NAME}-kos/$TARGET_LIBPATH/crt0.o"
 install_file /usr/src/hello-world.c                      "$OPTPATH/hello-world.c"
-

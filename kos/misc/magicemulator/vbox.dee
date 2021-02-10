@@ -143,7 +143,7 @@ function createNamePipeAndStartLogProcessingThread(
 			/* TODO: More commands */
 			/* TODO: Integration with the emulator-independent log-command API */
 			/* TODO: Check if a given line starts with "00:00:02.450585 VMMDev: Guest Log:",
-			 *       and only accept commands from those lines, as well as stripping the
+			 *       and  only accept  commands from those  lines, as well  as stripping the
 			 *       entire prefix from those lines. */
 		}
 #define PRINT_DATA(buf) File.stderr.write(buf)
@@ -389,7 +389,7 @@ function start(
 	fs.environ["VBOX_RELEASE_LOG"] = "-dev_vmm_backdoor.restrict";
 
 	/* Directly invoke VirtualBox so that we have terminate() powers over it,
-	 * and can immediately shut down emulation when the user presses CTRL+C
+	 * and can immediately shut down  emulation when the user presses  CTRL+C
 	 * from within our console. */
 //	runVBoxManageCommand({ "startvm", vmName });
 	local proc = ipc.Process(EXE_VIRTUALBOXVM, {
@@ -406,7 +406,7 @@ function start(
 		proc, pipeName, groups, config, connectedSemaphore, vboxcmd);
 	/* Wait for the processing thread to starting accepting connections.
 	 * Once this has happened, anyone can CreateFile() to open the pipe,
-	 * at which point we'll be receiving anything that gets written to
+	 * at which point we'll be  receiving anything that gets written  to
 	 * said file! */
 	win32.WaitNamedPipe(pipeName);
 	print "[vbox] Starting VM:", repr(vmName);
@@ -442,7 +442,3 @@ function start(
 		throw;
 	}
 }
-
-
-
-

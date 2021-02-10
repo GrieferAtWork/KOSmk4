@@ -40,9 +40,9 @@ function updateKernelShadow(KERNEL: string, TARGET_ARCH: string): string {
 			}[TARGET_ARCH],
 			keepBss: true,
 			overrideEntry: false);
-		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
+		/* In  order  to  be  accepted   by  BOCHS,  the  size  of   kernelFlatFilename
 		 * must be divisable by `0x7e000' (== 16heads * 63sectors_per_track * 512bytes)
-		 * Otherwise, the bootloader won't be able to read the entire kernel image! */
+		 * Otherwise,  the bootloader  won't be able  to read the  entire kernel image! */
 		try {
 			with (local fp = File.open(kernelShadowFilename, "rb+,nobuf")) {
 				local isSize = fp.size();
@@ -60,4 +60,3 @@ function updateKernelShadow(KERNEL: string, TARGET_ARCH: string): string {
 	}
 	return kernelShadowFilename;
 }
-

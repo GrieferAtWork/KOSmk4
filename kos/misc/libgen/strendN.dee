@@ -320,6 +320,3 @@ function getPrefixedMacrosFromFileAsMapping(
 	}
 	return result;
 }
-
-
-

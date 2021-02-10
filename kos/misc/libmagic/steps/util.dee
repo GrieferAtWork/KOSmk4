@@ -99,21 +99,3 @@ function updateFileContents(filename: string, callback: Callable): bool {
 		fp.write(tempfp);
 	return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

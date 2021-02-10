@@ -251,7 +251,7 @@ again:
 		if (CONFIG_VERBOSE)
 			print "[vboxgdb<-telnet]", repr(result);
 		/* This is an error that can happen sporadically for practically
-		 * any command. The solution is to try again when it happens... */
+		 * any  command. The solution is to try again when it happens... */
 		if ("Invalid command event" in result)
 			goto again;
 		if ("Syntax error: Invalid command ''" in result)
@@ -294,11 +294,11 @@ function vmSetCurrentCpu(newCpu: int) {
 
 function vmReadMemoryAt(addr: int | string): Bytes {
 	/* NOTE: We use dd for reading memory (and not db), because
-	 *       dd returns the same about of bytes per line, but
+	 *       dd returns the same about  of bytes per line,  but
 	 *       db also returns an ASCII representation that would
 	 *       only make this parser more complicated.
-	 *       Futhermore, if the memory contains an ASCII string
-	 *       equal to "error:", our response processing system
+	 *       Futhermore,  if the memory contains an ASCII string
+	 *       equal to "error:",  our response processing  system
 	 *       wouldn't be able to differenciate between something
 	 *       like the ASCII string, and an actual error... */
 	local hexaddr = addr;
@@ -337,16 +337,16 @@ function vmReadMemoryAt(addr: int | string): Bytes {
 		if (addr is int) {
 			local offset = addr & 15;
 			if (offset) {
-				/* Virtualbox always prints memory in lines of 16 bytes.
+				/* Virtualbox always  prints memory  in lines  of 16  bytes.
 				 * If the given address isn't aligned by at least that much,
-				 * there is a chance that part of those 16 bytes is located
-				 * somewhere in memory where accessing it is impossible.
-				 * If this happens, VirtualBox will given us an error, when
-				 * in fact it would have been possible to read at least a
+				 * there is a chance that part of those 16 bytes is  located
+				 * somewhere  in  memory where  accessing it  is impossible.
+				 * If this happens, VirtualBox will given us an error,  when
+				 * in  fact it would  have been possible to  read at least a
 				 * couple of leading bytes of memory.
 				 * To work around this issue, we handle a read-error with
 				 * an unaligned address by re-attempting the read with an
-				 * aligned address, thus allowing VirtualBox to at least
+				 * aligned  address, thus allowing VirtualBox to at least
 				 * read one line of memory successfully.
 				 * HINT: In such a scenario, VirtualBox's response might look like:
 				 * >> "%00000000ffffffe8: 07fa5023 00000000 07fa4023 00000000\r\n"
@@ -1014,8 +1014,8 @@ do_resume_from_steploop:
 			               0x100 | VBOXGDB_TRAPCTL_NTRAP);
 			goto do_resume;
 		}
-		/* VirtualBox's builtin single-step command is busted.
-		 * As a work-around, use ring0 code-injection.
+		/* VirtualBox's builtin single-step command is  busted.
+		 * As  a   work-around,   use   ring0   code-injection.
 		 * s.a. /kos/src/kernel/core/arch/i386/misc/vboxgdb32.S */
 		local rflags = vmGetRegister("rflags");
 		if (!(rflags & 0x00000100))
@@ -1086,14 +1086,14 @@ set_trapctl_and_wait_for_single_step:
 	if (_vmNewRip !is none || _vmNewRflags !is none) {
 		/* Setting rip or rflags directly doesn't work consistently.
 		 * Instead, this can be done via ring0 code injection:
-		 *          # Remember the old value of `*(u8 *)%rip`
+		 *          #  Remember the old value of `*(u8 *)%rip`
 		 *    Tel>$ dd rip
 		 *          # Insert a breakpoint instruction
 		 *    Tel>$ eb rip 0xcc
-		 *          # Tell KOS to expect a breakpoint interrupt
+		 *          # Tell  KOS to expect a breakpoint interrupt
 		 *          # This causes a int3 from this address to be
 		 *          # handled by entering _vboxgdb_steploop
-		 *    Tel>$ ed <_vboxgdb_trapctl.tc_teaddr>  <rip + 1>
+		 *    Tel>$ ed <_vboxgdb_trapctl.tc_teaddr> <rip + 1>
 		 *    do {
 		 *        _vmResume();
 		 *        Thread.yield();
@@ -1108,8 +1108,8 @@ set_trapctl_and_wait_for_single_step:
 		 *          # Allow the kernel to leave the step-loop
 		 *    Tel>$ ew <KERNEL_ADDROF["_vboxgdb_trapctl"][0]> <0x100 | VBOXGDB_TRAPCTL_NTRAP>
 		 *    _vmResume();
-		 * Once we're inside of the step-loop, we can simply store the
-		 * overwrite values `_vmNewRip' and `_vmNewRflags' into the iret
+		 * Once we're  inside of  the step-loop,  we can  simply store  the
+		 * overwrite values `_vmNewRip'  and `_vmNewRflags'  into the  iret
 		 * tail that leads back to where the int3 instruction was injected. */
 		local oldRip = vmGetRegister("rip");
 		local oldInstruction = vmReadMemoryAt(oldRip);
@@ -1136,9 +1136,9 @@ set_trapctl_and_wait_for_single_step:
 		}
 		/* We're now within the debugger step loop */
 		vmWriteMemoryB(oldRip.hex(), oldInstruction[0]);
-		/* Rewind the return-IP to point to the instruction that was
+		/* Rewind the return-IP  to point to  the instruction that  was
 		 * overwritten with int3 (must be done because int3 only causes
-		 * an interrupt with IRET.EIP == ADDR_OF_INT3 + 1, so we must
+		 * an interrupt with IRET.EIP ==  ADDR_OF_INT3 + 1, so we  must
 		 * re-wind to re-execute the original instruction following the
 		 * temporary re-direct) */
 		if (_vmNewRip is none)
@@ -1897,7 +1897,7 @@ wait_for_command:
 						if (CONFIG_VERBOSE)
 							print "[vboxgdb<-telnet] Event:", repr(c);
 						if ("Invalid command event" in c) {
-							/* This can happen if a previous resume attempt
+							/* This  can  happen if  a previous  resume attempt
 							 * failed with a delayed error. - Re-try the resume */
 							_vmResume();
 							continue; /* Ignore... */
@@ -2157,10 +2157,10 @@ function startVboxGDBGlue(
 
 	final local vboxTelnetAddr = "localhost:5000";
 	local connectResponse;
-	/* Try to connect 20 times with a delay of 0.1 seconds in-between.
-	 * In theory (and practice), this succeeds on the first try, but
-	 * it only started doing so after I added the connectedSemaphore.wait();
-	 * call in our caller to wait for VirtualBox to connect to the log pipe.
+	/* Try to  connect  20 times  with  a  delay of  0.1  seconds  in-between.
+	 * In  theory  (and  practice),  this  succeeds  on  the  first  try,  but
+	 * it only started doing so  after I added the  connectedSemaphore.wait();
+	 * call in our caller to wait for  VirtualBox to connect to the log  pipe.
 	 * And in theory, VirtualBox might open the debug server _much_ later than
 	 * the opening of the log file (so better be safe here...) */
 	if (CONFIG_VERBOSE)
@@ -2220,6 +2220,3 @@ function startVboxGDBGlue(
 	/* Inform magic that GDB is now accepting connection requests. */
 	magic.onEmulatorStarted();
 }
-
-
-

@@ -21,7 +21,7 @@
 
 /* Keymap definitions file format:
  *
- * Any line starting with a #-character is a comment
+ * Any line  starting  with  a  #-character  is  a  comment
  * Such comments are terminated when a line-feed is reached
  *
  * All other lines follow one of the following formats:
@@ -29,12 +29,12 @@
  *  <KEY_NAME>:<MODIFIERS>:<MAPPED-C-ESCAPED-STRING>
  *
  * Where <KEY_NAME> is one of the <KEY_*> constants from the KOS system
- * header <kos/keyboard.h>, or a c-like integer constant.
+ * header   <kos/keyboard.h>,   or    a   c-like   integer    constant.
  *
- * Where <MODIFIERS> is a `,'-seperated list of `|'-seperated modifer
- * flags that need to be present when the key is pressed. - When omitted,
- * the associated text is emit when no modifier keys are pressed.
- * When given, each `,'-seperated segment describes a set of `|'-seperated
+ * Where  <MODIFIERS>  is  a   `,'-seperated  list  of  `|'-seperated   modifer
+ * flags that need  to be  present when  the key  is pressed.  - When  omitted,
+ * the  associated  text   is  emit   when  no  modifier   keys  are   pressed.
+ * When given,  each `,'-seperated  segment describes  a set  of  `|'-seperated
  * flags that are or'd together. Each of these flag-sets describes one modifier
  * combination for which the line describes a mapping
  * With this in mind, omitting <MODIFIERS> is the same as using `0' for it:
@@ -827,22 +827,3 @@ nextline:
 		++lineno;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -171,31 +171,31 @@ got_name:
 
 File.stdout = File.open("kos/misc/scripts/routes-x86_64.txt", "w");
 
-/* Dump all of the system call tables that can be found within the x86_64 KOS kernel
- * This dump also includes all of the different names by which individual entries may
- * be addressed. This utility is mainly intended to confirm that system call tables
- * got linked correctly (which would otherwise be really had to ensure, given the
- * huge number of various automated systems working together in order to form them,
+/* Dump all of the system  call tables that can be  found within the x86_64 KOS  kernel
+ * This dump also includes all of the  different names by which individual entries  may
+ * be addressed. This  utility is mainly  intended to confirm  that system call  tables
+ * got linked  correctly (which  would otherwise  be really  had to  ensure, given  the
+ * huge number of  various automated systems  working together in  order to form  them,
  * including all of the system call compatibility checks done by generate_syscalls.dee,
- * along to the way that system call tables are generated, along to system calls being
+ * along  to the way that system call tables are generated, along to system calls being
  * implemented, alongside possibly aliasing entires in various other tables) */
 dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 
-	/* 64-bit, high-level SYSVABI-compatible tables
+	/* 64-bit, high-level SYSVABI-compatible  tables
 	 * In general, entires of this table are `sys_*' */
 	"x86_sysroute0_c",
 	"x86_sysroute1_c",
 
-	/* 32-bit, high-level SYSVABI-compatible tables, each on taking
-	 * a single argument `u64 *regv = %rdi' that points to a vector
-	 * of up to 6 registers to-be used during invocation. This table
+	/* 32-bit,  high-level  SYSVABI-compatible  tables,  each  on  taking
+	 * a single  argument  `u64 *regv = %rdi'  that points  to  a  vector
+	 * of up  to 6  registers to-be  used during  invocation. This  table
 	 * is used when system calls are emulated (s.a. `syscall_emulate()'),
-	 * and the `regv' argument taken by these functions is likely to
+	 * and the  `regv' argument  taken by  these functions  is likely  to
 	 * point at `rpc_syscall_info::rsi_regs'.
-	 * This table contains wrapper functions that handle double-wide,
-	 * as well as < 32-bit arguments, before calling forward to `sys32_*'
-	 * functions. If a system call doesn't take any arguments (and doesn't
-	 * need any form of adjustment being done to convert 32-bit registers
+	 * This  table  contains  wrapper  functions  that  handle double-wide,
+	 * as well as < 32-bit  arguments, before calling forward to  `sys32_*'
+	 * functions.  If a system call doesn't take any arguments (and doesn't
+	 * need any form of adjustment  being done to convert 32-bit  registers
 	 * into 64-bit argument), then this table directly contains a `sys32_*'
 	 * function pointer.
 	 * In general, entires of this table are `__x86_asm32_sysrun32_*' */
@@ -204,44 +204,42 @@ dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 
 	/* 64-bit, low-level system call wrappers to-be called by the `int80'
 	 * and `syscall' system call invocation facilities.
-	 * These tables are used by the kernel-space entry points for handling
+	 * These tables are  used by  the kernel-space entry  points for  handling
 	 * `int80' and `syscall' interrupts and are entered with `struct irregs64'
-	 * located at `0(%rsp)', with all other registers (including %rax, but
-	 * excluding any register found int he IRET tail) still having their
+	 * located  at `0(%rsp)',  with all  other registers  (including %rax, but
+	 * excluding  any  register found  int he  IRET  tail) still  having their
 	 * original user-space values.
 	 * In general, entires of this table are `__x86_asm64_syscall_*' */
 	"x86_sysroute0_asm64_syscall",
 	"x86_sysroute1_asm64_syscall",
 
 	/* 32-bit, low-level system call wrappers to-be called by `int80' from
-	 * compatibility mode (the `int80' contains a branch to check if the
-	 * interrupt originated from compatibility mode, and these tables are
+	 * compatibility mode (the `int80' contains  a branch to check if  the
+	 * interrupt originated from compatibility mode, and these tables  are
 	 * used if it did)
-	 * These wrappers are invoked the same way `x86_sysrouteN_asm64_syscall' is,
+	 * These wrappers are invoked  the same way `x86_sysrouteN_asm64_syscall'  is,
 	 * only that the register state matches what the 32-bit system call invocation
 	 * ABI (aka. REG0=%ebx, REG1=%ecx, etc...)
 	 * Additionally, a `struct irregs64' structure can be found at `0(%rsp)'
-	 * In general, entires of this table are `__x86_asm32_int80_*' */
+	 * In  general,  entires   of  this   table  are   `__x86_asm32_int80_*' */
 	"x86_sysroute0_asm32_int80",
 	"x86_sysroute1_asm32_int80",
 
 	/* 32-bit, low-level system call wrappers to-be called by `sysenter' from
-	 * compatibility mode (the `int80' contains a branch to check if the
-	 * interrupt originated from compatibility mode, and these tables are
+	 * compatibility mode  (the `int80'  contains a  branch to  check if  the
+	 * interrupt originated  from compatibility  mode, and  these tables  are
 	 * used if it did)
 	 * Same as `x86_sysrouteN_asm32_int80', however REG4 and REG5 are passed
-	 * via `0(%ebp)' and `4(%ebp)' (s.a. `x86_syscall32_sysenter')
-	 * Note that the `struct irregs64' structure found at `0(%rsp)'
-	 * is also present when one of these wrapper is called.
-	 * In general, entires of this table are `__x86_asm32_int80_*'
-	 * NOTE: Becaues binary compatibility with `x86_sysrouteN_asm32_int80' is
-	 *       possible when a system call's register count is `<= 4', the actual
-	 *       entry points used in these cases are shared with the `x86_sysrouteN_asm32_int80'
+	 * via   `0(%ebp)'   and   `4(%ebp)'   (s.a.   `x86_syscall32_sysenter')
+	 * Note   that  the  `struct irregs64'   structure  found  at  `0(%rsp)'
+	 * is   also   present   when   one   of   these   wrapper   is  called.
+	 * In  general,  entires   of  this   table  are   `__x86_asm32_int80_*'
+	 * NOTE: Becaues     binary     compatibility     with     `x86_sysrouteN_asm32_int80'     is
+	 *       possible  when   a   system   call's   register  count   is   `<= 4',   the   actual
+	 *       entry points used  in these  cases are shared  with the  `x86_sysrouteN_asm32_int80'
 	 *       tables, meaning that (e.g.) `__x86_asm32_int80_read' and `__x86_asm32_sysenter_read'
-	 *       are actually linked to the same address, which is something that is displayed
+	 *       are actually  linked to  the same  address,  which is  something that  is  displayed
 	 *       very neatly when this table gets dumped. */
 	"x86_sysroute0_asm32_sysenter",
 	"x86_sysroute1_asm32_sysenter",
 });
-
-

@@ -137,5 +137,3 @@ install_header_ex "$SRCPATH/c++/cursesp.h" cursesp.h
 install_header_ex "$SRCPATH/c++/cursesw.h" cursesw.h
 install_header_ex "$SRCPATH/c++/cursslk.h" cursslk.h
 install_header_ex "$OPTPATH/c++/etip.h" etip.h
-
-

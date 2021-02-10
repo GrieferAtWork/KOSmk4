@@ -173,7 +173,7 @@ function updateUserImplementationSourceFile(
 					errAt(tagStart, "Unknown function {!r}".format({ functionName }));
 				}
 				/* Delete the body (thus forcing it to be re-generated)
-				 * if the old body was simply auto-generated. */
+				 * if   the   old  body   was   simply  auto-generated. */
 				if (isFunctionBodyGenerated(func, bodyText))
 					bodyText = none;
 				userSourceLayout.append(
@@ -218,7 +218,7 @@ discard_function_during_scan:
 				flushStart = i = exportsBodyEnd + #EXPORTS_TABLE_END;
 			} else if (tagBody.startswith("skip:") || tagBody.startswith("impl:")) {
 				/* skip: Assume that the function is implemented elsewhere, and don't
-				 *       include its export listing as part of the exports section.
+				 *       include its export listing as  part of the exports  section.
 				 * impl: Same as skip, but still include exports of the function
 				 *       within the exports section. */
 				local isSkip = tagBody.startswith("skip:");
@@ -330,7 +330,7 @@ again_find_nextPresentFunction:
 				if (nextPresentFunction is none) {
 					/* No functions present at all.
 					 * -> Insert the last function from @header.order_libcUserSource
-					 *    just before the @UserSourceExportTable marker. */
+					 *    just    before    the    @UserSourceExportTable    marker. */
 					nextPresentFunction = header.order_libcUserSource.last;
 					local i = #userSourceLayout - 1;
 					while (userSourceLayout[i] !== UserSourceExportTable)
@@ -505,8 +505,8 @@ again_find_nextPresentFunction:
 	}
 	/* If the content differ, then write the new contents back to the file. */
 	printUpdateMessage("Updating: {!r}".format({ filename }));
-	/* Use a temporary file to guaranty that deemon crashing will
-	 * not cause a us to end up lost data, instead allowing the
+	/* Use a temporary file to guaranty that deemon crashing  will
+	 * not  cause a us  to end up lost  data, instead allowing the
 	 * user to manually rename files in order to recover any data. */
 	local tempFileFilename = "{}.{}.latest".format({ fs.headof(filename), fs.tailof(filename) });
 	local oldFileFilename = "{}.{}.old.latest".format({ fs.headof(filename), fs.tailof(filename) });
@@ -518,26 +518,3 @@ again_find_nextPresentFunction:
 		fs.unlink(oldFileFilename);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

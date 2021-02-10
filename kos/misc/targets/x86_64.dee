@@ -86,7 +86,7 @@ function build(magic: Module) {
 		/* Also output files into the x86_64 disk image! */
 		magic.toolchain.options[TOOLCHAIN_MTOOLS_DISK] = magic.TARGET_BINPATH[1:] + "/disk.img";
 		/* Re-configure the toolchain cache to use x86_64 paths, rather than i386 ones.
-		 * This is required to properly handle library dependencies for compatibility
+		 * This is required to properly  handle library dependencies for  compatibility
 		 * mode system libraries. */
 		magic.toolchain._stdlibCache.clear();
 		magic.toolchain.name = "x86_32-kos-" + magic.getConfig();
@@ -174,4 +174,3 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 			{ "bin/" + TARGET_NAME + "/lib64/crt0.o" }
 		));
 }
-

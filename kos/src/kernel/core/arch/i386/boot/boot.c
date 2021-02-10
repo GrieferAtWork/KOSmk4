@@ -5,17 +5,17 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 ]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
- * This  software  is  provided  'as-is',  without  any  express  or  implied *
- * warranty. In no  event will  the authors be  held liable  for any  damages *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
  * arising from the use of this software.                                     *
  *                                                                            *
- * Permission is granted  to anyone  to use  this software  for any  purpose, *
- * including  commercial applications,  and to  alter it  and redistribute it *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The  origin of this  software must not be  misrepresented; you must not *
- *    claim  that you wrote  the original software. If  you use this software *
- *    in a product,  an acknowledgement  (see the following)  in the  product *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
  *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
@@ -134,7 +134,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 #ifdef __x86_64__
 	/* Initialize (rd|wr)(fs|gs)base support and (if necessary)
-	 * patch the kernel to use (rd|wr)msr if unavailable. */
+	 * patch  the  kernel  to  use  (rd|wr)msr  if unavailable. */
 	x86_initialize_fsgsbase();
 #endif /* __x86_64__ */
 
@@ -159,7 +159,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       required  by  the  Unwind-FDE cache  sub-system,  meaning that
 	 *       they are also required for us to be able to handle exceptions.
 	 * In other words: Only once this function has been called can we
-	 *                 start making use of exceptions safely. */
+	 *                 start   making   use  of   exceptions  safely. */
 	kernel_initialize_scheduler_callbacks();
 
 	/* Load multiboot information.
@@ -286,7 +286,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Flush the entire TLB buffer, now that we're finished setting up the page directory.
 	 * NOTE: Technically, this should be unnecessary, but it may still clean up some
-	 *       caches that had become clobbered by our incessant modifications above. */
+	 *       caches that had become clobbered by our incessant modifications  above. */
 	pagedir_syncall();
 
 	/* Figure out how we want to implement the TSC (APIC+TSC, APIC or PIC) */
@@ -331,7 +331,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Release physical memory from minfo that was marked as `PMEMBANK_TYPE_PRESERVE'
 	 * NOTE: This can only be done after bootloader drivers, since drivers provided
-	 *       by the bootloader are themself mapped as preserved memory. */
+	 *       by  the   bootloader  are   themself  mapped   as  preserved   memory. */
 	minfo_release_preservations();
 
 	/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
@@ -360,14 +360,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       (u8)boot_device.bdi_sub_sub_partition);
 
 	/* Make sure that we've managed to detect a single, valid boot partition, or
-	 * that the user started the kernel with a boot=... commandline parameter. */
+	 * that the user started the  kernel with a boot=... commandline  parameter. */
 	if unlikely(boot_partition == NULL)
 		kernel_panic(FREESTR("Unable to detect boot partition (reboot with `boot=...')"));
 	if unlikely(boot_partition == (struct basic_block_device *)-1)
 		kernel_panic(FREESTR("Detected boot partition is ambiguous (reboot with `boot=...')"));
 
 	/* TODO: Don't hard-code fat here. - Instead, try every currently loaded filesystem driver.
-	 *       After all: The bootloader may have loaded additional drivers... */
+	 *       After   all:   The    bootloader   may   have    loaded   additional    drivers... */
 	/* TODO: Move this mount() call into a different file. */
 	path_mount(THIS_VFS, "fat", boot_partition, SUPERBLOCK_FNORMAL, NULL, NULL, true);
 
@@ -408,8 +408,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
-	/* TODO: Add an arch-specific <asm/signed-shift.h> file to contain a set of feature
-	 *       test macros that specify how the signed >>-operator behaves:
+	/* TODO: Add an arch-specific <asm/signed-shift.h> file  to contain a set  of
+	 *       feature test macros that specify how the signed >>-operator behaves:
 	 *        Behavior #1: Signed divide (iow. the sign-bit is copied)
 	 *        Behavior #2: Unsigned divide (iow. the same as the unsigned >>-operator)
 	 */
@@ -509,7 +509,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *                    including  mapping  of   libdl.so  into   the  address   space.
 	 *                    Note that /bin/peloader depends on libdl.so, but _NOT_ libc.so!
 	 *                #3: In /bin/peloader, figure out what address ranges need to be
-	 *                    preserved in order to be able to load the given PE binary.
+	 *                    preserved in order to be able to load the given PE  binary.
 	 *                #4: If  the load-address of libdl overlaps with this range, make use
 	 *                    of `DLAUXCTRL_RELOC_LIBDL' to move libdl to a different location
 	 *                #5: Load  both libc.so and a helper library libpe.so using a custom
@@ -544,8 +544,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      all of the relocations does).  - Maybe not implement this  as part of the  libdl
 	 *      core, but rather within some auxiliary helper library? */
 
-	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during a VM switch.
-	 *       On linux, they're PERMMAN, too, so we really should do the same. */
+	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during a VM
+	 *       switch.  On linux, they're PERMMAN, too, so  we really should do the same. */
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
@@ -560,7 +560,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *             exact dec files also get accepted as valid, possibly related to how
 	 *             they've been imported, implying a problem within the deemon core)
 	 *       NOTE: I'm assuming that the IllegalInstruction is caused by some discrepancy
-	 *             between the hand-written assembly RT engine, and the one written in C
+	 *             between the hand-written assembly RT engine, and the one written in  C
 	 *
 	 *       >> UnicodeDecodeError: Invalid utf-8 character byte 0x85
 	 *       >> /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
@@ -574,7 +574,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       Currently,  running deemon causes  the system log  to be spammed with
 	 *       calls to mmap() (an overallocation of 32768 bytes might work well...)
 	 * TODO: When opening a dec file, use mmap() (if available) and malloc()+read()
-	 *       as fall-back, rather than always using malloc()+read() */
+	 *       as    fall-back,    rather   than    always    using   malloc()+read() */
 
 	/* TODO: HOP_HANDLE_CREATE_STREAM
 	 *       Constructs a wrapper  for another  handle object that  includes a  `pos_t'
@@ -592,7 +592,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: renameat2() is missing from <stdio.h> */
 
 	/* TODO: Decompressed driver section data should be reference counted, such that (then)
-	 *       unused sections can be lazily unloaded during calls to `system_clearcache()' */
+	 *       unused sections can be lazily  unloaded during calls to  `system_clearcache()' */
 
 	/* TODO: Add auto-completion to the `cpuid' debugger command.
 	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */

@@ -71,5 +71,3 @@ while read line; do
 	fi
 	install_symlink "$line" "$text"
 done < "${OPTPATH}/busybox.links"
-
-

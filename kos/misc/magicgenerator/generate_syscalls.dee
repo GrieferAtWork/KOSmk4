@@ -74,7 +74,7 @@ local copyright =
  *       >> INTERN_FUNCTION(__asm32_int80_exit) ...; call sys_exit
  *
  *  /kos/src/libc/libc/arch/{name}/syscalls{suffix}.S
- *       Define libc wrappers for invoking kernel-space system calls
+ *       Define libc wrappers  for invoking  kernel-space system  calls
  *       This is that libc uses to export all of the `sys_XXX' symbols.
  *       >> INTERN_FUNCTION(libc_sys_exit)
  *
@@ -1148,7 +1148,7 @@ function parseSyscallDefs(
 						/* in i386-kos/asm/syscalls32.def:
 						 * >> %[typecompat(i386:time64_t = x86_64:[time32_t,time64_t])]
 						 * Syntax:
-						 *  TYPELIST ::= (typename | ('[' ',' ~~ typename... ']'))
+						 *  TYPELIST  ::=   (typename   |   ('[' ',' ~~ typename... ']'))
 						 *  ',' ~~ (aArchName ':' TYPELIST '=' bArchName ':' TYPELIST)...
 						 */
 						local j = 0;
@@ -1218,7 +1218,7 @@ function parseSyscallDefs(
 						 * >> %[typesize(i386:size_t = 4)]
 						 * Syntax:
 						 *  TYPELIST ::= (typename | ('[' ',' ~~ typename... ']'))
-						 *  ',' ~~ (aArchName ':' TYPELIST '=' INTVAL)...
+						 *  ','  ~~   (aArchName  ':'   TYPELIST  '='   INTVAL)...
 						 */
 						local j = 0;
 						local dlen = #directive_args;
@@ -1887,7 +1887,7 @@ function calculateSyscallTableRanges(ids: {int...}, arch/*: SyscallArch*/): {(in
 	/* The last range must end with the max used sysno */
 	result.last = (result.last.first, ids.last);
 	assert #result == tableCount;
-	/* Optimization: If the first system call range is close enough,
+	/* Optimization: If the first  system call range  is close  enough,
 	 *               then simply make it so that it starts at `0', thus
 	 *               preventing the need of checking `ID >= MINID' when
 	 *               routing the ID in kernel-space. */
@@ -3132,4 +3132,3 @@ function main(archNames: {string...}) {
 fs.chdir(fs.joinpath(fs.headof(__FILE__), "../.."));
 main(archNames: [...][1:]);
 #endif /* __MAIN__ */
-

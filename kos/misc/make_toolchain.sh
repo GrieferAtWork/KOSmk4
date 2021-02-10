@@ -811,14 +811,3 @@ if [[ `uname -s` == *CYGWIN* ]]; then
 		}
 	fi
 fi
-
-
-
-
-
-
-
-
-
-
-

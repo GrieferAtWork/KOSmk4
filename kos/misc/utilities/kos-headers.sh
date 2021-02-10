@@ -34,4 +34,3 @@ EOF
 
 install_file /usr/src/hello-header.c "$BINUTILS_SYSROOT/opt/hello-header-temp.c"
 unlink "$BINUTILS_SYSROOT/opt/hello-header-temp.c" > /dev/null 2>&1
-

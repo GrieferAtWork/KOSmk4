@@ -154,7 +154,7 @@ normal_line:
 	/* Join the clang-tidy process, and check its exit code. */
 	joinProcess(clangTidyProc);
 	/* If clang-tidy didn't exit with an error status code,
-	 * write its entire stdout output into the cto file. */
+	 * write its entire  stdout output into  the cto  file. */
 	with (local fp = File.open(ctoFile, "wb"))
 		fp << teeBuffer.string;
 }
@@ -203,8 +203,8 @@ function createClangTidyProcess(
 	}
 	ccargs.extend({ "-MMD", "-MF", depFile });
 	ccargs.extend({
-		/* XXX: These are work-arounds caused by the fact that I'm not
-		 *      using a cross-compiled version of clang-tidy, but instead
+		/* XXX: These  are work-arounds  caused by  the fact  that I'm not
+		 *      using  a cross-compiled version of clang-tidy, but instead
 		 *      some generic version of it that has been built for _WIN32.
 		 * You will probably have to adjust these if you're using a version
 		 * that was built for anything else...
@@ -246,5 +246,3 @@ function createClangTidyProcess(
 	}
 	return WaitableJoin(thr);
 }
-
-

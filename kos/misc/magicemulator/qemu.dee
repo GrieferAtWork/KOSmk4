@@ -103,10 +103,10 @@ function start(
 	if (opt.getBool(options, opt.HOSTED, true)) {
 		/* NOTE: Qemu will refuse to guest requests for a reboot when
 		 *       -no-reboot is given. However, reboot-on-tripple-fault
-		 *       will also work when -no-reboot isn't given, which
+		 *       will  also  work when  -no-reboot isn't  given, which
 		 *       probably isn't something you'd want...
 		 * NOTE: When GDB is enabled, you'll get a SIGQUIT trap when
-		 *       the guest tries to reboot, and -no-reboot is set. */
+		 *       the guest tries to  reboot, and -no-reboot is  set. */
 //		qemu_arguments.extend({ "-no-shutdown" });
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	}
@@ -253,4 +253,3 @@ did_update_x86_64_kernel:
 		throw;
 	}
 }
-

@@ -645,7 +645,7 @@ do_pp_if:
 				local e_class: ExceptClass = ExceptClass(
 					name:   macroName,
 					ppCond: ppCond);
-				/* Check if the code for this exception can be overwritten.
+				/* Check if the code for  this exception can be  overwritten.
 				 * This is the case if we're surrounded by `#ifndef E_MYNAME' */
 				for (local e: ppExpressionStack) {
 					if (e == ifNdefMacroName) {
@@ -937,7 +937,7 @@ function parseExceptionCodeOverrides(
 		filesCwd = fs.headof(__FILE__);
 		files = {
 			("defined(__i386__) || defined(__x86_64__)", "../../include/i386-kos/kos/except/asm/codes.h"),
-			/* NOTE: exception code overrides for other architectures (if applicable)
+			/* NOTE: exception  code overrides for  other architectures (if applicable)
 			 *       should be added here, alongside preprocessor-expressions which may
 			 *       be used to detect these architectures in portable code. */
 		};
@@ -945,9 +945,9 @@ function parseExceptionCodeOverrides(
 		filesCwd = fs.getcwd();
 	}
 	for (local ppCond, filename: files) {
-		/* Make sure to only work with optimized pp-expression,
+		/* Make  sure  to only  work with  optimized pp-expression,
 		 * so-as to ensure that we can safely compare the resulting
-		 * strings for equality, where the optimization phase will
+		 * strings  for equality, where the optimization phase will
 		 * have ensure that the expressions are canonical with each
 		 * other. */
 		ppCond = ppexpr.optimize(ppCond);
@@ -1060,11 +1060,11 @@ function getExceptionCodeMappings(
 			errorClass    = code;
 			errorSubClass = 0x0000;
 		} else {
-			/* Lookup the proper code for our namespace.
-			 * This is required to ensure that we use the correct
+			/* Lookup   the   proper    code   for   our    namespace.
+			 * This is  required to  ensure that  we use  the  correct
 			 * base-class code for our current pp-condition namespace,
-			 * in situations where an arch-specific header only
-			 * overrides the code of a base-class, without overriding
+			 * in   situations  where  an  arch-specific  header  only
+			 * overrides  the code of a base-class, without overriding
 			 * sub-class codes. */
 			errorClass    = cls.baseClass.getCodeForPPCond(fullPpCond);
 			errorSubClass = code;
@@ -1104,7 +1104,7 @@ function getExceptionCodeMappings(
 		}
 	}
 	/* Step #2: Fill in default codes whereever arch-specific
-	 *          overrides didn't define them already */
+	 *          overrides   didn't   define   them    already */
 	for (local name, ppCondToCls: classes) {
 		for (local classPpCond, cls: ppCondToCls) {
 			assert classPpCond != "0";
@@ -1153,7 +1153,7 @@ again_merge_dups:
 			nameMappings[ppCond] = mappings;
 		}
 	}
-	/* Check if we can get rid of nameMappings["1"]
+	/* Check  if we can get rid of nameMappings["1"]
 	 * We can do this if the ||-sum of all the other
 	 * mappings also equals "1" */
 	if ("1" in nameMappings) {
@@ -1470,21 +1470,3 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 	}
 }
 #endif /* __MAIN__ */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
