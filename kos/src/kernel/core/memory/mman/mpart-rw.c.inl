@@ -397,7 +397,7 @@ LOCAL_mpart_rw_or_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t offset,
                          struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	size_t result;
+	size_t result = 0;
 	struct mpart_physloc physloc;
 	assert(mpart_lock_acquired(self));
 	assert(offset + num_bytes > offset);
