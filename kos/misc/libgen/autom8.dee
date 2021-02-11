@@ -22,7 +22,7 @@
  * and will automatically generate code accordingly. Additionally, this script
  * will re-flow block comments to form them into paragraphs.
  *
- *  - [[[enum]]] Automatically generate  assembly-compatible  enum  macro
+ *  - [[[enum]]] Automatically generate assembly-compatible enum macro
  *               definitions. You may look for usage examples in headers!
  *
  */
@@ -40,7 +40,7 @@
 //    Alias for: "/* autom8 reflow-comments on */"
 
 #undef HAVE_DEBUG_PRINT
-#if 0
+#if 1
 #define HAVE_DEBUG_PRINT
 #endif
 
@@ -206,40 +206,55 @@ function containsUnevenSpaces(l: string): bool {
 function splitWords(l: string): {string...} {
 	local lineLen = #l;
 	local i = 0, flushStart = 0;
+	local isFirst = true;
 	while (i < lineLen) {
 		if (l.isspace(i)) {
-			if (i > flushStart)
+			if (i > flushStart) {
 				yield l[flushStart:i];
+				isFirst = false;
+			}
 			++i;
 			flushStart = i;
-		} else if (l[i] == "`") {
-			/* Special case: Don't re-flow spaces within inline code comments. */
-			local e = l.find("'", i);
-			if (e < 0)
-				e = l.find("`", i);
-			if (e >= 0) {
-				i = e + 1;
-			} else {
-				++i;
-			}
-		} else if (l[i] == '"') {
-			/* Special case: Don't re-flow quoted text. */
-			local e = l.find('"', i + 1);
-			if (e >= 0) {
-				i = e + 1;
-			} else {
-				++i;
-			}
-		} else if (l[i] == "[") {
-			/* Special case: Don't re-flow syntax annotatinos. */
-			local e = l.findmatch("[", "]", i + 1);
-			if (e >= 0)
-				i = e + 1;
-			else {
-				++i;
-			}
 		} else {
-			++i;
+			local ch = l[i];
+			if (ch == "`") {
+				/* Special case: Don't re-flow spaces within inline code comments. */
+				local e = l.find("'", i);
+				if (e < 0)
+					e = l.find("`", i);
+				if (e >= 0) {
+					i = e + 1;
+				} else {
+					++i;
+				}
+			} else if (ch == '"') {
+				/* Special case: Don't re-flow quoted text. */
+				local e = l.find('"', i + 1);
+				if (e >= 0) {
+					i = e + 1;
+				} else {
+					++i;
+				}
+			} else if (ch == "[") {
+				/* Special case: Don't re-flow syntax annotatinos. */
+				local e = l.findmatch("[", "]", i + 1);
+				if (e >= 0)
+					i = e + 1;
+				else {
+					++i;
+				}
+			} else if (ch == "-" && isFirst) {
+				++i;
+				while (i < lineLen && l.isspace(i))
+					++i;
+			} else if (ch == ":" && isFirst && i > 0 && l.issymcont(i-1)) {
+				print "HERE";
+				++i;
+				while (i < lineLen && l.isspace(i))
+					++i;
+			} else {
+				++i;
+			}
 		}
 	}
 	if (flushStart < lineLen)
@@ -373,7 +388,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	}
 	if (commonLineLength is none)
 		commonTail = "";
-	for (local c: "@-*`'\"") {
+	for (local c: "@-*`'\" \t") {
 		local p = commonPrefix.find(c);
 		if (p >= 0)
 			commonPrefix = commonPrefix[:p];
@@ -734,7 +749,9 @@ function autom8Worker(parser: Autom8Parser,
 			}
 			if (#commentLines >= 2) {
 				/* Check if all lines except for the last end with a trailing "\\" */
-				local linesExceptLast = commentLines[:-1];
+				local linesExceptLast = commentLines;
+				if (!hasTrailingNewline)
+					linesExceptLast = commentLines[:-1];
 				for (local l: linesExceptLast) {
 					if (!l.endswith("\\"))
 						goto normal_reflow;
@@ -743,13 +760,18 @@ function autom8Worker(parser: Autom8Parser,
 				commentLines = List([]{
 					for (local l: linesExceptLast)
 						yield l[:-1].rstrip();
-					yield commentLines.last;
+					if (!hasTrailingNewline)
+						yield commentLines.last;
 				}());
 				commentLines = List(reflowBlockComment(commentLines));
+				local linesExceptLast = commentLines;
+				if (!hasTrailingNewline)
+					linesExceptLast = commentLines[:-1];
 				commentLines = List([]{
-					for (local l: commentLines[:-1])
+					for (local l: linesExceptLast)
 						yield l.ljust(longestLineLength) + "\\";
-					yield commentLines.last;
+					if (!hasTrailingNewline)
+						yield commentLines.last;
 				}());
 			} else {
 normal_reflow:
@@ -884,9 +906,6 @@ while (argv && argv.first.startswith("-")) {
 	}
 }
 done_args:
-for (local l: File.open("E:\\c\\kls\\changed.txt"))
-	autom8File(l.decode("utf-8").strip());
-return 0;
 if (!argv) {
 	usage();
 	return 1;

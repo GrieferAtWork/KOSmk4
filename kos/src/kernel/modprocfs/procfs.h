@@ -100,7 +100,7 @@ DECL_BEGIN
 	mode_t          psd_mode;  /* File access mode (NOTE: Also encodes the file type, however that part is [const]) */        \
 	uid_t           psd_uid;   /* File owner UID (initialized to 0) */                                                        \
 	gid_t           psd_gid;   /* File group GID (initialized to 0) */
-	
+
 struct procfs_singleton_data {
 	/* Pointed to by the `struct inode_data *i_fsdata' of singleton INodes.
 	 * These are the saved, non-volatile values of various file attributes,
