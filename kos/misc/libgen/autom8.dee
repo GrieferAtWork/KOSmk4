@@ -665,10 +665,10 @@ reflow_normal_block:
 	if (currentBlock) {
 		/* Don't reflow if the text contains uneven space locations.
 		 * e.g. "foo   bar baz" is uneven, but "foo   bar  baz" isn't! */
-		if ((for (local l: currentBlock) containsUnevenSpaces(l)) || ...) {
-			result.extend(currentBlock);
-		} else if (currentBlock != lines) {
+		if (currentBlock != lines) {
 			result.extend(reflowBlockComment(currentBlock, lineLength));
+		} else if ((for (local l: currentBlock) containsUnevenSpaces(l)) || ...) {
+			result.extend(currentBlock);
 		} else {
 #ifdef HAVE_DEBUG_PRINT
 			print("reflowBlock:", lineLength);
@@ -814,7 +814,7 @@ normal_reflow:
 			if (hasTrailingNewline) {
 				parser.newText << "\n" << leadingTabs << leadingSpaces;
 				parser.newText << " ";
-			} else if (!commentBody.endswith(" ")) {
+			} else if (!commentBody.endswith(" ") && !commentBody.endswith("*")) {
 				parser.newText << " ";
 			}
 			parser.flushStart = parser.commentEnd;
