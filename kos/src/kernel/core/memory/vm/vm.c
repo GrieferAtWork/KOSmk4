@@ -3038,7 +3038,7 @@ LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
  *    mappings need to have their write-access updated, so-as to allow
  *    the copy-on-write mapping to be unshared after the next write.
  *    -> `vm_node_update_write_access()' needs to be called for every
- *        pre-existing SHARED memory mapping.
+ *       pre-existing SHARED memory mapping.
  *  - mmap(MAP_PRIVATE):
  *    The second mapping of an anonymous datapart (aka. the first datapart
  *    had been granted write-access since it was the sole owner owner of

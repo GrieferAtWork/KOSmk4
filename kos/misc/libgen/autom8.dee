@@ -397,11 +397,13 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	}
 	if (commonLineLength is none)
 		commonTail = "";
-	for (local c: "@-*`'\" \t") {
+	for (local c: "@-*`'\"") {
 		local p = commonPrefix.find(c);
 		if (p >= 0)
 			commonPrefix = commonPrefix[:p];
 	}
+	if (commonPrefix.isalnum())
+		commonPrefix = "";
 	if (commonPrefix || commonTail) {
 		/* Don't reflow if the common prefix indicates a code-block! */
 		local baseCommonPrefix = commonPrefix.lstrip();
@@ -525,32 +527,40 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	for (local i = 0; i < numLines;) {
 		local l = paragraphBlock[i];
 		local nspc;
-//		if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
-//			local j = 2;
-//			while (j < #l && l.issymcont(j))
-//				++j;
-//			while (j < #l && l.isspace(j))
-//				++j;
-//			if (j < #l && l[j] in ":") {
-//				/* Element-tag annotation */
-//				++j;
-//				while (j < #l && l.isspace(j))
-//					++j;
-//				nspc = j;
-//				if (currentBlock) {
-//					result.extend(reflowBlockComment(currentBlock, lineLength));
-//					currentBlock = none;
-//				}
-//			}
-//		} else
-		{
-			nspc = countLeadingSpaces(l);
-		}
+		nspc = countLeadingSpaces(l);
 		if (currentBlock is none) {
 			currentBlock = [l];
 			prevIndent = nspc;
 			++i;
 			continue;
+		}
+		/* Check if the line may be a @foo-annotation */
+		if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
+			local j = 2;
+			while (j < #l && l.issymcont(j))
+				++j;
+			while (j < #l && l.isspace(j))
+				++j;
+			if (j < #l && l[j] in ":") {
+				/* Element-tag annotation */
+				++j;
+				while (j < #l && l.isspace(j))
+					++j;
+				if (currentBlock)
+					result.extend(reflowBlockComment(currentBlock, lineLength));
+				currentBlock = [l];
+				if ((i + 1) >= numLines)
+					break;
+				local nextLine = paragraphBlock[i + 1];
+				if (countLeadingSpaces(nextLine) >= j)
+					continue;
+				/* Less indentation -> This one's a single-line-tag. */
+				if (lineLength >= 0)
+					l = l[:j] + reflowTextLine(l[j:], lineLength);
+				result.append(l);
+				currentBlock = [];
+				continue;
+			}
 		}
 		/* Check if the new line is may shorter than the previous.
 		 * If so, then this line marks the end of a paragraph */
@@ -677,7 +687,14 @@ reflow_normal_block:
 				/* Don't reflow the last line. */
 				currentBlock.popback();
 				result.extend(reflowSimpleText(currentBlock, lineLength));
-				result.append(lastLine);
+				if (#lastLine != lastLineLen) {
+					local saved_OPT_UNDO_REFLOW = OPT_UNDO_REFLOW;
+					OPT_UNDO_REFLOW = true;
+					result.append(reflowTextLine(lastLine, lineLength));
+					OPT_UNDO_REFLOW = saved_OPT_UNDO_REFLOW;
+				} else {
+					result.append(lastLine);
+				}
 			} else {
 				result.extend(reflowSimpleText(currentBlock, lineLength));
 			}
