@@ -26,7 +26,7 @@
 #include <hybrid/host.h>
 
 /* Helper macros to automatically select the optimal encoding for
- * the `test' instruction being used with an immediate operand.
+ * the `test' instruction being  used with an immediate  operand.
  *
  * Using this, something like
  *    `testl $0x10000, foo'
@@ -93,12 +93,12 @@ __ASM_L(.endif)
 __ASM_L(.endm)
 
 /* Same as `test[b|w|l|q] $mask, loc', but when `loc' is a memory location,
- * automatically try to truncate `mask', and adjust `loc' to reduce
+ * automatically  try  to  truncate  `mask',  and  adjust  `loc'  to reduce
  * the final sizeof the instruction.
  * As such, something like:  ttest 0x200, foo(%eax)
  * ... eventually becomes:   testb $0x2, 1+foo(%eax)
  * NOTE: `mask' must always be a 32-bit, unsigned, immediate
- *       constant integer. No extern symbols allowed!
+ *       constant  integer.  No   extern  symbols   allowed!
  * HINT: ttest stands for TruncatedTEST */
 __ASM_L(.macro ttest mask:req, loc:req, seg='')
 __ASM_L(.ifc __ASM_ARG(\loc),%al; __ttest_r __ASM_ARG(\mask), a, 0; .else)
@@ -174,7 +174,7 @@ __ASM_L(.ifc __ASM_ARG(\loc),%ch; testb $(__ASM_ARG(\mask)), %ch; .else)
 __ASM_L(.ifc __ASM_ARG(\loc),%dh; testb $(__ASM_ARG(\mask)), %dh; .else)
 __ASM_L(.ifc __ASM_ARG(\loc),%bh; testb $(__ASM_ARG(\mask)), %bh; .else)
 /* With that, all of the different registers have been handled.
- * Now to deal with testing of actual memory locations. */
+ * Now  to  deal  with  testing  of  actual  memory  locations. */
 __ASM_L(.if (__ASM_ARG(\mask) <= 0xff))
 __ASM_L(	.ifc __ASM_ARG(\seg),'')
 __ASM_L(		testb $(__ASM_ARG(\mask)), __ASM_ARG(\loc))

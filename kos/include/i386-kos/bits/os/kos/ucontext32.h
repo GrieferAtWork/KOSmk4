@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/ucontext32.h>
- * 
+ *
  * Definitions:
  *    - struct __ucontextx32 { ... };
  * #if !defined(__x86_64__) && defined(__i386__)

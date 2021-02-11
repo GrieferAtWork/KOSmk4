@@ -41,15 +41,15 @@
 #define ELF_ARCHX86_64_LAZYINDX 1 /* Lazy relocations use indices, rather than offsets */
 
 /* The user-space register holding a pointer to the ProcessEnvironmentBlock
- * immediately following the initial transition to user-space after a call
+ * immediately following the initial transition to user-space after a  call
  * to exec()
  * NOTE: This register points to a `struct process_peb' structure. */
 #define ELF_ARCHX86_64_PEB_REGISTER  rbp
 #define ELF_ARCHX86_64_PEB_REGISTER2 rdx
 
-/* When a dynamic linker is loaded, additional information is passed
- * via user-space registers containing information about how the program
- * must be linked before it can actually be executed properly.
+/* When a  dynamic  linker  is loaded,  additional  information  is  passed
+ * via user-space registers  containing information about  how the  program
+ * must   be  linked   before  it   can  actually   be  executed  properly.
  * The exact structures pointed to by `ELF_ARCHX86_64_DL_RTLDDATA_REGISTER'
  * depend on which DL loader was chosen:
  *   - ELF: `struct process_rtld_elfdata' */

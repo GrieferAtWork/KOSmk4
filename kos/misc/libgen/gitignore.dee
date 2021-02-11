@@ -28,7 +28,7 @@ global final _kosRoot =
 		.replace("\\", "/").rstrip("/") + "/";
 
 @@Mapping for PATHNAME -> GITIGNORE_FILE_LINES
-@@Files known not to exist are bound to 
+@@Files known not to exist are bound to
 global final _knownGitIgnoreFiles: {string: {string...}} = Dict();
 
 function _listGitIgnoreInPath(absPath: string): {string...} {
@@ -54,10 +54,11 @@ function _listGitIgnoreInPath(absPath: string): {string...} {
 @@may affect files in the given directory @path
 function enumerateRelevantGitIgnoreFiles(path: string): {(string, {string...})...} {
 	path = fs.expand(fs.abspath(path), "pc").replace("\\", "/").rstrip("/");
-	if (!path.startswith(_kosRoot))
-		return;
-	local relPath = path[#_kosRoot:];
-	local gitIgnorePath = _kosRoot[:-1];
+	local usedKosRoot = _kosRoot;
+	if (!path.startswith(usedKosRoot))
+		usedKosRoot = fs.driveof(path).replace("\\", "/");
+	local relPath = path[#usedKosRoot:];
+	local gitIgnorePath = usedKosRoot[:-1];
 	local gip = _listGitIgnoreInPath(gitIgnorePath);
 	if (gip)
 		yield (gitIgnorePath, gip);
@@ -94,18 +95,3 @@ function isFileGitIgnored(filename: string): bool {
 	}
 	return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

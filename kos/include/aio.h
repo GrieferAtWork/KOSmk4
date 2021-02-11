@@ -137,7 +137,7 @@ __AIO_REDIRECT(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__a
 #endif /* !__aio_cancel_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspend_defined
 #define __aio_suspend_defined 1
 #ifdef __USE_TIME_BITS64
@@ -214,7 +214,7 @@ __NOTHROW_NCX(__LIBRT_CC aio_cancel64)(__fd_t __fildes, struct aiocb64 *__aiocbp
 #endif /* !__aio_cancel64_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspend64_defined
 #define __aio_suspend64_defined 1
 #ifdef __USE_TIME_BITS64
@@ -238,7 +238,7 @@ __NOTHROW_NCX(__LIBRT_CC aio_fsync64)(int __operation, struct aiocb64 *__aiocbp)
 
 #ifdef __USE_TIME64
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifndef __aio_suspendt64_defined
 #define __aio_suspendt64_defined 1
 #ifdef __USE_FILE_OFFSET64
@@ -253,7 +253,7 @@ __NOTHROW_RPC(__LIBRT_CC aio_suspendt64)(struct aiocb const *const __list[], __S
 #endif /* !__aio_suspendt64_defined */
 
 /* Suspend calling thread until at least one of the asynchronous
- * I/O operations referenced by LIST has completed. */
+ * I/O    operations   referenced   by   LIST   has   completed. */
 #ifdef __USE_LARGEFILE64
 #ifndef __aio_suspend64t64_defined
 #define __aio_suspend64t64_defined 1

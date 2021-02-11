@@ -43,25 +43,25 @@ enum kcmp_type {
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define KCMP_FILE      KCMP_FILE
-#define KCMP_VM        KCMP_VM
-#define KCMP_FILES     KCMP_FILES
-#define KCMP_FS        KCMP_FS
-#define KCMP_SIGHAND   KCMP_SIGHAND
-#define KCMP_IO        KCMP_IO
-#define KCMP_SYSVSEM   KCMP_SYSVSEM
-#define KCMP_EPOLL_TFD KCMP_EPOLL_TFD
-#define KCMP_TYPES     KCMP_TYPES
+#define KCMP_FILE      KCMP_FILE      /* Compare `/proc/[pid1]/fd/[idx1]' with `/proc/[pid2]/fd/[idx2]' */
+#define KCMP_VM        KCMP_VM        /* Compare `task_getvm()' */
+#define KCMP_FILES     KCMP_FILES     /* Compare `task_gethandlemanager()' */
+#define KCMP_FS        KCMP_FS        /* Compare `task_getfs()' */
+#define KCMP_SIGHAND   KCMP_SIGHAND   /* Compare `task_getsighand_ptr()->sp_hand' */
+#define KCMP_IO        KCMP_IO        /* Not (yet) implemented on KOS */
+#define KCMP_SYSVSEM   KCMP_SYSVSEM   /* Not (yet) implemented on KOS */
+#define KCMP_EPOLL_TFD KCMP_EPOLL_TFD /* Not (yet) implemented on KOS */
+#define KCMP_TYPES     KCMP_TYPES     /* # of different compare types */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define KCMP_FILE      0
-#define KCMP_VM        1
-#define KCMP_FILES     2
-#define KCMP_FS        3
-#define KCMP_SIGHAND   4
-#define KCMP_IO        5
-#define KCMP_SYSVSEM   6
-#define KCMP_EPOLL_TFD 7
-#define KCMP_TYPES     8
+#define KCMP_FILE      0 /* Compare `/proc/[pid1]/fd/[idx1]' with `/proc/[pid2]/fd/[idx2]' */
+#define KCMP_VM        1 /* Compare `task_getvm()' */
+#define KCMP_FILES     2 /* Compare `task_gethandlemanager()' */
+#define KCMP_FS        3 /* Compare `task_getfs()' */
+#define KCMP_SIGHAND   4 /* Compare `task_getsighand_ptr()->sp_hand' */
+#define KCMP_IO        5 /* Not (yet) implemented on KOS */
+#define KCMP_SYSVSEM   6 /* Not (yet) implemented on KOS */
+#define KCMP_EPOLL_TFD 7 /* Not (yet) implemented on KOS */
+#define KCMP_TYPES     8 /* # of different compare types */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

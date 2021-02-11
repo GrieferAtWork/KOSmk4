@@ -106,7 +106,7 @@
 
 /* Register <--> Common/Uncommon-register mapping
  * Basically: These are all of the callee-preserve registers, meaning
- *            that these are the only registers for which GCC will
+ *            that these are  the only registers  for which GCC  will
  *            generate unwind instructions within normal assembly. */
 #define CFI_386_UNWIND_COMMON_REGISTER_EBX   0
 #define CFI_386_UNWIND_COMMON_REGISTER_EBP   1
@@ -115,7 +115,7 @@
 #define CFI_386_UNWIND_COMMON_REGISTER_EIP   4
 #define CFI_386_UNWIND_COMMON_REGISTER_COUNT 5
 
-#define CFI_386_UNWIND_UNCOMMON_REGISTER_SP  CFI_386_UNWIND_UNCOMMON_REGISTER_ESP
+#define CFI_386_UNWIND_UNCOMMON_REGISTER_SP     CFI_386_UNWIND_UNCOMMON_REGISTER_ESP
 #define CFI_386_UNWIND_UNCOMMON_REGISTER_EAX    0
 #define CFI_386_UNWIND_UNCOMMON_REGISTER_ECX    1
 #define CFI_386_UNWIND_UNCOMMON_REGISTER_EDX    2
@@ -170,14 +170,14 @@
 
 
 
-/* The common/uncommon system is optimized for unwinding
+/* The common/uncommon system  is optimized for  unwinding
  * regular C functions, since it only caches for registers
  * that have to be preserved when following the standard C
  * calling convention of the host.
  * However, at least within the kernel there is 1 additional
- * category of registers that _very_ often appear alongside
+ * category  of registers that _very_ often appear alongside
  * each other, mainly when unwinding a system call:
- * i386:
+ * i386:```
  *     Uncommon register used: 1 (1)
  *     Uncommon register used: 2 (2)
  *     Uncommon register used: 44 (36)
@@ -188,23 +188,24 @@
  *     Uncommon register used: 4 (3)
  *     Uncommon register used: 9 (4)
  *     Uncommon register used: 41 (33)
- * To optimize for stuff like this, provide an optional,
+ * ```
+ * To  optimize  for  stuff   like  this,  provide  an   optional,
  * secondary unwinding system specifically for sigframe functions.
  *  - When unwinding an FDE with the SIGNAL_FRAME flag set, use a different
- *    set of COMMON registers (mainly: all GP-regs, + segments/eflags)
- *  - This can then also be implemented in user-space, to only require a
+ *    set of  COMMON registers  (mainly:  all GP-regs,  +  segments/eflags)
+ *  - This  can then also  be implemented in user-space,  to only require a
  *    single evaluation-pass over the FDE body to gather all registers that
  *    are likely to ever be used.
- *  - This entire sub-system is be implemented in parallel to the CFA_EXEC+CFA_APPLY
- *    functions and when building with __OPTIMIZE_SIZE__, we could simply implement
+ *  - This entire  sub-system is  be implemented  in parallel  to the  CFA_EXEC+CFA_APPLY
+ *    functions  and  when building  with  __OPTIMIZE_SIZE__, we  could  simply implement
  *    these functions as aliases, since all they do is add another layer of optimization.
  */
 
-/* Register <--> Sigframe Common/Uncommon-register mapping
- * Signal frames are normally used to unwind to an interrupted code
+/* Register    <-->     Sigframe     Common/Uncommon-register     mapping
+ * Signal  frames  are normally  used to  unwind  to an  interrupted code
  * location. - For this purpose, they need to restore _all_ GP registers,
- * the FLAGS register, as well as all of the segment registers.
- * To speed up this process, define a special unwind register
+ * the  FLAGS  register,  as  well  as  all  of  the  segment  registers.
+ * To  speed  up   this  process,  define   a  special  unwind   register
  * namespace specifically for signal frame functions. */
 #define CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_SP  CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ESP
 #define CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX    0
@@ -267,9 +268,9 @@
 
 
 /* Register <--> Landing-pad Common/Uncommon-register mapping
- * Currently, landing-pad unwinding is only needed for inline, exception-enabled
+ * Currently, landing-pad unwinding is  only needed for inline,  exception-enabled
  * system calls, and as such only the %eflags register is considered common, since
- * that one needs to be modified in order to set EFLAGS.DF=0 during landing pad
+ * that one needs to be  modified in order to  set EFLAGS.DF=0 during landing  pad
  * adjustments. */
 #define CFI_386_UNWIND_LANDING_COMMON_REGISTER_EFLAGS 0
 #define CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT  1

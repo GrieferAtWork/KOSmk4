@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/sigevent64.h>
- * 
+ *
  * Definitions:
  *    - struct __sigeventx64 { ... };
  * #if defined(__x86_64__)
@@ -89,7 +89,7 @@ struct __sigeventx64 /*[NAME(sigeventx64)][PREFIX(sigev_)]*/ {
 	union {
 		union {
 			__UINT64_TYPE__ _sigev_data[(__SIGEVX64_MAX_SIZE / 8) - 2];
-			__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
+			__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and  SIGEV_THREAD_ID set,  LWP
 			                             * TID (pid_t) of the thread to receive the signal. */
 			struct {
 				__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sigev_notify_function,(union __sigvalx64 __val)); /* Function to start. */
@@ -99,7 +99,7 @@ struct __sigeventx64 /*[NAME(sigeventx64)][PREFIX(sigev_)]*/ {
 #endif /* Transparent struct/union */
 		union {
 			__UINT64_TYPE__ _data[(__SIGEVX64_MAX_SIZE / 8) - 2];
-			__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
+			__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and  SIGEV_THREAD_ID set,  LWP
 			                       * TID (pid_t) of the thread to receive the signal. */
 			struct {
 				__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, _function,(union __sigvalx64 __val)); /* Function to start. */

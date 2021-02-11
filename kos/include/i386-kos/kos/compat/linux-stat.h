@@ -40,8 +40,8 @@
 __DECL_BEGIN
 
 /* Compatibility mode structures for linux's `stat' system calls. (which KOS emulates)
- * NOTE: KOS uses different names for these system calls, but they numbers,
- *       as well as their behavior share binary compatibility:
+ * NOTE: KOS uses  different names  for these  system calls,  but  they
+ *       numbers, as well as their behavior share binary compatibility:
  *
  *    - linux:`struct __old_kernel_stat' --> kos:`struct linux_oldstat'
  *    - linux:`__NR_oldstat'             --> kos:`__NR_linux_oldstat'
@@ -73,7 +73,7 @@ struct linux_oldstat {
 	__UINT16_TYPE__  st_rdev;
 	__UINT16_TYPE__  __pad;    /* Hidden padding made visible */
 	/* Linux declares these as `unsigned long' on
-	 * i386, but as `unsigned int' on x86_64... */
+	 * i386, but as  `unsigned int' on  x86_64... */
 	__ULONG32_TYPE__ st_size;
 	__ULONG32_TYPE__ st_atime;
 	__ULONG32_TYPE__ st_mtime;

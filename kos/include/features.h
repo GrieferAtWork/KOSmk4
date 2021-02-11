@@ -28,17 +28,17 @@
 #include "__stdinc.h"
 
 
-/* Don't implicitly expose any system functionality that isn't
+/* Don't  implicitly  expose  any system  functionality  that isn't
  * strictly sanctioned by the C/C++ standard in C standard headers.
- * Headers that aren't mentioned by the C/C++ standards continue
- * to behave normally, and any symbol that starts with `__' also
+ * Headers that aren't  mentioned by the  C/C++ standards  continue
+ * to  behave normally, and  any symbol that  starts with `__' also
  * isn't necessarily affected.
  * -> This functionality is mainly intended to get an idea of how
  *    C-standard compliant some given application source actually
  *    is, as well as aid in putting together configure tests.
- * NOTE: Any source file using this should also make sure that
+ * NOTE: Any source file  using this should  also make sure  that
  *       no other *_SOURCE macro gets defined, since other macros
- *       may once again manually enable functionality that was
+ *       may once again  manually enable  functionality that  was
  *       originally disabled by this option. */
 #ifdef _ISOC_PURE_SOURCE
 #undef __USE_ISOC_PURE
@@ -50,10 +50,10 @@
 #if (defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
      !defined(__USE_ISOC_PURE) && !defined(_EVERY_SOURCE) &&      \
      (defined(__GNUC__) || __has_include(<bits/vector.tcc>)))
-/* Hacky work-around to satisfy header requirements for libstdc++
- * And before you say that this is a bad way of doing it, know that
- * on linux, g++ will _always_ pre-define `_GNU_SOURCE' straight
- * from within the compiler itself, in order to get access to some
+/* Hacky  work-around  to satisfy  header requirements  for libstdc++
+ * And  before you say that this is a  bad way of doing it, know that
+ * on  linux,  g++  will _always_  pre-define  `_GNU_SOURCE' straight
+ * from  within the compiler  itself, in order to  get access to some
  * of the symbols that are required to implement the inline functions
  * from headers. Don't believe me? - Compile the following on a linux
  * machine:
@@ -62,11 +62,11 @@
  * >> #error "Well... I was right."
  * >> #endif
  * $ g++ foo.cc
- * So to satisfy libstdc++ in this regard, but try to be a bit nicer
+ * So to satisfy libstdc++ in  this regard, but try  to be a bit  nicer
  * about it by only defining this macro when hosted by g++ (which still
- * must be handled explicitly so-as to already expose the required
- * symbols during the libstdc++ configure phase), or when one of the
- * headers specific to libstdc++ are apart of the include-path (thus
+ * must be  handled explicitly  so-as to  already expose  the  required
+ * symbols  during the libstdc++  configure phase), or  when one of the
+ * headers specific to  libstdc++ are apart  of the include-path  (thus
  * also supporting compilers other than g++).
  */
 #undef _GNU_SOURCE
@@ -79,17 +79,17 @@
  * >> ...
  * >> size_t foo;
  * This is wrong, since `size_t' might not appear in the global namespace,
- * but only within the std:: namespace. I tried to fix this by patching
- * its source, but after realizing how often it does this, I just gave
+ * but only within the  std:: namespace. I tried  to fix this by  patching
+ * its source, but  after realizing how  often it does  this, I just  gave
  * up and made this */
 #if defined(_BROKEN_CCOMPAT_SOURCE) || defined(_GLIBCXX_SHARED)
 #undef __USE_BROKEN_CCOMPAT
 #define __USE_BROKEN_CCOMPAT 1
 #endif /* _BROKEN_CCOMPAT_SOURCE || _GLIBCXX_SHARED */
 
-/* When exposed in headers, the behavior of memmem() and memrmem()
+/* When  exposed  in  headers,  the  behavior  of  memmem()  and memrmem()
  * differs from the behavior found in glibc's implementation (of memmem())
- * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (kos-specific)
+ * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE (kos-specific)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return `NULL'
  * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (glibc-compatible)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return:
@@ -111,11 +111,11 @@
 #endif /* _KOS_SOURCE */
 
 /* KOS Kernel extensions/kernel-level data structures/functions
- * These become visible within the KOS kernel by default, and
- * can manually be enabled by user-space applications.
- * These include internal ABI/API details normally hidden from
- * normal user-space applications and only need to be known by
- * libc and the kernel, such as `SA_RESTORER' or `io_delay()' */
+ * These become visible within the  KOS kernel by default,  and
+ * can  manually   be  enabled   by  user-space   applications.
+ * These  include internal ABI/API details normally hidden from
+ * normal user-space applications and only need to be known  by
+ * libc and the kernel,  such as `SA_RESTORER' or  `io_delay()' */
 #if (defined(_KOS_KERNEL_SOURCE) || \
      (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
 #define __USE_KOS_KERNEL 1
@@ -124,19 +124,19 @@
 #endif /* !defined(_KOS_PURE_SOURCE) || _KOS_PURE_SOURCE != 0 */
 #else /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
 /* KOS header purification.
- * This feature causes some old, or badly namespace'd macros,
- * structs and struct members to not be visible in order to
- * prevent redundancy and ensure that code uniformly uses the
- * same symbols for referring to the same functionality.
- * This mainly affects network- and socket-related headers, where
- * various protocol descriptor structures often come with varying
- * names that appear inconsistent with each other in how they've
+ * This feature  causes  some  old,  or  badly  namespace'd  macros,
+ * structs  and  struct  members  to  not  be  visible  in  order to
+ * prevent redundancy  and  ensure  that  code  uniformly  uses  the
+ * same   symbols   for   referring  to   the   same  functionality.
+ * This mainly affects  network- and  socket-related headers,  where
+ * various protocol descriptor  structures often  come with  varying
+ * names  that appear  inconsistent with  each other  in how they've
  * been named, as well as if their members have been given a prefix.
- * This feature is enabled by default when `__USE_KOS_KERNEL'
- * extensions are also enabled (i.e. the default when compiling
- * code for use within the kernel; though in can be disabled with
- * `#define _KOS_PURE_SOURCE 0'), and disabled otherwise (i.e. when
- * compiling code for user-space; though can manually be enabled
+ * This  feature  is  enabled  by  default  when  `__USE_KOS_KERNEL'
+ * extensions are  also enabled  (i.e.  the default  when  compiling
+ * code  for use within  the kernel; though in  can be disabled with
+ * `#define _KOS_PURE_SOURCE 0'), and disabled otherwise (i.e.  when
+ * compiling code  for user-space;  though can  manually be  enabled
  * by `#define _KOS_PURE_SOURCE 1') */
 #if defined(_KOS_PURE_SOURCE) && (_KOS_PURE_SOURCE + 0) != 0
 #define __USE_KOS_PURE 1
@@ -144,8 +144,8 @@
 #endif /* !_KOS_KERNEL_SOURCE && (!__KOS__ || !__KERNEL__ || __USE_ISOC_PURE) */
 
 /* Certain KOS extensions may alter the prototyping or invocation behavior
- * or functions or data structures. By default, this behavior is enabled
- * for kernel-space (when `_KOS_KERNEL_SOURCE' is also implied), but must
+ * or functions or data structures.  By default, this behavior is  enabled
+ * for kernel-space (when `_KOS_KERNEL_SOURCE' is also implied), but  must
  * explicitly be enabled for user-space.
  * Alterations include:
  *    - int sprintf() ->  size_t sprintf()
@@ -155,7 +155,7 @@
  *    - ...
  *    - Changing `int flags'-like arguments to `unsigned int flags'
  *    - Reversing the argument order of `outb()', `outw()', `outl()'
- *      and their `*_p' versions, such that the port comes first. */
+ *      and their `*_p'  versions, such that  the port comes  first. */
 #if (defined(_KOS_ALTERATIONS_SOURCE) || \
      (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
 #define __USE_KOS_ALTERATIONS 1
@@ -195,7 +195,7 @@
 
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038-01-19T03:14:07 this'll
- * be similar to what glibc will have to do if it doesn't wan'na roll over)
+ * be similar to  what glibc will  have to do  if it doesn't  wan'na roll  over)
  * Also available as extensions in other libcs:
  *  - defined(_TIME64_SOURCE):
  *    - KOS-specific feature macro
@@ -211,16 +211,16 @@
 
 /* Control the typing of `time_t' to either be `__time32_t' or `__time64_t'
  * Note that despite their names, on some architectures `sizeof(__time32_t) == sizeof(__time64_t)',
- * such that this option doesn't actually affect anything. One such architecture would be
- * the x86_64 CPU where `__time32_t' is defined as `__syscall_slong_t', which is already
- * 8 bytes big. To simplify the porting of programs, a properly written application could
- * be made 64-bit time_t-compliant by simply re-compiling everything with `-D_TIME_T_BITS=64'
- * Reminder: On `2038-01-19T03:14:07', 32-bit unix time will roll over, and this is a date
+ * such that  this  option  doesn't  actually  affect anything.  One  such  architecture  would  be
+ * the  x86_64  CPU  where  `__time32_t'  is  defined  as  `__syscall_slong_t',  which  is  already
+ * 8 bytes  big.  To  simplify the  porting  of  programs, a  properly  written  application  could
+ * be  made  64-bit time_t-compliant  by  simply re-compiling  everything  with `-D_TIME_T_BITS=64'
+ * Reminder: On  `2038-01-19T03:14:07', 32-bit unix time will roll  over, and this is a date
  *           that anyone reading this is likely to still experience, so be prepared and know
  *           that sooner or later _all_ applications will have to support this.
- * NOTE: As the aforementioned date becomes closer and closer, `__USE_TIME_BITS64' will eventually
+ * NOTE: As  the aforementioned date becomes closer and closer, `__USE_TIME_BITS64' will eventually
  *       become the default, and if I (or someone else) will still be willing to maintain this file
- *       as well as the KOS operating system at that point, 32-bit time support may eventually be
+ *       as  well as the KOS operating system at  that point, 32-bit time support may eventually be
  *       removed entirely, depending on adoption of 64-bit time by both KOS-specific and unix/linux
  *       software in general. */
 #ifdef _TIME_T_BITS
@@ -255,7 +255,7 @@
 /* Make available some BSD-specific extensions such as `cfmakesane()' */
 #ifdef _BSD_SOURCE
 #define __USE_BSD 1
-/* BSD name (not used in headers, but may be checked by
+/* BSD  name (not used in headers, but may be checked by
  * applications as a sort-of ACK that the system headers
  * have understood the _BSD_SOURCE request) */
 #define __BSD_VISIBLE 1 /* API alias (don't use in headers!) */
@@ -271,7 +271,7 @@
 #define __USE_NEWLIB 1
 #endif /* _NEWLIB_SOURCE */
 
-/* Enable additional extensions present on
+/* Enable  additional  extensions  present  on
  * Solaris (or more specifically: OpenSolaris) */
 #ifdef __EXTENSIONS__
 #define __USE_SOLARIS  1
@@ -528,17 +528,17 @@
 #endif /* _UTF_SOURCE */
 
 
-/* Enable closer emulation of glibc headers in cases where
- * standards leave the implementation behavior open.
- * This mainly affects optional include implications in system
+/* Enable  closer  emulation  of  glibc  headers  in  cases   where
+ * standards    leave    the    implementation    behavior    open.
+ * This  mainly  affects  optional include  implications  in system
  * headers. For example, POSIX allows (but doesn't require) <aio.h>
- * to also #include <sys/types.h>, where glibc does perform this
- * inclusion, however doing so isn't actually necessary under KOS.
+ * to also #include  <sys/types.h>, where glibc  does perform  this
+ * inclusion, however doing so isn't actually necessary under  KOS.
  *
- * When `_GLIBC_SOURCE' is defined, non-portable, implicit includes
- * are emulated more closely to what is also done by glibc, note
+ * When  `_GLIBC_SOURCE' is defined, non-portable, implicit includes
+ * are  emulated more  closely to what  is also done  by glibc, note
  * however that this additional level of compatibility is not backed
- * by any fixed standard, but depends solely on what glibc actually
+ * by  any fixed standard, but depends solely on what glibc actually
  * does in relation to fixed standards (such as POSIX) */
 #ifdef _GLIBC_SOURCE
 #undef __USE_GLIBC
@@ -546,10 +546,10 @@
 #endif /* _GLIBC_SOURCE */
 
 
-/* Some system headers may define secondary variants of certain
- * struct types (often ending with *64, hence the name of this
+/* Some system headers  may define secondary  variants of  certain
+ * struct types (often  ending with  *64, hence the  name of  this
  * feature test macro), that extend the non-suffixed types in some
- * way (usually related to `__USE_LARGEFILE64' or `__USE_TIME64')
+ * way  (usually related to `__USE_LARGEFILE64' or `__USE_TIME64')
  *
  * According to existing standards and conventions, user-code should
  * always be able to forward-declare all structure types declared in
@@ -567,20 +567,20 @@
  * >>     my_print_stat64(&st);
  * >> }
  *
- * Long story short. When `__USE_STRUCT64_MACRO' is enabled (it isn't
- * enabled by default), the above code would not be guarantied to compile
+ * Long  story  short.  When   `__USE_STRUCT64_MACRO'  is  enabled  (it   isn't
+ * enabled  by  default), the  above code  would not  be guarantied  to compile
  * without errors. In order to fix the code to work with `__USE_STRUCT64_MACRO'
- * enabled, one mustn't forward-declare struct types found in system headers
+ * enabled, one mustn't  forward-declare struct types  found in system  headers
  * before the respective header has already been included.
  *
  * The longer story is this:
  *   - Take `struct timespec' and `struct timespec64' as an example
- *   - When `_TIME_T_BITS=64', then they are mandated to share binary
+ *   - When `_TIME_T_BITS=64', then they  are mandated to share  binary
  *     compatibility, such that the offsetof for each field, and sizeof
- *     of the structures as a whole will be identical between the two.
+ *     of the structures as a whole will be identical between the  two.
  *   - Knowing this, it stands to reason to simply have the header define
- *     `struct timespec64' as `#define timespec64 timespec'
- *   - The only problem with this is that this would break any forward
+ *     `struct timespec64'        as        `#define timespec64 timespec'
+ *   - The only problem with this is  that this would break any  forward
  *     declarations of `struct timespec64' prior to the declaring header
  *     being included.
  *   - That is where this feature test macro comes into play, essentially
@@ -596,18 +596,18 @@
  *     >>     ... // Potentially some more fields...
  *     >> };
  *     >> #endif // !__USE_STRUCT64_MACRO
- *   - As you can see, when `__USE_STRUCT64_MACRO' isn't defined (which
+ *   - As you can  see, when `__USE_STRUCT64_MACRO'  isn't defined  (which
  *     is the case by default when `_KOS_KERNEL_SOURCE' isn't enabled, and
- *     the dedicated `_STRUCT64_MACRO_SOURCE' feature request is disabled
- *     as well), then `struct timespec' and `struct timespec64' continue
- *     to remain distinct types such that `struct timespec64' can still
+ *     the  dedicated `_STRUCT64_MACRO_SOURCE' feature request is disabled
+ *     as well), then  `struct timespec' and `struct timespec64'  continue
+ *     to remain distinct  types such that  `struct timespec64' can  still
  *     be forward-declared prior to the header being included.
- *   - However, when `__USE_STRUCT64_MACRO' is enabled, then headers are
- *     allowed to simply macro-alias binary-compatible struct-types with
+ *   - However,  when  `__USE_STRUCT64_MACRO' is  enabled, then  headers are
+ *     allowed  to  simply macro-alias  binary-compatible  struct-types with
  *     each other, and the hosted source file is responsible to not forward-
- *     declare special variants of struct types (such as `timespec64')
+ *     declare special  variants  of  struct types  (such  as  `timespec64')
  *     before the declaring header has also been included.
- * WARNING: KOS-specific types such as `timespec32' are _not_ affect by
+ * WARNING: KOS-specific types such  as `timespec32' are  _not_ affect  by
  *          this and may _always_ be declared as `#define timespec32 ...'!
  */
 #if defined(__USE_KOS_KERNEL) || defined(_STRUCT64_MACRO_SOURCE)
@@ -698,15 +698,15 @@
 #endif /* _EVERY_SOURCE */
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
- * to exclude select symbol definitions done by DOS that were only there
- * in order to pollute the global namespace (e.g. `typedef ... size_t;'
+ * to exclude select symbol definitions done by DOS that were only  there
+ * in order to pollute  the global namespace (e.g.  `typedef ... size_t;'
  * in <crtdefs.h>, or the wchar-based functions in <stdio.h>, in addition
  * to already being declared in <wchar.h>)
- * Programs written to only use functions after including the _correct_
- * header should be able to enable this option without issue. Programs
+ * Programs written  to only  use functions  after including  the  _correct_
+ * header  should  be able  to enable  this  option without  issue. Programs
  * that accidentally rely on DOS's excessive use of function re-declarations
- * may use this option to check if they might be making non-portable
- * assumption on which functions are being declared following inclusion
+ * may use  this  option to  check  if  they might  be  making  non-portable
+ * assumption on  which functions  are  being declared  following  inclusion
  * of a system header. */
 #ifdef __USE_DOS
 #ifdef _DOS_SOURCE_CLEAN

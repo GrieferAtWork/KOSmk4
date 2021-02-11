@@ -58,14 +58,14 @@ funcf:
 	                           //       %rax must be set to the total number of floating point
 	                           //       parameters passed to the function in vector registers
 	je      1f
-	movaps  %xmm0, 80(%rsp)    // 
-	movaps  %xmm1, 96(%rsp)    // 
-	movaps  %xmm2, 112(%rsp)   // 
-	movaps  %xmm3, 128(%rsp)   // 
-	movaps  %xmm4, 144(%rsp)   // 
-	movaps  %xmm5, 160(%rsp)   // 
-	movaps  %xmm6, 176(%rsp)   // 
-	movaps  %xmm7, 192(%rsp)   // 
+	movaps  %xmm0, 80(%rsp)    //
+	movaps  %xmm1, 96(%rsp)    //
+	movaps  %xmm2, 112(%rsp)   //
+	movaps  %xmm3, 128(%rsp)   //
+	movaps  %xmm4, 144(%rsp)   //
+	movaps  %xmm5, 160(%rsp)   //
+	movaps  %xmm6, 176(%rsp)   //
+	movaps  %xmm7, 192(%rsp)   //
 1:
 	movl    $8, 8(%rsp)        // x86_64_va_list_struct::vl_gp_offset
 	movl    $48, 12(%rsp)      // x86_64_va_list_struct::vl_fp_offset
@@ -85,11 +85,11 @@ funcf:
 
 
 /* All of the specs (SysV for AMD64) say that this should be 16,
- * but in practice, GCC always behaves as if this was 8 (This
- * happens both in KOS's own toolchain, as well as within the
+ * but  in practice, GCC  always behaves as if  this was 8 (This
+ * happens  both in KOS's  own toolchain, as  well as within the
  * standard gcc of an x86_64 linux machine)
- * In case this turns out to be a weird quirk of gcc, please make use
- * of this macro within hand-written assembly, such that your code
+ * In  case  this turns  out to  be a  weird  quirk of  gcc, please  make use
+ * of  this  macro  within  hand-written   assembly,  such  that  your   code
  * will work with X86_64_VA_LIST_XMM_COUNT=8 and X86_64_VA_LIST_XMM_COUNT=16.
  * Other values may be assumed to never be applicable. */
 #if 1
@@ -182,18 +182,18 @@ struct x86_64_va_list_reg_save_area /*[PREFIX(rsa_)]*/ {
 struct x86_64_va_list_struct /*[PREFIX(vl_)]*/ {
 	/* From here:
 	 * https://stackoverflow.com/questions/4958384/what-is-the-format-of-the-x86-64-va-list-structure */
-	__UINT32_TYPE__ vl_gp_offset;         /* The element holds the offset in bytes from vl_reg_save_area
+	__UINT32_TYPE__ vl_gp_offset;         /* The element holds  the offset in  bytes from  vl_reg_save_area
 	                                       * to the place where the next available general purpose argument
-	                                       * register is saved. In case all argument registers have been
+	                                       * register is saved.  In case all  argument registers have  been
 	                                       * exhausted, it is set to the value 48 (6 * 8). */
-	__UINT32_TYPE__ vl_fp_offset;         /* The element holds the offset in bytes from vl_reg_save_area to
+	__UINT32_TYPE__ vl_fp_offset;         /* The element  holds the  offset in  bytes from  vl_reg_save_area  to
 	                                       * the place where the next available floating point argument register
-	                                       * is saved. In case all argument registers have been exhausted,
+	                                       * is  saved.  In case  all  argument registers  have  been exhausted,
 	                                       * it is set to the value 304 (6 * 8 + 16 * 16). */
 	__HYBRID_PTR64(__BYTE_TYPE__)
-	                vl_overflow_arg_area; /* This pointer is used to fetch arguments passed on the stack.
+	                vl_overflow_arg_area; /* This  pointer is used  to fetch arguments  passed on the stack.
 	                                       * It is initialized with the address of the first argument passed
-	                                       * on the stack, if any, and then always updated to point to the
+	                                       * on  the stack, if any, and then  always updated to point to the
 	                                       * start of the next argument on the stack. */
 	__HYBRID_PTR64(struct x86_64_va_list_reg_save_area)
 	                vl_reg_save_area;     /* The element points to the start of the register save area */

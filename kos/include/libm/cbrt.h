@@ -47,7 +47,7 @@ __DECL_BEGIN
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -116,7 +116,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -230,7 +230,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	/* If X is not finite or is null return it (with raising exceptions
 	 * if necessary.
 	 * Note: *Our* version of `frexp' sets XE to zero if the argument is
-	 * Inf or NaN.  This is not portable but faster.  */
+	 * Inf or NaN. This is not portable but faster. */
 	if (xe == 0 &&
 	    ((x_class = __ieee854_fpclassifyl(x)) == __FP_ZERO ||
 	     x_class == __FP_NAN || x_class == __FP_INFINITE))

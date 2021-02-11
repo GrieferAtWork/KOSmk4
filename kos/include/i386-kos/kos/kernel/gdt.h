@@ -27,7 +27,7 @@
 __SYSDECL_BEGIN
 
 /*
- * NOTE: Segment indices must be selected to fulfill the
+ * NOTE: Segment  indices must be selected to fulfill the
  *       following architecturally mandated requirements:
  * >> SEGMENT_KERNEL_CODE == IA32_SYSENTER_CS       (sysenter)
  * >> SEGMENT_KERNEL_DATA == IA32_SYSENTER_CS + 8   (sysenter)
@@ -50,9 +50,9 @@ __SYSDECL_BEGIN
  * >> IA32_STAR[47:32] = SEGMENT_KERNEL_CODE
  * >> IA32_STAR[63:48] = SEGMENT_USER_CODE32 | 3 (aka. `SEGMENT_USER_CODE32_RPL')
  *
- * Also: Since these segment indices are visible to user-space, make sure that any
+ * Also: Since these segment indices are visible  to user-space, make sure that  any
  *       segment that may be useful to user-space (such as all of the SEGMENT_USER_*
- *       segments) have the same value between 32-bit and 64-bit mode, irregardless
+ *       segments)  have the same value between 32-bit and 64-bit mode, irregardless
  *       of user-space being hosted by a 32-bit or 64-bit kernel.
  *       User-space should be allowed to hard-code expected segment values when it
  *       deems that doing so may be beneficial.
@@ -75,7 +75,7 @@ __SYSDECL_BEGIN
 #else /* __x86_64__ */
 #define SEGMENT_KERNEL_FSBASE   0x0020 /* Ring #0 fs-base (%fs; Pointers to the `struct task' of the current thread)
                                         * NOTE: This segment's base address is updated during every task-switch,
-                                        *       and represents the linear base address of the current task. */
+                                        *       and represents  the linear  base address  of the  current  task. */
 #endif /* !__x86_64__ */
 #define SEGMENT_USER_FSBASE     0x0028 /* Ring #3 fs-segment (%fs by convention (user may re-assign the base address)) */
 #define SEGMENT_USER_FSBASE_RPL 0x002b /* SEGMENT_USER_FSBASE | 3 */
@@ -83,12 +83,12 @@ __SYSDECL_BEGIN
 #define SEGMENT_USER_GSBASE_RPL 0x0033 /* SEGMENT_USER_GSBASE | 3 */
 #define SEGMENT_KERNEL_CODE     0x0038 /* Ring #0 code segment (%cs) */
 #define SEGMENT_KERNEL_DATA     0x0040 /* Ring #0 data segment (%ss)
-                                        * NOTE: For %ds and %es, `SEGMENT_USER_DATA' is re-used, so-as to reduce
-                                        *       the number of required segment changes during interrupts/syscalls.
-                                        *       However, this also means that user-space isn't allowed to change the
+                                        * NOTE: For %ds  and %es,  `SEGMENT_USER_DATA' is  re-used, so-as  to  reduce
+                                        *       the number of  required segment  changes during  interrupts/syscalls.
+                                        *       However,  this also means that user-space isn't allowed to change the
                                         *       base addresses of these segments, but only allowed to change those of
                                         *       `SEGMENT_USER_FSBASE' and `SEGMENT_USER_GSBASE', which can be done by
-                                        *       use of the `wrfsbase' and `wrgsbase' instruction (which are emulated
+                                        *       use of the `wrfsbase' and `wrgsbase' instruction (which are  emulated
                                         *       within a 32-bit kernel) */
 #define SEGMENT_USER_CODE32     0x0048 /* Ring #3 32-bit code segment (%cs) */
 #define SEGMENT_USER_CODE32_RPL 0x004b /* SEGMENT_USER_CODE32 | 3 */
@@ -153,7 +153,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __x86_64__
-/* Because of stuff like `mov $0, %ax; mov %ax, %fs;', `0' must also
+/* Because of stuff  like `mov $0, %ax; mov %ax, %fs;',  `0' must  also
  * be allowed as user-space segment index (except for %ss or %cs, which
  * aren't allowed to be loaded with a zero-selector) */
 #define SEGMENT_IS_VALID_USERCODE(x)   ((x) == SEGMENT_USER_CODE64_RPL || (x) == SEGMENT_USER_CODE32_RPL)
@@ -209,11 +209,11 @@ __SYSDECL_BEGIN
  * always:  Guarantied to be the case (may assume this case)
  * usually: Is the case by default; can be changed by factors (don't assume, but may optimize for this case)
  *
- * NOTE: The fact that %gs goes unused in 32-bit kernel-space is also the reason
- *       why some CPU state structures exist that simply omit it, as it doesn't
+ * NOTE: The fact that %gs  goes unused in 32-bit  kernel-space is also the  reason
+ *       why some CPU  state structures exist  that simply omit  it, as it  doesn't
  *       need to be saved/written/restored for the purposes of syscalls or hardware
  *       interrupts. The only place where it does actually need to be saved is when
- *       it comes to scheduling, as different user-space tasks are allowed to have
+ *       it comes to scheduling, as different user-space tasks are allowed to  have
  *       different values for their %gs segment selector.
  */
 

@@ -42,13 +42,13 @@ typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
 #define __EXCEPT_HANDLER_CC  /* nothing */
 #endif /* !__EXCEPT_HANDLER_CC */
 
-/* Prototype for a low-level user-space exception handler.
- * Note that the exact prototype may differ between architectures, as
- * well as the calling convention not always being the same, either.
- * The passed pointers will point to structures stored on a dedicated
+/* Prototype   for   a   low-level   user-space   exception   handler.
+ * Note that the exact prototype may differ between architectures,  as
+ * well as the calling convention  not always being the same,  either.
+ * The  passed pointers will point to structures stored on a dedicated
  * exception handler stack, or (by default) on the stack of the thread
  * that caused the exception
- * Other caveats include the fact that the expected behavior of the
+ * Other  caveats  include  the  fact   that  the  expected  behavior  of   the
  * function may differ based on other flags passed to `set_exception_handler()' */
 typedef /*__ATTR_NORETURN*/ void
 (__EXCEPT_HANDLER_CC *__except_handler_t)(error_register_state_t *__restrict state,

@@ -25,10 +25,10 @@
 #include <hybrid/__asm.h>
 #include <hybrid/host.h>
 
-/* On x86_64, mov between 32-bit registers automatically fills in the upper 32 bits
+/* On x86_64, mov between 32-bit registers automatically fills in the upper 32  bits
  * of the destination register with all zeroes. - Sometimes, readability of assembly
- * can be improved by explicitly annotating this implicit zero-extension, however
- * no instructions `movzbq' / `movzwq' / `movzlq' exist, but can easily be emulated
+ * can be improved  by explicitly annotating  this implicit zero-extension,  however
+ * no instructions `movzbq' / `movzwq' / `movzlq' exist, but can easily be  emulated
  * by using assembly macros.
  * It is the purpose of this file to define these macros. */
 

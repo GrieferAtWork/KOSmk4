@@ -170,8 +170,8 @@ zlib_reader_read(struct zlib_reader *__restrict self,
  * and `zlib_reader_eof(self)' also returning false.
  * WARNING: In order for `feed' to function properly, the reader
  *          must   have  access  to  a  sliding  window  buffer.
- *          Otherwise, you must ensure that the compressed data
- *          blob   is   already  complete   from   the  get-go. */
+ *          Otherwise,  you must ensure that the compressed data
+ *          blob is already complete from the get-go. */
 typedef __ATTR_NONNULL((1)) void
 (LIBZLIB_CC *PZLIB_READER_FEED)(struct zlib_reader *__restrict self,
                                 void const *blob, size_t blob_size);

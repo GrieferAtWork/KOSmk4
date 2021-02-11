@@ -155,4 +155,3 @@ __SYSDECL_END
 #endif /* TTYDEFCHARS */
 
 #endif /* !_SYS_TTYDEFAULTS_H */
-

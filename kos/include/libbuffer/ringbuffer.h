@@ -179,7 +179,7 @@ __NOTHROW(ringbuffer_closed)(struct ringbuffer *__restrict self);
  * When `ringbuffer_read()' is called, and no data is available, the function
  * will block  until data  becomes available,  or the  ringbuffer is  closed.
  * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
- *        it may call `task_yield()' when trying to acquire `self->rb_lock'
+ *        it may call `task_yield()'  when trying to acquire  `self->rb_lock'
  * @return: * : The number of bytes read. */
 typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_READ)(struct ringbuffer *__restrict __self,

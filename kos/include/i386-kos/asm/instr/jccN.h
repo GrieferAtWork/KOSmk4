@@ -25,12 +25,12 @@
 #include <hybrid/__asm.h>
 #include <hybrid/host.h>
 
-/* When writing self-modifying code, it is often very important to already
+/* When writing  self-modifying code,  it is  often very  important to  already
  * know the size of the generated code at assembly-time, rather than link-time,
  * as one often has to ensure sufficient padding space for being able to inject
  * instruction overrides.
  * However, on x86, the conditional jump instructions (jcc) pose a problem for this,
- * since they can be assembled in one of a couple of ways (each of which results in
+ * since they can be assembled in one of a couple of ways (each of which results  in
  * different instruction lengths):
  * >>  jz    1f
  * Can be assembled as:
@@ -40,7 +40,7 @@
  *     >>  jmp32 1f
  *     >>2:
  * Because of these choices that can often only be made later on during linking, one might
- * get an assembler error `error : non-constant expression in ".if" statement', since the
+ * get  an assembler error `error : non-constant expression in ".if" statement', since the
  * exact size of a instruction is yet to be known.
  *
  * To fix this problem, the programmer can make use of the macros in this file to explicitly

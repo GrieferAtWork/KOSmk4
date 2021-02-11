@@ -42,8 +42,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-/* Indicate the register numbers for a number of the specific debug
- * registers.  Registers 0-3 contain the addresses we wish to trap on */
+/* Indicate  the register numbers for a number of the specific debug
+ * registers. Registers 0-3 contain the addresses we wish to trap on */
 #define DR_FIRSTADDR 0 /* u_debugreg[DR_FIRSTADDR] */
 #define DR_LASTADDR  3 /* u_debugreg[DR_LASTADDR] */
 
@@ -51,7 +51,7 @@
 #define DR_CONTROL 7 /* u_debugreg[DR_CONTROL] */
 
 /* Define a few things for the status register. We can use this to determine
- * which debugging register was responsible for the trap. The other bits
+ * which debugging register  was responsible  for the trap.  The other  bits
  * are either reserved or not of interest to us. */
 
 #define DR_TRAP0 0x1 /* db0 */
@@ -62,9 +62,9 @@
 #define DR_STEP   0x4000 /* single-step */
 #define DR_SWITCH 0x8000 /* task switch */
 
-/* Now define a bunch of things for manipulating the control register.
- * The top two bytes of the control register consist of 4 fields of 4
- * bits - each field corresponds to one of the four debug registers,
+/* Now define a bunch of  things for manipulating the control  register.
+ * The top two bytes of  the control register consist  of 4 fields of  4
+ * bits  - each  field corresponds to  one of the  four debug registers,
  * and indicates what types of access we trap on, and how large the data
  * field is that we are looking at */
 
@@ -82,10 +82,10 @@
 #define DR_LEN_8 0x8
 #endif /* __x86_64__ */
 
-/* The low byte to the control register determine which registers are
- * enabled. There are 4 fields of two bits. One bit is "local", meaning
- * that the processor will reset the bit after a task switch and the other
- * is global meaning that we have to explicitly reset the bit. With linux,
+/* The  low  byte  to  the  control  register  determine  which  registers are
+ * enabled. There  are 4  fields of  two  bits. One  bit is  "local",  meaning
+ * that the processor will  reset the bit  after a task  switch and the  other
+ * is global meaning  that we have  to explicitly reset  the bit. With  linux,
  * you can use either one, since we explicitly zero the register when we enter
  * kernel mode. */
 

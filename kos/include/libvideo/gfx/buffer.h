@@ -78,13 +78,13 @@ struct video_buffer_ops {
 	                                  struct video_lock const *__restrict __lock);
 
 	/* Get graphics functions for use with the given buffer
-	 * @param: blendmode: Pixel blending mode for graphics operations targeting this buffer.
-	 *                    This  argument  should  be  constructed  using  `GFX_BLENDINFO()'.
+	 * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
+	 *                    This  argument   should  be   constructed  using   `GFX_BLENDINFO()'.
 	 *                    Usually, you will want to use `GFX_BLENDINFO_ALPHA' as blending  mode
 	 *                    when you wish to make use of alpha-blending. However, if you know for
 	 *                    certain  that alpha-blending isn't required, graphics performance can
 	 *                    be improved by passing  `GFX_BLENDINFO_OVERRIDE' in order to  prevent
-	 *                    any overhead that would normally incur from blending operations.
+	 *                    any overhead  that would  normally  incur from  blending  operations.
 	 * @param: flags:     Set of `VIDEO_GFX_F*'
 	 * @param: colorkey:  A specific color that should always return fully opaque when read
 	 *                    To disable colorkey-ing, simply pass some color with ALPHA=0  (or

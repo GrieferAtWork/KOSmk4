@@ -104,10 +104,10 @@ __SYSDECL_BEGIN
 
 /* Flags for `struct uhci_td::td_cs' */
 #define UHCI_TDCS_ACTLEN  0x000007ff /* [bit(0:10)][out] Actual Length. Written by the Host
-                                      * Controller after a USB transaction to indicate the
+                                      * Controller  after a USB transaction to indicate the
                                       * actual number of bytes that were transferred */
 #define UHCI_TDCS_BSE     0x00020000 /* [bit(17)][out] This bit is set to a 1 by the Host Controller during
-                                      * status update to indicate that the receive data stream contained
+                                      * status update to  indicate that the  receive data stream  contained
                                       * a sequence of more than 6 ones in a row. */
 #define UHCI_TDCS_CRCTMO  0x00040000 /* [bit(18)][out] Set by the HC: OUT/SETUP: Timeout; IN: CRC error. */
 #define UHCI_TDCS_NAKR    0x00080000 /* [bit(19)][out] Set by the HC: NAK Received. */
@@ -119,9 +119,9 @@ __SYSDECL_BEGIN
 #define UHCI_TDCS_IOS     0x02000000 /* [bit(25)][in] Isochronous Select (If set, always clear `UHCI_TDCS_ACTIVE', even on error) */
 #define UHCI_TDCS_LSD     0x04000000 /* [bit(26)][in] Low Speed Device */
 #define UHCI_TDCS_ERRCNTM 0x18000000 /* [bit(27:28)][in|out] Remaining number of allowed retries (0-3)
-                                      * When non-zero, HC will decrement and write-back on error.
-                                      * If HC decrements to 0, write-back and set `UHCI_TDCS_STALL'
-                                      * When initialized to 0, HC will keep on trying without limit */
+                                      * When non-zero,  HC will  decrement  and write-back  on  error.
+                                      * If HC decrements  to 0, write-back  and set  `UHCI_TDCS_STALL'
+                                      * When  initialized to 0,  HC will keep  on trying without limit */
 #define UHCI_TDCS_ERRCNTS         27 /* Shift for `UHCI_TDCS_ERRCNTM' */
 #define UHCI_TDCS_SPD     0x20000000 /* [bit(29)][in] Short Packet Detect */
 

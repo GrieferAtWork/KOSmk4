@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/ucontext.h>
- * 
+ *
  * Definitions:
  *    - struct ucontext { ... };
  */

@@ -127,44 +127,44 @@ __SYSDECL_BEGIN
 /*      RPC_PROGRAM_OP_         0x0d /* ... */
 /*      RPC_PROGRAM_OP_         0x0e /* ... */
 #define RPC_PROGRAM_OP_ext      0x0f /* Extended opcode prefix (must be followed by 1 or more `RPC_PROGRAM_OP_arg' opcodes, the first of which contains the actual opcode as operand) */
-#define RPC_PROGRAM_OP_add      0x10 /* `add  %arg[i++],  %newreg(a)'                      -- %newreg(a) = %newreg(a) + %arg[i++]
-                                      * `add  %arg[i++],  %newreg(b), %newreg(a)'          -- %newreg(a) = %newreg(b) + %arg[i++]
-                                      * `add  %newreg(c), %newreg(b), %newreg(a)'          -- %newreg(a) = %newreg(b) + %newreg(c) */
-#define RPC_PROGRAM_OP_sub      0x11 /* `sub  %arg[i++],  %newreg(a)'                      -- %newreg(a) = %newreg(a) - %arg[i++]
-                                      * `sub  %arg[i++],  %newreg(b), %newreg(a)'          -- %newreg(a) = %newreg(b) - %arg[i++]
-                                      * `sub  %newreg(c), %newreg(b), %newreg(a)'          -- %newreg(a) = %newreg(b) - %newreg(c) */
-#define RPC_PROGRAM_OP_arith    0x11 /* `mul  %newreg(c), %newreg(b), %newreg(a)' + d=0x00 -- %newreg(a) = %newreg(b) * %newreg(c)
-                                      * `div  %newreg(c), %newreg(b), %newreg(a)' + d=0x01 -- %newreg(a) = %newreg(b) / %newreg(c)
-                                      * `mod  %newreg(c), %newreg(b), %newreg(a)' + d=0x02 -- %newreg(a) = %newreg(b) % %newreg(c)
-                                      * `shl  %newreg(c), %newreg(b), %newreg(a)' + d=0x03 -- %newreg(a) = %newreg(b) << %newreg(c)
-                                      * `shr  %newreg(c), %newreg(b), %newreg(a)' + d=0x04 -- %newreg(a) = %newreg(b) >> %newreg(c)
-                                      * `sar  %newreg(c), %newreg(b), %newreg(a)' + d=0x05 -- %newreg(a) = (signed)%newreg(b) >> %newreg(c)
-                                      * `and  %newreg(c), %newreg(b), %newreg(a)' + d=0x06 -- %newreg(a) = %newreg(b) & %newreg(c)
-                                      * `andn %newreg(c), %newreg(b), %newreg(a)' + d=0x07 -- %newreg(a) = %newreg(b) & ~%newreg(c)
-                                      * `or   %newreg(c), %newreg(b), %newreg(a)' + d=0x08 -- %newreg(a) = %newreg(b) | %newreg(c)
-                                      * `orn  %newreg(c), %newreg(b), %newreg(a)' + d=0x09 -- %newreg(a) = %newreg(b) | ~%newreg(c)
-                                      * `xor  %newreg(c), %newreg(b), %newreg(a)' + d=0x0a -- %newreg(a) = %newreg(b) ^ %newreg(c)
-                                      * `xorn %newreg(c), %newreg(b), %newreg(a)' + d=0x0b -- %newreg(a) = %newreg(b) ^ ~%newreg(c)
+#define RPC_PROGRAM_OP_add      0x10 /* >> add  %arg[i++],  %newreg(a)             #          -- %newreg(a) = %newreg(a) + %arg[i++]
+                                      * >> add  %arg[i++],  %newreg(b), %newreg(a) #          -- %newreg(a) = %newreg(b) + %arg[i++]
+                                      * >> add  %newreg(c), %newreg(b), %newreg(a) #          -- %newreg(a) = %newreg(b) + %newreg(c) */
+#define RPC_PROGRAM_OP_sub      0x11 /* >> sub  %arg[i++],  %newreg(a)             #          -- %newreg(a) = %newreg(a) - %arg[i++]
+                                      * >> sub  %arg[i++],  %newreg(b), %newreg(a) #          -- %newreg(a) = %newreg(b) - %arg[i++]
+                                      * >> sub  %newreg(c), %newreg(b), %newreg(a) #          -- %newreg(a) = %newreg(b) - %newreg(c) */
+#define RPC_PROGRAM_OP_arith    0x11 /* >> mul  %newreg(c), %newreg(b), %newreg(a) # + d=0x00 -- %newreg(a) = %newreg(b) * %newreg(c)
+                                      * >> div  %newreg(c), %newreg(b), %newreg(a) # + d=0x01 -- %newreg(a) = %newreg(b) / %newreg(c)
+                                      * >> mod  %newreg(c), %newreg(b), %newreg(a) # + d=0x02 -- %newreg(a) = %newreg(b) % %newreg(c)
+                                      * >> shl  %newreg(c), %newreg(b), %newreg(a) # + d=0x03 -- %newreg(a) = %newreg(b) << %newreg(c)
+                                      * >> shr  %newreg(c), %newreg(b), %newreg(a) # + d=0x04 -- %newreg(a) = %newreg(b) >> %newreg(c)
+                                      * >> sar  %newreg(c), %newreg(b), %newreg(a) # + d=0x05 -- %newreg(a) = (signed)%newreg(b) >> %newreg(c)
+                                      * >> and  %newreg(c), %newreg(b), %newreg(a) # + d=0x06 -- %newreg(a) = %newreg(b) & %newreg(c)
+                                      * >> andn %newreg(c), %newreg(b), %newreg(a) # + d=0x07 -- %newreg(a) = %newreg(b) & ~%newreg(c)
+                                      * >> or   %newreg(c), %newreg(b), %newreg(a) # + d=0x08 -- %newreg(a) = %newreg(b) | %newreg(c)
+                                      * >> orn  %newreg(c), %newreg(b), %newreg(a) # + d=0x09 -- %newreg(a) = %newreg(b) | ~%newreg(c)
+                                      * >> xor  %newreg(c), %newreg(b), %newreg(a) # + d=0x0a -- %newreg(a) = %newreg(b) ^ %newreg(c)
+                                      * >> xorn %newreg(c), %newreg(b), %newreg(a) # + d=0x0b -- %newreg(a) = %newreg(b) ^ ~%newreg(c)
                                       * NOTE: Divide-by-zero will set the `RPC_STATUS_BADARGUMENTS' status (as will modulo-by-zero). */
 
 /*      RPC_PROGRAM_OP_         0x16 /* ... */
 /*      RPC_PROGRAM_OP_         0x17 /* ... */
-#define RPC_PROGRAM_OP_padd     0x18 /* `psh  add  %newreg(a), %arg[i++]'            -- `push(%newreg(a) + %arg[i++]);'
-                                      * `psh  add  %newreg(b), %newreg(a)'           -- `push(%newreg(a) + %newreg(b));' */
-#define RPC_PROGRAM_OP_psub     0x19 /* `psh  sub  %newreg(a), %arg[i++]'            -- `push(%newreg(a) - %arg[i++]);'
-                                      * `psh  sub  %newreg(b), %newreg(a)'           -- `push(%newreg(a) - %newreg(b));' */
-#define RPC_PROGRAM_OP_parith   0x19 /* `psh  mul  %newreg(b), %newreg(a)' + c=0x00  -- `push(%newreg(a) * %newreg(b));'
-                                      * `psh  div  %newreg(b), %newreg(a)' + c=0x01  -- `push(%newreg(a) / %newreg(b));'
-                                      * `psh  mod  %newreg(b), %newreg(a)' + c=0x02  -- `push(%newreg(a) % %newreg(b));'
-                                      * `psh  shl  %newreg(b), %newreg(a)' + c=0x03  -- `push(%newreg(a) << %newreg(b));'
-                                      * `psh  shr  %newreg(b), %newreg(a)' + c=0x04  -- `push(%newreg(a) >> %newreg(b));'
-                                      * `psh  sar  %newreg(b), %newreg(a)' + c=0x05  -- `push((signed)%newreg(a) >> %newreg(b));'
-                                      * `psh  and  %newreg(b), %newreg(a)' + c=0x06  -- `push(%newreg(a) & %newreg(b));'
-                                      * `psh  andn %newreg(b), %newreg(a)' + c=0x07  -- `push(%newreg(a) & ~%newreg(b));'
-                                      * `psh  or   %newreg(b), %newreg(a)' + c=0x08  -- `push(%newreg(a) | %newreg(b));'
-                                      * `psh  orn  %newreg(b), %newreg(a)' + c=0x09  -- `push(%newreg(a) | ~%newreg(b));'
-                                      * `psh  xor  %newreg(b), %newreg(a)' + c=0x0a  -- `push(%newreg(a) ^ %newreg(b));'
-                                      * `psh  xorn %newreg(b), %newreg(a)' + c=0x0b  -- `push(%newreg(a) ^ ~%newreg(b));'
+#define RPC_PROGRAM_OP_padd     0x18 /* >> psh  add  %newreg(a), %arg[i++]  #           -- `push(%newreg(a) + %arg[i++]);'
+                                      * >> psh  add  %newreg(b), %newreg(a) #           -- `push(%newreg(a) + %newreg(b));' */
+#define RPC_PROGRAM_OP_psub     0x19 /* >> psh  sub  %newreg(a), %arg[i++]  #           -- `push(%newreg(a) - %arg[i++]);'
+                                      * >> psh  sub  %newreg(b), %newreg(a) #           -- `push(%newreg(a) - %newreg(b));' */
+#define RPC_PROGRAM_OP_parith   0x19 /* >> psh  mul  %newreg(b), %newreg(a) # + c=0x00  -- `push(%newreg(a) * %newreg(b));'
+                                      * >> psh  div  %newreg(b), %newreg(a) # + c=0x01  -- `push(%newreg(a) / %newreg(b));'
+                                      * >> psh  mod  %newreg(b), %newreg(a) # + c=0x02  -- `push(%newreg(a) % %newreg(b));'
+                                      * >> psh  shl  %newreg(b), %newreg(a) # + c=0x03  -- `push(%newreg(a) << %newreg(b));'
+                                      * >> psh  shr  %newreg(b), %newreg(a) # + c=0x04  -- `push(%newreg(a) >> %newreg(b));'
+                                      * >> psh  sar  %newreg(b), %newreg(a) # + c=0x05  -- `push((signed)%newreg(a) >> %newreg(b));'
+                                      * >> psh  and  %newreg(b), %newreg(a) # + c=0x06  -- `push(%newreg(a) & %newreg(b));'
+                                      * >> psh  andn %newreg(b), %newreg(a) # + c=0x07  -- `push(%newreg(a) & ~%newreg(b));'
+                                      * >> psh  or   %newreg(b), %newreg(a) # + c=0x08  -- `push(%newreg(a) | %newreg(b));'
+                                      * >> psh  orn  %newreg(b), %newreg(a) # + c=0x09  -- `push(%newreg(a) | ~%newreg(b));'
+                                      * >> psh  xor  %newreg(b), %newreg(a) # + c=0x0a  -- `push(%newreg(a) ^ %newreg(b));'
+                                      * >> psh  xorn %newreg(b), %newreg(a) # + c=0x0b  -- `push(%newreg(a) ^ ~%newreg(b));'
                                       * NOTE: Divide-by-zero will set the `RPC_STATUS_BADARGUMENTS' status. */
 /*      RPC_PROGRAM_OP_         0x1d /* ... */
 /*      RPC_PROGRAM_OP_         0x1e /* ... */

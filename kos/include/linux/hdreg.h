@@ -272,44 +272,44 @@ struct hd_driveid {
 	__UINT16_TYPE__     last_lun;         /* (word 126) */
 	__UINT16_TYPE__     word127;          /* (word 127) Feature Set
 	                                       * Removable Media Notification
-	                                       * 15:2  reserved
-	                                       *  1:0  00 = not supported
-	                                       *       01 = supported
-	                                       *       10 = reserved
-	                                       *       11 = reserved */
+	                                       * 15:2:  reserved
+	                                       *  1:0:  00: not supported
+	                                       *        01: supported
+	                                       *        10: reserved
+	                                       *        11: reserved */
 	__UINT16_TYPE__     dlf;              /* (word 128)
 	                                       * device lock function
-	                                       * 15:9  reserved
-	                                       *  8    security level 1:max 0:high
-	                                       *  7:6  reserved
-	                                       *  5    enhanced erase
-	                                       *  4    expire
-	                                       *  3    frozen
-	                                       *  2    locked
-	                                       *  1    en/disabled
-	                                       *  0    capability */
+	                                       * 15:9:  reserved
+	                                       *  8:    security level 1:max 0:high
+	                                       *  7:6:  reserved
+	                                       *  5:    enhanced erase
+	                                       *  4:    expire
+	                                       *  3:    frozen
+	                                       *  2:    locked
+	                                       *  1:    en/disabled
+	                                       *  0:    capability */
 	__UINT16_TYPE__     csfo;             /*  (word 129)
 	                                       * current set features options
-	                                       * 15:4  reserved
-	                                       *  3:   auto reassign
-	                                       *  2:   reverting
-	                                       *  1:   read-look-ahead
-	                                       *  0:   write cache */
+	                                       * 15:4:  reserved
+	                                       *  3:    auto reassign
+	                                       *  2:    reverting
+	                                       *  1:    read-look-ahead
+	                                       *  0:    write cache */
 	__UINT16_TYPE__     words130_155[26]; /* reserved vendor words 130-155 */
 	__UINT16_TYPE__     word156;          /* reserved vendor word 156 */
 	__UINT16_TYPE__     words157_159[3];  /* reserved vendor words 157-159 */
 	__UINT16_TYPE__     cfa_power;        /* (word 160) CFA Power Mode
-	                                       * 15 word 160 supported
-	                                       * 14 reserved
-	                                       * 13
-	                                       * 12
-	                                       * 11:0 */
+	                                       * 15:   word 160 supported
+	                                       * 14:   reserved
+	                                       * 13:   reserved
+	                                       * 12:   reserved
+	                                       * 11:0: reserved */
 	__UINT16_TYPE__     words161_175[15]; /* Reserved for CFA */
 	__UINT16_TYPE__     words176_205[30]; /* Current Media Serial Number */
 	__UINT16_TYPE__     words206_254[49]; /* reserved words 206-254 */
 	__UINT16_TYPE__     integrity_word;   /* (word 255)
-	                                       * 15:8 Checksum
-	                                       *  7:0 Signature */
+	                                       * 15:8: Checksum
+	                                       *  7:0: Signature */
 };
 #endif /* __CC__ */
 

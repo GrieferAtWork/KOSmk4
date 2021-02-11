@@ -79,12 +79,12 @@ typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 
 
-/* Establish connection between a process and a message queue NAME and
- * return message queue descriptor or (mqd_t)-1 on error. OFLAGS determines
- * the type of access used. If O_CREAT is on OFLAGS, the third argument is
+/* Establish  connection  between  a process  and  a message  queue  NAME and
+ * return message queue descriptor or  (mqd_t)-1 on error. OFLAGS  determines
+ * the type of access used.  If O_CREAT is on  OFLAGS, the third argument  is
  * taken as a `mode_t', the mode of the created message queue, and the fourth
- * argument is taken as `struct mq_attr *', pointer to message queue
- * attributes. If the fourth argument is NULL, default attributes are used. */
+ * argument  is  taken  as  `struct mq_attr *',  pointer  to  message   queue
+ * attributes. If the fourth argument  is NULL, default attributes are  used. */
 #ifndef __mq_open_defined
 #define __mq_open_defined 1
 __LIBRT_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) mqd_t
@@ -145,7 +145,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_send)(mqd_t __mqdes, char const *__msg_ptr,
 #endif /* !__mq_send_defined */
 
 #ifdef __USE_XOPEN2K
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 #ifndef __mq_timedreceive_defined
 #define __mq_timedreceive_defined 1
@@ -164,7 +164,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedreceive)(mqd_t __mqdes, char *__restrict __msg_
 #endif /* !__mq_timedreceive_defined */
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 #ifndef __mq_timedsend_defined
 #define __mq_timedsend_defined 1
 #ifdef __USE_TIME_BITS64
@@ -182,7 +182,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedsend)(mqd_t __mqdes, char const *__msg_ptr,
 #endif /* !__mq_timedsend_defined */
 
 #ifdef __USE_TIME64
-/* Receive the oldest from highest priority messages in
+/* Receive  the  oldest  from highest  priority  messages in
  * message queue MQDES, stop waiting if ABS_TIMEOUT expires. */
 #ifndef __mq_timedreceive64_defined
 #define __mq_timedreceive64_defined 1
@@ -193,7 +193,7 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedreceive64)(mqd_t __mqdes, char *__restrict __ms
 #endif /* !__mq_timedreceive64_defined */
 
 /* Add message pointed by MSG_PTR to message queue MQDES, stop
- * blocking on full message queue if ABS_TIMEOUT expires. */
+ * blocking  on  full  message queue  if  ABS_TIMEOUT expires. */
 #ifndef __mq_timedsend64_defined
 #define __mq_timedsend64_defined 1
 __LIBRT_DECL __ATTR_NONNULL((2, 5)) int

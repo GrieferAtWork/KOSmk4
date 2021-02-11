@@ -695,19 +695,19 @@ struct __exception_data32 /*[NAME(exception_data32)][PREFIX(e_)]*/ {
 	/* Exception-specific arguments */
 	union __exception_data_pointers32 e_args;
 	/* The address of the instruction that caused the fault.
-	 * Unlike the program counter stored within the `error_register_state_t'
-	 * structure which can be accessed through `error_register_state()', this
-	 * one _may_ point _before_ the instruction that caused the error, however
-	 * it may also point after the instruction. Which of the two it is depends
-	 * on how the specific exception was generated, though it should be noted
+	 * Unlike  the  program  counter stored  within  the `error_register_state_t'
+	 * structure  which  can be  accessed through  `error_register_state()', this
+	 * one  _may_ point _before_  the instruction that  caused the error, however
+	 * it may also point after  the instruction. Which of  the two it is  depends
+	 * on  how the  specific exception was  generated, though it  should be noted
 	 * that in the case of errors thrown by `THROW()', this address will _always_
-	 * point _after_ the instruction (meaning it's always equal to the program
+	 * point  _after_ the instruction  (meaning it's always  equal to the program
 	 * counter stored in `error_register_state()')
 	 *  - e_faultaddr: Either equal to `GETPC(error_register_state())', or points
-	 *                 to the instruction that is `error_register_state()'.
+	 *                 to  the  instruction  that  is   `error_register_state()'.
 	 *  - GETPC(error_register_state()):
 	 *                 Always points to the instruction that would have been
-	 *                 executed next if the exception hadn't been thrown. */
+	 *                 executed next if  the exception  hadn't been  thrown. */
 	__HYBRID_PTR32(void) e_faultaddr;
 };
 

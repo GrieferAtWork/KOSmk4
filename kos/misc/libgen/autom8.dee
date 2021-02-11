@@ -45,7 +45,6 @@
 #endif
 
 import * from deemon;
-import isFileGitIgnored from .gitignore;
 import fs;
 
 global Autom8Parser;
@@ -58,23 +57,43 @@ global OPT_UNDO_REFLOW = false;
 
 function builtinReflowOff(parser: Autom8Parser, none) { parser.commentReflowEnabled = false; }
 function builtinReflowOn(parser: Autom8Parser, none) { parser.commentReflowEnabled = true; }
+function builtinSkip2End(parser: Autom8Parser, none) {
+	local endTag = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
+	local endTag2 = parser.text.find("//[[[end]]]\n", parser.commentEnd);
+	if (endTag >= 0)
+		endTag += 13;
+	if (endTag2 >= 0)
+		endTag2 += 12;
+	if (endTag < 0)
+		endTag = endTag2;
+	else if (endTag2 >= 0 && endTag > endTag2) {
+		endTag = endTag2;
+	}
+	if (endTag < 0) {
+		parser.errAt(parser.commentStart + 3,
+			"Missing [[[end]]]-tag for [[[deemon]]]");
+	}
+	parser.newText << parser.text[parser.flushStart:endTag];
+	parser.flushStart = endTag;
+}
 
 /* A couple of built-in commands. */
 global final BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, string)} = {
-	"deemon" : none,           /* Intentionally ignored: You should still use `deemon -F' for these! */
-	"magic" : none,            /* Magic compiler annotations (used by the KOS build system) */
-	"AUTO" : none,             /* Generic region marker */
-	"start" : none,            /* Generic region start */
-	"begin" : none,            /* Generic region start */
-	"end" : none,              /* Generic region end */
-	"skip" : none,             /* Skip implementation (in libc/user/ *.c) */
-	"impl" : none,             /* Custom implementation (in libc/user/ *.c) */
-	"virtual" : none,          /* Seen in "x86-db.h" */
-	"struct" : none,           /* TODO: Planned extension for automation of __OFFSET_* macros... */
+	"deemon" : builtinSkip2End, /* Don't format auto-generated output of [[[deemon]]]-scripts */
+	"magic" : none,             /* Magic compiler annotations (used by the KOS build system) */
+	"AUTO" : none,              /* Generic region marker */
+	"start" : none,             /* Generic region start */
+	"begin" : none,             /* Generic region start */
+	"end" : none,               /* Generic region end */
+	"skip" : none,              /* Skip implementation (in libc/user/ *.c) */
+	"impl" : none,              /* Custom implementation (in libc/user/ *.c) */
+	"virtual" : none,           /* Seen in "x86-db.h" */
+	"struct" : none,            /* TODO: Planned extension for automation of __OFFSET_* macros... */
+	"order" : none,             /* Used by generate_headers.dee */
 
 	/* Disable comment reflow inside of auto-generated prototypes (in libc/user/ *.c) */
-	"head" : builtinReflowOff, /* Prototype header (in libc/user/ *.c) */
-	"body" : builtinReflowOn,  /* Prototype body (in libc/user/ *.c) */
+	"head" : builtinReflowOff,  /* Prototype header (in libc/user/ *.c) */
+	"body" : builtinReflowOn,   /* Prototype body (in libc/user/ *.c) */
 };
 
 function getAutom8Command(name: string): none | Callable with (Autom8Parser, string) {
@@ -505,25 +524,46 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	/* Split paragraphs that are separated by empty lines. */
 	local result = [];
 	local paragraphBlock = [];
-	for (local l: lines) {
-		l = l.rstrip();
+	local numLines = #lines;
+	for (local i = 0; i < numLines;) {
+		local l = lines[i].rstrip();
 		if (!l) {
 			if (paragraphBlock) {
 				result.extend(reflowBlockComment(paragraphBlock, lineLength));
 				paragraphBlock = [];
 			}
 			result.append(l);
-		} else if (l.first in "-*") {
+		} else if ("```" in l) {
+			/* Disable reflow when ``` is countered. */
+			local start = l.index("```");
+			local end   = l.find("```", start + 3);
+			if (end >= 0)
+				goto normal_paragraph_after_tripple_backtick;
+			local startLine = i;
+			++i;
+			while (i < numLines) {
+				if ("```" in lines[i])
+					break;
+				++i;
+			}
+			if (i < numLines)
+				++i; /* Also include the last line. */
+			if (paragraphBlock)
+				result.extend(reflowBlockComment(paragraphBlock, lineLength));
+			result.extend(lines[startLine:i]);
+			paragraphBlock = [];
+			continue;
+		} else normal_paragraph_after_tripple_backtick: if (l.first in "-*") {
 			if (paragraphBlock)
 				result.extend(reflowBlockComment(paragraphBlock, lineLength));
 			paragraphBlock = [l];
 		} else if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
-			local i = 2;
-			while (i < #l && l.issymcont(i))
-				++i;
-			while (i < #l && l.isspace(i))
-				++i;
-			if (i < #l && l[i] in ":") {
+			local j = 2;
+			while (j < #l && l.issymcont(j))
+				++j;
+			while (j < #l && l.isspace(j))
+				++j;
+			if (j < #l && l[j] in ":") {
 				/* Element-tag annotation */
 				if (paragraphBlock)
 					result.extend(reflowBlockComment(paragraphBlock, lineLength));
@@ -550,6 +590,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 				paragraphBlock.append(l);
 			}
 		}
+		++i;
 	}
 	/* Check for sub-paragraphs */
 	local currentBlock = none;
@@ -564,6 +605,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			++i;
 			continue;
 		}
+
 		/* Check if the line may be a @foo-annotation */
 		if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
 			local j = 2;
@@ -733,6 +775,14 @@ reflow_normal_block:
 	return result;
 }
 
+function shouldReflowComment(body: string): bool {
+	if (body.casecontains("copyright (c)"))
+		return false;
+	if (body.casecontains("gnu general public license"))
+		return false;
+	return true;
+}
+
 
 function autom8Worker(parser: Autom8Parser,
 		getCommandByName: Callable with string): bool {
@@ -760,14 +810,17 @@ function autom8Worker(parser: Autom8Parser,
 				try {
 					cmd = getCommandByName(commentBody[:cmdNameEnd]);
 				} catch (Error as e) {
-					parser.errAt(parser.commentStart + 3, e.message);
+					local l, c = parser.lcAt(parser.commentStart + 3)...;
+					print(parser.filename, "(", l, ",", c, ") : Error : ", e.message);
+					throw;
 				}
 				if (cmd !is none) {
 					commentBody = commentBody[cmdNameEnd:];
 					cmd(parser, commentBody.lstrip());
 				}
 			}
-		} else if ("\n" in commentBody && parser.commentReflowEnabled) {
+		} else if ("\n" in commentBody && parser.commentReflowEnabled &&
+		           shouldReflowComment(commentBody)) {
 			/* Reflow comment paragraphs. */
 			local commentLineStart = parser.text.rfind("\n", 0, parser.commentStart) + 1;
 			local numLeadingTabs = 0;
@@ -932,6 +985,7 @@ global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({
 });
 
 function autom8FileWithWildcard(filename: string) {
+	import isFileGitIgnored from .gitignore;
 	if ("*" !in filename)
 		return autom8File(filename);
 	local head = fs.headof(filename);

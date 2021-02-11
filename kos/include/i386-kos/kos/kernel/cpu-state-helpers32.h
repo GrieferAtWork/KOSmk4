@@ -1115,12 +1115,12 @@ __NOTHROW_NCX(ucpustate32_to_kcpustate32)(struct ucpustate32 const *__restrict _
 	__result->kcs_eflags = __self->ucs_eflags;
 	__result->kcs_eip    = __self->ucs_eip;
 }
-/* NOTE: `KERNEL_ESP' should point onto the kernel-stack where the cpu-state should
+/* NOTE: `KERNEL_ESP' should point onto the kernel-stack where the cpu-state  should
  *       be allocated, and will be initial ESP during execution (note that this last
- *       part is specific to icpustate32/scpustate32, as the 64-bit variants do not
+ *       part  is specific to icpustate32/scpustate32, as the 64-bit variants do not
  *       make this distinction).
- * WARNING: The `%gs' register is not applied this function, and must therefor be
- *          set manually by the caller if this is the intend (note that the absence
+ * WARNING: The `%gs' register  is not  applied this  function, and  must therefor  be
+ *          set manually by the caller  if this is the  intend (note that the  absence
  *          of the `%gs' register is what differentiates icpustate32 from scpustate32) */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
 __NOTHROW_NCX(ucpustate32_to_icpustate32_p)(struct ucpustate32 const *__restrict __self,

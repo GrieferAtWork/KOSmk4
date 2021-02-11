@@ -844,11 +844,11 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 /************************************************************************/
 #if defined(__USE_POSIX2) || defined(__DEEMON__)
 #ifndef _POSIX2_RE_DUP_MAX
-#define _POSIX2_RE_DUP_MAX 255 /* The maximum number of repeated occurrences of a regular
+#define _POSIX2_RE_DUP_MAX 255 /* The  maximum  number  of  repeated  occurrences  of  a   regular
                                 * expression permitted when using the interval notation `\{M,N\}'. */
 #endif /* !_POSIX2_RE_DUP_MAX */
 
-/* The maximum number of repeated occurrences of a regular
+/* The  maximum  number  of  repeated  occurrences  of  a   regular
  * expression permitted when using the interval notation `\{M,N\}'. */
 #ifndef RE_DUP_MAX
 #ifndef __RE_DUP_MAX

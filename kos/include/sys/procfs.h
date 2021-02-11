@@ -56,9 +56,9 @@ __SYSDECL_BEGIN
 /* Type for a general-purpose register. */
 typedef __ULONGPTR_TYPE__ elf_greg_t;
 
-/* And the whole bunch of them. We could have used `struct
+/* And   the  whole  bunch  of  them.  We  could  have  used  `struct
  * user_regs_struct' directly in the typedef, but tradition says that
- * the register set is an array, which does have some peculiar
+ * the  register  set  is an  array,  which does  have  some peculiar
  * semantics, so leave it that way. */
 #define ELF_NGREG (sizeof(struct user_regs_struct) / sizeof(elf_greg_t))
 typedef elf_greg_t elf_gregset_t[ELF_NGREG];
@@ -86,10 +86,10 @@ struct elf_siginfo {
 };
 
 
-/* Definitions to generate Intel SVR4-like core files. These mostly
- * have the same names as the SVR4 types with "elf_" tacked on the
- * front to prevent clashes with Linux definitions, and the typedef
- * forms have been avoided. This is mostly like the SVR4 structure,
+/* Definitions to generate Intel  SVR4-like core files. These  mostly
+ * have the same names  as the SVR4 types  with "elf_" tacked on  the
+ * front to prevent clashes with  Linux definitions, and the  typedef
+ * forms have been avoided. This  is mostly like the SVR4  structure,
  * but more Linuxy, with things that Linux does not support and which
  * GDB doesn't really use excluded. */
 
@@ -131,7 +131,7 @@ struct elf_prpsinfo {
 };
 
 
-/* The rest of this file provides the types for emulation of the
+/* The  rest of  this file provides  the types for  emulation of the
  * Solaris <proc_service.h> interfaces that should be implemented by
  * users of libthread_db. */
 

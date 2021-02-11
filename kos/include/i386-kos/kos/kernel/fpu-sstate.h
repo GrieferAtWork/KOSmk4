@@ -47,7 +47,7 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 	                                     * Get using `__fstcw()'/`__fnstcw()'; Set using `__fldcw()' */
 	__uint16_t          __fe_pad1;      /* ... */
 	__uint16_t            fe_fsw;       /* Floating point status word. (Set of `FSW_*')
-	                                     * Get using `__fstsw()'/`__fnstsw()'; */
+	                                     * Get  using   `__fstsw()'   /   `__fnstsw()'; */
 	__uint16_t          __fe_pad2;      /* ... */
 	__uint16_t            fe_ftw;       /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
 	__uint16_t          __fe_pad3;      /* ... */
@@ -93,7 +93,7 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]
 			                                   * Get using `__fstcw()'/`__fnstcw()'; Set using `__fldcw()' */
 			__uint16_t          __fs_pad1;    /* ... */
 			__uint16_t            fs_fsw;     /* Floating point status word. (Set of `FSW_*')
-			                                   * Get using `__fstsw()'/`__fnstsw()'; */
+			                                   * Get  using   `__fstsw()'   /   `__fnstsw()'; */
 			__uint16_t          __fs_pad2;    /* ... */
 			__uint16_t            fs_ftw;     /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
 			__uint16_t          __fs_pad3;    /* ... */

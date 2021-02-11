@@ -25,7 +25,7 @@
 #include <bits/elf-types.h>
 
 /* NOTE: Data structures in this header follow ELF naming and syntax contentions,
- *       but their names are non-standardized and should not be expected to be
+ *       but  their names are  non-standardized and should not  be expected to be
  *       available on platforms other than KOS. */
 
 /* Data structures for core file note segments. */

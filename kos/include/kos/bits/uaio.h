@@ -44,29 +44,29 @@ struct uaio {
 	__uint16_t             ua_op;       /* [in] The operation to-be performed (one of `UAIO_OP_*') */
 	__uint16_t             ua_flag;     /* [in] AIO operation flags (set of `UAIO_F_*'). */
 	uaio_id_t              ua_id;       /* [out] ID assigned by the kernel for this AIO operation.
-	                                     * This ID can be used to query the completion-progress
+	                                     * This ID can  be used to  query the  completion-progress
 	                                     * of this AIO operation (s.a. `HOP_UAIO_PROGRESS') */
 	__size_t               ua_result;   /* [out] AIO success return value (written just before
-	                                     *       the status is set to `UAIO_STATUS_SUCCESS').  */
+	                                     *       the status is set to `UAIO_STATUS_SUCCESS'). */
 	__uintptr_t            ua_status;   /* [in|out] The current status (must be pre-initialize to `UAIO_STATUS_PENDING')
-	                                     * NOTE: In order to prevent infinite recursion of uaio objects pointing
+	                                     * NOTE: In order to  prevent infinite recursion  of uaio objects  pointing
 	                                     *       back on themselves, the underlying UAIO object will stop execution
 	                                     *       and indicate UAIO completion (read(&c, 1) returns c=0) when a UAIO
-	                                     *       descriptor is encountered that has `ua_status' field with a value
-	                                     *       different from `UAIO_STATUS_PENDING', `UAIO_STATUS_RUNNING' and
-	                                     *       `UAIO_STATUS_CANCEL' (only these 3 values are accepted as valid
+	                                     *       descriptor is encountered that has `ua_status' field with a  value
+	                                     *       different from  `UAIO_STATUS_PENDING',  `UAIO_STATUS_RUNNING'  and
+	                                     *       `UAIO_STATUS_CANCEL' (only these  3 values are  accepted as  valid
 	                                     *       status values for which UAIO can be initiated)
-	                                     * -> Since the kernel _always_ writes a value that differs from these 3
-	                                     *    values when the operation completes on its own, a UAIO structure that
-	                                     *    points back to itself will automatically terminate once it reaches the
-	                                     *    first entry that had already been completed, thus making it impossible
+	                                     * -> Since the kernel  _always_ writes  a value  that differs  from these  3
+	                                     *    values when the operation completes on  its own, a UAIO structure  that
+	                                     *    points  back to itself will automatically terminate once it reaches the
+	                                     *    first  entry that had already been completed, thus making it impossible
 	                                     *    to have the kernel keep on executing UAIO operations without eventually
 	                                     *    finishing all enqueued operations. */
 	lfutex_t              *ua_changed;  /* [0..1][in] A futex that is broadcast when `ua_status' is changed,
-	                                     *            though do note the special case for `UAIO_F_RUNSTAT'
+	                                     *            though  do note the  special case for `UAIO_F_RUNSTAT'
 	                                     *            and `UAIO_STATUS_RUNNING'.
 	                                     * Set to `NULL' to disable futex notification for this operation. */
-	struct exception_data *ua_error;    /* [0..1][in] Exception data filled in if something goes wrong.
+	struct exception_data *ua_error;    /* [0..1][in] Exception  data  filled  in  if  something  goes  wrong.
 	                                     * The pointed-to memory region is written before `UAIO_STATUS_FAILED'
 	                                     * is indicated. */
 	union {

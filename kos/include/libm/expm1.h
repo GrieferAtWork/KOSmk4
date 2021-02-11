@@ -191,7 +191,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * Copyright (C) 2004 by Sun Microsystems, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -464,7 +464,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	/* exp(x) = exp(k ln 2) exp(remainder ln 2) = 2^k exp(remainder ln 2).
 	 * We have qx = exp(remainder ln 2) - 1, so
 	 * exp(x) - 1 = 2^k (qx + 1) - 1
-	 * = 2^k qx + 2^k - 1.  */
+	 * = 2^k qx + 2^k - 1. */
 	if (__k == 16384) {
 		__px = __ieee854_ldexpl(__IEEE854_LONG_DOUBLE_C(1.0), (int)__k - 2);
 		__x  = (__px * __qx + (__px - __IEEE854_LONG_DOUBLE_C(0.25))) * __IEEE854_LONG_DOUBLE_C(4.0);

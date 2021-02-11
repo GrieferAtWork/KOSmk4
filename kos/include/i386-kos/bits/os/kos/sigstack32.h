@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/sigstack32.h>
- * 
+ *
  * Definitions:
  *    - struct __sigstackx32 { ... };
  *    - struct __sigaltstackx32 { ... };

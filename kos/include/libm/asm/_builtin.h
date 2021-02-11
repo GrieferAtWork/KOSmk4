@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-/* Define these macros if the respective compiler builtin function
+/* Define these macros if  the respective compiler builtin  function
  * both exists, and never generates code containing calls to library
  * functions.
  * When individual macros are defined, compiler intrinsics are used
@@ -33,7 +33,7 @@
 
 
 /* NOTE: Many of these builtins probably also worked this way before 9.1.0,
- *       however that's the version for which I've checked the GCC source
+ *       however that's the version for  which I've checked the GCC  source
  *       to find those functions to which the above conditions apply. */
 #if defined(__GNUC__) && __GCC_VERSION_NUM >= 90100
 #define __LIBM_HAVE_BUILTIN_ASM_FABS           1

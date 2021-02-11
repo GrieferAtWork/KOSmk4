@@ -29,7 +29,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* `-fnon-call-exception' currently requires __asm__ to be marked as volatile.
+/* `-fnon-call-exception' currently  requires  __asm__  to be  marked  as  volatile.
  * s.a. the following bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357 */
 #ifndef __asm_ncx_memop__
 #ifdef __NON_CALL_EXCEPTIONS
@@ -58,16 +58,16 @@ __DECL_BEGIN
  */
 
 
-/* Technically, Zg would be the correct variant to choose here (at least under KOS,
- * or when unconditionally targeting AMD processors), since AMD provides an immediate
+/* Technically,  Zg  would be  the correct  variant to  choose here  (at least  under KOS,
+ * or when  unconditionally targeting  AMD processors),  since AMD  provides an  immediate
  * variant that is emulated under KOS. However (at least with QEMU), instruction emulation
- * is somewhat flawed, in that opcode 0x8f is emulated as pop for _all_ modrm.mi_reg
- * values, rather than only being emulated for 0x8f/0 (modrm.mi_reg == 0).
- * Because opcode 0x8f/{1-7} is the entry point for XOP opcodes, and because QEMU doesn't
- * natively emulate XOP opcodes, this makes it impossible for KOS to emulate XOP opcodes
- * when running under QEMU. (it is unknown if, but likely that real hardware exists with
+ * is somewhat flawed,  in that  opcode 0x8f  is emulated  as pop  for _all_  modrm.mi_reg
+ * values,   rather   than  only   being  emulated   for   0x8f/0  (modrm.mi_reg   ==  0).
+ * Because  opcode 0x8f/{1-7} is the entry point for XOP opcodes, and because QEMU doesn't
+ * natively emulate XOP opcodes, this makes it  impossible for KOS to emulate XOP  opcodes
+ * when  running under QEMU. (it is unknown if,  but likely that real hardware exists with
  * the same problem)
- * As such, keep `bextr' free of XOP (and as a side-note, try to avoid instructions
+ * As  such, keep `bextr' free of XOP (and  as a side-note, try to avoid instructions
  * annotated as `xop' below, as those are the ones that can't be emulated under QEMU) */
 #if 0
 #define __X86_BEXTR_STARTLEN_CONSTRAINTS "Zg" /* u32, modrm */

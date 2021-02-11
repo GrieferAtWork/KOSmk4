@@ -25,8 +25,8 @@
 #include <hybrid/__asm.h>
 
 /* >> __X86_64_DO_LAZYBIND(SYMBOL name, void *getaddr(void))
- * Define a self-modifying function that lazily invokes `getaddr()', then uses that function's
- * return value as a text location to jump to, permanently re-writing itself such that any future
+ * Define  a self-modifying  function that lazily  invokes `getaddr()', then  uses that function's
+ * return  value as a text location to jump to, permanently re-writing itself such that any future
  * calls to `name' will always be forwarded to the initially returned address, without `getaddr()'
  * having to be called ever again. */
 #define __X86_64_DO_LAZYBIND(name, getaddr, ...) \

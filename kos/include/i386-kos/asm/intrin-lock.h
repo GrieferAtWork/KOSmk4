@@ -35,7 +35,7 @@ __SYSDECL_BEGIN
 #endif /* !__x86_64__ */
 
 
-/* NOTE: The weird types (signed?!?) are used because this header isn't actually meant to be used.
+/* NOTE: The  weird types (signed?!?) are used because this header isn't actually meant to be used.
  *       The reason it exists is so we can implement msvc's <intrin.h> header more closely matching
  *       the original. */
 #define __DEFINE_UNARY_LOCK_OPERATION(__lock_name, __hybrid_atomic_fetchname) \

@@ -41,11 +41,11 @@ __DECL_BEGIN
 #define MOUSE_PACKET_TYPE_VSCROLL 0x3 /* The vertical scroll-wheel was moved */
 #define MOUSE_PACKET_TYPE_HSCROLL 0x4 /* The horizontal scroll-wheel was moved */
 #define MOUSE_PACKET_TYPE_MOVED   0x9 /* The mouse's absolute position has changed (only generated if abs-packets are enabled).
-                                       * When abs-packets are disabled, `MOUSE_PACKET_TYPE_MOTION' is generated instead. */
+                                       * When  abs-packets  are  disabled,  `MOUSE_PACKET_TYPE_MOTION'  is  generated  instead. */
 #define MOUSE_PACKET_TYPE_IS4FIELD(x) ((x) & 8) /* The packet has 4 6-bit signed integer fields. (else: 2 12-bit signed integer fields) */
 
 #define MOUSE_PACKET_SEQMAX  6 /* Limit on the number of packets apart of the same sequence.
-                                * Calculated as: X = 6 FOR X in 12*X >= 64 && 6*X >= 32 */
+                                * Calculated as: X  = 6 FOR  X in 12*X  >= 64 &&  6*X >=  32 */
 
 #ifdef __CC__
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -87,7 +87,7 @@ typedef union __ATTR_ALIGNED(2) __ATTR_PACKED {
 	__uint32_t mp_word; /* Packet control word */
 	struct __ATTR_PACKED {
 		/* Mouse packet. - This is the structure that is returned when `read(2)'-ing from a mouse device.
-		 * Prior to being usable, this structure should be processed using `mouse_packet_sequence()', in
+		 * Prior to being usable, this structure should be processed using `mouse_packet_sequence()',  in
 		 * order to safely handle packet sequences. */
 		unsigned int mp_type   : 4; /* Mouse packet type. */
 		unsigned int mp_seqnum : 4; /* Packet sequence number.
@@ -99,7 +99,7 @@ typedef union __ATTR_ALIGNED(2) __ATTR_PACKED {
 		                             * Example: { 3, 2, 1, 0 } (4-packet sequence) */
 		union __ATTR_PACKED {
 
-			/* NOTE: Sign-extension is done based on the most significant bit
+			/* NOTE: Sign-extension is done based on the most significant  bit
 			 *       of the sequence packet with the greatest sequence number. */
 			struct __ATTR_PACKED {
 				/* PACKET: RELX |= mm_relx << (mp_seqnum * 12);
@@ -152,7 +152,7 @@ typedef union __ATTR_ALIGNED(2) __ATTR_PACKED {
 } mouse_packet_t;
 
 typedef union {
-	__int64_t   psd_data64[2]; /* MOUSE_PACKET_TYPE_MOTION, MOUSE_PACKET_TYPE_BUTTON,
+	__int64_t   psd_data64[2]; /* MOUSE_PACKET_TYPE_MOTION,  MOUSE_PACKET_TYPE_BUTTON,
 	                            * MOUSE_PACKET_TYPE_VSCROLL, MOUSE_PACKET_TYPE_HSCROLL */
 	__int32_t   psd_data32[4]; /* MOUSE_PACKET_TYPE_MOVED { posx, posy, relx, rely } */
 	__intptr_t _psd_ptr[16 / __SIZEOF_POINTER__];

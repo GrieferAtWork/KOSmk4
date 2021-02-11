@@ -349,7 +349,7 @@ struct ansitty_operators {
 	 *      The return value for this case doesn't matter and is ignored.
 	 *  - newios != NULL:
 	 *      Compare the current IOS state with `oldios'
-	 *      If they differ,  leave  `oldios'  undefined,  and  return  `false'
+	 *      If they  differ,  leave  `oldios' undefined,  and  return  `false'
 	 *      If they match, set `newios' as the new IOS state and return `true'
 	 */
 	__ATTR_NONNULL((1, 2))

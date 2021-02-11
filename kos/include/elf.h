@@ -50,9 +50,9 @@
 #include <bits/elf.h>
 #endif /* __USE_KOS */
 
-/* The contents of this file were originally based on GLibc /usr/include/elf.h
+/* The contents of this file  were originally based on GLibc  /usr/include/elf.h
  * Note however that heavy additions were made and more documentation was added,
- * meaning that the original should be retrieved from GLibc instead.
+ * meaning  that  the   original  should  be   retrieved  from  GLibc   instead.
  * Additional sources:
  *  - https://docs.oracle.com/cd/E19253-01/817-1984/chapter6-14428/index.html
  *  - GNU Binutils (internal headers)
@@ -249,7 +249,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #endif
 
 /* Fields in the e_ident array. The EI_* macros are indices into the
- * array. The macros under each EI_* macro are the values the byte
+ * array. The macros under each EI_*  macro are the values the  byte
  * may have. */
 #define EI_MAG0         0               /* File identification byte 0 index */
 #define ELFMAG0         0x7f            /* Magic number byte 0 */
@@ -576,7 +576,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define EM_RISCV        243             /* RISC-V */
 #define EM_NUM          244             /* Max (low) used EM_* code plus 1 */
 
-/* If it is necessary to assign new unofficial EM_* values, please
+/* If  it is necessary to assign new unofficial EM_* values, please
  * pick large random numbers (0x8523, 0xa7f2, etc.) to minimize the
  * chances of collision with official or non-GNU unofficial values. */
 #define EM_ALPHA_EXP    0x9026 /* used by NetBSD/alpha; obsolete */
@@ -588,10 +588,10 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define EV_NUM          2
 
 
-/* Given one of the above EM_* constants, expand to the
- * machine's name (that is: the part following the EM_*)
+/* Given one  of the  above EM_*  constants, expand  to  the
+ * machine's name  (that is:  the part  following the  EM_*)
  * If the given `em' doesn't name one of the EM_* constants,
- * or isn't a preprocessor-time constant itself, expand to
+ * or  isn't a preprocessor-time  constant itself, expand to
  * either `error', or `"?"' instead. Usage:
  * >> static char const foo[] = "mach: " ELF_EMNAME(EM_386); // strcmp(foo, "mach: 386") == 0 */
 #ifdef __USE_KOS
@@ -790,7 +790,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define __PRIVATE_EM_NAME_0x9026 _EN(ALPHA_EXP)
 
 /* Expand to the name of the given ELFCLASS* constant.
- * The string expanded to is the part after the "ELF"
+ * The string expanded to is the part after the  "ELF"
  * prefix. E.g. "CLASS32" for `ELFCLASS32' */
 #ifdef __USE_KOS
 #define ELF_CLASSNAME(em)                   __PRIVATE_ELF_CLASSNAME(em, "?")
@@ -822,7 +822,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define __PRIVATE_ELFDATA_NAME_2 _EN(DATA2MSB)
 
 
-/* Expand to the name of the given ELFOSABI_* constant.
+/* Expand to  the name  of the  given ELFOSABI_*  constant.
  * The string expanded to is the part after the "ELFOSABI_"
  * prefix. E.g. "SYSV" for `ELFOSABI_SYSV' */
 #ifdef __USE_KOS
@@ -857,7 +857,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define __PRIVATE_ELFOSABI_NAME_255  _EN(STANDALONE)
 
 
-/* Expand to the name of the given ET_* constant.
+/* Expand to  the name  of the  given ET_*  constant.
  * The string expanded to is the part after the "ET_"
  * prefix. E.g. "EXEC" for `ET_EXEC' */
 #ifdef __USE_KOS
@@ -1160,35 +1160,35 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
  *     Behavior:
  *       ...
  *     st_value: Pointer to a function `T (*resolve(void))(T1 a, T2 b, ...)'
- *               When called, this function should return a pointer to the
+ *               When called, this function should  return a pointer to  the
  *               function that should be linked at runtime.
- *     st_size:  Only used for R_386_SIZE32 and similar relocations
- *     compiler-time linker may use relocations such as `R_386_JUMP_SLOT' to
+ *     st_size:  Only  used   for   R_386_SIZE32   and   similar   relocations
+ *     compiler-time linker may use  relocations such as `R_386_JUMP_SLOT'  to
  *     add another layer of indirection, where `resolve()' will only be called
  *     once the function is used for the first time.
  *
  * STT_KOS_IDATA:
  *     Purpose:
  *       - Can be used to lazily initialize global data structures in support
- *         libraries, but only do so when those structures actually end
- *         up being used, rather than the conventional method of doing so
+ *         libraries,  but  only do  so  when those  structures  actually end
+ *         up being used,  rather than  the conventional method  of doing  so
  *         unconditionally within some library initializer callback.
  *     Behavior:
  *       - ld:    Same as `STT_OBJECT'
  *       - rtld:  Same as `STT_GNU_IFUNC' (during relocations/symbol lookup)
  *     Fields:
  *         st_value: Pointer to a function `T *resolve(void)'
- *                   When called, this function should return a pointer to the
- *                   data-blob that should be linked at runtime. Note however
+ *                   When  called, this  function should  return a  pointer to the
+ *                   data-blob that  should be  linked  at runtime.  Note  however
  *                   that due to relocations such as `R_386_GLOB_DAT', the pointed
- *                   that will be returned by dlsym() for the object may differ
- *                   from the pointer returned by resolve(). When this is the
- *                   case, then the actual symbol pointer will be filled with a
- *                   copy of the data-blob returned by resolve(), where this
- *                   copy will have previously been allocated by `ld' when it
+ *                   that  will be returned  by dlsym() for  the object may differ
+ *                   from the  pointer returned  by resolve().  When this  is  the
+ *                   case,  then the actual  symbol pointer will  be filled with a
+ *                   copy of  the  data-blob  returned by  resolve(),  where  this
+ *                   copy will  have previously  been allocated  by `ld'  when  it
  *                   was linking against the declaring library.
- *         st_size:  The size of the lazily initialized data blob. This size must
- *                   match the size of the data-blob returned by `resolve()'!
+ *         st_size:  The size of the lazily  initialized data blob. This size  must
+ *                   match the  size  of  the data-blob  returned  by  `resolve()'!
  *                   Note that this is a link-time constant that cannot be affected
  *                   by the `resolve()' function.
  *
@@ -1197,8 +1197,8 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 
 #define ELF_SYM_UNDEFINED 0             /* Symbol Table index of the undefined symbol */
 
-/* Symbol table indices are found in the hash buckets and chain table
- * of a symbol hash table section. This special index value indicates
+/* Symbol  table  indices are  found in  the hash  buckets and  chain table
+ * of  a  symbol hash  table section.  This  special index  value indicates
  * the end of a chain, meaning no further symbols are found in that bucket. */
 #define STN_UNDEF       0               /* End of a chain. */
 
@@ -1231,7 +1231,7 @@ typedef struct elf32_rel /*[PREFIX(r_)]*/ {
 } Elf32_Rel;
 #endif /* __CC__ */
 
-/* I have seen two different definitions of the Elf64_Rel and
+/* I have seen two different definitions of the Elf64_Rel  and
  * Elf64_Rela structures, so we'll leave them out until Novell
  * (or whoever) gets their act together. */
 /* The following, at least, is used on Sparc v9, MIPS, and Alpha. */
@@ -1526,7 +1526,7 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define DT_HIPROC       0x7fffffff      /* End of processor-specific */
 #define DT_PROCNUM      DT_MIPS_NUM     /* Most used by any processor */
 
-/* DT_* entries which fall between DT_VALRNGHI & DT_VALRNGLO use the
+/* DT_* entries which fall between DT_VALRNGHI & DT_VALRNGLO use  the
  * Dyn.d_un.d_val field of the Elf*_Dyn structure. This follows Sun's
  * approach. */
 #define DT_VALRNGLO     0x6ffffd00
@@ -1566,7 +1566,7 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define DT_ADDRNUM 11
 
 /* The versioning entry types. The next are
- * defined as part of the GNU extension. */
+ * defined as  part of  the GNU  extension. */
 #define DT_VERSYM       0x6ffffff0
 
 #define DT_RELACOUNT    0x6ffffff9
@@ -1581,7 +1581,7 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define DT_VERSIONTAGIDX(tag)   (DT_VERNEEDNUM - (tag)) /* Reverse order! */
 #define DT_VERSIONTAGNUM 16
 
-/* Sun added these machine-independent extensions
+/* Sun added  these  machine-independent  extensions
  * in the "processor-specific" range. Be compatible. */
 #define DT_AUXILIARY    0x7ffffffd      /* Shared object to load before self */
 #define DT_FILTER       0x7fffffff      /* Shared object to get values from */
@@ -1596,7 +1596,7 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define DF_STATIC_TLS   0x00000010      /* Module uses the static TLS model */
 
 /* State flags selectable in the `d_un.d_val' element
- * of the DT_FLAGS_1 entry in the dynamic section. */
+ * of the DT_FLAGS_1  entry in  the dynamic  section. */
 #define DF_1_NOW        0x00000001      /* Set RTLD_NOW for this object. */
 #define DF_1_GLOBAL     0x00000002      /* Set RTLD_GLOBAL for this object. */
 #define DF_1_GROUP      0x00000004      /* Set RTLD_GROUP for this object. */
@@ -1831,15 +1831,15 @@ typedef struct elf64_vernaux /*[PREFIX(vna_)]*/ {
 
 
 /* Auxiliary vector. */
-/* FIXME: The Auxiliary vector is OS-dependent and should therefor not appear
+/* FIXME: The Auxiliary  vector is  OS-dependent and  should therefor  not  appear
  *        here, but instead be encoded inside of a separate header <asm/os/auxv.h>
  */
 
 /* This vector is normally only used by the program interpreter. The
- * usual definition in an ABI supplement uses the name auxv_t. The
- * vector is not usually defined in a standard <elf.h> file, but it
- * can't hurt. We rename it to avoid conflicts. The sizes of these
- * types are an arrangement between the exec server and the program
+ * usual definition in an ABI  supplement uses the name auxv_t.  The
+ * vector is not usually defined in a standard <elf.h> file, but  it
+ * can't hurt. We rename it to  avoid conflicts. The sizes of  these
+ * types  are an arrangement between the exec server and the program
  * interpreter, so we don't fully specify them here. */
 #define __OFFSET_ELF32_AUXV_TYPE 0
 #define __OFFSET_ELF32_AUXV_VAL  4 /* [FIELD(a_un.a_val)] */
@@ -1855,7 +1855,7 @@ typedef struct elf32_auxv_t /*[NAME(elf32_auxv)][PREFIX(a_)]*/ {
 	union {
 		Elf32_Word a_val; /* Integer value */
 		/* We used to have pointer elements added here. We cannot do that,
-		 * though, since it does not work when using 32-bit definitions
+		 * though, since it  does not work  when using 32-bit  definitions
 		 * on 64-bit platforms and vice versa. */
 	} a_un;
 } Elf32_auxv_t;
@@ -1865,7 +1865,7 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 	union {
 		Elf64_Xword a_val; /* Integer value */
 		/* We used to have pointer elements added here. We cannot do that,
-		 * though, since it does not work when using 32-bit definitions
+		 * though, since it  does not work  when using 32-bit  definitions
 		 * on 64-bit platforms and vice versa. */
 	} a_un;
 } Elf64_auxv_t;
@@ -1903,7 +1903,7 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 #define AT_UCACHEBSIZE    21            /* Unified cache block size. */
 
 /* A special ignored value for PPC, used by the kernel to
- * control the interpretation of the AUXV. Must be > 16. */
+ * control the interpretation of the AUXV. Must be >  16. */
 #define AT_IGNOREPPC      22            /* Entry should be ignored. */
 #define AT_SECURE         23            /* Boolean, was exec setuid-like?  */
 #define AT_BASE_PLATFORM  24            /* String identifying real platforms.*/
@@ -1913,7 +1913,7 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 #define AT_SYSINFO_EHDR   33
 
 /* Shapes of the caches. Bits 0-3 contains associativity; bits 4-7
- * contains log2 of line size; mask those to get cache size. */
+ * contains  log2  of line  size; mask  those  to get  cache size. */
 #define AT_L1I_CACHESHAPE 34
 #define AT_L1D_CACHESHAPE 35
 #define AT_L2_CACHESHAPE  36
@@ -1964,13 +1964,13 @@ typedef struct elf64_nhdr /*[PREFIX(n_)]*/ {
 
 /* ABI information. The descriptor consists of words:
  * word 0: OS descriptor
- * word 1: major version of the ABI
- * word 2: minor version of the ABI
+ * word 1:  major version  of the  ABI
+ * word 2:  minor version  of the  ABI
  * word 3: subminor version of the ABI */
 #define ELF_NOTE_ABI            1
 
 /* Known OSes. These value can appear in word
- * 0 of an ELF_NOTE_ABI note section entry. */
+ * 0 of an  ELF_NOTE_ABI note section  entry. */
 #define ELF_NOTE_OS_LINUX       0
 #define ELF_NOTE_OS_GNU         1
 #define ELF_NOTE_OS_SOLARIS2    2
@@ -2970,7 +2970,7 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_PPC_NUM               95
 
 /* The remaining relocs are from the Embedded
- * ELF ABI, and are not in the SVR4 ELF ABI. */
+ * ELF ABI, and are not in the SVR4 ELF  ABI. */
 #define R_PPC_EMB_NADDR32       101
 #define R_PPC_EMB_NADDR16       102
 #define R_PPC_EMB_NADDR16_LO    103
@@ -3002,7 +3002,7 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_PPC_REL16_HI          251     /* half16   (sym-.)@h */
 #define R_PPC_REL16_HA          252     /* half16   (sym-.)@ha */
 
-/* This is a phony reloc to handle any old fashioned
+/* This is a phony reloc  to handle any old  fashioned
  * TOC16 references that may still be in object files. */
 #define R_PPC_TOC16             255
 
@@ -3191,7 +3191,7 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Legal values for note segment descriptor types for core files. */
 #define NT_ARM_VFP           0x400      /* ARM VFP registers */
 /* The following definitions should really use NT_AARCH_...,
- * but defined this way for compatibility with Linux. */
+ * but  defined  this  way  for  compatibility  with  Linux. */
 #define NT_ARM_TLS           0x401      /* AArch TLS registers; note name must be "LINUX". */
 #define NT_ARM_HW_BREAK      0x402      /* AArch hardware breakpoint registers; note name must be "LINUX". */
 #define NT_ARM_HW_WATCH      0x403      /* AArch hardware watchpoint registers; note name must be "LINUX". */

@@ -187,7 +187,7 @@ struct ip6_opt {
 };
 #endif /* __CC__ */
 
-/* The high-order 3 bits of the option type define the behavior
+/* The  high-order 3 bits  of the option  type define the behavior
  * when processing an unknown option and whether or not the option
  * content changes in flight. */
 #define IP6OPT_TYPE(o)       ((o) & 0xc0)

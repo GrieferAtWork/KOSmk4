@@ -55,7 +55,7 @@ case EMU86_OPCODE_ENCODE(0xa5):
 #endif /* !EMU86_EMULATE_CONFIG_WANT_MOVS */
 {
 	/* A4     MOVSB     For legacy mode, Move byte from address DS:(E)SI to ES:(E)DI.
-	 *                  For 64-bit mode move  byte from address  (R|E)SI to  (R|E)DI. */
+	 *                  For 64-bit mode  move byte from  address (R|E)SI to  (R|E)DI. */
 	byte_t *psi_addr, *pdi_addr;
 #if !EMU86_EMULATE_CONFIG_WANT_MOVS
 	EMU86_UREG_TYPE psi, pdi;
@@ -86,9 +86,9 @@ do_movs_save_pointer:
 #if EMU86_EMULATE_CONFIG_WANT_MOVS
 case EMU86_OPCODE_ENCODE(0xa5): {
 	/*         A5     MOVSW     For legacy mode, move word from address DS:(E)SI to ES:(E)DI.
-	 *                          For 64-bit mode  move word  at  address (R|E)SI  to  (R|E)DI.
+	 *                          For 64-bit  mode move  word at  address (R|E)SI  to  (R|E)DI.
 	 *         A5     MOVSD     For legacy mode, move dword from address DS:(E)SI to ES:(E)DI.
-	 *                          For 64-bit mode move  dword from address  (R|E)SI to  (R|E)DI.
+	 *                          For 64-bit mode  move dword from  address (R|E)SI to  (R|E)DI.
 	 * REX.W + A5     MOVSQ     Move qword from address (R|E)SI to (R|E)DI. */
 	byte_t *psi_addr, *pdi_addr;
 	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr,

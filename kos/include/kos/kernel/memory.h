@@ -27,7 +27,7 @@
 
 __DECL_BEGIN
 
-/* Type declarations and helper macros for
+/* Type  declarations  and  helper  macros   for
  * working with physical memory addresses/pages. */
 
 #ifdef __CC__

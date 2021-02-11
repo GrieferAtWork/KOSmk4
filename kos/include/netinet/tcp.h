@@ -372,8 +372,8 @@ enum {
 #define TCPOPT_TSTAMP_HDR      (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_TIMESTAMP<<8|TCPOLEN_TIMESTAMP)
 
 /* Default maximum segment size for TCP.
- * With an IP MSS of 576, this is 536,
- * but 512 is probably more convenient.
+ * With an IP MSS  of 576, this is  536,
+ * but 512 is probably more  convenient.
  * This should be defined as MIN(512, IP_MSS - sizeof(struct tcpiphdr)). */
 #define TCP_MSS                 512
 #define TCP_MAXWIN              65535 /* largest value for (unscaled) window */

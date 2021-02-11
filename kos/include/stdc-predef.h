@@ -22,11 +22,11 @@
 #ifndef _STDC_PREDEF_H
 #define _STDC_PREDEF_H 1
 
-/* Special case: This header (is|may be) included by a compiler as the first thing
- *               that's done when compilation starts. As such, we don't include
- *               <__stdinc.h> in here, since that would mean there (may) not be
+/* Special case: This header (is|may be) included by a compiler as the first  thing
+ *               that's  done when  compilation starts.  As such,  we don't include
+ *               <__stdinc.h> in here,  since that  would mean there  (may) not  be
  *               any way to prevent that header from being included, or to override
- *               some of its macros on a per-file basis (also: doing so would mean
+ *               some of its macros on a per-file basis (also: doing so would  mean
  *               a lot of (possibly) unnecessary overhead) */
 
 

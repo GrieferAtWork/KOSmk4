@@ -90,7 +90,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_rintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
-	 * and using round-to-even for FE_TONEAREST */
+	 * and  using   round-to-even  for   FE_TONEAREST */
 	switch (__libc_fegetround()) {
 
 	case FE_UPWARD:
@@ -188,7 +188,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_rint)(__IEEE754_DOUBLE_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
-	 * and using round-to-even for FE_TONEAREST */
+	 * and  using   round-to-even  for   FE_TONEAREST */
 	switch (__libc_fegetround()) {
 
 	case FE_UPWARD:
@@ -288,7 +288,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_rintl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
-	 * and using round-to-even for FE_TONEAREST */
+	 * and  using   round-to-even  for   FE_TONEAREST */
 	switch (__libc_fegetround()) {
 
 	case FE_UPWARD:

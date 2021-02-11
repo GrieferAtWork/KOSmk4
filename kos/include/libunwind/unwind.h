@@ -32,8 +32,8 @@
 #include "cfi.h"
 #include "eh_frame.h"
 
-/* High-level  API   functions   for   (optionally   cached)   queries
- * on   FDE   descriptors   associated   with   arbitrary   addresses.
+/* High-level API functions for (optionally cached) queries
+ * on  FDE descriptors associated with arbitrary addresses.
  * NOTE: The internally kept FDE cache is cleared by `dlclearcaches()'
  */
 

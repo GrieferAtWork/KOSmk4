@@ -37,10 +37,10 @@ __DECL_BEGIN
 
 /* Create a new UAIO controller file descriptor.
  * WARNING: The resulting UAIO object is bound to the calling process's VM!
- *          You can share the UAIO object between processes, just like any
- *          other UAIO object, however attempting to use `UAio_Start()' in
- *          a process other than the one that originally created the UAIO
- *          controller will cause `UAio_Start()' to return by throwing an
+ *          You  can share the UAIO object between processes, just like any
+ *          other UAIO object, however attempting to use `UAio_Start()'  in
+ *          a process other than the  one that originally created the  UAIO
+ *          controller will cause `UAio_Start()'  to return by throwing  an
  *          `E_ILLEGAL_OPERATION' exception.
  * @param: uaio_flags: Set of `UAIO_CREATE_*'
  * @throws: E_BADALLOC: [...] */
@@ -58,20 +58,20 @@ UAio_Create(__syscall_ulong_t __uaio_flags) {
 #endif /* __KSysctl_defined */
 
 /* Start a UAIO command chain.
- * NOTE: You are allowed to start (enqueue) additional UAIO operation before `self'
+ * NOTE: You  are allowed to start (enqueue) additional UAIO operation before `self'
  *       has finished. However the order in which newly added operation are executed
  *       in relation to pre-existing operations is undefined.
  *       Additionally, the kernel is allowed to implement this case by modifying the
  *       `ua_next' pointers of the given `ops'
- * NOTE: You can wait for the UAIO object to finish all of the given UAIO operations
+ * NOTE: You  can wait for  the UAIO object to  finish all of  the given UAIO operations
  *       by polling it for `POLLIN', or by using `do read(self, &c, 1); while (c != 0);'
- *       Note that `read()' will always return 1 byte of data that is a 0-byte if UAIO
- *       has been completed, and `1' if UAIO is currently in progress. The later will
- *       only ever be returned when the `IO_NONBLOCK' flag is set for `self'. If that
- *       flag is not set, then `read()' will block until all operations have completed.
+ *       Note  that `read()' will always return 1 byte  of data that is a 0-byte if UAIO
+ *       has been completed, and `1'  if UAIO is currently  in progress. The later  will
+ *       only ever be returned when  the `IO_NONBLOCK' flag is  set for `self'. If  that
+ *       flag is not set, then `read()' will block until all operations have  completed.
  * @throws: E_BADALLOC:          [...]
  * @throws: E_INVALID_HANDLE:    [...]
- * @throws: E_ILLEGAL_OPERATION: The given UAIO object is bound to a different process's VM.
+ * @throws: E_ILLEGAL_OPERATION: The  given UAIO object is bound to a different process's VM.
  *                               Or in other words: You're not the one that created this UAIO
  *                               object. You're only allowed to poll() and read() in order to
  *                               wait for the UAIO object to complete. */
@@ -89,7 +89,7 @@ UAio_Start(__fd_t __self, struct uaio *__restrict __ops) {
 #endif /* __Hop_defined */
 
 /* Cancel all pending UAIO operations that haven't been completed, yet.
- * NOTE: 
+ * NOTE:
  * @throws: E_INVALID_HANDLE: [...] */
 #ifdef __hop_defined
 __LOCAL int __NOTHROW_NCX(__LIBCCALL uaio_cancel)(__fd_t __self) {

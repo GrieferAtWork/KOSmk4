@@ -48,8 +48,8 @@ __DECL_BEGIN
 #define ATA_ADDRESS3       __IOPORT(5)
 #define ATA_DRIVE_SELECT   __IOPORT(6)
 #define ATA_STATUS         __IOPORT(7) /* [READ] ATA Status port (same values as `a_ctrl')
-                                        * NOTE: Unlike `a_ctrl', when read, pending interrupts are cleared.
-                                        *       This port should really only be used for polling-like ATA
+                                        * NOTE: Unlike  `a_ctrl', when read, pending interrupts are cleared.
+                                        *       This port should  really only be  used for polling-like  ATA
                                         *       operations, as only `a_ctrl' can safely be used when working
                                         *       with interrupts enabled. */
 #define ATA_COMMAND        __IOPORT(7) /* [WRITE] ATA Command port */
@@ -100,7 +100,7 @@ __DECL_BEGIN
 /* Bits for `DMA_PRIMARY_COMMAND' */
 #define DMA_COMMAND_FENABLED  0x01 /* When set, DMA mode is enabled.
                                     * NOTE: Setting this bit also resets the ATA's DMA pointer to the start
-                                    *       of the PRD vector, should that pointer have been anywhere else
+                                    *       of  the PRD vector, should that pointer have been anywhere else
                                     *       prior to then.
                                     * NOTE: When a transfer has been completed, this bit must be cleared
                                     *       before it can be set again. */
@@ -110,13 +110,13 @@ __DECL_BEGIN
 
 
 /* Bits for `DMA_PRIMARY_STATUS' */
-#define DMA_STATUS_FDMARUNNING        0x01 /* When set, DMA mode is currently running and working to complete
+#define DMA_STATUS_FDMARUNNING        0x01 /* When  set, DMA mode  is currently running  and working to complete
                                             * all provided `AtaPRD' entries. Once completed, this bit is cleared
                                             * by the ATA device. */
 #define DMA_STATUS_FTRANSPORT_FAILURE 0x02 /* Set if any of the `AtaPRD' entries failed to be completed for whatever reason. */
 #define DMA_STATUS_FINTERRUPTED       0x04 /* Set if the associated ATA device was responsible for an IRQ being generated. */
 #define DMA_STATUS_FNO_PARALLEL_DMA   0x80 /* Indicates that the primary and secondary ATA devices can be used
-                                            * for DMA at the same time. (Not normally set on modern hardware) */
+                                            * for DMA at the same time. (Not normally set on modern  hardware) */
 
 
 #ifdef __CC__
@@ -125,7 +125,7 @@ struct ata_ports {
 	__IOPORT_T a_ctrl; /* Device control register/Alternate status ports. */
 	__IOPORT_T a_dma;  /* DMA controller port (or (__IOPORT_T)-1 if DMA isn't supported)
 	                    * NOTE: When initializing a secondary ATA device, this port
-	                    *       has been shifted such that `DMA_SECONDARY_COMMAND'
+	                    *       has been shifted such that  `DMA_SECONDARY_COMMAND'
 	                    *       becomes `DMA_PRIMARY_COMMAND', etc. */
 };
 

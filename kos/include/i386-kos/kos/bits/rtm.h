@@ -35,11 +35,11 @@ typedef __UINT32_TYPE__ __rtm_status_t;
 /* Inline-optimizations for specific RTM functions. */
 
 /* Since we can assume that we're already inside of an RTM operation,
- * we know that we can only get here in 2 circumstances:
+ * we   know  that  we   can  only  get   here  in  2  circumstances:
  *   - The real hardware has support for RTM, in which case it should
- *     also be able to recognize the `xend' instruction.
- *   - We're being emulated by the `rtm' driver, in which case its
- *     instruction decoder is able to detect the `xend' instruction,
+ *     also   be   able   to   recognize   the   `xend'  instruction.
+ *   - We're  being emulated by  the `rtm' driver,  in which case its
+ *     instruction decoder is able to detect the `xend'  instruction,
  *     and handle it as an alias for the `sys_rtm_end()' system call. */
 #define __arch_rtm_end() __asm__ __volatile__("xend" : : : "memory")
 

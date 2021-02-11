@@ -27,11 +27,11 @@
 
 #include <asm/instr/movzxq.h>
 
-/* Helper macros to push/pop the `IA32_KERNEL_GS_BASE' MSR.
+/* Helper  macros   to  push/pop   the  `IA32_KERNEL_GS_BASE'   MSR.
  * Note that while _in_ kernel-space, `IA32_KERNEL_GS_BASE' actually
- * refers to the user-space %gs.base value, so these macros can be
+ * refers to the user-space %gs.base  value, so these macros can  be
  * used to push/pop that register instead, meaning that they're very
- * useful when it comes to constructing `scpustate' structures. */
+ * useful  when  it  comes to  constructing  `scpustate' structures. */
 
 #ifdef __x86_64__
 __ASM_BEGIN

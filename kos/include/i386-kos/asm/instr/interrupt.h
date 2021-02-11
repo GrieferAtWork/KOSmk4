@@ -25,7 +25,7 @@
 #include <hybrid/host.h>
 
 /* On x86_64, entering/exiting an interrupt requires some special actions to be
- * be performed in order to safely load/restore %gs.base. Additionally, iretq
+ * be performed in order to  safely load/restore %gs.base. Additionally,  iretq
  * must be used instead of `iret'
  * With all of this in mind, an interrupt handler on x86_64 should be written
  * using the macros in this file:

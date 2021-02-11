@@ -371,7 +371,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			__LIBM_GET_HIGH_WORD(__exponent, __ex2_u);
 			__exponent += ((__int32_t)__n) << IEEE754_DOUBLE_SHIFT;
 			__LIBM_SET_HIGH_WORD(__ex2_u, __exponent);
-			/* Approximate e^(dx+delta) - 1, using a second-degree polynomial,
+			/* Approximate  e^(dx+delta) - 1,  using a second-degree polynomial,
 			 * with maximum error in [-2^-10-2^-28,2^-10+2^-28] less than 5e-11. */
 			__x22 = (__IEEE754_DOUBLE_C(0.5000000496709180453) * __dx +
 			         __IEEE754_DOUBLE_C(1.0000001192102037084)) *
@@ -412,7 +412,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  *
  * Developed at SunSoft, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */

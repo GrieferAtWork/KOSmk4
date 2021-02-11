@@ -40,14 +40,14 @@
 #define ELF_ARCH386_USESRELA 0 /* i386 doesn't use addend-relocations */
 #define ELF_ARCH386_LAZYINDX 0 /* Lazy relocations use offsets, rather than indices */
 
-/* The user-space register holding a pointer to the ProcessEnvironmentBlock
+/* The  user-space  register  holding  a  pointer  to  the   ProcessEnvironmentBlock
  * immediately following the initial transition to user-space after a call to exec()
  * NOTE: This register points to a `struct process_peb' structure. */
 #define ELF_ARCH386_PEB_REGISTER ebp
 
-/* When a dynamic linker is loaded, additional information is passed
+/* When  a dynamic  linker is  loaded, additional  information is passed
  * via user-space registers containing information about how the program
- * must be linked before it can actually be executed properly.
+ * must  be  linked  before  it  can  actually  be  executed   properly.
  * The exact structures pointed to by `ELF_ARCH386_DL_RTLDDATA_REGISTER'
  * depend on which DL loader was chosen:
  *   - ELF: `struct process_rtld_elfdata' */

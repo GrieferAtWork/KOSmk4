@@ -155,11 +155,11 @@ __SYSDECL_BEGIN
 #define ARPOP_InREPLY   9  /* InARP reply. */
 #define ARPOP_NAK       10 /* (ATM)ARP NAK. */
 
-/* See RFC 826 for protocol description. ARP packets are variable
- * in size; the arphdr structure defines the fixed-length portion.
+/* See RFC 826 for protocol  description. ARP packets are  variable
+ * in size; the arphdr structure defines the fixed-length  portion.
  * Protocol type values are the same as those for 10 Mb/s Ethernet.
- * It is followed by the variable-sized fields ar_sha, arp_spa,
- * arp_tha and arp_tpa in that order, according to the lengths
+ * It is  followed by  the variable-sized  fields ar_sha,  arp_spa,
+ * arp_tha and  arp_tpa in  that order,  according to  the  lengths
  * specified. Field names used correspond to RFC 826. */
 
 /* This structure defines an ethernet arp header. */

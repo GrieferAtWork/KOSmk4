@@ -116,8 +116,8 @@ struct unimapinit {
  *                 s.a. `ps2_keyboard_ss1' and `ps2_keyboard_ss1_e0' from
  *                      `/kos/src/kernel/modps2/keyboard-scansets.c'
  *
- *  - K_XLATE:     The *normal* (but deprecated) mode, where actual text is read from
- *                 the keyboard. Characters encoded via `keymap_translate_buf()' must
+ *  - K_XLATE:     The *normal* (but  deprecated) mode,  where actual text  is read  from
+ *                 the  keyboard.  Characters encoded  via  `keymap_translate_buf()' must
  *                 fall into the ascii range. If they don't, they are silently discarded.
  *
  *  - K_MEDIUMRAW: Produce keycodes (as found in <kos/keyboard.h>) that are encoded as:
@@ -130,10 +130,10 @@ struct unimapinit {
  *                 >> }
  *
  *  - K_UNICODE:   The actual default mode. Behaves the same as `K_XLATE', except that
- *                 characters from outside the ascii range are encoded as utf-8.
+ *                 characters  from  outside the  ascii  range are  encoded  as utf-8.
  *
  *  - K_OFF:       Keyboard input isn't being generated. (But internal control sequences,
- *                 including the 4xF12=dbg() behavior continue to function)
+ *                 including   the   4xF12=dbg()    behavior   continue   to    function)
  */
 #define KDGKBMODE _IO('K', 0x44) /* gets current keyboard mode */
 #define KDSKBMODE _IO('K', 0x45) /* sets current keyboard mode */

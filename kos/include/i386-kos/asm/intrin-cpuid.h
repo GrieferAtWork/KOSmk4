@@ -27,11 +27,11 @@
 #include <asm/cpu-cpuid.h>
 #include <asm/intrin.h>
 
-/* Figure out if feature test macros should not assume
- * kernel emulation for certain instructions. This is
- * required while in kernel-space itself (in order to
- * prevent the possibility of recursion of certain
- * instructions being accidentally emulated with themself,
+/* Figure out  if feature  test  macros should  not  assume
+ * kernel  emulation  for  certain  instructions.  This  is
+ * required  while  in  kernel-space  itself  (in  order to
+ * prevent  the   possibility  of   recursion  of   certain
+ * instructions being accidentally emulated with  themself,
  * or when we're not actually compiling with KOS as target) */
 #ifndef __WANT_CPU_HAVE_NOT_EMULATED
 #if !defined(__KOS__) || defined(__KERNEL__)
@@ -44,15 +44,15 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/* NOTE: The `cpuid' instruction is emulated by the
- *       KOS kernel and can be used unconditionally.
+/* NOTE: The `cpuid'  instruction is  emulated by  the
+ *       KOS kernel and  can be used  unconditionally.
  *       Also note that a couple of other instructions
  *       are emulated.
- * To simplify CPU detection, as well as the fact
+ * To simplify CPU detection,  as well as the  fact
  * that I very much doubt the fact that you'll find
- * a CPU without `cpuid', as well as the fact that
+ * a CPU without `cpuid', as well as the fact  that
  * the KOS kernel emulates this instruction, checks
- * for cpuid actually existing are omitted to keep
+ * for  cpuid actually existing are omitted to keep
  * things a little bit simpler. */
 #if defined(__SSE__) || defined(__SSE_MATH__)
 #define __CPU_HAVE_SSE()       1

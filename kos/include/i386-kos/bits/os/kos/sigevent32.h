@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/sigevent32.h>
- * 
+ *
  * Definitions:
  *    - struct __sigeventx32 { ... };
  * #if !defined(__x86_64__) && defined(__i386__)
@@ -90,7 +90,7 @@ struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 	union {
 		union {
 			__UINT32_TYPE__ _sigev_data[(__SIGEVX32_MAX_SIZE - 12) / 4];
-			__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
+			__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and  SIGEV_THREAD_ID set,  LWP
 			                             * TID (pid_t) of the thread to receive the signal. */
 			struct {
 				__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sigev_notify_function,(union __sigvalx32 __val)); /* Function to start. */
@@ -100,7 +100,7 @@ struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 #endif /* Transparent struct/union */
 		union {
 			__UINT32_TYPE__ _data[(__SIGEVX32_MAX_SIZE - 12) / 4];
-			__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
+			__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and  SIGEV_THREAD_ID set,  LWP
 			                       * TID (pid_t) of the thread to receive the signal. */
 			struct {
 				__HYBRID_FUNCPTR32(void, __ATTR_CDECL, _function,(union __sigvalx32 __val)); /* Function to start. */

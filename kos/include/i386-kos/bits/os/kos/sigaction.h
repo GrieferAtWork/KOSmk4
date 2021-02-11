@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/sigaction.h>
- * 
+ *
  * Definitions:
  *    - typedef ... __sighandler_t;
  *    - struct sigaction { ... };

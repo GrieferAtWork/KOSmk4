@@ -125,7 +125,7 @@ typedef enum {
 	_URC_END_OF_STACK             = 5, /* Don't continue unwinding */
 	_URC_HANDLER_FOUND            = 6, /* During `_UA_SEARCH_PHASE':  A handler for the exception was found (continue with `_UA_CLEANUP_PHASE') */
 	_URC_INSTALL_CONTEXT          = 7, /* During `_UA_CLEANUP_PHASE': The handler was applied. - Resume execution */
-	_URC_CONTINUE_UNWIND          = 8  /* During `_UA_SEARCH_PHASE':  Continue searching in the next frame.
+	_URC_CONTINUE_UNWIND          = 8  /* During  `_UA_SEARCH_PHASE': Continue searching in the next frame.
 	                                    * During `_UA_CLEANUP_PHASE': Continue unwinding to the next frame. */
 } _Unwind_Reason_Code;
 

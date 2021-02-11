@@ -116,7 +116,7 @@ struct exception_badalloc_data {
 
 		struct {
 			__syscall_ulong_t /*uintptr_t*/ iiv_vector; /* The given vector (if that specific vector is already in use),
-			                                             * or (uintptr_t)-1 when all vectors are already in use. */
+			                                             * or  (uintptr_t)-1  when  all  vectors  are  already  in  use. */
 		} ba_insufficient_interrupt_vectors; /* E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS */
 
 		struct {
@@ -178,22 +178,22 @@ struct exception_fserror_data {
 		} f_path_not_found; /* E_FSERROR_PATH_NOT_FOUND */
 
 		struct {
-			__syscall_ulong_t /*uintptr_t*/ nad_action_context; /* The context in which a filesystem component was required to be
+			__syscall_ulong_t /*uintptr_t*/ nad_action_context; /* The  context in which  a filesystem component  was required to be
 			                                                     * a directory, but wasn't (One of `E_FILESYSTEM_NOT_A_DIRECTORY_*') */
 		} f_not_a_directory; /* E_FSERROR_NOT_A_DIRECTORY */
 
 		struct {
 			__syscall_ulong_t /*uintptr_t*/ iad_action_context; /* The context in which a filesystem component was required to not be
-			                                                     * a directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*') */
+			                                                     * a  directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*') */
 		} f_is_a_directory; /* E_FSERROR_IS_A_DIRECTORY */
 
 		struct {
-			__syscall_ulong_t /*uintptr_t*/ nasl_action_context; /* The context in which a filesystem component was required to be a
+			__syscall_ulong_t /*uintptr_t*/ nasl_action_context; /* The context in which a filesystem  component was required to be  a
 			                                                      * symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*') */
 		} f_not_a_symbolic_link; /* E_FSERROR_NOT_A_SYMBOLIC_LINK */
 
 		struct {
-			__syscall_ulong_t /*uintptr_t*/ iasl_action_context; /* The context in which a filesystem component was required to not be
+			__syscall_ulong_t /*uintptr_t*/ iasl_action_context; /* The context in which a filesystem component was required to not  be
 			                                                      * a symlink, but was one (One of `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_*') */
 		} f_is_a_symbolic_link; /* E_FSERROR_IS_A_SYMBOLIC_LINK */
 
@@ -259,7 +259,7 @@ struct exception_illegal_instruction_data {
 		struct {
 			__syscall_ulong_t /*uintptr_t*/ bo_what;    /* For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*') */
 			__syscall_ulong_t /*uintptr_t*/ bo_regno;   /* The accessed register index (from `<asm/register.h>')
-			                                             * NOTE: When set to `X86_REGISTER_MSR', then the next 3
+			                                             * NOTE: When set to  `X86_REGISTER_MSR', then  the next  3
 			                                             *       pointers are index(%ecx), loval(%eax), hival(%edx) */
 			__syscall_ulong_t /*uintptr_t*/ bo_offset;  /* An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
 			                                             * In case an MSR register was accessed, this is the MSR index */
@@ -276,7 +276,7 @@ struct exception_illegal_instruction_data {
 		struct {
 			__syscall_ulong_t /*uintptr_t*/ r_how;     /* How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*') */
 			__syscall_ulong_t /*uintptr_t*/ r_regno;   /* The accessed register index (from `<asm/register.h>')
-			                                            * NOTE: When set to `X86_REGISTER_MSR', then the next 3
+			                                            * NOTE: When set to  `X86_REGISTER_MSR', then  the next  3
 			                                            *       pointers are index(%ecx), loval(%eax), hival(%edx) */
 			__syscall_ulong_t /*uintptr_t*/ r_offset;  /* An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
 			                                            * In case an MSR register was accessed, this is the MSR index */
@@ -634,19 +634,19 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 	/* Exception-specific arguments */
 	union exception_data_pointers e_args;
 	/* The address of the instruction that caused the fault.
-	 * Unlike the program counter stored within the `error_register_state_t'
-	 * structure which can be accessed through `error_register_state()', this
-	 * one _may_ point _before_ the instruction that caused the error, however
-	 * it may also point after the instruction. Which of the two it is depends
-	 * on how the specific exception was generated, though it should be noted
+	 * Unlike  the  program  counter stored  within  the `error_register_state_t'
+	 * structure  which  can be  accessed through  `error_register_state()', this
+	 * one  _may_ point _before_  the instruction that  caused the error, however
+	 * it may also point after  the instruction. Which of  the two it is  depends
+	 * on  how the  specific exception was  generated, though it  should be noted
 	 * that in the case of errors thrown by `THROW()', this address will _always_
-	 * point _after_ the instruction (meaning it's always equal to the program
+	 * point  _after_ the instruction  (meaning it's always  equal to the program
 	 * counter stored in `error_register_state()')
 	 *  - e_faultaddr: Either equal to `GETPC(error_register_state())', or points
-	 *                 to the instruction that is `error_register_state()'.
+	 *                 to  the  instruction  that  is   `error_register_state()'.
 	 *  - GETPC(error_register_state()):
 	 *                 Always points to the instruction that would have been
-	 *                 executed next if the exception hadn't been thrown. */
+	 *                 executed next if  the exception  hadn't been  thrown. */
 	void *e_faultaddr;
 };
 

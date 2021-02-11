@@ -3409,7 +3409,7 @@ again_parse_annotations:
 					 * [[if(cond), crt_intern_kos_alias(name)]]
 					 * In other words: When "cond" is true, link the current function
 					 *                 against some other function "name" in both the
-					 *                 system header, as well as the internal libc
+					 *                 system header, as  well as  the internal  libc
 					 *                 implementation. */
 					self.next();
 					self.skip("(");
@@ -3735,8 +3735,8 @@ again_skip_annotation_rbracket:
 		/* Right now, @tok points at the first token after the prototype
 		 * This is going to be one of:
 		 *   "{"  - function implementation
-		 *   "%"  - automatic implementation generator
-		 *   "="  - Aliasing definition
+		 *   "%" - automatic implementation generator
+		 *   "=" - Aliasing definition
 		 *   ";"  - No implementation
 		 */
 		switch (tok) {

@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/siginfo.h>
- * 
+ *
  * Definitions:
  *    - struct __siginfo_struct { ... };
  */

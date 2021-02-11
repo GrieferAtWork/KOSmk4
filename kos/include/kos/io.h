@@ -75,7 +75,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 
 /* Poll flags (`poll_mode_t' / `struct pollfd')
- *     Event types that can be polled for. These bits may be set in `events'
+ *     Event  types that can be polled for. These bits may be set in `events'
  *     to indicate the interesting event types; they will appear in `revents'
  *     to indicate the status of the file descriptor. */
 #if !defined(POLLIN) && defined(__POLLIN)
@@ -328,10 +328,10 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !O_LARGEFILE && __O_LARGEFILE */
 #if !defined(O_DIRECTORY) && defined(__O_DIRECTORY)
 #define O_DIRECTORY __O_DIRECTORY /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' (-ENOTDIR) exception when the
-                                   * final path component of an open() system call turns out to be something other than a directory. */
+                                   * final path component of  an open() system  call turns out  to be something  other than a  directory. */
 #endif /* !O_DIRECTORY && __O_DIRECTORY */
 #if !defined(O_NOFOLLOW) && defined(__O_NOFOLLOW)
-#define O_NOFOLLOW  __O_NOFOLLOW  /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception when
+#define O_NOFOLLOW  __O_NOFOLLOW  /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception  when
                                    * the final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
                                    * is given, in which case the link itself is opened. */
 #endif /* !O_NOFOLLOW && __O_NOFOLLOW */
@@ -342,13 +342,13 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define O_CLOFORK   __O_CLOFORK   /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #endif /* !O_CLOFORK && __O_CLOFORK */
 #if !defined(O_DOSPATH) && defined(__O_DOSPATH)
-#define O_DOSPATH   __O_DOSPATH   /* Interpret '\\' as '/', and ignore casing during path resolution.
-                                   * Additionally, recognize DOS mounting points, and interpret leading
+#define O_DOSPATH   __O_DOSPATH   /* Interpret  '\\'  as  '/',  and   ignore  casing  during  path   resolution.
+                                   * Additionally,   recognize  DOS  mounting   points,  and  interpret  leading
                                    * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
 #endif /* !O_DOSPATH && __O_DOSPATH */
 #if !defined(O_SYMLINK) && defined(__O_SYMLINK)
 #define O_SYMLINK   __O_SYMLINK   /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
-                                   * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
+                                   * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
                                    *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
 #endif /* !O_SYMLINK && __O_SYMLINK */
 #if !defined(O_DIRECT) && defined(__O_DIRECT)
@@ -379,7 +379,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define FS_MODE_FSYMLINK_NOFOLLOW         0x00000100 /* If the last path component is a symlink, don't follow it. */
 #define FS_MODE_FNO_AUTOMOUNT             0x00000800 /* Suppress terminal automount traversal. */
 #define FS_MODE_FEMPTY_PATH               0x00001000 /* Allow empty relative pathname. */
-#define FS_MODE_FSYMLINK_REGULAR          0x00002000 /* Treat symbolic links similar to like regular files and throw an
+#define FS_MODE_FSYMLINK_REGULAR          0x00002000 /* Treat  symbolic  links similar  to like  regular  files and  throw an
                                                       * `E_FSERROR_TOO_MANY_SYMBOLIC_LINKS' error during the first encounter. */
 #define FS_MODE_FDOSPATH                  0x00100000 /* Interpret '\\' as '/', and ignore casing during path resolution. */
 
@@ -401,29 +401,29 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define READDIR_SKIPREL  0x4000 /* Skip reading the `.' and `..' directory entries. */
 #define READDIR_WANTEOF  0x8000 /* Minor optimization for `READDIR_MULTIPLE':
                                  * The system is allowed to append an empty directory entry
-                                 * (with `d_namlen = 0' and `d_name[0] = '\0''; other fields are undefined).
+                                 * (with  `d_namlen = 0' and `d_name[0] = '\0''; other fields are undefined).
                                  * If there isn't enough space for such an entry, no such entry will be emit.
-                                 * Since no other directory entry can ever have a length of ZERO(0),
-                                 * this allows user-space to detect end-of-directory without the need
-                                 * of re-invoking the kreaddir() system call and inspecting its return
+                                 * Since no  other  directory  entry  can ever  have  a  length  of  ZERO(0),
+                                 * this  allows  user-space  to  detect  end-of-directory  without  the  need
+                                 * of re-invoking  the  kreaddir()  system call  and  inspecting  its  return
                                  * value for being equal to ZERO(0).
-                                 * However, that check is still required, as this flag may be ignored
-                                 * for no reason immediately apparent (if the EOF entry can't fit into
-                                 * the buffer, there's no way of knowing if there's a missing entry that's
-                                 * supposed to go into the buffer, or if it was actually an EOF entry).
-                                 * Additionally, no eof entry may be written if kreaddir() is invoked
+                                 * However, that  check  is  still  required, as  this  flag  may  be  ignored
+                                 * for no  reason  immediately apparent  (if  the  EOF entry  can't  fit  into
+                                 * the buffer, there's  no way of  knowing if there's  a missing entry  that's
+                                 * supposed  to  go into  the buffer,  or if  it was  actually an  EOF entry).
+                                 * Additionally,  no  eof  entry  may  be  written  if  kreaddir()  is invoked
                                  * on a directory handle who's stream position is at the end of the directory.
-                                 * For usage, see the example below, as well as `READDIR_MULTIPLE_ISEOF()' */
+                                 * For  usage, see  the example  below, as  well as `READDIR_MULTIPLE_ISEOF()' */
 #define READDIR_MODEMASK 0x001f /* Mask for the kreaddir() mode. */
 #define READDIR_FLAGMASK 0xc000 /* Mask of known kreaddir() flags. */
 #define READDIR_MODEMAX  0x0003 /* Mask recognized mode ID. */
-#define READDIR_MULTIPLE 0x0003 /* Read as many directory entries as can fit into the buffer.
-                                 * If at least one entry could be read, return the combined size
+#define READDIR_MULTIPLE 0x0003 /* Read as  many  directory  entries  as can  fit  into  the  buffer.
+                                 * If at least  one entry  could be  read, return  the combined  size
                                  * of all read entries (in bytes) (in this case, `return <= bufsize')
-                                 * If the buffer was too small to contain the next entry,
-                                 * return the required size to house that pending entry,
-                                 * but don't yield it, the same way `READDIR_DEFAULT' wouldn't.
-                                 * To enumerate multiple directories in some buffer, use the
+                                 * If  the  buffer  was  too   small  to  contain  the  next   entry,
+                                 * return  the   required  size   to   house  that   pending   entry,
+                                 * but don't  yield  it,  the same  way  `READDIR_DEFAULT'  wouldn't.
+                                 * To  enumerate  multiple  directories  in  some  buffer,  use   the
                                  * macros below. */
 #ifdef __CC__
 /* READDIR_MULTIPLE buffer helpers:
@@ -484,8 +484,8 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_SYNC       0x1000 /* Ensure that all modified caches are flushed during write() */
 #define IO_ASYNC      0x2000 /* Use asynchronous I/O and generate SIGIO upon completion. */
 #define IO_DIRECT     0x4000 /* Bypass input/output buffers if possible. - Try to read/write data directly to/from provided buffers. */
-#define IO_NODATAZERO 0x8000 /* For use with `IO_NONBLOCK': Allow 0 to be returned (which normally indicates EOF)
-                              * when no data is available at the moment (which normally would cause `E_WOULDBLOCK'
+#define IO_NODATAZERO 0x8000 /* For use with  `IO_NONBLOCK': Allow  0 to be  returned (which  normally indicates  EOF)
+                              * when no data  is available at  the moment (which  normally would cause  `E_WOULDBLOCK'
                               * to be thrown). NOTE: This flag is merely a hint. - Functions are allowed to ignore it! */
 
 /* Check if reading/writing is possible with a given I/O mode. */
@@ -504,7 +504,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_SETFD_MASK (IO_CLOEXEC | IO_CLOFORK)
 
 /* NOTE: The following flags don't affect I/O, but are stored in the same field.
- *       Additionally, their `O_*' equivalent have different values. */
+ *       Additionally,   their   `O_*'   equivalent   have   different   values. */
 #define IO_HANDLE_CLOEXEC           IO_CLOEXEC /* Close during exec() */
 #define IO_HANDLE_CLOFORK           IO_CLOFORK /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
 #define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x180000) >> 17))

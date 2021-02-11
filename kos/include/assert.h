@@ -170,6 +170,3 @@
 #endif /* ... */
 #endif /* __USE_KOS */
 #endif /* !NDEBUG */
-
-
-

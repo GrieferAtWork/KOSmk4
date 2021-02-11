@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/linux/ucontext64.h>
- * 
+ *
  * Definitions:
  *    - struct __ucontext_linux64 { ... };
  * #if defined(__linux__) && defined(__x86_64__)

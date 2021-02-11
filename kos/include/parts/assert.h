@@ -22,7 +22,7 @@
 #include "../features.h"
 #include "../__stdinc.h"
 
-/* Define `static_assert()', optionally with no-message
+/* Define `static_assert()', optionally with  no-message
  * overload when KOS or isoc++17 extensions are enabled. */
 #if !defined(static_assert) && (defined(__USE_ISOC11) || defined(__USE_ISOCXX11) || defined(__USE_KOS))
 #if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
@@ -65,22 +65,22 @@
 #endif /* !static_assert */
 
 /* Need KOS extensions for compile-time `assert()' support.
- * STDC-compliant code is allowed to use `assert(0)' as an alias for `abort()',
- * however with this compile-time assert extension, such code can no longer
- * be compiled (which is intentional, and the whole purpose of this extension),
+ * STDC-compliant code is allowed to use  `assert(0)' as an alias for  `abort()',
+ * however  with  this compile-time  assert extension,  such  code can  no longer
+ * be compiled (which is intentional, and  the whole purpose of this  extension),
  * meaning that this behavior has to be opt-in, which it is by use of _KOS_SOURCE
- * or _KOS_KERNEL_SOURCE, or simply being apart of the kernel core, or a driver
+ * or  _KOS_KERNEL_SOURCE, or simply being apart of  the kernel core, or a driver
  * module to-be loaded into the KOS kernel. */
 #undef __do_cassert_wrapper
 #if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL)) && \
      0 /* I keep having problems with this. - GCC seems to be unable to fully deal with this... */
 #if !defined(__NO_builtin_choose_expr) && \
     !defined(__NO_builtin_constant_p) && 0
-/* This one doesn't seem to work... Apparently, GCC won't evaluate the
- * expression not chosen, however it will still compile it, meaning that
- * static_assert() with a non-constant expression will produce a compiler
+/* This  one  doesn't seem  to work...  Apparently,  GCC won't  evaluate the
+ * expression not chosen,  however it  will still compile  it, meaning  that
+ * static_assert() with a  non-constant expression will  produce a  compiler
  * error. I guess I can live with that, given that `__builtin_choose_expr()'
- * is a GCC extension, it stands to reason that GCC is allowed to decide
+ * is a GCC extension,  it stands to  reason that GCC  is allowed to  decide
  * what can and what cannot be done with it. */
 /************************************************************************
  * Compile-time assert support:                                         *
@@ -100,9 +100,9 @@
  * Compile-time assert support:                                         *
  * (0 ? (int(*)[(...) ? 1 : -1])0 : runtime_assert(...))                *
  ************************************************************************/
-/* NOTE: The VLA assertion must be wrapped in an expression-block.
+/* NOTE: The  VLA  assertion  must   be  wrapped  in  an   expression-block.
  *       Otherwise, the vla-array-size-expression will be assembled, despite
- *       being apart of a dead branch. (s.a. the following bug report which
+ *       being apart of a dead branch. (s.a. the following bug report  which
  *       I've submitted: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92641) */
 #ifndef __NO_builtin_constant_p
 #define __do_cassert_wrapper(expr, expr_str, rassert) \

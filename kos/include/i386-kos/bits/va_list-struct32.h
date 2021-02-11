@@ -33,9 +33,9 @@
 __DECL_BEGIN
 
 struct i386_va_list_struct {
-	/* Inline array of 4-byte-aligned arguments. - va_arg() modifies the value of the given
+	/* Inline array of  4-byte-aligned arguments.  - va_arg() modifies  the value  of the  given
 	 * va_list object itself (which is a pointer) to point to the next argument before returning
-	 * the previous one. - The size of any given argument `T' is always `(sizeof(T) + 3) & ~3' */
+	 * the previous one. - The size of  any given argument `T' is always  `(sizeof(T) + 3) & ~3' */
 	__UINT32_TYPE__ vl_args[1024];
 };
 

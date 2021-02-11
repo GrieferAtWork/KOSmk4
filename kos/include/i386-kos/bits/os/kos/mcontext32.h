@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/mcontext32.h>
- * 
+ *
  * Definitions:
  * #if defined(__KOS__) && __KOS_VERSION__ >= 300
  *    - typedef ... __gregsetx32_t;
@@ -119,7 +119,7 @@ __DECL_BEGIN
 #define __MCONTEXTX32_FLAG_NORMAL   0x0000 /* Normal context flags. */
 #define __MCONTEXTX32_FLAG_HAVECR2  0x0001 /* The `mc_cr2' field contains a valid value. */
 #define __MCONTEXTX32_FLAG_HAVESFPU 0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
-                                            * When not set: The FPU hasn't been initialized yet, and a context
+                                            * When not set: The FPU hasn't been  initialized yet, and a  context
                                             *               load will leave the FPU unmodified if it hasn't been
                                             *               initialized, or will default-initialize itself if it
                                             *               had been initialized in the mean time. */

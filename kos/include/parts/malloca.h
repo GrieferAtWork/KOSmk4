@@ -34,9 +34,9 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 /* A hybrid between alloca and malloc, using alloca for
- * small allocations, but malloc() for larger ones.
+ * small  allocations,  but malloc()  for  larger ones.
  * NOTE: In all cases, 'afree()' should be used to clean up a
- *       pointer previously allocated using 'amalloc()' and
+ *       pointer previously allocated  using 'amalloc()'  and
  *       friends. */
 #if (((defined(__CRT_HAVE_malloc) && defined(__CRT_HAVE_free)) || \
       (defined(__KOS__) && defined(__KERNEL__))) &&               \

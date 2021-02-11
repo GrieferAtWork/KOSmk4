@@ -50,8 +50,8 @@ __NOTHROW_NCX(xfpustate64_assign_xfpustate32)(struct xfpustate64 *__restrict __s
 	__self->fx_fip = __data->fx_fip;
 	__self->fx_fdp = __data->fx_fdp;
 	/* Copy remaining data one-on-one, but stop after XMM register #7
-	 * In 32-bit mode, only 8 XMM registers are available, so when
-	 * converting the FPU state structure, leave 64-bit mode's XMM
+	 * In  32-bit mode, only  8 XMM registers  are available, so when
+	 * converting the FPU  state structure, leave  64-bit mode's  XMM
 	 * register #8-#15 unchanged. */
 	__libc_memcpy((__byte_t *)__self + OFFSET_XFPUSTATE64_MXCSR,
 	              (__byte_t const *)__data + OFFSET_XFPUSTATE32_MXCSR,

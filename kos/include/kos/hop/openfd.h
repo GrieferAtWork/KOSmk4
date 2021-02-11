@@ -28,10 +28,10 @@
 #include <bits/types.h>
 
 #define HOP_OPENFD_MODE_AUTO       0x0000 /* Ignore `of_hint' and automatically select an appropriate handle
-                                           * This is the same as `HOP_OPENFD_MODE_HINT' with `of_hint=0' */
+                                           * This  is  the same  as `HOP_OPENFD_MODE_HINT'  with `of_hint=0' */
 #define HOP_OPENFD_MODE_HINT       0x0001 /* Install the newly opened handle into the lowest unused handle that is `>= of_hint' */
 #define HOP_OPENFD_MODE_INTO       0x0002 /* Install the newly opened handle into `of_hint', automatically
-                                           * closing any handle that may have been stored inside before.
+                                           * closing any handle that may  have been stored inside  before.
                                            * Additionally, `of_hint' may be any writable symbolic handle (e.g. `AT_FDCWD') */
 #define HOP_OPENFD_MODE_INTO_EXACT 0x0003 /* Same as `HOP_OPENFD_MODE_INTO', but don't recognize symbolic
                                            * handles, and throw an `E_INVALID_HANDLE_FILE' error instead. */

@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/sigval64.h>
- * 
+ *
  * Definitions:
  *    - union __sigvalx64 { ... };
  * #ifdef __x86_64__

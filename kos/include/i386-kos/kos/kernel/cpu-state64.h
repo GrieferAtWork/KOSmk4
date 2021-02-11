@@ -264,13 +264,13 @@ struct gpregsnsp64 /*[PREFIX(gp_)]*/ {
 #ifdef __CC__
 struct sgregs64 {
 	union {
-		__u64 sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL')
+		__u64 sg_gs;     /* G  segment   register   (Usually   `SEGMENT_USER_GSBASE_RPL')
 		                  * (upper 48 bits are undefined, but should be written as zeros) */
 		__u16 sg_gs16;   /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
 	};
 	union {
 		__u64 sg_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
-		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		                  * (upper   48   bits   are   undefined,   but   should   be   written   as  zeros) */
 		__u16 sg_fs16;   /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
 	};
 	union {
@@ -280,7 +280,7 @@ struct sgregs64 {
 	};
 	union {
 		__u64 sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
-		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		                  * (upper 48  bits are  undefined, but  should be  written as  zeros) */
 		__u16 sg_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
 	};
 };
@@ -346,7 +346,7 @@ struct irregs64 {
 	/* On x86_64, the interrupt return tail always looks the same. */
 	__u64     ir_rip;    /* Instruction pointer */
 	union {
-		__u64 ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE')
+		__u64 ir_cs;     /* Code   segment   (Ring  #0,   usually  `SEGMENT_KERNEL_CODE')
 		                  * (upper 48 bits are undefined, but should be written as zeros) */
 		__u16 ir_cs16;   /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE') */
 	};
@@ -354,7 +354,7 @@ struct irregs64 {
 	__u64     ir_rsp;    /* Return stack pointer */
 	union {
 		__u64 ir_ss;     /* Return stack segment (Ring #0, usually `SEGMENT_KERNEL_DATA' or `0')
-		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		                  * (upper  48  bits  are undefined,  but  should be  written  as zeros) */
 		__u16 ir_ss16;   /* Return stack segment (Ring #0, usually `SEGMENT_KERNEL_DATA' or `0') */
 	};
 };
@@ -374,16 +374,16 @@ struct irregs64 {
 struct ucpustate64 { /* u -- User */
 	/* Full CPU state, as used by system calls.
 	 * NOTE: Also represents the state saved when an exception occurs,
-	 *       both inside kernel-, as well as user-space. */
+	 *       both   inside   kernel-,    as   well   as    user-space. */
 	struct sgregs64 ucs_sgregs; /* Segment registers. */
 	struct sgbase64 ucs_sgbase; /* Segment base registers. */
 	union {
-		__u64       ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
+		__u64       ucs_cs;     /* Code  segment  (Ring  #3,  usually   `SEGMENT_USER_CODE_RPL')
 		                         * (upper 48 bits are undefined, but should be written as zeros) */
 		__u16       ucs_cs16;   /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
 	};
 	union {
-		__u64       ucs_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		__u64       ucs_ss;     /* Stack  segment  (Ring  #3,  usually  `SEGMENT_USER_DATA_RPL')
 		                         * (upper 48 bits are undefined, but should be written as zeros) */
 		__u16       ucs_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
@@ -407,7 +407,7 @@ struct ucpustate64 { /* u -- User */
 #ifdef __CC__
 struct lcpustate64 { /* l -- Little */
 	/* A minimal CPU state containing only registers that are callee-preserved.
-	 * This kind of CPU state is most useful for generating tracebacks. */
+	 * This kind  of  CPU  state  is most  useful  for  generating  tracebacks. */
 	__u64         lcs_r15;    /* [P] General purpose register #15 */
 	__u64         lcs_r14;    /* [P] General purpose register #14 */
 	__u64         lcs_r13;    /* [P] General purpose register #13 */
@@ -428,7 +428,7 @@ struct lcpustate64 { /* l -- Little */
 #ifdef __CC__
 struct kcpustate64 {
 	/* A CPU state used to describe a known, valid register state in kernel-space.
-	 * This kind of state is also used by exception handling, and the associated
+	 * This  kind of state is also used  by exception handling, and the associated
 	 * stack unwinding. */
 	struct gpregs64 kcs_gpregs; /* General purpose registers. */
 	__u64           kcs_rflags; /* Flags register */
@@ -443,29 +443,29 @@ struct kcpustate64 {
 #define SIZEOF_ICPUSTATE64           160
 #ifdef __CC__
 struct icpustate64 { /* i -- Interrupts */
-	/* A CPU state that is used by hardware interrupts (other than those used
+	/* A  CPU state that is used by  hardware interrupts (other than those used
 	 * by scheduling, which generate `scpustate' instead), in order to describe
 	 * the interrupted text location.
 	 * Also the primary CPU state used by RPC handlers.
 	 * Note that while inside of an interrupt, the %gs_base value that's going
 	 * to be restored depends on `ics_irregs.ir_cs & 3'.
 	 * If user-space is indicated, `swapgs' is executed and `%gs_base' is filled
-	 * with `IA32_KERNEL_GS_BASE', with the original `%gs_base' value written
+	 * with `IA32_KERNEL_GS_BASE', with  the original  `%gs_base' value  written
 	 * back into `IA32_KERNEL_GS_BASE'
-	 * As such, while inside of kernel-space, the user-space-return value
-	 * for `%gs_base' is stored within `IA32_KERNEL_GS_BASE' (don't let the
+	 * As such, while  inside of kernel-space,  the user-space-return  value
+	 * for `%gs_base' is stored within `IA32_KERNEL_GS_BASE' (don't let  the
 	 * name of that MSR fool you. - While in kernel-space, this is the user-
 	 * space %gs_base value!)
 	 * NOTES:
 	 *   - Wherever an icpustate is used, that state is applicable in the context
-	 *     of the current thread (You will never find an icpustate belonging to
+	 *     of the current thread (You will  never find an icpustate belonging  to
 	 *     another thread, and if you do, something has probably gone wrong)
 	 *   - With this in mind, registers not apart of this structure retain their
-	 *     effective values, meaning that %ds, %es, %fs, %gs, %fs.base, %tr and
+	 *     effective  values, meaning that %ds, %es, %fs, %gs, %fs.base, %tr and
 	 *     %ldtr continue to hold their values from wherever the interrupt
 	 *     originated from.
 	 *   - %gs.base is a bit more complicated, since it is made up of 2 different
-	 *     registers %gs.base and %gs.kernel_base that can be exchanged for each
+	 *     registers %gs.base and %gs.kernel_base that  can be exchanged for  each
 	 *     other (don't let the name %gs.kernel_base fool you; the implied meaning
 	 *     only holds true while in user-space)
 	 *
@@ -504,7 +504,7 @@ struct icpustate64 { /* i -- Interrupts */
 #define SIZEOF_SCPUSTATE64               208
 #ifdef __CC__
 struct scpustate64 { /* i -- Interrupts */
-	/* A CPU state that is used by hardware interrupts (other than
+	/* A  CPU state that  is used by  hardware interrupts (other than
 	 * those used by scheduling, which generate `scpustate' instead),
 	 * in order to describe the interrupted text location. */
 	struct sgregs64    scs_sgregs;        /* Segment registers. */

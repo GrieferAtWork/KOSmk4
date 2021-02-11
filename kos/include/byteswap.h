@@ -33,14 +33,14 @@
 #define bswap_32(x) __hybrid_bswap32(x)
 #define bswap_64(x) __hybrid_bswap64(x)
 
-/* Define escaped byteorder macros since some programs
- * wrongly think that <byteswap.h> is supposed to define
+/* Define  escaped  byteorder macros  since  some programs
+ * wrongly  think that <byteswap.h>  is supposed to define
  * these (*cough* libpciaccess *cough*), when in actuality
  * it's <endian.h> that's defining them...
  *
  * On true Glibc, many headers implicitly include <endian.h>,
- * and thus implicitly define these macros as well (fun fact
- * though: not actually <byteswap.h>), but since I suspect
+ * and thus implicitly define these macros as well (fun  fact
+ * though: not actually <byteswap.h>),  but since I  suspect
  * that more programs might make this mistake, do them all a
  * favor and define them here (at least as long as we're not
  * in one of the pure-header modes) */

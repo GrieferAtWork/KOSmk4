@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 
 /* Hardware defined RTM transaction status codes.
- * NOTE: A value of `0' is possible, and indicates that the transaction
+ * NOTE: A  value of `0' is possible, and indicates that the transaction
  *       cannot be performed atomically (but that the fallback-path must
  *       be executed instead) */
 #define _XABORT_FAILED   __UINT32_C(0x00000000) /* Transaction cannot be performed atomically */
@@ -71,7 +71,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__(__xbegin)(void) {
 
 
 /* End a transaction (s.a. `rtm_end()')
- * If the transaction was successful, return normally.
+ * If  the  transaction   was  successful,  return   normally.
  * If the transaction failed, `__xbegin()' returns `_XABORT_*'
  * If no transaction was in progress, trigger #GP(0) that is propagated to user-space as
  * `E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE:E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f01, 2)' */
@@ -85,7 +85,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void) {
 
 
 /* Abort the current transaction by having `__xbegin()'
- * return with `_XABORT_EXPLICIT | ((code & 0xff) << _XABORT_CODE_S)'
+ * return    with     `_XABORT_EXPLICIT | ((code & 0xff) << _XABORT_CODE_S)'
  * If no transaction was in progress, behave as a no-op (s.a. `rtm_abort()') */
 #if __has_builtin(__builtin_ia32_xabort)
 #define __xabort(code) __builtin_ia32_xabort(code)

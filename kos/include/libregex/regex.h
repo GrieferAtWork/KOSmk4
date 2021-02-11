@@ -31,12 +31,12 @@ __DECL_BEGIN
 #define REGEX_FLAG_DOTLF                         0x00000001 /* The `.' regex matches line-feeds */
 #define REGEX_FLAG_DOTNUL                        0x00000002 /* The `.' regex matches NUL-characters */
 #define REGEX_FLAG_MULTILINE                     0x00000004 /* Allow `^' to match immediately after a line-feed. (else: only match at the start of input data, unless `REGEX_FLAG_NOT_BEGIN_OF_LINE' is set)
-                                                             * Allow `$' to match immediately before a line-feed. (else: only match at the end of input data, unless `REGEX_FLAG_NOT_END_OF_LINE' is set)*/
+                                                             * Allow `$' to match immediately before a  line-feed. (else: only match at the end  of input data, unless `REGEX_FLAG_NOT_END_OF_LINE' is  set) */
 #define REGEX_FLAG_NOCASE                        0x00000008 /* Ignore case when matching single characters, or character ranges. */
 #define REGEX_FLAG_NO_BACKSLASH_UNICODE_DECIMAL  0x00000010 /* Don't support non-standard unicode numeric matching:
                                                              *  - "(?\\d=3)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) == 3'
-                                                             *  - "(?\\d<7)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) < 7' 
-                                                             *  - "(?\\d>4)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) > 4' 
+                                                             *  - "(?\\d<7)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) < 7'
+                                                             *  - "(?\\d>4)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) > 4'
                                                              *  - "(?\\d<=3>=1)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) >= 1 && unicode_asdigit(x) <= 3' */
 #define REGEX_FLAG_NO_CHARACTER_CLASSES          0x00000020 /* Don't support unicode character classes in ranges */
 #define REGEX_FLAG_ESCAPED_INTERVALS             0x00000040 /* Swap the meaning of { and } with \{ and \} */
@@ -114,13 +114,13 @@ regex_matches(/*utf-8*/ char const *__restrict data, __size_t datalen,
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 
-/* Same as `regex_matches()', but also store a pointer to the end of
+/* Same as `regex_matches()',  but also  store a  pointer to  the end  of
  * consumed data in `pdataend'. Because input data is formatted in UTF-8,
  * this position would only be equal to `data + return' if all input data
- * was ASCII only, meaning that in the universal case, this function
+ * was ASCII  only, meaning  that in  the universal  case, this  function
  * becomes useful when dealing with unicode data.
  * @param: pdataend:          Upon success (return != 0 && return != (size_t)-1),
- *                            save a pointer to the end of consumed data here.
+ *                            save a pointer  to the end  of consumed data  here.
  * @param: datalen:           Number of bytes (not characters) in data.
  * @param: patternlen:        Number of bytes (not characters) in pattern.
  * @return: * :               Number of characters (not bytes) matched in `data'.
@@ -157,7 +157,7 @@ struct regex_range_ex {
 };
 
 
-/* Find the first instance matching `pattern' and store the
+/* Find the  first instance  matching  `pattern' and  store  the
  * character indices (not byte offsets) in `*pstart' and `*pend'
  * @return: 1:                Pattern was found.
  * @return: 0:                Pattern not found.

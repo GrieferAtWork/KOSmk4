@@ -187,7 +187,7 @@
 #define IPPROTO_LOUSER   253 /* Use for experimentation and testing RFC 3692 */
 #define IPPROTO_HIUSER   254 /* Use for experimentation and testing RFC 3692 */
 #define IPPROTO_RAW      255 /* Raw IP packets. */
-#define IPPROTO_MAX      256 /* WARNING: This is actually 1+ the max possible IPPROTO!
+#define IPPROTO_MAX      256 /* WARNING: This  is  actually 1+  the max  possible IPPROTO!
                               * The protocol-field of IP is 1-byte, so the max is 0xff=255 */
 
 

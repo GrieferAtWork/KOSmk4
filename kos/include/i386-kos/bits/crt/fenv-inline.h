@@ -113,7 +113,7 @@ __NOTHROW_NCX(__inline_fegetenv)(struct __fenv_struct *__restrict __envp) {
 	 * s.a. doc for `__fnstenv()' */
 	__fldenv((struct sfpuenv *)__envp);
 	if (__CPU_HAVE_SSE()) {
-		/* Need to store the mxcsr mask somewhere.
+		/* Need  to  store  the  mxcsr  mask  somewhere.
 		 * Mirror what Glibc does and use the EIP field. */
 		__envp->__eip = __stmxcsr();
 	}

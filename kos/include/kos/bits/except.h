@@ -21,7 +21,7 @@
 #define _KOS_BITS_EXCEPT_H 1
 
 /* Helper macros for portably working with error register state,
- * as well as specifying how an error register state even looks
+ * as  well as specifying how an error register state even looks
  * like. */
 
 /*

@@ -84,7 +84,7 @@ __SYSDECL_BEGIN
 #define OHCI_HcRhDescriptorA    0x48
 #define OHCI_HcRhDescriptorB    0x4c
 #define OHCI_HcRhStatus         0x50
-/* Warning the specs are dumb and enumerate these from 1 (but you
+/* Warning the specs are dumb and enumerate these from 1 (but  you
  * can just enum them from 0, because _that's_ where arrays start) */
 #define OHCI_HcRhPortStatus(i)  (0x54+((i)*4))
 
@@ -141,7 +141,7 @@ __SYSDECL_BEGIN
 #define OHCI_TDFL_T_AVAIL 0x02000000 /* [bit(25)][in|out] When set, use `OHCI_TDFL_T_STATE' as data-toggle bit. - Else, use `OHCI_EDHP_CAR'
                                       * Note that this, and `OHCI_TDFL_T_STATE' are maintained by the HC to allow
                                       * for a single TD to be used multiple times for transmission of larger packets.
-                                      * As such, both this, and `OHCI_TDFL_T_STATE' should be initialized to `0',
+                                      * As such, both  this, and  `OHCI_TDFL_T_STATE' should be  initialized to  `0',
                                       * and software should simply ignore them at all times. */
 #define OHCI_TDFL_ECM     0x0c000000 /* [bit(26:27)][in|out] Number of consecutive errors (used by hardware; just initialize it to `0') */
 #define OHCI_TDFL_CCM     0xf0000000 /* [bit(28:31)][out] Condition code (open error, filled with that error before a TD is placed in the done queue) (One of `OHCI_CC_*') */
@@ -199,17 +199,17 @@ struct /*__ATTR_ALIGNED(OHCI_ED_ALIGN)*/ ohci_ed {
 	__PHYS __uint32_t ed_hp;  /* [in|out] Points to the next TD to be processed for this endpoint
 	                           *          (16-byte aligned); or'd with `OHCI_EDHP_*'
 	                           * Note that this is either `struct ohci_td' or `struct ohci_itd',
-	                           * depending on the state of the `OHCI_EDFL_ISO' flag. */
+	                           * depending   on   the   state  of   the   `OHCI_EDFL_ISO'  flag. */
 	__PHYS __uint32_t ed_ned; /* [in] If non-zero, next Endpoint Descriptor (`ohci_ed') (16-byte aligned) */
 };
 
 struct /*__ATTR_ALIGNED(OHCI_TD_ALIGN)*/ ohci_td {
 	__uint32_t        td_fl;  /* [in] Flags (Set of `OHCI_TDFL_*') */
 	__PHYS __uint32_t td_cbp; /* [in|out] Pointer to the next unwritten buffer location (or 0 if the buffer is empty)
-	                           * Note that the buffer described by this and `ed_be' may only cross a physical page
-	                           * boundary once, meaning that the max buffer size is 2*4096=8192 bytes, though in
-	                           * practice, the safest bet is to just require a max buffer size of 4096 bytes, thus
-	                           * preventing the need to fiddle around with buffer alignment, this that limit allows
+	                           * Note that the buffer described  by this and `ed_be' may  only cross a physical  page
+	                           * boundary once, meaning  that the  max buffer size  is 2*4096=8192  bytes, though  in
+	                           * practice, the safest bet is  to just require a max  buffer size of 4096 bytes,  thus
+	                           * preventing  the need to fiddle around with  buffer alignment, this that limit allows
 	                           * for any arbitrary buffer alignment. */
 	__PHYS __uint32_t td_ntd; /* [in] Next Transfer Descriptor (or `ed_tp' for end) (16-byte aligned) */
 	__PHYS __uint32_t td_be;  /* [in] Buffer end (or rather: max; as in: last byte written) pointer. */

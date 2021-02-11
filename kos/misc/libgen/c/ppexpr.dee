@@ -1015,8 +1015,8 @@ have_non_boolean_in_brt_any:
 				return PPBranch(BRT_CONST, 0);
 			if (a.isBoolean) {
 				/* a   b
-				 * 0 % x  ->  0
-				 * 1 % x  ->  0 */
+				 * 0 % x -> 0
+				 * 1 % x -> 0 */
 				return PPBranch(BRT_CONST, 0);
 			}
 			if (b.isBoolean)
@@ -1082,7 +1082,7 @@ have_non_boolean_in_brt_any:
 				} else {
 					/* Swap operands such  that the  constant always  comes
 					 * second. Doing this simplifies further optimizations.
-					 * 10 < x  ->  x > 10  ->  !(x <= 10) */
+					 * 10 < x -> x > 10 -> !(x <= 10) */
 					return PPBranch(BRT_NOT, PPBranch(BRT_LE, { b, a })).optimize(true, assume);
 				}
 			}
@@ -1120,7 +1120,7 @@ have_non_boolean_in_brt_any:
 				} else {
 					/* Swap operands such  that the  constant always  comes
 					 * second. Doing this simplifies further optimizations.
-					 * 10 <= x  ->  x >= 10  ->  !(x < 10) */
+					 * 10 <= x -> x >= 10 -> !(x < 10) */
 					return PPBranch(BRT_NOT, PPBranch(BRT_LO, { b, a })).optimize(true, assume);
 				}
 			}

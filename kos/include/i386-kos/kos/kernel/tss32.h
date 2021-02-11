@@ -96,14 +96,14 @@ __DECL_BEGIN
 
 #ifdef __CC__
 struct __ATTR_ALIGNED(ALIGNOF_TSS32) __ATTR_PACKED tss32 /*[PREFIX(t_)]*/ {
-	__UINT16_TYPE__   t_link;  /* Contains the segment selector for the TSS of the previous task (updated
+	__UINT16_TYPE__   t_link;  /* Contains the segment selector for the TSS of the previous task  (updated
 	                            * on a task switch that was initiated by a call, interrupt, or exception).
-	                            * This field (which is sometimes called the back link field) permits a
+	                            * This  field (which  is sometimes called  the back link  field) permits a
 	                            * task switch back to the previous task by using the IRET instruction. */
 	__UINT16_TYPE__ __t_zero0; /* Reserved... */
-	/* These stack pointers consist of a logical address made up of the segment selector for
+	/* These stack pointers  consist of a  logical address made  up of the  segment selector  for
 	 * the stack segment (SS0, SS1, and SS2) and an offset into the stack (ESP0, ESP1, and ESP2).
-	 * Note that the values in these fields are static for a particular task; whereas,
+	 * Note that  the  values  in  these  fields are  static  for  a  particular  task;  whereas,
 	 * the SS and ESP values will change if stack switching occurs within the task */
 	__UINT32_TYPE__   t_esp0;  /* Very important: The stack that is switched to when an interrupt switches to the kernel (Ring #0) */
 	__UINT16_TYPE__   t_ss0;   /* Stack segment for `t_esp0' */
@@ -115,13 +115,13 @@ struct __ATTR_ALIGNED(ALIGNOF_TSS32) __ATTR_PACKED tss32 /*[PREFIX(t_)]*/ {
 	__UINT16_TYPE__   t_ss2;   /* Stack segment for `t_esp2' */
 	__UINT16_TYPE__ __t_zero3; /* ... */
 	/* NOTE: As you can see, there is no `t_esp3' (ring #3 is userspace). So with that in mind,
-	 *       the existing stack is re-used when an interrupt happens while inside the kernel,
-	 *       meaning that kernel-space IRQ recursion is implicitly possible, yet one has to
+	 *       the  existing stack is re-used when an  interrupt happens while inside the kernel,
+	 *       meaning  that kernel-space  IRQ recursion is  implicitly possible, yet  one has to
 	 *       keep in mind that the stack must always be of sufficient size! */
 
 
 	__UINT32_TYPE__   t_cr3;    /* Contains the base physical address of the page directory to be used by the task.
-	                             * Control register CR3 is also known as the page-directory base register (PDBR). */
+	                             * Control register CR3 is also known  as the page-directory base register  (PDBR). */
 	__UINT32_TYPE__   t_eip;    /* State of the EIP register prior to the task switch. */
 	__UINT32_TYPE__   t_eflags; /* State of the EFAGS register prior to the task switch. */
 	__UINT32_TYPE__   t_eax;    /* State of the EAX register prior to the task switch. */
@@ -149,15 +149,15 @@ struct __ATTR_ALIGNED(ALIGNOF_TSS32) __ATTR_PACKED tss32 /*[PREFIX(t_)]*/ {
 	union __ATTR_PACKED {
 		__UINT16_TYPE__ t_flags; /* TSS flags (bit 1 is the `T' (debug trap) bit) */
 		struct __ATTR_PACKED {
-			unsigned int   t_trap : 1; /* When set, the T flag causes the processor to raise a
+			unsigned int   t_trap : 1; /* When set, the T flag  causes the processor to raise  a
 			                            * debug exception when a task switch to this task occurs */
 			unsigned int __t_zerob : 15; /* ... */
 		};
 	};
 	__UINT16_TYPE__   t_iomap;  /* Contains a 16-bit offset from the base of the TSS to the I/O permission
-	                             * bit map and interrupt redirection bitmap. When present, these maps are
-	                             * stored in the TSS at higher addresses. The I/O map base address points
-	                             * to the beginning of the I/O permission bit map and the end of the
+	                             * bit  map and interrupt redirection bitmap. When present, these maps are
+	                             * stored in the TSS at higher addresses. The I/O map base address  points
+	                             * to the beginning  of the  I/O permission  bit map  and the  end of  the
 	                             * interrupt redirection bit map */
 };
 #endif /* __CC__ */

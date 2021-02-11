@@ -23,9 +23,9 @@
 #include <__stdinc.h>
 
 /* User program capabilities.
- * Note that linux has a similar feature and that KOS tries to maintain
+ * Note that linux  has a similar  feature and that  KOS tries to  maintain
  * binary compatibility with linux's capability codes. As such, KOS extends
- * the valid range of capability IDs to negative values, which are used to
+ * the valid range of capability IDs to negative values, which are used  to
  * encode KOS-specific kernel capability codes. */
 
 /* Capability aliases */
@@ -47,7 +47,7 @@
 #define CAP_OPEN_BLOCKDEV_PART               CAP_SYS_ADMIN       /* Allow use of `HOP_BLOCKDEVICE_OPENDRIVEPART' */
 #define CAP_SET_TTY_BUFFER_SIZES             CAP_SYS_RESOURCE    /* Allow use of `TTYIO_IBUF_SETLIMIT', `TTYIO_CANON_SETLIMIT', `TTYIO_OPEND_SETLIMIT', `TTYIO_IPEND_SETLIMIT' */
 #define CAP_DRIVER_QUERY                     CAP_SYS_MODULE      /* Allow use of `KSYSCTL_DRIVER_LSMOD', `KSYSCTL_DRIVER_GETMOD', `KSYSCTL_DRIVER_GET_LIBRARY_PATH',
-                                                                  * as well as `HOP_DRIVER_STATE_GET_DRIVER', `HOP_DRIVER_OPEN_FILE', `HOP_DRIVER_OPEN_DEPENDENCY',
+                                                                  * as well as `HOP_DRIVER_STATE_GET_DRIVER', `HOP_DRIVER_OPEN_FILE',  `HOP_DRIVER_OPEN_DEPENDENCY',
                                                                   * as well as `KSYSCTL_OPEN_KERNEL_DRIVER' */
 #define CAP_DRIVER_CONTROL                   CAP_SYS_MODULE      /* Allow use of `HOP_DRIVER_INITIALIZE', `HOP_DRIVER_FINALIZE' */
 #define CAP_KERNEL_QUERY                     CAP_SYS_ADMIN       /* Allow use of `KSYSCTL_OPEN_KERNEL_VFS' `KSYSCTL_OPEN_KERNEL_FS', `KSYSCTL_OPEN_KERNEL_VM', \
@@ -66,11 +66,11 @@ enum {
 #ifdef __KOS__
 	CAP_FIRST_CAP          = -2,   /* Lowest capability in use */
 	CAP_DEBUGTRAP          = -2,   /* Allowed to trigger `debugtrap(2)' for the following reasons:
-	                                *    DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
-	                                *    DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
-	                                *    DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
-	                                *    DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
-	                                *    DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
+	                                *   - DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
+	                                *   - DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
+	                                *   - DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
+	                                *   - DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
+	                                *   - DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
 	CAP_MMAP_UNINITIALIZED = -1,   /* Allowed to use `MAP_UNINITIALIZED' (when not allowed, that flag is silently ignored) */
 #else /* __KOS__ */
 	CAP_FIRST_CAP = 0, /* Lowest capability in use */
@@ -78,9 +78,9 @@ enum {
 	CAP_CHOWN           = 0,                /* chown() is allowed, no matter what the file's previous user/group was. */
 	CAP_DAC_OVERRIDE    = 1,                /* Skip checks for read, write or execute on files */
 	CAP_DAC_READ_SEARCH = 2,                /* Skip checks for read and execute on directories */
-	CAP_FOWNER          = 3,                /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
+	CAP_FOWNER          = 3,                /* Ignore  filesystem-uid  checks  (s.a.  `sys_getfsuid()'),   allowing
 	                                         * `chmod()', `utime()', etc. on files not owned by the calling thread.
-	                                         * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
+	                                         * Checks  controlled  by `CAP_DAC_OVERRIDE'  and `CAP_DAC_READ_SEARCH'
 	                                         * are not affected by this. */
 	CAP_FSETID          = 4,                /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
 	CAP_KILL            = 5,                /* Skip checks done by `kill(2)' */
@@ -106,11 +106,11 @@ enum {
 #ifdef __KOS__
 #define CAP_FIRST_CAP          CAP_FIRST_CAP          /* Lowest capability in use */
 #define CAP_DEBUGTRAP          CAP_DEBUGTRAP          /* Allowed to trigger `debugtrap(2)' for the following reasons:
-                                                       *    DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
-                                                       *    DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
-                                                       *    DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
-                                                       *    DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
-                                                       *    DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
+                                                       *   - DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
+                                                       *   - DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
+                                                       *   - DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
+                                                       *   - DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
+                                                       *   - DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
 #define CAP_MMAP_UNINITIALIZED CAP_MMAP_UNINITIALIZED /* Allowed to use `MAP_UNINITIALIZED' (when not allowed, that flag is silently ignored) */
 #else /* __KOS__ */
 #define CAP_FIRST_CAP          CAP_FIRST_CAP          /* Lowest capability in use */
@@ -118,9 +118,9 @@ enum {
 #define CAP_CHOWN              CAP_CHOWN              /* chown() is allowed, no matter what the file's previous user/group was. */
 #define CAP_DAC_OVERRIDE       CAP_DAC_OVERRIDE       /* Skip checks for read, write or execute on files */
 #define CAP_DAC_READ_SEARCH    CAP_DAC_READ_SEARCH    /* Skip checks for read and execute on directories */
-#define CAP_FOWNER             CAP_FOWNER             /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
+#define CAP_FOWNER             CAP_FOWNER             /* Ignore  filesystem-uid  checks  (s.a.  `sys_getfsuid()'),   allowing
                                                        * `chmod()', `utime()', etc. on files not owned by the calling thread.
-                                                       * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
+                                                       * Checks  controlled  by `CAP_DAC_OVERRIDE'  and `CAP_DAC_READ_SEARCH'
                                                        * are not affected by this. */
 #define CAP_FSETID             CAP_FSETID             /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
 #define CAP_KILL               CAP_KILL               /* Skip checks done by `kill(2)' */
@@ -143,11 +143,11 @@ enum {
 #ifdef __KOS__
 #define CAP_FIRST_CAP          (-2) /* Lowest capability in use */
 #define CAP_DEBUGTRAP          (-2) /* Allowed to trigger `debugtrap(2)' for the following reasons:
-                                     *    DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
-                                     *    DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
-                                     *    DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
-                                     *    DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
-                                     *    DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
+                                     *   - DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
+                                     *   - DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
+                                     *   - DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
+                                     *   - DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
+                                     *   - DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
 #define CAP_MMAP_UNINITIALIZED (-1) /* Allowed to use `MAP_UNINITIALIZED' (when not allowed, that flag is silently ignored) */
 #else /* __KOS__ */
 #define CAP_FIRST_CAP          0    /* Lowest capability in use */
@@ -155,9 +155,9 @@ enum {
 #define CAP_CHOWN              0    /* chown() is allowed, no matter what the file's previous user/group was. */
 #define CAP_DAC_OVERRIDE       1    /* Skip checks for read, write or execute on files */
 #define CAP_DAC_READ_SEARCH    2    /* Skip checks for read and execute on directories */
-#define CAP_FOWNER             3    /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
+#define CAP_FOWNER             3    /* Ignore  filesystem-uid  checks  (s.a.  `sys_getfsuid()'),   allowing
                                      * `chmod()', `utime()', etc. on files not owned by the calling thread.
-                                     * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
+                                     * Checks  controlled  by `CAP_DAC_OVERRIDE'  and `CAP_DAC_READ_SEARCH'
                                      * are not affected by this. */
 #define CAP_FSETID             4    /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
 #define CAP_KILL               5    /* Skip checks done by `kill(2)' */
@@ -186,7 +186,7 @@ enum {
 #define SECBIT_NOROOT                 0x0001 /* Disable special handling for exec() with euid=0 */
 #define SECBIT_NOROOT_LOCKED          0x0002 /* Make `SECBIT_NOROOT' immutable (this flag cannot be unset) */
 #define SECBIT_NO_SETUID_FIXUP        0x0004 /* Disable changes to capabilities when any of (r|e|s)uid
-                                              * becomes 0 / all of (r|e|s)uid become non-0 */
+                                              * becomes   0   /   all  of   (r|e|s)uid   become  non-0 */
 #define SECBIT_NO_SETUID_FIXUP_LOCKED 0x0008 /* Make `SECBIT_NO_SETUID_FIXUP' immutable (this flag cannot be unset) */
 #define SECBIT_KEEP_CAPS              0x0010 /* Don't clear permitted capabilities when all of (r|e|s)uid become non-0  */
 #define SECBIT_KEEP_CAPS_LOCKED       0x0020 /* Make `SECBIT_KEEP_CAPS' immutable (this flag cannot be unset) */

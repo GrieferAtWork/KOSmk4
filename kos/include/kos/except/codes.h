@@ -243,7 +243,7 @@
                                                                                 * [fld(mask:    uintptr_t, "The mask in which the bits of `value' must match `required_masked_value'")]
                                                                                 * [fld(required_masked_value: uintptr_t, "The required result of masking `value'")]
                                                                                 * A given `value' has an invalid alignment when masked by `mask', such that
-                                                                                * the expression `(mask & value) != required_masked_value' was the case. */
+                                                                                * the  expression  `(mask & value) != required_masked_value' was  the case. */
 #endif /* !E_INVALID_ARGUMENT_BAD_ALIGNMENT */
 #ifndef E_INVALID_ARGUMENT_BAD_VALUE
 #define E_INVALID_ARGUMENT_BAD_VALUE              (E_INVALID_ARGUMENT, 0x0006) /* [msg("A given value is invalid for the associated argument")]
@@ -485,7 +485,7 @@
 /*[[[end]]]*/
 #ifndef E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER
 #define E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER 0x0001 /* Attempted to move the leader of a process group into a different
-                                                           * process group (`pid2' is the PID of the target process group) */
+                                                           * process  group (`pid2' is  the PID of  the target process group) */
 #endif /* !E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER */
 /*[[[begin]]]*/
 
@@ -831,7 +831,7 @@
 #ifndef E_INTERRUPT
 #define E_INTERRUPT                               (0xf000)              /* [errno(EINTR), msg("Interrupt")]
                                                                          * The thread has been interrupted by a RPC function,
-                                                                         * causing a premature return to user-space.
+                                                                         * causing  a   premature   return   to   user-space.
                                                                          * NOTE: If  the  system  communication facility  that  was used  for  the interrupt
                                                                          *       supports  restarting (e.g.  loadcore() following a  #PF on X86),  or if the
                                                                          *       interrupt happened during a  restartable system call (e.g.  `sys_close()'),
@@ -852,7 +852,7 @@
                                                                          *      also done by linux, as described on this page:
                                                                          *     `http://man7.org/linux/man-pages/man7/signal.7.html')
                                                                          *  #3: Restart the system call if the interrupt wasn't caused by a posix_signal,
-                                                                         *      or if it was caused by a posix_signal with the `SA_RESTART' flag set. */
+                                                                         *      or if it  was caused by  a posix_signal with  the `SA_RESTART' flag  set. */
 #endif /* !E_INTERRUPT */
 #ifndef E_INTERRUPT_USER_RPC
 #define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind  in  order  to

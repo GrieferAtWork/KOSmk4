@@ -35,8 +35,8 @@ __DECL_BEGIN
 #define __RTLD_BINDING_MASK 0x00003 /* Mask of binding time value. */
 #define __RTLD_NOLOAD       0x00004 /* Do not load the object. */
 #define __RTLD_DEEPBIND     0x00008 /* Use deep binding. */
-#define __RTLD_GLOBAL       0x00100 /* If the following bit is set in the MODE argument to `dlopen',
-                                     * the symbols of the loaded object and its dependencies are made
+#define __RTLD_GLOBAL       0x00100 /* If the following bit is set  in the MODE argument to  `dlopen',
+                                     * the  symbols of the loaded object and its dependencies are made
                                      * visible as if the object were linked directly into the program. */
 #define __RTLD_LOCAL        0x00000 /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */
 #define __RTLD_NODELETE     0x01000 /* Do not delete object when closed. */
@@ -51,8 +51,8 @@ __DECL_BEGIN
 #define __RTLD_NOINIT 0x80000000 /* KOS Extension: Don't run module initializers, and consequently
                                   *                skip running finalizers as well.
                                   * When set, `dlopen()' will immeditaly return to the caller upon success,
-                                  * rather than running initializers of all affected libraries first.
-                                  * HINT: You may run initializers (and finalizers during exit()) at a
+                                  * rather than  running  initializers  of all  affected  libraries  first.
+                                  * HINT: You may  run initializers  (and finalizers  during exit())  at  a
                                   *       later time by calling `dlopen()' again without passing this flag.
                                   * WARNING: Initializers of newly loaded dependencies will not be executed either! */
 
@@ -131,8 +131,8 @@ __DECL_BEGIN
 #define __RTLD_NODELETE     0x00008 /* Do not delete object when closed. */
 #define __RTLD_NOLOAD       0x00010 /* Do not load the object. */
 #define __RTLD_DEEPBIND     0x00020 /* Use deep binding. */
-#define __RTLD_GLOBAL       0x00100 /* If the following bit is set in the MODE argument to `dlopen',
-                                     * the symbols of the loaded object and its dependencies are made
+#define __RTLD_GLOBAL       0x00100 /* If the following bit is set  in the MODE argument to  `dlopen',
+                                     * the  symbols of the loaded object and its dependencies are made
                                      * visible as if the object were linked directly into the program. */
 #define __RTLD_LOCAL        0x00000 /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */
 #define __CRT_HAVE_dladdr 1
@@ -199,7 +199,7 @@ __DECL_BEGIN
 #endif /* !__RTLD_LOCAL */
 
 
-/* The KOS kernel doesn't implement the <dlfcn.h> interface!
+/* The   KOS   kernel   doesn't  implement   the   <dlfcn.h>  interface!
  * Instead, a functionally similar interface exists in <kernel/driver.h> */
 #if defined(__KOS__) && defined(__KERNEL__)
 #undef __CRT_HAVE_dlopen

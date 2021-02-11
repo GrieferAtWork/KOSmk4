@@ -24,4 +24,3 @@
 #else /* __x86_64__ */
 #include "crt-kos32.h"
 #endif /* !__x86_64__ */
-

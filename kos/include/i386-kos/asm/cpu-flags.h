@@ -42,19 +42,19 @@
 #define EFLAGS_ID          __UINT32_C(0x00200000) /* [bit(21)] ID Flag (System). */
 #define EFLAGS_GTIOPL(flags) (((flags) >> 12) & 3)
 
-/* Mask of bits that user-space may assume to always be modifiable
- * There are a couple of bits in here that I wish weren't available to
+/* Mask  of  bits  that user-space  may  assume to  always  be modifiable
+ * There are a couple of  bits in here that  I wish weren't available  to
  * ring#3, however ring#3 already has implicit access to them since these
- * are the bits that `popf[l|q]' allows to be modified, so there'd be no
+ * are the bits that `popf[l|q]' allows to be modified, so there'd be  no
  * point in restricting this set in any form.
- * The only thing that I don't understand about this is `EFLAGS.AC', because
- * there are 2 dedicated instructions `stac' and `clac' that can be used to
- * set/clear that bit. However attempting to do so (normally) causes a #GP
- * if done so from ring#3 (and there is no way to disable this other than
- * emulating these instructions for ring#3 from kernel-space, as done by
+ * The  only thing  that I don't  understand about this  is `EFLAGS.AC', because
+ * there are 2  dedicated instructions  `stac' and `clac'  that can  be used  to
+ * set/clear  that  bit. However  attempting to  do so  (normally) causes  a #GP
+ * if done  so from  ring#3 (and  there is  no way  to disable  this other  than
+ * emulating  these  instructions  for  ring#3  from  kernel-space,  as  done by
  * the KOS kernel). So it doesn't actually make sense to lock those instructions
- * as being privileged when in fact everything they might be useful for can
- * already be done via the `popf' instruction (which isn't privileged for
+ * as being privileged  when in  fact everything they  might be  useful for  can
+ * already  be  done  via the  `popf'  instruction (which  isn't  privileged for
  * `EFLAGS.AC' and cannot be made to be privileged, either...) */
 #define EFLAGS_UMASK                                                         \
 	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_TF | \
@@ -101,8 +101,8 @@
 
 
 /* NOTE: Within the int1 handler, B{0-3} may be set even if the associated breakpoint
- *       in %dr7 isn't enabled (enabling a breakpoint may only cause an exception to
- *       be generated when its condition is detected, but doesn't necessarily affect
+ *       in %dr7 isn't enabled (enabling a breakpoint may only cause an exception  to
+ *       be  generated when its condition is detected, but doesn't necessarily affect
  *       if and what bits get set within %dr6)
  * NOTE: Undefined bits must remain unchanged! */
 #define DR6_B0             __UINT32_C(0x00000001) /* [bit(0)] Breakpoint condition 0 detected */
@@ -129,7 +129,7 @@
 #define DR7_GE             __UINT32_C(0x00000200) /* [bit(9)] Global exact breakpoint enable. */
 #define DR7_RTM            __UINT32_C(0x00000800) /* [bit(11)] Restricted transactional memory (Requires `IA32_DEBUGCTL.RTM'). */
 #define DR7_GD             __UINT32_C(0x00002000) /* [bit(13)] Enable debug register protection.
-                                                   * mov instructions attempting to access debug registers
+                                                   * mov  instructions attempting to access debug registers
                                                    * will cause a #DB exception to be triggered on said mov */
 #define DR7_LN(n)          (__UINT32_C(0x1) << ((n)*2))
 #define DR7_GN(n)          (__UINT32_C(0x2) << ((n)*2))
@@ -178,7 +178,7 @@
 #   define FCW_PC_DOUBLE  __UINT16_C(0x0200) /* Double Precision (53 bits) */
 #   define FCW_PC_EXTEND  __UINT16_C(0x0300) /* Double Extended Precision (64 bits) */
 #define FCW_RC   __UINT16_C(0x0c00) /* [bit(10 - 11)] Rounding control. */
-#   define FCW_RC_NEAREST __UINT16_C(0x0000) /* Result is closest to the infinitely precise result.
+#   define FCW_RC_NEAREST __UINT16_C(0x0000) /* Result   is   closest  to   the  infinitely   precise  result.
                                               * If 2 values are equally close, the even one is used. (DEFAULT) */
 #   define FCW_RC_DOWN    __UINT16_C(0x0400) /* Round towards -INF */
 #   define FCW_RC_UP      __UINT16_C(0x0800) /* Round towards +INF */
@@ -228,7 +228,7 @@
 #define MXCSR_UM  __UINT16_C(0x00000800) /* [bit(11)] Underflow (Exception mask) */
 #define MXCSR_PM  __UINT16_C(0x00001000) /* [bit(12)] Precision (Exception mask) */
 #define MXCSR_RC  __UINT16_C(0x00006000) /* [bit(13 - 14)] Rounding control. */
-#   define MXCSR_RC_NEAREST __UINT16_C(0x00000000) /* Result is closest to the infinitely precise result.
+#   define MXCSR_RC_NEAREST __UINT16_C(0x00000000) /* Result   is   closest  to   the  infinitely   precise  result.
                                                     * If 2 values are equally close, the even one is used. (DEFAULT) */
 #   define MXCSR_RC_DOWN    __UINT16_C(0x00002000) /* Round towards -INF */
 #   define MXCSR_RC_UP      __UINT16_C(0x00004000) /* Round towards +INF */

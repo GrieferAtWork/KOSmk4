@@ -48,7 +48,7 @@
        * TODO: Must test the x86_64 kernel with _and_ without the physical identity mapping! */
 
 /* First first half of the kernel address space is used as identity mapping
- * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
+ * for the  first  64TiB  (yes:  that is  Terrabyte)  of  physical  memory. */
 #define KERNEL_PHYS2VIRT_BASE __UINT64_C(0xffff880000000000) /* Start of the physical identity mapping */
 #define KERNEL_PHYS2VIRT_SIZE __UINT64_C(0x0000400000000000) /* Size of the physical identity mapping (== 64TiB) */
 #define KERNEL_PHYS2VIRT_MIN  KERNEL_PHYS2VIRT_BASE          /* Lowest address apart of the physical identity mapping */

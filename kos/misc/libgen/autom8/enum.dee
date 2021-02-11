@@ -228,7 +228,14 @@ function main(parser: Autom8Parser, none) {
 			}
 			i = enumDocEnd + 2;
 		}
-		enumValues.append((enumName, str(enumValue), enumDoc.rstrip()));
+		if (enumValue is int) {
+			if (enumValue < 0)
+				enumValue = "({})".format({ enumValue });
+			else {
+				enumValue = str(enumValue);
+			}
+		}
+		enumValues.append((enumName, enumValue, enumDoc.rstrip()));
 		nextEnumValue = incrementIntegerStringExpression(enumValue);
 		flushStart = i;
 	}

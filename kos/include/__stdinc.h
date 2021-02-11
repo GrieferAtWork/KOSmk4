@@ -48,7 +48,7 @@
 
 #if !defined(__PE__) && !defined(__ELF__)
 /* Try to determine current binary format using other platform
- * identifiers. (When KOS headers are used on other systems) */
+ * identifiers. (When KOS headers  are used on other  systems) */
 #if (defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || defined(__WINDOWS__) || \
      defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) ||                       \
      defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) ||              \
@@ -132,15 +132,15 @@
 #define __NOTHROW __ATTR_NOTHROW
 #endif /* !... */
 
-/* A special variant of NOTHROW that is only applied when
- * `-fnon-call-exceptions' is disabled (NCX -- NonCallExceptions)
- * This applies to a huge set of functions, including practically
+/* A  special  variant  of  NOTHROW  that  is  only  applied   when
+ * `-fnon-call-exceptions' is disabled  (NCX --  NonCallExceptions)
+ * This applies to a huge  set of functions, including  practically
  * everything from <string.h>, as well as a lot of other functions.
  *     So many as a matter of fact, that it is the default nothrow-mode
- *     used by magic headers created by `generated_header.dee'
+ *     used  by   magic  headers   created  by   `generated_header.dee'
  * Basically, anything that is designed to interact with user-provided
- * memory buffers applies for this, as the user may have defined a
- * signal handler to throw an exception upon `SIGSEGV', or the like.
+ * memory  buffers applies  for this, as  the user may  have defined a
+ * signal handler to throw an  exception upon `SIGSEGV', or the  like.
  * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>) */
 #if (!defined(__NO_NON_CALL_EXCEPTIONS) || \
      (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0))
@@ -164,10 +164,10 @@
 
 
 
-/* RPC-nothrow exceptions definition (used for functions that may only throw
+/* RPC-nothrow exceptions definition (used for functions that may only  throw
  * exceptions due to the use of RPC callbacks and pthread cancellation points
  * which themself may throw errors).
- * By default, declare functions such that generated code is capable of dealing
+ * By default, declare functions such that generated code is capable of  dealing
  * with throwing RPC functions (`rpc_schedule()'), as well as `pthread_cancel()'
  * -> This mainly affects system calls */
 #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS)
@@ -226,9 +226,9 @@
 #ifndef __DEFINE_PUBLIC_ALIAS
 #ifdef __COMPILER_HAVE_GCC_ASM
 #ifdef __PE__
-#if 1 /* PE doesn't have .pushsection, .popsection, or even .previous, however we'd need
-       * to change sections in order to write to the `.drectve' section that we want to
-       * export a certain symbol. - So while in theory we can define non-public aliases,
+#if 1 /* PE doesn't have .pushsection, .popsection,  or even .previous, however we'd  need
+       * to change sections in order  to write to the `.drectve'  section that we want  to
+       * export a certain symbol. - So while  in theory we can define non-public  aliases,
        * defining public ones is something that we cannot do without assuming the caller's
        * current section. */
 #define __NO_DEFINE_ALIAS
@@ -320,10 +320,10 @@
 #elif defined(__ELF__) && defined(__WANT_NO_PLT_RELOCATIONS)
 /* Even though this does work, and does prevent the creation of PLT entries,
  * and instead uses the GOT directly in order to access functions, this also
- * prevents lazy relocations from being used, so overall, enabling this by
+ * prevents lazy relocations from being  used, so overall, enabling this  by
  * default would degrade program performance.
  * As such, this feature is implement as opt-in on a per-file basis, with the
- * user having to `#define __WANT_NO_PLT_RELOCATIONS' prior to including any
+ * user  having to `#define __WANT_NO_PLT_RELOCATIONS' prior to including any
  * system header file. */
 #if __has_attribute(__noplt__) && __has_attribute(__visibility__)
 #define __HAVE_NO_PLT_RELOCATIONS /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
@@ -378,25 +378,25 @@
 #endif /* !... */
 
 /* COMDAT function definitions:
- * When applied to a function, an attempt will be made to ensure that multiple
- * instances of the same function, which may exist in multiple compilation units
- * get merged into a single instance at link-time. No guaranty is made that this
+ * When applied to  a function, an  attempt will  be made to  ensure that  multiple
+ * instances  of the same  function, which may exist  in multiple compilation units
+ * get merged into a single  instance at link-time. No  guaranty is made that  this
  * will actually be the case, meaning that as a fall-back, these macros are allowed
- * to simply declare functions as static (with the exception of `__PUBLIC_COMDAT',
- * which will define `__NO_PUBLIC_COMDAT' if the function cannot be provided as
+ * to  simply declare functions as static (with the exception of `__PUBLIC_COMDAT',
+ * which will define  `__NO_PUBLIC_COMDAT' if  the function cannot  be provided  as
  * part of the containing programs export table)
- *   - __INTERN_COMDAT: Combination of __PRIVATE, in that the symbol is only
+ *   - __INTERN_COMDAT: Combination of  __PRIVATE, in  that  the symbol  is  only
  *                      guarantied to be visible within the declaring compilation
- *                      unit, but also similar to `__INTERN', in that the final
- *                      run-time address of the symbol may be identical between
+ *                      unit, but also similar to  `__INTERN', in that the  final
+ *                      run-time address of the  symbol may be identical  between
  *                      multiple compilation units.
  *                      Note that unlike `__INTERN', declaration with this visibility
- *                      should appear in headers, rather than source files!
- *   - __PUBLIC_COMDAT: An optional extension to `__INTERN_COMDAT' that exists mainly
- *                      in c++, where the annotated function (may) also be exported
+ *                      should  appear  in   headers,  rather   than  source   files!
+ *   - __PUBLIC_COMDAT: An  optional extension to  `__INTERN_COMDAT' that exists mainly
+ *                      in  c++, where  the annotated  function (may)  also be exported
  *                      from the associated program, and relocations (may) be generated
- *                      to ensure that a single, common address is used in the event
- *                      that other linked components export the same symbol.
+ *                      to  ensure that a  single, common address is  used in the event
+ *                      that   other   linked  components   export  the   same  symbol.
  *                      If this macro is a simple alias for `__INTERN_COMDAT', then the
  *                      macro `__NO_PUBLIC_COMDAT' is defined to `1' */
 #ifndef __INTERN_COMDAT
@@ -670,10 +670,10 @@
 #endif /* ____PRIVATE_VREDIRECT_UNPACK */
 #else /* __cplusplus */
 /* Fallback: Assume that the compiler supports scoped declarations,
- *           as well as deleting them once the scope ends.
- * NOTE: GCC actually doesn't support this one, somehow keeping
- *       track of the C declaration types even after the scope ends,
- *       causing it to fail fatal()-style with incompatible-prototype errors.
+ *           as  well  as  deleting  them  once  the  scope   ends.
+ * NOTE: GCC actually doesn't support this one, somehow keeping  track
+ *       of the C declaration types even after the scope ends, causing
+ *       it to fail fatal()-style with incompatible-prototype errors.
  * HINT: This implementation does however work for MSVC when compiling for C.
  */
 
@@ -745,8 +745,8 @@
 	((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
 #if defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_builtin_types_compatible_p)
 /* Syntax highlighting for improper use of `container_of' (typeof(*ptr) != typeof(type::member))
- * Only do this with intellisense, since GCC's VLA extension might try to turn int(*)[expr(-1)]
- * into a runtime expression `alloca((size_t)-1)' if (for some reason) it's unable to evaluate
+ * Only  do this with intellisense, since GCC's VLA extension might try to turn int(*)[expr(-1)]
+ * into  a runtime expression `alloca((size_t)-1)' if (for  some reason) it's unable to evaluate
  * the array length expression at compile-time. */
 #define __COMPILER_CONTAINER_OF(ptr, type, member)                                 \
 	((type *)(int(*)[__builtin_types_compatible_p(__typeof__(((type *)0)->member), \

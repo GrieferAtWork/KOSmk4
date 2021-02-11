@@ -75,11 +75,11 @@ __DECL_BEGIN
 struct userkern32 /*[PREFIX(uk_)]*/ {
 	/* Thread-local state information provided by the kernel.
 	 * NOTE: This structure is implemented through VIO, so it doesn't really behave
-	 *       like you would expect it to, while any sort of memory access is quite
+	 *       like  you would expect it to, while any sort of memory access is quite
 	 *       slow and should be kept at a minimum for that reason.
 	 *  - The contents of this structure are thread-local for the most part
 	 *  - Calling the address of this structure after adding an offset of one of `__NR_*',
-	 *    allows that system call to be invoked as a regular, old function:
+	 *    allows   that  system   call  to  be   invoked  as  a   regular,  old  function:
 	 *    >> typedef int (*POPEN)(char const *filename, oflag_t flags, ...);
 	 *    >> typedef int (*PCLOSE)(int fd);
 	 *    >> struct userkern *t = userkern_get();
@@ -113,13 +113,13 @@ struct userkern32 /*[PREFIX(uk_)]*/ {
 	__uint32_t const            uk_pid;   /* [const] PID of the calling process. */
 	__uint32_t                  uk_ppid;  /* PID of the calling process's parent process.
 	                                       * You may write `0' to this field for the same effect that `detach(getpid())' would have had.
-	                                       * Attempting to write other values causes an `E_INVALID_ARGUMENT_BAD_VALUE' exception
+	                                       * Attempting  to  write  other  values  causes  an  `E_INVALID_ARGUMENT_BAD_VALUE'  exception
 	                                       * to be thrown (context `E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID') */
-	__uint32_t                  uk_pgid;  /* ID of the process group that the calling thread is apart of.
+	__uint32_t                  uk_pgid;  /* ID  of  the process  group  that the  calling  thread is  apart of.
 	                                       * Writing to this field has the same effect as `setpgid(0, <VALUE>)'. */
 	__uint32_t                  uk_sid;   /* ID of the session that the calling thread is apart of.
-	                                       * Writing either `0' of the TID or PID of the calling thread has the same effect as `setsid()'.
-	                                       * Attempting to write other values causes an `E_INVALID_ARGUMENT_BAD_VALUE'
+	                                       * Writing either `0' of  the TID or PID  of the calling thread  has the same effect  as
+	                                       * `setsid()'. Attempting to write other values causes an `E_INVALID_ARGUMENT_BAD_VALUE'
 	                                       * exception to be thrown (context `E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID') */
 	__uint32_t volatile         uk_uid;   /* Access to real uid (`getuid()' / `setuid()') of the calling process */
 	__uint32_t volatile         uk_gid;   /* Access to real gid (`getgid()' / `setgid()') of the calling process */
@@ -127,7 +127,7 @@ struct userkern32 /*[PREFIX(uk_)]*/ {
 	__uint32_t volatile         uk_egid;  /* Access to effective gid (`getegid()' / `setegid()') of the calling process */
 	__uint32_t volatile         uk_suid;  /* Access to saved uid of the calling process */
 	__uint32_t volatile         uk_sgid;  /* Access to saved gid of the calling process */
-	struct ucpustate32 volatile uk_regs;  /* Your current register state. (essentially, this is can be
+	struct ucpustate32 volatile uk_regs;  /* Your current register  state. (essentially, this  is can  be
 	                                       * used as a memory-mapped copy of your current register state) */
 	struct sfpustate volatile   uk_sfpu;  /* Simple FPU register map */
 	__uint8_t                 __uk_pad[4]; /* Pad to have `uk_xfpu' be aligned by 16 bytes */

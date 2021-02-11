@@ -26,7 +26,7 @@
 
 #include "../../../libm/asm/_builtin.h"
 
-/* Define these macros if the respective compiler builtin function
+/* Define these macros if  the respective compiler builtin  function
  * both exists, and never generates code containing calls to library
  * functions.
  * When individual macros are defined, compiler intrinsics are used

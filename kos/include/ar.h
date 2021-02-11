@@ -51,9 +51,9 @@
    <http://www.gnu.org/licenses/>.  */
 
 
-/* Archive files start with the ARMAG identifying string. Then follows a
+/* Archive files start with the  ARMAG identifying string. Then follows  a
  * `struct ar_hdr', and as many bytes of member file data as its `ar_size'
- * member indicates, for each member file.  */
+ * member indicates, for each member file. */
 
 
 #define ARMAG  "!<arch>\n" /* String that begins an archive file. */

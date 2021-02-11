@@ -66,7 +66,7 @@
 #endif /* !PATH_MAX && __PATH_MAX != -1 */
 
 /* Max # bytes in atomic write to a pipe (Default value, assuming
- * that backing memory isn't VIO or re-mapped during a write) */
+ * that  backing memory  isn't VIO  or re-mapped  during a write) */
 #if !defined(PIPE_BUF) && defined(__PIPE_BUF) && (__PIPE_BUF + 0) != -1
 #define PIPE_BUF __PIPE_BUF
 #endif /* !PIPE_BUF && __PIPE_BUF != -1 */

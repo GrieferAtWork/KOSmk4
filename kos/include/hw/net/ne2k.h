@@ -31,8 +31,8 @@
 
 
 /* Some of the definitions and macros below are taken from
- * linux sources: "/drivers/net/ethernet/8390/8390.h"
- * The comment below can be found in the original source.
+ * linux   sources:    "/drivers/net/ethernet/8390/8390.h"
+ * The comment below can be found in the original  source.
  * NOTICE: Changes, as well as additions have been made using the following source(s):
  * >> http://www.ethernut.de/pdf/8019asds.pdf */
 /* This file is part of Donald Becker's 8390 drivers, and is distributed

@@ -48,7 +48,7 @@ __DECL_BEGIN
 
 
 #ifdef __CC__
-/* Helper wrapper for generating a callable prototype for any
+/* Helper wrapper for  generating a callable  prototype for  any
  * given system call, using the userkern segment `base' as base.
  * >> #include <sys/syscall-proto.h>
  * >> #include <kos/ukern.h>
@@ -60,22 +60,22 @@ __DECL_BEGIN
  * >> fd_t fd = userkern_syscall(me, open)("/bin/init", O_RDONLY, 0777);
  * >> userkern_syscall(me, read)(fd, buf, sizeof(buf));
  * >> userkern_syscall(me, close)(fd);
- * WARNING: Unlike the C library's `syscall()' function, this method of invocation
+ * WARNING: Unlike the C library's `syscall()' function, this method of  invocation
  *          will not set the `errno' variable on error, but instead return negative
  *          E* error codes from <errno.h> upon failure. */
 #define userkern_syscall(base, name)                                   \
 	(*(SYSCALL_PROTO_POINTER(name))(void *)((__UINTPTR_TYPE__)(base) + \
 	                                        USERKERN_SYSCALL_ENCODE(__NR_##name)))
 
-/* Same as `userkern_syscall()', but enable exceptions (s.a. `set_exception_handler()'),
+/* Same as `userkern_syscall()',  but enable  exceptions (s.a.  `set_exception_handler()'),
  * as opposed to causing the system call to return a negative errno code (s.a. `E_ISERR()') */
 #define userkern_Syscall(base, name)                                   \
 	(*(SYSCALL_PROTO_POINTER(name))(void *)((__UINTPTR_TYPE__)(base) + \
 	                                        USERKERN_SYSCALL_ENCODE_EX(__NR_##name, 1)))
 
 
-/* Access fields of- or return the base address of the userkern descriptor
- * for the calling thread. - Based on architecture, these functions assume
+/* Access  fields of- or  return the base address  of the userkern descriptor
+ * for  the calling thread.  - Based on  architecture, these functions assume
  * that the internal register used to save the descriptor base address hasn't
  * been overwritten to point elsewhere:
  *   - x86_64:
@@ -91,9 +91,9 @@ __CDECLARE(,struct userkern *,__NOTHROW_NCX,userkern_self,(void),())
 #endif /* __CRT_HAVE_userkern_self */
 #endif /* !userkern_self */
 
-/* Returns `true' if the userkern segment can be used.
+/* Returns `true'  if  the  userkern segment  can  be  used.
  * When `false' is returned, you may call `userkern_reset()'
- * in order to reset the userkern segment to a valid value */
+ * in order to reset the  userkern segment to a valid  value */
 #ifndef userkern_valid
 #include <__crt.h>
 #ifdef __CRT_HAVE_userkern_valid
@@ -102,7 +102,7 @@ __CDECLARE(,__BOOL,__NOTHROW_NCX,userkern_valid,(void),())
 #endif /* __CRT_HAVE_userkern_valid */
 #endif /* !userkern_valid */
 
-/* Reset the base address of the user-thread segment to a valid
+/* Reset  the base address of the user-thread segment to a valid
  * value (in case the address had previously been re-assigned by
  * some other TLS mechanism) */
 #ifndef userkern_reset

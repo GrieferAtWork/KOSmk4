@@ -49,7 +49,7 @@
 #ifdef __USE_KOS
 #ifdef __WONLYTHREADS
 #define WONLYTHREADS __WONLYTHREADS /* Only wait for children created within the current
-                                     * process, and with the `CLONE_THREAD' flag set. */
+                                     * process, and  with the  `CLONE_THREAD' flag  set. */
 #endif /* __WONLYTHREADS */
 #ifdef __WNOWAIT
 #define WNOREAP __WNOWAIT /* Don't reap, just poll status (doesn't this name make more sense than `WNOWAIT'?). */

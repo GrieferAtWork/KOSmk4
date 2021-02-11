@@ -42,7 +42,7 @@ __LOCAL void (cpustate_verify_userpflags)(__uintptr_t __old_pflags,
                                           __uintptr_t __new_pflags,
                                           __uintptr_t __modifyable_mask)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
-	if __unlikely((__old_pflags & ~__modifyable_mask) != 
+	if __unlikely((__old_pflags & ~__modifyable_mask) !=
 	              (__new_pflags & ~__modifyable_mask)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,

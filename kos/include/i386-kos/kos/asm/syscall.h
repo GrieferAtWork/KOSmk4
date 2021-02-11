@@ -105,26 +105,26 @@ __SYSDECL_BEGIN
 #define __X86_SYSCALL_ASSEMBLY \
 	"syscall"
 
-/* Encode a CFI sequence to clear EFLAGS.DF when the system call returns
- * by throwing an exception. This is required since the kernel will preserve
- * the state of EFLAGS.DF, and libc's unwind engine has to be told to clear
- * the direction bit when unwinding. (if this isn't done, stuff like strlen()
+/* Encode a  CFI  sequence to  clear  EFLAGS.DF  when the  system  call  returns
+ * by  throwing an  exception. This is  required since the  kernel will preserve
+ * the state of  EFLAGS.DF, and libc's  unwind engine  has to be  told to  clear
+ * the  direction bit when  unwinding. (if this isn't  done, stuff like strlen()
  * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
  * upon function entry)
  * HINT:
- *   .cfi_escape DW_CFA_KOS_startcapsule
- *   .cfi_escape DW_CFA_val_expression
- *   .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
- *   .cfi_escape 7 // Code size
- *   .cfi_escape DW_OP_regx
- *   .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
- *   .cfi_escape DW_OP_const2u
- *   .cfi_escape (EFLAGS_DF & 0x00ff)
- *   .cfi_escape (EFLAGS_DF & 0xff00) >> 8
- *   .cfi_escape DW_OP_not
- *   .cfi_escape DW_OP_and
- *   ...
- *   .cfi_escape DW_CFA_KOS_endcapsule */
+ * >>    .cfi_escape DW_CFA_KOS_startcapsule
+ * >>    .cfi_escape DW_CFA_val_expression
+ * >>    .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
+ * >>    .cfi_escape 7 // Code size
+ * >>    .cfi_escape DW_OP_regx
+ * >>    .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
+ * >>    .cfi_escape DW_OP_const2u
+ * >>    .cfi_escape (EFLAGS_DF & 0x00ff)
+ * >>    .cfi_escape (EFLAGS_DF & 0xff00) >> 8
+ * >>    .cfi_escape DW_OP_not
+ * >>    .cfi_escape DW_OP_and
+ * >>    ...
+ * >>    .cfi_escape DW_CFA_KOS_endcapsule */
 #define __X86_XSYSCALL_ASSEMBLY                                    \
 	"std\n\t"                                                      \
 	".cfi_escape 0x38,0x16,0x31,7,0x90,0x31,0xa,0,4,0x20,0x1a\n\t" \
@@ -193,8 +193,8 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
 #define __X86_XSYSCALL_ASSEMBLY "call libc___i386_Xsyscall"
 #define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
 #elif (defined(__CRT_HAVE___i386_syscall) && defined(__CRT_HAVE___i386_Xsyscall) &&    \
-       0 /* This method doesn't work since PLT requires %ebx to point to the GOT,      \
-          * however the system call itself also needs %ebx as an argument register,    \
+       0 /* This method doesn't  work since  PLT requires %ebx  to point  to the  GOT, \
+          * however  the system call  itself also needs %ebx  as an argument register, \
           * so we have no way of actually invoking any kind of system call (especially \
           * since it is %ebx that is used to pass the very first argument) */)
 #define __X86_SYSCALL_ASSEMBLY   "call __i386_syscall@PLT"
@@ -204,20 +204,20 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
 
 #ifndef __X86_SYSCALL_ASSEMBLY
 #define __X86_SYSCALL_ASSEMBLY "int {$0x80|80h}"
-/* Encode a CFI sequence to clear EFLAGS.DF when the system call returns
- * by throwing an exception. This is required since the kernel will preserve
- * the state of EFLAGS.DF, and libc's unwind engine has to be told to clear
- * the direction bit when unwinding. (if this isn't done, stuff like strlen()
+/* Encode a  CFI  sequence to  clear  EFLAGS.DF  when the  system  call  returns
+ * by  throwing an  exception. This is  required since the  kernel will preserve
+ * the state of  EFLAGS.DF, and libc's  unwind engine  has to be  told to  clear
+ * the  direction bit when  unwinding. (if this isn't  done, stuff like strlen()
  * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
  * upon function entry)
  * HINT:
  *   .cfi_escape DW_CFA_KOS_startcapsule
- *   .cfi_escape DW_CFA_val_expression
+ *   .cfi_escape   DW_CFA_val_expression
  *   .cfi_escape CFI_386_UNWIND_REGISTER_EFLAGS
  *   .cfi_escape 6 // Code size
  *   .cfi_escape DW_OP_reg0 + CFI_386_UNWIND_REGISTER_EFLAGS
  *   .cfi_escape DW_OP_const2u
- *   .cfi_escape (EFLAGS_DF & 0x00ff)
+ *   .cfi_escape   (EFLAGS_DF   &  0x00ff)
  *   .cfi_escape (EFLAGS_DF & 0xff00) >> 8
  *   .cfi_escape DW_OP_not
  *   .cfi_escape DW_OP_and
@@ -285,7 +285,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall5_dw)(__sysc
 
 #if 0 /* F$CK! YOU GCC! Why isn't there any f-ing way to pass values through EBP? */
 register __ULONGPTR_TYPE__ __kos_syscall6_ebp __asm__("%ebp");
-#define __X86_SYSCALL_WITH_EBP(c) c 
+#define __X86_SYSCALL_WITH_EBP(c) c
 #ifdef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __edx; __register __syscall_ulong_t __res; __kos_syscall6_ebp = __arg5; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY) : "=a" (__res), "=&c" (__ecx), "=&d" (__edx) : "0" (__sysno), "b" (__arg0), "1" (__arg1), "2" (__arg2), "S" (__arg3), "D" (__arg4) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __edx; __register __syscall_ulong_t __res; __kos_syscall6_ebp = __arg5; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY) : "=a" (__res), "=&c" (__ecx), "=&d" (__edx) : "0" (__sysno), "b" (__arg0), "1" (__arg1), "2" (__arg2), "S" (__arg3), "D" (__arg4) : "memory", "cc"); return __res; }
@@ -299,7 +299,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 #endif /* !__X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
 #undef __X86_SYSCALL_WITH_EBP
 #else
-/* FIXME: `__X86_SYSCALL_TEST_EBP' is incomplete, and could never be complete.
+/* FIXME: `__X86_SYSCALL_TEST_EBP' is incomplete,  and could  never be  complete.
  *        Add an extension to binutils `.ifccont' that behaves similar to `.ifc',
  *        but checks for contains, rather than equals */
 #include "syscall-test-ebp.h"
@@ -321,7 +321,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	"\t.cfi_endproc\n"                                                            \
 	".popsection\n"                                                               \
 	".endif\n"
-	
+
 #define __X86_DEFINE_XSYSCALL6_WRAPPER                                              \
 	".ifndef __x86.Xsyscall6\n"                                                     \
 	".pushsection .text.__x86.Xsyscall6,\"axG\",@progbits,__x86.Xsyscall6,comdat\n" \
@@ -340,7 +340,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	".size __x86.Xsyscall6, . - __x86.Xsyscall6\n"                                  \
 	".popsection\n"                                                                 \
 	".endif\n"
-	
+
 #ifdef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #define __X86_SYSCALL_WITH_EBP(c, w, cw) \
 	".ifc %10,%%ebp\n\t" c "\n\t"        \

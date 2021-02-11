@@ -30,7 +30,7 @@
 
 #include "stddef.h"
 
-/* NOTE: This stuff isn't actually used by the KOS kernel,
+/* NOTE: This stuff isn't actually used by the KOS  kernel,
  *       which uses the same structures/types as userspace. */
 
 #ifndef __BITS_PER_LONG

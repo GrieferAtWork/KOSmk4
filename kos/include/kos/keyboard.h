@@ -75,7 +75,7 @@
 
 
 
-#define KEY_FREPEAT      0x4000 /* FLAG: The key is being repeated periodically,
+#define KEY_FREPEAT      0x4000 /* FLAG: The  key  is  being  repeated  periodically,
                                  *       because the user is holding down the button.
                                  * WARNING: This flag may not be supported by all drivers! */
 #define KEY_FRELEASED    0x8000 /* FLAG: The key was released. */
@@ -96,7 +96,7 @@
 
 
 /* NOTE: Key codes and names match those used by linux, where they
- *       can be found in /usr/include/linux/input-event-codes.h */
+ *       can be  found  in  /usr/include/linux/input-event-codes.h */
 
 #define KEY_NONE     0 /* No key (used internally). */
 #define KEY_RESERVED 0 /* Reserved key code (never produced) */

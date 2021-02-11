@@ -42,12 +42,12 @@ __DECL_BEGIN
 struct hop_task_join /*[PREFIX(tj_)]*/ {
 	__uint32_t            tj_struct_size;     /* [== sizeof(struct hop_task_join)]
 	                                           * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                           * this value is too small or doesn't match any recognized
+	                                           * this value is too small  or doesn't match any  recognized
 	                                           * structure version. */
 	__uint32_t          __tj_pad1;            /* ... */
 	__uint64_t            tj_reltimeout_sec;  /* Relative timeout seconds (or (__uint64_t)-1 to wait indefinitely) */
 	__uint32_t            tj_reltimeout_nsec; /* Relative timeout nano seconds (< 1000000000 == 1_000_000_000) */
-	__uint32_t            tj_status;          /* [OUT][TYPE(union wait)] The exit status of the thread.
+	__uint32_t            tj_status;          /* [OUT][TYPE(union wait)]  The exit status of the thread.
 	                                           * If the thread has yet to exit, this field is set to `0' */
 };
 #endif /* __CC__ */
@@ -70,7 +70,7 @@ struct hop_task_join /*[PREFIX(tj_)]*/ {
 struct hop_task_setprocessgroupleader /*[PREFIX(tspgl_)]*/ {
 	__uint32_t            tspgl_struct_size; /* [== sizeof(struct hop_task_setprocessgroupleader)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t            tspgl_leader;      /* [IN] Handle for to a thread who's process should be used as leader */
 	struct hop_openfd    *tspgl_old_leader;  /* [OUT_OPT][0..1] When non-NULL store a handle to the old process group leader of `HOP_TASK_OPEN_PROCESS(<thread>)'. (NOTE: Only written to on HOP_TASK_SETPROCESSGROUPLEADER_SUCCESS) */
@@ -86,10 +86,10 @@ struct hop_task_setprocessgroupleader /*[PREFIX(tspgl_)]*/ {
 #define HOP_TASK_SETSESSIONLEADER_SUCCESS 0 /* Successfully added `HOP_TASK_OPEN_PROCESS(thread)' (which at that
                                              * point is guarantied to be identical to `HOP_TASK_OPEN_PROCESS_GROUP_LEADER(thread)')
                                              * to the session that `tssl_leader' is apart of (which is
-                                             * `HOP_TASK_OPEN_SESSION_LEADER(tssl_leader)'), or make `thread' become a new session when
+                                             * `HOP_TASK_OPEN_SESSION_LEADER(tssl_leader)'), or  make  `thread'  become  a  new  session  when
                                              * `HOP_TASK_OPEN_PROCESS_GROUP_LEADER(thread) == HOP_TASK_OPEN_PROCESS_GROUP_LEADER(tssl_leader)' */
 #define HOP_TASK_SETSESSIONLEADER_LEADER  1 /* The given `thread' is already the leader of a different session than `tssl_leader'.
-                                             * -> Once promoted to a session leader, a process group cannot back out and no longer be one!  */
+                                             * -> Once promoted to a session leader, a process group cannot back out and no longer be one! */
 #define __OFFSET_HOP_TASK_SETSESSIONLEADER_STRUCT_SIZE    0
 #define __OFFSET_HOP_TASK_SETSESSIONLEADER_LEADER         4
 #define __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_GRP_LEADER 8
@@ -126,7 +126,7 @@ struct hop_task_setsessionleader /*[PREFIX(tssl_)]*/ {
 #define HOP_TASK_GETPID                           0x00090003 /* hop() returns the process ID of the given thread
                                                               * @throw: E_PROCESS_EXITED: [...] */
 #define HOP_TASK_GETPPID                          0x00090004 /* hop() returns the parent process ID of the given thread
-                                                              * If the thread doesn't have a parent, return 0 instead
+                                                              * If the thread doesn't have  a parent, return 0  instead
                                                               * @throw: E_PROCESS_EXITED: [...] */
 #define HOP_TASK_GETPGID                          0x00090005 /* hop() returns the process group ID of the given thread
                                                               * @throw: E_PROCESS_EXITED: [...] */

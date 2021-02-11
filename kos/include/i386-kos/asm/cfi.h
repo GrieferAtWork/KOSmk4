@@ -47,7 +47,7 @@
 __ASM_BEGIN
 
 /* NOTE: CFI capsules are currently restricted to KOS+!KERNEL.
- *       s.a. `LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES' */
+ *       s.a.          `LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES' */
 #if defined(__KOS__) && !defined(__KERNEL__)
 __ASM_L(.macro .cfi_startcapsule)
 __ASM_L(	.cfi_escape 0x38)
@@ -88,8 +88,8 @@ __ASM_L(.macro pushfq_cfi_r; pushfq; .cfi_adjust_cfa_offset 8; .cfi_rel_offset %
 __ASM_L(.macro popfq_cfi_r; popfq; .cfi_adjust_cfa_offset -8; .cfi_restore %eflags; .endm)
 
 /* Because x86_64 doesn't allow `pushq %ss/%cs/%ds/%es/%fs.base/%gs.base', add a
- * convenience wrapper that uses an intermediate register `clobber'
- * The same also goes for popq, which also gets a convenience wrapper */
+ * convenience   wrapper   that   uses   an   intermediate   register  `clobber'
+ * The  same  also  goes  for  popq,  which  also  gets  a  convenience  wrapper */
 __ASM_L(.macro pushq_cfi_seg_r reg:req, clobber:req)
 __ASM_L(.ifc __ASM_ARG(\reg),%fs.base)
 __ASM_L(	safe_rdfsbase __ASM_ARG(\clobber))

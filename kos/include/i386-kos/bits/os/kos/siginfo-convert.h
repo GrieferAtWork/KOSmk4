@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/siginfo-convert.h>
- * 
+ *
  * Definitions:
  *    - void siginfox32_to_siginfox32(struct __siginfox32_struct const *self, struct __siginfox32_struct *result);
  *    - void siginfox64_to_siginfox64(struct __siginfox64_struct const *self, struct __siginfox64_struct *result);

@@ -41,7 +41,7 @@ __DECL_BEGIN
 
 typedef unsigned char bitstr_t;
 
-/* Allocate a zero-initialized bitstring on the heap.
+/* Allocate  a  zero-initialized   bitstring  on  the   heap.
  * If the allocation fails, then this function returns `NULL' */
 #ifdef __INTELLISENSE__
 __ATTR_WUNUSED __ATTR_MALLOC bitstr_t *(bit_alloc)(int nbits);
@@ -49,7 +49,7 @@ __ATTR_WUNUSED __ATTR_MALLOC bitstr_t *(bit_alloc)(int nbits);
 #define bit_alloc(nbits) (bitstr_t *)__libc_calloc((__size_t)bitstr_size(nbits), sizeof(bitstr_t))
 #endif /* !__INTELLISENSE__ */
 
-/* Declare a bitstring variable `self' that can hold at least `nbits' bits:
+/* Declare a bitstring  variable `self'  that can  hold at  least `nbits'  bits:
  * >> bitstr_t bit_decl(mybitstr, 42); // `mybitstr' can hold at least `42' bits */
 #define bit_decl(self, nbits) \
 	((self)[bitstr_size(nbits)])
@@ -101,13 +101,13 @@ __ATTR_NONNULL((1)) void (bit_clear)(bitstr_t *__restrict self, int bitno);
 
 #ifdef __INTELLISENSE__
 /* Turn off bits [minbitno, maxbitno] (inclusive) in `self'
- * NOTE: When `minbitno > maxbitno', the result is weak undefined behavior,
+ * NOTE: When  `minbitno > maxbitno', the result  is weak undefined behavior,
  *       in that the way in which `self' is modified is undefined, though the
  *       function still guaranties that nothing but `self' gets modified. */
 __ATTR_NONNULL((1)) void (bit_nclear)(bitstr_t *__restrict self, int minbitno, int maxbitno);
 
 /* Turn on bits [minbitno, maxbitno] (inclusive) in `self'
- * NOTE: When `minbitno > maxbitno', the result is weak undefined behavior,
+ * NOTE: When  `minbitno > maxbitno', the result  is weak undefined behavior,
  *       in that the way in which `self' is modified is undefined, though the
  *       function still guaranties that nothing but `self' gets modified. */
 __ATTR_NONNULL((1)) void (bit_nset)(bitstr_t *__restrict self, int minbitno, int maxbitno);
@@ -174,10 +174,10 @@ __LOCAL __ATTR_NONNULL((1)) void
 		result = -1
 
 #ifdef __INTELLISENSE__
-/* Find the first bitno within [0, nbits) that is off and store its
+/* Find the first bitno  within [0, nbits) that  is off and store  its
  * index in `*value'. If no such bit exists, write `-1' into `*value'. */
 __ATTR_NONNULL((1, 3)) void (bit_ffc)(bitstr_t *__restrict self, int nbits, int *value);
-/* Find the first bitno within [0, nbits) that is on and store its
+/* Find the first  bitno within [0,  nbits) that is  on and store  its
  * index in `*value'. If no such bit exists, write `-1' into `*value'. */
 __ATTR_NONNULL((1, 3)) void (bit_ffs)(bitstr_t *__restrict self, int nbits, int *value);
 #elif !defined(__NO_XBLOCK)

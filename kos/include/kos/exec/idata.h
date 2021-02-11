@@ -61,13 +61,13 @@
  * >> }
  *
  * Note that in the above example, `resolve_program_pid()' from `libmylib.so'
- * will only be called when the symbol `program_pid' ends up being used!
- * 
+ * will only be  called when  the symbol  `program_pid' ends  up being  used!
+ *
  * NOTE: The weird wrapper with `.set .Lidata_foo, rfoo - 1; .set foo, .Lidata_foo + 1'
- *       is required (and cannot be replaced with `.set foo, rfoo') because otherwise
- *       we won't be able to explicitly assign the proper .size to the symbol `foo',
- *       because otherwise gas will think that this is an alias symbol declaration,
- *       and will lock us out of modifying the new symbol's size attribute by forcing
+ *       is required (and cannot be  replaced with `.set foo, rfoo') because  otherwise
+ *       we won't be able to  explicitly assign the proper  .size to the symbol  `foo',
+ *       because  otherwise gas  will think that  this is an  alias symbol declaration,
+ *       and will lock us out of modifying  the new symbol's size attribute by  forcing
  *       it to be equivalent to the size of the resolver function... */
 
 #ifdef __CC__

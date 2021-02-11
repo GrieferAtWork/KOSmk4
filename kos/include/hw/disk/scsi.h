@@ -69,7 +69,7 @@ __DECL_BEGIN
 #ifdef __CC__
 struct __ATTR_PACKED scsi_cbw {
 	/* SCSI_CommandBlockWrapper */
-	/* XXX: Explicitly annotate endian? (It seems that aside of
+	/* XXX: Explicitly  annotate  endian? (It  seems that  aside of
 	 *      `cbw_cb', this structure is actually defined by USB...) */
 	__uint32_t cbw_sig;     /* Signature (== SCSI_CBW_SIG) */
 	__uint32_t cbw_tag;     /* Transaction Unique Identifier (used to identify a command and its response) */

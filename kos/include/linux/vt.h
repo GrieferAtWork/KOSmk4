@@ -64,7 +64,7 @@ struct vt_stat {
 };
 #endif /* __CC__ */
 
-/* Note: the ioctl VT_GETSTATE does not work for
+/* Note: the  ioctl  VT_GETSTATE does  not  work for
  * consoles 16 and higher (since it returns a short) */
 #define VT_GETSTATE    _IO('V', 0x03) /* [struct vt_stat *st] get global vt state info */
 #define VT_SENDSIG     _IO('V', 0x04) /* signal to send to bitmask of vts */

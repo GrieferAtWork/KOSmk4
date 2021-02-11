@@ -32,8 +32,8 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* NOTE: We manually encode `fld1' because having gcc fill
- *       in that register for us produces sub-optimal text on x86_64:
+/* NOTE: We    manually    encode    `fld1'    because    having    gcc   fill
+ *       in  that  register  for  us  produces  sub-optimal  text  on  x86_64:
  *       >> __asm__("fpatan" : "=t" (__res) : "u" (__x), "0" (1.0) : "st(1)");
  * x86_64:
  *     movsd  CSWTCH.3+0xae0, %xmm1   # Loads 1.0 into %xmm1
@@ -50,8 +50,8 @@ __DECL_BEGIN
  *     fpatan            # Do the thing!
  *     ...
  * In other words: GCC thinks that it has to load the 1.0 as an xmm register...
- * So because of this, use different assembly when __SSE__ is enabled, so that
- * the x86_64 variant doesn't do the unnecessary SSE register conversion.
+ * So because of this, use different assembly when __SSE__ is enabled, so  that
+ * the  x86_64  variant doesn't  do  the unnecessary  SSE  register conversion.
  * s.a. this bug report that I've filed:
  *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93985
  */

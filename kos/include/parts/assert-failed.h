@@ -92,22 +92,22 @@ void (__LIBCCALL __fallback_assert_fail)(void) {
 #endif /* !... */
 
 #ifdef __CRT_HAVE___acheck
-/* __acheck() needs to be declared as CDECL rather than STDCALL within kernel-space.
+/* __acheck() needs to be declared as CDECL rather than STDCALL within  kernel-space.
  * This is required because otherwise we'd end up with an inconsistency in regards to
  * what the proper %esp-value of an assertion failure is. It could either include the
  * argument list, or it could not.
- *   - If it does include the argument list, then unwinding is broken (since unwinding
+ *   - If it does include  the argument list, then  unwinding is broken (since  unwinding
  *     (correctly) expects that a STDCALL argument list hasn't been popped when unwinding
- *     through a call expression), but assertion retry works, as actually resuming
- *     execution after the call to `__acheck()' requires that %esp be updated to discard
+ *     through  a  call  expression), but  assertion  retry works,  as  actually resuming
+ *     execution after the call to `__acheck()' requires that %esp be updated to  discard
  *     the argument list.
- *   - If it does not include the argument, then unwinding works correctly, however
+ *   - If it does not include the  argument, then unwinding works correctly,  however
  *     trying to retry the assertion will break, as execution will be resumed with an
- *     incorrect %esp that doesn't actually include the argument list (meaning the
+ *     incorrect  %esp that doesn't  actually include the  argument list (meaning the
  *     call would behave like CDECL instead)
  * Solution:
  *   - Go with the second variant, but actually declare the function as CDECL, thus
- *     allowing both assertion retrying, and stack unwinding to function properly!
+ *     allowing both assertion retrying, and stack unwinding to function  properly!
  */
 /*__CDECLARE(__ATTR_COLD,__BOOL,,__acheck,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))*/
 __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheck)(char const *__expr, char const *__file, unsigned int __line, char const *__func) __CASMNAME_SAME("__acheck");

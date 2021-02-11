@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/tms.h>
- * 
+ *
  * Definitions:
  *    - struct tms { ... };
  */

@@ -51,7 +51,7 @@ __DECL_BEGIN
 struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
 	__uint32_t   bs_struct_size;   /* [== sizeof(struct hop_blockdevice_stat)]
 	                                * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                * this value is too small or doesn't match any recognized
+	                                * this value is too small  or doesn't match any  recognized
 	                                * structure version. */
 	__uint32_t __bs_pad;           /* ... */
 	__uint64_t   bs_devno;         /* Device number (`dev_t') */
@@ -73,7 +73,7 @@ struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
 struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 	__uint32_t        bop_struct_size; /* [== sizeof(struct hop_blockdevice_openpart)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                    * this value is too small or doesn't match any recognized
+	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
 	__uint32_t        bop_partno;      /* Partition index. */
 	struct hop_openfd bop_openfd;      /* File descriptor open controller. */

@@ -22,7 +22,7 @@
 
 /* UAIO operations. (for `struct uaio::ua_op')
  * HINT: If the documented operation throws an exception, that exception
- *       can be retrieved using `uaio_rethrow(..., ua_id)' */
+ *       can    be     retrieved    using     `uaio_rethrow(..., ua_id)' */
 #define UAIO_OP_NOOP      0x0000 /* Does nothing */
 #define UAIO_OP_READ      0x0001 /* pread(2) */
 #define UAIO_OP_READV     0x0002 /* preadv(2) */
@@ -38,25 +38,25 @@
 #define UAIO_F_RUNSTAT 0x0001 /* Broadcast the status futex for `UAIO_STATUS_RUNNING' */
 #define UAIO_F_WAITFOR 0x0002 /* Asynchronously wait for all currently running AIO operations
                                * before proceeding with the operation pointed to by `ua_next'
-                               * Using this flag, you can enforce happens-before semantics,
-                               * as may be necessary when you're re-using memory buffers, or
-                               * want to use the memory written by one AIO operation getting
+                               * Using  this flag, you  can enforce happens-before semantics,
+                               * as may be necessary when you're re-using memory buffers,  or
+                               * want  to use the memory written by one AIO operation getting
                                * used by the next operation. */
 
 
 /* UAIO status codes. (for `struct uaio::ua_status') */
 #define UAIO_STATUS_PENDING 0x00 /* The initial AIO status: Not started, yet. */
 #define UAIO_STATUS_RUNNING 0x01 /* In-progress status value (this status being set
-                                  * will not trigger a futex broadcast, unless the
+                                  * will  not trigger a futex broadcast, unless the
                                   * `UAIO_F_RUNSTAT' flag had been set). */
 #define UAIO_STATUS_SUCCESS 0x10 /* Exit status: The operation was successful. */
 #define UAIO_STATUS_NOTSUPP 0x11 /* Exit status: The given `ua_fd' doesn't support `ua_op'
-                                  *              Re-try the operation synchronously. */
-#define UAIO_STATUS_FAILED  0x12 /* Exit status: The operation failed with an exception
+                                  *              Re-try   the   operation   synchronously. */
+#define UAIO_STATUS_FAILED  0x12 /* Exit   status:  The  operation  failed  with  an  exception
                                   * (use `uaio_rethrow(..., ua_id)' to re-throw that exception) */
 #define UAIO_STATUS_CANCEL  0x13 /* Exit status: The operation was canceled.
                                   * This exit status is set when `uaio_cancel()' is used,
-                                  * and the AIO operation hadn't already been completed. */
+                                  * and  the AIO operation hadn't already been completed. */
 
 /* Flags for `uaio_create()' */
 #define UAIO_CREATE_NONBLOCK 0x000800 /* Set the IO_NONBLOCK flag. */

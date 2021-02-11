@@ -128,7 +128,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -319,7 +319,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 		}
 	} else {
 		/* The number is too large.
-		 * It is left implementation defined what happens.  */
+		 * It is left implementation defined what happens. */
 		return (long int)__x;
 	}
 	if (__sign < 0)
@@ -368,7 +368,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		}
 	} else {
 		/* The number is too large.
-		 * It is left implementation defined what happens.  */
+		 * It is left implementation defined what happens. */
 		return (__LONGLONG)__x;
 	}
 	if (__sign < 0)

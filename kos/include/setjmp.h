@@ -193,7 +193,7 @@ __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,_longjmp,(__NAMESPACE_STD_SYM jmp_
 #undef __std_longjmp_defined
 #endif /* !__CRT_HAVE_longjmp */
 
-/* Alias for `setjmp()' (but is guarantied to never save the signal mask,
+/* Alias for `setjmp()' (but is guarantied  to never save the signal  mask,
  * irregardless of how the C library, or the linked program was configured) */
 #if defined(__CRT_HAVE__setjmp)
 __CDECLARE(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,_setjmp,(__NAMESPACE_STD_SYM jmp_buf __buf),(__buf))

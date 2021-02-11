@@ -367,7 +367,7 @@ __DECL_BEGIN
 
 #ifdef __CC__
 /* GDT/LDT/IDT segment entry.
- * NOTE: On x86_64, IDT entries always have a fixed length of 16 bytes,
+ * NOTE: On x86_64, IDT entries always have a fixed length of 16  bytes,
  *       with every first entry being one of the low-segment fields, and
  *       every second being the associated *_hi entry. */
 struct __ATTR_PACKED segment {
@@ -554,7 +554,7 @@ struct __ATTR_PACKED segment {
 
 
 		/* On x86_64 a couple of descriptors take up 2 consecutive GDT/LDT entries.
-		 * These are the data formats for the second entry respectively. */
+		 * These  are  the  data  formats   for  the  second  entry   respectively. */
 #ifdef __x86_64__
 		struct __ATTR_PACKED {
 			__UINT32_TYPE__ th_base3;        /* Bit 32-63 of the segment base. */

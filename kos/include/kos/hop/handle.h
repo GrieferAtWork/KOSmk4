@@ -44,7 +44,7 @@ __DECL_BEGIN
 struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 	__uint32_t            hs_struct_size;  /* [== sizeof(struct hop_handle_stat)]
 	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
+	                                        * this value is too small  or doesn't match any  recognized
 	                                        * structure version. */
 	__uint16_t            hs_mode;         /* The I/O mode with which this handle operates (set of `IO_*'). */
 	__uint16_t          __hs_pad1;         /* ... */
@@ -54,12 +54,12 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 	__uint64_t            hs_refcnt;       /* Reference counter of this handle. */
 	__uint64_t            hs_address;      /* Kernel-space pointer to the address where data of this handle is stored.
 	                                        * Note: Do not rely on this actually being the proper address when interfacing
-	                                        *       with custom drivers (as a matter of fact: custom drivers should never
+	                                        *       with custom drivers (as a matter of fact: custom drivers should  never
 	                                        *       blindly trust kernel-space pointers passed from user-space, and should
 	                                        *       always instead make use of handles to kernel-space objects).
 	                                        *       Anyways: the kernel is allowed to mangle the actual address however
 	                                        *                it pleases, so-long as the value stored here ends up being
-	                                        *                system-wide persistent-unique for as long as references
+	                                        *                system-wide persistent-unique  for as  long as  references
 	                                        *                exist for the handle. */
 	char                  hs_typename[32]; /* The name of the handle's type. */
 };

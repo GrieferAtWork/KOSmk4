@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 /* Format of `ur_index' for `USB_REQUEST_RETYPE_DEST_ENDP' */
 #define USB_REQUEST_ENDP_INDEX_ID   0x000f /* Endpoint number */
 #define USB_REQUEST_ENDP_INDEX_DIRM 0x0080 /* Mask for the transfer direction (how is this
-                                            * different from `USB_REQUEST_RETYPE_DIRM'?). */
+                                            * different from  `USB_REQUEST_RETYPE_DIRM'?). */
 #define    USB_REQUEST_ENDP_INDEX_DIR_OUT 0x0000 /* Out direction? */
 #define    USB_REQUEST_ENDP_INDEX_DIR_IN  0x0080 /* In direction? */
 
@@ -68,21 +68,21 @@ __SYSDECL_BEGIN
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE_QUALIFIER          0x0600
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_OTHER_SPEED_CONFIGURATION 0x0700
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_INTERFACE_POWER           0x0800
-#define USB_REQUEST_SET_CONFIGURATION 0x09 /* Set device configuration. (The conf value should be taken from one of
+#define USB_REQUEST_SET_CONFIGURATION 0x09 /* Set  device configuration.  (The conf value  should be taken  from one of
                                             * the entries returned by `USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION',
-                                            * and should appear in the `ur_value' field, with the upper 8 bits clear) */
+                                            * and  should appear in the `ur_value' field,  with the upper 8 bits clear) */
 
 
 
 /* Flags for `usb_configuration_descriptor::uc_attrib' */
-#define USB_CONFIGURATION_ATTRIB_EXTPWR 0x40 /* When set to 1, then the device runs on an external
+#define USB_CONFIGURATION_ATTRIB_EXTPWR 0x40 /* When set to  1, then  the device runs  on an  external
                                               * power supply. Otherwise, it will run off of bus power. */
 #define USB_CONFIGURATION_ATTRIB_ONE    0x80 /* Always 1 */
 
 
 /* Flags for `usb_endpoint_descriptor::ue_addr' */
 #define USB_ENDPOINT_ADDR_INDEX   0x0f /* Endpoint number (0-15) */
-#define USB_ENDPOINT_ADDR_IN      0x80 /* Input-only endpoint (when not set: output-only endpoint)
+#define USB_ENDPOINT_ADDR_IN      0x80 /* Input-only endpoint (when  not set: output-only  endpoint)
                                         * This bit is ignored by control endpoints (aka. endpoint#0) */
 
 

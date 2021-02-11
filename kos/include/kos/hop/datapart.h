@@ -64,7 +64,7 @@ __DECL_BEGIN
 struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
 	__uint32_t   ds_struct_size;          /* [== sizeof(struct hop_datablock_stat)]
 	                                       * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                       * this value is too small or doesn't match any recognized
+	                                       * this value is too small  or doesn't match any  recognized
 	                                       * structure version. */
 	__uint32_t   ds_features;             /* [OUT] Set of `HOP_DATAPART_STAT_FEATURE_*' */
 	__uint32_t   ds_state;                /* [OUT] One of `HOP_DATAPART_STAT_STATE_*' */
@@ -87,7 +87,7 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
                                                      * @return: == result->dof_openfd.of_hint */
 #define HOP_DATAPART_OPEN_FUTEX_EXISTING 0x00150003 /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
                                                      * @return: -ENOENT: No futex exists for the given address
-                                                     * @return: -ERANGE: The given address lies outside of the bounds of this datapart
+                                                     * @return: -ERANGE: The given address lies outside  of the bounds of this  datapart
                                                      *                   Note that this can happen arbitrarily since it is possible that
                                                      *                   the datapart is truncated between the time of you accessing it,
                                                      *                   and invoking this command!

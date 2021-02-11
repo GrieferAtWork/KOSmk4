@@ -4160,10 +4160,10 @@ checklock_modrm_memory_parsed:
 			 * SLWPCB reg32                         8F RXB.09 0.1111.0.00 12 /1
 			 * SLWPCB reg64                         8F RXB.09 1.1111.0.00 12 /1
 			 *
-			 * LWPINS reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /0 /imm32
-			 * LWPINS reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /0 /imm32
-			 * LWPVAL reg32.vvvv, reg/mem32, imm32  8F RXB.0A 0.src1.0.00 12 /1 /imm32
-			 * LWPVAL reg64.vvvv, reg/mem32, imm32  8F RXB.0A 1.src1.0.00 12 /1 /imm32
+			 * LWPINS reg32.vvvv, reg/mem32, imm32 8F RXB.0A 0.src1.0.00 12 /0 /imm32
+			 * LWPINS reg64.vvvv, reg/mem32, imm32 8F RXB.0A 1.src1.0.00 12 /0 /imm32
+			 * LWPVAL reg32.vvvv, reg/mem32, imm32 8F RXB.0A 0.src1.0.00 12 /1 /imm32
+			 * LWPVAL reg64.vvvv, reg/mem32, imm32 8F RXB.0A 1.src1.0.00 12 /1 /imm32
 			 */
 
 			default:

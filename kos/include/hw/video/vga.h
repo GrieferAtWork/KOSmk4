@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
  *	Based on VESA framebuffer (c) 1998 Gerd Knorr
  *
  * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * Public License. See the file COPYING in the main directory of  this
  * archive for more details.
  *
  */
@@ -257,7 +257,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 struct __ATTR_PACKED vga_color {
-	/* NOTE: When loading/saving the color palette, the kernel
+	/* NOTE: When loading/saving  the color  palette, the  kernel
 	 *       will automatically up/down-scale the color intensity
 	 *       in order to clamp it to VGA's limit of `0x3f'.
 	 *       With that in mind, to get `0x3f', you should pass `0xff'! */
@@ -403,18 +403,18 @@ struct __ATTR_PACKED vga_mode {
 #define VGA_BIOTEXT80x25_MODE_INIT(...)                                              \
 	{                                                                                \
 		/* BAD! DON'T YOU DARE TO BLINK!                                             \
-		 * Like literally, dis shit is dangerous to look at                          \
+		 * Like literally,  dis  shit  is dangerous  to  look  at                    \
 		 * (Sorry, but even though I never actually had a seizure                    \
 		 *  from stupid $h1t like this, every time I see this blinking,              \
 		 *  I can just feel that if I were to stare at it for too long,              \
 		 *  I'd either throw up, or literally just die)                              \
 		 * Especially since I use the intensity attribute when the kernel            \
-		 * panics, meaning that while this is still enabled, it'll blink             \
-		 * when I was sitting here knowing that I had to look at it to               \
+		 * panics, meaning that while this is still enabled, it'll  blink            \
+		 * when I was sitting here  knowing that I had  to look at it  to            \
 		 * figure out what happened.                                                 \
 		 * And I know I could have simply used regular colors at any point,          \
-		 * but before starting this module and reading up on VGA I didn't            \
-		 * see the connection and didn't understand why text was sometimes           \
+		 * but before starting this module and  reading up on VGA I  didn't          \
+		 * see the connection and didn't understand why text was  sometimes          \
 		 * blinking.                                                                 \
 		 * (And wiki.osdev's VGA TTY page neglects to mention the seizure-           \
 		 *  inducing blinkyness that happens on real hardware and emulators          \

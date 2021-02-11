@@ -38,10 +38,10 @@
 __DECL_BEGIN
 
 /* User-space sigprocmask() control structure (this structure should be
- * placed in TLS memory, and its contents are shared with the kernel)
+ * placed in TLS memory, and its  contents are shared with the  kernel)
  *
  * NOTE: On i386, you must initialize `_pm_pad1' and `_pm_pad2' to `0'
- *       before calling `sys_set_userprocmask_address(2)'. This is
+ *       before  calling  `sys_set_userprocmask_address(2)'.  This  is
  *       required for binary compatibility with x86_64! */
 struct userprocmask /*[PREFIX(pm_)]*/ {
 	__INT32_TYPE__          pm_mytid;   /* [const] TID of the thread (same as `set_tid_address(2)') */
@@ -49,14 +49,14 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 #ifdef __x86_64__
 	__UINT64_TYPE__         pm_sigsize; /* [const] == sizeof(sigset_t) */
 	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][1..1] Pointer to the current signal mask
-	                                     * The kernel may or' this with another mask when a signal handler is invoked
+	                                     * The  kernel may or' this with another mask when a signal handler is invoked
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
 #else /* __x86_64__ */
 	__UINT32_TYPE__         pm_sigsize; /* [const] == sizeof(sigset_t) */
 	__UINT32_TYPE__        _pm_pad1;    /* ... */
 	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][1..1] Pointer to the current signal mask
-	                                     * The kernel may or' this with another mask when a signal handler is invoked
+	                                     * The  kernel may or' this with another mask when a signal handler is invoked
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
 	__UINT32_TYPE__        _pm_pad2;    /* ... */

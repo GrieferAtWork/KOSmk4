@@ -35,16 +35,16 @@
 __DECL_BEGIN
 
 /* User-space sigprocmask() control structure (this structure should be
- * placed in TLS memory, and its contents are shared with the kernel)
+ * placed in TLS memory, and its  contents are shared with the  kernel)
  *
- * NOTE: Arch-specific variants of this structure may contain additional
- *       fields that must be initialized to all 0-es, meaning that when
- *       the caller intends to initialize this structure, they must either
+ * NOTE: Arch-specific variants of  this structure  may contain  additional
+ *       fields that must  be initialized  to all 0-es,  meaning that  when
+ *       the caller intends to initialize this structure, they must  either
  *       know of all of these fields, or they may simply bzero() the entire
  *       structure before filling in the intended fields.
  *       Also note that for this purpose, `pm_pending' is _always_ the last
- *       element of this structure, as this field is technically variable-
- *       length, such that the actual sizeof() this structure is always:
+ *       element of this structure, as this field is technically  variable-
+ *       length, such that  the actual sizeof()  this structure is  always:
  *       >> offsetof(struct userprocmask, pm_pending) + self->pm_sigsize; */
 struct userprocmask /*[PREFIX(pm_)]*/ {
 	__pid_t                 pm_mytid;   /* [const] TID of the thread (same as `set_tid_address(2)') */
@@ -53,7 +53,7 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 #endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
 	__size_t                pm_sigsize; /* [const] == sizeof(sigset_t) */
 	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][0..1] Pointer to the current signal mask
-	                                     * The kernel may or' this with another mask when a signal handler is invoked
+	                                     * The  kernel may or' this with another mask when a signal handler is invoked
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
 	struct __sigset_struct  pm_pending; /* [KERNEL:WRITE, USER:READWRITE][sizeof(== pm_sigsize)] Set of pending signals

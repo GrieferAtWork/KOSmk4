@@ -72,7 +72,7 @@ struct drregs;
 struct desctab;
 
 /* NOTE: Some printers will emit additional information while in kernel-space,
- *       as some of the possibly dumped information is locked behind RING#0
+ *       as  some of the  possibly dumped information  is locked behind RING#0
  *       access requirements. */
 
 

@@ -95,10 +95,10 @@
 
 
 /* HINT: Embedding CFI code that is only meant for the eyes of KOS:
- *    .cfi_escape DW_OP_skip, 3, 0
- *    .cfi_escape 'K', 'O', 'S'
- *    .cfi_escape DW_OP_skip, n, m
- *    .cfi_escape ...  // This code (with a size of n + (m << 8)) is only executed under KOS
+ * >>    .cfi_escape DW_OP_skip, 3, 0
+ * >>    .cfi_escape 'K', 'O', 'S'
+ * >>    .cfi_escape DW_OP_skip, n, m
+ * >>    .cfi_escape ...  // This code (with a size of n + (m << 8)) is only executed under KOS
  */
 
 /*      DW_OP_                     0x00  * ... */
@@ -670,9 +670,9 @@ typedef struct unwind_emulator_struct {
 	                                                * is considered an illegal instruction, or `(__byte_t *)-1' to lazily calculate) */
 } unwind_emulator_t;
 
-/* Execute  the   CFI  expression   loaded  into   the  given   unwind-emulator   `SELF'.
- * Upon  success,  `SELF->ue_stacksz'   will  have   been  updated  to   the  new   stack
- * size,  allowing  the  caller  to  read   the  expression's  return  values  from   it.
+/* Execute the CFI expression loaded into the given unwind-emulator  `SELF'.
+ * Upon  success, `SELF->ue_stacksz' will have been updated to the new stack
+ * size, allowing the caller to read the expression's return values from it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
  *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'

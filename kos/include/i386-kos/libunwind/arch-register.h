@@ -34,7 +34,7 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
 #endif /* !__unwind_regno_t_defined */
 
 /* Register accessor callbacks for a variety of known cpu context structures.
- * NOTE: When the intent is to unwind both CPU and FPU registers, you must create
+ * NOTE: When the intent  is to unwind  both CPU  and FPU registers,  you must  create
  *       your own custom register get/set functions that call forward to the functions
  *       below:
  * >> unsigned int LIBUNWIND_CC my_getreg(void const *arg, uintptr_half_t regno, void *dst) {
@@ -55,10 +55,10 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
  * >>         return UNWIND_SUCCESS;
  * >>     return UNWIND_INVALID_REGISTER;
  * >> }
- * NOTE: *_exclusive functions will always return `UNWIND_INVALID_REGISTER' when attempting to
- *       access persistent registers that are not present within the given CPU state, as opposed
+ * NOTE: *_exclusive functions  will always  return  `UNWIND_INVALID_REGISTER' when  attempting  to
+ *       access persistent registers that are  not present within the  given CPU state, as  opposed
  *       to reading the current register value during get, and returning `CURRENT_VAL() == new_val'
- *       on set (aka.: setreg() normally returns true for untraced registers when the old value
+ *       on set (aka.: setreg()  normally returns true  for untraced registers  when the old  value
  *       matches the new one) */
 typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE)(/*struct lcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
 typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE)(/*struct lcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);

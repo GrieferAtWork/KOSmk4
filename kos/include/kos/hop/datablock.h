@@ -65,7 +65,7 @@ __DECL_BEGIN
 struct hop_datablock_stat /*[PREFIX(ds_)]*/ {
 	__uint32_t   ds_struct_size;          /* [== sizeof(struct hop_datablock_stat)]
 	                                       * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                       * this value is too small or doesn't match any recognized
+	                                       * this value is too small  or doesn't match any  recognized
 	                                       * structure version. */
 	__uint32_t   ds_features;             /* Set of `HOP_DATABLOCK_STAT_FEATURE_*' */
 	__uint32_t   ds_pageshift;            /* `struct vm_datablock::db_pageshift'
@@ -102,7 +102,7 @@ struct hop_datablock_stat /*[PREFIX(ds_)]*/ {
 struct hop_datablock_syncpages /*[PREFIX(dsp_)]*/ {
 	__uint32_t        dsp_struct_size; /* [== sizeof(struct hop_datablock_syncpages)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                    * this value is too small or doesn't match any recognized
+	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
 	__uint32_t      __dsp_pad;         /* ... */
 	__uint64_t        dsp_minpage;     /* [IN] Index of the lowest data page that should be synced. */
@@ -120,12 +120,12 @@ struct hop_datablock_syncpages /*[PREFIX(dsp_)]*/ {
 struct hop_datablock_syncbytes /*[PREFIX(dsb_)]*/ {
 	__uint32_t        dsb_struct_size; /* [== sizeof(struct hop_datablock_syncpages)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                    * this value is too small or doesn't match any recognized
+	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
 	__uint32_t      __dsb_pad;         /* ... */
 	/* NOTE: `bsr_minbyte' and `bsr_maxbyte' are simply adjusted such that
-	 *        they span whole data pages, meaning that `bsr_count' will always
-	 *        be a multiple of `getpagesize() >> [HOP_DATABLOCK_STAT]:ds_pageshift',
+	 *        they span  whole  data  pages, meaning  that  `bsr_count'  will  always
+	 *        be a multiple of  `getpagesize() >> [HOP_DATABLOCK_STAT]:ds_pageshift',
 	 *        and may be greater than the total number of bytes between `bsr_minbyte'
 	 *        and `bsr_maxbyte'. */
 	__uint64_t        dsb_minbyte;     /* [IN] Offset of the lowest byte that should be synced. */
@@ -143,15 +143,15 @@ struct hop_datablock_syncbytes /*[PREFIX(dsb_)]*/ {
 struct hop_datablock_openpart /*[PREFIX(dop_)]*/ {
 	__uint32_t        dop_struct_size; /* [== sizeof(struct hop_datablock_openpart)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                    * this value is too small or doesn't match any recognized
+	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
 	__uint32_t      __dop_pad;         /* ... */
 	__uint64_t        dop_pageno;      /* [IN]  The page-index (pageid64_t) of the first page that should be opened.
 	                                    * [OUT] The page-index (pageid64_t) of the first page that was opened.
 	                                    *       This is equal to the `ds_minpage' field return by `HOP_DATAPART_STAT',
-	                                    *       and may be lower than the originally given `dop_pageno' when
-	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to the
-	                                    *       original value when `HOP_DATABLOCK_OPEN_PART_EXACT' was used. */
+	                                    *       and  may  be  lower  than  the  originally  given  `dop_pageno'   when
+	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to  the
+	                                    *       original  value   when   `HOP_DATABLOCK_OPEN_PART_EXACT'   was   used. */
 	__uint64_t        dop_pages_hint;  /* [IN]  Hint for the number of pages across which the part should span. */
 	struct hop_openfd dop_openfd;      /* File descriptor open controller (filled with a handle for the part). */
 };
@@ -168,7 +168,7 @@ struct hop_datablock_openpart /*[PREFIX(dop_)]*/ {
 struct hop_datablock_haschanged /*[PREFIX(dhc_)]*/ {
 	__uint32_t        dhc_struct_size; /* [== sizeof(struct hop_datablock_haschanged)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                    * this value is too small or doesn't match any recognized
+	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
 	__uint32_t        dhc_result;      /* [OUT] Set to a set of `HOP_DATABLOCK_HASCHANGED_FLAG_*'. */
 	__uint64_t        dhc_minbyte;     /* [IN] Lowest byte to check for changes */
@@ -185,7 +185,7 @@ struct hop_datablock_haschanged /*[PREFIX(dhc_)]*/ {
 struct hop_datablock_open_futex /*[PREFIX(dof_)]*/ {
 	__uint32_t          dof_struct_size; /* [== sizeof(struct hop_datablock_open_futex)]
 	                                      * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                      * this value is too small or doesn't match any recognized
+	                                      * this value is too small  or doesn't match any  recognized
 	                                      * structure version. */
 	__uint32_t        __dof_pad;         /* ... */
 	__uint64_t          dof_address;     /* [IN] Address of the futex */
@@ -203,7 +203,7 @@ struct hop_datablock_open_futex /*[PREFIX(dof_)]*/ {
 struct hop_inode_chmod /*[PREFIX(icm_)]*/ {
 	__uint32_t            icm_struct_size; /* [== sizeof(struct hop_inode_chmod)]
 	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
+	                                        * this value is too small  or doesn't match any  recognized
 	                                        * structure version. */
 	/* Atomically change INode permissions:
 	 * >> icm_perm_old = OLD_PERM;
@@ -224,7 +224,7 @@ struct hop_inode_chmod /*[PREFIX(icm_)]*/ {
 struct hop_inode_chown /*[PREFIX(ico_)]*/ {
 	__uint32_t            ico_struct_size; /* [== sizeof(struct hop_inode_chown)]
 	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
+	                                        * this value is too small  or doesn't match any  recognized
 	                                        * structure version. */
 	/* Atomically change INode ownership and store the old owner information */
 	__uint32_t            ico_newowner;    /* [IN] The new owner that should be assigned. */
@@ -248,14 +248,14 @@ struct hop_inode_chown /*[PREFIX(ico_)]*/ {
 struct hop_directory_opennode /*[PREFIX(don_)]*/ {
 	__uint32_t            don_struct_size; /* [== sizeof(struct hop_directory_opennode)]
 	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
+	                                        * this value is too small  or doesn't match any  recognized
 	                                        * structure version. */
 	__uint32_t          __don_pad1;        /* ... */
 	/* Open the INode/Directory entry of a given child of some directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *don_name;        /* [IN][1..don_len] Name of the child to lookup */
 	__HOP_PAD_POINTER  (__don_pad2)        /* ... */
@@ -286,14 +286,14 @@ struct hop_directory_opennode /*[PREFIX(don_)]*/ {
 struct hop_directory_creatfile /*[PREFIX(dcf_)]*/ {
 	__uint32_t            dcf_struct_size;   /* [== sizeof(struct hop_directory_creatfile)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __dcf_pad1;          /* ... */
 	/* Create/open a child within a given directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory.
 	 * NOTE: When `open_mode & O_EXCL' is set, throw an `E_FSERROR_FILE_ALREADY_EXISTS' if the file already existed.
 	 * NOTE: When `open_mode & O_DOSPATH' is set, ignore casing when checking for existing files. */
@@ -324,9 +324,9 @@ struct hop_directory_creatfile /*[PREFIX(dcf_)]*/ {
 #define HOP_DIRECTORY_REMOVE_STATUS_UNLINK   0x0001 /* The operation has removed or unlinked a file. */
 #define HOP_DIRECTORY_REMOVE_STATUS_RMDIR    0x0002 /* The operation has removed or unlinked a directory. */
 #define HOP_DIRECTORY_REMOVE_STATUS_FDELETED 0x4000 /* FLAG: The associated node has been deleted.
-                                                     * This flag is set when the node's NLINK counter has reached
+                                                     * This  flag is set when the node's NLINK counter has reached
                                                      * ZERO(0) as a result of the remove operation, at which point
-                                                     * the `INODE_FDELETED' flag is set, and the node is removed
+                                                     * the `INODE_FDELETED' flag is set,  and the node is  removed
                                                      * from the INode tree of the associated superblock. */
 
 #define __OFFSET_HOP_DIRECTORY_REMOVE_STRUCT_SIZE 0
@@ -341,14 +341,14 @@ struct hop_directory_creatfile /*[PREFIX(dcf_)]*/ {
 struct hop_directory_remove /*[PREFIX(drm_)]*/ {
 	__uint32_t            drm_struct_size;  /* [== sizeof(struct hop_directory_remove)]
 	                                         * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                         * this value is too small or doesn't match any recognized
+	                                         * this value is too small  or doesn't match any  recognized
 	                                         * structure version. */
 	__uint32_t          __drm_pad1;         /* ... */
 	/* Remove a child from a given directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *drm_name;         /* [IN][1..drm_len] Name of the child to lookup */
 	__HOP_PAD_POINTER  (__drm_pad2)         /* ... */
@@ -382,14 +382,14 @@ struct hop_directory_remove /*[PREFIX(drm_)]*/ {
 struct hop_directory_rename /*[PREFIX(drn_)]*/ {
 	__uint32_t            drn_struct_size;  /* [== sizeof(struct hop_directory_rename)]
 	                                         * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                         * this value is too small or doesn't match any recognized
+	                                         * this value is too small  or doesn't match any  recognized
 	                                         * structure version. */
 	__uint32_t          __drn_pad1;         /* ... */
 	/* Rename a child in a given directory, potentially also moving it into another directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *drn_srcname;      /* [IN][1..drn_srclen] Name of the source file */
 	__HOP_PAD_POINTER  (__drn_pad2)         /* ... */
@@ -425,14 +425,14 @@ struct hop_directory_rename /*[PREFIX(drn_)]*/ {
 struct hop_directory_link /*[PREFIX(dli_)]*/ {
 	__uint32_t            dli_struct_size;   /* [== sizeof(struct hop_directory_link)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __dli_pad1;          /* ... */
 	/* Create hard links within a given directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *dli_name;          /* [IN][1..dli_len] Name of the link to create */
 	__HOP_PAD_POINTER  (__dli_pad2)          /* ... */
@@ -463,14 +463,14 @@ struct hop_directory_link /*[PREFIX(dli_)]*/ {
 struct hop_directory_symlink /*[PREFIX(dsl_)]*/ {
 	__uint32_t            dsl_struct_size;   /* [== sizeof(struct hop_directory_symlink)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __dsl_pad1;          /* ... */
 	/* Create a new symbolic link within a given directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *dsl_name;          /* [IN][1..dsl_len] Name of the symlink to create */
 	__HOP_PAD_POINTER  (__dsl_pad2)          /* ... */
@@ -509,14 +509,14 @@ struct hop_directory_symlink /*[PREFIX(dsl_)]*/ {
 struct hop_directory_mknod /*[PREFIX(dmn_)]*/ {
 	__uint32_t            dmn_struct_size;   /* [== sizeof(struct hop_directory_symlink)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __dmn_pad1;          /* ... */
 	/* Create a new symbolic link within a given directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *dmn_name;          /* [IN][1..dmn_len] Name of the symlink to create */
 	__HOP_PAD_POINTER  (__dmn_pad2)          /* ... */
@@ -554,14 +554,14 @@ struct hop_directory_mknod /*[PREFIX(dmn_)]*/ {
 struct hop_directory_mkdir /*[PREFIX(dmd_)]*/ {
 	__uint32_t            dmd_struct_size;   /* [== sizeof(struct hop_directory_symlink)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __dmd_pad1;          /* ... */
 	/* Create a new symbolic link within a given directory.
 	 * WARNING: This function does not follow symbolic links, doesn't understand
-	 *          the special paths `.' and `..', and will not even traverse more
-	 *          than a single directory component (aka. no slashes)
-	 *          These are the low-level functions used to lookup a child
+	 *          the special paths `.' and `..', and will not even traverse  more
+	 *          than   a   single   directory   component   (aka.   no  slashes)
+	 *          These  are  the  low-level  functions  used  to  lookup  a child
 	 *          entry within some given directory. */
 	char const           *dmd_name;          /* [IN][1..dmd_len] Name of the symlink to create */
 	__HOP_PAD_POINTER  (__dmd_pad2)          /* ... */
@@ -605,10 +605,10 @@ struct hop_directory_mkdir /*[PREFIX(dmd_)]*/ {
 struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
 	__uint32_t            sbf_struct_size;        /* [== sizeof(struct hop_superblock_features)]
 	                                               * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                               * this value is too small or doesn't match any recognized
+	                                               * this value is too small  or doesn't match any  recognized
 	                                               * structure version. */
 	__uint32_t            sbf_features;           /* Filesystem features (Set of `HOP_SUPERBLOCK_FEAT_*') */
-	__uint64_t            sbf_sector_size;        /* Sector/Fragment/Cluster/Frame/Page/whatever-you-want-to-call-it size of
+	__uint64_t            sbf_sector_size;        /* Sector/Fragment/Cluster/Frame/Page/whatever-you-want-to-call-it  size  of
 	                                               * the filesystem. Calculated from `struct hop_datablock_stat::ds_pageshift'
 	                                               * s.a.: `struct statfs::f_frsize' */
 	__uint64_t            sbf_link_max;           /* Max # links a file may have
@@ -649,14 +649,14 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
                                                               * Write 0/1 to *result, indicative of:
                                                               *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
                                                               *  - 1: The data block has been deanonymized. */
-#define HOP_DATABLOCK_OPEN_PART                   0x00010007 /* [struct hop_datablock_openpart *arg] Lookup (and create if missing) the data
+#define HOP_DATABLOCK_OPEN_PART                   0x00010007 /* [struct hop_datablock_openpart *arg] Lookup (and  create  if  missing)  the  data
                                                               * part associated with a given page offset (s.a. `vm_paged_datablock_locatepart()')
                                                               * @return: == arg->dop_openfd.of_hint */
-#define HOP_DATABLOCK_OPEN_PART_EXACT             0x00010008 /* [struct hop_datablock_openpart *arg] Same as `HOP_DATABLOCK_OPEN_PART', but make sure
+#define HOP_DATABLOCK_OPEN_PART_EXACT             0x00010008 /* [struct hop_datablock_openpart *arg] Same   as   `HOP_DATABLOCK_OPEN_PART',  but   make  sure
                                                               * that the part begins at the exact given offset (s.a. `vm_paged_datablock_locatepart_exact()')
                                                               * @return: == arg->dop_openfd.of_hint */
 #define HOP_DATABLOCK_HASCHANGED                  0x00010009 /* [struct hop_datablock_haschanged *arg] Check for changes within
-                                                              * the given address range (s.a. `vm_datablock_haschanged()') */
+                                                              * the  given  address  range  (s.a.  `vm_datablock_haschanged()') */
 #define HOP_DATABLOCK_OPEN_FUTEX                  0x0001000a /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
                                                               * @return: == result->dof_openfd.of_hint */
 #define HOP_DATABLOCK_OPEN_FUTEX_EXISTING         0x0001000b /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
@@ -692,7 +692,7 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
                                                               * @throw: E_FSERROR_READONLY: [...]
                                                               * @throw: E_IOERROR: [...] */
 #define HOP_DIRECTORY_REMOVE                      0x00010303 /* [struct hop_directory_remove *arg] Extended interface for removing files.
-                                                              * WARNING: This function may leave behind stale PATH nodes which may still be accessible,
+                                                              * WARNING: This function may  leave behind  stale PATH nodes  which may  still be  accessible,
                                                               *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified file was already deleted)
@@ -710,7 +710,7 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
 #define HOP_DIRECTORY_RENAME                      0x00010304 /* [struct hop_directory_rename *arg] Extended interface for renaming files.
-                                                              * WARNING: This function may leave behind stale PATH nodes which may still be accessible,
+                                                              * WARNING: This function may  leave behind  stale PATH nodes  which may  still be  accessible,
                                                               *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RENAME: [...]

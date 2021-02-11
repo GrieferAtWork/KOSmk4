@@ -28,17 +28,17 @@
 #ifdef __CC__
 enum {
 	KP_INVALID,               /* Invalid/unused personality code. */
-	KP_OPEN_CREAT_CHECK_MODE, /* [default=0] The `open(..., O_CREAT, mode)' system call will check
+	KP_OPEN_CREAT_CHECK_MODE, /* [default=0] The  `open(..., O_CREAT, mode)'  system call  will check
 	                           * its `mode' for invalid bits, as opposed to simply masking them away.
 	                           * Effect:
 	                           *   0: When used by open(), `mode' will always be masked by `07777' (aka. `S_IALLUGO')
 	                           *   1: When used by open(), `mode' is checked for invalid bits. If at least one bit is
-	                           *      set that cannot be masked by `07777' (aka. `S_IALLUGO'), then an exception
+	                           *      set that cannot  be masked  by `07777'  (aka. `S_IALLUGO'),  then an  exception
 	                           *      `E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE'
 	                           *      is thrown, that may be translated into `EINVAL'
 	                           * Compliance:
 	                           *   - Posix does not define an errno code for bad bits in open's mode argument.
-	                           *     As such, full posix compliance requires this personality to be disabled.
+	                           *     As  such, full posix compliance requires this personality to be disabled.
 	                           *   - Linux always masks the mode argument and doesn't have a way of changing this.
 	                           * Affected programs:
 	                           *   - python: Whether intentional or not, python has problems updating its *.pyc
@@ -49,13 +49,13 @@ enum {
 	KP_MKDIR_CHECK_MODE,      /* [default=0] The `mkdir()' family of system calls will assert that
 	                           *             the `mode' argument can be masked by `07777' */
 	KP_EPOLL_DELETE_ONESHOT,  /* [default=0] Instead of leaving `EPOLLONESHOT' monitors as dormant after they've
-	                           *             been triggered, remove them from the epoll-controller, meaning that
-	                           *             when receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
+	                           *             been triggered, remove  them from the  epoll-controller, meaning  that
+	                           *             when  receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
 	                           *             the monitor of that event is automatically removed, just like it would
 	                           *             have been by a call to `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'.
 	                           * Compliance:
 	                           *   - Linux invented the epoll interface, and in its implementation, EPOLLONESHOT
-	                           *     monitors remain dormant after being returned from `epoll_wait(2)', and can
+	                           *     monitors remain dormant after being returned from `epoll_wait(2)', and  can
 	                           *     be re-armed through use of `epoll_ctl(EPOLL_CTL_MOD)'
 	                           *   - Programs that would already remove one-shot monitors from an epfd after
 	                           *     the associated event has fired can enable this personality to have this
@@ -66,17 +66,17 @@ enum {
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define KP_INVALID               KP_INVALID               /* Invalid/unused personality code. */
-#define KP_OPEN_CREAT_CHECK_MODE KP_OPEN_CREAT_CHECK_MODE /* [default=0] The `open(..., O_CREAT, mode)' system call will check
+#define KP_OPEN_CREAT_CHECK_MODE KP_OPEN_CREAT_CHECK_MODE /* [default=0] The  `open(..., O_CREAT, mode)'  system call  will check
                                                            * its `mode' for invalid bits, as opposed to simply masking them away.
                                                            * Effect:
                                                            *   0: When used by open(), `mode' will always be masked by `07777' (aka. `S_IALLUGO')
                                                            *   1: When used by open(), `mode' is checked for invalid bits. If at least one bit is
-                                                           *      set that cannot be masked by `07777' (aka. `S_IALLUGO'), then an exception
+                                                           *      set that cannot  be masked  by `07777'  (aka. `S_IALLUGO'),  then an  exception
                                                            *      `E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE'
                                                            *      is thrown, that may be translated into `EINVAL'
                                                            * Compliance:
                                                            *   - Posix does not define an errno code for bad bits in open's mode argument.
-                                                           *     As such, full posix compliance requires this personality to be disabled.
+                                                           *     As  such, full posix compliance requires this personality to be disabled.
                                                            *   - Linux always masks the mode argument and doesn't have a way of changing this.
                                                            * Affected programs:
                                                            *   - python: Whether intentional or not, python has problems updating its *.pyc
@@ -87,30 +87,31 @@ enum {
 #define KP_MKDIR_CHECK_MODE      KP_MKDIR_CHECK_MODE      /* [default=0] The `mkdir()' family of system calls will assert that
                                                            *             the `mode' argument can be masked by `07777' */
 #define KP_EPOLL_DELETE_ONESHOT  KP_EPOLL_DELETE_ONESHOT  /* [default=0] Instead of leaving `EPOLLONESHOT' monitors as dormant after they've
-                                                           *             been triggered, remove them from the epoll-controller, meaning that
-                                                           *             when receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
+                                                           *             been triggered, remove  them from the  epoll-controller, meaning  that
+                                                           *             when  receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
                                                            *             the monitor of that event is automatically removed, just like it would
                                                            *             have been by a call to `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'.
                                                            * Compliance:
                                                            *   - Linux invented the epoll interface, and in its implementation, EPOLLONESHOT
-                                                           *     monitors remain dormant after being returned from `epoll_wait(2)'.
+                                                           *     monitors remain dormant after being returned from `epoll_wait(2)', and  can
+                                                           *     be re-armed through use of `epoll_ctl(EPOLL_CTL_MOD)'
                                                            *   - Programs that would already remove one-shot monitors from an epfd after
                                                            *     the associated event has fired can enable this personality to have this
                                                            *     be done automatically. */
 #define KP_COUNT                 KP_COUNT                 /* # of different personality codes. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define KP_INVALID               0 /* Invalid/unused personality code. */
-#define KP_OPEN_CREAT_CHECK_MODE 1 /* [default=0] The `open(..., O_CREAT, mode)' system call will check
+#define KP_OPEN_CREAT_CHECK_MODE 1 /* [default=0] The  `open(..., O_CREAT, mode)'  system call  will check
                                     * its `mode' for invalid bits, as opposed to simply masking them away.
                                     * Effect:
                                     *   0: When used by open(), `mode' will always be masked by `07777' (aka. `S_IALLUGO')
                                     *   1: When used by open(), `mode' is checked for invalid bits. If at least one bit is
-                                    *      set that cannot be masked by `07777' (aka. `S_IALLUGO'), then an exception
+                                    *      set that cannot  be masked  by `07777'  (aka. `S_IALLUGO'),  then an  exception
                                     *      `E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE'
                                     *      is thrown, that may be translated into `EINVAL'
                                     * Compliance:
                                     *   - Posix does not define an errno code for bad bits in open's mode argument.
-                                    *     As such, full posix compliance requires this personality to be disabled.
+                                    *     As  such, full posix compliance requires this personality to be disabled.
                                     *   - Linux always masks the mode argument and doesn't have a way of changing this.
                                     * Affected programs:
                                     *   - python: Whether intentional or not, python has problems updating its *.pyc
@@ -121,13 +122,14 @@ enum {
 #define KP_MKDIR_CHECK_MODE      4 /* [default=0] The `mkdir()' family of system calls will assert that
                                     *             the `mode' argument can be masked by `07777' */
 #define KP_EPOLL_DELETE_ONESHOT  5 /* [default=0] Instead of leaving `EPOLLONESHOT' monitors as dormant after they've
-                                    *             been triggered, remove them from the epoll-controller, meaning that
-                                    *             when receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
+                                    *             been triggered, remove  them from the  epoll-controller, meaning  that
+                                    *             when  receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
                                     *             the monitor of that event is automatically removed, just like it would
                                     *             have been by a call to `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'.
                                     * Compliance:
                                     *   - Linux invented the epoll interface, and in its implementation, EPOLLONESHOT
-                                    *     monitors remain dormant after being returned from `epoll_wait(2)'.
+                                    *     monitors remain dormant after being returned from `epoll_wait(2)', and  can
+                                    *     be re-armed through use of `epoll_ctl(EPOLL_CTL_MOD)'
                                     *   - Programs that would already remove one-shot monitors from an epfd after
                                     *     the associated event has fired can enable this personality to have this
                                     *     be done automatically. */

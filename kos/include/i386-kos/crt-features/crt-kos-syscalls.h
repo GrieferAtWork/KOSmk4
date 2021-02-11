@@ -25,4 +25,3 @@
 #else /* __x86_64__ */
 #include "crt-kos-syscalls32.h"
 #endif /* !__x86_64__ */
-

@@ -250,14 +250,14 @@
 #   define X86_REGISTER_MISC_GSBASEL    __UINT16_C(0x9421) /* %gs.basel */
 #ifdef __x86_64__
 /* NOTE:
- *   - `X86_REGISTER_MISC_GSBASE(L|Q)' always refers to the
+ *   - `X86_REGISTER_MISC_GSBASE(L|Q)' always  refers to  the
  *     user-space `%gs.base' register. As such, its value is:
  *     >> #ifdef __KERNEL__
  *     >> __rdmsr(IA32_KERNEL_GS_BASE);
  *     >> #else
  *     >> __rdmsr(IA32_GS_BASE); // or `__rdgsbase()'
  *     >> #endif
- *   - `X86_REGISTER_MISC_KGSBASE(L|Q)' always refers to the
+ *   - `X86_REGISTER_MISC_KGSBASE(L|Q)'   always    refers   to    the
  *     kernel-space `%kernel_gs.base' register. As such, its value is:
  *     >> #ifdef __KERNEL__
  *     >> __rdmsr(IA32_GS_BASE); // or `__rdgsbase()', or `__rdgsptr(0)'

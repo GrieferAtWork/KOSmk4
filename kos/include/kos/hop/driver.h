@@ -41,10 +41,10 @@ __DECL_BEGIN
 #define HOP_DRIVER_STATE_INITIALIZED  0x0020 /* Initializers (constructors) have been executed. */
 #define HOP_DRIVER_STATE_FINALIZING   0x0040 /* Finalizers (destructors) have been executed / are currently being executed. */
 #define HOP_DRIVER_STATE_FINALIZED    0x0080 /* Finalizers (destructors) have been executed.
-                                              * NOTE: This flag also means that the driver is no longer
-                                              *       registered as part of the current driver state,
-                                              *       meaning that the current driver state no longer
-                                              *       holds a reference to the driver in question.
+                                              * NOTE: This flag also means that the driver is no  longer
+                                              *       registered as part  of the  current driver  state,
+                                              *       meaning that the  current driver  state no  longer
+                                              *       holds  a  reference  to  the  driver  in question.
                                               *       Though an older, dangling driver state might still
                                               *       hold such a reference.
                                               * NOTE: When this flag is set, additional driver sections can no
@@ -77,7 +77,7 @@ __DECL_BEGIN
 struct hop_driver_stat /*[PREFIX(ds_)]*/ {
 	__uint32_t            ds_struct_size;  /* [== sizeof(struct hop_driver_stat)]
 	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
+	                                        * this value is too small  or doesn't match any  recognized
 	                                        * structure version. */
 	__uint32_t            ds_state;        /* Driver state (set of `HOP_DRIVER_STATE_*') */
 	__uint32_t            ds_flags;        /* Driver flags (set of `HOP_DRIVER_FLAG_*') */
@@ -103,7 +103,7 @@ struct hop_driver_stat /*[PREFIX(ds_)]*/ {
 struct hop_driver_string /*[PREFIX(ds_)]*/ {
 	__uint32_t          ds_struct_size; /* [== sizeof(struct hop_driver_string)]
 	                                     * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                     * this value is too small or doesn't match any recognized
+	                                     * this value is too small  or doesn't match any  recognized
 	                                     * structure version. */
 	__uint32_t        __ds_pad1;        /* ... */
 	char               *ds_buf;         /* [1..ds_size] User-space buffer to-be filled with the string. */
@@ -123,7 +123,7 @@ struct hop_driver_string /*[PREFIX(ds_)]*/ {
 struct hop_driver_open_dependency /*[PREFIX(dod_)]*/ {
 	__uint32_t        dod_struct_size; /* [== sizeof(struct hop_driver_open_dependency)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                    * this value is too small or doesn't match any recognized
+	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
 	__uint32_t      __dod_pad1;        /* ... */
 	__uint64_t        dod_depno;       /* Dependency ID */

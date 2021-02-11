@@ -28,7 +28,7 @@ EMU86_INTELLISENSE_BEGIN(stos) {
 
 #if EMU86_EMULATE_CONFIG_WANT_STOS
 case EMU86_OPCODE_ENCODE(0xaa): {
-	/* AA     STOSB     For legacy  mode, store AL at address ES:(E)DI;
+	/* AA     STOSB     For  legacy mode, store AL at address ES:(E)DI;
 	 *                  For 64-bit mode store AL at address RDI or EDI. */
 	u8 value;
 	value = EMU86_GETAL();
@@ -49,9 +49,9 @@ case EMU86_OPCODE_ENCODE(0xaa):
 
 #if EMU86_EMULATE_CONFIG_WANT_STOS
 case EMU86_OPCODE_ENCODE(0xab): {
-	/*         AB     STOSW     For legacy  mode, store AX at address ES:(E)DI;
+	/*         AB     STOSW     For  legacy mode, store AX at address ES:(E)DI;
 	 *                          For 64-bit mode store AX at address RDI or EDI.
-	 *         AB     STOSD     For legacy  mode, store EAX at address ES:(E)DI;
+	 *         AB     STOSD     For  legacy mode, store EAX at address ES:(E)DI;
 	 *                          For 64-bit mode store EAX at address RDI or EDI.
 	 * REX.W + AB     STOSQ     Store RAX at address RDI or EDI. */
 	IF_64BIT(if (IS_64BIT()) {

@@ -21,7 +21,7 @@
 #define _KOS_IOCTL_TTY_H 1
 
 /* KOS-specific tty-device system interface.
- * NOTE: Stuff related to ansitty devices and `libansitty' goes into "video.h"!
+ * NOTE: Stuff  related  to  ansitty  devices   and  `libansitty'  goes  into   "video.h"!
  *       Everything in here is more closely related to `struct termios' and `libterminal'! */
 
 #include <__stdinc.h>

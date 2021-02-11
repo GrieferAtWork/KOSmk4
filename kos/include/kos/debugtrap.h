@@ -40,7 +40,7 @@
 #define DEBUGTRAP_REASON_LIBRARY   0x0006 /* Set of loaded libraries has changed. */
 #define DEBUGTRAP_REASON_FORK      0x0007 /* [USER(dtr_intarg = (pid_t)CHILD)]
                                            * [KERNEL(dtr_ptrarg = (struct task *)CHILD)]
-                                           * New process created (invoked by the parent process,
+                                           * New process created  (invoked by  the parent  process,
                                            * with the child already available, but not yet started) */
 #define DEBUGTRAP_REASON_VFORK     0x0008 /* [USER(dtr_intarg = (pid_t)CHILD)]
                                            * [KERNEL(dtr_ptrarg = (struct task *)CHILD)]

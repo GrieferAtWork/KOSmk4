@@ -21,7 +21,7 @@
 #define _KOS_EXEC_MODULE_H 1
 
 /* Portable (as in: both user- and kernel-space capable) API
- * for working with dynamically loaded objects, including:
+ * for working with  dynamically loaded objects,  including:
  *   - (kernelspace-only) Userspace modules (`struct usermod')
  *   - (kernelspace-only) Kernel drivers (`struct driver')
  *   - (userspace-only)   libdl.so shared library handles

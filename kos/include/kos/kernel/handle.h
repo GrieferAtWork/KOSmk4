@@ -84,7 +84,7 @@
 #define HANDLE_TYPE_UAIO            0x001a /* `struct uaio_controller' */
 #define HANDLE_TYPE_FIFO_USER       0x001b /* `struct fifo_user' */
 #define HANDLE_TYPE_COUNT           0x001c /* # of recognized handle types
-                                            * NOTE: After changing this value, be sure to
+                                            * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
@@ -113,7 +113,7 @@
 	cb(HANDLE_TYPE_SOCKET, struct socket)                                 \
 	cb(HANDLE_TYPE_UAIO, struct uaio_controller)
 
-/* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type
+/* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
  * that could reasonably be used for callback registrations (such
  * as `register_async_worker()' or `hisr_register()') */
 #define HANDLE_FOREACH_CUSTOMTYPE(cb)                        \

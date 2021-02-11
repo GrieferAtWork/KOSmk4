@@ -25,7 +25,7 @@
 #include <hybrid/host.h>
 
 /* T &loadfarptr(T &x);
- * Return a pointer to a far-off symbol, regardless of the used memory model.
+ * Return  a pointer to a far-off symbol,  regardless of the used memory model.
  * On x86_64, this is required for addressing symbols outside the -2GiB...+2Gib
  * range from within program text. */
 #ifdef __x86_64__

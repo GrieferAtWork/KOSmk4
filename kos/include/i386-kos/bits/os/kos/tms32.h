@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/tms32.h>
- * 
+ *
  * Definitions:
  *    - struct __tmsx32 { ... };
  */

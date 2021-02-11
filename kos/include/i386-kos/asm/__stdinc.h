@@ -23,7 +23,7 @@
 #if (!defined(__INTELLISENSE__) && defined(__CC__) && \
      defined(__KOS__) && defined(__KERNEL__) &&       \
      defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))
-/* Define some assembler macros to cause compiler error when GCC generates
+/* Define  some assembler macros to cause compiler error when GCC generates
  * floating-point instructions. This can unintentionally happen when 32-bit
  * codes uses ATOMIC_READ() or ATOMIC_WRITE() with 64-bit operands.
  *

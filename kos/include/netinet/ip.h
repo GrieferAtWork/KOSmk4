@@ -304,7 +304,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) ip_timestamp {
 #define IPTOS_ECN_CE           0x03
 
 /* Definitions for IP differentiated services code points (DSCP)
- * Taken from RFC-2597, Section 6 and RFC-2598, Section 2.3. */
+ * Taken from  RFC-2597, Section  6 and  RFC-2598, Section  2.3. */
 #define IPTOS_DSCP_MASK        0xfc
 #define IPTOS_DSCP(x)        ((x) & IPTOS_DSCP_MASK)
 #define IPTOS_DSCP_AF11        0x28
@@ -321,7 +321,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) ip_timestamp {
 #define IPTOS_DSCP_AF43        0x98
 #define IPTOS_DSCP_EF          0xb8
 
-/* In RFC 2474, Section 4.2.2.1, the Class Selector
+/* In  RFC 2474, Section 4.2.2.1, the Class Selector
  * Codepoints subsume the old ToS Precedence values. */
 #define IPTOS_CLASS_MASK       0xe0
 #define IPTOS_CLASS(class)   ((class) & IPTOS_CLASS_MASK)

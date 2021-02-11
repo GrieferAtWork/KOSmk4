@@ -53,7 +53,7 @@ __DECL_BEGIN
 #endif /* !__COMPILER_ASM_BUFFER */
 
 
-/* `-fnon-call-exception' currently requires __asm__ to be marked as volatile.
+/* `-fnon-call-exception' currently  requires  __asm__  to be  marked  as  volatile.
  * s.a. the following bug report: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357 */
 #ifndef __asm_ncx_memop__
 #ifdef __NON_CALL_EXCEPTIONS
@@ -172,9 +172,9 @@ __FORCELOCAL void (__sti)(void) { __asm__ __volatile__("sti" : : : "memory"); }
 __FORCELOCAL void (__clflush)(void *__p) { struct __cl { __BYTE_TYPE__ __b[64]; }; __asm__ __volatile__("clflush %0" : : "m" (*(struct __cl *)__p)); }
 __FORCELOCAL void (__cpuid)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ *__peax, __UINT32_TYPE__ *__pecx, __UINT32_TYPE__ *__pedx, __UINT32_TYPE__ *__pebx) { __asm__("cpuid" : "=a" (*__peax), "=c" (*__pecx), "=d" (*__pedx), "=b" (*__pebx) : "a" (__leaf_eax)); }
 __FORCELOCAL void (__cpuid2)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx, __UINT32_TYPE__ *__peax, __UINT32_TYPE__ *__pecx, __UINT32_TYPE__ *__pedx, __UINT32_TYPE__ *__pebx) { __asm__("cpuid" : "=a" (*__peax), "=c" (*__pecx), "=d" (*__pedx), "=b" (*__pebx) : "a" (__leaf_eax), "c" (__leaf_ecx)); }
-/* NOTE: There may be cases where cpuid returns different values between
- *       multiple invocations, however in the most common case this doesn't
- *       happen, which is the case of using it as a feature test helper.
+/* NOTE: There  may  be  cases  where  cpuid  returns  different  values  between
+ *       multiple  invocations,  however in  the  most common  case  this doesn't
+ *       happen, which  is  the  case of  using  it  as a  feature  test  helper.
  *       So to optimize for this case, annotate these functions are `ATTR_CONST'. */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_eax)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res; __asm__("cpuid" : "=a" (__res) : "a" (__leaf_eax) : "ecx", "edx", "ebx"); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_ecx)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=c" (__res), "=a" (__eax) : "a" (__leaf_eax) : "edx", "ebx"); return __res; }
@@ -191,10 +191,10 @@ __FORCELOCAL void (__stac)(void) { __asm__ __volatile__("stac" : : : "memory", "
 __FORCELOCAL void (__clac)(void) { __asm__ __volatile__("clac" : : : "memory", "cc"); }
 #else /* __KERNEL__ || (__KOS__ && __OPTIMIZE_SIZE__) */
 /* For whatever reason, STAC and CLAC can't be used to modify EFLAGS.AC in user-space.
- * However, user-space is allowed to modify EFLAGS.AC through use of `popf', meaning
+ * However, user-space is allowed to modify  EFLAGS.AC through use of `popf',  meaning
  * that this restriction is completely pointless...
- * Furthermore, the KOS kernel emulates these 2 instructions when executed from user-space
- * essentially do the same as also done here (which is why we still encode the ~privileged~
+ * Furthermore, the KOS kernel emulates these  2 instructions when executed from  user-space
+ * essentially  do the same as also done here (which is why we still encode the ~privileged~
  * instructions when optimizing for size with KOS as target, but encode a sequence to modify
  * EFLAGS directly in all other cases, which ends up having identical behavior) */
 #ifdef __x86_64__
@@ -490,8 +490,8 @@ void (__wrgsbase)(void *__val);
 
 /* The KOS kernel emulates the `(wr|rd)(fs|gs)base' instructions in 32-bit mode!
  * As a matter of fact, this is the preferred way for user-space to change them.
- * NOTE: The byte sequences below are what the `(wr|rd)(fs|gs)base' instructions
- *       would assembly to if they were valid for 32-bit code. However since Intel
+ * NOTE: The byte sequences  below are what  the `(wr|rd)(fs|gs)base'  instructions
+ *       would assembly to if they were valid for 32-bit code. However since  Intel
  *       states that these instructions are not available in protected mode (32-bit
  *       mode), let's just be safe and encode them manually, rather than relying on
  *       the assembler to be natively providing them as an extension.
@@ -587,12 +587,12 @@ __FORCELOCAL void (__wrfs_keepbase)(__UINT16_TYPE__ __val) {
 __FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
 #ifdef __KERNEL__
 	__UINT64_TYPE__ __temp;
-	/* On x86_64, %gs.base is the THIS_TASK register in kernel-space.
-	 * As such, we must be extremely careful when setting %gs, as doing
-	 * so will always override %gs.base with the base value found within
-	 * the GDT at that time. As such, we disable interrupts while doing
+	/* On x86_64,  %gs.base  is  the THIS_TASK  register  in  kernel-space.
+	 * As  such, we  must be extremely  careful when setting  %gs, as doing
+	 * so  will always override  %gs.base with the  base value found within
+	 * the  GDT at  that time. As  such, we disable  interrupts while doing
 	 * this, and immediately restore the original %gs.base (aka. THIS_TASK)
-	 * value so-as to never allow our thread to be interrupted with an
+	 * value so-as to  never allow  our thread  to be  interrupted with  an
 	 * invalid value set in %gs.base! */
 	__asm__ __volatile__("pushfq\n\t"
 	                     "cli\n\t"
@@ -612,9 +612,9 @@ __FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
 }
 #else /* __x86_64__ */
 /* Set the %fs or %gs register index, but also preserve the segment base address values.
- * In 32-bit mode, this is the same as regular writes to the %fs or %gs register, since
- * due to fs/gs.base emulation, the actual segment base address is stored within the
- * GDT, meaning that segment reloads will not clobber the base register so-long as the
+ * In 32-bit mode, this is the same as regular writes to the %fs or %gs register,  since
+ * due to fs/gs.base  emulation, the actual  segment base address  is stored within  the
+ * GDT, meaning that segment reloads will not  clobber the base register so-long as  the
  * segment being re-loaded doesn't have a different base address. */
 #ifdef __INTELLISENSE__
 __FORCELOCAL void (__wrfs_keepbase)(__UINT16_TYPE__ __val);

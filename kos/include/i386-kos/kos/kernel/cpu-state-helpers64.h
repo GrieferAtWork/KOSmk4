@@ -546,7 +546,7 @@ __NOTHROW_NCX(icpustate64_to_icpustate64_p)(struct icpustate64 const *__restrict
 }
 #define icpustate64_user_to_icpustate64_p icpustate64_to_icpustate64_p
 /* Convert the given interrupt CPU state into a scheduler CPU state.
- * NOTE: Unlike the 32-bit variant of this, the kernel-space RSP value
+ * NOTE: Unlike  the 32-bit  variant of  this, the  kernel-space RSP value
  *       will always be copied, and `KERNEL_RSP' is only used for storage! */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
 __NOTHROW_NCX(icpustate64_to_scpustate64_p_ex)(struct icpustate64 const *__restrict __self,
@@ -661,7 +661,7 @@ __NOTHROW_NCX(scpustate64_to_kcpustate64)(struct scpustate64 const *__restrict _
 }
 #define scpustate64_user_to_kcpustate64 scpustate64_to_kcpustate64
 /* Convert the given scheduler CPU state into an interrupt CPU state.
- * NOTE: Unlike the 32-bit variant of this, the kernel-space RSP value
+ * NOTE: Unlike  the 32-bit  variant of  this, the  kernel-space RSP value
  *       will always be copied, and `KERNEL_RSP' is only used for storage! */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
 __NOTHROW_NCX(scpustate64_to_icpustate64_p)(struct scpustate64 const *__restrict __self,

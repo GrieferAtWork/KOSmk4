@@ -195,13 +195,13 @@ struct gpregs32 {
 #ifdef __CC__
 struct sgregs32 {
 	union {
-		__u32 sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL')
+		__u32 sg_gs;     /* G  segment   register   (Usually   `SEGMENT_USER_GSBASE_RPL')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16 sg_gs16;   /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
 	};
 	union {
 		__u32 sg_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
-		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		                  * (upper   16   bits   are   undefined,   but   should   be   written   as  zeros) */
 		__u16 sg_fs16;   /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
 	};
 	union {
@@ -211,7 +211,7 @@ struct sgregs32 {
 	};
 	union {
 		__u32 sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
-		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		                  * (upper 16  bits are  undefined, but  should be  written as  zeros) */
 		__u16 sg_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
 	};
 };
@@ -288,7 +288,7 @@ struct drregs32 {
 struct irregs32_kernel {
 	__u32     ir_eip;    /* Instruction pointer */
 	union {
-		__u32 ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE')
+		__u32 ir_cs;     /* Code   segment   (Ring  #0,   usually  `SEGMENT_KERNEL_CODE')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16 ir_cs16;   /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE') */
 	};
@@ -299,7 +299,7 @@ struct irregs32_user: irregs_kernel {
 	/* The following fields are popped when `(ir_cs & 3) != CURRENT_RING' */
 	__u32     ir_esp;    /* Stack pointer */
 	union {
-		__u32 ir_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		__u32 ir_ss;     /* Stack  segment  (Ring  #3,  usually  `SEGMENT_USER_DATA_RPL')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16 ir_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
@@ -328,7 +328,7 @@ struct irregs32_vm86: irregs_user {
 struct irregs32_user {
 	__u32     ir_eip;    /* Instruction pointer */
 	union {
-		__u32 ir_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
+		__u32 ir_cs;     /* Code  segment  (Ring  #3,  usually   `SEGMENT_USER_CODE_RPL')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16 ir_cs16;   /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
 	};
@@ -336,7 +336,7 @@ struct irregs32_user {
 	/* The following fields are popped when `(ir_cs & 3) != CURRENT_RING' */
 	__u32     ir_esp;    /* Stack pointer */
 	union {
-		__u32 ir_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		__u32 ir_ss;     /* Stack  segment  (Ring  #3,  usually  `SEGMENT_USER_DATA_RPL')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16 ir_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
@@ -387,16 +387,16 @@ struct irregs32_vm86 {
 struct ucpustate32 { /* u -- User */
 	/* Full CPU state, as used by system calls.
 	 * NOTE: Also represents the state saved when an exception occurs,
-	 *       both inside kernel-, as well as user-space. */
+	 *       both   inside   kernel-,    as   well   as    user-space. */
 	struct gpregs32 ucs_gpregs; /* General purpose registers. */
 	struct sgregs32 ucs_sgregs; /* Segment registers. */
 	union {
-		__u32       ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
+		__u32       ucs_cs;     /* Code  segment  (Ring  #3,  usually   `SEGMENT_USER_CODE_RPL')
 		                         * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16       ucs_cs16;   /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
 	};
 	union {
-		__u32       ucs_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		__u32       ucs_ss;     /* Stack  segment  (Ring  #3,  usually  `SEGMENT_USER_DATA_RPL')
 		                         * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16       ucs_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
@@ -417,7 +417,7 @@ struct ucpustate32 { /* u -- User */
 #ifdef __CC__
 struct lcpustate32 { /* l -- Little */
 	/* A minimal CPU state containing only registers that are callee-preserved.
-	 * This kind of CPU state is most useful for generating tracebacks. */
+	 * This kind  of  CPU  state  is most  useful  for  generating  tracebacks. */
 	__u32         lcs_edi;    /* [P] Destination pointer */
 	__u32         lcs_esi;    /* [P] Source pointer */
 	__u32         lcs_ebp;    /* [P] Frame base pointer */
@@ -436,7 +436,7 @@ struct lcpustate32 { /* l -- Little */
 #ifdef __CC__
 struct kcpustate32 {
 	/* A CPU state used to describe a known, valid register state in kernel-space.
-	 * This kind of state is also used by exception handling, and the associated
+	 * This  kind of state is also used  by exception handling, and the associated
 	 * stack unwinding. */
 	struct gpregs32 kcs_gpregs; /* General purpose registers. */
 	__u32           kcs_eflags; /* Flags register */
@@ -453,24 +453,24 @@ struct kcpustate32 {
 #define OFFSET_ICPUSTATE32_IRREGS 44
 #ifdef __CC__
 struct icpustate32 { /* i -- Interrupts */
-	/* A CPU state that is used by hardware interrupts (other than those used
+	/* A  CPU state that is used by  hardware interrupts (other than those used
 	 * by scheduling, which generate `scpustate' instead), in order to describe
 	 * the interrupted text location.
 	 * Also the primary CPU state used by RPC handlers.
-	 * Because interrupts always lead into kernel-space, and because the kernel
-	 * doesn't make use of the %gs register, that register is not saved by this
-	 * kind of state, and when required should always be assumed to equal
-	 * `SEGMENT_USER_GSBASE_RPL', as is the default expectation for user-space.
-	 * Note however that because %gs is not saved, its exact value can therefor
-	 * be read using `__rdgs()' (though only in the thread that generated the
-	 * `struct icpustate'), as well as the fact that modifications to the %gs
+	 * Because interrupts always lead into kernel-space, and because the  kernel
+	 * doesn't  make use of the %gs register, that register is not saved by this
+	 * kind  of  state, and  when  required should  always  be assumed  to equal
+	 * `SEGMENT_USER_GSBASE_RPL',  as is the default expectation for user-space.
+	 * Note however that because %gs is not saved, its exact value can  therefor
+	 * be  read using `__rdgs()'  (though only in the  thread that generated the
+	 * `struct icpustate'),  as well as  the fact that  modifications to the %gs
 	 * segment selector will not be undone when an `struct icpustate' is loaded. */
 	struct gpregs32    ics_gpregs; /* General purpose registers. */
 	union {
 		__u32          ics_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
-		                            * (upper 16 bits are undefined, but should be written as zeros) */
+		                            * (upper   16   bits   are   undefined,   but   should   be   written   as  zeros) */
 		__u16          ics_fs16;   /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
-		                            * (upper 16 bits are undefined, but should be written as zeros) */
+		                            * (upper   16   bits   are   undefined,   but   should   be   written   as  zeros) */
 	};
 	union {
 		__u32          ics_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL')
@@ -479,17 +479,17 @@ struct icpustate32 { /* i -- Interrupts */
 	};
 	union {
 		__u32          ics_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
-		                            * (upper 16 bits are undefined, but should be written as zeros) */
+		                            * (upper 16  bits are  undefined, but  should be  written as  zeros) */
 		__u16          ics_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
 	};
 	union {
 		/* Interrupt return registers.
-		 * NOTE: When returning to user-space, the ESP inside
-		 *       of this structure is the user-space EPS.
-		 *       Otherwise, the return-ESP is equal to the
+		 * NOTE: When  returning to user-space, the ESP inside
+		 *       of this  structure  is  the  user-space  EPS.
+		 *       Otherwise,  the  return-ESP is  equal  to the
 		 *       address of `ir_esp' (Use `icpustate_getsp()')
 		 * NOTE: Since the size of this structure depends on one
-		 *       of its fields, use `icpustate_sizeof()'
+		 *       of   its   fields,   use   `icpustate_sizeof()'
 		 *       to determine it. */
 		struct irregs32_kernel ics_irregs;
 		struct irregs32_kernel ics_irregs_k;
@@ -511,12 +511,12 @@ struct scpustate32 { /* s -- Scheduling */
 	struct sgregs32    scs_sgregs; /* Segment registers. */
 	union {
 		/* Interrupt return registers.
-		 * NOTE: When returning to user-space, the ESP inside
-		 *       of this structure is the user-space EPS.
-		 *       Otherwise, the return-ESP is equal to the
+		 * NOTE: When  returning to user-space, the ESP inside
+		 *       of this  structure  is  the  user-space  EPS.
+		 *       Otherwise,  the  return-ESP is  equal  to the
 		 *       address of `ir_esp' (Use `scpustate_getsp()')
 		 * NOTE: Since the size of this structure depends on one
-		 *       of its fields, use `scpustate_sizeof()'
+		 *       of   its   fields,   use   `scpustate_sizeof()'
 		 *       to determine it. */
 		struct irregs32_kernel scs_irregs;
 		struct irregs32_kernel scs_irregs_k;

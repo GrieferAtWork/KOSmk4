@@ -25,7 +25,7 @@
 #include <hybrid/host.h>
 
 /* Helper assembler macros for encoding fixed-width data words in
- * text, as well as module-relative (non-relocated) pointers. */
+ * text,  as  well as  module-relative  (non-relocated) pointers. */
 
 
 __ASM_BEGIN
@@ -65,7 +65,7 @@ __ASM_L(.endm)
 
 
 /* Emit a pointer-sized relocation to `value', offset by `offset',
- * that will become a module-relative pointer at runtime. */
+ * that   will  become  a   module-relative  pointer  at  runtime. */
 __ASM_L(.macro .wordrel value:req, offset=0)
 #ifdef __x86_64__
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

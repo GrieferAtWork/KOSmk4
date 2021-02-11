@@ -68,7 +68,7 @@
 #define CMOS_STATE_B       0x0b /* CMOS status register B */
 #   define CMOS_B_DSE      0x01 /* [r] Daylight Savings Enable (When enabled, the RTC will automatically
                                  *     turn the clock back/forward at appropriate times through the year)
-                                 *     (might be writable? Don't risk changing this, though...)  */
+                                 *     (might  be  writable?   Don't  risk   changing  this,   though...) */
 #   define CMOS_B_2412     0x02 /* [r] 24/12-hour mode. (might be writable? Don't risk changing this, though...) */
 #      define CMOS_B_2412_12H         0x00 /* 12-hour format (PM-bit is masked by 0x80) */
 #      define CMOS_B_2412_24H         0x02 /* 24-hour format (BIOS default) */
@@ -81,7 +81,7 @@
 #   define CMOS_B_PIE      0x40 /* [r/w] Periodic Interrupt Enable (s.a. `CMOS_A_PINTRATE') */
 #   define CMOS_B_SET      0x80 /* [r/w] When set, abort in-progress update, and prevent further updates.
                                  *       I believe this must be set before attempting to write to any
-                                 *       of the Current/Alarm registers, and cleared after...
+                                 *       of  the  Current/Alarm   registers,  and  cleared   after...
                                  *       Also: Setting this bit clears `CMOS_B_UIE' */
 #define CMOS_STATE_C       0x0c /* CMOS status register C */
 #   define CMOS_C_UF       0x10 /* [r/c] Update-ended interrupt occurred (cleared on read) */

@@ -22,7 +22,7 @@
 /* NOTE: Section ordering follows special matching order rules, in that 2 rules...
  *       .text.*
  *       .text.my_part.*
- *       ... are handled properly in that `.text.my_part.*' is applied to all known
+ *       ... are handled  properly in  that `.text.my_part.*'  is applied  to all  known
  *       sections before `.text.*' is then applied to all unmatched, remaining sections.
  *       The order used is that rules are applied in order of longest --> shortest.
  */
@@ -411,6 +411,3 @@
 	CB(PREFIX.dos.wchar.errno.*) \
 /**/
 //[[[end]]]
-
-
-

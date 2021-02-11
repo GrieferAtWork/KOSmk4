@@ -333,9 +333,9 @@
 
 
 /* Register <--> Landing-pad Common/Uncommon-register mapping
- * Currently, landing-pad unwinding is only needed for inline, exception-enabled
+ * Currently, landing-pad unwinding is  only needed for inline,  exception-enabled
  * system calls, and as such only the %eflags register is considered common, since
- * that one needs to be modified in order to set EFLAGS.DF=0 during landing pad
+ * that one needs to be  modified in order to  set EFLAGS.DF=0 during landing  pad
  * adjustments. */
 #define CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_RFLAGS 0
 #define CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT  1

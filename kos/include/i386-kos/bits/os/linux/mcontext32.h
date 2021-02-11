@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/linux/mcontext32.h>
- * 
+ *
  * Definitions:
  *    - typedef ... __gregset_linux32_t;
  *    - typedef ... __fpregset_linux32_t;
@@ -244,7 +244,7 @@ struct __mcontext_linux32 /*[NAME(mcontext_linux32)][PREFIX()]*/ {
 	/* Context to describe whole processor state. */
 	__gregset_linux32_t  gregs;
 	__fpregset_linux32_t fpregs; /* Due to Linux's history we have to use a pointer here.
-	                              * The SysV/i386 ABI requires a struct with the values. */
+	                              * The SysV/i386 ABI requires a struct with the  values. */
 	__ULONG32_TYPE__     oldmask;
 	__ULONG32_TYPE__     cr2;
 };

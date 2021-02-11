@@ -73,7 +73,7 @@ struct ether_arp {
 };
 #endif /* __CC__ */
 
-/* Macro to map an IP multicast address to an Ethernet multicast address.
+/* Macro to map an IP multicast address to an Ethernet multicast  address.
  * The high-order 25 bits of the Ethernet address are statically assigned,
  * and the low-order 23 bits are taken from the low end of the IP address. */
 #ifdef __CC__

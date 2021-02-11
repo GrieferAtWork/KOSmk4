@@ -47,7 +47,7 @@
 
 /* USB Keyboard keycodes.
  * - https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2
- * - https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html  */
+ * - https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html */
 
 /*      USBKBD_KEY_                       0x00  * ... */
 /*      USBKBD_KEY_                       0x01  * ... */

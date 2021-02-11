@@ -78,7 +78,7 @@ struct __jmp_buf {
 #ifdef __CC__
 #ifndef __KERNEL__
 struct __sigjmp_buf {
-	struct __jmp_buf       __sj_buf;    /* regular jump buffer (NOTE: `__padding[0] != 0'
+	struct __jmp_buf       __sj_buf;    /* regular jump buffer (NOTE:  `__padding[0] != 0'
 	                                     * is used to indicate the validity of `__sj_sig') */
 #ifdef __x86_64__
 	__UINTPTR_TYPE__       __sj_hassig; /* non-zero if a signal set is present. */

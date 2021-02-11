@@ -41,8 +41,8 @@
 #   define __CRT_KOS_PRIMARY
 #   define __CRT_KOS
 /* This might seem like a good idea, but programs using `-ffreestanding',
- * but still ending up #including some CRT header will likely also pass
- * `-lc' on the commandline, so we shouldn't respond to that flag to
+ * but still ending up #including some  CRT header will likely also  pass
+ * `-lc' on the  commandline, so  we shouldn't  respond to  that flag  to
  * determine the linked CRT library to be non-present... */
 //#elif defined(__STDC_HOSTED__) && (__STDC_HOSTED__ + 0) == 0
 ///* Freestanding CRT environment. */
@@ -158,11 +158,11 @@
 #endif /* !__LIBC_BIND_CRTBUILTINS */
 #elif (!defined(__INTELLISENSE__) && !defined(__NO_has_builtin) &&                              \
        /* Don't bind CRT-builtin functions (such as `__builtin_malloc()') when building         \
-        * libc itself, so-as to prevent GCC from generating relocations against the             \
+        * libc itself, so-as  to prevent  GCC from generating  relocations against  the         \
         * real symbols (which would end up as relocations in the final binary), when we         \
         * actually want everything to be linked against symbols from the `libc_' namespace. */  \
        !defined(__BUILDING_LIBC) &&                                                             \
-       /* Don't bind CRT-builtin functions when linking against the i386 kernel's builtin CRT.  \
+       /* Don't bind CRT-builtin functions when linking against the i386 kernel's builtin  CRT. \
         * Because GCC assumes the default calling convention for builtin functions, we'd end up \
         * with stack corruptions since the kernel uses STDCALL, but gcc invokes as CDECL. */    \
        !(defined(__CRT_KOS_KERNEL) && (defined(__i386__) && !defined(__x86_64__))))
@@ -248,8 +248,8 @@
  *
  * cc-behavior test macros:
  *   - *_CALLER_CLEANUP:
- *     The caller of a function is responsible to clean up the argument list.
- *     When defined, this allows functions to be called with more arguments
+ *     The caller of a  function is responsible to  clean up the argument  list.
+ *     When defined,  this allows  functions to  be called  with more  arguments
  *     than they actually take, with superfluous arguments simply being ignored.
  *       - __LIBCCALL_CALLER_CLEANUP
  *       - __LIBKCALL_CALLER_CLEANUP
@@ -830,10 +830,10 @@ __NAMESPACE_STD_END
 
 
 /* Special c-declare functions that are needed to work around a GCC bug that
- * causes certain functions to _always_ be considered as nothrow/noexcept,
+ * causes certain functions to  _always_ be considered as  nothrow/noexcept,
  * irregardless of compiler options passed, or how they are declared.
  *
- * The only thing that seems to work as far as workarounds go, is to declare
+ * The  only thing that seems to work as far as workarounds go, is to declare
  * the function with extern "C++" linkage, and use `__ASMNAME()' to re-assign
  * the proper symbol name. */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
@@ -984,10 +984,10 @@ __NAMESPACE_STD_END
 
 
 #ifdef __CC__
-/* Figure out where unreachable code locations are originating from.
- * Without this, GCC (rightfully) likes to make use of undefined behavior
- * when it comes to unreachable locations in order better optimize code.
- * However, this makes debugging much harder than it needs to be, so to
+/* Figure  out  where  unreachable  code  locations  are  originating   from.
+ * Without this, GCC  (rightfully) likes  to make use  of undefined  behavior
+ * when it  comes to  unreachable locations  in order  better optimize  code.
+ * However, this  makes debugging  much harder  than it  needs to  be, so  to
  * make our lives a bit easier, provide a functions that gets called in these
  * situations, with the equivalent effect of `abort()' and `std::terminate()' */
 #if !defined(NDEBUG) && defined(__CRT_HAVE___crt_unreachable)
@@ -1010,7 +1010,7 @@ __DECL_END
 
 /* Configure SSP *_chk bindings
  * NOTE: SSP requires compiler support in the form of `__builtin_object_size()'
- *       If this builtin isn't available, SSP is disabled in headers! */
+ *       If  this  builtin  isn't  available,  SSP  is  disabled  in   headers! */
 #ifdef __SSP_FORTIFY_LEVEL
 #if (__SSP_FORTIFY_LEVEL + 0) > 0
 #if !__has_builtin(__builtin_object_size)

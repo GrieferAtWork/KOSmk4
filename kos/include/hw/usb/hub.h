@@ -29,7 +29,7 @@ __SYSDECL_BEGIN
 /* For use with `USB_REQUEST_GET_DESCRIPTOR' */
 #define USB_REQUEST_GET_DESCRIPTOR_VALUE_HUB 0x2900
 
-/* Flags for ´usb_hub_descriptor::uh_attrib' */
+/* Flags for `usb_hub_descriptor::uh_attrib' */
 #define USB_HUB_ATTRIB_PSMM      0x0003 /* [bit(0:1)] PowerSwitchingMode */
 #define USB_HUB_ATTRIB_PSMS           0 /* Shift for `USB_HUB_ATTRIB_PSMM' */
 #define    USB_HUB_ATTRIB_PSM_GANGED    0x0000 /* All ports are powered at once */

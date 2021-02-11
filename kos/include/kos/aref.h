@@ -237,7 +237,7 @@
 
 
 /* Atomic reference pointer.
- * This is a special type of pointer that allows for a non-blocking, atomic read+incref
+ * This is a  special type  of pointer  that allows  for a  non-blocking, atomic  read+incref
  * operation, while still implementing an atomic-exchange, as well as atomic-compare-exchange
  * operation, all-the-while still allowing for references to be traced correctly.
  *
@@ -278,7 +278,7 @@
  *     which in is done through `awref_set(..., NULL)'
  *
  * In all 3 cases, it is possible to atomically (in an re-entrant-safe way)
- * get, set, exchange, compare-exchange, etc... the pointed-to field, such
+ * get, set, exchange, compare-exchange, etc... the pointed-to field,  such
  * that all transactions are performed atomically.
  *
  * >> T     *arref_ptr                     (ARREF(T) const *self);
@@ -663,11 +663,11 @@
 	__PRIVATE_arref_set_inherit_nopr_3(self, newobj, __typeof__(*(self)->arr_obj))
 #ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj);
- * >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj, typename T); 
+ * >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define arref_set_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_inherit_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj);
- * >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, typename T); 
+ * >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define arref_set_inherit_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_inherit_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
@@ -677,10 +677,10 @@
 #define arref_set_inherit_nopr __PRIVATE_arref_set_inherit_nopr_4
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 #elif defined(__HYBRID_PP_VA_OVERLOAD)
-/* >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj, typename T); 
+/* >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void arref_set_inherit(ARREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define arref_set_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_inherit_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, typename T); 
+/* >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void arref_set_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define arref_set_inherit_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_inherit_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* ... */
@@ -716,11 +716,11 @@
 	__PRIVATE_arref_set_nopr_3(self, newobj, __typeof__(*(self)->arr_obj))
 #ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> void arref_set(ARREF(T) *self, T *newobj);
- * >> void arref_set(ARREF(T) *self, T *newobj, typename T); 
+ * >> void arref_set(ARREF(T) *self, T *newobj, typename T);
  * >> void arref_set(ARREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define arref_set(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> void arref_set_nopr(ARREF(T) *self, T *newobj);
- * >> void arref_set_nopr(ARREF(T) *self, T *newobj, typename T); 
+ * >> void arref_set_nopr(ARREF(T) *self, T *newobj, typename T);
  * >> void arref_set_nopr(ARREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define arref_set_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
@@ -730,10 +730,10 @@
 #define arref_set_nopr __PRIVATE_arref_set_nopr_5
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 #elif defined(__HYBRID_PP_VA_OVERLOAD)
-/* >> void arref_set(ARREF(T) *self, T *newobj, typename T); 
+/* >> void arref_set(ARREF(T) *self, T *newobj, typename T);
  * >> void arref_set(ARREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define arref_set(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> void arref_set_nopr(ARREF(T) *self, T *newobj, typename T); 
+/* >> void arref_set_nopr(ARREF(T) *self, T *newobj, typename T);
  * >> void arref_set_nopr(ARREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define arref_set_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_set_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* ... */
@@ -1220,11 +1220,11 @@
 	__PRIVATE_axref_set_inherit_nopr_3(self, newobj, __typeof__(*(self)->axr_obj))
 #ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj);
- * >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj, typename T); 
+ * >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define axref_set_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_inherit_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj);
- * >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, typename T); 
+ * >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define axref_set_inherit_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_inherit_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
@@ -1234,10 +1234,10 @@
 #define axref_set_inherit_nopr __PRIVATE_axref_set_inherit_nopr_4
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 #elif defined(__HYBRID_PP_VA_OVERLOAD)
-/* >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj, typename T); 
+/* >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void axref_set_inherit(AXREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define axref_set_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_inherit_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, typename T); 
+/* >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, typename T);
  * >> void axref_set_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, typename T, void decref(T *)); */
 #define axref_set_inherit_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_inherit_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* ... */
@@ -1277,11 +1277,11 @@
 	__PRIVATE_axref_set_nopr_3(self, newobj, __typeof__(*(self)->axr_obj))
 #ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> void axref_set(AXREF(T) *self, T *newobj);
- * >> void axref_set(AXREF(T) *self, T *newobj, typename T); 
+ * >> void axref_set(AXREF(T) *self, T *newobj, typename T);
  * >> void axref_set(AXREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define axref_set(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> void axref_set_nopr(AXREF(T) *self, T *newobj);
- * >> void axref_set_nopr(AXREF(T) *self, T *newobj, typename T); 
+ * >> void axref_set_nopr(AXREF(T) *self, T *newobj, typename T);
  * >> void axref_set_nopr(AXREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define axref_set_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
@@ -1291,10 +1291,10 @@
 #define axref_set_nopr __PRIVATE_axref_set_nopr_5
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 #elif defined(__HYBRID_PP_VA_OVERLOAD)
-/* >> void axref_set(AXREF(T) *self, T *newobj, typename T); 
+/* >> void axref_set(AXREF(T) *self, T *newobj, typename T);
  * >> void axref_set(AXREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define axref_set(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> void axref_set_nopr(AXREF(T) *self, T *newobj, typename T); 
+/* >> void axref_set_nopr(AXREF(T) *self, T *newobj, typename T);
  * >> void axref_set_nopr(AXREF(T) *self, T *newobj, typename T, void incref(T *), void decref(T *)); */
 #define axref_set_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_set_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* ... */
@@ -1330,11 +1330,11 @@
 	__PRIVATE_axref_clear_nopr_2(self, __typeof__(*(self)->axr_obj))
 #ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> void axref_clear(AXREF(T) *self);
- * >> void axref_clear(AXREF(T) *self, typename T); 
+ * >> void axref_clear(AXREF(T) *self, typename T);
  * >> void axref_clear(AXREF(T) *self, typename T, void decref(T *)); */
 #define axref_clear(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_clear_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> void axref_clear_nopr(AXREF(T) *self);
- * >> void axref_clear_nopr(AXREF(T) *self, typename T); 
+ * >> void axref_clear_nopr(AXREF(T) *self, typename T);
  * >> void axref_clear_nopr(AXREF(T) *self, typename T, void decref(T *)); */
 #define axref_clear_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_clear_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
@@ -1344,10 +1344,10 @@
 #define axref_clear_nopr __PRIVATE_axref_clear_nopr_3
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 #elif defined(__HYBRID_PP_VA_OVERLOAD)
-/* >> void axref_clear(AXREF(T) *self, typename T); 
+/* >> void axref_clear(AXREF(T) *self, typename T);
  * >> void axref_clear(AXREF(T) *self, typename T, void decref(T *)); */
 #define axref_clear(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_clear_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> void axref_clear_nopr(AXREF(T) *self, typename T); 
+/* >> void axref_clear_nopr(AXREF(T) *self, typename T);
  * >> void axref_clear_nopr(AXREF(T) *self, typename T, void decref(T *)); */
 #define axref_clear_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_clear_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* ... */

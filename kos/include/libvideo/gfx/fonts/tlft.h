@@ -34,16 +34,16 @@ __DECL_BEGIN
 
 /* Definitions for a simple tile-based font file format.
  * This file format is defined to be saved to a file that is then mmap()-ed
- * into a processes memory, at which point a header can be read to quickly
- * determine the file offset (and thus memory address) of a bitmask-based
- * descriptor of which pixels to turn on/off for representing some given
+ * into  a processes memory, at which point a header can be read to quickly
+ * determine the file offset (and  thus memory address) of a  bitmask-based
+ * descriptor  of which pixels  to turn on/off  for representing some given
  * character.
  * With this in mind:
  *   - Characters are grouped as blocks of consecutively mapped unicode ranges
  *   - Only 16-bit unicode characters (U+0000 to U+FFFF) can be mapped
  *   - All characters have a fixed max width/height
  * Essentially, this file format is designed in order to house a unicode
- * character font set such as u_vga16, as used by KOS and found here:
+ * character font set such  as u_vga16, as used  by KOS and found  here:
  *    http://www.inp.nsk.su/~bolkhov/files/fonts/univga/
  */
 
@@ -83,7 +83,7 @@ typedef struct {
 } TLFT_Hdr;
 
 /* Helper macros to getting offsets and file size from a given TLFT header.
- * NOTE: To verify the integrity of a TLFT memory mapping, all that's required
+ * NOTE: To verify the integrity of a TLFT memory mapping, all that's  required
  *       is to ensure that header identification bits have their proper values,
  *       as well as that `stat::st_size >= TLFT_Hdr_GetSizeOfFile()' */
 #define TLFT_Hdr_GetOffsetOfGroups(self) (__CCAST(__uint32_t)(self)->h_hdrsize)
@@ -101,10 +101,10 @@ typedef struct {
 
 
 #ifndef TLFT_NO_LOOKUP
-/* Sample implementation for how to perform a character bitmap
+/* Sample implementation for  how to perform  a character  bitmap
  * lookup for a given TLFT file that has been mapped into memory.
- * Upon success, return the `1 << self->h_log2chsize'-byte large
- * bitmap for `ch', or `NULL' if the character is not printable. */
+ * Upon success, return the `1 << self->h_log2chsize'-byte  large
+ * bitmap  for `ch', or `NULL' if the character is not printable. */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __uint8_t const *
 tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 	__uint8_t const *chars, *ascii;

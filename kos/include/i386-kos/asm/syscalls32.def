@@ -220,16 +220,16 @@ select64 = selectx32_64;
 
 0x00000000:restart_syscall /* Used internally by the linux kernel, but not needed on KOS */
 /* NOTE: exit() _always_ has to be vector #1 to comply with SysV abi386-4:3-24
- *       specs, which describe the full implementation of the `_exit':
+ *       specs,  which  describe  the  full  implementation  of  the  `_exit':
  * >> .globl _exit
  * >> _exit:
  * >>     movl   $1, %eax
  * >>     lcall  $7, $0
  * s.a. `http://www.sco.com/developers/devspecs/abi386-4.pdf'
  * As such, we _must_ assign 1:exit, or 1:exit_group, though for historical reasons,
- * and the fact that multi-threading on i386-unix was an afterthought, the syscall
- * vector #1 has always been the kernel-equivalent of `pthread_exit(3)', thus also
- * setting the implied definition that a single-threaded application that calls
+ * and the fact that multi-threading on  i386-unix was an afterthought, the  syscall
+ * vector #1 has always been  the kernel-equivalent of `pthread_exit(3)', thus  also
+ * setting the  implied definition  that a  single-threaded application  that  calls
  * `pthread_exit(3)' will terminated itself. */
 0x00000001:exit
 0x00000002:fork

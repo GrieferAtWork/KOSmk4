@@ -38,13 +38,13 @@ struct vio_emulate_args {
 	void          *vea_ptrlo; /* Lower virtual address at which the VIO fault happened. */
 	void          *vea_ptrhi; /* Upper virtual address at which the VIO fault happened. */
 #if defined(__KERNEL__) && !defined(__x86_64__)
-	/* Because `struct icpustate32' doesn't contain dedicated fields for the
+	/* Because  `struct icpustate32'  doesn't contain  dedicated fields  for the
 	 * %esp and %ss registers when describing kernel-space register states,
-	 * emulating instructions that may modify these registers requires special
+	 * emulating instructions that may  modify these registers requires  special
 	 * care in order to delay the actual assignment of new register values until
 	 * after instruction emulation has completed.
-	 * This is done by having the kernel-space #PF check if a custom %ss or %esp
-	 * had been assigned during emulation, such that it will then load them
+	 * This  is done by having the kernel-space #PF check if a custom %ss or %esp
+	 * had  been  assigned during  emulation, such  that it  will then  load them
 	 * by re-directing execution to a custom register loading bootstrap function.
 	 * s.a. `x86_vio_kernel_esp_bootstrap_loader()' in
 	 *      `kernel/core/arch/i386/fault/handle_pagefault.c' */

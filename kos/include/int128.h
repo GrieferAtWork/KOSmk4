@@ -27,8 +27,8 @@
 #include <bits/types.h>
 
 /* HINT: If your compiling your program with C++, you can enable c++ operator
- *       integration for (u)int128_t for (most) standard operators by pre-
- *       defining a macro `#define WANT_INT128_CXX_INTEGRATION 1' at the
+ *       integration for (u)int128_t  for (most) standard  operators by  pre-
+ *       defining  a  macro  `#define WANT_INT128_CXX_INTEGRATION 1'  at  the
  *       start of your source file. */
 
 #ifdef __CC__
@@ -64,7 +64,7 @@ __ATTR_WUNUSED __ATTR_CONST __uint64_t (&uint128_vec64(uint128_t &__var))[2];
 __ATTR_WUNUSED __ATTR_CONST __uint64_t const (&uint128_vec64(uint128_t const &__var))[2];
 #endif /* __UINT64_TYPE__ */
 
-/* Return a reference to the I'th least significant word, where 0 is the least
+/* Return a reference to the  I'th least significant word,  where 0 is the  least
  * significant word, and ((16 / sizeof(return)) - 1) is the most significant one. */
 __ATTR_WUNUSED __ATTR_CONST __int8_t &int128_vec8_significand(int128_t &__var, unsigned int __i);
 __ATTR_WUNUSED __ATTR_CONST __int8_t const &int128_vec8_significand(int128_t const &__var, unsigned int __i);

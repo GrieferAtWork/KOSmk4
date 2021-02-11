@@ -77,14 +77,14 @@ __FORCELOCAL void (__fninit)(void) { __asm__ __volatile__("fninit"); }
 
 /* Load/Store the extended FPU state
  * WARNING: When working in kernel-space, be aware that these instruction may not
- *          necessarily be supported by the CPU, that that emulating them may be
+ *          necessarily be supported by the CPU, that that emulating them may  be
  *          expensive, or even impossible in certain situations.
  *          For this purpose, kernel-space should instead make use of the functions
  *          exported from <kernel/arch/fpu.h>:
  *           - x86_fxsave(), x86_fxsave32(), x86_fxsave64()
  *           - x86_fxrstor(), x86_fxrstor32(), x86_fxrstor64()
  *          Additionally, kernel-space code should also check the `x86_fpustate_variant'
- *          global variable which describes which is the preferred mechanism for saving
+ *          global  variable which describes which is the preferred mechanism for saving
  *          and loading the FPU context. */
 #ifdef __x86_64__
 struct xfpustate32;

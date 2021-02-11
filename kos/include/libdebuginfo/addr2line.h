@@ -198,9 +198,9 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully retrieved information.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either no information is known about `module_relative_pc',
  *                                    or the given `level >= OUT(result->al_levelcnt)', and also
- *                                    isn't  equal  to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
- *                                    `result->al_levelcnt' is set  to 0 if  no information  is
- *                                    known at all, or whatever the total number of information
+ *                                    isn't  equal   to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
+ *                                    `result->al_levelcnt' is  set to  0 if  no information  is
+ *                                    known at all, or whatever the total number of  information
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
 typedef __ATTR_NONNULL((1, 2)) unsigned int

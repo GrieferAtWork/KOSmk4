@@ -23,27 +23,27 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-/* KOS futex operations (for use with the lfutex() system
+/* KOS futex  operations (for  use with  the lfutex()  system
  * call, though can't be used with the futex() system call!). */
 #define LFUTEX_WAKE               0x00000000 /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
 #define LFUTEX_NOP                0x00000001 /* >> return 0; */
 #define LFUTEX_GETFUTEX           0x00000002 /* [struct hop_openfd *val]
-                                              * Return a handle for the underlying kernel futex object that
+                                              * Return a handle for the underlying kernel futex object  that
                                               * is automatically created for some given address, as doing so
                                               * becomes necessary by other LFUTEX_* operations.
-                                              * The return value in this case is the `fd_t' of the newly allocated
-                                              * handle, which may be influenced by `val' (s.a. the documentation of
+                                              * The  return value in this case is  the `fd_t' of the newly allocated
+                                              * handle,  which may be influenced by `val' (s.a. the documentation of
                                               * `struct hop_openfd'). When `val' is `NULL', the behavior is the same
-                                              * as though `val->of_mode' was set to `HOP_OPENFD_MODE_AUTO', meaning
+                                              * as  though `val->of_mode' was set to `HOP_OPENFD_MODE_AUTO', meaning
                                               * that a file descriptor will be assigned automatically. */
 #define LFUTEX_GETFUTEX_EXISTING  0x00000003 /* [struct hop_openfd *val]
                                               * Same as `LFUTEX_GETFUTEX', but don't create a futex where there is none already.
-                                              * If no futex already exists, simply return `-ENOENT', and don't throw an error */
-#define LFUTEX_WAKEMASK           0x00000004 /* Same as `LFUTEX_WAKE', but clear/set certain bits once there are no
+                                              * If no futex already  exists, simply return `-ENOENT',  and don't throw an  error */
+#define LFUTEX_WAKEMASK           0x00000004 /* Same as `LFUTEX_WAKE', but clear/set  certain bits once there are  no
                                               * more threads to wake up, before broadcasting all remaining threads to
                                               * ensure that futex bits are in a consistent state.
                                               * Mainly intended to be used like this (allowing something like `sem_post()'
-                                              * to be implemented without the need of a system call whenever there
+                                              * to be  implemented  without the  need  of  a system  call  whenever  there
                                               * aren't any waiting threads):
                                               * >> if (BIT_SET(LFUTEX_WAIT_LOCK_WAITERS))
                                               * >>     wakemask(timeout: ~LFUTEX_WAIT_LOCK_WAITERS, val2: 0);
@@ -87,30 +87,30 @@
 
 
 /* Bit indicating a futexfd operation.
- * When or'd with one of the `LFUTEX_WAIT*' operations, the `lfutex()'
- * system call will then return a file descriptor that can be used
- * with `poll()' or `select()' in order to perform the same operation
- * that would have been done by `lfutex()', had this bit not been set.
+ * When or'd with one of  the `LFUTEX_WAIT*' operations, the  `lfutex()'
+ * system  call  will then  return a  file descriptor  that can  be used
+ * with  `poll()' or `select()'  in order to  perform the same operation
+ * that  would have been done by `lfutex()',  had this bit not been set.
  * For more information on this, see the section `lfutex() and select()'
  * that can be found in <kos/futex.h>
- * Note that when a futexfd object is shared between different processes,
- * the underlying futex that the associated thread will be waiting on will
- * remain the same, even when used within the same process after memory at
- * the location where the FD originally existed at has been unmapped.
- * However, futex wait operation that will read (and possibly write) memory
- * in order to determine if a wait really has to be performed will always do
- * so using the same virtual memory address with which the descriptor was
- * originally created, however will always do so using the currently set VM,
- * meaning that user-space application must either ensure that memory is
+ * Note that  when a  futexfd object  is shared  between different  processes,
+ * the  underlying futex  that the associated  thread will be  waiting on will
+ * remain the same,  even when used  within the same  process after memory  at
+ * the  location  where  the  FD  originally  existed  at  has  been unmapped.
+ * However,  futex wait operation  that will read  (and possibly write) memory
+ * in  order to determine if a wait really  has to be performed will always do
+ * so using the  same virtual  memory address  with which  the descriptor  was
+ * originally created, however will always do  so using the currently set  VM,
+ * meaning  that  user-space application  must  either ensure  that  memory is
  * properly shared between applications, or simply only use this functionality
  * for futex objects within the same process.
- * If the user of this functionality requires that futex FD objects still
- * function properly, even in other processes where memory may potentially
- * be mapped differently that it is within the process that originally
+ * If the user of this functionality  requires that futex FD objects  still
+ * function properly, even in other processes where memory may  potentially
+ * be mapped  differently that  it is  within the  process that  originally
  * created the FD object, then you may instead make use of `LFUTEX_MPFDBIT'
  * NOTE: The file descriptor used cannot be influenced directly, meaning that
- *       wishing make use of some particular descriptor will require the use
- *       of an additional call to some kernel function that can be used for
+ *       wishing  make use of some particular descriptor will require the use
+ *       of  an additional call to some kernel  function that can be used for
  *       duplicating file descriptors (e.g. `dup2()' or `HOP_HANDLE_REOPEN'). */
 #define LFUTEX_FDBIT                0x00000100
 #define LFUTEX_FDWAIT               (LFUTEX_FDBIT | LFUTEX_WAIT)
@@ -124,26 +124,26 @@
 #define LFUTEX_FDWAIT_WHILE_CMPXCH  (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_CMPXCH)
 #define LFUTEX_FDWAIT_UNTIL_CMPXCH  (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL_CMPXCH)
 
-/* This bit function very similar to `LFUTEX_FDBIT', however enables the use
- * of futex FD objects across multiple processes with different, and possibly
- * incompatible VMs, such that whatever operation is meant to be performed
- * when polling from the associated FD will still be able to happen.
- * This is essentially done by storing a reference to the `vm_datapart' that
+/* This bit function very similar  to `LFUTEX_FDBIT', however enables the  use
+ * of  futex FD objects across multiple processes with different, and possibly
+ * incompatible VMs, such  that whatever  operation is meant  to be  performed
+ * when polling  from  the  associated  FD  will  still  be  able  to  happen.
+ * This is essentially done by storing  a reference to the `vm_datapart'  that
  * contains the backing memory descriptor for the indicated address, and using
- * reads/writes to/from this `vm_datapart' to implement the checks associated
+ * reads/writes to/from this `vm_datapart' to implement the checks  associated
  * with the used wait operation.
- * WARNING: Any memory writes that are performed as part of one of the futex
+ * WARNING: Any memory  writes that  are performed  as part  of one  of the  futex
  *          operations that can write to memory (LFUTEX_WAIT_(WHILE|UNTIL)_CMPXCH,
- *          and `LFUTEX_WAIT_LOCK'), will be made as through they where done by
- *          writing to a memory-mapped file, meaning that any such changes will
- *          not appear in memory images that aren't mapped with the `MAP_SHARED'
+ *          and  `LFUTEX_WAIT_LOCK'), will be  made as through  they where done by
+ *          writing  to a memory-mapped  file, meaning that  any such changes will
+ *          not appear in memory images  that aren't mapped with the  `MAP_SHARED'
  *          flag set.
- *          As such, this flag should only ever be used to create futex FDs for
+ *          As such, this flag  should only ever  be used to  create futex FDs  for
  *          futex objects in memory mappings that are mapped as `MAP_SHARED', since
- *          changes may otherwise not become visible to either the process that
- *          originally created the memory mapping, or the process that is using
- *          the FD to actually wait for something to happen. Note that access to
- *          the data part used by a MPFUTEXFD object can be gained through use
+ *          changes may otherwise  not become  visible to either  the process  that
+ *          originally created the  memory mapping,  or the process  that is  using
+ *          the FD to actually  wait for something to  happen. Note that access  to
+ *          the data part  used by  a MPFUTEXFD object  can be  gained through  use
  *          of the `HOP_MPFUTEXFD_OPEN_DATAPART' hop() function.
  */
 #define LFUTEX_MPFDBIT              0x00000200

@@ -38,7 +38,7 @@ struct clock_timestamp {
 	__uint64_t   ct_seconds;          /* Amount of whole seconds passed */
 	__uint64_t   ct_ticks;            /* Number of sub-second ticks passed */
 	__uint64_t   ct_ticks_per_second; /* [!0] Number of ticks per second (when 1, the clock
-	                                   * doesn't allow provide for sub-second precision)
+	                                   * doesn't  allow  provide for  sub-second precision)
 	                                   * WARNING: This number may change over time! */
 };
 #endif /* __CC__ */

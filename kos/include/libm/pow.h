@@ -56,7 +56,7 @@ __DECL_BEGIN
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -213,7 +213,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		if (__ix > 0x3f800007)
 			return (__hy > 0) ? __LIBM_LOCAL_VALUE(hugef) * __LIBM_LOCAL_VALUE(hugef)
 			                  : __LIBM_LOCAL_VALUE(tinyf) * __LIBM_LOCAL_VALUE(tinyf);
-		/* now |1-x| is tiny <= 2 ** -20, suffice to compute 
+		/* now |1-x| is tiny <= 2 ** -20, suffice to compute
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
 		__t  = __ax - 1; /* t has 20 trailing zeros */
 		__w  = (__t * __t) * (__IEEE754_FLOAT_C(0.5) - __t * (__IEEE754_FLOAT_C(0.333333333333) - __t * __IEEE754_FLOAT_C(0.25)));
@@ -367,7 +367,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */

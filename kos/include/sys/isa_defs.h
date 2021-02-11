@@ -90,7 +90,7 @@ meanings (and values). - Please change your code to only include one of either"
 #ifndef _IEEE_754
 #include <ieee754.h>
 /* Define `_IEEE_754' if all of `float', `double' (and if
- * defined by the compiler `long double') map to types
+ * defined by the  compiler `long double')  map to  types
  * that are compatible with the `ieee[78]54' standard. */
 #if ((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||         \
       defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||        \
@@ -173,7 +173,7 @@ meanings (and values). - Please change your code to only include one of either"
 
 
 
-/* I get all of the other options, but from this point on, it gets _extremely_ specific.
+/* I get all  of the other  options, but from  this point on,  it gets _extremely_  specific.
  * And even more though: This really doesn't have too much to do with the arch ISA anymore...
  * (Well... DMA addressing maybe, but not that fdisk/console stuff further below!) */
 #undef _DMA_USES_PHYSADDR

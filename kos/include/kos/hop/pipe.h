@@ -42,7 +42,7 @@ __DECL_BEGIN
 struct hop_pipe_stat /*[PREFIX(ps_)]*/ {
 	__uint32_t            ps_struct_size;    /* [== sizeof(struct hop_pipe_stat)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __ps_pad1;           /* ... */
 	__uint64_t            ps_rdtotal;        /* Total number of bytes read since the pipe buffer was last defragmented (which must be done before it can be re-allocated) */
@@ -62,7 +62,7 @@ struct hop_pipe_stat /*[PREFIX(ps_)]*/ {
 struct hop_pipe_writesome /*[PREFIX(pws_)]*/ {
 	__uint32_t            pws_struct_size;   /* [== sizeof(struct hop_pipe_writesome)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __pws_pad1;          /* ... */
 	void                 *pws_buf;           /* [IN] Base address of the data to write to the pipe */
@@ -85,7 +85,7 @@ struct iovec;
 struct hop_pipe_vwritesome /*[PREFIX(pvws_)]*/ {
 	__uint32_t            pvws_struct_size;  /* [== sizeof(struct hop_pipe_vwritesome)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __pvws_pad1;         /* ... */
 	struct iovec const   *pvws_buf;          /* [IN] Vector of buffer locations */
@@ -107,7 +107,7 @@ struct hop_pipe_vwritesome /*[PREFIX(pvws_)]*/ {
 struct hop_pipe_skipdata /*[PREFIX(psd_)]*/ {
 	__uint32_t            psd_struct_size;   /* [== sizeof(struct hop_pipe_skipdata)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __psd_pad1;          /* ... */
 	__HOP_SIZE64_FIELD   (psd_num_bytes);    /* [IN] The max number of bytes to skip. */
@@ -125,7 +125,7 @@ struct hop_pipe_skipdata /*[PREFIX(psd_)]*/ {
 struct hop_pipe_unread /*[PREFIX(pur_)]*/ {
 	__uint32_t            pur_struct_size;   /* [== sizeof(struct hop_pipe_unread)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __pur_pad1;          /* ... */
 	__HOP_SIZE64_FIELD   (pur_num_bytes);    /* [IN] The max number of bytes to unread. */
@@ -143,7 +143,7 @@ struct hop_pipe_unread /*[PREFIX(pur_)]*/ {
 struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 	__uint32_t            puw_struct_size;   /* [== sizeof(struct hop_pipe_unwrite)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __puw_pad1;          /* ... */
 	__HOP_SIZE64_FIELD   (puw_num_bytes);    /* [IN] The max number of bytes to unwrite. */
@@ -167,39 +167,39 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                            * write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
                                            * HOP_PIPE_WRITESOME:      Block until _any_ data was written
                                            *                          NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
-                                           *                          it will behave identical to `write() w/ IO_NONBLOCK' */
+                                           *                          it  will  behave   identical  to   `write() w/ IO_NONBLOCK' */
 #define HOP_PIPE_VWRITESOME    0x000c0006 /* [struct hop_pipe_vwritesome *data] Vectored variant of `HOP_PIPE_WRITESOME' */
 #define HOP_PIPE_SKIPDATA      0x000c0007 /* [struct hop_pipe_skipdata *data] Skip buffered data, rather than reading it. */
 #define HOP_PIPE_UNREAD        0x000c0008 /* [struct hop_pipe_unread *data] Try to unread previously read, but not yet written data. */
 #define HOP_PIPE_UNWRITE       0x000c0009 /* [struct hop_pipe_unwrite *data] Try to unwrite previously written, but not yet read data. */
 #define HOP_PIPE_SETWRITTEN    0x000c000a /* [IN:uint64_t *data] Set the total number of written bytes to `*data' (no-op if `*data' is greater than what is currently written, but not read)
                                            * [OUT:uint64_t *data] Return the number of available bytes for reading afterwards. */
-#define HOP_PIPE_CLOSE         0x000c000b /* Explicitly close the pipe (same as `HOP_PIPE_SETLIM(0)')
-                                           * Internally, this is automatically done when either last reader,
-                                           * or the last writer object associated with some pipe is destroyed.
-                                           * When a pipe is closed, no new data can be written to it (since it's
-                                           * limit is set to 0), once all remaining data has been read, read() on
+#define HOP_PIPE_CLOSE         0x000c000b /* Explicitly   close    the   pipe    (same   as    `HOP_PIPE_SETLIM(0)')
+                                           * Internally,  this  is  automatically  done  when  either  last  reader,
+                                           * or  the  last writer  object associated  with  some pipe  is destroyed.
+                                           * When  a pipe is  closed, no new data  can be written  to it (since it's
+                                           * limit is set to 0),  once all remaining data  has been read, read()  on
                                            * the pipe will no longer block, but instead always return 0 immediately.
-                                           * A pipe can be un-closed by re-assigning a new limit value. */
+                                           * A   pipe  can  be   un-closed  by  re-assigning   a  new  limit  value. */
 #define HOP_PIPE_OPEN_PIPE     0x000c000c /* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE' of a `HANDLE_TYPE_PIPE_READER' or `HANDLE_TYPE_PIPE_WRITER'
                                            * @return: == arg->of_hint */
-#define HOP_PIPE_CREATE_READER 0x000c000d /* [struct hop_openfd *arg] Create a new reader object for the associated pipe.
-                                           * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
-                                           * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
-                                           * By using `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER', additional reader/writer
+#define HOP_PIPE_CREATE_READER 0x000c000d /* [struct hop_openfd *arg] Create   a   new   reader   object   for   the   associated    pipe.
+                                           * When the pipe(2) system call  is used to create a  new pipe, the internal  `HANDLE_TYPE_PIPE'
+                                           * object is hidden from user-space,  and instead is wrapped by  1 reader, and 1 writer  object.
+                                           * By using  `HOP_PIPE_CREATE_READER'  and  `HOP_PIPE_CREATE_WRITER',  additional  reader/writer
                                            * objects can be created for a pipe (although pretty much identical behavior can be achieved by
                                            * simply dup(2)-ing the original reader/writer).
                                            * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE')
+                                           * pipe   object   is  closed   by   having  its   limit   set  to   0   (s.a.  `HOP_PIPE_CLOSE')
                                            * @return: == arg->of_hint */
-#define HOP_PIPE_CREATE_WRITER 0x000c000e /* [struct hop_openfd *arg] Create a new writer object for the associated pipe.
-                                           * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
-                                           * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
-                                           * By using `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER', additional reader/writer
+#define HOP_PIPE_CREATE_WRITER 0x000c000e /* [struct hop_openfd *arg] Create   a   new   writer   object   for   the   associated    pipe.
+                                           * When the pipe(2) system call  is used to create a  new pipe, the internal  `HANDLE_TYPE_PIPE'
+                                           * object is hidden from user-space,  and instead is wrapped by  1 reader, and 1 writer  object.
+                                           * By using  `HOP_PIPE_CREATE_READER'  and  `HOP_PIPE_CREATE_WRITER',  additional  reader/writer
                                            * objects can be created for a pipe (although pretty much identical behavior can be achieved by
                                            * simply dup(2)-ing the original reader/writer).
                                            * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE')
+                                           * pipe   object   is  closed   by   having  its   limit   set  to   0   (s.a.  `HOP_PIPE_CLOSE')
                                            * @return: == arg->of_hint */
 
 __DECL_END

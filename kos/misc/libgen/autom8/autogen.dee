@@ -17,27 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-import fs;
-import util;
-import * from .optiexpr;
-import * from deemon;
-/* TODO: Deprecated!!! -- Re-implemented as an autom8 applet! */
 
-global FILENAME: string;
+/* TODO: Deprecated!!!  --   Re-write   the   stuff  in   here   from   scratch!
+ * Everything in here is just a dumb port of the (now deleted) "autogen" script! */
+import * from deemon;
+import * from ..autom8;
+import * from ..optiexpr;
+import fs;
+
 global FILETEXT: string;
-global FILESIZE: int;
-global CURRENT_CMD_START: int;
-global CURRENT_CMD_END: int;
-global CURRENT_OUTPUT_START: int;
-global CURRENT_OUTPUT_END: int;   /* Points at `/.*[[[end]]]*./' */
 global CURRENT_OUTPUT_END2: int;  /* Points after `/.*[[[end]]]*./' */
 
-function err(i: int, message: string) {
-	local fp = File.stderr;
-	fp << FILENAME << "(" << (FILETEXT.count("\n", i) + 1) << ") : Error : "
-		<< message << "\n";
-	throw Error(message);
-}
 
 function enumerateMacrosNamesBetween(start: int, end: int): {string...} {
 	for (local l: FILETEXT[start:end].splitlines(false)) {
@@ -58,7 +48,7 @@ function enumerateMacrosNamesBetween(start: int, end: int): {string...} {
 function enumerateMacrosNamesAfterOutputEnd(): {string...} {
 	local nextOutputStart = FILETEXT.find("/*[[[", CURRENT_OUTPUT_END2);
 	if (nextOutputStart < 0)
-		nextOutputStart = FILESIZE;
+		nextOutputStart = #FILETEXT;
 	return enumerateMacrosNamesBetween(CURRENT_OUTPUT_END2, nextOutputStart);
 }
 
@@ -114,7 +104,7 @@ function defineMacros(macros: {(string, string)...}) {
 	}
 }
 
-/*[[[wrapx32_and_x32_64(
+/*![[[autogen:wrapx32_and_x32_64(
 	linkIf:    "defined(__x86_64__) || !defined(__i386__)",
 	name:      "itimerspec",
 	name32:    "itimerspecx32",
@@ -158,7 +148,7 @@ function do_wrap3264_x32_and_x32_64(
 	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
 	defineMacros({ ("{}32".format({ name }), "__{}32".format({ name })), });
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name32If })) << " */\n";
-	
+
 	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
 	fp << optimizeAndWrapProcessorExpressionForIf(macro64If) << "\n";
 	defineMacros({
@@ -237,7 +227,7 @@ function do_wrap3264_x32_and_x32_64(
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << "*/\n";
 }
 
-/*[[[autogen:wrap3264_x64(
+/*![[[autogen:wrap3264_x64(
 	linkIf:    "defined(__x86_64__)",
 	name:      "itimerspec",
 	name64:    "itimerspecx64",
@@ -303,107 +293,34 @@ function do_wrap3264_x64(
 
 
 
-global functions: {string: Callable} = {
+global final AUTOGEN_FUNCTIONS: {string: Callable} = {
 	"wrap3264_x32_and_x32_64" : do_wrap3264_x32_and_x32_64,
 	"wrap3264_x64"            : do_wrap3264_x64,
 };
 
-function doFileImpl(filename: string) {
-	FILENAME = filename;
-	File.Writer newText;
-	with (local fp = File.open(FILENAME, "r"))
-		FILETEXT = fp.read().decode("utf-8").unifylines();
-	FILESIZE = #FILETEXT;
-	local prevOutputEnd = 0;
-	local i = 0;
-	while (i < FILESIZE) {
-		final local START_PATTERN = "/*[[[autogen:";
-		local cmd_start = FILETEXT.find(START_PATTERN, i);
-		if (cmd_start < 0)
-			break;
-		CURRENT_CMD_START = cmd_start + #START_PATTERN;
-		while (CURRENT_CMD_START < FILESIZE && FILETEXT.isspace(CURRENT_CMD_START))
-			++CURRENT_CMD_START;
-		CURRENT_CMD_END = FILETEXT.find("]]]*/", CURRENT_CMD_START);
-		if (CURRENT_CMD_END < 0)
-			err(CURRENT_CMD_START, "Missing `]]]*/'");
-		CURRENT_OUTPUT_START = CURRENT_CMD_END + 5;
-		while (CURRENT_CMD_END > CURRENT_CMD_START && FILETEXT.isspace(CURRENT_CMD_END - 1))
-			--CURRENT_CMD_END;
-		local startsWithSpace = false;
-		if (CURRENT_OUTPUT_START < FILESIZE && FILETEXT.islf(CURRENT_OUTPUT_START)) {
-			startsWithSpace = true;
-			++CURRENT_OUTPUT_START;
-		}
-		CURRENT_OUTPUT_END = FILETEXT.find("/*[[[end]]]*/", CURRENT_OUTPUT_START);
-		if (CURRENT_OUTPUT_END < 0)
-			err(CURRENT_OUTPUT_START, "Missing `/*[[[end]]]*/'");
-		CURRENT_OUTPUT_END2 = CURRENT_OUTPUT_END + #"/*[[[end]]]*/";
-		while (CURRENT_OUTPUT_END2 < FILESIZE && FILETEXT.isspace(CURRENT_OUTPUT_END2))
-			++CURRENT_OUTPUT_END2;
-		newText << FILETEXT[prevOutputEnd:CURRENT_OUTPUT_START];
-		local oldStdout = File.stdout;
-		File.Writer replacementText;
-		File.stdout = replacementText;
-		try {
-			exec(
-				FILETEXT[CURRENT_CMD_START:CURRENT_CMD_END],
-				globals: functions);
-		} finally {
-			File.stdout = oldStdout;
-		}
-		replacementText = replacementText.string.rstrip();
-		if (startsWithSpace)
-			replacementText += "\n";
-		newText << replacementText;
-		prevOutputEnd = CURRENT_OUTPUT_END;
-		i = CURRENT_OUTPUT_END2;
-	}
-	newText << FILETEXT[prevOutputEnd:];
-	newText = newText.string;
-	if (newText != FILETEXT) {
-		print "Updating file:", repr filename;
-		local tempFilename = filename + ".new";
-		try fs.unlink(tempFilename); catch (...);
-		with (local newFp = File.open(tempFilename, "w"))
-			newFp.write(newText.encode("utf-8"));
-		try fs.unlink(filename); catch (...);
-		fs.rename(tempFilename, filename);
-	}
-}
 
-function doFile(filename: string) {
+function autom8AutoGenEvalBody(parser: Autom8Parser, body: string) {
+	local saved_stdout = File.stdout;
+	File.stdout = parser.newText;
 	try {
-		doFileImpl(filename);
-	} catch (e...) {
-		print File.stderr: "Failed to autogen file:", repr filename;
-		print File.stderr: repr e;
-		print File.stderr: repr Traceback.current;
+		exec(body, globals: AUTOGEN_FUNCTIONS);
+	} finally {
+		File.stdout = saved_stdout;
 	}
 }
 
-function main(argv: {string...}) {
-	for (local filename: argv) {
-		if ("*" in filename) {
-			local head = fs.headof(filename);
-			local tail = fs.tailof(filename);
-			if ("*" in tail) {
-				for (local f: fs.query(filename)) {
-					f = fs.joinpath(head, f);
-					if (fs.stat.isreg(f))
-						doFile(f);
-				}
-				continue;
-			}
-		}
-		doFile(filename);
-	}
+function main(parser: Autom8Parser, body: string) {
+	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
+	if (autoEnd < 0)
+		parser.errAt(parser.commentStart, "Missing /*[[[end]]]*/ tag");
+	parser.newText << parser.text[parser.flushStart:parser.commentEnd+2] << "\n";
+	parser.flushStart = autoEnd + 13;
+	if (!body.startswith(":"))
+		parser.errAt(parser.commentStart, "Expected ':' after `[[[autogen'");
+	FILETEXT = parser.text;
+	CURRENT_OUTPUT_END2 = parser.flushStart;
+	autom8AutoGenEvalBody(parser, body[1:].lstrip());
+	del CURRENT_OUTPUT_END2;
+	del FILETEXT;
+	parser.newText << "/*[[[end]]]*/";
 }
-
-main([...][1:]);
-
-
-
-
-
-

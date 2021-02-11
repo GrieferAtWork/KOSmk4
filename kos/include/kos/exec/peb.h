@@ -27,9 +27,9 @@
 
 #include <libc/string.h>
 
-/* Information about data passed by the kernel following an exec() system call.
+/* Information about data passed by the kernel following an exec() system  call.
  * These are the data structures and formats for information about where to find
- * argc+argv, as well as environ, in addition to specific information given to
+ * argc+argv, as well as environ, in  addition to specific information given  to
  * the dynamic linker program (even though in the case of KOS, the RTLD is hard-
  * coded as a simple one-segment application always loaded from kernel-memory) */
 

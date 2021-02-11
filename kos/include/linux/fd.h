@@ -29,7 +29,7 @@
 #include <asm/ioctl.h>
 
 /* Taken from /usr/include/linux/fd.h
- * This file is needed for busybox mkfs_vfat.c, but KOS doesn't (currently) implement
+ * This file is needed for busybox  mkfs_vfat.c, but KOS doesn't (currently)  implement
  * the command codes from this file (and probably never will because who the hell still
  * uses floppies in 2019?) */
 
@@ -73,7 +73,7 @@ struct floppy_max_errors {
 	__UINT32_TYPE__ read_track; /* maximal number of errors permitted to read an entire track at once */
 	__UINT32_TYPE__ reset;      /* maximal number of errors before a reset is tried */
 	__UINT32_TYPE__ recal;      /* maximal number of errors before a recalibrate is tried */
-	__UINT32_TYPE__ reporting;  /* Threshold for reporting FDC errors to the console.
+	__UINT32_TYPE__ reporting;  /* Threshold for reporting  FDC errors  to the  console.
 	                             * Setting this to zero may flood your screen when using
 	                             * ultra cheap floppies ;-) */
 };
@@ -82,7 +82,7 @@ typedef char floppy_drive_name[16];
 
 struct floppy_drive_params {
 	__INT8_TYPE__            cmos; /* CMOS type */
-	/* Spec2 is (HLD<<1 | ND), where HLD is head load time (1=2ms, 2=4 ms 
+	/* Spec2  is (HLD<<1 | ND), where HLD is head load time (1=2ms, 2=4 ms
 	 * etc) and ND is set means no DMA. Hardcoded to 6 (HLD=6ms, use DMA). */
 	__ULONGPTR_TYPE__        max_dtr;         /* Step rate, usec */
 	__ULONGPTR_TYPE__        hlt;             /* Head load/settle time, msec */
@@ -106,9 +106,9 @@ struct floppy_drive_params {
 #define FD_SILENT_DCL_CLEAR 0x4
 #define FD_INVERTED_DCL     0x80 /* must be 0x80, because of hardware considerations */
 	__UINT8_TYPE__ read_track; /* use readtrack during probing? */
-	/* Auto-detection. Each drive type has eight formats which are
+	/* Auto-detection.  Each   drive  type   has  eight   formats  which   are
 	 * used in succession to try to read the disk. If the FDC cannot lock onto
-	 * the disk, the next format is tried. This uses the variable 'probing'. */
+	 * the disk, the next format is  tried. This uses the variable  'probing'. */
 	__INT16_TYPE__ autodetect[8]; /* autodetected formats */
 	__INT32_TYPE__ checkfreq;     /* how often should the drive be checked for disk changes */
 	__INT32_TYPE__ native_format; /* native format of this drive */
@@ -141,7 +141,7 @@ struct floppy_drive_struct {
 	__INT16_TYPE__    maxtrack;   /* id of highest half track read */
 	__INT32_TYPE__    generation; /* how many diskchanges? */
 	__INT32_TYPE__    keep_data;  /* (User-provided) media information is _not_ discarded after a media change
-	                               * if the corresponding keep_data flag is non-zero. Positive values are
+	                               * if the  corresponding keep_data  flag is  non-zero. Positive  values  are
 	                               * decremented after each probe. */
 	__INT32_TYPE__    fd_ref;     /* Prevent "aliased" accesses. */
 	__INT32_TYPE__    fd_device;
@@ -170,26 +170,26 @@ struct floppy_fdc_state {
 	unsigned int      has_fifo : 1;
 	__UINT32_TYPE__   driver_version; /* version code for floppy driver */
 #define FD_DRIVER_VERSION 0x100
-	/* user programs using the floppy API should use floppy_fdc_state to
-	 * get the version number of the floppy driver that they are running
+	/* user programs using the floppy  API should use floppy_fdc_state  to
+	 * get the version number of the  floppy driver that they are  running
 	 * on. If this version number is bigger than the one compiled into the
-	 * user program (the FD_DRIVER_VERSION define), it should be prepared
+	 * user program (the FD_DRIVER_VERSION define), it should be  prepared
 	 * to bigger structures */
 	unsigned char     track[4];
-	/* Position of the heads of the 4 units attached to this FDC,
+	/* Position of the heads of the 4 units attached to this  FDC,
 	 * as stored on the FDC. In the future, the position as stored
-	 * on the FDC might not agree with the actual physical
+	 * on  the  FDC  might  not  agree  with  the  actual physical
 	 * position of these drive heads. By allowing such
 	 * disagreement, it will be possible to reset the FDC without
-	 * incurring the expensive cost of repositioning all heads.
+	 * incurring  the expensive cost  of repositioning all heads.
 	 * Right now, these positions are hard wired to 0. */
 };
 
 struct floppy_write_errors {
 	/* Write error logging.
-	 * These fields can be cleared with the FDWERRORCLR ioctl.
-	 * Only writes that were attempted but failed due to a physical media
-	 * error are logged.  write(2) calls that fail and return an error code
+	 * These  fields   can  be   cleared  with   the  FDWERRORCLR   ioctl.
+	 * Only writes that were attempted but failed due to a physical  media
+	 * error are logged. write(2) calls that fail and return an error code
 	 * to the user process are not counted. */
 	__UINT32_TYPE__   write_errors;       /* number of physical write errors encountered */
 	__ULONGPTR_TYPE__ first_error_sector; /* position of first and last write errors */

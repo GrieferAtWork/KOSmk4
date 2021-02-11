@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/kos/siginfo64.h>
- * 
+ *
  * Definitions:
  *    - struct __siginfox64_struct { ... };
  *    - #define __SIX64_MAX_SIZE ...

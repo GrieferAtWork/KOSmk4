@@ -25,7 +25,7 @@
 #endif /* __INTELLISENSE__ */
 
 /* 66 XX push16
- *    XX push32  (in 32-bit mode)
+ *    XX push32 (in 32-bit  mode)
  *    XX illegal (in 64-bit mode) */
 #if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
 #define EMU86_PUSH1632(T, value)                     \
@@ -151,8 +151,8 @@
 
 
 /* 66 XX push16
- *    XX push32  (in 32-bit mode)
- *    XX push64  (in 64-bit mode) */
+ *    XX push32 (in 32-bit mode)
+ *    XX push64 (in 64-bit mode) */
 #define EMU86_PUSH163264(value16, value32, value64)                    \
 	do {                                                               \
 		byte_t *sp;                                                    \
@@ -200,8 +200,8 @@
 	} __WHILE0
 
 /* [66] XX push64  (in 64-bit mode)
- *  66  XX push16  (outside 64-bit mode)
- *      XX push32  (outside 64-bit mode) */
+ *  66  XX push16 (outside 64-bit mode)
+ *      XX push32 (outside 64-bit mode) */
 #define EMU86_PUSH163264_FORCE64(value16, value32, value64)            \
 	do {                                                               \
 		byte_t *sp;                                                    \
@@ -246,8 +246,8 @@
 
 
 /* 66 XX pop16
- *    XX pop32  (in 32-bit mode)
- *    XX pop64  (in 64-bit mode) */
+ *    XX pop32 (in 32-bit mode)
+ *    XX pop64 (in 64-bit mode) */
 #define EMU86_POP163264(setter16, setter32, setter64)      \
 	do {                                                   \
 		byte_t *sp;                                        \

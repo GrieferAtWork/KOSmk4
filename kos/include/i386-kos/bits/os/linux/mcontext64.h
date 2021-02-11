@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/linux/mcontext64.h>
- * 
+ *
  * Definitions:
  *    - typedef ... __gregset_linux64_t;
  *    - typedef ... __fpregset_linux64_t;

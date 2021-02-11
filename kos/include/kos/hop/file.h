@@ -42,7 +42,7 @@ __DECL_BEGIN
 struct hop_file_cmpxchg_offset /*[PREFIX(cxo_)]*/ {
 	__uint32_t            cxo_struct_size;   /* [== sizeof(struct hop_file_cmpxchg_offset)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                          * this value is too small or doesn't match any recognized
+	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
 	__uint32_t          __cxo_pad1;          /* ... */
 	__uint64_t            cxo_expoffset;     /* [IN] The expected old file offset that must be matched

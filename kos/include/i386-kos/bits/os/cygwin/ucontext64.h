@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/cygwin/ucontext64.h>
- * 
+ *
  * Definitions:
  *    - struct __cygwin64_ucontext { ... };
  * #if defined(__CRT_CYG) && defined(__x86_64__)

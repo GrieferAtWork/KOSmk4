@@ -40,8 +40,8 @@
 
 /* NOTE: KOS doesn't actually make use of this header!
  *    >> It is only provided to define all the stuff glibc does,
- *       allowing the KOS toolchain the potential of compiling
- *       applications that may rely on this non-standard header
+ *       allowing  the KOS toolchain  the potential of compiling
+ *       applications  that may rely on this non-standard header
  *       and its contents. */
 
 #ifdef __GNUC__
@@ -548,9 +548,9 @@
 
 
 /* On GLibc, this header unconditionally #includes <bits/wordsize.h>,
- * which defines a bunch of arch-specific configuration helpers.
+ * which  defines  a  bunch of  arch-specific  configuration helpers.
  * Since programs might therefor expect <sys/cdefs.h> to define those
- * same macros on other platforms, emulate macros from that header
+ * same macros on  other platforms, emulate  macros from that  header
  * here, since KOS doesn't have <bits/wordsize.h> (any more) */
 
 /* __WORDSIZE = __SIZEOF_POINTER__ * __CHAR_BIT__ */

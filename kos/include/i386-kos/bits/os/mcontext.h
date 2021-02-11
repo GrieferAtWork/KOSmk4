@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/mcontext.h>
- * 
+ *
  * Definitions:
  *    - struct mcontext { ... };
  */

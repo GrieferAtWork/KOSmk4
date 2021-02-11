@@ -29,8 +29,8 @@
 
 
 /* NOTE: KOS's lfutex() and linux's futex() system calls can be used interchangably.
- *       However, note that lfutex() operates on `uintptr_t', while linux operates
- *       on `int', meaning that associated data type sizes may differ on certain
+ *       However, note that lfutex() operates  on `uintptr_t', while linux  operates
+ *       on  `int', meaning  that associated data  type sizes may  differ on certain
  *       architectures. */
 
 
@@ -85,7 +85,7 @@
 #undef list_op_pending
 
 /* Per-lock list entry - embedded in user-space locks, somewhere close
- * to the futex field. (Note: user-space uses a double-linked list to
+ * to  the futex field. (Note: user-space uses a double-linked list to
  * achieve O(1) list add and remove, but the kernel only needs to know
  * about the forward link)
  * NOTE: this structure is part of the syscall ABI, and must not be changed. */
@@ -94,26 +94,26 @@ struct robust_list {
 };
 
 /* Per-thread list head:
- * NOTE: this structure is part of the syscall ABI, and must only be
- * changed if the change is first communicated with the glibc folks.
+ * NOTE: this structure is part of the syscall ABI, and must only  be
+ * changed  if the change is first communicated with the glibc folks.
  * (When an incompatible change is done, we'll increase the structure
  *  size, which glibc will detect) */
 struct robust_list_head {
 	/* The head of the list. Points back to itself if empty: */
 	struct robust_list  list;
-	/* This relative offset is set by user-space, it gives the kernel
-	 * the relative position of the futex field to examine. This way
+	/* This  relative offset is set by user-space, it gives the kernel
+	 * the relative position of the  futex field to examine. This  way
 	 * we keep userspace flexible, to freely shape its data-structure,
 	 * without hardcoding any particular offset into the kernel: */
 	__LONGPTR_TYPE__    futex_offset;
-	/* The death of the thread may race with userspace setting
+	/* The death of  the thread may  race with userspace  setting
 	 * up a lock's links. So to handle this race, userspace first
-	 * sets this field to the address of the to-be-taken lock,
-	 * then does the lock acquire, and then adds itself to the
-	 * list, and then clears this field. Hence the kernel will
-	 * always have full knowledge of all locks that the thread
-	 * _might_ have taken. We check the owner TID in any case,
-	 * so only truly owned locks will be handled. 	 */
+	 * sets this field  to the address  of the to-be-taken  lock,
+	 * then  does the lock  acquire, and then  adds itself to the
+	 * list, and then  clears this field.  Hence the kernel  will
+	 * always have full  knowledge of all  locks that the  thread
+	 * _might_  have taken. We  check the owner  TID in any case,
+	 * so only truly owned locks will be handled. */
 	struct robust_list *list_op_pending;
 };
 
@@ -129,8 +129,8 @@ struct robust_list_head {
 
 #define FUTEX_WAITERS          0x80000000 /* Are there any waiters for this robust futex */
 #define FUTEX_OWNER_DIED       0x40000000 /* The kernel signals via this bit that a thread holding a futex
-                                           * has exited without unlocking the futex. The kernel also does
-                                           * a FUTEX_WAKE on such futexes, after setting the bit, to wake
+                                           * has exited without unlocking the futex. The kernel also  does
+                                           * a  FUTEX_WAKE on such futexes, after setting the bit, to wake
                                            * up any possible waiters */
 #define FUTEX_TID_MASK         0x3fffffff /* The rest of the robust-futex field is for the TID */
 #define ROBUST_LIST_LIMIT      2048       /* This limit protects against a deliberately circular list.
@@ -154,7 +154,7 @@ struct robust_list_head {
  * >> int oldval = *(int *)UADDR2;
  * >> *(int *)UADDR2 = oldval OP OPARG;
  * >> if (oldval CMP CMPARG)
- * >>     wake UADDR2;  */
+ * >>     wake UADDR2; */
 #define FUTEX_OP(op, oparg, cmp, cmparg)        \
 	(((op & 0xf) << 28) | ((cmp & 0xf) << 24) | \
 	 ((oparg & 0xfff) << 12) | (cmparg & 0xfff))

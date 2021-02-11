@@ -22,7 +22,7 @@
 
 /* File:
  *    <i386-kos/bits/os/cygwin/mcontext64.h>
- * 
+ *
  * Definitions:
  *    - struct __cygwin64_mcontext { ... };
  * #if defined(__CRT_CYG) && (!defined(__x86_64__) && defined(__i386__))
