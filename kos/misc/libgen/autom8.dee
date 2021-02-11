@@ -161,13 +161,19 @@ function containsUnevenSpaces(l: string): bool {
 		if (l.isspace(i)) {
 			if (i > flushStart)
 				isFirst = false;
+			local n = 1;
 			for (;;) {
 				++i;
 				if (i >= lineLen)
 					break;
 				if (!l.isspace(i))
 					break;
+				++n;
 			}
+			if (minSpaceCount > n)
+				minSpaceCount = n;
+			if (maxSpaceCount < n)
+				maxSpaceCount = n;
 			flushStart = i;
 		} else {
 			local ch = l[i];
