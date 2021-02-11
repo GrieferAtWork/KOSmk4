@@ -40,7 +40,7 @@
 //    Alias for: "/* autom8 reflow-comments on */"
 
 #undef HAVE_DEBUG_PRINT
-#if 1
+#if 0
 #define HAVE_DEBUG_PRINT
 #endif
 
@@ -154,50 +154,60 @@ function containsUnevenSpaces(l: string): bool {
 	local minSpaceCount = int.SIZE_MAX;
 	local maxSpaceCount = 0;
 	l = l.strip();
-	local i = 0, len = #l;
-	while (i < len) {
+	local i = 0, flushStart = 0;
+	local lineLen = #l;
+	local isFirst = true;
+	while (i < lineLen) {
 		if (l.isspace(i)) {
-			local n = 1;
+			if (i > flushStart)
+				isFirst = false;
 			for (;;) {
 				++i;
-				if (i >= len)
+				if (i >= lineLen)
 					break;
 				if (!l.isspace(i))
 					break;
-				++n;
 			}
-			if (minSpaceCount > n)
-				minSpaceCount = n;
-			if (maxSpaceCount < n)
-				maxSpaceCount = n;
-		} else if (l[i] == "`") {
-			/* Special case: Don't re-flow spaces within inline code comments. */
-			local e = l.find("'", i);
-			if (e < 0)
-				e = l.find("`", i);
-			if (e >= 0) {
-				i = e + 1;
-			} else {
-				++i;
-			}
-		} else if (l[i] == '"') {
-			/* Special case: Don't re-flow quoted text. */
-			local e = l.find('"', i + 1);
-			if (e >= 0) {
-				i = e + 1;
-			} else {
-				++i;
-			}
-		} else if (l[i] == "[") {
-			/* Special case: Don't re-flow syntax annotatinos. */
-			local e = l.findmatch("[", "]", i + 1);
-			if (e >= 0)
-				i = e + 1;
-			else {
-				++i;
-			}
+			flushStart = i;
 		} else {
-			++i;
+			local ch = l[i];
+			if (ch == "`") {
+				/* Special case: Don't re-flow spaces within inline code comments. */
+				local e = l.find("'", i);
+				if (e < 0)
+					e = l.find("`", i);
+				if (e >= 0) {
+					i = e + 1;
+				} else {
+					++i;
+				}
+			} else if (ch == '"') {
+				/* Special case: Don't re-flow quoted text. */
+				local e = l.find('"', i + 1);
+				if (e >= 0) {
+					i = e + 1;
+				} else {
+					++i;
+				}
+			} else if (ch == "[") {
+				/* Special case: Don't re-flow syntax annotatinos. */
+				local e = l.findmatch("[", "]", i + 1);
+				if (e >= 0)
+					i = e + 1;
+				else {
+					++i;
+				}
+			} else if (ch == "-" && isFirst) {
+				++i;
+				while (i < lineLen && l.isspace(i))
+					++i;
+			} else if (ch == ":" && isFirst && i > 0 && l.issymcont(i-1)) {
+				++i;
+				while (i < lineLen && l.isspace(i))
+					++i;
+			} else {
+				++i;
+			}
 		}
 	}
 	return (maxSpaceCount - minSpaceCount) >= 2;
@@ -248,7 +258,6 @@ function splitWords(l: string): {string...} {
 				while (i < lineLen && l.isspace(i))
 					++i;
 			} else if (ch == ":" && isFirst && i > 0 && l.issymcont(i-1)) {
-				print "HERE";
 				++i;
 				while (i < lineLen && l.isspace(i))
 					++i;

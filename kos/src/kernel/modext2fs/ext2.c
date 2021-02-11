@@ -538,7 +538,7 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
        *        symlink data that was small enough within the INode itself.             \
        *        Although sources state that prior to this data was written in actual    \
        *        blocks, what isn't stated is anything about how to differentiate        \
-       *        these two cases other than the link size (which is ambiguous for small
+       *        these two cases other than the link size (which is ambiguous for small  \
        *        links). */
 		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4 &&
 		    node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->sd_total_blocks)

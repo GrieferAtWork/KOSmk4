@@ -166,7 +166,7 @@ struct uhci_interrupt: usb_interrupt {
  *     changed, or that a USB device caused an interrupt (which I assume includes stuff like you
  *     pressing a key on a USB keyboard, but definitely includes device attach/detach)
  *  -> This is then handled by setting the `UHCI_CONTROLLER_FLAG_RESDECT' flag below, and broadcasting
- *     the `uc_resdec' signal, waking up the `uhci_powerctl_cb' and causing it to clear the 
+ *     the `uc_resdec' signal, waking up the `uhci_powerctl_cb' and causing it to clear the
  *     `UHCI_USBCMD_EGSM' flag (which by the way is kept in sync with `UHCI_CONTROLLER_FLAG_SUSPENDED'),
  *     before enumerating the root hub ports (`UHCI_PORTSC(0 ... uc_portnum - 1)') and checking each
  *     of them for the `UHCI_PORTSC_CSC' flag.
@@ -205,7 +205,7 @@ struct uhci_controller: usb_controller {
 	alignas(UHCI_FLE_ALIGN)
 	struct uhci_osqh           uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to
 	                                               * optional isochronous, and eventually to this one) Afterwards, all entires point to
-	                                               * this one, allowing one-time transfer descriptors  to be scheduled following after
+	                                               * this one, allowing one-time transfer descriptors to be scheduled following after
 	                                               * this queue.
 	                                               * NOTE: The hardware pointer of the last queue head always points back
 	                                               *       to `uc_qhstart', or `uc_intreg' if that is non-NULL.
