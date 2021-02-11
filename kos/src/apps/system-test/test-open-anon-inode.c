@@ -89,7 +89,7 @@ DEFINE_TEST(open_anon_inode) {
 
 	/* First  test: When using one of the  fd/xxx files as part of a
 	 * path expression, the symlink must still be followed normally,
-	 * and the expression would have to  behave more like a call  to
+	 * and the expression would have to behave more like a call to
 	 * openat():
 	 * >> open("/proc/self/fd/{dfd}/{path}", oflags);
 	 * Same as:

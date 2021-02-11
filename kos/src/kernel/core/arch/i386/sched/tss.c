@@ -273,7 +273,7 @@ NOTHROW(KCALL get_stack_avail)(void) {
 	}
 	if likely(sp >= start && sp < end)
 		return (size_t)((byte_t *)sp - (byte_t *)start);
-	/* FIXME: This is an ugly work-around for when the kernel is
+	/* FIXME: This  is  an ugly  work-around  for when  the  kernel is
 	 *        running from a custom stack, such as the debugger stack,
 	 *        or the stack defined by the GDB server driver. */
 	return 8096;
@@ -328,7 +328,7 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
 		*pend  = end;
 		return;
 	}
-	/* FIXME: This is an ugly work-around for when the kernel is
+	/* FIXME: This  is  an ugly  work-around  for when  the  kernel is
 	 *        running from a custom stack, such as the debugger stack,
 	 *        or the stack defined by the GDB server driver. */
 	*pbase = (void *)(FLOOR_ALIGN((uintptr_t)sp, PAGESIZE) - PAGESIZE);

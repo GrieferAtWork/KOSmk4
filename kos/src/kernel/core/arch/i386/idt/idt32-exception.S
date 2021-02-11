@@ -142,10 +142,10 @@ IDT_HANDLER_BEGIN
 	.cfi_def_cfa %esp, 0
 #endif /* !IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
-	/* Encode instructions as explicit bytes so it's clear that the
-	 * following sequence of instructions is exactly 5 bytes long.
+	/* Encode instructions as explicit bytes  so it's clear that  the
+	 * following sequence of  instructions is exactly  5 bytes  long.
 	 * This is important for code that injects interrupt redirection,
-	 * which requires exactly 5 bytes of instructions (E9h, DISP32) */
+	 * which requires exactly 5  bytes of instructions (E9h,  DISP32) */
 	.byte 0x1e /* pushl %ds */
 	.cfi_adjust_cfa_offset 4
 	.cfi_restore_iret_ds_or_offset -4

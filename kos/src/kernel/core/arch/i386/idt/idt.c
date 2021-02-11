@@ -156,15 +156,15 @@ NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
 }
 #endif /* !CONFIG_NO_SMP */
 
-/* Set the IDT base pointer currently in use on all CPUs.
+/* Set   the  IDT  base  pointer  currently  in  use  on  all  CPUs.
  * This function only returns once all CPUs have updated their IDTs. */
 PRIVATE ATTR_COLDTEXT NOBLOCK void
 NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
-	/* TODO: When a CPU goes into deep-sleep, we must save, and
+	/* TODO: When a CPU goes into deep-sleep, we must save,  and
 	 *       during the next wake-up, restore, the current IDTR!
-	 * NOTE: The same also goes for the GDTR, LDTR and TR, all of
+	 * NOTE: The same also goes for the GDTR, LDTR and TR, all  of
 	 *       which should really be saved in some PERCPU variables
-	 *       whenever a CPU goes into deep sleep, and be restored
+	 *       whenever a CPU goes into deep sleep, and be  restored
 	 *       whenever the CPU comes back to live!
 	 * NOTE: Possibly, we could even go so far as-to save CRn registers.
 	 * Also: Check if we're actually restoring DRn registers, as already
@@ -182,11 +182,11 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 		void *args[CPU_IPI_ARGCOUNT];
 		ATOMIC_WRITE(x86_idt_setcurrent_ack, 0);
 		args[0] = (void *)ptr;
-		/* NOTE: We always set the `CPU_IPI_FWAKEUP' flag, even though doing
+		/* NOTE: We always set the `CPU_IPI_FWAKEUP' flag, even though  doing
 		 *       so is kind-of excessive, simply because we don't want to run
-		 *       any risk of not being able to reach some specific CPU when
-		 *       that CPU is currently waking up, or has gone to sleep after
-		 *       having received a previous IDT override request, with the
+		 *       any risk of not being able  to reach some specific CPU  when
+		 *       that CPU is currently waking up, or has gone to sleep  after
+		 *       having received a  previous IDT override  request, with  the
 		 *       current invocation of `x86_idt_setcurrent()' relating to the
 		 *       old (original) IDT base address being restored. */
 		count = cpu_broadcastipi_notthis(&x86_idt_setcurrent_ipi, args,
@@ -207,10 +207,10 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 
 /* Start modifying `x86_idt'
  * This function must be called prior to making modifications to `x86_idt'.
- * Doing this is required to prevent other CPUs/threads from servicing
- * interrupts with IDT segments that aren't fully initialized.
- * As such, any modifications made to `x86_idt' after this function
- * is called will only come into effect once `x86_idt_modify_end()' is
+ * Doing this  is required  to prevent  other CPUs/threads  from  servicing
+ * interrupts   with   IDT   segments   that   aren't   fully  initialized.
+ * As  such,  any  modifications  made  to  `x86_idt'  after  this function
+ * is called  will only  come into  effect once  `x86_idt_modify_end()'  is
  * called. These functions are implemented as:
  *   x86_idt_modify_begin():
  *     - Acquire an internal mutex
@@ -222,14 +222,14 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
  *     - Broadcast an IPI, telling all CPUs to `lidt(&x86_idt_ptr)'
  *     - Free the internal copy previously allocated by `x86_idt_modify_begin()'
  *     - Release the internal mutex
- * Using this method, changes can be staged for eventual use in `x86_idt',
+ * Using this method, changes can be staged for eventual use in  `x86_idt',
  * without running the risk of any CPU/thread ever accessing an incomplete/
  * corrupt IDT entry.
- * When calling `x86_idt_modify_end()', the caller is responsible to ensure
+ * When calling  `x86_idt_modify_end()', the  caller is  responsible to  ensure
  * that the call was preceded by `x86_idt_modify_begin()', as well as to ensure
- * that any call to `x86_idt_modify_begin()' is eventually followed by another
+ * that any call to `x86_idt_modify_begin()' is eventually followed by  another
  * call to `x86_idt_modify_end()'
- * Also note that these functions must not be called recursively from the same
+ * Also note that these  functions must not be  called recursively from the  same
  * thread. - A call to `x86_idt_modify_begin()' must _NOT_ be followed by another
  * call to `x86_idt_modify_begin()' from the same thread!
  * @param: nx:     When true, don't do anything that could throw an exception, or block.

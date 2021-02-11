@@ -27,19 +27,19 @@ import * from threading;
 /* When a process (inferior) exits under GDB, the related MI-event send to visual
  * studio isn't parsed properly.
  * Essentially, the event says `Inferior #<ID> exited normally/with-error/with-signal',
- * and Visual Studio doesn't quite get it right by forgetting that there can be more
- * than one process attached to GDB. So what it ends up doing is terminating GDB after
- * failing to parse the <ID> part of the event, thinking that any such event indicates
- * that the primary program has exited (ugh... This is the second time that I've run
- * into a debugging issue caused by VS not quite getting it right...)
+ * and Visual Studio doesn't quite  get it right by forgetting  that there can be  more
+ * than  one process attached to GDB. So what it ends up doing is terminating GDB after
+ * failing  to parse the <ID> part of the event, thinking that any such event indicates
+ * that the primary program has  exited (ugh... This is the  second time that I've  run
+ * into   a   debugging  issue   caused   by  VS   not   quite  getting   it  right...)
  * Anyways...
  * This script and the associated gdbridge.exe program fixes this issue:
- *       A small pipe-wrapper program for `gdb.exe --interpreter=mi' that simply forwards
- *       all input/output to the real gdb, but scans the data stream from gdb->vs for
- *       `Inferior [...] exited [...]' events, then discarding them such that VS never
+ *       A small  pipe-wrapper program  for `gdb.exe --interpreter=mi'  that simply  forwards
+ *       all input/output  to the  real  gdb, but  scans the  data  stream from  gdb->vs  for
+ *       `Inferior [...] exited [...]' events,  then  discarding  them  such  that  VS  never
  *       gets to seem them. Any such event is then followed by an `-exec-continue --thread 1'
- *       command send to GDB (since for whatever reason, GDB thinks it to be a good idea to
- *       stop execution whenever a process exits, and not even give you a configuration
+ *       command send to GDB (since for whatever reason,  GDB thinks it to be a good idea  to
+ *       stop execution  whenever a  process exits,  and not  even give  you a  configuration
  *       toggle to change this fact)
  */
 
@@ -114,7 +114,7 @@ try {
 	local token = 0x7fffffff;
 	for (local l: our) {
 		/* Visual Studio doesn't understand `target-stream-output'
-		 * However, it _does_ understand `console-stream-output',
+		 * However, it _does_ understand  `console-stream-output',
 		 * so redirect these streams! */
 		if (l.startswith("@\"") && l.endswith("\"\n")) {
 			print log: ("< ", l),;
@@ -147,8 +147,3 @@ try {
 } finally {
 	try gdb.terminate(); catch (...);
 }
-
-
-
-
-

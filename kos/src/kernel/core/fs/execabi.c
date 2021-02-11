@@ -98,7 +98,7 @@ NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self) {
 
 
 
-/* Register a given exec-ABI. Note that the only way to unregister
+/* Register  a given exec-ABI. Note that the only way to unregister
  * an ABI is to unload the associated driver (in which case the ABI
  * is automatically unregistered)
  * @return: true:  Successfully registered the given `abi'.

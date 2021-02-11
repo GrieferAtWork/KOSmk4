@@ -30,9 +30,9 @@ local copyright =
  *   - /kos/src/libc/auto/string.c
  *   - /kos/src/libc/user/string.h
  *
- * Using this, KOS is able provide an extremely versatile libc integration, as well as
- * substitue any missing functionality via local implementations of any function which
- * may be used by any piece of code (this isn't even bound to KOS, as KOS's headers
+ * Using  this, KOS is able provide an extremely versatile libc integration, as well as
+ * substitue  any missing functionality via local implementations of any function which
+ * may be used by  any piece of code  (this isn't even bound  to KOS, as KOS's  headers
  * should be usable with any kind of CRT, so-long as that CRT provides a features File)
  */
 
@@ -207,8 +207,8 @@ function key_crt_have_is_extended(x: string): bool {
 
 function key_asmname(x: string): bool {
 	/* Extended symbol names need to be wrapped in "...", in order
-	 * to get GAS to interpret the symbol as beginning with `?'.
-	 * If we didn't do this, we'd get an assembler error stating
+	 * to get GAS to interpret  the symbol as beginning with  `?'.
+	 * If we didn't do this,  we'd get an assembler error  stating
 	 * that an unrecognized character `?' was encountered. */
 	if (key_crt_have_is_extended(x))
 		return "\"{}\"".format({ x });
@@ -220,11 +220,11 @@ function key_crt_have(x: string): string {
 	all_crt_features.insert(x);
 	if (key_crt_have_is_extended(x)) {
 		/* Need to require __KOS__ to ensure that ld knows of the
-		 * extension where a symbol starting with `?' mustn't be
-		 * considered as a symver-like symbol, but instead as a
+		 * extension where a symbol starting with `?' mustn't  be
+		 * considered as a symver-like  symbol, but instead as  a
 		 * regular, old symbol.
-		 * Also need `!__NO_ASMNAME', since linking against such
-		 * a symbol is only possible when using `__ASMNAME()', since
+		 * Also need  `!__NO_ASMNAME',  since  linking  against  such
+		 * a symbol is only possible when using `__ASMNAME()',  since
 		 * a symbol such as this contains characters that are invalid
 		 * when used inside of a c-like symbol name. */
 		return "defined(__KOS__) && !defined(__NO_ASMNAME) && "
@@ -2855,7 +2855,7 @@ again_enum_name:
 					}
 					break;
 					/* CP for stdio (because of libio, custom FILE cookies may throw exceptions)
-					 * Used for functions that are already CP in their syscall form. */
+					 * Used  for  functions  that  are   already  CP  in  their  syscall   form. */
 				case "cp_stdio":
 					/* STDIO functions that may throw because of custom FILE cookies. */
 				case "stdio_throws":
@@ -3216,9 +3216,9 @@ again_enum_name:
 					break;
 				case "ATTR_MCONST":
 					/* ATTR_CONST for math functions:
-					 *   - The return value of these functions is constant, however
+					 *   - The return value of  these functions is constant,  however
 					 *     for specific input values `errno' may be modified, meaning
-					 *     that the function can have side-effects other than the
+					 *     that the  function can  have side-effects  other than  the
 					 *     return value.
 					 *     For now, this TAG is simply ignored and doesn't cause any
 					 *     code to be generated. */
@@ -3974,7 +3974,7 @@ got_chk_checkexpr:
 			if (userimpl_if_requires)
 				userimpl_if_requires_functions.append(fun);
 			if ((doc is string && !doc) && function_throws_anno) {
-				/* Auto-generate one documentation line for every
+				/* Auto-generate  one  documentation   line  for   every
 				 * type of exception which may be thrown by the function */
 				File.Writer throws_anno;
 				for (local x: function_throws_anno)
@@ -5479,8 +5479,8 @@ do_return_crt:
 			fp << key_attr_source(at);
 		}
 		/* Auto implementations are defined weakly, each in its own section.
-		 * That way, the linker can simply remove unused sections when the
-		 * function has been overwritten by an arch-specific / better
+		 * That way, the linker can  simply remove unused sections when  the
+		 * function has  been  overwritten  by  an  arch-specific  /  better
 		 * implementation! */
 		if (has_attributes) fp << "\n";
 		fp << "ATTR_WEAK ATTR_SECTION(\"{}.".format({
@@ -5625,8 +5625,8 @@ do_return_crt:
 			fp << key_attr_source(at);
 		}
 		/* Auto implementations are defined weakly, each in its own section.
-		 * That way, the linker can simply remove unused sections when the
-		 * function has been overwritten by an arch-specific / better
+		 * That way, the linker can  simply remove unused sections when  the
+		 * function has  been  overwritten  by  an  arch-specific  /  better
 		 * implementation! */
 		if (has_attributes) fp << "\n";
 		fp << "ATTR_WEAK ATTR_SECTION(\"{}.".format({
@@ -7718,10 +7718,10 @@ function write_std_header(fp, comnam, funcs) {
 			"include/" + headerName, cppGuard, guard_name);
 		fp << "#ifdef " << cStdOnlyDefinedGuard << "\n";
 		/* Only std:: symbols have been defined.
-		 * If we're included from a c++ header, don't do anything.
+		 * If we're  included  from  a c++  header,  don't  do  anything.
 		 * Otherwise, export all std:: symbols into the global namespace. */
 		fp << "#ifdef __CXX_SYSTEM_HEADER\n";
-		/* Make sure our header can be re-#included as <headerName>
+		/* Make sure  our header  can  be re-#included  as  <headerName>
 		 * at which point all symbols that are currently std::-only will
 		 * appear in the global namespace. */
 		fp << "#undef " << guard_name << " /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */\n";
@@ -7888,11 +7888,11 @@ function write_std_header(fp, comnam, funcs) {
 	}
 	if (ccompat !is none) {
 		fp << "#ifdef __CXX_SYSTEM_HEADER\n";
-		/* Allow our header to be re-included in the future in order
+		/* Allow our header  to be  re-included in the  future in  order
 		 * to export all of our std:: symbols into the global namespace.
-		 * In order for this to happen, the #include-site simply has to
-		 * make sure that `__CXX_SYSTEM_HEADER' isn't defined. If we're
-		 * included while it is still defined, that inclusion will be
+		 * In  order for this to happen, the #include-site simply has to
+		 * make  sure that `__CXX_SYSTEM_HEADER' isn't defined. If we're
+		 * included while it  is still defined,  that inclusion will  be
 		 * a no-op! */
 		fp << "#define " << ccompat[2] << " 1\n";
 		fp << "#undef " << guard_name << "\n";

@@ -612,7 +612,7 @@ NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
  *                       undefined(out(data));        (If a `data' argument is present)
  *   - return == false:  mpart_lock_release(self);
  *   - EXCEPT:           mpart_lock_release(self);
- *********************************************************************** */
+ ************************************************************************/
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
@@ -806,9 +806,9 @@ mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
 
 
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
- * NOTE: The caller is responsible to ensure that mem-part is in a state
+ * NOTE: The  caller is responsible  to ensure that mem-part  is in a state
  *       where the bitset is valid (iow: `MPART_ST_HASST(self->mp_state)'),
- *       and   that    `partrel_block_index'    is    located    in-bounds.
+ *       and that `partrel_block_index' is located in-bounds.
  * NOTE: The caller must be holding a lock to `self', unless the intend is to
  *       change the state of a  block that used to be  `MPART_BLOCK_ST_INIT',
  *       in which case `mpart_setblockstate()' may be called without  holding
@@ -840,7 +840,7 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
  * this function immediately returns `false'.
  * Otherwise, all blocks of the part are searched, and if one is found that
  * uses the `MPART_BLOCK_ST_INIT'  state, return  `true'. Otherwise,  clear
- * the    `MPART_F_MAYBE_BLK_INIT'     flag     and     return     `false'.
+ * the `MPART_F_MAYBE_BLK_INIT' flag and return `false'.
  * NOTE: The caller must be holding a lock to `self' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self);
@@ -889,9 +889,9 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
  * required  to  not   have  a  state   set  to   `MPART_BLOCK_ST_INIT'.
  *
  * @return: true:  Success
- * @return: false: Error: At least one fully accessed block has a  state
- *                        that is `MPART_BLOCK_ST_INIT', or at least one
- *                        of the 0-2 border blocks has  a state that is  one
+ * @return: false: Error: At least  one fully  accessed  block has  a  state
+ *                        that  is  `MPART_BLOCK_ST_INIT', or  at  least one
+ *                        of the 0-2 border blocks  has a state that is  one
  *                        of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
@@ -945,12 +945,12 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...);
 
-/* Directly  return  physical  backing  memory  containing  the  byte  `partrel_offset',
- * without  looking  at the  associated block-state  at all.  The caller  is responsible
- * to   ensure  that  `MPART_ST_INMEM(self->mp_state)'  before  calling  this  function.
+/* Directly return physical backing  memory containing the byte  `partrel_offset',
+ * without looking at the associated block-state at all. The caller is responsible
+ * to ensure that `MPART_ST_INMEM(self->mp_state)' before calling this function.
  * NOTE: The caller must be holding a lock to `self' (which is allowed to be a DMA lock)
  * NOTE: This function may also assume that at least the first byte (that
- *       is: the byte described by `partrel_offset') is in-bounds of  the
+ *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,

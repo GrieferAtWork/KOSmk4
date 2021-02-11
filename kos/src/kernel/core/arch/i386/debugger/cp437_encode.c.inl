@@ -215,7 +215,7 @@ for (local i,x: util.enumerate(l)) {
 
 /* Encode the given unicode character `ch' using cp437 (the codepage
  * used by VGA) If the character can't be encoded, return 0 instead.
- * s.a.: https://en.wikipedia.org/wiki/Code_page_437  */
+ * s.a.: https://en.wikipedia.org/wiki/Code_page_437 */
 LOCAL ATTR_COLDTEXT u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 	u8 result;
 	if (ch <= 0xff) {

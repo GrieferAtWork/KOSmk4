@@ -63,10 +63,10 @@
 
 
 /* Emulate the execution of a system call.
- * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
- *       will reset the kernel-space stack to `state', and immediately return
+ * NOTE: `syscall_emulate_r()'   is  the  same  as  `syscall_emulate()',  however
+ *       will  reset the  kernel-space stack  to `state',  and immediately return
  *       to userspace after the system call has returned (or unwind any exception
- *       that was thrown by the system call, also dealing with the possibility
+ *       that  was thrown by  the system call, also  dealing with the possibility
  *       of RPC function handling, as well as system call restarting) */
 
 
@@ -90,7 +90,7 @@ END(x86_syscall_emulate_traced_r)
 
 PUBLIC_FUNCTION(syscall_emulate_r)
 	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
-	/* Start by copying `sc_info' (%rsi) just infront of `state' (%rdi)
+	/* Start by copying `sc_info' (%rsi)  just infront of `state'  (%rdi)
 	 * Note that that sc_info may already be overlapping with said target
 	 * area, meaning that we have to use memmove() semantics copying data
 	 * from the top down to the bottom */
@@ -104,9 +104,9 @@ PUBLIC_FUNCTION(syscall_emulate_r)
 
 	/* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
 INTERN_OBJECT(x86_syscall_emulate_r_redirection)
-	/* When system calls are being traced, this `rep; movsq' is re-written as
-	 * `jmp8 x86_syscall_emulate_traced_r'. Note that in this case, the entry
-	 * point of `x86_syscall_emulate_traced_r' will do the missed `rep; movsq'
+	/* When system  calls  are  being  traced, this  `rep; movsq'  is  re-written  as
+	 * `jmp8 x86_syscall_emulate_traced_r'.   Note  that  in  this  case,  the  entry
+	 * point  of  `x86_syscall_emulate_traced_r'  will  do  the  missed  `rep; movsq'
 	 * before performing tracing and returning to `.Lsyscall_emulate_r_after_tracing' */
 	.byte  0xf3 /* rep */
 	.byte  0x48 /* REX.W */
@@ -121,10 +121,10 @@ END(x86_syscall_emulate_r_redirection)
 .Lsyscall_emulate_r_after_tracing:
 
 	/* At this point, our stack looks like this:
-	 * %rbx = %rsp
-	 * 0(%rsp):                                                 struct rpc_syscall_info sc_info;
-	 * SIZEOF_RPC_SYSCALL_INFO(%rsp):                           struct icpustate state;
-	 * SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%rsp): <END-OF-STACK> */
+	 * >> %rbx = %rsp
+	 * >> 0(%rsp):                                                 struct rpc_syscall_info sc_info;
+	 * >> SIZEOF_RPC_SYSCALL_INFO(%rsp):                           struct icpustate state;
+	 * >> SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%rsp): <END-OF-STACK> */
 
 	/* Check if this a 32-bit or 64-bit system call. */
 	movw   (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rbx), %ax

@@ -30,6 +30,7 @@
 #include <kernel/isr.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
@@ -73,7 +74,7 @@ struct hisr {
 };
 
 /* Try to acquire a reference to the pointed-to object, or return
- * NULL if the pointed-to object had already been destroyed. */
+ * NULL if  the pointed-to  object  had already  been  destroyed. */
 LOCAL NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) REF void *KCALL
 NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
 	REF void *obj;
@@ -247,13 +248,13 @@ NOTHROW(KCALL isr_vector_state_remove_noop_hisr)(struct isr_vector_state *__rest
 			continue;
 		}
 		/* Found a dead HISR handler that should get removed!
-		 * NOTE: As far as the actual destruction of the associated callback,
+		 * NOTE: As far as the actual  destruction of the associated  callback,
 		 *       that job falls to our caller, as this can only be done _after_
 		 *       the new ISR vector has been installed (in order to ensure that
 		 *       an installed vector is always in a consistent state) */
 remove_dead_hisr_at_i:
 		assert(self->ivs_handv[i].ivh_drv == &drv_self);
-		/* The caller also has a reference to this, and ontop of that, this is our own
+		/* The  caller also has a reference to this, and ontop of that, this is our own
 		 * driver, so anyone calling into us also has to have some kind of refernece to
 		 * keep this driver from being unloaded! */
 		decref_nokill(self->ivs_handv[i].ivh_drv);
@@ -273,7 +274,7 @@ remove_dead_hisr_at_i:
 			}
 			goto remove_dead_hisr_at_i;
 		}
-		/* Since some handlers got removed, try to truncate the
+		/* Since some  handlers got  removed, try  to truncate  the
 		 * ISR vector heap block to release unused trailing memory. */
 		{
 			struct heapptr shrunked_vector;
@@ -306,7 +307,7 @@ NOTHROW(KCALL isr_vector_state_cleanup_noop_hisr)(struct isr_vector_state *__res
 #endif /* !NDEBUG */
                                                   ) {
 	/* Try to finalize the old greedy callback (in case we've overwritten it after
-	 * a prior call to `hisr_unregister_impl()' failed to replace the ISR vector) */
+	 * a  prior call to `hisr_unregister_impl()' failed to replace the ISR vector) */
 	if (hisr_iswrapper(old_state->ivs_greedy_fun) &&
 	    (new_state->ivs_greedy_fun != old_state->ivs_greedy_fun ||
 	     new_state->ivs_greedy_arg != old_state->ivs_greedy_arg)) {
@@ -352,7 +353,7 @@ NOTHROW(KCALL isr_vector_state_cleanup_noop_hisr)(struct isr_vector_state *__res
 				continue;
 			}
 			/* The handler from `old_state->ivs_handv[oi]' was removed!
-			 * The only reason this might happen is if that handler is
+			 * The  only reason this might happen is if that handler is
 			 * a dead HISR callback, in which case we must destroy it. */
 			assert(old_state->ivs_handv[oi].ivh_drv == &drv_self);
 			assert(hisr_callback_mayoverride(old_state->ivs_handv[oi].ivh_drv,
@@ -464,7 +465,7 @@ again_check_finalizing:
 again_determine_winner:
 	winner = arref_get(&isr_vectors[winner_index]);
 	if (winner->ivs_handc || winner->ivs_greedy_drv) {
-		/* Search for the vector with the least amount of handlers,
+		/* Search for the vector with the least amount of  handlers,
 		 * preferring those without greedy handlers over those with. */
 		for (i = 1; i < ISR_COUNT; ++i) {
 			REF struct isr_vector_state *temp;
@@ -524,7 +525,7 @@ isr_register_at_impl(isr_vector_t vector, void *func, void *arg, bool is_greedy)
 	size_t index;
 	uintptr_t cache_version;
 	cache_version = 0;
-	/* Make sure that the given vector is valid. - If it isn't,
+	/* Make sure that the given vector is valid. - If it  isn't,
 	 * act like it's impossible to allocate further data for it. */
 	if unlikely(!ISR_VECTOR_IS_VALID(vector))
 		THROW(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS, vector);
@@ -717,13 +718,13 @@ isr_unregister_any_at_(isr_vector_t vector, void *func) THROWS(E_BADALLOC) {
 
 
 /* Register ISR handlers, either by automatically selecting an
- * appropriate vector, or by specifying the required vector.
+ * appropriate  vector, or by  specifying the required vector.
  * WARNING: The caller is responsible to ensure that any given func+arg
  *          combination will only be registered once.
  * @return: ISR_VECTOR_INVALID: The given `func' maps to a driver that is currently being finalized.
  * @throws: E_SEGFAULT:         The given `func' doesn't map to the static segment of any known driver.
  * @throws: E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS: The given, or all vectors are already in use,
- *                                                     or the given vector cannot be allocated. */
+ *                                                     or the  given  vector  cannot  be  allocated. */
 PUBLIC isr_vector_t KCALL
 isr_register(isr_function_t func,
              void *arg)
@@ -881,18 +882,18 @@ again:
 			/* Clear the HISR descriptor. */
 			hisr_clear(hi);
 			/* Delete the greedy handler of this ISR, thus marking
-			 * the greedy handler as no longer being in-use. */
+			 * the  greedy  handler  as  no  longer  being in-use. */
 			if (old_state->ivs_handc == 0) {
 				new_state = incref(&empty_vector_state);
 			} else {
-				/* _try_ to allocate a new ISR vector state (but don't block, or throw an
-				 * exception if this cannot be done). If we're unable to delete the ISR
-				 * handler that we had registered for the given function, then the fact
+				/* _try_  to allocate a new ISR vector state (but don't block, or throw an
+				 * exception if this cannot  be done). If we're  unable to delete the  ISR
+				 * handler  that we had  registered for the given  function, then the fact
 				 * that we've already called `hisr_clear()' above will already allow other
-				 * pieces of code to detect that the associated callback is dead and can
+				 * pieces  of code to detect that the  associated callback is dead and can
 				 * be overwritten/discarded as will.
 				 * In other words: If we fail this allocation, there's going to be a temporary
-				 *                 memory leak that'll get fixed as soon as some other piece
+				 *                 memory leak that'll get fixed  as soon as some other  piece
 				 *                 of code ties to modify the ISR vector.
 				 */
 				new_state = isr_vector_state_alloc_atomic_nx(old_state->ivs_handc);
@@ -1063,7 +1064,7 @@ NOTHROW(KCALL compare_handler_hitmiss_gr)(struct isr_vector_handler const *__res
 }
 
 
-/* Try to re-order ISR handlers such that `src_handler_index' gets moved
+/* Try to  re-order  ISR  handlers such  that  `src_handler_index'  gets  moved
  * closer to the start of the handler vector, placing it at `dst_handler_index' */
 PRIVATE NOBLOCK ATTR_NOINLINE bool
 NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
@@ -1088,29 +1089,37 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	new_state->ivs_greedy_arg = old_state->ivs_greedy_arg;
 	new_state->ivs_greedy_drv = xincref(old_state->ivs_greedy_drv);
 	new_state->ivs_greedy_cnt = old_state->ivs_greedy_cnt;
-	/*   d  s   *
+	/************
+	 *   d  s   *
 	 * ABCDEFG  *
-	 * AB       */
+	 * AB       *
+	 ************/
 	memcpy(&new_state->ivs_handv[0],
 		   &old_state->ivs_handv[0],
 	       dst_handler_index,
 	       sizeof(struct isr_vector_handler));
-	/*   d  s   *
+	/************
+	 *   d  s   *
 	 * ABCDEFG  *
-	 * ABF      */
+	 * ABF      *
+	 ************/
 	memcpy(&new_state->ivs_handv[dst_handler_index],
 	       &old_state->ivs_handv[src_handler_index],
 	       sizeof(struct isr_vector_handler));
-	/*   d  s   *
+	/************
+	 *   d  s   *
 	 * ABCDEFG  *
-	 * ABFCDE   */
+	 * ABFCDE   *
+	 ************/
 	memcpy(&new_state->ivs_handv[dst_handler_index + 1],
 	       &old_state->ivs_handv[dst_handler_index],
 	       src_handler_index - dst_handler_index,
 	       sizeof(struct isr_vector_handler));
-	/*   d  s   *
+	/************
+	 *   d  s   *
 	 * ABCDEFG  *
-	 * ABFCDEG  */
+	 * ABFCDEG  *
+	 ************/
 	memcpy(&new_state->ivs_handv[src_handler_index + 1],
 	       &old_state->ivs_handv[src_handler_index + 1],
 	       new_state->ivs_handc - src_handler_index,

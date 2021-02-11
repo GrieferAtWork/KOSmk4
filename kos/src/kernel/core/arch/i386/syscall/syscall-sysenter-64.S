@@ -60,8 +60,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_register %rsp, %rbp /* RBP is the designated return-sp register */
 	.cfi_register %rip, %rdi /* RDI is the designated return-pc register */
 	/* `IA32_SYSENTER_ESP' points at the RSP0 field of the CPU's TSS
-	 * In other words: we only need to replace RSP with its own
-	 * dereference, and we already have `THIS_TASK->t_stackend'. */
+	 * In other words:  we only  need to  replace RSP  with its  own
+	 * dereference, and  we  already  have  `THIS_TASK->t_stackend'. */
 	movq   0(%rsp), %rsp
 	swapgs
 	/* Construct an IRET tail. */
@@ -129,8 +129,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_register %rsp, %rbp /* RBP is the designated return-sp register */
 	.cfi_register %rip, %rdi /* RDI is the designated return-pc register */
 	/* `IA32_SYSENTER_ESP' points at the ESP0 field of the CPU's TSS
-	 * In other words: we only need to replace RSP with its own
-	 * dereference, and we already have `THIS_TASK->t_stackend'. */
+	 * In other words:  we only  need to  replace RSP  with its  own
+	 * dereference, and  we  already  have  `THIS_TASK->t_stackend'. */
 	movq   0(%rsp), %rsp
 	swapgs
 	/* Construct an IRET tail. */
@@ -144,7 +144,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	pushq  %rdi                       /* %rip */
 
 	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
-	 * property enabled, thus allowing for normal system call return behavior. */
+	 * property enabled,  thus  allowing  for normal  system  call  return  behavior. */
 /*	.cfi_def_cfa %rsp, 0 */
 	.cfi_restore_iret_rip
 	.cfi_restore_iret_cs
@@ -282,13 +282,13 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 2:	movq   %rbp, OFFSET_IRREGS_RSP(%rsp) /* RSP := RBP */
 	sti    /* Re-enable interrupts now that all async-critical components were serviced. */
 
-	/* At this point, most of the original user-space CPU context from the point
+	/* At this point,  most of the  original user-space CPU  context from the  point
 	 * when the `sysenter' instruction was executed has been restored. Additionally,
-	 * we have already applied the required register transformations for safely
+	 * we have  already applied  the required  register transformations  for  safely
 	 * returning to user-space once we're done here.
 	 * -> With all of this done, we can now continue handling the sysenter as
 	 *    though the CPU had supported the instruction from the get-go, using
-	 *    the same assembly-level wrappers that would normally be used for
+	 *    the same assembly-level  wrappers that would  normally be used  for
 	 *    routing a real sysenter system call invocation. */
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
@@ -351,7 +351,7 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	/* We can just use `sysret' as a drop-in replacement for `sysexit', since
-	 * `sysret' doesn't clobber any 32-bit registers that `sysexit' doesn't
+	 * `sysret' doesn't clobber any  32-bit registers that `sysexit'  doesn't
 	 * also clobber! */
 	X86_IRET_BUT_PREFER_SYSRET32
 1:

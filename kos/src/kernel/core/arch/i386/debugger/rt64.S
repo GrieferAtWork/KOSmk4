@@ -65,9 +65,9 @@ PUBLIC_FUNCTION(dbg_exit)
 
 	/* Load the current thread (needed to get someplace that we can put the IRET tail)
 	 * NOTE: This must be done before we call `dbg_fini()', since `thiscpu_idle_x86_kernel_psp0(THIS_CPU)'
-	 *       is one of the fields which was saved and overwritten during debugger initialization.
-	 *       By leaving the debugger, that field once again gets restored and may no longer be
-	 *       initialized in case the debugger was entered early on during booting, or in case
+	 *       is one  of  the  fields which  was  saved  and overwritten  during  debugger  initialization.
+	 *       By  leaving  the  debugger,  that  field  once again  gets  restored  and  may  no  longer be
+	 *       initialized  in  case  the  debugger  was  entered  early  on  during  booting,  or  in  case
 	 *       the field became corrupt for some reason. */
 	movq   %gs:0, %rbp /* THIS_TASK */
 	EXTERN(this_cpu)
@@ -156,7 +156,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RAX), %rax
 
 	/* Load the end of the current cpu's IDLE thread's stack
-	 * to (ab-)use as temporary storage for an IRET tail.
+	 * to (ab-)use as  temporary storage for  an IRET  tail.
 	 * NOTE: The stack location we had already loaded above! */
 	leaq   -(KERNEL_IDLE_STACKSIZE - SIZEOF_IRREGS)(%rbp), %rsp
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBP), %rbp
@@ -168,7 +168,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_CS)
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_RIP)
 
-	/* Release the master debugger lock now that all that's missing for us to
+	/* Release  the master debugger lock now that  all that's missing for us to
 	 * do is to perform an IRET to return to the origin of `x86_dbg_exitstate'. */
 	EXTERN(x86_dbg_owner_lapicid)
 	movw   $(0), x86_dbg_owner_lapicid

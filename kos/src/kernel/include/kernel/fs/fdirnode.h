@@ -173,8 +173,8 @@ struct fdirnode_ops {
 	                        struct flookup_info *__restrict info);                      \
 	                                                                                    \
 	/* [1..1] Construct a directory enumerator object in `*result'.                     \
-	 * This function must initialize _all_ fields of `*result'                          \
-	 * It is undefined if files created or deleted after the creation of an             \
+	 * This  function  must  initialize _all_  fields  of `*result'                     \
+	 * It  is undefined if files created or  deleted after the creation of an           \
 	 * enumerator, will still be enumerated by said enumerator. It is however           \
 	 * guarantied that all files not created/deleted afterwards will always             \
 	 * be enumerated */                                                                 \
@@ -182,8 +182,8 @@ struct fdirnode_ops {
 	(FCALL *prefix##enum)(T *__restrict self,                                           \
 	                      struct fdirenum *__restrict result);                          \
 	                                                                                    \
-	/* [0..1] Create new files within a given directory.                                \
-	 * If another file with the same name already existed, then                         \
+	/* [0..1] Create   new   files   within   a   given   directory.                    \
+	 * If another  file with  the same  name already  existed,  then                    \
 	 * `FMKFILE_F_EXISTS' is set, and that file is returned instead.                    \
 	 * @throw: E_FSERROR_ILLEGAL_PATH:        `info->mkf_name' contains bad characters  \
 	 * @throw: E_FSERROR_DISK_FULL:           Disk full                                 \
@@ -196,7 +196,7 @@ struct fdirnode_ops {
 			       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS);                  \
 	                                                                                    \
 	/* [0..1] Delete the specified file from this directory                             \
-	 * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had already been deleted, or     \
+	 * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or   \
 	 *                                        renamed (it no longer exists as `entry'   \
 	 *                                        within `self').                           \
 	 * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.          \

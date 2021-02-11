@@ -30,17 +30,17 @@
 
 DECL_BEGIN
 
-/* Traverse a relative path, starting at `cwd' and walking until the
- * requested path was found, or until a missing path segment was encountered.
- * This function will automatically deal with `.' and `..' segments, always
- * accepting `/' between directories, and `\\' when `FS_MODE_FDOSPATH' is set.
+/* Traverse  a  relative  path,  starting   at  `cwd'  and  walking  until   the
+ * requested  path was found,  or until a missing  path segment was encountered.
+ * This function  will automatically  deal with  `.' and  `..' segments,  always
+ * accepting `/' between directories, and  `\\' when `FS_MODE_FDOSPATH' is  set.
  * Additionally, symbolic links are followed, with the final path segment stored
- * in the provided output arguments, with `*plastlen' set to 0 when the final
- * segment was empty and `FS_MODE_FIGNORE_TRAILING_SLASHES' wasn't set, or
- * when the entire input path is empty and `FS_MODE_FEMPTY_PATH' was set, or
- * if the last segment of the input path was one of `.' or `..', or if the
- * input path referred to the root path, or a drive root (`/' or `C:')
- * Additionally, when `plastseg' itself is `NULL', always walk the entire path.
+ * in the provided output  arguments, with `*plastlen' set  to 0 when the  final
+ * segment  was  empty  and  `FS_MODE_FIGNORE_TRAILING_SLASHES'  wasn't  set, or
+ * when  the entire  input path is  empty and `FS_MODE_FEMPTY_PATH'  was set, or
+ * if the last  segment of the  input path  was one of  `.' or `..',  or if  the
+ * input path  referred  to  the root  path,  or  a drive  root  (`/'  or  `C:')
+ * Additionally,  when `plastseg' itself is `NULL', always walk the entire path.
  *     INPUT      |  RETURN  |  LASTSEG
  *    ------------+----------+------------
  *     ""         |  "."     |  ""         (Throws `E_FSERROR_ILLEGAL_PATH' unless `FS_MODE_FEMPTY_PATH' is set)
@@ -59,9 +59,9 @@ DECL_BEGIN
  *                      were given, in which case the last segment being a symlink will cause an
  *                     `E_FSERROR_TOO_MANY_SYMBOLIC_LINKS' exception to be thrown.
  * @param: premaining_symlinks: [in|out] When non-NULL, load/store the amount of remaining
- *                              symbolic link indirection which the path may have still
- *                              traversed during evaluation (aka.: the limit on how many
- *                              symbolic links may still be traversed during further path
+ *                              symbolic link indirection  which the path  may have  still
+ *                              traversed during evaluation (aka.:  the limit on how  many
+ *                              symbolic links may still be traversed during further  path
  *                              walks)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
  *                                            One of the accessed directory INodes had been deleted.
@@ -636,7 +636,7 @@ path_traversefull_ex(struct fs *__restrict filesystem,
 #endif /* !TRAVERSE_N */
 	TRY {
 		/* Check if the given filename refers to a path (must be done explicitly since
-		 * that path may in turn refer to a mounting point which we must dereference) */
+		 * that  path may in turn refer to a mounting point which we must dereference) */
 		REF struct path *result_path;
 		if (!last_seglen) {
 			sync_read(containing_path);
@@ -708,7 +708,7 @@ again_follow_symlink:
 							decref(containing_path);
 							containing_path = new_containing_path;
 							if unlikely(!last_seglen) {
-								/* This can happen when `sl_node->sl_text == "/"', since in this
+								/* This  can happen when `sl_node->sl_text == "/"', since in this
 								 * case, we'd still end with a trailing path segment of 0-length. */
 								sync_read(containing_path);
 								new_containing_directory = (REF struct directory_node *)incref(containing_path->p_inode);
@@ -747,7 +747,7 @@ again_follow_symlink:
 								if unlikely(!new_result)
 									THROW(E_FSERROR_FILE_NOT_FOUND);
 								if (last_seg[last_seglen] == '/') {
-									/* The symlink _must_ point to a directory!
+									/* The  symlink  _must_  point  to  a  directory!
 									 * s.a. `FS_MODE_FIGNORE_TRAILING_SLASHES' above. */
 									if (!INODE_ISDIR(new_result)) {
 										decref_unlikely(new_result);

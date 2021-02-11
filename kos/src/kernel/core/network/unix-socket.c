@@ -100,7 +100,7 @@ unix_ancillary_data_decode(struct ancillary_rmessage const *__restrict message,
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
-/* Returns the required user-space buffer size needed to
+/* Returns   the   required  user-space   buffer  size   needed  to
  * represent the given packet's ancillary data in its decoded form.
  * s.a. `ancillary_rmessage::am_controllen' */
 PRIVATE NONNULL((1)) size_t FCALL
@@ -168,7 +168,7 @@ NOTHROW(FCALL unix_client_close_connection)(struct unix_client *__restrict self)
 
 
 
-/* Shut-down the given unix-server to tell all currently waiting clients that
+/* Shut-down  the given unix-server to tell all currently waiting clients that
  * they won't get accepted, and all future clients that they will never get to
  * be accepted. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -193,26 +193,26 @@ NOTHROW(FCALL unix_server_shutdown_listen)(struct unix_server *__restrict self) 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unix_server_fini)(struct unix_server *__restrict self) {
 	/* Ensure that the server was shut-down properly, and that all
-	 * clients that are still pending to be accept(2)-ed get told
+	 * clients that are still pending to be accept(2)-ed get  told
 	 * that they've been refused. */
 	unix_server_shutdown_listen(self);
 
-	/* Broadcast the signal one last time, just in case someone was
+	/* Broadcast  the signal one  last time, just  in case someone was
 	 * still listening, thus telling them that we're about to go away. */
 	sig_broadcast_for_fini(&self->us_acceptme_sig);
 }
 
 
-/* Append the given chain of clients to the chain of clients that
- * want to be accepted. If the resulting total number of clients
- * would exceed the currently-set `us_max_backlog', a random # of
+/* Append the given chain of clients to the chain of clients  that
+ * want to be accepted. If  the resulting total number of  clients
+ * would exceed the currently-set `us_max_backlog', a random #  of
  * clients is chosen to have their connection requests be refused.
  * The caller must ensure the validity of the link:
  *   `acceptme_first->[uc_next->...] == acceptme_last'
  * Note however that `acceptme_last->uc_next' may be undefined
  *
- * Additionally, `was_i_accepted' may be given as non-NULL, which
- * will alter the behavior if that client was chosed to be refused,
+ * Additionally,  `was_i_accepted'  may  be  given  as  non-NULL, which
+ * will  alter the  behavior if that  client was chosed  to be refused,
  * such that this function returns `false' if that client in particular
  * was refused, and `true' otherwise. */
 PRIVATE NOBLOCK NONNULL((1)) bool
@@ -256,7 +256,7 @@ refuse_everyone:
 			assert(iter);
 			++count;
 			if unlikely(count > limit) {
-				/* Refuse the request of all clients starting
+				/* Refuse the request  of all clients  starting
 				 * with `iter', and ending with `acceptme_last' */
 				for (;;) {
 					REF struct unix_client *next;
@@ -273,7 +273,7 @@ refuse_everyone:
 					iter = next;
 				}
 				/* Set the last accepted client to the
-				 * predecessor of the original `iter' */
+				 * predecessor of the original  `iter' */
 				acceptme_last = container_of(piter, struct unix_client, uc_next);
 				break;
 			}
@@ -283,7 +283,7 @@ refuse_everyone:
 	/* Terminate the chain. */
 	acceptme_last->uc_next = NULL;
 	/* Install the chain.
-	 * In the case that some other chain got
+	 * In  the  case  that some  other  chain got
 	 * installed in the mean time, merge with it. */
 	for (;;) {
 		struct unix_client *chain, *iter;
@@ -314,8 +314,8 @@ done:
 	return result;
 }
 
-/* Re-install the chain of pending acceptme clients. This should be
- * called if the `us_max_backlog' is lowered, such that in the event
+/* Re-install the chain of pending  acceptme clients. This should  be
+ * called  if the `us_max_backlog' is lowered, such that in the event
  * of too many clients being set as pending at that point will result
  * in a random selection of them being refused. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -337,7 +337,7 @@ NOTHROW(FCALL unix_server_reinstall_acceptme)(struct unix_server *__restrict sel
 }
 
 
-/* Try to pop one waiting unix client from `self'.
+/* Try  to  pop  one  waiting  unix  client  from   `self'.
  * If no clients are currently waiting, simply return NULL. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct unix_client *
 NOTHROW(FCALL unix_server_pop_acceptme)(struct unix_server *__restrict self) {
@@ -360,7 +360,7 @@ NOTHROW(FCALL unix_server_pop_acceptme)(struct unix_server *__restrict self) {
 			unix_server_append_acceptme(self, next, last, NULL);
 		}
 		/* Invalidate the next-pointer, now that this client
-		 * is no longer apart of the waiting-clients-chain. */
+		 * is  no longer apart of the waiting-clients-chain. */
 		DBG_memset(&result->uc_next, 0xcc, sizeof(result->uc_next));
 	}
 	return result;
@@ -368,7 +368,7 @@ NOTHROW(FCALL unix_server_pop_acceptme)(struct unix_server *__restrict self) {
 
 
 /* Try to remove the given client from the chain of waiting clients.
- * Upon success, the internal reference is automatically dropped by
+ * Upon success, the internal reference is automatically dropped  by
  * this function, and `true' is returned.
  * Otherwise, `false' is returned. */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
@@ -423,7 +423,7 @@ NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 		/* If this is the server socket, then we must:
 		 * - Set `us_max_backlog' to 0
 		 * - Wake up all waiting client sockets from the accept-queue.
-		 *   The clients should then check the `us_max_backlog' field
+		 *   The  clients should then check the `us_max_backlog' field
 		 *   to determine if the server was closed.
 		 * - Mark the chain of clients to prevent any new ones from ever
 		 *   being added again.
@@ -434,9 +434,9 @@ NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 		} else {
 			/* Client-socket */
 			/* NOTE: If `me->us_client' won't get destroyed here, then we
-			 *       must still close its buffers to indicate that the
-			 *       connection has been terminated, since either the
-			 *       server-side socket (as returned by accept()), or
+			 *       must still close  its buffers to  indicate that  the
+			 *       connection  has  been terminated,  since  either the
+			 *       server-side  socket  (as returned  by  accept()), or
 			 *       the client-side socket was closed. */
 			unix_client_close_connection(me->us_client);
 			decref(me->us_client);
@@ -525,9 +525,9 @@ UnixSocket_Bind(struct socket *__restrict self,
 	u16 socket_filename_len;
 
 	addr_un = (USER CHECKED struct sockaddr_un *)addr;
-	/* We need at least 1 character in the path-buffer.
+	/* We need  at  least  1  character  in  the  path-buffer.
 	 * The shortest valid bind-path is a single-character path
-	 * that contains the filename of the socket, and will be
+	 * that contains the filename of  the socket, and will  be
 	 * created in the current working directory. */
 	if unlikely(addr_len < offsetof(struct sockaddr_un, sun_path) + 1)
 		THROW(E_BUFFER_TOO_SMALL, offsetof(struct sockaddr_un, sun_path) + 1, addr_len);
@@ -555,7 +555,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 	                           &socket_filename_len,
 	                           fsmode,
 	                           NULL);
-	/* Start the binding process, and ensure that the socket isn't
+	/* Start the  binding process,  and ensure  that the  socket  isn't
 	 * already bound, or is currently being bound by some other thread. */
 	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct socket_node *)-1)) {
 		decref_unlikely(bind_path);
@@ -563,7 +563,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 		      E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND);
 	}
 	/* At this point, we need to create a socket-file within `bind_path',
-	 * under the name `socket_filename_ptr...+=socket_filename_len' */
+	 * under   the   name   `socket_filename_ptr...+=socket_filename_len' */
 	TRY {
 		REF struct directory_node *bind_path_dir;
 		sync_read(bind_path);
@@ -646,7 +646,7 @@ UnixSocket_WaitForAccept_Poll(async_job_t self,
 	/* Check if we're still pending (in interlocked mode). */
 	if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_PENDING)
 		return ASYNC_JOB_POLL_AVAILABLE;
-	/* XXX: We could easily implement a timeout for connect()-attempt by
+	/* XXX: We  could  easily  implement   a  timeout  for  connect()-attempt   by
 	 *      filling in `abs_timeout' here, and returning `ASYNC_JOB_POLL_WAITFOR'! */
 	/* Wait for our status change. */
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
@@ -680,14 +680,14 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 	me->aw_bind_name    = NULL;             /* Inherited by `socket->us_nodename' */
 	me->aw_client       = NULL;             /* Inherited by `socket->us_client' */
 	COMPILER_WRITE_BARRIER();
-	/* Fill in the node-pointer, thus marking the socket
+	/* Fill  in the node-pointer, thus marking the socket
 	 * as having been connected (from its own view-point) */
 	ATOMIC_WRITE(socket->us_node, me->aw_bind_node); /* Inherit reference */
 	me->aw_bind_node = NULL;
 	COMPILER_WRITE_BARRIER();
 	{
 		FINALLY_DECREF_UNLIKELY(socket);
-		/* If the socket wasn't accepted, tell the caller by throwing
+		/* If the socket  wasn't accepted, tell  the caller by  throwing
 		 * an `E_NET_CONNECTION_REFUSED' exception, which will translate
 		 * to connect() returning with `errno=ECONNREFUSED' */
 		if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_ACCEPTED)
@@ -704,12 +704,12 @@ UnixSocket_WaitForAccept_Cancel(async_job_t self) {
 	client = me->aw_client;
 	/* Remove myself from the chain of pending clients. */
 	unix_server_remove_acceptme(&me->aw_bind_node->s_server, client);
-	/* Try to change the state of the client to refused.
+	/* Try to change the state of the client to  refused.
 	 * Note that this might fail if the server was faster
 	 * and accepted us before we were able to refuse. */
 	if (!unix_client_refuse_connection(client)) {
 		/* If we weren't able to refuse the connection before it
-		 * was fully established, try to close the connection
+		 * was fully established,  try to  close the  connection
 		 * after it was already established. */
 		unix_client_close_connection(client);
 	}
@@ -745,9 +745,9 @@ UnixSocket_Connect(struct socket *__restrict self,
 	REF struct directory_entry *bind_name;
 	USER CHECKED struct sockaddr_un *addr_un;
 	addr_un = (USER CHECKED struct sockaddr_un *)addr;
-	/* We need at least 1 character in the path-buffer.
+	/* We need  at  least  1  character  in  the  path-buffer.
 	 * The shortest valid bind-path is a single-character path
-	 * that contains the filename of the socket, and will be
+	 * that contains the filename of  the socket, and will  be
 	 * created in the current working directory. */
 	if unlikely(addr_len < offsetof(struct sockaddr_un, sun_path) + 1)
 		THROW(E_BUFFER_TOO_SMALL, offsetof(struct sockaddr_un, sun_path) + 1, addr_len);
@@ -788,15 +788,15 @@ UnixSocket_Connect(struct socket *__restrict self,
 			/* Make sure that what we've found is actually a socket INode */
 			if unlikely(!INODE_ISSOCK(bind_node))
 				THROW(E_NET_CONNECTION_REFUSED);
-	
+
 #ifndef __OPTIMIZE_SIZE__
 			/* Check that someone is listening to `bind_node'
 			 * NOTE: This check is also performed implicitly by `unix_server_append_acceptme()' */
 			if unlikely(!ATOMIC_READ(bind_node->s_server.us_max_backlog))
 				THROW(E_NET_CONNECTION_REFUSED);
 #endif /* !__OPTIMIZE_SIZE__ */
-	
-			/* Allocate our reference-counted unix-socket-client-descriptor
+
+			/* Allocate our reference-counted  unix-socket-client-descriptor
 			 * that we can link into the server socket INode to inform it of
 			 * the fact that we wish to connect. */
 			client = (REF struct unix_client *)kmalloc(sizeof(struct unix_client),
@@ -812,10 +812,10 @@ UnixSocket_Connect(struct socket *__restrict self,
 
 			/* Initialize the client/server packet buffers.
 			 * WARNING: Changes made to the send/recv buffer sizes after this point,
-			 *          and before we've been accepted by the server will be lost.
-			 * Also note that the buffer size limits set here may be increased when
-			 * the server accepts us, since the effective buffer size limits of an
-			 * established unix socket connection are MAX(client, server), which we
+			 *          and before we've been accepted  by the server will be  lost.
+			 * Also note that the  buffer size limits set  here may be increased  when
+			 * the  server accepts  us, since the  effective buffer size  limits of an
+			 * established unix socket  connection are MAX(client,  server), which  we
 			 * implement by allowing the server to increase the limit before accepting
 			 * our connection. */
 			pb_buffer_init_ex(&client->uc_fromclient, ATOMIC_READ(me->us_sndbufsiz));
@@ -823,7 +823,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 
 			TRY {
 				/* Construct an async worker for informing the server of our
-				 * presence, as well as to wait for it to accept(2) us. */
+				 * presence, as  well as  to wait  for it  to accept(2)  us. */
 				job = async_job_alloc(&UnixSocket_WaitForAccept);
 				TRY {
 					/* Inform the server that we're trying to connect to it */
@@ -843,12 +843,12 @@ UnixSocket_Connect(struct socket *__restrict self,
 					}
 					/* Insert our new client. */
 					client->uc_next = next;
-					/* Re-install the chain of _all_ new clients, as well as
+					/* Re-install the  chain of  _all_ new  clients, as  well  as
 					 * check that the total # of pending clients isn't too large. */
 					if (!unix_server_append_acceptme(&bind_node->s_server,
 					                                 client, last, client))
 						THROW(E_NET_CONNECTION_REFUSED);
-	
+
 				} EXCEPT {
 					async_job_free(job);
 				}
@@ -862,7 +862,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 			con->aw_bind_path = bind_path; /* Inherit reference */
 			con->aw_bind_name = bind_name; /* Inherit reference */
 			con->aw_bind_node = bind_node; /* Inherit reference */
-	
+
 			/* Start the job. */
 			decref(async_job_start(job, aio));
 		} EXCEPT {
@@ -893,16 +893,16 @@ socket_is_not_bound:
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND);
 	}
-	/* Verify that we're a server socket. (i.e. don't have one of those
-	 * client descriptors as mentioned in `UnixSocket_Connect()')
-	 * If we do have one, throw E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND
+	/* Verify  that  we're  a  server  socket.  (i.e.  don't  have  one  of   those
+	 * client     descriptors     as    mentioned     in    `UnixSocket_Connect()')
+	 * If  we  do   have  one,  throw   E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND
 	 * Once that's been done, we know that we're the _only_ server socket that will
 	 * ever exist for the associated `server_node' */
 	if unlikely(me->us_client != NULL)
 		goto socket_is_not_bound;
 
 	/* Save `max_backlog' within `server_node', thus indicating
-	 * that we're now accepting client connections. */
+	 * that   we're   now    accepting   client    connections. */
 	old_max_backlog = ATOMIC_XCH(server_node->s_server.us_max_backlog,
 	                             max_backlog);
 	/* Limit the # of pending clients. */
@@ -949,7 +949,7 @@ socket_is_not_bound:
 #ifndef __OPTIMIZE_SIZE__
 	if (mode & IO_NONBLOCK) {
 		/* When in non-blocking mode, check if there are any connection requests.
-		 * Doing this now will safe us the unnecessary allocation of a socket
+		 * Doing  this now  will safe us  the unnecessary allocation  of a socket
 		 * object in the event that we're unable to accept anyone. */
 		if (ATOMIC_READ(server_node->s_server.us_acceptme) == NULL)
 			return NULL; /* No pending connections. */
@@ -957,7 +957,7 @@ socket_is_not_bound:
 #endif /* !__OPTIMIZE_SIZE__ */
 
 	/* Allocate the new unix socket now, so-as to not have to deal with allocation
-	 * errors after already having taken one client from the waiting-client set. */
+	 * errors after already having taken  one client from the waiting-client  set. */
 	result = (REF UnixSocket *)kmalloc(sizeof(UnixSocket), GFP_CALLOC);
 	socket_cinit(result, &unix_socket_ops, self->sk_type, PF_UNIX);
 
@@ -971,9 +971,9 @@ again_wait_for_client:
 			if (mode & IO_NONBLOCK) {
 				/* Non-blocking, and no-one to accept.
 				 * -> Return failure.
-				 * XXX: This still leaves the scenario where we're only temporarily
+				 * XXX: This still  leaves the  scenario where  we're only  temporarily
 				 *      not seeing any clients because of how management of the clients
-				 *      chains is being handled, where any modifications of the list
+				 *      chains is being  handled, where any  modifications of the  list
 				 *      require it to be temporarily cleared...
 				 *      But I guess that's OK, since non-blocking kind-of implies a
 				 *      try-until-we-success mentality, which will eventually allow
@@ -991,7 +991,7 @@ again_wait_for_client:
 			task_waitfor();
 		}
 
-		/* Update the packet buffer limits so we're use the greater of our
+		/* Update  the packet buffer  limits so we're use  the greater of our
 		 * own limit configuration, and the limits already set by the client. */
 		raise_pb_buffer_limit(&result_client->uc_fromserver, me->us_sndbufsiz);
 		raise_pb_buffer_limit(&result_client->uc_fromclient, me->us_rcvbufsiz);
@@ -1069,7 +1069,7 @@ UnixSocket_PollTest(struct socket *__restrict self,
 	node = ATOMIC_READ(me->us_node);
 	if (!node || node == (struct socket_node *)-1) {
 		/* Technically true, as neither will block (both
-		 * `recv()' and `accept()' will throw errors!) */
+		 * `recv()' and `accept()'  will throw  errors!) */
 		result |= what & POLLINMASK;
 	} else if (me->us_client) {
 		struct unix_client *client;
@@ -1099,8 +1099,8 @@ UnixSocket_PollTest(struct socket *__restrict self,
 }
 
 
-/* Try to send a SOCK_STREAM-style packet containing the first
- * N bytes of data, starting at buf+offset, but write at most
+/* Try to send a  SOCK_STREAM-style packet containing the  first
+ * N  bytes of data,  starting at buf+offset,  but write at most
  * `bufsize' bytes in total. No ancillary data will be included.
  * @throw: E_NET_SHUTDOWN: The buffer was closed.
  * @return: 0 : Cannot send data without blocking at this time.
@@ -1119,7 +1119,7 @@ again:
 		/* Connection was closed. */
 		/* TODO: if (!MSG_NOSIGNAL) raise(SIGPIPE);
 		 * REMINDER: You're running from an async-worker, so don't get
-		 *           the idea of sending the SIGPIPE to THIS_TASK! */
+		 *           the  idea  of sending  the SIGPIPE  to THIS_TASK! */
 		THROW(E_NET_SHUTDOWN);
 	}
 	if (used >= limt)
@@ -1186,7 +1186,7 @@ async_send_test(struct async_send_job *__restrict me) {
 		/* Connection was closed. */
 		/* TODO: if (!MSG_NOSIGNAL) raise(SIGPIPE);
 		 * REMINDER: You're running from an async-worker, so don't get
-		 *           the idea of sending the SIGPIPE to THIS_TASK! */
+		 *           the  idea  of sending  the SIGPIPE  to THIS_TASK! */
 		THROW(E_NET_SHUTDOWN);
 	}
 	if (used >= limt)
@@ -1203,7 +1203,7 @@ async_send_test(struct async_send_job *__restrict me) {
 nope:
 	if (me->as_socket->sk_type != SOCK_STREAM) {
 		/* Make sure that sending the packet is still even possible.
-		 * After all: The limit may have been lowered... */
+		 * After   all:   The   limit  may   have   been  lowered... */
 		used = pb_packet_get_totalsize_s(me->as_payload_size,
 		                                 me->as_ancillary_size);
 		if unlikely(used > limt)
@@ -1381,7 +1381,7 @@ again_start_packet:
 		}
 		if (offset != 0) {
 			/* We _did_ manage to send ~some~ data successfully, so we
-			 * must tell our caller about that fact and _not_ enqueue
+			 * must tell our caller about that fact and _not_  enqueue
 			 * an async job to send the rest, because if that job ends
 			 * up being canceled, then our caller would have no way of
 			 * knowing how much we've already succeeded in sending! */
@@ -1536,7 +1536,7 @@ again_read_packet:
 				}
 				if (msg_control) {
 					/* Don't actually decode ancillary data for user-space.
-					 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
+					 * UNIX  socket  ancillary data  cannot  be MSG_PEEK'd. */
 					ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 				}
 				if (presult_flags)
@@ -1577,13 +1577,13 @@ again_read_packet:
 					*presult_flags = result_flags;
 				/*BEGIN:NOTHROW*/
 				unix_ancillary_data_fini(packet);
-				/* Special handling here, as required by POSIX:
+				/* Special   handling  here,  as  required  by  POSIX:
 				 * Ancillary data in UNIX domain socket datagrams form
-				 * a sort-of barrier between packets, in that reading
+				 * a  sort-of barrier between packets, in that reading
 				 * will stop prematurely at the end of the packet that
 				 * contained the ancillary data.
 				 *
-				 * -> As such, always stop receiving data if we've
+				 * -> As such, always  stop receiving  data if  we've
 				 *    encountered a datagram that ends with ancillary
 				 *    data. */
 				pb_buffer_endread_consume(pbuf, packet);
@@ -1622,7 +1622,7 @@ again_read_packet:
 						if (required_size > msg_control->am_controllen)
 							result_flags |= MSG_CTRUNC;
 						/* Don't actually decode ancillary data for user-space.
-						 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
+						 * UNIX  socket  ancillary data  cannot  be MSG_PEEK'd. */
 						ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
 					}
 				} else if (msg_control) {
@@ -1763,7 +1763,7 @@ UnixSocket_GetRcvBuf(struct socket *__restrict self) {
 	result = ATOMIC_READ(me->us_rcvbufsiz);
 	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
 		/* We're a connected client socket, meaning that we must
-		 * actually return the buffer limit from `us_recvbuf' */
+		 * actually return  the buffer  limit from  `us_recvbuf' */
 		COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
 		result = ATOMIC_READ(me->us_recvbuf->pb_limt);
 	}
@@ -1779,7 +1779,7 @@ again:
 	old_rcv_bufsiz = ATOMIC_READ(me->us_rcvbufsiz);
 	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
 		/* We're a connected client socket, meaning that we must
-		 * actually write the buffer limit to `us_recvbuf' */
+		 * actually  write  the  buffer  limit  to  `us_recvbuf' */
 		COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
 		ATOMIC_WRITE(me->us_recvbuf->pb_limt, bufsiz);
 		return;
@@ -1796,7 +1796,7 @@ UnixSocket_GetSndBuf(struct socket *__restrict self) {
 	result = ATOMIC_READ(me->us_sndbufsiz);
 	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
 		/* We're a connected client socket, meaning that we must
-		 * actually return the buffer limit from `us_sendbuf' */
+		 * actually return  the buffer  limit from  `us_sendbuf' */
 		COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
 		result = ATOMIC_READ(me->us_sendbuf->pb_limt);
 	}
@@ -1812,7 +1812,7 @@ again:
 	old_snd_bufsiz = ATOMIC_READ(me->us_sndbufsiz);
 	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
 		/* We're a connected client socket, meaning that we must
-		 * actually write the buffer limit to `us_sendbuf' */
+		 * actually  write  the  buffer  limit  to  `us_sendbuf' */
 		COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
 		ATOMIC_WRITE(me->us_sendbuf->pb_limt, bufsiz);
 		return;

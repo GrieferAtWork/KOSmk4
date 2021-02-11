@@ -166,7 +166,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP), %ebp
 
 .Lunlock_and_iret:
-	/* Release the master debugger lock now that all that's missing for us to
+	/* Release  the master debugger lock now that  all that's missing for us to
 	 * do is to perform an IRET to return to the origin of `x86_dbg_exitstate'. */
 	EXTERN(x86_dbg_owner_lapicid)
 	movw   $(0), x86_dbg_owner_lapicid

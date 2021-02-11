@@ -32,9 +32,9 @@
 
 /* Enable RTM support in MMan data structures.
  * Note however that RTM emulation is not actually implemented
- * as part of the kernel core, but is loaded as a separate
+ * as  part of  the kernel core,  but is loaded  as a separate
  * driver `/os/drivers/rtm' upon first use.
- * HINT: RTM stands for RestrictedTransactionalMemory.
+ * HINT: RTM    stands    for   RestrictedTransactionalMemory.
  *       To get an overview on what this is, and how it works,
  *       you may take a look at `/kos/src/kernel/modrtm/rtm.h' */
 #undef ARCH_HAVE_RTM
@@ -54,8 +54,8 @@ struct icpustate;
 struct mrtm_hooks_struct {
 	/* [1..1] Hook for the `xbegin' instruction.
 	 * When invoked, `state' will point to the first instruction to-be executed
-	 * in transactional execution mode, whilst `fallback_ip' points to the
-	 * instruction to which to jump in the event of the transaction failing. */
+	 * in transactional  execution mode,  whilst  `fallback_ip' points  to  the
+	 * instruction  to which to  jump in the event  of the transaction failing. */
 	ATTR_RETNONNULL NONNULL((1)) struct icpustate *
 	(FCALL *rh_xbegin)(struct icpustate *__restrict state,
 	                   uintptr_t fallback_ip);
@@ -67,12 +67,12 @@ struct mrtm_hooks_struct {
 #define mrtm_setnosys(state) (void)((state)->ics_gpregs.gp_eax = RTM_NOSYS)
 #endif /* !__x86_64__ */
 
-/* Execute code pointed-to by `state' in transactional execution mode.
- * This function will operate such that `state' will be updated to
+/* Execute code pointed-to by  `state' in transactional execution  mode.
+ * This  function  will operate  such that  `state'  will be  updated to
  * reflect the proper RTM execution error code within the default system
- * call return register, which are defined in `<kos/asm/rtm.h>'
+ * call   return  register,  which   are  defined  in  `<kos/asm/rtm.h>'
  * This function is used to implement the `sys_rtm_begin()' system call,
- * in the event that said system call is available for the current
+ * in  the  event that  said system  call is  available for  the current
  * architecture. */
 LOCAL ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *FCALL
 mrtm_exec(struct mrtm_hooks_struct const *__restrict hooks,

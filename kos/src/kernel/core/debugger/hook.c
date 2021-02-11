@@ -384,7 +384,7 @@ dbg_lookup_command_fuzzy(char const *__restrict similar_to_name) {
 }
 
 
-/* Search for a debug command who's name starts with `name'.
+/* Search  for  a  debug  command   who's  name  starts  with   `name'.
  * If more than one command matches this criteria, return NULL instead. */
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) struct dbg_commandhook const *FCALL
 dbg_lookup_command_startswith(char const *__restrict name_start) {

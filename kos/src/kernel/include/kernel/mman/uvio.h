@@ -64,7 +64,7 @@
  *    and   looks   at   `struct kernel_uvio_request::kur_status'  of   its   request  slot.
  *  - If the status indicates an exception, that exception is re-thrown (that exception
  *    being   the   original    exception   from   the    user-space   VIO    callback)
- *    Otherwise, the correct VIO result value is returned by `uvio_request()'
+ *    Otherwise,  the  correct  VIO  result  value  is  returned  by   `uvio_request()'
  *  - Irregardless of an exception having been thrown, the request slot is marked as
  *    free, and `struct uvio::uv_reqfree' is broadcast.
  *  - In case of an  exception, that exception is  propagated normally with its  fault

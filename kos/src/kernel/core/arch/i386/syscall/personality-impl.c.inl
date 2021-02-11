@@ -47,7 +47,7 @@ halt_unhandled_exception(unsigned int error,
 #endif /* !HALT_UNHANDLED_EXCEPTION_DEFINED */
 
 
-/* The personality function used to handle exceptions propagated through
+/* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
 INTERN unsigned int
@@ -71,15 +71,15 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struc
 			goto err;
 	}
 	/* Check if the return state actually points into user-space,
-	 * or alternatively: indicates a user-space redirection. */
+	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
-	/* System calls encode their vector number as the LSDA pointer, so that
-	 * when unwinding we can reverse-engineer that number in order to decide
+	/* System calls encode their vector number  as the LSDA pointer, so  that
+	 * when  unwinding we can reverse-engineer that number in order to decide
 	 * on special actions to perform based on the called function, as well as
-	 * inform user-space of which function caused the exception, as well as
+	 * inform user-space of which function  caused the exception, as well  as
 	 * implement system call restarting. */
 	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
 #endif /* DEFINE_NORMAL */
@@ -90,7 +90,7 @@ err:
 	return DWARF_PERSO_ABORT_SEARCH;
 }
 
-/* The personality function used to handle exceptions propagated through
+/* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
 INTERN unsigned int
@@ -114,15 +114,15 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_st
 			goto err;
 	}
 	/* Check if the return state actually points into user-space,
-	 * or alternatively: indicates a user-space redirection. */
+	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
-	/* System calls encode their vector number as the LSDA pointer, so that
-	 * when unwinding we can reverse-engineer that number in order to decide
+	/* System calls encode their vector number  as the LSDA pointer, so  that
+	 * when  unwinding we can reverse-engineer that number in order to decide
 	 * on special actions to perform based on the called function, as well as
-	 * inform user-space of which function caused the exception, as well as
+	 * inform user-space of which function  caused the exception, as well  as
 	 * implement system call restarting. */
 	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
 #endif /* DEFINE_NORMAL */
@@ -137,7 +137,7 @@ err:
 
 #ifdef __x86_64__
 
-/* The personality function used to handle exceptions propagated through
+/* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
 INTERN unsigned int
@@ -161,15 +161,15 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_str
 			goto err;
 	}
 	/* Check if the return state actually points into user-space,
-	 * or alternatively: indicates a user-space redirection. */
+	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
-	/* System calls encode their vector number as the LSDA pointer, so that
-	 * when unwinding we can reverse-engineer that number in order to decide
+	/* System calls encode their vector number  as the LSDA pointer, so  that
+	 * when  unwinding we can reverse-engineer that number in order to decide
 	 * on special actions to perform based on the called function, as well as
-	 * inform user-space of which function caused the exception, as well as
+	 * inform user-space of which function  caused the exception, as well  as
 	 * implement system call restarting. */
 	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
 #endif /* DEFINE_NORMAL */

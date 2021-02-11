@@ -135,7 +135,7 @@ struct vm vm_kernel_head = {
 
 
 /* Allocate BSS memory for the initial shared+identity mapping
- * that will later be shared with, and re-appear in all other
+ * that  will later be shared with, and re-appear in all other
  * page directories (except for the identity page)
  * NOTE: This buffer is quite large (1Mb), but we'd need
  *       to allocate it sooner or later, no matter what. */
@@ -228,11 +228,11 @@ INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 	if __untraced(HAVE_4MIB_PAGES) {
 		__wrcr4(__rdcr4() | CR4_PSE);
-		/* TODO: Merge whole 4MiB pages within the kernel core, thus saving on the
+		/* TODO: Merge  whole  4MiB pages  within  the kernel  core,  thus saving  on the
 		 *       amount of needed TLB entires to translate kernel-space memory addresses. */
 	}
-	/* TODO: Add support for `PSE-36' to map 4MiB pages to 40-bit physical addresses.
-	 *       Implementing this shouldn't be too difficult, but would require a dedicated
+	/* TODO: Add support for  `PSE-36' to  map 4MiB  pages to  40-bit physical  addresses.
+	 *       Implementing this shouldn't be too  difficult, but would require a  dedicated
 	 *       function for mapping a 4MiB-aligned 40-bit physical address to a 4MiB-aligned
 	 *       virtual address. */
 	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
@@ -250,7 +250,7 @@ INTDEF u64 pae_pageperm_matrix_[16] ASMNAME("pae_pageperm_matrix");
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 	if __untraced(HAVE_2MIB_PAGES) {
-		/* TODO: Merge whole 2MiB pages within the kernel core, thus saving on the
+		/* TODO: Merge  whole  2MiB pages  within  the kernel  core,  thus saving  on the
 		 *       amount of needed TLB entires to translate kernel-space memory addresses. */
 	}
 	if __untraced(!HAVE_EXECUTE_DISABLE) {
@@ -296,9 +296,9 @@ NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
 	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
 	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p32(&_bootcpu);
 #ifndef CONFIG_NO_PAGING_PAE
-	/* Re-write the assembly of `__x86_lazy_disable_ioperm_bitmap_pae', as
+	/* Re-write the assembly of `__x86_lazy_disable_ioperm_bitmap_pae',  as
 	 * found in `arch/i386/sched/sched32.S' to only clear 8 bytes of memory
-	 * in order to unmap the IOB vector, rather than clearing 16 bytes (as
+	 * in order to unmap the IOB vector, rather than clearing 16 bytes  (as
 	 * is required by PAE paging, which is the default configuration) */
 	{
 		INTDEF byte_t __x86_lazy_disable_ioperm_bitmap_pae[];
@@ -377,7 +377,7 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 	if (!HAVE_PAGE_GLOBAL_BIT) {
 		/* If global TLBs don't exist, we can simply use the mov-to-cr3 trick to flush TLBs */
 		/* Also: Since global TLBs don't exist, we can re-write `x86_pagedir_syncall_maybe_global'
-		 *       to always unconditionally reload cr3 with the same code we already use
+		 *       to  always  unconditionally  reload  cr3  with  the  same  code  we  already  use
 		 *       for `pagedir_syncall' */
 		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
 		memcpy((void *)&x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
@@ -403,10 +403,10 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		}
 	}
 
-	/* TODO: Make use of `HAVE_PAGE_ATTRIBUTE_TABLE' to control
+	/* TODO: Make  use   of   `HAVE_PAGE_ATTRIBUTE_TABLE'   to   control
 	 *       availability of `P32_PAGE_FPAT_4KIB' / `P32_PAGE_FPAT_4MIB' */
 
-	/* TODO: Make use of `CPUID.80000008H:EAX[7:0]' to figure out the
+	/* TODO: Make  use of `CPUID.80000008H:EAX[7:0]'  to figure out the
 	 *       physical address width supported by the hosting processor. */
 
 }

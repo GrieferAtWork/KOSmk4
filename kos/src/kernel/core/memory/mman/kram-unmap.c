@@ -1190,9 +1190,9 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 		 *  - Because hinted mem-nodes cannot be split (only truncated),
 		 *    we must first see how many  pages reside on the upper  end
 		 *    of the sub-segment to-be unmapped.
-		 *  - We  must  always chose  the upper  end  because we  must eventually
-		 *    truncate the  associated mem-part's  `mp_blkst_ptr' vector,  though
-		 *    we  cannot modify  its base-pointer,  or move  around its elements.
+		 *  - We  must always chose  the upper end  because we must eventually
+		 *    truncate the associated mem-part's `mp_blkst_ptr' vector, though
+		 *    we cannot modify its base-pointer, or move around its  elements.
 		 *    NOTE: The   same    goes   for    the   `mp_mem_sc.ms_v'    vector.
 		 *    This  restriction must  be in  place, since  the page-fault handler
 		 *    doesn't acquire any sort of lock before accessing such a component,

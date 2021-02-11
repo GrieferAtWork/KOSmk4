@@ -76,7 +76,7 @@ PUBLIC_FUNCTION(pagedir_syncall)
 END(pagedir_syncall)
 
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
- * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
+ * overlaps with kernel-space, behave  the same as `pagedir_syncall()',  otherwise,
  * behave the same as `pagedir_syncall_user()' */
 /* >> FUNDEF NOBLOCK void
  * >> NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(PAGEDIR_PAGEALIGNED VIRT void *addr,

@@ -128,18 +128,18 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 
 
 
-/* Try to invoke the user-space exception handler for the
+/* Try to invoke the user-space exception handler for  the
  * currently set exception, as described by `error_info()'
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
- * @param: sc_info: When non-NULL, information about the system call that caused the exception.
+ * @param: sc_info: When  non-NULL, information about  the system call  that caused the exception.
  *                  Otherwise, if this argument is `NULL', the exception was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from `sc_info->rsi_flags'! (s.a. `<librpc/bits/rpc-common.h>')
+ *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
  * @return: NULL:   User-space does not define an exception handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space exception handler once user-space execution
+ *                  user-space exception handler once user-space  execution
  *                  resumes. */
 #ifdef __x86_64__
 PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
@@ -192,7 +192,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	user_error->e_code = (__error_code64_t)except_data->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_args.e_pointers[i] = (u64)except_data->e_args.e_pointers[i];
-	/* In case of a system call, set the fault
+	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getuserpsp(state)
@@ -260,7 +260,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	/* Copy exception data onto the user-space stack. */
 #ifdef __x86_64__
 	/* Propagate class & sub-class individually, since the way in
-	 * which they form e_code is different in x32 and x64 mode. */
+	 * which they form e_code is  different in x32 and x64  mode. */
 	user_error->e_class    = (__error_class32_t)except_data->e_class;
 	user_error->e_subclass = (__error_subclass32_t)except_data->e_subclass;
 #else /* __x86_64__ */
@@ -268,7 +268,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_args.e_pointers[i] = (u32)except_data->e_args.e_pointers[i];
-	/* In case of a system call, set the fault
+	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getuserpsp(state)
@@ -332,7 +332,7 @@ done:
 LOCAL ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict except_data) {
 	siginfo_t si;
-	/* Try to translate the current exception into a signal, so that we
+	/* Try to translate the current exception  into a signal, so that  we
 	 * can use that signal code as reason for why the process has exited. */
 	if (!error_as_signal(except_data, &si))
 		si.si_signo = SIGILL;
@@ -343,20 +343,20 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data c
 
 /* Raise a posix signal in user-space for `siginfo'
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
- * @param: sc_info: When non-NULL, information about the system call that caused the signal.
- *                  Otherwise, if this argument is `NULL', the signal was caused by user-space,
+ * @param: sc_info: When  non-NULL,  information about  the system  call  that caused  the signal.
+ *                  Otherwise,  if this argument  is `NULL', the signal  was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from `sc_info->rsi_flags'! (s.a. `<librpc/bits/rpc-common.h>')
+ *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
- *                  and if a coredump ends up being generated as a result of the signal being
+ *                  and  if a coredump ends up being generated  as a result of the signal being
  *                  raised, that coredump will include information about `error_info()', rather
  *                  than the given `siginfo'
  * @return: NULL:   User-space does not define an signal handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space signal handler once user-space execution
+ *                  user-space signal  handler  once  user-space  execution
  *                  resumes. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
@@ -404,7 +404,7 @@ again_gethand:
 		xdecref_unlikely(action.sa_mask);
 		if (except_info) {
 			/* If we've gotten here because of a system call, then we can assume that
-			 * the exception does have a kernel-space side, and thus we must include
+			 * the exception does have a kernel-space side, and thus we must  include
 			 * information about that exception's origin. */
 			coredump_create_for_exception(state, except_info, sc_info != NULL);
 		} else {
@@ -462,11 +462,11 @@ again_gethand:
 }
 
 
-/* Helper function for `x86_userexcept_raisesignal()' that may be used
+/* Helper function for  `x86_userexcept_raisesignal()' that  may be  used
  * to raise the appropriate POSIX signal for the currently set exception.
  * @return: NULL: The current exception cannot be translated into a posix signal.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space signal handler once user-space execution
+ *                  user-space signal  handler  once  user-space  execution
  *                  resumes. */
 PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
@@ -506,7 +506,7 @@ NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
 
 
 /* Translate the current exception into an errno and set that errno
- * as the return value of the system call described by `sc_info'. */
+ * as the return value of  the system call described by  `sc_info'. */
 #ifdef __x86_64__
 PUBLIC WUNUSED NONNULL((1, 2, 3)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
@@ -531,7 +531,7 @@ NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
 	gpregs_setpax(&state->ics_gpregs, (uintptr_t)(intptr_t)errval);
 	/* Check if the system call is double-wide so we
-	 * can sign-extend the error code if necessary. */
+	 * can  sign-extend the error code if necessary. */
 	if (kernel_syscall64_doublewide(sc_info->rsi_sysno))
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	/* Set an error flag (if any) */
@@ -556,7 +556,7 @@ NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
 	gpregs_setpax(&state->ics_gpregs, errval);
 	/* Check if the system call is double-wide so we
-	 * can sign-extend the error code if necessary. */
+	 * can  sign-extend the error code if necessary. */
 	if (kernel_syscall32_doublewide(sc_info->rsi_sysno))
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	/* Set an error flag (if any) */
@@ -565,9 +565,9 @@ NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
 }
 
 
-/* Propagate the currently thrown exception into user-space, using either the user-space
- * exception handler, by raising a POSIX signal, or by translating the exception into an
- * E* error code in the event of a system call with exceptions disabled (on x86, except-
+/* Propagate the currently  thrown exception  into user-space, using  either the  user-space
+ * exception handler, by raising  a POSIX signal,  or by translating  the exception into  an
+ * E* error code in  the event of a  system call with exceptions  disabled (on x86,  except-
  * enabled is usually controlled by the CF bit, however this function takes that information
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
@@ -649,7 +649,7 @@ again:
 			result = x86_userexcept_seterrno(state, sc_info, &info.ei_data);
 			goto done;
 		}
-	
+
 		/* Check if signal exceptions should be propagated in non-syscall scenarios. */
 		if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
 		     EXCEPT_HANDLER_MODE_MASK) == EXCEPT_HANDLER_MODE_SIGHAND) {
@@ -672,7 +672,7 @@ again:
 
 terminate_app:
 	/* If we've gotten here because of a system call, then we can assume that
-	 * the exception does have a kernel-space side, and thus we must include
+	 * the exception does have a kernel-space side, and thus we must  include
 	 * information about that exception's origin. */
 	coredump_create_for_exception(state, &info, sc_info != NULL);
 	process_exit_for_exception_after_coredump(&info.ei_data);
@@ -691,7 +691,7 @@ done:
 /* Serve all user-space redirection RPCs
  * @return: * : The new CPU state to restore
  * @param: prestart_system_call: If `reason == TASK_RPC_REASON_SYSCALL', whilst an `E_INTERRUPT_USER_RPC'
- *                               exception was handled, when `RPC_KIND_USER_SYNC' RPCs exist that cannot
+ *                               exception was handled, when `RPC_KIND_USER_SYNC' RPCs exist that  cannot
  *                               be handled in the current context, then set to true. */
 INTDEF WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state,
@@ -706,7 +706,7 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
  * into user-space with the help of `x86_userexcept_propagate()'.
  * Afterwards, load the updated icpustate at the base of the calling thread's stack,
  * and finally fully unwind into user-space by use of `'. */
-PUBLIC ATTR_NORETURN NONNULL((1)) void 
+PUBLIC ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
                                      struct rpc_syscall_info const *sc_info) {
 	struct icpustate *return_state;
@@ -734,7 +734,7 @@ NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
 		assert(SEGMENT_IS_VALID_KERNCODE(return_state->ics_irregs.ir_cs));
 		/* Manually unwind additional FLAGS registers.
 		 * Because .cfi_iret_signal_frame perform a kernel-space unwind
-		 * due to the redirection, we must manually complete the
+		 * due to  the  redirection,  we  must  manually  complete  the
 		 * unwind to also include ESP and SS
 		 *  - Right now, ESP points at &irregs_user::ir_esp / &irregs_vm86::ir_esp */
 #ifdef __x86_64__
@@ -792,9 +792,9 @@ NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
 		__wrgs(ustate->ucs_sgregs.sg_gs16);
 		__wrgsbase(me);
 	}
-	/* FIXME: Restoring segment base registers here is correct, however
-	 *        unnecessary in all current use cases. - The solution would
-	 *        be to have another kind of cpustate structure that is like
+	/* FIXME: Restoring  segment  base  registers here  is  correct, however
+	 *        unnecessary  in all  current use  cases. -  The solution would
+	 *        be to have  another kind  of cpustate structure  that is  like
 	 *        ucpustate, but don't contain segment base registers on x86_64! */
 	set_user_gsbase(ustate->ucs_sgbase.sg_gsbase);
 	set_user_fsbase(ustate->ucs_sgbase.sg_fsbase);
@@ -825,7 +825,7 @@ NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
 	x86_userexcept_unwind_i(return_state, sc_info);
 }
 
-/* Same as `x86_userexcept_unwind()', however the caller has already done the work
+/* Same  as  `x86_userexcept_unwind()',  however  the  caller  has  already  done  the work
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
 PUBLIC ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
@@ -845,7 +845,7 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
 		                                       sc_info,
 		                                       &must_restart_syscall);
 		assert(PREEMPTION_ENABLED());
-		/* If there is still an active exception (i.e. RPC handling didn't resolve
+		/* If there is still an active exception (i.e. RPC handling didn't  resolve
 		 * the exception, as would be the case for `E_INTERRUPT_USER_RPC'), then we
 		 * must somehow propagate the exception into user-space. */
 		if (error_code() != E_OK) {
@@ -860,7 +860,7 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
 		                                       TASK_RPC_REASON_ASYNCUSER,
 		                                       NULL,
 		                                       NULL);
-		/* If there is still an active exception (i.e. RPC handling didn't resolve
+		/* If there is still an active exception (i.e. RPC handling didn't  resolve
 		 * the exception, as would be the case for `E_INTERRUPT_USER_RPC'), then we
 		 * must somehow propagate the exception into user-space. */
 		if (error_code() != E_OK)

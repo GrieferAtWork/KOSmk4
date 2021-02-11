@@ -34,7 +34,7 @@
  *            Note that the checked domain is always PROCESS and THREAD of the
  *            calling thread, meaning  that sharing  signalfd handles  between
  *            processes does _not_ actually share the pool of polled  signals.
- *            This   behavior   is   implied  by   the   linux  documentation:
+ *            This behavior is implied by the linux documentation:
  *            ```
  *            After a fork(2), the child inherits a copy of the signalfd  file
  *            descriptor. A read(2) from the file descriptor in the child will

@@ -77,7 +77,7 @@ struct path {
 	struct atomic_rwlock        p_lock;    /* Lock for accessing this path component. */
 	REF struct directory_node  *p_inode;   /* [0..1][lock(p_lock)] The associated directory (or `NULL' if the root-path is unmounted).
 	                                        * NOTE: Query functions such as `path_child()' are allowed
-	                                        *       to assume that this field is always non-NULL. */
+	                                        *       to  assume  that  this field  is  always non-NULL. */
 	struct mounted_path        *p_mount;   /* [0..1][lock(p_lock)][owned_if(!= &p_vfs->v_rootmount)] Mounting point data. */
 	REF struct directory_entry *p_dirent;  /* [1..1][const] Name of this directory entry (empty for VFS root). */
 	LLIST_NODE(struct path)     p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
@@ -391,7 +391,7 @@ path_newchild(struct path *__restrict self,
  * @param: premoved_dirent:       Upon success, store a reference to the removed INode's directory entry here.
  * @param: pcontaining_directory: Upon success, store a reference to the directory node from which an element got removed here.
  *                                Since   `self->p_inode'   can   arbitrarily   change   due   to   mounting,   this   is   the
- *                                only save way to determine the exact directory from which the element got removed.
+ *                                only save  way  to  determine  the  exact directory  from  which  the  element  got  removed.
  * @param: premoved_path:         Upon success, store a reference to the removed path here (or `NULL' if it wasn't
  *                                a directory that  got removed, or  if that  directory didn't have  a path  node)
  * @return: * : Set of `DIRECTORY_REMOVE_STATUS_*'
@@ -509,8 +509,8 @@ path_rename(struct path *__restrict source_path,
  *                     `E_FSERROR_TOO_MANY_SYMBOLIC_LINKS' exception to be thrown.
  * @param: premaining_symlinks: [in|out] When non-NULL, load/store the amount of remaining
  *                              symbolic link indirection  which the path  may have  still
- *                              traversed during evaluation (aka.: the limit on how  many
- *                              symbolic links may still be traversed during further path
+ *                              traversed during evaluation (aka.:  the limit on how  many
+ *                              symbolic links may still be traversed during further  path
  *                              walks)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
  *                                            One of the accessed directory INodes had been deleted.
@@ -864,7 +864,7 @@ struct handle;
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH | O_TMPFILE | O_SYMLINK | O_*'
+ *                         O_PATH   |  O_TMPFILE  |  O_SYMLINK  |  O_*'
  * @param: fsmode: Set of `0 | FS_MODE_FDOSPATH | FS_MODE_FEMPTY_PATH |
  *                         FS_MODE_FSYMLINK_NOFOLLOW' */
 FUNDEF WUNUSED NONNULL((1, 2, 3)) REF struct handle KCALL

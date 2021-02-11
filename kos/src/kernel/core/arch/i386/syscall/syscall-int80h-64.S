@@ -55,7 +55,7 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	/* Because we can assume that we only get here from user-space with #IF enabled,
-	 * we don't have to swapgs or sti conditionally, but can simply always do so. */
+	 * we don't have to swapgs  or sti conditionally, but  can simply always do  so. */
 	swapgs
 	sti
 PUBLIC_FUNCTION(x86_syscall64_int80_after_swapgs)
@@ -127,7 +127,7 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 PUBLIC_FUNCTION(x86_syscall64_int80_after_swapgs_traced)
 	/* Check if we got here from compatibility mode.
 	 * Note that this check must be done before re-enabling interrupts, since
-	 * once that is done, our iret tail may have already been redirected! */
+	 * once  that is  done, our iret  tail may have  already been redirected! */
 	cmpq   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS64_CS(%rsp)
 	/* Unconditionally re-enable interrupts (only get here from user-space) */
 	sti

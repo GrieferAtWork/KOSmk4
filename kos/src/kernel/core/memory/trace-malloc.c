@@ -979,8 +979,8 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 			/* FIXME: What if `base' isn't writable because it was written to SWAP?
 			 *        In this case  we'd have  to abort GC  detection, release  our
 			 *        scheduler super-lock, force  load `base' into  the core,  and
-			 *        finally: try again (though  we should probably  all pages  to
-			 *        which this applies, and load them all at once)
+			 *        finally: try again (though we should probably all pages to
+			 *        which  this   applies,  and   load  them   all  at   once)
 			 * NOTE:  We  can only load them when not holding a super-lock, since
 			 *        the act of loading memory  from SWAP might require the  use
 			 *        of an async worker, which don't work while holding a super-
@@ -1506,8 +1506,8 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 	/* Step #1: Calculate the xref total for every node. */
 	for (leak = leaks; leak; leak = trace_node_leak_next(leak)) {
 		/* XXX: Only use this slow O(N^2) approach when there are only a couple of leaks,
-		 *      (say: less than 64), and try to re-construct an RBTREE for faster  lookup
-		 *      of  addr->node which can then be used to only have to enumerate memory of
+		 *      (say: less than 64), and try to re-construct an RBTREE for faster lookup
+		 *      of addr->node which can then be used to only have to enumerate memory of
 		 *      nodes once. */
 		struct trace_node *leak2;
 		uintptr_t leak_min, leak_max;

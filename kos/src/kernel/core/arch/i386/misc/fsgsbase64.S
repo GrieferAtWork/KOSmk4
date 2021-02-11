@@ -45,7 +45,7 @@
 #define TARGET_REGISTER rbp
 #include "fsgsbase64-impl.S.inl"
 
-/* Don't include rsp. - Even though it's a GP register, I can't see any
+/* Don't include rsp. - Even  though it's a GP  register, I can't see  any
  * situation where one could reasonable argue that using the stack pointer
  * for something like this is a good idead... */
 /* #define TARGET_REGISTER rsp */

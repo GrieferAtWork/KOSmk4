@@ -122,7 +122,7 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,
 		      turn_on);
 	}
-	/* Manipulate the IOBM of our own thread through use of the `thiscpu_x86_iob' vector.
+	/* Manipulate the  IOBM of  our own  thread  through use  of the  `thiscpu_x86_iob'  vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	old_thread_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
 	TRY {
@@ -132,7 +132,7 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		 * This essentially enforces that:
 		 *  - Anyone is allowed to disable ports (or keep them enabled)
 		 *  - As such, we must only throw an insufficient-rights exception
-		 *    if the calling thread doesn't have permissions to turn on
+		 *    if the calling  thread doesn't have  permissions to turn  on
 		 *    permissions for some specific port. */
 #ifndef CONFIG_EVERYONE_IS_ROOT
 		if (turn_on && !capable(CAP_SYS_RAWIO)) {

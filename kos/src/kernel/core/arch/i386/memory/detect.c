@@ -60,8 +60,8 @@ INTDEF struct pmembank kernel_membanks_initial[];
 PUBLIC ATTR_COLDDATA struct pmeminfo minfo = {
 	 .mb_total = {
 		/* NOTE: Memory totals are initialized in `x86_initialize_default_memory_banks'
-		 *       technically, this could be initialized at compile-/link-time, however
-		 *       doing so would be quite complicated, so I'm going to act like I don't
+		 *       technically,  this could be initialized at compile-/link-time, however
+		 *       doing  so would be quite complicated, so I'm going to act like I don't
 		 *       know about this potential optimization for the time being... */
 		/* [PMEMBANK_TYPE_UNDEF]     = */ 0,
 		/* [PMEMBANK_TYPE_RAM]       = */ 0,

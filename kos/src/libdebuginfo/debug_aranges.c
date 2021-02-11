@@ -49,8 +49,8 @@ DECL_BEGIN
  * into the .debug_info section in `*pdebug_info_cu_offset' and return success.
  * @param: pdebug_info_cu_offset: Pointer  that  will  receive an  offset  into .debug_info,
  *                                which may then be used with `debuginfo_cu_parser_loadunit'
- *                                in order to load the compilation unit associated with
- *                                the  `module_relative_pc'  originally passed  to this
+ *                                in order  to load  the  compilation unit  associated  with
+ *                                the   `module_relative_pc'   originally  passed   to  this
  *                                function.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...

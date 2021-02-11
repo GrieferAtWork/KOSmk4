@@ -241,10 +241,10 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
  * This function does:
  *  - assert(fmnode->mbn_part != NULL);
  *  - assert(fmnode->mbn_file != NULL);
- *  - fmnode->mbn_filnxt = NULL;       // Only   single-nde   initial  mappings   are  supported.
- *                                     // Additional required nodes are added lazily if necessary
+ *  - fmnode->mbn_filnxt = NULL;       // Only  single-nde   initial   mappings   are   supported.
+ *                                     // Additional  required nodes are added lazily if necessary
  *                                     // via the re-flow mechanism that is done as part of a call
- *                                     // to              `mbuilder_partlocks_acquire_or_unlock()'
+ *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
  *  - SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
  *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
  *                                           fmnode->mbn_part),

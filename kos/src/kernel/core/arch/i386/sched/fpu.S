@@ -84,9 +84,9 @@ END(x86_fpustate_save_noreset)
 PUBLIC_FUNCTION(x86_fpustate_init)
 	/* void FCALL x86_fpustate_init(struct fpustate *__restrict state); */
 
-	/* >> movw   $(FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
-	 * >>          FCW_UM | FCW_PM | 0x40 (???) | \
-	 * >>          FCW_PC_EXTEND | FCW_RC_NEAREST),  \
+	/* >> movw   $(FCW_IM | FCW_DM | FCW_ZM | FCW_OM |
+	 * >>          FCW_UM | FCW_PM | 0x40 (???) |
+	 * >>          FCW_PC_EXTEND | FCW_RC_NEAREST),
 	 * >>        OFFSET_XFPUSTATE_FCW(%R_fcall0P) */
 #if OFFSET_XFPUSTATE_FCW == 0
 	.byte  0x66, 0xc7, (0x00 | RNO_fcall0)
@@ -255,7 +255,7 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	.cfi_adjust_cfa_offset SIZEOF_SFPUSTATE
 
 	/* Load the primary part of the FPU by converting the xfpustate
-	 * into an `sfpustate' which we'll keep ontop of the stack. */
+	 * into  an `sfpustate'  which we'll  keep ontop  of the stack. */
 	movzwl OFFSET_XFPUSTATE_FCW(%R_fcall0P), %eax
 	movl   %eax, OFFSET_SFPUSTATE_FCW(%Psp)
 	movzwl OFFSET_XFPUSTATE_FSW(%R_fcall0P), %eax

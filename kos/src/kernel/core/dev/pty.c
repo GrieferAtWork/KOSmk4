@@ -66,7 +66,7 @@ NOTHROW(KCALL pty_slave_fini)(struct character_device *__restrict self) {
 	if (master) {
 		assert(awref_ptr(&master->pm_slave) == me);
 		awref_clear(&master->pm_slave);
-		/* Unlikely, since the controlling application is probably
+		/* Unlikely,  since the controlling application is probably
 		 * still holding a reference to the master side of the PTY. */
 		decref_unlikely(master);
 	}
@@ -360,7 +360,7 @@ pty_alloc(REF struct pty_master **__restrict pmaster,
 				slave->ps_wsize.ws_xpixel = slave->ps_wsize.ws_col = 80;
 				slave->ps_wsize.ws_ypixel = slave->ps_wsize.ws_row = 25;
 			}
-			/* Set the weak-registration flags for the master slave PTY devices.
+			/* Set the weak-registration flags for  the master slave PTY  devices.
 			 * This allows the devices to automatically be deleted once user-space
 			 * gets rid of the last reference to any of them! */
 			master->cd_flags |= CHARACTER_DEVICE_FLAG_WEAKREG;

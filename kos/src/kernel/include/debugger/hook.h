@@ -194,7 +194,7 @@ typedef void (DBG_CALL *dbg_autocomplete_cb_t)(void *arg, char const *name, size
  * argc+argv by invoking `(*cb)(arg, ...)' for each possibility.
  * @param: starts_with: (optional) When non-NULL (and non-empty), the function
  *                       is allowed to only enumerate auto-completion options
- *                       that start with the C-string `starts_with' */
+ *                       that   start   with   the   C-string   `starts_with' */
 typedef void (DBG_CALL *dbg_autocomplete_t)(size_t argc, char *argv[],
                                             dbg_autocomplete_cb_t cb, void *arg,
                                             char const *starts_with,

@@ -54,21 +54,21 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 /* TODO: Add a virtual indirection layer to the debugger input sub-system
  * -> When it comes to user-input, the debugger should make use of
- *    other kernel keyboard drivers to provide it with input, and
- *    only fall-back to using this built-in PS/2 driver when no
+ *    other kernel keyboard drivers to provide it with input,  and
+ *    only fall-back to  using this built-in  PS/2 driver when  no
  *    keyboard device has yet to be registered.
- * -> Currently, this PS/2 fallback driver breaks when the user
+ * -> Currently, this PS/2 fallback  driver breaks when the  user
  *    has a USB keyboard, and the USB driver has already disabled
  *    PS/2-through-USB emulation. In this case, we'd have to poll
  *    data from the keyboard driver instead!
  * -> This would also solve the keymap problem by allowing the use
- *    of whatever keymap has been loaded into individual keyboard
+ *    of whatever keymap has been loaded into individual  keyboard
  *    devices! */
 /* TODO: Re-enable PS/2-through-USB emulation after it has already been enabled.
- *       This is required to ensure that the debugger works correctly when used
- *       after emulation was already disabled, as might be the case following a
- *       soft-reboot, or the debugger being invoked during USB initialization,
- *       after PS/2 emulation was disabled, but before a USB keyboard was fully
+ *       This is required to ensure that the debugger works correctly when  used
+ *       after emulation was already disabled, as might be the case following  a
+ *       soft-reboot, or the debugger  being invoked during USB  initialization,
+ *       after PS/2 emulation was disabled, but before a USB keyboard was  fully
  *       initialized. */
 
 DECL_BEGIN
@@ -864,10 +864,10 @@ function MAP(id, a, b = none, c = none) {
 }
 #define MAP(...) MAP(__VA_ARGS__);
 MAP(KEY_DELETE,     '\x7f')
-MAP(KEY_GRAVE_ACCENT,'^',  '°')
+MAP(KEY_GRAVE_ACCENT,'^',  'Â°')
 MAP(KEY_1,          '1',   '!')
-MAP(KEY_2,          '2',   '\"',  '²')
-MAP(KEY_3,          '3',   '§',   '³')
+MAP(KEY_2,          '2',   '\"',  'Â²')
+MAP(KEY_3,          '3',   'Â§',   'Â³')
 MAP(KEY_4,          '4',   '$')
 MAP(KEY_5,          '5',   '%')
 MAP(KEY_6,          '6',   '&')
@@ -875,14 +875,14 @@ MAP(KEY_7,          '7',   '/',   '{')
 MAP(KEY_8,          '8',   '(',   '[')
 MAP(KEY_9,          '9',   ')',   ']')
 MAP(KEY_0,          '0',   '=',   '}')
-MAP(KEY_MINUS,      'ß',   '?',   '\\')
-MAP(KEY_EQUALS,     '´',   '`')
+MAP(KEY_MINUS,      'ÃŸ',   '?',   '\\')
+MAP(KEY_EQUALS,     'Â´',   '`')
 MAP(KEY_BACKSPACE,  '\x8')
 
 MAP(KEY_TAB,        '\t')
 MAP(KEY_Q,          'q',   'Q',   '@')
 MAP(KEY_W,          'w',   'W')
-MAP(KEY_E,          'e',   'E',   '€')
+MAP(KEY_E,          'e',   'E',   'Â€')
 MAP(KEY_R,          'r',   'R')
 MAP(KEY_T,          't',   'T')
 MAP(KEY_Y,          'z',   'Z')
@@ -890,7 +890,7 @@ MAP(KEY_U,          'u',   'U')
 MAP(KEY_I,          'i',   'I')
 MAP(KEY_O,          'o',   'O')
 MAP(KEY_P,          'p',   'P')
-MAP(KEY_LBRACKET,   'ü',   'Ü')
+MAP(KEY_LBRACKET,   'Ã¼',   'Ãœ')
 MAP(KEY_RBRACKET,   '+',   '*',   '~')
 MAP(KEY_ENTER,      '\n',  '\xc') // Form feed (New page)
 
@@ -903,8 +903,8 @@ MAP(KEY_H,          'h',   'H')
 MAP(KEY_J,          'j',   'J')
 MAP(KEY_K,          'k',   'K')
 MAP(KEY_L,          'l',   'L')
-MAP(KEY_SEMICOLON,  'ö',   'Ö')
-MAP(KEY_SINGLEQUOTE,'ä',   'Ä')
+MAP(KEY_SEMICOLON,  'Ã¶',   'Ã–')
+MAP(KEY_SINGLEQUOTE,'Ã¤',   'Ã„')
 MAP(KEY_NUMBERSIGN, '#',   '\'')
 
 MAP(KEY_LESS,       '<',   '>',   '|')
@@ -1355,7 +1355,7 @@ PRIVATE ATTR_DBGBSS unsigned int dbg_awaiting_what  = 0;
 PRIVATE ATTR_DBGBSS unsigned int dbg_awaiting_input = 0;
 
 /* Begin/end expecting further user-input in the near future.
- * While user-input is being awaited, `dbg_awaituser()' will
+ * While  user-input is being awaited, `dbg_awaituser()' will
  * return `true' when `dbg_getc()' would not block.
  * @param: what: One of `DBG_AWAIT_*' */
 PUBLIC NOBLOCK void
@@ -1375,8 +1375,8 @@ NOTHROW(FCALL dbg_awaituser_end)(bool force) {
 }
 
 /* Check if there is pending user-input left to-be processed,
- * and that the debugger is currently awaiting user-input.
- * This function should be called from within long-running
+ * and that the  debugger is  currently awaiting  user-input.
+ * This function should  be called  from within  long-running
  * functions, and a `true' return value should be interpreted
  * as a request to stop the function and return to the caller
  * with some sort of consistent state as soon as possible. */
@@ -1508,7 +1508,7 @@ again:
 		goto err_no_ps2;
 	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK)) {
 		/* Try to re-initialize the keyboard (it may just be really
-		 * old, or not capable of supporting multiple scansets...) */
+		 * old,  or not capable of supporting multiple scansets...) */
 		position = __LINE__;
 		if (!ps2_write_data(PS2_KEYBOARD_CMD_RESET))
 			goto err_no_ps2;
@@ -1547,7 +1547,7 @@ again:
 	if unlikely(!ps2_keyboard_scanset)
 		ps2_keyboard_scanset = 1;
 
-	/* TODO: Set a faster default repeat rate (the default one
+	/* TODO: Set a faster  default repeat rate  (the default  one
 	 *       is _way_ too slow; should be at least twice as fast) */
 
 	/* Enable scanning */

@@ -60,7 +60,7 @@
 
 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
  * NOTE: Same as the `MAP_SHARED' map flag, but
- *       can be set like any other protection. */
+ *       can  be set like any other protection. */
 #if !defined(PROT_SHARED) && defined(__PROT_SHARED)
 #define PROT_SHARED __PROT_SHARED
 #endif /* !PROT_SHARED && __PROT_SHARED */
@@ -160,7 +160,7 @@ DATDEF struct mfile mfile_zero;     /* Zero-initialized, anonymous memory. */
  * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
  * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED' (Other bits are silently ignored)
  *                        Additionally,  the   following   flags   may  be   set   to   customize  the   behavior   of   how
- *                        a  suitable   address  is   located  (s.a.   `mman_findunmapped()'  for   more   info):
+ *                        a   suitable    address    is    located   (s.a.    `mman_findunmapped()'    for    more    info):
  *                        `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE'
  * @param: file:          The file that is being mapped.
  * @param: file_fspath:   Optional mapping path (only used for memory->disk mapping listings)

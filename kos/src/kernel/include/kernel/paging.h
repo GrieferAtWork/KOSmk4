@@ -423,9 +423,9 @@ FUNDEF NOBLOCK WUNUSED void *NOTHROW(FCALL pagedir_gethint)(VIRT void *addr);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETHINT */
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped.
+ * @param: perm: A set  of `PAGEDIR_MAP_F*'  detailing how  memory should  be  mapped.
  * `pagedir_sync()' must be called while specifying a virtual address range containing
- * `addr...+=num_bytes'  in  order  to  ensure  that  changes  will  become   visible.
+ * `addr...+=num_bytes' in order to ensure that changes will become visible.
  * NOTE: This function  can be called  regardless of which  page directory is  active. */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAP
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,

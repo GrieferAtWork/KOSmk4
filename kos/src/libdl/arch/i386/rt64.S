@@ -103,7 +103,7 @@ DEFINE_PUBLIC_ALIAS(__tls_get_addr, libdl___tls_get_addr)
 .section .text
 	/* The heart-piece of lazy symbol relocations:
 	 *   - This function is called by user-code the first time an R_X86_64_JMP_SLOT
-	 *     relocation is accessed, at which point the relocation is resolved.
+	 *     relocation  is  accessed, at  which  point the  relocation  is resolved.
 	 *   - See the explanation about `PLTGOT' below for how this actually works.
 	 */
 INTERN_FUNCTION(dl_load_lazy_relocation)

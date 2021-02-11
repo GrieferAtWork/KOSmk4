@@ -401,14 +401,14 @@ INTERN_FUNCTION(x86_dbgidt_apic_ipi)
 	call   x86_dbg_handle_altcore_interrupt
 
 	/* Do normal APIC-IPI handling (ala. cpu_sendipi())
-	 * This is still required, because other CPUs will only send HW-ipis
-	 * to us if we keep on handling SW-based IPIs, meaning that we'll only
+	 * This  is still required,  because other CPUs  will only send HW-ipis
+	 * to us if we keep on handling SW-based IPIs, meaning that we'll  only
 	 * get IPI-related interrupts if we're nice and handling SW-based ones!
 	 *
-	 * Also: Since we're in debug-mode, and the specific CPU that's
-	 *       responsible for controlling the system at the moment, any
+	 * Also: Since we're  in debug-mode,  and the  specific CPU  that's
+	 *       responsible for controlling the system at the moment,  any
 	 *       IPI that gets back to us should really be as the result of
-	 *       us requesting some sort of data (such as disk I/O, or the
+	 *       us requesting some sort of data (such as disk I/O, or  the
 	 *       like...) */
 	EXTERN(x86_idt_apic_ipi_icpustate_Psp)
 	jmp    x86_idt_apic_ipi_icpustate_Psp

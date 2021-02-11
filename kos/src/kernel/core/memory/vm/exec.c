@@ -65,8 +65,8 @@ PUBLIC ATTR_PERMMAN struct vm_execinfo_struct thisvm_execinfo = {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-/* List  of   callbacks  that   should  be   invoked  after   vm_exec()
- * These  are  called alongside  stuff  like `handle_manager_cloexec()'
+/* List  of  callbacks  that  should  be  invoked  after  vm_exec()
+ * These are called alongside stuff like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_MMAN', and is never `&vm_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
 

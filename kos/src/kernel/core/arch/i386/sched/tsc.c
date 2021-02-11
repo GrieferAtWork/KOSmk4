@@ -57,8 +57,8 @@
 
 DECL_BEGIN
 
-/* (In HZ): The lowest distance for which a TSC deadline can be set.
- *          Attempting to set something lower than this will cause the
+/* (In HZ): The lowest  distance for  which a  TSC deadline  can be  set.
+ *          Attempting to set  something lower than  this will cause  the
  *          kernel to simply spin until the deadline has actually passed. */
 #ifndef TSC_MIN_DISTANCE_HZ
 #define TSC_MIN_DISTANCE_HZ 10000
@@ -71,18 +71,18 @@ PUBLIC struct atomic_lock x86_pit_lock = ATOMIC_LOCK_INIT;
 #endif /* !CONFIG_NO_SMP */
 
 
-/* The best approximation currently known in regards to the TSC
+/* The best approximation currently known in regards to the  TSC
  * frequency of this CPU. This frequency should approximately be
- * the same on all CPUs, and shouldn't change too much as time
- * goes on. However minor adjustments may be made in order to
- * deal with drifts and inaccuracies. Also: the actual HZ may
- * be a floating point number, and this value can only ever be
+ * the same on all CPUs, and  shouldn't change too much as  time
+ * goes  on. However minor  adjustments may be  made in order to
+ * deal with drifts  and inaccuracies. Also:  the actual HZ  may
+ * be a floating point number, and  this value can only ever  be
  * as good of an approximation as we can manage to calculate.
  *
  * NOTE: The value of this variable may only change when preemption
- *       is enabled, at which point low-level, arch-specific code
- *       may set-up a periodic interrupt handler who's purpose is
- *       to occasionally re-sync the realtime() clock, as well as
+ *       is  enabled, at which  point low-level, arch-specific code
+ *       may set-up a periodic  interrupt handler who's purpose  is
+ *       to occasionally re-sync the  realtime() clock, as well  as
  *       make minor adjustments to the TSC_HZ.
  *
  * HINT: HZ = ticks_per_second. */
@@ -110,10 +110,10 @@ INTERN ATTR_PERCPU u32 thiscpu_x86_apic_emutsc_initial = PIT_HZ_DIV(X86_PIT_EARL
 
 /* Only used in APIC and PIT mode!
  * The current shift stored in `APIC_TIMER_DIVIDE' (shadow value)
- * This variable contains `CTZ(n)' of `APIC_TIMER_DIVIDE_Fn' */
+ * This  variable  contains  `CTZ(n)'  of  `APIC_TIMER_DIVIDE_Fn' */
 INTERN ATTR_PERCPU u8 thiscpu_x86_apic_emutsc_divide = 0;
 
-/* The minimal distance for TSC. Attempts at
+/* The minimal  distance for  TSC. Attempts  at
  * setting a distance less than this will fail. */
 INTERN ATTR_PERCPU tsc_t thiscpu_x86_apic_emutsc_mindistance = PIT_HZ_DIV(TSC_MIN_DISTANCE_HZ);
 
@@ -211,8 +211,8 @@ NOTHROW(FCALL tsc_ignore_pending_interrupt)(struct cpu *__restrict me) {
 
 
 /* Only used in APIC and PIT mode!
- * [const] Additional delay needed to account for the time it
- *         takes to read, compare + write the APIC current timer
+ * [const] Additional delay  needed to  account for  the time  it
+ *         takes to read, compare + write the APIC current  timer
  *         during execution of `tsc_ll_cmpxch_divide_and_initial'
  * This delay is valid under `APIC_TIMER_DIVIDE_F1' */
 PRIVATE ATTR_PERCPU u32 thiscpu_x86_apic_emutsc_cmpxch_delay = 0;
@@ -226,10 +226,10 @@ PRIVATE ATTR_PERCPU u32 thiscpu_x86_apic_emutsc_cmpxch_delay = 0;
  * >>     lapic_write(APIC_TIMER_INITIAL, new_initial);
  * >> }
  * >> return result;
- * With the (best-effort) guaranty that the final write to
+ * With the (best-effort) guaranty that the final write  to
  * `APIC_TIMER_INITIAL', when propagating its value back to
  * `APIC_TIMER_CURRENT', the value being replaced inside of
- * `APIC_TIMER_CURRENT' is equal to `old_current', thus
+ * `APIC_TIMER_CURRENT' is  equal  to  `old_current',  thus
  * ensuring that no time is lost. */
 FORCELOCAL NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) u32
 NOTHROW(tsc_ll_cmpxch_divide_and_initial)(struct cpu *__restrict me,
@@ -240,7 +240,7 @@ NOTHROW(tsc_ll_cmpxch_divide_and_initial)(struct cpu *__restrict me,
 	COMPILER_BARRIER();
 #if 1 /* Do this in assembly (with fixed registers), so we can better control timings!
        * Also: this way we can easily write (similar) code to calibrate the value for
-       *       `thiscpu_x86_apic_emutsc_cmpxch_delay' during early boot. */
+       *       `thiscpu_x86_apic_emutsc_cmpxch_delay'     during     early      boot. */
 	__asm__ __volatile__("movl   " PP_STR(APIC_TIMER_CURRENT) "(%[x86_lapicbase]), %%eax\n"
 	                     "subl   %%ecx, %%eax\n"
 	                     "cmpl   %%ebx, %%eax\n"
@@ -257,7 +257,7 @@ NOTHROW(tsc_ll_cmpxch_divide_and_initial)(struct cpu *__restrict me,
 	                     , "D" (new_initial)
 	                     : "memory", "cc");
 #else
-	/* The C-equivalent of the above assembly block.
+	/* The   C-equivalent   of  the   above   assembly  block.
 	 * Only here do aid in visualizing what our function does. */
 	result = lapic_read(APIC_TIMER_CURRENT);
 	result -= FORCPU(me, thiscpu_x86_apic_emutsc_cmpxch_delay) >>
@@ -283,19 +283,19 @@ NOTHROW(KCALL x86_calibrate_tsc_cmpxch_delay)(void) {
 	                     "subl   %%ecx, %%eax\n"
 	                     "cmpl   %%ebx, %%eax\n"
 	                     "jne    1f\n" /* Hopefully this instr will take just as long, even though
-	                                    * both of its branches point to the same address... */
+	                                    * both of  its  branches  point  to  the  same  address... */
 	                     "1:\n"
 	                     /* Hopefully, writing to `APIC_EOI' takes just as long as writing
-	                      * to `APIC_TIMER_DIVIDE' and `APIC_TIMER_INITIAL' would.
-	                      * We can't write to the later two, since that would alter/reset
-	                      * the clock that we (have to) use for measuring the timings. */
+	                      * to   `APIC_TIMER_DIVIDE'   and   `APIC_TIMER_INITIAL'   would.
+	                      * We  can't write to the later two, since that would alter/reset
+	                      * the clock that  we (have  to) use for  measuring the  timings. */
 	                     "movl   %%esi, " PP_STR(APIC_EOI) "(%[x86_lapicbase])\n"
 	                     "movl   %%esi, " PP_STR(APIC_EOI) "(%[x86_lapicbase])\n"
-	                     /* Read the final current-count twice, so we can derive the time it
-	                      * takes to do perform this final write. - After all: We need to know
+	                     /* Read  the final current-count  twice, so we can  derive the time it
+	                      * takes  to do perform this final write. - After all: We need to know
 	                      * the APIC time at this point right here, and not following the first
-	                      * read below. - So we read twice and use the difference between the
-	                      * two reads to derive the time as it was before the first read (that
+	                      * read  below. - So we read twice  and use the difference between the
+	                      * two  reads to derive the time as it was before the first read (that
 	                      * is: right now) */
 	                     "movl   " PP_STR(APIC_TIMER_CURRENT) "(%[x86_lapicbase]), %%ecx\n"
 	                     "movl   " PP_STR(APIC_TIMER_CURRENT) "(%[x86_lapicbase]), %%edx\n"
@@ -337,9 +337,9 @@ INTERN ATTR_PERCPU tsc_t thiscpu_x86_last_tsc = 0;
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 
-/* Read and return the current timestamp counter of the calling CPU.
- * The base-line of the returned counter is the calling CPU being
- * booted, or more precisely: some point in time during before the
+/* Read  and return the current timestamp counter of the calling CPU.
+ * The base-line of  the returned  counter is the  calling CPU  being
+ * booted,  or more precisely:  some point in  time during before the
  * CPU completed its low-level, arch-specific startup initialization.
  * This function may only be called with preemption disabled. */
 PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
@@ -376,7 +376,7 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 }
 
 /* Disable the TSC deadline, such that it will never trigger (or at the
- * very least: won't trigger until in a couple of months or something
+ * very least: won't trigger until in  a couple of months or  something
  * like that...) */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
@@ -389,7 +389,7 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 	/* TODO: Support for PIC-mode */
 	FORCPU(me, thiscpu_x86_apic_emutsc_deadline) = (u64)-1;
-	/* Check for simple case: If initial+divide didn't change,
+	/* Check for simple case: If  initial+divide  didn't change,
 	 *                        then we don't have to do anything! */
 	if (FORCPU(me, thiscpu_x86_apic_emutsc_initial) == UINT32_MAX &&
 	    FORCPU(me, thiscpu_x86_apic_emutsc_divide) == APIC_TIMER_DIVIDE_F128)
@@ -422,7 +422,7 @@ again_with_timer:
 		/* Special case: Roll-over will (probably) happen during our calculations. */
 		task_pause();
 		/* In case there was a (really long) SMM interrupt,
-		 * we need to be able to deal with that, too */
+		 * we need  to  be  able to  deal  with  that,  too */
 		delay >>= 1;
 		goto again;
 	}
@@ -438,7 +438,7 @@ again_with_timer:
 		goto again_with_timer;
 	}
 	/* Ignore the next TSC interrupt, if it's already pending.
-	 * NOTE: Technically, we'd have to do this atomically alongside
+	 * NOTE: Technically,  we'd have to do this atomically alongside
 	 *       `tsc_ll_cmpxch_divide_and_initial()', however we should
 	 *       be safe to assume that the newly set APIC counter won't
 	 *       have already expired at this point. */
@@ -456,11 +456,11 @@ again_with_timer:
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 }
 
-/* Set the TSC deadline, that is: the point in time when `tsc_interrupt()'
- * should be called by low-level, arch-specific code. This function,
+/* Set the TSC deadline, that is: the point in time when  `tsc_interrupt()'
+ * should be  called  by  low-level,  arch-specific  code.  This  function,
  * alongside `tsc_get()' form the basis for timing-based scheduling on KOS.
  * NOTE: A previously set deadline is overwritten by later calls to this
- *       function. If a previous deadline has expired in the mean time,
+ *       function.  If a previous deadline has expired in the mean time,
  *       then `tsc_interrupt()' may or may not be called once the caller
  *       re-enables preemption.
  * @return: * :          The timestamp at the time of the deadline being set.
@@ -485,7 +485,7 @@ NOTHROW(FCALL tsc_deadline)(struct cpu *__restrict me,
 	delay = 1; /* Initial guess */
 again:
 	COMPILER_BARRIER();
-	/* NOTE: All control paths between here and the
+	/* NOTE: All  control  paths between  here  and the
 	 *       `tsc_ll_cmpxch_divide_and_initial()' below
 	 *       must be timing-safe! */
 	current_reg = lapic_read(APIC_TIMER_CURRENT);
@@ -513,7 +513,7 @@ again_with_timer:
 		/* Special case: Roll-over will (probably) happen during our calculations. */
 		task_pause();
 		/* In case there was a (really long) SMM interrupt,
-		 * we need to be able to deal with that, too */
+		 * we need  to  be  able to  deal  with  that,  too */
 		delay >>= 1;
 		goto again;
 	}
@@ -544,10 +544,10 @@ again_with_timer:
 		 * This must be done because our distance to the deadline is too small
 		 * to allow us to safely set-up the APIC/PIT timer interval, and still
 		 * be able to safely trace timings.
-		 * Imagine setting the initial counter to something like `10'. In that
+		 * Imagine setting the  initial counter  to something like  `10'. In  that
 		 * case the entire machine will freeze because it'll end up in an infinite
-		 * loop where the timing chip will just keep on triggering interrupt
-		 * after interrupt, without leaving us enough time to actually handle
+		 * loop  where  the timing  chip will  just  keep on  triggering interrupt
+		 * after interrupt,  without leaving  us enough  time to  actually  handle
 		 * everything! */
 		task_pause();
 		goto again;
@@ -555,7 +555,7 @@ again_with_timer:
 
 	initial = (u32)-1;
 	divide  = 7;
-	/* Try to use small divisions to maximize precision.
+	/* Try  to use small divisions to maximize precision.
 	 * As such, have this loop run backwards so we'll end
 	 * up with the most precise division in the end.
 	 *
@@ -568,9 +568,9 @@ again_with_timer:
 	 * >>         break;
 	 * >>     }
 	 * >> }
-	 * However that version wouldn't be timing-safe, as it's
+	 * However  that version wouldn't be timing-safe, as it's
 	 * runtime depends on the value of `tsc_distance' (making
-	 * it O(N)), however we need all code here to be O(1)
+	 * it O(N)), however  we need  all code here  to be  O(1)
 	 * (even if that 1 ends up being > N) */
 	i = 8;
 	while (i) {
@@ -582,14 +582,14 @@ again_with_timer:
 			divide  = i;
 		}
 	}
-	/* Check for simple case: If initial+divide didn't change,
+	/* Check for simple case: If  initial+divide  didn't change,
 	 *                        then we don't have to do anything! */
 	if (FORCPU(me, thiscpu_x86_apic_emutsc_initial) == initial &&
 	    FORCPU(me, thiscpu_x86_apic_emutsc_divide) == divide)
 		goto done;
 
 	/* Now that we've figured out everything that we need, atomically
-	 * re-configure the clock. in such a manner that we  */
+	 * re-configure  the   clock.   in   such  a   manner   that   we */
 	new_current_reg = tsc_ll_cmpxch_divide_and_initial(me,
 	                                                   old_current_reg,
 	                                                   emutsc_shift_to_divide[divide],
@@ -602,7 +602,7 @@ again_with_timer:
 		goto again_with_timer;
 	}
 	/* Ignore the next TSC interrupt, if it's already pending.
-	 * NOTE: Technically, we'd have to do this atomically alongside
+	 * NOTE: Technically,  we'd have to do this atomically alongside
 	 *       `tsc_ll_cmpxch_divide_and_initial()', however we should
 	 *       be safe to assume that the newly set APIC counter won't
 	 *       have already expired at this point. */
@@ -624,21 +624,21 @@ done:
 
 
 
-/* The time that TSC calibration should take, specified as in HZ, such
- * that calibration will take 1/X86_TSC_CALIBRATE_DELAY_HZ seconds.
+/* The time that TSC calibration should take, specified as in HZ,  such
+ * that calibration  will  take  1/X86_TSC_CALIBRATE_DELAY_HZ  seconds.
  * Note that this value must be `>= 19', since smaller values cannot be
  * properly represented as PIT delays.
  * NOTE: Larger values mean less precise HZ calibrations, but faster init,
- *       while smaller values mean more HZ precision, but slower init.
- *       100 (iow. 1/100'th of a second) is a decent delay that results
- *       in a total HZ-error of around 0.1% in practice. For QEMU:
+ *       while  smaller values  mean more  HZ precision,  but slower init.
+ *       100  (iow. 1/100'th of  a second) is a  decent delay that results
+ *       in a  total  HZ-error  of  around 0.1%  in  practice.  For  QEMU:
  *       >> [tsc] Boot CPU uses tsc_hz=1001300000
  *       The correct value would be:    1000000000
  * Also note that this constant should not be greater than 100, since APIC
- * initialization uses the time it takes to calibrate the boot CPU's HZ
- * counter for performing the initial initialization of secondary CPUs,
- * which includes one part where the kernel must wait for at least 10
- * milliseconds (which ends up being exactly 1/100'th of a second), and
+ * initialization  uses the time  it takes to calibrate  the boot CPU's HZ
+ * counter for performing  the initial initialization  of secondary  CPUs,
+ * which includes one  part where  the kernel must  wait for  at least  10
+ * milliseconds  (which ends up  being exactly 1/100'th  of a second), and
  * is therefor spent doing HZ calibration. */
 #ifndef X86_TSC_CALIBRATE_DELAY_HZ
 #define X86_TSC_CALIBRATE_DELAY_HZ 100
@@ -646,7 +646,7 @@ done:
 
 
 /* Make sure that the PIT HZ value that we're to use for calibration can
- * even be represented as a constant to be passed to the PIT circuitry. */
+ * even be represented as a constant to be passed to the PIT  circuitry. */
 STATIC_ASSERT_MSG(PIT_HZ_DIV(X86_TSC_CALIBRATE_DELAY_HZ) <= UINT16_MAX,
                   "X86_TSC_CALIBRATE_DELAY_HZ is too low");
 
@@ -718,7 +718,7 @@ again_calibrate:
 	COMPILER_BARRIER();
 	if unlikely(remaining == 0 && divide < 7) {
 		/* The APIC timer expired before we were finished...
-		 * Increase the division and try again... */
+		 * Increase   the   division   and   try    again... */
 		++divide;
 		outb(PIT_COMMAND,
 		     PIT_COMMAND_SELECT_F1 |
@@ -783,12 +783,12 @@ NOTHROW(FCALL x86_tsc_calibrate_hz)(void) {
 	/* Do the initial calibration. */
 	result = x86_tsc_calibrate_hz_cali();
 	/* Don't account for the raw delay caused by performing I/O.
-	 * For this purpose, profile the time it takes to do the 4
-	 * unconditional I/O instructions that had to be apart of
+	 * For this purpose, profile the time  it takes to do the  4
+	 * unconditional I/O instructions  that had to  be apart  of
 	 * the TSC calibration. */
 	result -= x86_tsc_calibrate_hz_offs();
 	/* Multiply with the delay HZ, because we were running the
-	 * test for 1/X86_TSC_CALIBRATE_DELAY_HZ'th of a second. */
+	 * test for 1/X86_TSC_CALIBRATE_DELAY_HZ'th  of a  second. */
 	result *= X86_TSC_CALIBRATE_DELAY_HZ;
 	return result;
 }
@@ -799,8 +799,8 @@ NOTHROW(FCALL x86_tsc_calibrate_hz)(void) {
 #ifndef CONFIG_NO_SMP
 INTDEF FREE volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8)];
 
-/* TODO: This function being apart of the .free section is unsafe!
- *       The boot core may move on to unmap the .free section while
+/* TODO: This function being  apart of the  .free section is  unsafe!
+ *       The boot core may move on  to unmap the .free section  while
  *       a secondary core is still performing initialization in here!
  *       Solution: The boot CPU must wait for secondary CPUs to finish
  *       their inits before unmapping .free!
@@ -832,7 +832,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	tsc_ignore_pending_interrupt(me);
 
 	/* Since we've screwed with our APIC, we must
-	 * once again re-initialize our RTC-sync. */
+	 * once  again  re-initialize  our  RTC-sync. */
 	tsc_resync_init(me);
 
 	printk(FREESTR(KERN_INFO "[tsc] CPU #%u uses tsc_hz=%" PRIuN(__SIZEOF_TSC_HZ_T__) "\n"),
@@ -869,8 +869,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 		 * inconsistent, and it seems like QEMU only increments the APIC counter in
 		 * multiples of 100, so that kind-of sucks...)
 		 *
-		 * Since we do already know our HZ at this point, we could in theory once
-		 * again use the PIT to determine the timings of for this, however I feel
+		 * Since  we do already know our HZ at this point, we could in theory once
+		 * again  use the PIT to determine the timings of for this, however I feel
 		 * like doing it that way would only introduce further inaccuracies due to
 		 * having to convert timings back-and-forth... */
 		FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_cmpxch_delay) = x86_calibrate_tsc_cmpxch_delay_stable();

@@ -33,11 +33,11 @@
 
 
 /* Hard-set the current stack depth to `state' and invoke `cb()' by passing `state' to it.
- * Once `cb()' returns, the cpu state returned by it is loaded, and execution is resumed.
+ * Once  `cb()' returns, the cpu state returned by it is loaded, and execution is resumed.
  * WARNING: When this function is called, the caller's stack is _NOT_ unwound until `state'
  *          is reached. - No TRY-EXCEPT/FINALLY blocks or destructors are invoked, and this
- *          function does not return in any way that is observable to the caller.
- *          Rather, it behaves similar to `longjmp()', in that `cb()' is made to return to
+ *          function does  not  return  in  any  way that  is  observable  to  the  caller.
+ *          Rather,  it behaves similar to `longjmp()', in that `cb()' is made to return to
  *          the origin of `state' after being injected ontop of that location. */
 /* FUNDEF ATTR_NORETURN void FCALL
  * kernel_restart_interrupt(struct icpustate *__restrict state,

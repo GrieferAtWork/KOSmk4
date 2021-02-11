@@ -58,8 +58,8 @@ NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
 	__flush_instruction_cache();
 	COMPILER_WRITE_BARRIER();
 	/* Notify vboxgdb that the initial kernel init has completed
-	 * by sending a special control sequence through port:0x504
-	 * Afterwards, jump into the vboxgdb step loop to allow any
+	 * by  sending a special control sequence through port:0x504
+	 * Afterwards, jump into the vboxgdb step loop to allow  any
 	 * attached GDB instance to set initial kernel breakpoints. */
 	vboxgdb_trap(FREESTR(VBOXGDB_TRAP_STARTUP));
 }

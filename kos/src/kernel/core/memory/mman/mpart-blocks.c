@@ -572,12 +572,12 @@ initdone:
 
 
 
-/* Directly  return  physical  backing  memory  containing  the  byte  `partrel_offset',
- * without  looking  at the  associated block-state  at all.  The caller  is responsible
- * to   ensure  that  `MPART_ST_INMEM(self->mp_state)'  before  calling  this  function.
+/* Directly return physical backing  memory containing the byte  `partrel_offset',
+ * without looking at the associated block-state at all. The caller is responsible
+ * to ensure that `MPART_ST_INMEM(self->mp_state)' before calling this function.
  * NOTE: The caller must be holding a lock to `self' (which is allowed to be a DMA lock)
  * NOTE: This function may also assume that at least the first byte (that
- *       is: the byte described by `partrel_offset') is in-bounds of  the
+ *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,

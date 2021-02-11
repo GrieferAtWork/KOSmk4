@@ -97,7 +97,7 @@ END(sys_break6)
 #define __NR32RC_break __NR32FEAT_SYSCALL_REGISTER_MAX_COUNT
 
 /* Define all unimplemented system calls as weak aliases
- * of `sys_breakN', where N is the register count */
+ * of  `sys_breakN',  where  N  is  the  register  count */
 #define __SYSINVALID_OF2(register_count) sys_break##register_count
 #define __SYSINVALID_OF(register_count) __SYSINVALID_OF2(register_count)
 #define __SYSCALL(name) \

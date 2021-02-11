@@ -80,7 +80,7 @@ typedef struct {
 	union {
 		struct vm_dmalock  hd_dmalock;    /* [valid_if(ATA_AIO_HANDLE_FONEDMA)] Single DMA lock */
 		struct vm_dmalock *hd_dmalockvec; /* [valid_if(!ATA_AIO_HANDLE_FONEDMA)][0..1][owned] Vector of DMA locks
-		                                   * NOTE: This vector is terminated by a sentinel DMA
+		                                   * NOTE: This  vector is terminated  by a sentinel DMA
 		                                   *       lock with its `dl_part' pointer set to `NULL' */
 	};
 	u8                hd_io_lbaaddr[6];/* [const] 48-bit starting LBA address. */

@@ -411,13 +411,13 @@ ramfs_opennode(struct superblock *__restrict UNUSED(self),
                struct directory_node *__restrict UNUSED(parent_directory),
                struct directory_entry *__restrict UNUSED(parent_directory_entry))
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
-	/* INode are only ever created newly and exist solely in-cache!
+	/* INode  are  only  ever  created  newly  and  exist  solely  in-cache!
 	 * This function would be used to open a persistent node stored on-disk,
-	 * however such nodes don't exist in a ram-filesystem, so we actually
+	 * however  such nodes don't  exist in a  ram-filesystem, so we actually
 	 * shouldn't ever get here.
 	 * But just to be save, indicate that this operation isn't supported.
 	 * NOTE: We can get here if an INode was removed from the superblock,
-	 *       but is still referenced by a remaining directory entry! */
+	 *       but is  still referenced  by  a remaining  directory  entry! */
 	THROW(E_FSERROR_DELETED);
 }
 

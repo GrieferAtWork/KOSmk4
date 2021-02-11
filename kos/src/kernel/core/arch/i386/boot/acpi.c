@@ -62,13 +62,13 @@ NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
 	byte_t *vsrc = THIS_TRAMPOLINE;
 	pagedir_pushval_t pv;
 	/* NOTE: We must still preserve the trampoline here, since the trampoline
-	 *       for _boottask is allocated past the end of the kernel's .free
-	 *       section. This is important since the bootloader/bios may have
-	 *       placed various data structures at that location (on QEMU I
-	 *       noticed that the kernel's commandline is placed directly over-
-	 *       top of the _boottask's page directory identity mapping)
-	 *       As such, we must preserve this mapping, as things such that the
-	 *       kernel commandline are still used by later steps of the boot
+	 *       for  _boottask is allocated  past the end  of the kernel's .free
+	 *       section. This is  important since the  bootloader/bios may  have
+	 *       placed  various  data structures  at  that location  (on  QEMU I
+	 *       noticed that the kernel's  commandline is placed directly  over-
+	 *       top   of  the  _boottask's   page  directory  identity  mapping)
+	 *       As such, we must preserve this mapping, as things such that  the
+	 *       kernel commandline are  still used  by later steps  of the  boot
 	 *       process. */
 	pv = pagedir_push_mapone(vsrc, src & ~(PAGESIZE - 1), PAGEDIR_MAP_FREAD);
 	pagedir_syncone(vsrc);
@@ -82,14 +82,14 @@ NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
 }
 
 /* Because the pyhs2virt identity mapping is initialized _after_
- * ACPI, which needs to be done this way because pyhs2virt must
- * be able to allocate physical memory, which requires a prior
+ * ACPI,  which needs to be done this way because pyhs2virt must
+ * be able to allocate physical  memory, which requires a  prior
  * call to `kernel_initialize_minfo_makezones()', which requires
- * that memory bank initialization has been finalized, which it
- * isn't yet (as indicative of `x86_initialize_acpi()' below
+ * that memory bank initialization has been finalized, which  it
+ * isn't  yet  (as indicative  of  `x86_initialize_acpi()' below
  * calling `minfo_addbank()')
  * This function behaves the same as `copyfromphys()', however
- * will not make use of the phys2virt identity segment. */
+ * will not  make  use  of  the  phys2virt  identity  segment. */
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL copyfromphys_noidentity)(void *__restrict dst,
                                        PHYS physaddr_t src,
@@ -251,8 +251,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	              (physaddr_t)header.rsdp_length,
 	              PMEMBANK_TYPE_DEVICE);
 
-	/* Go through all available tables, enumerating them and validating their checksum
-	 * Each table that checks out is then marked as PRESERVE, while each table that appears
+	/* Go  through  all available  tables, enumerating  them  and validating  their checksum
+	 * Each  table that checks out is then marked as PRESERVE, while each table that appears
 	 * to be corrupt gets its signature overwritten with all ZEROes, so when later searching
 	 * the table, we don't end up stumbling over corrupted entries.
 	 * Note though, that corrupted entries in themself probably indicate a bigger problem... */

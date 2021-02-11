@@ -45,10 +45,10 @@
 DECL_BEGIN
 
 /* Convert flags:
- *    MFILE_F_READONLY  -->  ST_RDONLY
- *    MFILE_FS_NOSUID   -->  ST_NOSUID
- *    MFILE_FS_NOEXEC   -->  ST_NOEXEC
- *    MFILE_F_NOATIME   -->  ST_NOATIME */
+ *    - MFILE_F_READONLY  -->  ST_RDONLY
+ *    - MFILE_FS_NOSUID   -->  ST_NOSUID
+ *    - MFILE_FS_NOEXEC   -->  ST_NOEXEC
+ *    - MFILE_F_NOATIME   -->  ST_NOATIME */
 #if (MFILE_F_READONLY == __ST_RDONLY && \
      MFILE_FS_NOSUID == __ST_NOSUID &&  \
      MFILE_FS_NOEXEC == __ST_NOEXEC &&  \

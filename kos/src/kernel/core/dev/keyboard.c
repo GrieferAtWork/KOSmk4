@@ -361,7 +361,7 @@ sync_leds(struct keyboard_device *__restrict self)
 			break;
 		if (!sync_trywrite(&self->kd_leds_lock))
 			break; /* Some other thread must already be syncing LEDs, or
-			        * is deliberately setting some custom LED values */
+			        * is  deliberately  setting some  custom  LED values */
 		COMPILER_READ_BARRIER();
 		if likely(self->kd_leds == oldled) {
 			/* Update LEDs on the keyboard */
@@ -429,9 +429,11 @@ keyboard_device_getkey(struct keyboard_device *__restrict self)
 
 LOCAL NOBLOCK u8
 NOTHROW(KCALL get_control_key)(u8 ch) {
-	/* Playing around with linux, I've noticed some mappings which I can't
+	/* Playing around with linux, I've  noticed some mappings which I  can't
 	 * really explain myself, however one of them: CTRL+^ is what allows one
 	 * to generate SIGQUIT with a European keyboard.
+	 *
+	 * ```
 	 *       Second-Key
 	 *            |  Second-Key-Ascii
 	 *            |  |      Produced-ctrl-char
@@ -458,6 +460,8 @@ NOTHROW(KCALL get_control_key)(u8 ch) {
 	 *       CTRL+/ (0x2f) --> 0x1f [3][6]
 	 *       CTRL+8 (0x38) --> 0x7f [1][2][3][6]
 	 *       CTRL+? (0x3f) --> 0x7f [6]
+	 * ```
+	 *
 	 * References:
 	 *  - [1] Own tests using PuTTY
 	 *  - [2] https://unix.stackexchange.com/questions/226327/what-does-ctrl4-and-ctrl-do-in-bash
@@ -469,8 +473,8 @@ NOTHROW(KCALL get_control_key)(u8 ch) {
 	 * This page seems to suggest that xterm uses `Xutf8LookupString()' for the CTRL+... translation:
 	 *    https://invisible-island.net/xterm/modified-keys.html
 	 *   ...
-	 *   xterm calls Xutf8LookupString or XmbLookupString to obtain equivalent characters and key symbol
-	 *   Both XKB (keyboard) and the X11 library contribute to the key symbol returned by the *LookupString functions.
+	 *   xterm calls Xutf8LookupString or  XmbLookupString to obtain equivalent  characters and key symbol.  Both
+	 *   XKB (keyboard) and the X11 library contribute to the key symbol returned by the *LookupString functions.
 	 *   ...
 	 *   The latter has special cases for certain control keys, e.g., converting control-3 to the escape character.
 	 *   ...
@@ -527,21 +531,21 @@ NOTHROW(KCALL get_control_key)(u8 ch) {
 	return ch;
 }
 
-/* Perform key->char translation and store the results in `self->kd_map_pend'
+/* Perform key->char translation and store the results in  `self->kd_map_pend'
  * Note that unlike `keymap_translate_buf()', this function also takes care of
- * special posix escape sequences (e.g. `\e[11~' for KEY_F1), as well as the
+ * special posix escape sequences (e.g. `\e[11~'  for KEY_F1), as well as  the
  * posix control character modification that causes `64' to be subtracted from
  * character ordinals in the range of '@'...'_' (with '`'...'DEL' aliasing the
  * same character) (e.g. `\3' for CTRL+C)
- * NOTE: KOS also provides for windows-style CTRL+ALT key modifiers, allowing
- *       e.g. `@' to be written on a European keyboard by pressing CTRL+ALT+Q,
+ * NOTE: KOS also  provides  for  windows-style  CTRL+ALT  key  modifiers,  allowing
+ *       e.g.  `@'  to be  written on  a European  keyboard by  pressing CTRL+ALT+Q,
  *       instead of forcing the user to press RIGHT_ALT+Q (since some people (me ;P)
- *       are using such a keyboard if you couldn't have already guessed by the
+ *       are using  such a  keyboard if  you couldn't  have already  guessed by  the
  *       presence of a de_DE layout preset)
  *       Because of this, certain key combinations are ambiguous, such as
  *       the aforementioned CTRL+ALT+Q.
  *       In these cases, we first try to decode the key through use of the
- *       keymap program, before doing UNIX ascii escape sequencing.
+ *       keymap  program,  before  doing  UNIX  ascii  escape  sequencing.
  */
 PRIVATE NOBLOCK size_t
 NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict self,
@@ -556,7 +560,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 	if (!result) {
 		/* No layout-specific mapping given for this key.
 		 * Check for special mappings of CONTROL character, as well as
-		 * other special keys that should produce escape sequences. */
+		 * other special keys  that should  produce escape  sequences. */
 		u8 ch;
 		/* Y          -- 0x59 */
 		/* CTRL+Y     -- 0x19 */
@@ -571,7 +575,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 					goto done;
 				goto nope;
 			}
-			/* Transform into a control character,
+			/* Transform into  a control  character,
 			 * and prefix with 0x1b (ESC; aka. `\e') */
 			ch = get_control_key(ch);
 			if (ch == 0xff)
@@ -635,7 +639,7 @@ nope:
 }
 
 
-/* Apply transformations mandated by the currently
+/* Apply  transformations  mandated by  the currently
  * set code-page of a potentially connected ANSI tty. */
 PRIVATE NOBLOCK /*utf-8*/ size_t
 NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self,
@@ -653,10 +657,10 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	atty = (struct ansitty_device *)tty->t_ohandle_ptr;
 	if (!character_device_isanansitty(atty))
 		goto done_tty;
-	/* When the TTY uses CP#0 (UTF-8), then we don't actually need to re-encode
+	/* When  the TTY uses CP#0 (UTF-8), then  we don't actually need to re-encode
 	 * the input text sequence, since both input and output would use pure UTF-8.
 	 * And given that the most likely situation has the ANSITTY be in UTF-8 mode,
-	 * as everything in KOS is (at heart) designed for full UTF-8 support, check
+	 * as everything in KOS is (at heart) designed for full UTF-8 support,  check
 	 * for this highly likely case and optimize for it. */
 	if likely(atty->at_ansi.at_codepage == 0)
 		goto done_tty;
@@ -979,7 +983,7 @@ linux_keyboard_setmeta(struct keyboard_device *__restrict self,
 	/* TODO: This should configure if pressing ALT will:
 	 *   K_METABIT:    Or' the produced character with 0x80
 	 *   K_ESCPREFIX:  Prefix the produced character with \e
-	 * On KOS, this is done in `ansitty_translate_misc()'
+	 * On  KOS,  this  is  done  in  `ansitty_translate_misc()'
 	 * (s.a. the call to said function further up in this file)
 	 */
 	if (mode != K_ESCPREFIX) {
@@ -1137,7 +1141,7 @@ restart_getkeymap_locked:
 		if (data.km_mapsize >= mapsize) {
 			/* Copy the key translation map into user-space.
 			 * Note that since we need to be holding an atomic lock while doing this,
-			 * we have to use memcpy_nopf() and copy faulting bytes individually. */
+			 * we  have to  use memcpy_nopf()  and copy  faulting bytes individually. */
 			size_t offset = 0, error;
 			byte_t *extbase = (byte_t *)me->kd_map.km_ext;
 continue_copy_keymap:
@@ -1422,11 +1426,11 @@ continue_copy_keymap:
 	}	break;
 
 	/* TODO: Add an ioctl() to pre-calculate _all_ possible ASCII keymap keys.
-	 *       This could be useful to improve security at a password prompt,
-	 *       since a not-very-nice person could determine which keys were
-	 *       pressed since initialization by enumerating all possible keys
-	 *       and using a timing side-channel to determine which keys had
-	 *       already been cached (the ones that were pressed), and which
+	 *       This  could be useful  to improve security  at a password prompt,
+	 *       since a  not-very-nice person  could  determine which  keys  were
+	 *       pressed  since  initialization by  enumerating all  possible keys
+	 *       and  using  a timing  side-channel  to determine  which  keys had
+	 *       already  been  cached (the  ones  that were  pressed),  and which
 	 *       had to be freshly cached then (the ones that weren't) */
 
 
@@ -1442,11 +1446,11 @@ continue_copy_keymap:
 
 
 /* Initialize/finalize the given keyboard device.
- * NOTE: Drivers that override the `ct_fini' operator of a given keyboard
+ * NOTE: Drivers that override  the `ct_fini' operator  of a given  keyboard
  *       must ensure that `keyboard_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by keyboard,
- *       get initialized by `keyboard_device_init()', and should not be
+ *       get  initialized by `keyboard_device_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl

@@ -106,8 +106,8 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  *    NOTE: thiscpu_x86_tss.t_iomap == CEIL_ALIGN((uintptr_t)&thiscpu_x86_tss +
  *                                                SIZEOF_TSS32 +
  *                                                SIZEOF_INTERRUPT_REDIRECTION_BITMAP,
- *                                                4096) - (uintptr_t)&thiscpu_x86_tss
- *          -> Meaning that it points to the first page boundry following
+ *                                                4096) -  (uintptr_t)&thiscpu_x86_tss
+ *          -> Meaning  that  it  points  to  the  first  page  boundry  following
  *             the TSS, leaving enough space for the interrupt redirection bitmap.
  *
  * IOBM = (uintptr_t)&thiscpu_x86_tss + thiscpu_x86_tss.t_iomap = thiscpu_x86_iob;
@@ -116,7 +116,7 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  * IOBM + 2 * PAGESIZE: The continuation of ATTR_PERCPU data, with the first byte being a const `0xff'
  *
  * And the GDT entry for the TSS looks like this:
- * GDT[SEGMENT_CPU_TSS].base  = &thiscpu_x86_tss
+ * GDT[SEGMENT_CPU_TSS].base  =  &thiscpu_x86_tss
  * GDT[SEGMENT_CPU_TSS].limit = ((IOBM - (uintptr_t)&thiscpu_x86_tss) + 2 * 4096 + 1) - 1;
  */
 

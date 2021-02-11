@@ -164,9 +164,9 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self,
 	                        sizeof(void *));
 	if unlikely(error != UNWIND_SUCCESS)
 		return error;
-	/* Don't try to cache the results if we've been poisoned.
+	/* Don't try  to  cache  the results  if  we've  been  poisoned.
 	 * If the problem is related to a heap violation, then we can no
-	 * longer trust that heap memory hasn't been corrupted beyond
+	 * longer trust that  heap memory hasn't  been corrupted  beyond
 	 * repair! */
 	if (kernel_poisoned())
 		goto done;
@@ -175,9 +175,9 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self,
 
 	/* Try to cache the FDE descriptor.
 	 * Emphasis on the _try_. - Only do an atomic+NX allocation here, so
-	 * there is no chance of an exception, nor any chance of blocking.
-	 * Also: PREFAULT is required since we may be getting called from within
-	 *       the builtin debugger, in which case we have to make sure that
+	 * there is no chance of an  exception, nor any chance of  blocking.
+	 * Also: PREFAULT is  required since  we may  be getting  called from  within
+	 *       the  builtin  debugger, in  which  case we  have  to make  sure that
 	 *       any memory allocated will not cause a #PF (since lazy initialization
 	 *       would be disabled in this case) */
 	nodeptr = heap_alloc_untraced_nx(&kernel_locked_heap,
@@ -240,11 +240,11 @@ done:
  *       is implemented here so-as to allow for per-driver caching of FDE
  *       descriptors. */
 
-/* Lookup FDE information associated with a given program counter position.
+/* Lookup FDE information  associated with a  given program counter  position.
  * Using integration with KOS's DL extension APIs, this function automatically
- * accesses the `.eh_frame' sections of the module associated with the given
- * address, as well as keep track of a lazily allocated address-tree of FDE
- * caches for quick (O(1)) repeated access to an FDE located within a known
+ * accesses the `.eh_frame' sections of  the module associated with the  given
+ * address, as well as  keep track of a  lazily allocated address-tree of  FDE
+ * caches for quick (O(1))  repeated access to an  FDE located within a  known
  * function. */
 INTERN NOBLOCK unsigned int
 NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void const *absolute_pc,
@@ -277,10 +277,10 @@ PUBLIC CALLBACK_LIST(void KCALL(struct driver *))
 driver_finalized_callbacks = CALLBACK_LIST_INIT;
 
 /* Callbacks invoked just before a driver is unloaded.
- * WARNING: The given driver has a reference count of 0, which must not
+ * WARNING: The given driver has a reference count of 0, which must  not
  *          be increased by callbacks. However, the actual driver itself
- *          hasn't been destroyed, yet (meaning all of its members are
- *          still as they were just before its reference count dropped
+ *          hasn't been destroyed, yet (meaning  all of its members  are
+ *          still as they were just  before its reference count  dropped
  *          to ZERO)! */
 PUBLIC CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *))
 driver_unloaded_callbacks = CALLBACK_LIST_INIT;
@@ -409,7 +409,7 @@ ARREF(driver_state_arref, driver_state);
 #endif /* !__driver_state_arref_defined */
 
 /* The current state of loaded drivers.
- * This needs to be implemented as an ARREF pointer, so-as to allow for NOBLOCK+NOEXCEPT
+ * This needs to be implemented  as an ARREF pointer,  so-as to allow for  NOBLOCK+NOEXCEPT
  * enumeration of loaded drivers for the purpose of both discovering, as well as locking of
  * the driver associated with some given static data pointer. */
 INTERN struct driver_state_arref current_driver_state = ARREF_INIT(&empty_driver_state);
@@ -432,9 +432,9 @@ REF struct driver_state *NOTHROW(KCALL driver_get_state)(void) {
 }
 
 
-/* Add a given driver `self' to the global driver state.
+/* Add  a  given driver  `self'  to the  global  driver state.
  * If another driver with the same name already exists, return
- * a reference to it. - Else, add `self' and return NULL. */
+ * a reference  to it.  - Else,  add `self'  and return  NULL. */
 PRIVATE REF struct driver *KCALL
 add_global_driver(struct driver *__restrict self) THROWS(E_BADALLOC) {
 	size_t i, j;
@@ -486,9 +486,9 @@ again:
 	return NULL;
 }
 
-/* Try to remove a given driver `self' from the list of loaded drivers.
- * This function is called as part of `driver_destroy()', but is allowed
- * to fail, in which case anyone using the global driver list will simply
+/* Try to remove  a given driver  `self' from the  list of loaded  drivers.
+ * This  function is called  as part of  `driver_destroy()', but is allowed
+ * to  fail, in which case anyone using  the global driver list will simply
  * notice that one of the drivers has been destroyed, which is then handled
  * by simply skipping that driver. */
 PRIVATE NOBLOCK bool
@@ -511,8 +511,8 @@ again:
 				                                                  sizeof(REF struct driver *),
 				                                                  GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
 				if unlikely(!new_state) {
-					/* Cannot allocate the truncated driver state list...
-					 * That means that the driver will remain as a ghost entry that
+					/* Cannot  allocate   the   truncated   driver   state   list...
+					 * That means that the driver will remain as a ghost entry  that
 					 * users of the loaded-driver-list will simply have to skip over
 					 * upon being encountered... */
 					decref_unlikely(old_state);
@@ -629,8 +629,8 @@ NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion) {
 		return 1;
 	}
 	/* There is still the possibility that some other thread is still in
-	 * the middle of a call to `system_clearcaches()'. - In this case,
-	 * try to yield to them so they can finish, and keep on checking if
+	 * the middle of a call  to `system_clearcaches()'. - In this  case,
+	 * try  to yield to them so they can finish, and keep on checking if
 	 * the number of threads inside decreases. */
 	inside_counter = ATOMIC_READ(system_clearcaches_isinside);
 	if (inside_counter != 0) {
@@ -651,8 +651,8 @@ NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion) {
 		*pversion = new_version;
 		return 1;
 	}
-	/* Even when nothing seems to change, try a couple more times in the vain
-	 * hope that some other thread managed to get hold of a lock that was required
+	/* Even  when  nothing seems  to change,  try a  couple more  times in  the vain
+	 * hope  that some other thread managed to get  hold of a lock that was required
 	 * to release the resource which our caller is after, and just didn't get around
 	 * to incrementing the version counter, yet.
 	 * However, only do this a limited number of times! */
@@ -665,9 +665,9 @@ NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion) {
 		return 1;
 	}
 	if unlikely(new_version == (uintptr_t)-1) {
-		/* We got here because the version number is too high.
+		/* We got here because the  version number is too  high.
 		 * Fix this and indicate success since this only happens
-		 * once every bagillion iterations, so this won't cause
+		 * once  every bagillion iterations, so this won't cause
 		 * a soft-lock. */
 		ATOMIC_CMPXCH(system_clearcaches_version, new_version, 0);
 		*pversion = 0;
@@ -679,9 +679,9 @@ NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion) {
 
 /* Invoke cache clear callbacks for each and every globally reachable
  * component within the entire kernel.
- * This function is called when the kernel has run out of physical/virtual
+ * This function is  called when  the kernel  has run  out of  physical/virtual
  * memory, or some other kind of limited, and dynamically allocatable resource.
- * @return: * : At least some amount of some kind of resource was released.
+ * @return: * : At  least some amount of some kind of resource was released.
  *              In this case the caller should re-attempt whatever lead them
  *              to try and clear caches to reclaim resource (usually memory)
  * @return: 0 : Nothing was released/freed.
@@ -693,7 +693,7 @@ NOTHROW(KCALL system_clearcaches)(void) {
 	/* XXX: Execute this function on a separate stack to make invocations
 	 *      in scenarios where little to no memory is available possible.
 	 *      It is OK if this function cannot be executed in parallel with
-	 *      itself, meaning that such a stack could easily be allocated
+	 *      itself, meaning that such a  stack could easily be  allocated
 	 *      statically. */
 	ATOMIC_INC(system_clearcaches_isinside);
 	{
@@ -733,7 +733,7 @@ NOTHROW(KCALL system_clearcaches)(void) {
 		}
 	}
 	/* Lastly, trim kernel heaps within a threshold of 0 pages (thus forcing
-	 * the heap sub-system to release as much memory as it possibly can) */
+	 * the  heap sub-system  to release as  much memory as  it possibly can) */
 	temp = system_trimheaps();
 	if (OVERFLOW_UADD(result, temp, &result))
 		result = (size_t)-1;
@@ -752,7 +752,7 @@ NOTHROW(KCALL driver_section_cdata_test)(struct driver_section *__restrict self)
 		return self->ds_cdata;
 	assertf(self->ds_data != (void *)-1, "Raw section data hasn't been loaded");
 	/* Check if the section is really compressed. Because if it isn't, then
-	 * we must set-up the `ds_cdata' field as an alias for `ds_data'! */
+	 * we  must  set-up the  `ds_cdata' field  as  an alias  for `ds_data'! */
 	if (!(self->ds_flags & SHF_COMPRESSED)) {
 		self->ds_csize = self->ds_size;
 		COMPILER_WRITE_BARRIER();
@@ -792,10 +792,10 @@ NOTHROW(KCALL decompress_section_data_with_log)(struct driver_section *self,
                                                 void *dst, size_t dst_size,
                                                 void const *src, size_t src_size) {
 	int result;
-	/* Tell the user that we're decompressing section data if we're in
-	 * debugger mode. Do this because the act of decompressing may take
+	/* Tell the user  that we're  decompressing section data  if we're  in
+	 * debugger  mode. Do this  because the act  of decompressing may take
 	 * 1 to 2 seconds, and the user may otherwise be confused about what's
-	 * taking so long the first time they try to run some command that
+	 * taking so long  the first time  they try to  run some command  that
 	 * makes use of debug information. */
 	if (dbg_active && self && self->ds_sectflags != 0xffff && self->ds_module) {
 		struct driver *d = self->ds_module;
@@ -855,7 +855,7 @@ typedef ElfW(Chdr) ElfV_Chdr;
  * NOTE: The caller must ensure that raw section data of `self' has been loaded,
  *       as in `self->ds_data != (void *)-1'!
  * @return: * : A blob of `self->ds_csize' (after the caller) bytes of memory,
- *              representing the section's decompressed memory contents. */
+ *              representing  the  section's  decompressed  memory   contents. */
 #ifdef ElfV_NEED_MODDTYPE
 INTERN ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
 driver_section_cdata_impl(struct driver_section *__restrict self,
@@ -1082,7 +1082,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	driver_do_service_dead_sections(self);
 	assert(!self->d_dangsect);
 	/* Go through all of the module's program headers and unload them from memory.
-	 * Because drivers are mapped as anonymous memory, rather than file mappings,
+	 * Because  drivers are mapped as anonymous memory, rather than file mappings,
 	 * we can simply use the NOEXCEPT,NOBLOCK `vm_unmap_kernel_ram()' function! */
 	for (i = 0; i < self->d_phnum; ++i) {
 		uintptr_t progaddr;
@@ -1093,7 +1093,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 		progsize = self->d_phdr[i].p_memsz;
 		progsize += progaddr & PAGEMASK;
 		progaddr &= ~PAGEMASK;
-		/* NOTE: During finalization, all write-only program headers were re-mapped
+		/* NOTE: During  finalization, all write-only program headers were re-mapped
 		 *       as read/write, so-as to allow us to free them as kernel-ram at this
 		 *       point. */
 		vm_unmap_kernel_ram((void *)progaddr,
@@ -1472,7 +1472,7 @@ NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self) {
 	}
 	/* Must delete the driver.
 	 * -> Since we were already unable to lock `drv->d_sections_lock',
-	 *    we already know that we must make use of the `d_deadsect'
+	 *    we  already know that  we must make  use of the `d_deadsect'
 	 *    chain mechanism. */
 	{
 		struct driver_section *next;
@@ -1536,7 +1536,7 @@ err_elf_reason:
 
 
 
-/* Return the INode/filename of a given driver (which is
+/* Return the  INode/filename  of  a  given  driver  (which  is
  * lazily loaded for drivers loaded via the kernel commandline) */
 PUBLIC WUNUSED NONNULL((1)) struct regular_node *KCALL
 driver_getfile(struct driver *__restrict self)
@@ -1616,7 +1616,7 @@ PUBLIC WUNUSED NONNULL((1)) char const *
  *  - self->d_shdr
  * @return: * :   Returns `self->d_shdr'
  * @return: NULL: Failed to load the section headers vector (the driver
- *                file wasn't found, or doesn't contain any sections) */
+ *                file  wasn't found, or  doesn't contain any sections) */
 PUBLIC WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getshdrs(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
@@ -1652,7 +1652,7 @@ driver_getshdrs(struct driver *__restrict self)
 /* Lazily allocate if necessary, and return the section header string table for `self'
  * @return: * :   Returns `self->d_shstrtab'
  * @return: NULL: Failed to load the section headers string table (the driver
- *                file wasn't found, or doesn't contain any sections) */
+ *                file   wasn't  found,  or  doesn't  contain  any  sections) */
 PUBLIC WUNUSED NONNULL((1)) char const *KCALL
 driver_getshstrtab(struct driver *__restrict self)
 		THROWS(E_IOERROR,E_WOULDBLOCK, E_BADALLOC) {
@@ -1699,7 +1699,7 @@ driver_getshstrtab(struct driver *__restrict self)
  * @return: * :   Returns a pointer to one of `&self->d_shdr[*]'
  * @return: NULL: No section exists that matches the given `name'
  * @return: NULL: Failed to load the section headers string table (the driver
- *                file wasn't found, or doesn't contain any sections) */
+ *                file   wasn't  found,  or  doesn't  contain  any  sections) */
 PUBLIC WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getsection(struct driver *__restrict self,
                   USER CHECKED char const *name)
@@ -1722,12 +1722,12 @@ err:
 }
 
 /* Registers/thread-local variables that are saved/restored unconditionally
- * before/after invocation of driver initializers/finalizers.
+ * before/after    invocation     of    driver     initializers/finalizers.
  * This is done since driver init/fini functions may leave certain registers
- * clobbered, such as `PREEMPTION_ENABLED()', which we must make certain to
- * properly restore after invocation, as not doing so may cause later code
- * to throw `E_WOULDBLOCK' when `task_yield()' is called with preemption
- * disabled after a driver initializer failed to restore the preemption-
+ * clobbered, such as `PREEMPTION_ENABLED()', which we must make certain  to
+ * properly restore after invocation, as not  doing so may cause later  code
+ * to throw  `E_WOULDBLOCK' when  `task_yield()' is  called with  preemption
+ * disabled  after a  driver initializer  failed to  restore the preemption-
  * enabled state. */
 struct driver_initstate {
 	pflag_t di_preemption; /* The old preemption state. */
@@ -1821,7 +1821,7 @@ driver_enable_textrel(struct driver *__restrict self)
 		                    (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%" PRIu16 " mapped at %p",
 		        self->d_name, (uint16_t)i, (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
-		/* By simply adding write permissions here, a future #PF for nodes within this
+		/* By simply adding  write permissions here,  a future #PF  for nodes within  this
 		 * memory range will simply propagate this permission bit into the page directory. */
 		ATOMIC_OR(node->vn_prot, VM_PROT_WRITE);
 	}
@@ -1876,7 +1876,7 @@ driver_disable_textrel(struct driver *__restrict self)
  *  #1: Execute destructor callbacks.
  *  #2: Decref (and ATOMIC_XCH(NULL)) each module from the dependency vector.
  * NOTE: In case the driver is being finalized right now, wait for another
- *       thread doing the finalization to either complete, or abort.
+ *       thread doing  the  finalization  to either  complete,  or  abort.
  * @return: true:  Successfully finalized the driver.
  * @return: false: The driver had already been finalized (also a success-case). */
 PUBLIC NONNULL((1)) bool KCALL
@@ -1917,7 +1917,7 @@ do_start_finalization:
 			}
 			/* Acquire a sections lock so we can clear dangling sections. */
 			TRY {
-				/* Enable text-relocations for the driver, so the driver destructor
+				/* Enable text-relocations for  the driver, so  the driver  destructor
 				 * will be able to unmap program sections as though it was Kernel-RAM. */
 				driver_enable_textrel(self);
 
@@ -1953,14 +1953,14 @@ do_start_finalization:
  * This function will:
  *   - invoke module finalizers (if they haven't been already)
  *   - if (!DRIVER_DELMOD_FLAG_NODEPEND):
- *         Search for other modules make use of `self' through
+ *         Search for other modules  make use of `self'  through
  *         dependencies and finalize all of them such that their
- *         dependency vectors can be cleared, including the
+ *         dependency vectors  can  be  cleared,  including  the
  *         contained references to `self'
  * @param: self:   The driver to try to unload.
  * @param: flags:  Set of `DRIVER_DELMOD_FLAG_*'
  * @return: true:  Successfully unloaded the driver and inherited the reference to `self'
- * @return: false: Failed to unload the driver (there are still unaccounted
+ * @return: false: Failed to  unload  the  driver  (there  are  still  unaccounted
  *                 references to it other than the reference given through `self') */
 PUBLIC NONNULL((1)) bool KCALL
 driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict self,
@@ -1997,7 +1997,7 @@ again_search_for_depending_drivers:
 						/* Recursively delete this driver. */
 						driver_try_decref_and_delmod(d, flags);
 						/* Even if 1 depending driver could not be unloaded, keep on finalizing
-						 * all other drivers to give the first one more time to come to terms
+						 * all other drivers to give the first  one more time to come to  terms
 						 * with the fact that it is being unloaded.
 						 * If everything works out, we'll still be able to destroy our driver
 						 * in the final ATOMIC_CMPXCH() below. */
@@ -2012,7 +2012,7 @@ find_next_dependent_driver:
 				;
 			}
 			/* If the set of loaded drivers has changed, then
-			 * we have to check for more depending drivers. */
+			 * we  have to check  for more depending drivers. */
 			if (arref_ptr(&current_driver_state) != ds) {
 				decref_unlikely(ds);
 				goto again_search_for_depending_drivers;
@@ -2049,7 +2049,7 @@ find_next_dependent_driver:
 		if unlikely(remaining_references == 1)
 			goto success;
 		/* Forcing the kernel to do this is really bad, and the only situation
-		 * where us getting won't end up in the kernel crashing, is when the
+		 * where  us getting won't end up in  the kernel crashing, is when the
 		 * driver really did leak one of its references.
 		 * Now granted, the driver may have intentionally leaked one of its
 		 * references, but even still: this is bad... */
@@ -2072,8 +2072,8 @@ again_decref_and_waitfor_destroy:
 			RETHROW();
 		}
 		/* Check if we can still acquire references.
-		 * This really shouldn't happen, since task_waitfor() shouldn't return
-		 * sporadically (meaning that we should only get here if someone did a
+		 * This  really shouldn't happen, since task_waitfor() shouldn't return
+		 * sporadically (meaning that we should only get here if someone did  a
 		 * broadcast over `d_destroyed'), but just to be safe, do the check for
 		 * ourselves. */
 		if unlikely(tryincref(self)) {
@@ -2437,7 +2437,7 @@ NOTHROW(KCALL kernel_symbol_at)(uintptr_t addr,
 
 /* Simplified variant of `driver_symbol_ex()'
  * This function returns `NULL' on error, however thus also
- * creates ambiguity for symbols defined as SHN_ABS:0. */
+ * creates ambiguity  for  symbols  defined  as  SHN_ABS:0. */
 PUBLIC WUNUSED NONNULL((1)) void *KCALL
 driver_symbol(struct driver *__restrict self,
               /*in*/ USER CHECKED char const *name,
@@ -2508,20 +2508,20 @@ driver_symbol_ex(struct driver *__restrict self,
 }
 
 
-/* Check if the given driver `self' is exporting a symbol that
- * contains the given `driver_relative_address', or it exports a symbol
- * with an undefined size that begins before `driver_relative_address',
+/* Check   if  the  given   driver  `self'  is   exporting  a  symbol  that
+ * contains the  given `driver_relative_address',  or it  exports a  symbol
+ * with  an  undefined size  that begins  before `driver_relative_address',
  * but isn't defined within the SHN_ABS section, nor is followed by another
  * symbol that does have a defined size value.
  * NOTE: This function cannot be used to reverse special driver symbols
  * WARNING: This operation in O(n) | n = number of symbols exported by `self'
  * @return: * :                      The NUL-terminated name of the symbol.
  *                                   This pointer is valid as long as `self' isn't unloaded.
- * @return: NULL:                    No public symbol is defined for `driver_relative_address'
- *                                   Note however that the associated symbol may not necessarily
+ * @return: NULL:                    No  public  symbol is  defined  for `driver_relative_address'
+ *                                   Note however that the  associated symbol may not  necessarily
  *                                   have been made public by the associated driver. In this case,
  *                                   it may be possible to determine the symbol name by looking at
- *                                   the driver's debug data (s.a. `<libdebuginfo/addr2line.h>')
+ *                                   the driver's debug  data (s.a.  `<libdebuginfo/addr2line.h>')
  * @param: driver_relative_address:  A module-relative pointer who's associated symbol should be located.
  * @param: psymbol_relative_address: When non-NULL, store the module-relative base address of the found symbol here.
  * @param: psymbol_size:             When non-NULL, store the size of the symbol here, or 0 if undefined. */
@@ -2554,7 +2554,7 @@ NOTHROW(KCALL driver_symbol_at)(struct driver *__restrict self,
 
 
 /* Same as `driver_symbol_at()', but returns the ELF symbol
- * WARNING: This function cannot be used with `&kernel_driver', as
+ * WARNING: This  function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
 PUBLIC WUNUSED NONNULL((1)) ElfW(Sym) const *
@@ -2629,7 +2629,7 @@ NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
 
 
 /* Lookup a locally defined ELF symbol within `self'
- * WARNING: This function cannot be used with `&kernel_driver', as
+ * WARNING: This  function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
 PUBLIC WUNUSED NONNULL((1, 3, 4)) ElfW(Sym) const *KCALL
@@ -2752,7 +2752,7 @@ nosym_no_elf_ht:
 }
 
 
-/* Lock a named section of a given driver into
+/* Lock a  named section  of  a given  driver  into
  * memory and return a descriptor for that section.
  * @return: * :   Reference to the section descriptor.
  *                This reference must be released with `decref(return)'
@@ -2946,7 +2946,7 @@ NOTHROW(KCALL driver_section_lock_nx)(struct driver *__restrict self,
 
 
 /* Try to lookup a driver stored at a given address.
- * If no such driver exists, return NULL */
+ * If   no   such   driver   exists,   return   NULL */
 PUBLIC NOBLOCK WUNUSED REF struct driver *
 NOTHROW(FCALL driver_at_address)(void const *static_pointer) {
 	REF struct driver_state *ds;
@@ -3180,7 +3180,7 @@ driver_parse_cmdline(struct driver *__restrict self,
 	TRY {
 		memcpy(cmdline_copy, cmdline, cmdline_length, sizeof(char));
 		/* Add a double-NUL terminator to allow the commandline
-		 * to always be interpreted into a NUL-NUL string-list */
+		 * to  always be interpreted into a NUL-NUL string-list */
 		cmdline_copy[cmdline_length + 0] = '\0';
 		cmdline_copy[cmdline_length + 1] = '\0';
 		/* Split the commandline through use of libcmdline */
@@ -3223,13 +3223,13 @@ driver_do_load_dependencies(struct driver *__restrict self)
 				dependency = driver_with_name(filename);
 				if likely(dependency)
 					goto got_dependency;
-				/* We get here if a driver loaded as a bootloader module required
+				/* We  get here if  a driver loaded as  a bootloader module required
 				 * another driver as a dependency, with that other driver not having
 				 * been provided in the same manner.
 				 * In this case, tell the user that they've booted KOS in an impossible
-				 * configuration, also informing them of the missing driver.
-				 * Note that when built with the builtin debugger enabled, the user
-				 * will even be prompted with a really nice error message! ;) */
+				 * configuration,   also   informing  them   of  the   missing  driver.
+				 * Note that when  built with  the builtin debugger  enabled, the  user
+				 * will  even  be  prompted  with  a  really  nice  error  message!  ;) */
 				name = strchr(filename, '/');
 				name = name ? name + 1 : filename;
 				kernel_panic("Cannot load dependency %q of driver %q\n"
@@ -3253,10 +3253,10 @@ got_dependency:
 		RETHROW();
 	}
 	assert(dep_i == self->d_depcnt);
-	/* Check for special case: A callback from of the dependencies contained
-	 * a call that resulted in our driver being finalized. - Instead of saving
+	/* Check for  special case:  A callback  from of  the dependencies  contained
+	 * a call that resulted  in our driver being  finalized. - Instead of  saving
 	 * references to all of the dependencies, we must drop all of the references,
-	 * thus complying with the command of us being supposed to resolve our
+	 * thus  complying  with the  command  of us  being  supposed to  resolve our
 	 * inter-driver dependencies. */
 	if unlikely(ATOMIC_READ(self->d_flags) & DRIVER_FLAG_FINALIZING) {
 		while (dep_i--)
@@ -3696,13 +3696,13 @@ again:
 			self->d_initthread = NULL;
 			/* Don't unset the INITIALIZING flag, thus allowing
 			 * driver finalizer callbacks to still be executed.
-			 * After all: There may be more than one initializer, and it may
-			 *            not be the first callback which threw the error, so
-			 *            to make things simple: Always invoke _all_ finalizers
+			 * After all: There may  be more  than one  initializer, and  it  may
+			 *            not  be the  first callback  which threw  the error, so
+			 *            to  make things simple:  Always invoke _all_ finalizers
 			 *            (which have to be written such that they work properly,
 			 *            even when their accompanying initializer has never been
-			 *            called), so-as to ensure that we don't skip one that
-			 *            turned out to be important for freeing some resource
+			 *            called), so-as to  ensure that we  don't skip one  that
+			 *            turned out to  be important for  freeing some  resource
 			 *            that had already been allocated successfully. */
 #if 1
 			ATOMIC_OR(self->d_flags, DRIVER_FLAG_INITIALIZED);
@@ -3715,7 +3715,7 @@ again:
 		ATOMIC_OR(self->d_flags, DRIVER_FLAG_INITIALIZED);
 	} else {
 		/* Also set the `DRIVER_FLAG_FINALIZED_C' flag,
-		 * so-as to prevent finalizers from being run. */
+		 * so-as  to prevent finalizers from being run. */
 		ATOMIC_OR(self->d_flags,
 		          DRIVER_FLAG_INITIALIZED |
 		          DRIVER_FLAG_FINALIZED_C);
@@ -3926,7 +3926,7 @@ find_new_candidate_tryhard:
 				filesize = size;
 			/* Create the program segment. */
 			/* XXX: Prefault this mapping! (although technically, this would only be a performance
-			 *      improvement, since we're faulting all of the memory below anyways...) */
+			 *      improvement,  since  we're  faulting  all  of  the  memory  below  anyways...) */
 			if (!vm_mapat(&vm_kernel,
 			              (void *)(addr & ~PAGEMASK),
 			              CEIL_ALIGN(size + (addr & PAGEMASK), PAGESIZE),
@@ -3994,10 +3994,10 @@ driver_do_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
 	{
 		ElfW(Dyn) *pt_dynamic, *pt_dynamic_end;
 		/* Search for the .dynamic section.
-		 * We need find this section first, because it contains the DT_SONAME
+		 * We  need find this section first, because it contains the DT_SONAME
 		 * tag which we need to determine the driver's name, which is used for
-		 * matching the driver against other, already-loaded drivers in order
-		 * to prevent unnecessary work when it comes to ensuring that any
+		 * matching the driver against other, already-loaded drivers in  order
+		 * to prevent  unnecessary work  when it  comes to  ensuring that  any
 		 * driver is only loaded once! */
 		for (phdr_pt_dynamic = 0; phdr_pt_dynamic < phdrc; ++phdr_pt_dynamic) {
 			if (phdrv[phdr_pt_dynamic].p_type == PT_DYNAMIC)
@@ -4053,7 +4053,7 @@ done_tags_for_soname:
 				if (phdrv[i].p_vaddr > dynstr_vla)
 					continue;
 				/* Technically p_memsz, but any pointer above would
-				 * always be an empty string, which isn't allowed! */
+				 * always  be an empty string, which isn't allowed! */
 				if (phdrv[i].p_vaddr + phdrv[i].p_filesz <= dynstr_vla)
 					continue;
 				/* Found the segment. */
@@ -4210,7 +4210,7 @@ done_tags_for_soname:
 			}
 
 			/* Scan .dynamic program tags to figure out driver dependencies,
-			 * as well as how it performs its relocations, etc. */
+			 * as  well   as  how   it   performs  its   relocations,   etc. */
 			{
 				uintptr_t soname_offset;
 				size_t dyni, dynstr_size;
@@ -4330,7 +4330,7 @@ do_dynstr_size:
 					size_t count;
 					ElfW(GnuHashTable) const *ht;
 					ElfW(Word) const *buckets, *chains;
-					/* GNU hash tables are a bit more complicated, since we need to
+					/* GNU hash tables are a bit more complicated, since we need  to
 					 * find the symbol with the greatest index, then add +1 to that. */
 					ht      = result->d_gnuhashtab;
 					buckets = (ElfW(Word) const *)(ht->gh_bloom + ht->gh_bloom_size);
@@ -4370,18 +4370,18 @@ done_dynsym:
 
 			/* Allocate the driver dependency vector.
 			 * HINT: The number of dependencies was already calculated
-			 *       by the `DT_NEEDED' case in the for-loop above. */
+			 *       by the `DT_NEEDED'  case in  the for-loop  above. */
 			result->d_depvec = (REF struct driver **)kmalloc(result->d_depcnt *
 			                                                 sizeof(REF struct driver *),
 			                                                 GFP_CALLOC |
 			                                                 GFP_LOCKED |
 			                                                 GFP_PREFLT);
 
-			/* At this point, the driver structure has been fully initialized,
+			/* At this point,  the driver structure  has been fully  initialized,
 			 * so now it's time to actually register it as a known driver, before
-			 * moving on to load dependencies, applying relocation, and finally
+			 * moving on to load  dependencies, applying relocation, and  finally
 			 * invoking driver initializers.
-			 * However, firstly we must register the driver as globally loaded,
+			 * However, firstly we must register the driver as globally  loaded,
 			 * as well as do one final check to ensure that no other driver with
 			 * the same name has already been loaded. */
 			TRY {
@@ -4435,7 +4435,7 @@ done_dynsym:
 			driver_apply_relocations(result);
 			/* Inform any attached debugger of the new driver.
 			 * NOTE: This is done after relocations, but before initializers, so that
-			 *       a debugger is able to safely set breakpoints without overriding
+			 *       a debugger is able to safely set breakpoints without  overriding
 			 *       memory locations possibly affected by relocations. */
 			vboxgdb_trap(FREESTR(VBOXGDB_TRAP_LIBRARY));
 			if (kernel_debugtrap_enabled()) {
@@ -4478,14 +4478,14 @@ done_dynsym:
 }
 
 
-/* Load a new driver into the kernel, either from the
+/* Load  a new  driver into  the kernel,  either from the
  * specified filesystem location, or via a raw data blob.
  * @param: driver_inode:       The INode from which to load the driver.
  * @param: driver_path:        The parent directory path for `driver_inode'
  * @param: driver_dentry:      The directory entry of `driver_inode' within `driver_path'
  * @param: driver_cmdline:     The commandline to-be passed to the driver, or `NULL'
  * @param: pnew_driver_loaded: When non-NULL, write `true' to this pointer when the returned
- *                             driver was just newly loaded. - Otherwise, write `false'.
+ *                             driver was  just newly  loaded. -  Otherwise, write  `false'.
  * @return: * :                A reference to the freshly loaded driver. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct regular_node *__restrict driver_inode,
@@ -4540,7 +4540,7 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 		                               flags);
 	} EXCEPT {
 		/* TODO: With the new mman, we can use `mman_unmap_kram_locked_ex()'
-		 *       to get the guaranty that unmapping won't fail here! */
+		 *       to  get  the  guaranty  that  unmapping  won't  fail  here! */
 		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
 		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 		RETHROW();
@@ -4644,7 +4644,7 @@ INTERN struct driver_library_path_string default_library_path = {
 /* TODO: Kernel commandline option `driver-libpath=...' */
 
 /* [1..1] The current driver library path.
- * This path is a ':'-separated list of UNIX-style pathnames
+ * This path  is  a  ':'-separated list  of  UNIX-style  pathnames
  * that are used to resolve dependencies of kernel driver modules.
  * By default, this string is simply set to "/os/drivers" */
 PUBLIC struct driver_library_path_string_arref
@@ -4817,7 +4817,7 @@ NOTHROW(KCALL initdrivers)(size_t buflen) {
 			}
 			/* Step #2: Sort drivers based on inter-driver dependencies
 			 *   -> Drivers that are dependencies of other drivers must be
-			 *      initialized before drivers that depend on them. */
+			 *      initialized   before  drivers  that  depend  on  them. */
 			sort_remaining = 64;
 again_sort:
 			sort_must_restart = false;
@@ -4843,8 +4843,8 @@ again_sort:
 						if (buf[k] != dep)
 							continue;
 						/* Yes, it would be.
-						 * -> Shift elements in `buf[i...k-1]' up by 1, then
-						 *    override buf[i] with dep, thus causing `dep' to
+						 * -> Shift  elements  in  `buf[i...k-1]' up  by  1, then
+						 *    override  buf[i]  with dep,  thus causing  `dep' to
 						 *    be initialized before the driver `d', which depends
 						 *    on it. */
 						memmoveup(&buf[i + 1],
@@ -4862,7 +4862,7 @@ again_sort:
 			}
 			/* Re-sort only a limited number of times to prevent the kernel from
 			 * freezing up due to dependency loops (even though dependency loops
-			 * aren't actually allowed, but I still don't want the kernel
+			 * aren't actually  allowed,  but  I still  don't  want  the  kernel
 			 * freezing up...) */
 			if (sort_must_restart && sort_remaining) {
 				--sort_remaining;
@@ -4926,10 +4926,10 @@ done:
 	return loaded_drivers;
 }
 
-/* Initialize (link, relocation & initialize) all drivers
+/* Initialize (link, relocation  & initialize) all  drivers
  * loaded via the kernel commandline as bootloader modules.
- * This is done as a separate step from the actual loading
- * of drivers so-as to allow for inter-driver dependencies
+ * This  is done as a separate step from the actual loading
+ * of  drivers so-as to allow for inter-driver dependencies
  * to be resolved correctly. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_loaded_drivers)(void) {

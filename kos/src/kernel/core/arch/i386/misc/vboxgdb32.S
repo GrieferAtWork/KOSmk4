@@ -134,7 +134,7 @@ PRIVATE_LABEL(.Lenter_steploop):
 	movw   $(0x0000 | VBOXGDB_TRAPCTL_TRIGG), %ss:(_vboxgdb_trapctl + tc_ctrl)
 
 	/* This the vboxgdb single-step break loop.
-	 * In order to resume execution, vboxgdb will advance
+	 * In  order to resume execution, vboxgdb will advance
 	 * our EIP to point after this loop whenever it wishes
 	 * to continue. (s.a. _vmIsStepLoopPaused) */
 PUBLIC_OBJECT(_vboxgdb_steploop)

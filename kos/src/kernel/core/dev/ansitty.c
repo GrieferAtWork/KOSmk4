@@ -69,7 +69,7 @@ ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 		assert(me->at_ansi.at_ops.ato_getcursor);
 		assert(me->at_ansi.at_ops.ato_setcursor);
 		/* Make use of the fact that the cursor position is clamped to the display bounds.
-		 * Note that libansitty makes use of the same fact to determine the window size
+		 * Note that libansitty makes use  of the same fact  to determine the window  size
 		 * whenever it needs to know that value. */
 		if (me->at_ansi.at_ops.ato_getsize) {
 			(*me->at_ansi.at_ops.ato_getsize)(&me->at_ansi, sxy);
@@ -80,7 +80,7 @@ ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, sxy);
 			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1], false);
 			/* Because the cursor coords are clamped to the max valid values, the
-			 * actual display size is described by the max valid coords +1 each. */
+			 * actual display size is described by the max valid coords +1  each. */
 			++sxy[0];
 			++sxy[1];
 		}
@@ -119,11 +119,11 @@ ansitty_device_output(struct ansitty *__restrict self,
 		FINALLY_DECREF_UNLIKELY(output);
 #if 1
 		/* Directly write to the input buffer, bypassing terminal
-		 * keyboard input processing functionality that might do
+		 * keyboard  input processing functionality that might do
 		 * strange stuff to our output data.
-		 * Even though it would make sense to do this, I'm not entirely
-		 * confident that this is really what's supposed to be done here.
-		 * There is a chance that ANSI response codes are meant to be
+		 * Even  though it would  make sense to do  this, I'm not entirely
+		 * confident  that this is really what's supposed to be done here.
+		 * There is a  chance that  ANSI response  codes are  meant to  be
 		 * pre-processed before being passed to the actual input buffer...
 		 * (Although that wouldn't make much sense to me, since that would
 		 *  also mean that the response would be echoed on-screen when ECHO
@@ -191,9 +191,9 @@ ansitty_device_termios(struct ansitty *__restrict self,
 
 
 /* Initialize a given ansitty device.
- * NOTE: `ops->ato_output' must be set to NULL when calling this function.
+ * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
- *       is done dynamically when the ANSI TTY is connected to the output
+ *       is done dynamically when the ANSI  TTY is connected to the  output
  *       channel of a `struct tty_device'
  * This function initializes the following operators:
  *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!

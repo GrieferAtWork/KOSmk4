@@ -499,7 +499,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *                   as well as greatly reduce  future maintenance when kernel  APIs
 	 *                   change (since it would use  the syscall apis, which are  _much_
 	 *                   more stable in comparison)
-	 *                   Also: portability,  and would  make it  easier to  pre-configure
+	 *                   Also: portability,  and  would make  it easier  to pre-configure
 	 *                   other aspects of the process state to enable windows  emulation,
 	 *                   such  as changing the fsmode, binding DOS drives, and the direct
 	 *                   integration of both the regular libdl.so, as well as a secondary

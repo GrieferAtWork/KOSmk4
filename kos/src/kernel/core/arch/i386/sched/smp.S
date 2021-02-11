@@ -132,8 +132,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 #endif /* !__x86_64__ */
 INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 
-	/* Achnowledge the IPI beforehand, thus allowing another
-	 * to be delivered while we're still handling the old one.
+	/* Achnowledge  the  IPI beforehand,  thus  allowing another
+	 * to be delivered while we're  still handling the old  one.
 	 * The new one will not start executing until the iret below
 	 * re-enabled interrupts (if it does so), but our LAPIC will
 	 * have already been able to acknowledge the IPI, preventing
@@ -208,12 +208,12 @@ INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 .Lapic_ipi_no_pending:
 
 
-	/* Check for more pending IPIs by looking at the first word
-	 * of the IPI in-use bitset. - The same check is also done by
-	 * code used to trigger this interrupt from other cores, with
+	/* Check for more  pending IPIs  by looking at  the first  word
+	 * of  the IPI in-use bitset. - The  same check is also done by
+	 * code used to trigger this  interrupt from other cores,  with
 	 * the expectation that the presence of any IPIs allows for the
-	 * assumption that no interrupt has to be fired on the target
-	 * core, in which case it is expected that we handle that IPI. */
+	 * assumption that no interrupt has  to be fired on the  target
+	 * core, in which case it is expected that we handle that  IPI. */
 	EXTERN(thiscpu_x86_ipi_inuse)
 	cmpP   $(0), thiscpu_x86_ipi_inuse(%Pbx)
 	jne    1b
@@ -346,7 +346,7 @@ END(x86_execute_direct_ipi)
 
 
 /* 16-bit (real-mode) bootstrap code executed by secondary cores.
- * All this code does is load a GDT and use it to jump
+ * All  this  code  does  is  load  a  GDT  and  use  it  to jump
  * into 32-bit mode at `x86_smp_entry32' */
 #define SYM(x) ((x) - KERNEL_CORE_BASE)
 .section .text.free
@@ -693,7 +693,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* Configure the %CR4 register. */
 	movl   %cr4, %esp
 	/* Enable PageSizeExtension (required for 2Mib pages & long-mode),
-	 * as well as PhysicalAddressExtension (required for the 48-bit
+	 * as well as  PhysicalAddressExtension (required  for the  48-bit
 	 * physical address space needed in long-mode) */
 	orl    $(CR4_PSE | CR4_PAE), %esp
 	movl   $(1), %eax
@@ -729,7 +729,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   %edx, %ebp
 
 	/* Since we're already here, try to enable some other long-mode extensions,
-	 * such as the NXE bit, as well as SCE (SysCallExtensions) */
+	 * such   as   the   NXE   bit,   as   well   as   SCE  (SysCallExtensions) */
 	movl   $(0x80000001), %eax
 	cpuid
 	ttest  mask=CPUID_80000001D_NX, loc=%edx
@@ -745,7 +745,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	wrmsr
 #else /* __x86_64__ */
 	/* Configure extended paging features.
-	 * This has to be done before we can load `pagedir_kernel', as features such
+	 * This has to  be done before  we can load  `pagedir_kernel', as features  such
 	 * as PAE, or even just use of the GLOBAL bit would otherwise cause #PFs because
 	 * the CPU would claim that reserved bits were set, or who-know-what in the case
 	 * of the PAE page table really just being a completely different structure than
@@ -769,7 +769,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	orl    $(IA32_EFER_NXE), %eax
 	wrmsr
 	/* With PAE + NX, try to enable its effects while
-	 * in kernel-space (if supported by the CPU) */
+	 * in kernel-space  (if  supported  by  the  CPU) */
 	ttest  mask=CPUID_7B_SMEP, loc=(bootcpu_x86_cpuid + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %esp
@@ -783,12 +783,12 @@ INTERN_FUNCTION(x86_smp_entry32)
 #endif /* !__x86_64__ */
 
 	/* Enable paging.
-	 * NOTE: This is why this part must appear in the .pdata section.
-	 *       Because we still are in physical memory, we must enable
+	 * NOTE: This  is why this  part must appear  in the .pdata section.
+	 *       Because  we still  are in  physical memory,  we must enable
 	 *       paging in a context where the page directory we're enabling
 	 *       has our current location mapped to ourself.
 	 *       Later then, we'll jump into true virtual memory, but for
-	 *       now, our actual PC is offset by `KERNEL_CORE_BASE' */
+	 *       now,  our  actual  PC  is  offset  by `KERNEL_CORE_BASE' */
 	movl   $(pagedir_kernel_phys), %esp
 	movl   %esp, %cr3
 
@@ -995,11 +995,11 @@ INTERN_FUNCTION(x86_smp_entry64)
 	ttest  mask=CPUID_80000001D_SYSCALL, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
 	jz     .Ldone_syscall
 
-	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32 |
+	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE  <<  32   |
 	 *                    (u64)SEGMENT_USER_CODE32_RPL << 48); */
 	movl   $(IA32_STAR), %ecx
 	rdmsr  /* Preserve the lower 32 bits! (in %eax)
-	        * Intel defines these bits as RESERVED, so they mustn't be altered.  */
+	        * Intel defines these bits as RESERVED, so they mustn't be altered. */
 	movl   $(SEGMENT_KERNEL_CODE | SEGMENT_USER_CODE32_RPL << 16), %edx
 	wrmsr
 
@@ -1027,12 +1027,12 @@ INTERN_FUNCTION(x86_smp_entry64)
 	wrmsr
 
 	/* TODO: `IA32_CSTAR' must be set to some kernel-space PC location
-	 *       that is used to handle user-space using `syscall' from
+	 *       that is used  to handle user-space  using `syscall'  from
 	 *       32-bit mode!
-	 *       On Intel CPUs, this MSR isn't used, and the CPU natively
-	 *       causes a #UD to be thrown, but AMD CPUs do make use of
+	 *       On  Intel CPUs, this MSR isn't used, and the CPU natively
+	 *       causes a #UD to  be thrown, but AMD  CPUs do make use  of
 	 *       this MSR, so we must still program it, else the CPU might
-	 *       end up jumping to some user-space text location when a
+	 *       end up jumping  to some user-space  text location when  a
 	 *       32-bit program makes use of `syscall'! */
 
 .Ldone_syscall:
@@ -1050,7 +1050,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   %Pax, %cr3
 
 	/* Set up tracing to appear as though we're nothing but an interrupt originating
-	 * from whereever we're supposed to start executing the provided thread. */
+	 * from  whereever  we're  supposed  to  start  executing  the  provided thread. */
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %Psp, OFFSET_SCPUSTATE_IRREGS
@@ -1129,7 +1129,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 #ifdef CONFIG_FPU
 	/* Indicate that no task is currently holding an FPU context.
 	 * NOTE: Technically, we could also move this part into `cpu_enter_deepsleep()',
-	 *       however it's safer to unconditionally do this during initialization! */
+	 *       however it's safer  to unconditionally do  this during  initialization! */
 	EXTERN(thiscpu_fputhread)
 	movP   $(0), thiscpu_fputhread(R_CPU)
 #endif /* CONFIG_FPU */
@@ -1258,7 +1258,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* Service pending IPIs for the first time.
 	 * -> Since we got here thanks to an INIT IPI, regular IPI callbacks
-	 *    would not have generated their IPI interrupt, meaning we have
+	 *    would not have generated their IPI interrupt, meaning we  have
 	 *    to manually check for callbacks this one time.
 	 * NOTE: Since `x86_serve_ipi()' expects an `icpustate' structure,
 	 *       we were forced to partially unwind the CPU state so-as to
@@ -1312,7 +1312,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 
 #ifdef CONFIG_FPU
 	/* With the CPU about to go OFFLINE, make sure to also save the current
-	 * FPU state (if the FPU was used), so-as to not lose that information
+	 * FPU state (if the FPU was used), so-as to not lose that  information
 	 * and have it still be available when we come back online. */
 	EXTERN(thiscpu_fputhread)
 	movP   thiscpu_fputhread(%R_fcall0P), %Pax
@@ -1329,13 +1329,13 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 1:
 #endif /* CONFIG_FPU */
 
-	/* Save the current RGDT/IDTR/LDTR/TR in some PERCPU field.
-	 * There are system functions that will temporarily alter these
+	/* Save   the   current   RGDT/IDTR/LDTR/TR   in   some   PERCPU   field.
+	 * There  are  system  functions   that  will  temporarily  alter   these
 	 * registers for all CPUs on the system, (e.g. `x86_idt_modify_begin()'),
-	 * so if these registers currently contain non-standard values, then we
-	 * mustn't clobber them, as would happen as the result of us going to
-	 * deep sleep, before being re-awokened, at which point we'd load the
-	 * original (standard) values, rather than those that were set just
+	 * so if these registers currently  contain non-standard values, then  we
+	 * mustn't clobber them,  as would happen  as the result  of us going  to
+	 * deep sleep, before  being re-awokened,  at which point  we'd load  the
+	 * original  (standard)  values, rather  than  those that  were  set just
 	 * prior to us going to deep-sleep. */
 	EXTERN(thiscpu_x86_saved_gdtr)
 	sgdtP  thiscpu_x86_saved_gdtr(%R_fcall0P)
@@ -1370,7 +1370,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	 * and there is nothing we can do to undo this ourself, or prevent such a
 	 * reset from happening.
 	 * However, in the interest of ensuring that everyone got the memo, invalidate
-	 * caches one more time (although this time it should only be caches related
+	 * caches  one more time (although this time  it should only be caches related
 	 * to us setting `thiscpu_state' to `CPU_STATE_DREAMING') */
 
 	wbinvd /* TODO: Only available since 486. - Must be replaced with `nop' no 386 */
@@ -1378,9 +1378,9 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	/* Disable our LAPIC
 	 * s.a.: Intel manual Volume #3: 10.4.7.2      Local APIC State After It Has Been Software Disabled
 	 * "The local APIC will respond normally to INIT, NMI, SMI, and SIPI messages"
-	 * -> In other words, it will still be able to respond to the INIT IPI
-	 *    send by other cores, however we can conserve power by turning off
-	 *    a majority of its other functions. -> After all: we're routing all
+	 * -> In other words,  it will  still be  able to  respond to  the INIT  IPI
+	 *    send by other  cores, however  we can  conserve power  by turning  off
+	 *    a  majority of  its other functions.  -> After all:  we're routing all
 	 *    hardware interrupts to CPU#0, so if we can still handle INIT normally,
 	 *    there's no reason to stay alive in order to do all of the other stuff! */
 	EXTERN(x86_lapicbase)
@@ -1389,11 +1389,11 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 
 
 	/* This is the master `hlt' instruction that is executed by a CPU when it is
-	 * currently OFFLINE. - A CPU with an execution EIP set here isn't actually
+	 * currently OFFLINE. - A CPU with an execution EIP set here isn't  actually
 	 * running.
 	 * Also note that the BOOT CPU must never be allowed to get here!
-	 * Reminder: A CPU is able to get out of this by another CPU sending an INIT IPI,
-	 *           at which point the SMP bootstrap code (s.a. `x86_smp_entry32') gets
+	 * Reminder: A  CPU is able to get out of this by another CPU sending an INIT IPI,
+	 *           at which point the SMP  bootstrap code (s.a. `x86_smp_entry32')  gets
 	 *           executed again, at the end of which the CPU context we've saved above
 	 *           will get loaded once again. */
 1:	hlt
@@ -1401,7 +1401,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 
 .Lx86_smp_kill:
 	/* we really shouldn't get here, but just in case we somehow do, manually
-	 * disable interrupts once again, and jump back to continue halting. */
+	 * disable interrupts  once again,  and jump  back to  continue  halting. */
 	cli
 	jmp    1b
 	.cfi_endproc

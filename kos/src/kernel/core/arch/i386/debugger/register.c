@@ -103,7 +103,7 @@ NOTHROW(KCALL get_fcpustate_from_trapstate)(struct fcpustate *__restrict result)
 	}
 }
 
-/* Assign the given `struct fcpustate' to `x86_dbg_trapstate', and let
+/* Assign  the given `struct fcpustate'  to `x86_dbg_trapstate', and let
  * registers not defined inside of it ripple down to `x86_dbg_exitstate' */
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict state) {
@@ -175,7 +175,7 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		return;
 	}
 	/* These registers are never present in trap states other than `X86_DBG_STATEKIND_FCPU'.
-	 * As such, changes to the values of these registers must cascade down to the debugger
+	 * As  such, changes to the values of these  registers must cascade down to the debugger
 	 * exit state. */
 	x86_dbg_exitstate.de_state.fcs_sgregs.sg_tr  = state->fcs_sgregs.sg_tr16;
 	x86_dbg_exitstate.de_state.fcs_sgregs.sg_ldt = state->fcs_sgregs.sg_ldt16;
@@ -188,9 +188,9 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 
 
 #ifdef __x86_64__
-/* Try to get/set the `%kernel_gs.base' register of `dbg_current'
- * Note that doing this is only possible for `THIS_TASK', as well as
- * the current thread of another CPU. All other threads have an implicit
+/* Try   to   get/set   the  `%kernel_gs.base'   register   of  `dbg_current'
+ * Note that  doing  this  is  only possible  for  `THIS_TASK',  as  well  as
+ * the current thread  of another  CPU. All  other threads  have an  implicit
  * `%kernel_gs.base' register value set to the address of their `struct task'
  * structure, which is non-relocatable. */
 PRIVATE ATTR_DBGTEXT bool
@@ -198,7 +198,7 @@ NOTHROW(KCALL get_dbg_current_kernel_gs_base)(u64 *__restrict presult) {
 	if (!x86_dbg_viewthread)
 		return false;
 	if (dbg_current == THIS_TASK) {
-		/* Assign registers to the trap state, and let
+		/* Assign  registers  to  the  trap  state,  and  let
 		 * undefined registers ripple down to the exit state. */
 		*presult = x86_dbg_exitstate.de_kernel_gsbase;
 		return true;
@@ -228,7 +228,7 @@ NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
 	if (!x86_dbg_viewthread)
 		return false;
 	if (dbg_current == THIS_TASK) {
-		/* Assign registers to the trap state, and let
+		/* Assign  registers  to  the  trap  state,  and  let
 		 * undefined registers ripple down to the exit state. */
 		x86_dbg_exitstate.de_kernel_gsbase = value;
 		return true;
@@ -256,7 +256,7 @@ NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
 #endif /* __x86_64__ */
 
 /* Write the contents of `x86_dbg_origstate', into the
- * state to-be loaded by `x86_dbg_viewthread' */
+ * state   to-be   loaded   by    `x86_dbg_viewthread' */
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL saveorig)(void) {
 	/* Special case: If no thread is being viewed, then we can't save anything. */
@@ -269,7 +269,7 @@ NOTHROW(KCALL saveorig)(void) {
 		return;
 	}
 	if (dbg_current == THIS_TASK) {
-		/* Assign registers to the trap state, and let
+		/* Assign  registers  to  the  trap  state,  and  let
 		 * undefined registers ripple down to the exit state. */
 		set_trapstate_from_fcpustate(&x86_dbg_origstate);
 #ifndef CONFIG_NO_SMP
@@ -509,7 +509,7 @@ do_normal_unscheduled_thread:
 				} else {
 nocpu:
 					/* The thread may not have been started, yet.
-					 * Fill in generic register information. */
+					 * Fill  in  generic  register   information. */
 					x86_dbg_origstate.fcs_sgregs.sg_tr  = SEGMENT_CPU_TSS;
 					x86_dbg_origstate.fcs_sgregs.sg_ldt = SEGMENT_CPU_LDT;
 					x86_dbg_origstate.fcs_coregs        = x86_dbg_exitstate.de_state.fcs_coregs;
@@ -565,7 +565,7 @@ NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
 		if (dbg_current == THIS_TASK) {
 			if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
-				 *       fall-back, rather than the current register state being used! */
+				 *       fall-back, rather than the  current register state being  used! */
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
@@ -628,7 +628,7 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 		if (dbg_current == THIS_TASK) {
 			if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
-				 *       fall-back, rather than the current register state being used! */
+				 *       fall-back, rather than the  current register state being  used! */
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
@@ -712,7 +712,7 @@ NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
 		if (dbg_current == THIS_TASK) {
 			if (level == DBG_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
-				 *       fall-back, rather than the current register state being used! */
+				 *       fall-back, rather than the  current register state being  used! */
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
@@ -819,7 +819,7 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 		if (dbg_current == THIS_TASK) {
 			if (level == DBG_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
-				 *       fall-back, rather than the current register state being used! */
+				 *       fall-back, rather than the  current register state being  used! */
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
@@ -942,7 +942,7 @@ NOTHROW(KCALL dbg_getallregs)(unsigned int level,
 			memcpy(state, &x86_dbg_exitstate, sizeof(struct fcpustate));
 			if (level == DBG_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
-				 *       fall-back, rather than the current register state being used! */
+				 *       fall-back, rather than the  current register state being  used! */
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
@@ -994,7 +994,7 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
 			/* Access the exit CPU state. */
 			if (level == DBG_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
-				 *       fall-back, rather than the current register state being used! */
+				 *       fall-back, rather than the  current register state being  used! */
 				set_trapstate_from_fcpustate(state);
 				return;
 			}

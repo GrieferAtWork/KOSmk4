@@ -135,7 +135,7 @@ CC_FLAGS({
 
 	/* cold attribute suggestions are broken at the moment:
 	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93087
-	 * If (and once) they get  fixed, and I've updated  the
+	 * If (and once) they get fixed, and I've updated the
 	 * toolchain, this'll get enabled again. */
 //	"-Wsuggest-attribute=cold",
 

@@ -206,9 +206,9 @@ PRIVATE struct ansitty_operators const video_stubtty = {
 };
 
 /* Initialize a given video device.
- * NOTE: `ops->ato_output' must be set to NULL when calling this function.
+ * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
- *       is done dynamically when the ANSI TTY is connected to the output
+ *       is done dynamically when the ANSI  TTY is connected to the  output
  *       channel of a `struct tty_device'
  * This function initializes the following operators:
  *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!

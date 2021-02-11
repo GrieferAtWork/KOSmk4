@@ -2129,9 +2129,9 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
 }
 
 
-/* Synchronize   all   modified  pages   within   the  given   part-relative   address  range.
- * If  the  given  part-relative   address  range  is  out-size   of  the  bounds  of   `self'
- * after   a  lock  to  `self'  has  been  acquired,  then  that  range  is  truncated  first.
+/* Synchronize all modified pages within the given part-relative address  range.
+ * If the given part-relative address range is out-size of the bounds of  `self'
+ * after a lock to `self' has been acquired, then that range is truncated first.
  * NOTE: The caller should not be holding any kind of lock to either `self' or its data block.
  * NOTE: If  the  data block  associated  with `self'  does  not implement  a `dt_savepart'
  *       function, or if `self' doesn't have the CHANGED flag set, the function immediately
@@ -3426,8 +3426,8 @@ DECL_BEGIN
 
 
 
-/* Sync  changes  made  to  file  mappings  within  the  given address
- * range   with  on-disk  file  images.  (s.a.  `vm_datablock_sync()')
+/* Sync changes made to file mappings within the given  address
+ * range with on-disk file images. (s.a. `vm_datablock_sync()')
  * NOTE: Memory ranges that aren't actually mapped are simply ignored.
  * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
 PUBLIC u64 FCALL

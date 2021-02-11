@@ -26,7 +26,7 @@
 
 /* #include <crt-features/crt-kos-sections-order.h> */
 /* Include as relative so we get a dependency on that header.
- * Since that header is automatically generated, it updating
+ * Since  that header is automatically generated, it updating
  * will also force our file to be re-preprocessed, automating
  * the process a little bit better. */
 #include "../../../../../include/crt-features/crt-kos-sections-order.h"

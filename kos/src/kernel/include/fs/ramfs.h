@@ -38,8 +38,8 @@ DATDEF struct inode_type ramfs_regular_type;
 DATDEF struct inode_type ramfs_directory_type;
 DATDEF struct inode_type ramfs_symlink_type;
 
-/* The builtin filesystem that is mounted under /dev
- * This is a singleton instance of ramfs */
+/* The builtin filesystem that is mounted under
+ * /dev.  This is a singleton instance of ramfs */
 DATDEF struct superblock devfs;
 
 /* Without blocking, remove an INode from the

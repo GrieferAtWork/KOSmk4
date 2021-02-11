@@ -71,9 +71,9 @@ DECL_BEGIN
  *   EXCEPT:                                     mfile_lock_end(self) && unlock()
  * @return: * : Success: A pointer to an extended mem-part that contains the entirety
  *                       of the address  range originally specified  in `data'.  Note
- *                       that  in this case,  you're inheriting a  lock to that part.
- *                       Note: In this case, this  function also guaranties that  the
- *                       returned  part doesn't  exist in  SWAP, though  it may still
+ *                       that in this case, you're inheriting a lock to that part.
+ *                       Note: In this case, this function also guaranties that the
+ *                       returned part doesn't exist in  SWAP, though it may  still
  *                       not be allowed (i.e. it's state may be MPART_ST_VOID)
  * @return: MFILE_EXTENDPART_OR_UNLOCK_NOSIB: (kind-of) success; the function was unable
  *                       to extend a pre-existing mem-part, but this is because there was

@@ -378,11 +378,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
 		inb_p(PS2_DATA); /* Make sure that there is no dangling data */
 
-		/* Workaround: If the  controller is  configured  to have  interrupts  enabled
-		 *             for  either PORT1  or PORT2, then  instead of us  being able to
-		 *             read command  data in  the following  call, the  response  byte
-		 *             will  have already been read by `ps2_probe_handle_interrupt()',
-		 *             such  that  the   following  line  will   cause  an   exception
+		/* Workaround: If the  controller is  configured to  have interrupts  enabled
+		 *             for  either PORT1 or  PORT2, then instead of  us being able to
+		 *             read  command data  in the  following call,  the response byte
+		 *             will have already been read by `ps2_probe_handle_interrupt()',
+		 *             such that the following line will cause an exception
 		 *             `E_IOERROR_TIMEOUT:E_IOERROR_SUBSYSTEM_HID'   to   be   thrown.
 		 *             The problem here is that the bit  that can tell us if the  PS/2
 		 *             controller is able to trigger interrupts right now is contained

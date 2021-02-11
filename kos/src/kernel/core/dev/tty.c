@@ -162,11 +162,11 @@ ttyfwd_work(void *__restrict arg) {
 		}
 		if (!count)
 			break;
-		/* NOTE: Data also gets written with the `IO_NONBLOCK' flag set.
+		/* NOTE: Data also gets written  with the `IO_NONBLOCK' flag  set.
 		 *       This has to be done because control characters still have
-		 *       to be processed, even when canon buffers have filled up.
-		 *       Otherwise, you would no longer be able to CTRL+C a hung
-		 *       application after hammering away at your keyboard for a
+		 *       to be processed, even when canon buffers have filled  up.
+		 *       Otherwise, you would no longer  be able to CTRL+C a  hung
+		 *       application after hammering away  at your keyboard for  a
 		 *       couple of minutes. */
 		TRY {
 			terminal_iwrite(&tty->t_term, buf, count,
@@ -187,12 +187,12 @@ PRIVATE struct async_worker_callbacks const ttyfwd_cb = {
 	/* .awc_test = */ NULL
 };
 
-/* Start/Stop forwarding input handle data on the given TTY
- * Note that for any given input handle, only a single TTY should
+/* Start/Stop forwarding  input  handle  data  on  the  given  TTY
+ * Note that for any given input handle, only a single TTY  should
  * ever be allowed to process data. - Allowing multiple TTYs to do
- * so could result in weakly undefined behavior as it would no
- * longer be clear who should actually receive data, causing a
- * soft race condition with the potential of data being scattered
+ * so could result  in weakly  undefined behavior as  it would  no
+ * longer  be clear  who should  actually receive  data, causing a
+ * soft race condition with the potential of data being  scattered
  * between readers, or some random reader getting all of the data.
  * @return: true:  The FWD thread was started/stopped
  * @return: false: The FWD thread was already running/halted */
@@ -304,19 +304,19 @@ tty_device_mmap(struct character_device *__restrict self,
 	struct tty_device *me;
 	me = (struct tty_device *)self;
 	/* mmap() may be implemented by the display handle (e.g. for direct framebuffer access),
-	 * so forward any request for mapping data into memory to it, and it alone. */
+	 * so  forward  any  request  for  mapping  data  into  memory  to  it,  and  it  alone. */
 	(*handle_type_db.h_mmap[me->t_ohandle_typ])(me->t_ohandle_ptr, info);
 }
 
 
 
 
-/* Create (but don't register) a new TTY device that connects the two given
+/* Create (but  don't register)  a new  TTY device  that connects  the two  given
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
- * and ansi-compliant display output is written to `ohandle_ptr'
- * For this purpose, special handling is done for certain handles:
- *   - ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isanansitty(ohandle_ptr):
- *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty device
+ * and   ansi-compliant   display    output   is    written   to    `ohandle_ptr'
+ * For   this   purpose,  special   handling   is  done   for   certain  handles:
+ *   - ohandle_typ  ==   HANDLE_TYPE_CHARACTERDEVICE   &&   character_device_isanansitty(ohandle_ptr):
+ *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty  device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
  *     When the returned tty device is destroyed, this link gets severed automatically.
  * Upon success, the caller should:
@@ -374,7 +374,7 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	(*handle_type_db.h_incref[ihandle_typ])(ihandle_ptr);
 	(*handle_type_db.h_incref[ohandle_typ])(ohandle_ptr);
 	COMPILER_BARRIER();
-	/* Special case: Always read characters from a connected
+	/* Special case: Always   read   characters  from   a  connected
 	 *               keyboard device, rather than reading key codes. */
 	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isakeyboard((struct character_device *)ihandle_ptr)) {
@@ -382,15 +382,15 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		idev = (struct keyboard_device *)ihandle_ptr;
 		COMPILER_BARRIER();
 		/* When the output handle is an ansitty, then we must somehow register
-		 * that ansitty within the keyboard, such that the keyboard can call
-		 * into `ansitty_translate()' for the encoding of keyboard input into
+		 * that ansitty within the keyboard,  such that the keyboard can  call
+		 * into `ansitty_translate()' for the encoding of keyboard input  into
 		 * a CP-specific, encoded byte sequence! */
 		if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 		    character_device_isanansitty((struct character_device *)ohandle_ptr))
 			awref_cmpxch(&idev->kd_tty, NULL, result);
 	}
-	/* Try to bind the new TTY device to an ANSI TTY output device.
-	 * Note that a single output device may have multiple TTY drivers
+	/* Try to bind  the new  TTY device to  an ANSI  TTY output  device.
+	 * Note  that a single  output device may  have multiple TTY drivers
 	 * associated with it, as is the case for the CTRL+ALT+F{1-12} TTYs. */
 	if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isanansitty((struct character_device *)ohandle_ptr)) {

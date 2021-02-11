@@ -54,7 +54,7 @@ INTDEF byte_t __x86_syscall_emulate_r_protect_start[];
 INTDEF byte_t __x86_syscall_emulate_r_protect_end[];
 
 
-/* The personality function used to handle exceptions propagated through
+/* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
 INTERN NONNULL((1, 2, 3)) unsigned int
@@ -66,7 +66,7 @@ NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restric
 	byte_t *pc;
 	/* Check if the exception happened while actually in the process of
 	 * servicing the system call.
-	 * Technically, there shouldn't be a chance of an exception happening
+	 * Technically, there shouldn't  be a chance  of an exception  happening
 	 * for another reason, but better be careful and do this check properly. */
 	pc = (byte_t *)kcpustate_getpc(state);
 	if (pc <= __x86_syscall_emulate_r_protect_start ||
@@ -117,7 +117,7 @@ NOTHROW(KCALL x86_syscall_personality_asm32_lcall7)(struct unwind_fde_struct *__
 			goto err;
 	}
 	/* Check if the return state actually points into user-space,
-	 * or alternatively: indicates a user-space redirection. */
+	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
@@ -136,9 +136,9 @@ typedef u64 (__ARCH_SYSCALLCC *syscall_proto64_t)(syscall_ulong_t arg0, syscall_
                                                   syscall_ulong_t arg2, syscall_ulong_t arg3,
                                                   syscall_ulong_t arg4, syscall_ulong_t arg5);
 
-/* Don't warn about the fact that parts of `argv' below may be
+/* Don't warn about the fact that parts of `argv' below may  be
  * uninitialized when `proto()' gets invoked. This is intended,
- * as the uninitialized portion makes up the arguments that
+ * as the  uninitialized portion  makes up  the arguments  that
  * aren't actually being used. */
 #ifdef __GNUC__
 #pragma GCC diagnostic push

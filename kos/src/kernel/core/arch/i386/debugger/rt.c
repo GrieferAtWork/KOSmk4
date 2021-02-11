@@ -71,7 +71,7 @@ DECL_BEGIN
 
 /* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
  *        Set to non-NULL before `dbg_active' becomes `true', and set
- *        to `NULL' before `dbg_active' becomes `false' */
+ *        to   `NULL'    before    `dbg_active'    becomes    `false' */
 DATDEF ATTR_DBGBSS struct cpu *dbg_cpu_ ASMNAME("dbg_cpu");
 
 
@@ -88,8 +88,8 @@ PUBLIC ATTR_DBGBSS void *x86_dbg_trapstate            = NULL;
 PUBLIC ATTR_DBGBSS unsigned int x86_dbg_trapstatekind = X86_DBG_STATEKIND_NONE;
 
 /* 1 + the LAPIC ID of the CPU currently holding the debugger lock.
- * This value is used with `lock cmpxchgw' to describe the primary
- * lock used to ensure that only a single thread can ever be the
+ * This value is used with `lock cmpxchgw' to describe the  primary
+ * lock used to ensure  that only a single  thread can ever be  the
  * controller of debugger mode. */
 PUBLIC ATTR_DBGBSS WEAK u16 x86_dbg_owner_lapicid = 0;
 
@@ -146,10 +146,10 @@ union ac_int { /* AltCore_Interrupt */
 PRIVATE ATTR_DBGBSS union ac_int
 ac_ints[CONFIG_DBG_ALTCORE_MAX_INTERRUPTS] = { };
 
-/* Handle an interrupt happening on a CPU that isn't `dbg_cpu'
- * while the debugger is active. When this function is called,
+/* Handle  an  interrupt happening  on  a CPU  that  isn't `dbg_cpu'
+ * while  the  debugger is  active.  When this  function  is called,
  * we know that our caller is the `PREEMPTION_ENABLE_WAIT_DISABLE()'
- * statement inside of `debugger_wait_for_done()', and our job
+ * statement  inside  of  `debugger_wait_for_done()',  and  our  job
  * is to filter out `vector == 0xf1' */
 INTERN ATTR_DBGTEXT NOBLOCK void
 NOTHROW(FCALL x86_dbg_altcore_interrupt)(u8 vector) {
@@ -197,10 +197,10 @@ again_index_i:
 
 INTDEF NOBLOCK void NOTHROW(KCALL x86_handle_dbg_ps2_interrupt)(void);
 
-/* High-level function for handling an AltCoreInterrupt
+/* High-level  function   for   handling   an   AltCoreInterrupt
  * originating from `sender', and having been caused by `vector'
  * @return: true:  Successfully handled the interrupt.
- * @return: false: Interrupt cannot be handled in debug-mode.
+ * @return: false: Interrupt  cannot   be   handled   in   debug-mode.
  *                 Mark the interrupt as pending, and have the sending
  *                 CPU execute the vector's normal handler once debug-
  *                 mode is left. */
@@ -326,7 +326,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	/* Clear the set of pending interrupts. */
 	memset(ammend.dca_intr, 0, sizeof(ammend.dca_intr));
 
-	/* Fill in the host-backup area of our CPU, thus
+	/* Fill in  the host-backup  area  of our  CPU,  thus
 	 * ACK-ing the fact that we're now supposed to sleep. */
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, state);
@@ -337,7 +337,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	__lidt_p(&x86_dbgaltcoreidt_ptr);
 
 	/* Make sure that other IPIs also get handled!
-	 * This is important because HW-IPIs may only be send when there aren't
+	 * This is important because HW-IPIs may only be send when there  aren't
 	 * any pending SW-IPIs, meaning that we wouldn't get the memo if we were
 	 * to wait for other CPUs while there are still more pending SW-IPIs! */
 	cpu_ipi_service_nopr();
@@ -346,7 +346,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	while (ATOMIC_READ(dbg_cpu_) != NULL) {
 		COMPILER_BARRIER();
 		/* NOTE: Mark (R|E)AX as clobbered, since the interrupt handlers (which may only be
-		 *       executed during the `hlt' instruction in this inline assembly statement)
+		 *       executed during the `hlt' instruction  in this inline assembly  statement)
 		 *       may override that register during execution! */
 		__asm__ __volatile__("sti\n\t"
 		                     "hlt\n\t"
@@ -442,17 +442,17 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		if (target == calling_cpu)
 			continue;
 		/* At one point during early boot, the entires of the `cpu_vector'
-		 * are used to carry a 16-bit block of information about the how
+		 * are used to carry a 16-bit  block of information about the  how
 		 * the associated CPU will be addressed physically.
-		 * Since we known that the kernel lives in upper memory, and that
-		 * this type of address information only uses the lower-most 16
-		 * bits, we can infer that anything that isn't >= 0xc000000 in i386,
+		 * Since we known  that the  kernel lives  in upper  memory, and  that
+		 * this type  of  address  information only  uses  the  lower-most  16
+		 * bits, we can infer that anything  that isn't >= 0xc000000 in  i386,
 		 * or `0xffff800000000000' on x86_64 isn't an initialized CPU pointer. */
 		if ((uintptr_t)target < KERNELSPACE_BASE)
 			continue;
 
 		/* One of the last things done during init is setting TTS.PSP0
-		 * Check if that field has already been initialized */
+		 * Check   if   that  field   has  already   been  initialized */
 		thread = FORCPU(target, thiscpu_sched_current);
 		if ((uintptr_t)thread < KERNELSPACE_BASE)
 			continue;
@@ -535,7 +535,7 @@ INTDEF void KCALL dbg_reset_tty(void);
 INTDEF void KCALL x86_debug_initialize_ps2_keyboard(void);
 INTDEF void KCALL x86_debug_finalize_ps2_keyboard(void);
 
-/* Flagset of components that could be preserved (used to make the
+/* Flagset  of components that could be preserved (used to make the
  * debugger initialization more robust against recursively entering
  * itself) (set of `INITOK_*') */
 PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
@@ -710,13 +710,13 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 
 	/* Push active connections. */
 	if (!(initok & INITOK_CONNECTIONS)) {
-		/* NOTE: Also guard against attempts to re-push the same connection
+		/* NOTE: Also guard  against attempts  to re-push  the same  connection
 		 *       set, as might happen if something after this point goes wrong,
-		 *       and the debugger tries to enter itself, which would lead to
+		 *       and  the debugger tries  to enter itself,  which would lead to
 		 *       an assertion failure in `task_pushconnections()':
 		 *       `Connection <addressof(x86_dbg_hostbackup.dhs_signals)> set was already pushed'
 		 * Technically, this should already be prevented by `initok & INITOK_CONNECTIONS',
-		 * however given that this is all about making this code be robust against broken
+		 * however  given that this is all about making this code be robust against broken
 		 * code elsewhere within the kernel, double-checking isn't a problem here! */
 		if unlikely(!verify_task_connections(FORTASK(mythread, this_connections))) {
 			/* Connections are all f'ed up. - Fully reset them, so
@@ -739,7 +739,7 @@ fully_reset_task_connections:
 	}
 
 	/* NOTE: Clear `dbg_cpu_' _BEFORE_ sending the IPI to stop execution
-	 *       on other CPUs. - This field being non-NULL is the trigger
+	 *       on other CPUs. - This  field being non-NULL is the  trigger
 	 *       that causes other CPUs to stay suspended! */
 	COMPILER_BARRIER();
 	dbg_cpu_ = me;
@@ -758,15 +758,15 @@ fully_reset_task_connections:
 			/* Wait for other CPUs to ACK becoming suspended. */
 			unsigned int volatile timeout = 1000000;
 
-			/* NOTE: We need a timeout here, since this can dead-lock if one of the other
-			 *       CPUs is itself in a dead-lock, which could easily happen when the
+			/* NOTE: We  need a timeout here, since this can dead-lock if one of the other
+			 *       CPUs  is itself  in a dead-lock,  which could easily  happen when the
 			 *       debugger was entered while the caller was holding some kind of atomic
-			 *       lock, which another CPU is now trying to acquire. (all while having
+			 *       lock, which another CPU is now  trying to acquire. (all while  having
 			 *       preemption, and thus all types of interrupts disabled)
 			 * When this happens, the other CPU will never respond to us until the user is
-			 * ready to return from debugger mode, but assuming that the above assumption
+			 * ready to return from debugger mode, but assuming that the above  assumption
 			 * is correct, the secondary core that's not responding, while being unable to
-			 * halt in the mean time, still shouldn't be able to do any real harm until
+			 * halt in the mean time,  still shouldn't be able to  do any real harm  until
 			 * that point, so this is actually (kind-of) ok. */
 			while (x86_dbg_hostbackup_cpu_suspended_count() < count) {
 				if (!timeout)
@@ -783,7 +783,7 @@ fully_reset_task_connections:
 	x86_dbg_viewthread = NULL;
 
 	/* Make sure that the PIC is initialized properly, as the debugger's
-	 * PS/2 keyboard driver requires interrupts to be mapped properly. */
+	 * PS/2 keyboard driver requires  interrupts to be mapped  properly. */
 	x86_initialize_pic();
 
 	/* Configure VGA + PS/2 keyboard. */
@@ -876,15 +876,15 @@ reset_pdir(struct task *mythread) {
 #endif
 
 	/* The page directory seems to be consistent. -> Use it instead to
-	 * minimize the number of necessary page directory switches when
+	 * minimize the number of  necessary page directory switches  when
 	 * inspecting memory. */
 	pagedir_set(mymm->mm_pagedir_p);
 }
 
 
-/* Called to perform reset operations that must be performed before
+/* Called to  perform reset  operations that  must be  performed  before
  * the debugger stack is reset as part of the debugger resetting itself.
- * This function should perform any reset that interacts with data
+ * This  function  should perform  any  reset that  interacts  with data
  * structures which may be located on the debugger stack. */
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
 	struct cpu *me;
@@ -906,18 +906,18 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
 		pertask_init_task_connections(mythread);
 
 	/* When the debugger is reset after a prior call to `task_pushconnections()',
-	 * then we must take special care to pop the pushed set of connections.
-	 * This case can be detected by looking at connection set pointers, and
-	 * checking if they are apart of the debugger stack (if they are, then
+	 * then we  must take  special care  to pop  the pushed  set of  connections.
+	 * This  case  can be  detected by  looking at  connection set  pointers, and
+	 * checking if  they are  apart of  the  debugger stack  (if they  are,  then
 	 * the debugger was reset with at least one set of pushed connections) */
 	if (likely(initok & INITOK_CONNECTIONS) &&
 	    likely(&FORTASK(mythread, this_connections) == &PERTASK(this_connections))) {
 		if unlikely(FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
 			struct task_connections *chain;
 			chain = FORTASK(mythread, this_connections);
-			/* Validate the chain of pushed connections. If we're able to detect
+			/* Validate  the chain of  pushed connections. If  we're able to detect
 			 * any faults, then we will not actually disconnect from them properly.
-			 * Otherwise, we essentially pop connections until we reach the one
+			 * Otherwise,  we essentially  pop connections  until we  reach the one
 			 * we've been expecting to find. */
 			TRY {
 				struct task_connections *iter;
@@ -996,13 +996,13 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	dbg_runhooks(DBG_HOOK_RESET);
 
 	/* Finally, handle any pending SW-ipis for our CPU.
-	 * There may still be some unhandled ones if the debugger was reset
+	 * There may still be some unhandled ones if the debugger was  reset
 	 * from within an IPI callback, in which case we may not have gotten
 	 * around to handling any potentially remaining IPIs.
 	 *
 	 * One example where this might happen would be the F12-reset trick,
-	 * in which case the debugger gets reset from within an interrupt
-	 * handler, which may actually be the IPI-handler if the debug-cpu
+	 * in  which case the  debugger gets reset  from within an interrupt
+	 * handler, which may actually be  the IPI-handler if the  debug-cpu
 	 * isn't the boot cpu! */
 	{
 		pflag_t was;
@@ -1045,7 +1045,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	dbg_finalize_tty();
 
 	/* NOTE: Clear `dbg_cpu_' _BEFORE_ sending the IPI to resume execution
-	 *       on other CPUs. - This field being NULL is the trigger that
+	 *       on  other CPUs. -  This field being NULL  is the trigger that
 	 *       causes other CPUs to resume! */
 	COMPILER_BARRIER();
 	dbg_cpu_ = NULL;
@@ -1092,11 +1092,11 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 			task_popconnections();
 	}
 
-	/* Update the debugger exit state to have `dbg_enter_r()' return
-	 * the updated trap state descriptor pointer. This pointer has to
+	/* Update the debugger  exit state to  have `dbg_enter_r()'  return
+	 * the updated trap state descriptor  pointer. This pointer has  to
 	 * be updated in case the trap state was moved, as is required when
-	 * setting the kernel_esp register of a 32-bit irregs structure,
-	 * as found in icpustate or scpustate, both of which may appear
+	 * setting the kernel_esp  register of a  32-bit irregs  structure,
+	 * as found in  icpustate or  scpustate, both of  which may  appear
 	 * within the `x86_dbg_trapstate' pointer. */
 	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
 		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
@@ -1105,7 +1105,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 
 
 /* Construct a debugger entry info descriptor which will invoke the given entry
- * by passing a pointer to a stack-allocated copy of the given structure.
+ * by  passing  a pointer  to a  stack-allocated copy  of the  given structure.
  * Note that this copy is allocated on the debugger stack! */
 #ifdef __x86_64__
 #define MAKEINFO(entry, data, num_bytes)                                              \

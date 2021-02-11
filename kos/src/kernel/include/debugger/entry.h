@@ -82,7 +82,7 @@ FUNDEF ATTR_NORETURN void KCALL dbg_exit(void);
 
 /* A special debugger entry function that can be used to quickly  enter
  * debugger mode at an arbitrary code location, and greet the user with
- * a    CLI-based   interface   for    querying   the   system   state.
+ * a CLI-based interface for querying the system state.
  * NOTE: This function preserves _all_ registers! */
 FUNDEF void KCALL dbg(void);
 

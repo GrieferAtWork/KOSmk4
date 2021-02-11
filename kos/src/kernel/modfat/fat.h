@@ -437,7 +437,7 @@ struct fat_superblock
 
 /* Get/Set   FAT   indirection,  automatically   loading   missing  parts
  * of the FileAllocationTable, as well as mark modified parts as changed.
- * NOTE: When calling `Fat_SetFatIndirection()', the
+ * NOTE: When  calling  `Fat_SetFatIndirection()', the
  *       caller must be holding a lock on `f_fat_lock' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFatIndirection(FatSuperblock *__restrict self,

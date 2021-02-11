@@ -91,7 +91,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	 * - Enable protected mode and fill in %cs and %ds
 	 * - Jump to `_start' (which is at `_start - KERNEL_CORE_BASE')
 	 * - If possible, also fill in custom boot magic in `%eax'
-	 *   to pass information about `BOOTDISK' to the kernel. */
+	 *   to  pass information about  `BOOTDISK' to the kernel. */
 
 	/* Enable A20 (from https://wiki.osdev.org/A20_Line) */
 
@@ -201,7 +201,7 @@ PRIVATE_FUNCTION(a20test)
 	/* Negate the word at %ds:%si */
 	notw   %ds:(%si)             /* *(u16 *)0x7dfe = ~*(u16 *)0x7dfe;              */
 	/* Repeat the compare (if A20 was enabled, the only 0x0000:0x7dfe was
-	 * changed. Otherwise, both memory locations will have been changed) */
+	 * changed. Otherwise, both memory locations will have been  changed) */
 	cmpsw  %es:(%di), %ds:(%si)  /* FLAGS.ZF = *(u16 *)0x7dfe == *(u16 *)0x107dfe; */
 	jne8   2f                    /* if (!FLAGS.ZF) goto 2f; // non-equal -> A20 is enabled. */
 	popw   %ds

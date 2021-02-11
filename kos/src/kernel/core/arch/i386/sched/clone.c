@@ -115,8 +115,8 @@ task_srpc_set_child_tid(void *arg,
 PUBLIC NOBLOCK uintptr_t
 NOTHROW(KCALL x86_get_random_userkern_address)(void) {
 	uintptr_t offset;
-	/* Assign a random (pointer-aligned) offset into kernel-space
-	 * as the base address for the userkern segment. */
+	/* Assign a random (pointer-aligned) offset into kernel-
+	 * space as the base  address for the userkern  segment. */
 	offset = (uintptr_t)(krand() * USERKERN_SEGMENT_ALIGN);
 	offset %= ((uintptr_t)0 - KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
 	offset += KERNELSPACE_BASE;
@@ -128,7 +128,7 @@ PUBLIC NOBLOCK u32
 NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 	u32 offset;
 	/* Assign a random (pointer-aligned) offset into (compatibility-mode)
-	 * kernel-space as the base address for the userkern segment. */
+	 * kernel-space  as  the  base  address  for  the  userkern  segment. */
 	offset = (u32)(krand32() * USERKERN_SEGMENT_ALIGN);
 	offset %= ((u32)0 - COMPAT_KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
 	offset += COMPAT_KERNELSPACE_BASE;
@@ -198,8 +198,8 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		REL(FORTASK(result, this_kernel_stackpart_).dp_srefs);
 #undef REL
 		/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
-		 * This must be done before we start making the thread visible to
-		 * other kernel components, since this also affects things such as
+		 * This must be done before we  start making the thread visible  to
+		 * other kernel components, since this also affects things such  as
 		 * the thread's effective signal mask. */
 		if (clone_flags & CLONE_VFORK)
 			result->t_flags |= TASK_FVFORK;
@@ -331,10 +331,10 @@ again_lock_vm:
 		gpregs_setpax(&state->scs_gpregs, 0);
 
 		if (clone_flags & CLONE_CHILD_SETTID) {
-			/* Inject an RPC for saving the child's TID within the given pointer
+			/* Inject  an  RPC  for  saving  the  child's  TID  within  the  given  pointer
 			 * This always needs to be done in the context of the child, so that exceptions
 			 * during the write are handled in the proper context, as well as in regards to
-			 * the child actually existing in a different VM when `CLONE_VM' isn't given. */
+			 * the child actually existing in a  different VM when `CLONE_VM' isn't  given. */
 			state = task_push_asynchronous_rpc(state,
 			                                   &task_srpc_set_child_tid,
 			                                   child_tidptr);
@@ -386,25 +386,25 @@ again_lock_vm:
 		}
 #endif
 
-		/* Before we actually start executing the child thread,
+		/* Before  we actually start executing the child thread,
 		 * check if there are any pending POSIX signals directed
-		 * at us, and don't actually start the child thread if
+		 * at us, and don't actually  start the child thread  if
 		 * there are any.
 		 *
 		 * This must be done to prevent run-away child processes
-		 * as the result of code like `for (;;) fork();'.
+		 * as   the  result  of  code  like  `for (;;) fork();'.
 		 * Consider a user now presses `CTRL+C'.
 		 *
-		 * That signal will have been sent to all threads apart
-		 * of the existing process group. However this may have
+		 * That signal will  have been sent  to all threads  apart
+		 * of the existing  process group. However  this may  have
 		 * been done before `result' (aka. the new thread/process)
-		 * was added to that process group, meaning that there's
+		 * was added to that  process group, meaning that  there's
 		 * a chance that it didn't get the signal.
 		 *
-		 * In this scenario, we can't allow the new thread/process
+		 * In this  scenario, we  can't allow  the new  thread/process
 		 * to start executing, since that would violate the assumption
-		 * that sending a signal to process group means that _all_
-		 * threads that existed at one point within the group had
+		 * that  sending a  signal to  process group  means that _all_
+		 * threads that  existed at  one point  within the  group  had
 		 * the signal delivered. */
 		task_serve();
 
@@ -420,8 +420,8 @@ again_lock_vm:
 			 * our child process indicates that they're done using our VM
 			 *
 			 * This way, the child process can freely (and unknowingly) modify
-			 * the parent process's signal mask, without actually affecting
-			 * anything, and without those changes remaining visible once the
+			 * the parent process's  signal mask,  without actually  affecting
+			 * anything, and without those changes remaining visible once  the
 			 * parent process is resumed. */
 			if (caller->t_flags & TASK_FUSERPROCMASK) {
 				sigset_t saved_user_sigset;
@@ -432,7 +432,7 @@ again_lock_vm:
 				validate_readwrite(user_sigmask, sizeof(sigset_t));
 				memcpy(&saved_user_sigset, user_sigmask, sizeof(sigset_t));
 				/* Switch over to a completely filled, kernel-space
-				 * signal mask to-be used by the calling thread. */
+				 * signal mask to-be  used by  the calling  thread. */
 				old_sigmask = arref_xch(maskref, &kernel_sigmask_full);
 				ATOMIC_AND(caller->t_flags, ~TASK_FUSERPROCMASK);
 				TRY {
@@ -453,11 +453,11 @@ again_lock_vm:
 				/* Re-enable userprocmask-mode. */
 				ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 
-				/* Restore the old (saved) state of the user-space signal
+				/* Restore the old (saved) state of the user-space  signal
 				 * mask, as it was prior to the vfork-child being started.
-				 * NOTE: Do this _after_ we've already restored the kernel-side
+				 * NOTE: Do this _after_  we've already  restored the  kernel-side
 				 *       of the calling thread's TLS state. That way, if something
-				 *       goes wrong while we're restoring the user-space side of
+				 *       goes wrong while we're  restoring the user-space side  of
 				 *       things, it won't actually our fault! */
 				memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
 				ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
@@ -466,9 +466,9 @@ again_lock_vm:
 			{
 				/* Actually start execution of the newly created thread. */
 				task_start(result);
-	
+
 				/* The specs say that we should ignore (mask) all POSIX
-				 * signals until the child indicate VFORK completion. */
+				 * signals until the  child indicate VFORK  completion. */
 				old_sigmask = arref_xch(maskref, &kernel_sigmask_full);
 				TRY {
 					/* Wait for the thread to clear its VFORK flag. */
@@ -481,7 +481,7 @@ again_lock_vm:
 				arref_set_inherit(maskref, old_sigmask);
 			}
 			/* With the original signal mask restored, we must check if
-			 * we (the parent) have received any signals while we were
+			 * we (the parent) have received any signals while we  were
 			 * waiting on the child */
 			sigmask_check();
 		} else {

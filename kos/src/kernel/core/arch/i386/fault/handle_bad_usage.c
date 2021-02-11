@@ -28,17 +28,17 @@ opt.append("-Os");
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
 
-/* NOTE: Alongside emulating various instructions that might not normally be
+/* NOTE: Alongside emulating  various instructions  that might  not normally  be
  *       available on any X86-PC, KOS extends X86 architecture functionality by:
  *
- *  - Allowing use of `rdfsbase', `rdgsbase', `wrfsbase' and `wrgsbase' in 32-bit mode,
- *    where these instructions allow write access to the BASE fields of the following
+ *  - Allowing  use of `rdfsbase', `rdgsbase', `wrfsbase' and `wrgsbase' in 32-bit mode,
+ *    where these instructions allow  write access to the  BASE fields of the  following
  *    GDT segments (which are indexed by the %fs or %gs registers respectivly, such that
  *    e.g. `wrgsbase' will attempt to write the base field of GDT[%gs]):
  *     - SEGMENT_USER_FSBASE
  *     - SEGMENT_USER_GSBASE
- *    Note that these segments ~normally~ map to the %fs and %gs registers, however
- *    since %fs and %gs are merely selectors, they could be changed to any other
+ *    Note that these segments ~normally~ map to the %fs and %gs registers,  however
+ *    since %fs and %gs  are merely selectors,  they could be  changed to any  other
  *    segment, though the rule persists that only these 2 segments are writable from
  *    user-space.
  *    Read access is granted to any arbitrary segment, so-long as SEGMENT.DPL >= CPL
@@ -159,7 +159,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_LOCK_ARPL   0 /* [not enabled] Accept `lock' for arpl */
 #endif /* !CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
 
-/* Configure for which instructions emulation should be attempted.
+/* Configure   for  which  instructions   emulation  should  be  attempted.
  * Any instruction enabled here will be emulated if not supported natively! */
 #define EMU86_EMULATE_CONFIG_WANT_ADCX          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_ADOX          1 /* Emulate non-standard instructions */
@@ -424,8 +424,8 @@ NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
 			PERTASK_SET(this_exception_trace[i], (void *)0);
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	/* Manually fix-up exception flags since we're not actually going
-	 * to call `__cxa_end_catch()' because of the direct unwinding
+	/* Manually fix-up  exception flags  since we're  not actually  going
+	 * to  call  `__cxa_end_catch()'  because  of  the  direct  unwinding
 	 * used here. As such, we must manually ensure that `EXCEPT_FINCATCH'
 	 * isn't set once we return to our caller. */
 	PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
@@ -604,20 +604,20 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 		}
 #ifdef __x86_64__
 		/* On x86_64, a #GPF is thrown when attempting to access a non-canonical address.
-		 * However, the kernel expects that the only exception that might be thrown when
-		 * accessing some unchecked pointer is an E_SEGFAULT (or E_WOULDBLOCK when pre-
+		 * However, the kernel expects that the only exception that might be thrown  when
+		 * accessing some unchecked pointer is  an E_SEGFAULT (or E_WOULDBLOCK when  pre-
 		 * emption is currently disabled).
 		 * Emu86 already tried to inspect the source instruction to determine the faulting
-		 * memory address. However there are literally thousands of different X86
-		 * instructions that take a memory operand, and we can only know about so many
-		 * before we run into one that may not even have existed at the time this
+		 * memory  address.  However  there  are  literally  thousands  of  different  X86
+		 * instructions that take a  memory operand, and  we can only  know about so  many
+		 * before we  run into  one  that may  not  even have  existed  at the  time  this
 		 * decoder was written.
-		 * So despite the fact that we haven't managed to figure out the faulting memory
+		 * So  despite the fact that we haven't managed to figure out the faulting memory
 		 * address, simply assume that a 0-error-code is indicative of a instruction that
 		 * tried to access a non-canonical address.
 		 * In this case, we set the first non-canonical address as faulting address.
 		 * Also: we don't know if it was a write that caused the problem, so we just
-		 *       always act like it was an unspecific access to an unmapped page. */
+		 *       always  act like it  was an unspecific access  to an unmapped page. */
 		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_GFP && BAD_USAGE_ECODE(usage) == 0) {
 			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? "
 			                    "[pc=%p,opcode=%#" PRIxPTR ",opflags=%#" PRIx32 "]\n",
@@ -630,12 +630,12 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 			                : E_SEGFAULT_CONTEXT_NONCANON);
 		}
 #endif /* __x86_64__ */
-		/* If the error originated from user-space, default to assuming it's
-		 * because of some privileged instruction not explicitly handled (maybe
+		/* If  the  error originated  from  user-space, default  to  assuming it's
+		 * because of some  privileged instruction not  explicitly handled  (maybe
 		 * because we don't know about it, or maybe because of some other reason). */
 		if (icpustate_isuser(state)) {
 			/* #GPF is also thrown when EFLAGS.AC is set, and the caller originates from user-space.
-			 * When EFLAGS.AC is set, we default to throwing an `E_SEGFAULT_UNALIGNED' exception! */
+			 * When  EFLAGS.AC is set,  we default to  throwing an `E_SEGFAULT_UNALIGNED' exception! */
 			if (icpustate_getpflags(state) & EFLAGS_AC) {
 				throw_exception(state,
 				                ERROR_CODEOF(E_SEGFAULT_UNALIGNED), 0,
@@ -780,8 +780,8 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 /* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
 #define EMU86_EMULATE_RDPID() emulate_rdpid()
 PRIVATE ATTR_PURE WUNUSED u32 KCALL emulate_rdpid(void) {
-	/* TODO: KOS currently doesn't program the `IA32_TSC_AUX' MSR during CPU initialization.
-	 *       We really need to do this, though (programming should always be done when cpuid
+	/* TODO: KOS currently doesn't  program the `IA32_TSC_AUX'  MSR during CPU  initialization.
+	 *       We really need to do  this, though (programming should  always be done when  cpuid
 	 *       bit `CPUID_80000001D_RDTSCP' is enabled, in which case `rdtscp' exists, and should
 	 *       consequently also be able to hold the ID of the current CPU) */
 	return THIS_CPU->c_id;
@@ -792,7 +792,7 @@ LOCAL WUNUSED NONNULL((1)) u64 KCALL
 emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
 	pflag_t was;
-	/* To guaranty that the hosting CPU doesn't change during
+	/* To guaranty that the hosting CPU doesn't change  during
 	 * execution here, temporarily disable preemption, so that
 	 * the TSC and CPU-ID are consistent with each other! */
 	was = PREEMPTION_PUSHOFF();
@@ -879,8 +879,8 @@ PRIVATE u64 KCALL emulate_rdtsc(void) {
 #define EMU86_SETFSBASE(v) \
 	__wrmsr(IA32_FS_BASE, (uintptr_t)(v))
 /* NOTE: When the access originates from user-space, we must write to `IA32_KERNEL_GS_BASE',
- *       since the kernel has executed `swapgs' upon exiting user-space. Because of this,
- *       the current %gs.base is `THIS_TASK', while `IA32_KERNEL_GS_BASE' contains the
+ *       since  the kernel has  executed `swapgs' upon exiting  user-space. Because of this,
+ *       the current  %gs.base  is  `THIS_TASK', while  `IA32_KERNEL_GS_BASE'  contains  the
  *       saved user-space %gs.base! */
 #define EMU86_SETGSBASE(v)             \
 	__wrmsr(icpustate64_isuser(_state) \
@@ -942,17 +942,17 @@ setgsbase(uintptr_t value) {
 
 
 
-/* Special handling for user-space address range validation:
- * Because our version of libemu86 is the one responsible for emulating
- * instruction that may not necessarily be known to the host CPU, there
- * also exists the case where user-space is trying to perform a memory
+/* Special    handling   for   user-space   address   range   validation:
+ * Because our version of libemu86  is the one responsible for  emulating
+ * instruction that may not necessarily be  known to the host CPU,  there
+ * also  exists the case  where user-space is trying  to perform a memory
  * access to its UKERN segment, using an instruction that is not natively
  * known to the host CPU.
- * In this case, when trying to emulate the instruction, we would normally
- * notice that user-space is trying to access a kernel-space address.
- * However, the UKERN segment exists as an overlay on-top of kernel-space,
+ * In this case, when trying to emulate the instruction, we would  normally
+ * notice  that  user-space is  trying  to access  a  kernel-space address.
+ * However,  the UKERN segment exists as an overlay on-top of kernel-space,
  * and as such any memory access originating from user-space, and targeting
- * a kernel-space address (while also overlapping with the UKERN segment),
+ * a kernel-space address (while also overlapping with the UKERN  segment),
  * must be dispatched through VIO, as implemented by libviocore. */
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 PRIVATE struct icpustate *FCALL
@@ -974,7 +974,7 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 
 	/* Setup meta-data for where VIO is mapped
 	 * Since we know that the USERKERN VIO mapping consists of
-	 * only a single data part, this part is quite simple. */
+	 * only  a single  data part,  this part  is quite simple. */
 	args.vea_args.va_acmap_page   = args.vea_ptrlo;
 	args.vea_args.va_acmap_offset = 0;
 	args.vea_args.va_state        = state;
@@ -985,7 +985,7 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 
 #ifndef __x86_64__
 	/* NOTE: No need to deal with kernel ss/esp redirection, because we only
-	 *       ever get called for user-space VIO access (s.a. the fact that
+	 *       ever get called for user-space  VIO access (s.a. the fact  that
 	 *       this function is only used to deal with userkern memory access,
 	 *       which in turn can only ever happen from user-space) */
 #endif /* !__x86_64__ */
@@ -1130,8 +1130,8 @@ assert_canonical_address(struct icpustate *__restrict state,
 		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%s] [#GPF]\n",
 		       addr, icpustate_getpc(state),
 		       reading && writing ? "rw" : reading ? "ro" : "wo");
-		/* NOTE: When reading+writing, then the read always comes first, so even
-		 *       though the instruction would have also performed a write, the
+		/* NOTE: When reading+writing, then the read always comes first, so  even
+		 *       though the instruction  would have also  performed a write,  the
 		 *       read happening first means that we mustn't set the WRITING flag. */
 		THROW(E_SEGFAULT_UNMAPPED,
 		      addr,
@@ -1582,9 +1582,9 @@ DEFINE_DO_ATOMIC_CMPXCH(l, 32)
 #define HINT_GETMODE(x) HINT_MODE x
 
 
-/* Define handlers for automatic patching of (rd|wr)(fs|gs)base instructions in drivers.
+/* Define handlers for automatic patching of (rd|wr)(fs|gs)base instructions in  drivers.
  * When the faulting reason is a #UD, then we know that the instruction isn't recognized,
- * in which case a kernel-space fault address can be patched into a call to one of the
+ * in which case a kernel-space fault  address can be patched into  a call to one of  the
  * emulated fs/gs-access functions. */
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
@@ -1604,20 +1604,20 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 		 * instruction without patching) */
 	} else {
 		/* By holding a reference to `d' (as returned by `driver_at_address()'),
-		 * we know that the associated driver won't get unloaded from memory
-		 * while we're in here, meaning that we're safe to access its backing
+		 * we know that  the associated  driver won't get  unloaded from  memory
+		 * while  we're in here,  meaning that we're safe  to access its backing
 		 * segment memory.
-		 * However, we must still acquire a lock to the kernel VM, so-as to
+		 * However, we must still acquire a lock to the kernel VM, so-as  to
 		 * ensure that no-one tries to off-load the drivers text data into a
-		 * different memory bank. Because even though driver sections are
+		 * different memory bank.  Because even though  driver sections  are
 		 * loaded into LOCKED memory, the backing banks are still allowed to
-		 * be changed, which can only be prevented by holding a lock to the
+		 * be changed, which can only be prevented by holding a lock to  the
 		 * kernel VM. */
 		if (mman_lock_tryacquire(&mman_kernel)) {
 			/* With a lock to the kernel VM held, do another sanity check to ensure
-			 * that the backing memory of return-PC is still mapped into memory.
+			 * that  the backing memory  of return-PC is  still mapped into memory.
 			 * There isn't any rule against drivers doing weird trickery with their
-			 * own program segments, so-long as they follow the rules that kernel
+			 * own program segments, so-long as  they follow the rules that  kernel
 			 * memory can only be altered while holding a lock to the kernel VM. */
 			if (pagedir_ismapped(pc)) {
 				physaddr_t pc_phys;
@@ -1630,7 +1630,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 				} else
 #endif /* !NO_PHYS_IDENTITY */
 				if ((uintptr_t)(pc_phys & PAGEMASK) < (PAGESIZE - 5)) {
-					/* Simple case: The All (5) bytes that might possibly need
+					/* Simple case: The  All (5) bytes  that might possibly need
 					 *              patching are contained within the same page.
 					 * In this case, we can simply use our trampoline to gain
 					 * write-access. */
@@ -1673,8 +1673,8 @@ done:
 	return ok;
 }
 
-/* NOTE: Only patch 64-bit, kernel-space segment accesses.
- *       The 32-bit variants can't be patched because they
+/* NOTE: Only patch 64-bit, kernel-space segment  accesses.
+ *       The  32-bit variants can't be patched because they
  *       are only encoded with 4 bytes, but we need 5 bytes
  *       for the patch */
 #define PATCH_FSGSBASE(pc)                                \
@@ -1723,7 +1723,7 @@ throw_illegal_op:
 }
 
 /* RTM instruction emulation.
- * `xbegin' calls into the `rtm' driver, while all of the other
+ * `xbegin'  calls into the `rtm' driver, while all of the other
  * instruction must be implemented to behave as though execution
  * was outside of an RTM context (which it is) */
 #define EMU86_EMULATE_RETURN_AFTER_XBEGIN(fallback_ip) \
@@ -1849,7 +1849,7 @@ x86_validate_datseg(struct icpustate *__restrict state,
 	struct segment *seg;
 #ifdef __x86_64__
 	/* Special case: In 64-bit mode, one is allowed
-	 * to assign 0-values to segment registers. */
+	 * to assign  0-values  to  segment  registers. */
 	if (segment_value == 0 && icpustate_is64bit(state))
 		return;
 #endif /* __x86_64__ */
@@ -1878,7 +1878,7 @@ x86_validate_datseg(struct icpustate *__restrict state,
 DECL_END
 
 /* TODO: call, jmp and jcc (also: loop[cc]) instruction can cause #GP
- *       on x86_64 when TARGET_PC isn't a canonical address.
+ *       on   x86_64  when  TARGET_PC   isn't  a  canonical  address.
  *       -> This should result in an `E_SEGFAULT_NOTEXECUTABLE'
  *          exception with its fault address set to `TARGET_PC'
  */

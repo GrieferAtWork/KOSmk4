@@ -69,7 +69,7 @@ STATIC_ASSERT(__builtin_types_compatible_p(TYPE_Z, my_array_t<my_array_t<int, 2>
 #endif /* __cplusplus */
 
 /* I always find recursive array declarations in C to be extremely confusing,
- * so to make sure I didn't screw up the array-length ordering of the E{1-3}
+ * so  to make sure I didn't screw up the array-length ordering of the E{1-3}
  * descriptor types, assert that they offsets behave correctly in relation to
  * their indices. */
 struct pae_pdir_e1_identity_t_struct { pae_pdir_e1_identity_t x; };
@@ -82,7 +82,7 @@ STATIC_ASSERT(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
 
 #ifndef __x86_64__
 /* We can't use the the normal ATOMIC_READ(), since the code that GCC (rightfully) generates
- * for atomically reading a 64-bit value makes use of the FPU, which is something that we
+ * for atomically reading a 64-bit  value makes use of the  FPU, which is something that  we
  * can't have, as the paging system can't possibly make use of the FPU, as this would create
  * a dependency on the heap sub-system (which could cause E_BADALLOC), as well as a loop:
  *
@@ -91,7 +91,7 @@ STATIC_ASSERT(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
  *       |                                |
  *       +--------------------------------+
  *
- * So because of all of this, we are left having to implement an atomic read by
+ * So  because of all of this, we are  left having to implement an atomic read by
  * reading 64-bit words in 2 steps (hi/lo part), which may yield corrupted values
  * if another thread/cpu did a reverse write at the same time.
  * For this reason, we need to use the cmpxchg8b instruction which we're already
@@ -148,7 +148,7 @@ STATIC_ASSERT(PAE_PDIR_E1_IDENTITY_BASE == PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE);
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
- * controller itself, which must be aligned and sized
+ * controller itself, which  must be  aligned and  sized
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTERN NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
@@ -218,7 +218,7 @@ err_0:
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
- * controller itself, which must be aligned and sized
+ * controller itself, which  must be  aligned and  sized
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTERN NONNULL((1)) void FCALL
 pae_pagedir_init(VIRT struct pae_pdir *__restrict self)
@@ -242,9 +242,9 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 	was = PREEMPTION_PUSHOFF();
 	old_pagedir = pagedir_get();
 
-	/* Temporarily switch to the page-directory to-be freed, so we
+	/* Temporarily  switch  to  the  page-directory  to-be  freed,  so  we
 	 * can make use of its identity-mapping in order to free its contents.
-	 * The other possibility would be to use the slow vm_copyfromphys()
+	 * The other possibility  would be to  use the slow  vm_copyfromphys()
 	 * function to dereference its memory contents. */
 	pagedir_set((pagedir_phys_t)phys_self);
 	/* NOTE: Only iterate 0, 1 and 2 here (entry #3 contains) */
@@ -287,10 +287,10 @@ NOTHROW(FCALL pae_pagedir_set_prepared)(union pae_pdir_e1 *__restrict e1_p) {
 }
 
 
-/* Try to widen a 2MiB mapping to a 512*4KiB vector of linear memory
- * Alternatively, if the specified E1-vector is absent, pre-allocate it.
+/* Try  to  widen a  2MiB  mapping to  a  512*4KiB vector  of  linear memory
+ * Alternatively, if  the specified  E1-vector is  absent, pre-allocate  it.
  * Additionally, set the `P64_PAGE_FPREPARED' bit for all E1 vector elements
- * within the range of `vec1_prepare_start...+=vec1_prepare_size'
+ * within   the    range    of    `vec1_prepare_start...+=vec1_prepare_size'
  * Note that `vec1_prepare_size' must be non-zero!
  * @return: true:  Success
  * @return: false: Failed to allocate physical memory */
@@ -360,11 +360,11 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 	} else if (e2.p_2mib.d_2mib_1) {
 		/* Convert a 2MiB mapping to 512*4KiB pages
 		 * Because the mapping may be getting used _right_ _now_, we have
-		 * to be careful about how we go about initializing the vector.
-		 * Because the process has to be atomic, we use our thread-local
-		 * temporary mapping trampoline to temporarily map the new page
-		 * for initialization (Because the trampoline always uses
-		 * `PAE_PAGE_FNOFLATTEN' when mapping, it is always prepared) */
+		 * to be careful about how  we go about initializing the  vector.
+		 * Because  the process has to be atomic, we use our thread-local
+		 * temporary mapping trampoline to  temporarily map the new  page
+		 * for  initialization  (Because   the  trampoline  always   uses
+		 * `PAE_PAGE_FNOFLATTEN'  when  mapping, it  is  always prepared) */
 		new_e1_vector = page_mallocone();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
@@ -411,7 +411,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		/* The first page needs to be marked under special conditions. */
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
 		/* With a prepare-first token held, check if our e2 control work is still correct.
-		 * If some other thread flattened the vector in the mean time, that control word
+		 * If some other thread flattened the vector  in the mean time, that control  word
 		 * will have changed. */
 		COMPILER_BARRIER();
 		if unlikely(e2.p_word != ATOMIC_READ64(e2_p->p_word)) {
@@ -433,12 +433,12 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 
 
 
-/* Called after an E1-vector was flattened into an E2-entry
+/* Called after  an E1-vector  was flattened  into an  E2-entry
  * that now resides at `PAE_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
 PRIVATE NOBLOCK void
 NOTHROW(FCALL pae_pagedir_sync_flattened_e1_vector)(unsigned int vec3,
                                                     unsigned int vec2) {
-	/* Even though the in-memory mapping of `PAE_PDIR_VECADDR(vec4, vec3, vec2, 0..511)'
+	/* Even  though the in-memory mapping of `PAE_PDIR_VECADDR(vec4, vec3, vec2, 0..511)'
 	 * didn't change, due to being flattened, the contents of our page directory identity
 	 * mapping _have_ changed:
 	 *     UNMAP(PAE_PDIR_E1_IDENTITY[vec3][vec2][0..511])  (This is exactly 1 page)
@@ -593,9 +593,9 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
 	        "A 2MiB page couldn't have been prepared (only 4KiB pages can be)");
 	/* Check if the 4KiB vector can be merged.
-	 * NOTE: We are guarantied that accessing the E1-vector is OK, because
-	 *       the caller guaranties that at least some part of the vector is
-	 *       still marked as prepared, meaning that no other thread is able
+	 * NOTE: We are guarantied  that accessing the  E1-vector is OK,  because
+	 *       the caller guaranties that at least  some part of the vector  is
+	 *       still marked as prepared, meaning  that no other thread is  able
 	 *       to fully free() the vector until we've cleared all of our marked
 	 *       bits. */
 	e1_p = PAE_PDIR_E1_IDENTITY[vec3][vec2];
@@ -604,7 +604,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 		pae_pagedir_unset_prepared(&e1_p[vec1], vec3, vec2, vec1,
 		                           vec1_unprepare_start, vec1_unprepare_size);
 	}
-	/* Read the current prepare-version _before_ we check if flattening is
+	/* Read  the  current prepare-version  _before_  we check  if  flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
 	 * forcing us to check again further below. */
 	old_version = ATOMIC_READ(x86_pagedir_prepare_version);
@@ -625,7 +625,7 @@ again_try_exchange_e2_word:
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
 		if unlikely(must_restart) {
 			/* Check again if the vector can be flattened.
-			 * Note that we need a read-lock to to the prepare-lock in
+			 * Note  that  we need  a read-lock  to  to the  prepare-lock in
 			 * order to prevent the vector from being freed while we do this */
 			X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was);
 			/* Re-load the E2 control word in case it has changed. */
@@ -1112,10 +1112,10 @@ NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 
 /* Set a mapping hint for pages apart of the given virtual memory range.
- * Mapping hints are overwritten once a page has been mapped, and when
+ * Mapping hints are overwritten once a  page has been mapped, and  when
  * not specified, will default to `NULL'.
  * Their main purpose is to be accessible through atomic means, allowing
- * them to be used by the PAGE_FAULT handler, while still ensuring that
+ * them to be used by the PAGE_FAULT handler, while still ensuring  that
  * access remains non-blocking. */
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -1213,9 +1213,9 @@ NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 }
 
 /* Special variants of `pagedir_mapone()' that should be used to
- * temporary override the mapping of a single, prepared page.
- * These functions are mainly intended for use with `this_trampoline_page', allowing
- * each thread to push/pop its trampoline page, with doing so actually being an atomic
+ * temporary override the  mapping of a  single, prepared  page.
+ * These functions are  mainly intended for  use with `this_trampoline_page',  allowing
+ * each  thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
@@ -1308,7 +1308,7 @@ NOTHROW(FCALL pae_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
- *       can perform the task without needing to allocate more memory! */
+ *       can perform the task without  needing to allocate more  memory! */
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unmap_userspace)(void) {
 	unsigned int vec3, vec2, free_count = 0;
@@ -1331,9 +1331,9 @@ again_read_word:
 				continue; /* 2MiB page. */
 			pageptr = e2.p_word >> PAE_PAGE_SHIFT;
 			if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
-				/* Must sync memory before we can actually delete pages.
-				 * Otherwise, other CPUs may still be using the mappings after
-				 * they've already been re-designated as general-purpose RAM, at
+				/* Must  sync  memory  before  we  can  actually  delete   pages.
+				 * Otherwise, other CPUs  may still be  using the mappings  after
+				 * they've  already been re-designated as general-purpose RAM, at
 				 * which point they'd start reading garbage, or corrupt pointers. */
 				pagedir_syncall_smp();
 				page_freeone((physpage_t)pageptr);

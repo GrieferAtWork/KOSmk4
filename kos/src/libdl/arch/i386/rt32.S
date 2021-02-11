@@ -65,7 +65,7 @@ BUILTIN_GLOBALS_ENUMERATE(DEFINE_GLOBAL_SYMBOL_IMPORT)
 
 
 	/* Same as `___tls_get_addr()', but uses CDECL instead of REGPARAM(1),
-	 * meaning that the pointer to the tls_index structure is stored at
+	 * meaning  that the pointer  to the tls_index  structure is stored at
 	 * 4(%esp) upon entry, rather than within %eax */
 .section .text
 INTERN_FUNCTION(libdl___tls_get_addr)
@@ -103,7 +103,7 @@ DEFINE_PUBLIC_ALIAS(___tls_get_addr, libdl____tls_get_addr)
 .section .text
 	/* The heart-piece of lazy symbol relocations:
 	 *   - This function is called by user-code the first time an R_386_JMP_SLOT
-	 *     relocation is accessed, at which point the relocation is resolved.
+	 *     relocation is accessed,  at which point  the relocation is  resolved.
 	 *   - See the explanation about `PLTGOT' below for how this actually works.
 	 */
 INTERN_FUNCTION(dl_load_lazy_relocation)
@@ -126,45 +126,45 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 *
 	 * Lazy linkage procedure:
 	 *  - User-code calls `dlsym()', which is compiled as `call dlsym@plt'
-	 *    Additionally, user-code will have set up `%ebx' to point to the
+	 *    Additionally,  user-code will have set up `%ebx' to point to the
 	 *    associated module's PLT/GOT.
 	 *  - Within `dlsym@plt', read a pointer from `GOT + 0x1c' and jump
 	 *    to the address contained within.
-	 *  - During module initialization, that address will have been set
+	 *  - During module  initialization,  that  address  will  have  been  set
 	 *    up to point to the address of the `push $0x20' immediately following
 	 *    the `jmp *0x1c(%ebx)' instruction at the start of `dlsym@plt'
 	 *    - This is done simply by resolving R_386_JMP_SLOT as:
 	 *      >> *(u32 *)reladdr += module->dm_loadaddr;
 	 *      Where `reladdr' is equal to `0x1c(%ebx)', which the linker will
-	 *      have pre-initialized to be equal to the module-relative offset
+	 *      have pre-initialized to be equal to the module-relative  offset
 	 *      of the PLT/GOT entry to that push instruction.
 	 *  - `push   $0x20' will then store 0x20 ontop of the stack
 	 *    - This is an offset into the vector of jmp-relocations,
 	 *      which we store in `module->dm_elf.de_jmprel', and can be read from the
-	 *      module's .dynamic section, where it is stored within a `DT_JMPREL'
+	 *      module's  .dynamic section,  where it  is stored  within a `DT_JMPREL'
 	 *      tag.
 	 *  - Next, execution jumps to the start of the PLT, where a piece of code
-	 *    that is common to all jump-relocations pushes the value stored at
-	 *    `4(%ebp)' (again: %ebp points to the PLT/GOT which by the way is
+	 *    that  is common to  all jump-relocations pushes  the value stored at
+	 *    `4(%ebp)'  (again: %ebp  points to the  PLT/GOT which by  the way is
 	 *    referenced by a .dynamic tag `DT_PLTGOT').
-	 *     - The offset `4' here is constant, which we have previously filled in
+	 *     - The  offset `4'  here is constant,  which we have  previously filled in
 	 *       to be the address of the `DlModule' structure of the associated module.
-	 *  - Finally, execution jumps to an address stored within `8(%ebp)', which
+	 *  - Finally, execution jumps to an address stored within `8(%ebp)',  which
 	 *    is another fixed location which we've already filled in to contain the
 	 *    address of this very function (`&dl_load_lazy_relocation')
-	 *  - During the process of this function, we override `*0x1c(%ebx)' such
-	 *    that the next call to `dlsym@plt' will immediately jump to the linked
+	 *  - During the  process of  this function,  we override  `*0x1c(%ebx)'  such
+	 *    that  the next call  to `dlsym@plt' will immediately  jump to the linked
 	 *    symbol, rather than having to jump through all of the hoops to get here.
 	 *
 	 * So in other words, when we get here, our
-	 * register/stack state looks like this:
+	 * register/stack state  looks  like  this:
 	 *  - 0(%esp)      == MODULE
 	 *  - 4(%esp)      == 0x20   (Offset added to `self->dm_elf.de_jmprel' for the associated jump relocation)
 	 *  - 8(%esp)      == User-return-address
 	 *  - 12 + ?(%esp) == Undefined/user-owned
 	 *  - %ebx         == MODULE->dm_elf.de_pltgot   (Though this detail is unimportant)
 	 *
-	 * Also note that since we don't know anything about the calling convention
+	 * Also note that since we don't know anything about the calling  convention
 	 * with which the user intends to invoke the lazily linked function, we must
 	 * make sure that we don't clobber any of their registers!
 	 *

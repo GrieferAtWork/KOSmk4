@@ -229,7 +229,7 @@ FUNDEF WUNUSED NONNULL((1)) struct heapptr NOTHROW(KCALL __os_heap_realign_nx)(s
  *        If `vm_unmap()' needs to  be called, the free()  operation
  *        is either postponed until the next call to a heap function
  *        that is allowed to block, or  is simply kept in cache,  as
- *        though `GFP_NOMAP'  has been passed.
+ *        though `GFP_NOMAP' has been passed.
  * NOTE:  The `*_traced' family of functions will automatically call `mall_trace' / `mall_untrace'
  *        in order to  register /  unregister the  data blocks  as a  MALL GC  search data  block.
  *        When  building without  `CONFIG_TRACE_MALLOC', they  are aliasing  the regular versions.

@@ -198,7 +198,7 @@ NOTHROW(KCALL handle_isdirectory)(struct handle self) {
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH | O_TMPFILE | O_SYMLINK | O_*'
+ *                         O_PATH   |  O_TMPFILE  |  O_SYMLINK  |  O_*'
  * @param: fsmode: Set of `0 | AT_SYMLINK_NOFOLLOW | FS_MODE_FDOSPATH |
  *                         FS_MODE_FEMPTY_PATH | FS_MODE_FSYMLINK_NOFOLLOW' */
 PUBLIC WUNUSED NONNULL((1, 2, 3)) REF struct handle KCALL
@@ -289,8 +289,8 @@ fs_open_ex(struct fs *__restrict filesystem,
 check_result_inode_for_symlink:
 						if (INODE_ISLNK(result_inode) && !(fsmode & AT_SYMLINK_NOFOLLOW) &&
 						    !(result_inode->i_flags & INODE_FLNK_DONT_FOLLOW_FINAL_LINK)) {
-							/* No new file was created, and the accessed file turned out to be a symbolic
-							 * link. - In this case, we must continue following that file's link for at
+							/* No  new file was created, and the accessed file turned out to be a symbolic
+							 * link. - In this case,  we must continue following  that file's link for  at
 							 * most `max_remaining_links' additional links and open/create the file at its
 							 * target location. */
 							struct symlink_node *sl_node;
@@ -356,9 +356,9 @@ check_result_inode_for_symlink:
 						if (!was_newly_created) {
 							/* If the O_EXCL flag was given, make sure that the file was newly created.
 							 * Otherwise, throw an exception.
-							 * NOTE: Even though `directory_creatfile()' has builtin support for this type
+							 * NOTE: Even though `directory_creatfile()' has builtin support for this  type
 							 *       of check when passed the O_EXCL flag, we don't use that functionality,
-							 *       as it wouldn't allow for the special handling of SMYLINK+!O_NOFOLLOW
+							 *       as it wouldn't allow for  the special handling of  SMYLINK+!O_NOFOLLOW
 							 *       which we do above (which allows open() to create/open files pointed to
 							 *       by symbolic links directly) */
 							if (oflags & O_EXCL)
@@ -385,9 +385,9 @@ check_result_inode_for_symlink:
 		}
 		TRY {
 			if (INODE_ISLNK(result_inode)) {
-				/* Special handling: If the caller was requesting access to the symlink itself,
-				 *                   then we must bypass any custom open protocol and directly
-				 *                   open the pointed-to symbolic link. This is similar to how
+				/* Special handling: If the caller was requesting  access to the symlink  itself,
+				 *                   then we must  bypass any custom  open protocol and  directly
+				 *                   open the pointed-to  symbolic link. This  is similar to  how
 				 *                   the O_PATH flag also bypasses a majority of path processing,
 				 *                   any simply always returns a `HANDLE_TYPE_PATH' object. */
 				if (oflags & O_SYMLINK)
@@ -397,23 +397,23 @@ check_result_inode_for_symlink:
 				 *   - When `O_SYMLINK' is given, then the symbolic link is opened
 				 *     as a regular file.
 				 *   - When `O_SYMLINK' isn't given, throw an `E_FSERROR_IS_A_SYMBOLIC_LINK'
-				 *     exception with `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' context. */
+				 *     exception   with   `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'    context. */
 				if (!(result_inode->i_flags & INODE_FLNK_DONT_FOLLOW_FINAL_LINK)) {
 					THROW(E_FSERROR_IS_A_SYMBOLIC_LINK,
 					      E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN);
 				} else {
-					/* One last special case: When access was made to a symbolic link with
-					 * the `INODE_FLNK_DONT_FOLLOW_FINAL_LINK' flag set, but the caller also
+					/* One last  special case:  When access  was made  to a  symbolic link  with
+					 * the  `INODE_FLNK_DONT_FOLLOW_FINAL_LINK'  flag set,  but the  caller also
 					 * specified the NOFOLLOW flag (i.e. symbolic links should not be followed),
-					 * the we mustn't allow the link to be opened (which would likely be done
-					 * through use of `result_inode->i_type->it_attr.a_open'), as doing this
-					 * would also mean that the link would have been ~followed~ in one way
+					 * the we mustn't allow the  link to be opened  (which would likely be  done
+					 * through  use  of `result_inode->i_type->it_attr.a_open'),  as  doing this
+					 * would also  mean that  the link  would have  been ~followed~  in one  way
 					 * or another. */
 					if (fsmode & AT_SYMLINK_NOFOLLOW)
 						THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
 				}
 			} else {
-				/* Special case: O_SYMLINK | O_EXCL must cause an exception if the named
+				/* Special case: O_SYMLINK | O_EXCL must cause  an exception if the  named
 				 *               file ended up being something other than a symbolic link! */
 				if ((oflags & (O_CREAT | O_SYMLINK | O_EXCL)) == (O_SYMLINK | O_EXCL))
 					THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
@@ -427,7 +427,7 @@ check_result_inode_for_symlink:
 				                                                 result_containing_directory,
 				                                                 result_containing_dirent);
 				/* Implement support for the `O_DIRECTORY' flag by throwing
-				 * an error if the accessed file isn't a directory. */
+				 * an  error  if  the  accessed  file  isn't  a  directory. */
 				if ((oflags & O_DIRECTORY) && !handle_isdirectory(result)) {
 					decref(result);
 					THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_OPEN);
@@ -446,19 +446,19 @@ check_result_inode_for_symlink:
 				decref(result_containing_dirent);
 			} else {
 				/* Implement support for the `O_DIRECTORY' flag by throwing
-				 * an error if the accessed file isn't a directory. */
+				 * an  error  if  the  accessed  file  isn't  a  directory. */
 				if (!INODE_ISDIR(result_inode) && (oflags & O_DIRECTORY))
 					THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_OPEN);
-	
+
 				/* Create a file handle from all of the gathered object pointers. */
 				switch (result_inode->i_filemode & S_IFMT) {
-	
+
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct file, f_refcnt));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct file, f_node));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct file, f_path));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct file, f_dirent));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct file, f_offset));
-	
+
 				case S_IFBLK: {
 					/* Open the associated block-device. */
 					dev_t devno;
@@ -475,7 +475,7 @@ check_result_inode_for_symlink:
 					decref(result_containing_directory);
 					decref(result_containing_dirent);
 				}	break;
-	
+
 				case S_IFCHR: {
 					/* Open the associated character-device. */
 					dev_t devno;
@@ -492,8 +492,8 @@ check_result_inode_for_symlink:
 					/* Allow custom callbacks during open(2) */
 					if unlikely(cdev->cd_type.ct_open) {
 						/* Keep an additional reference around during the callbacks
-						 * This is to ensure that the device doesn't get destroyed
-						 * from within one of its own callbacks in the event that
+						 * This is to ensure that the device doesn't get  destroyed
+						 * from within one of its  own callbacks in the event  that
 						 * the callback chooses to replace the handle data pointer. */
 						incref(cdev);
 						FINALLY_DECREF_UNLIKELY(cdev);
@@ -510,7 +510,7 @@ check_result_inode_for_symlink:
 					decref(result_containing_directory);
 					decref(result_containing_dirent);
 				}	break;
-	
+
 				case S_IFIFO: {
 					struct fifo_node *fn;
 					REF struct fifo_user *user;
@@ -580,7 +580,7 @@ open_result_inode:
 					result.h_data  = result_file;
 					decref_unlikely(result_containing_directory);
 				}	break;
-	
+
 				}
 			}
 		} EXCEPT {

@@ -129,13 +129,13 @@ NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
 
 
 /* Low-level, arch-specific enable/disable system call tracing.
- * NOTE: Don't call `arch_syscall_tracing_setenabled()' directly.
+ * NOTE: Don't   call   `arch_syscall_tracing_setenabled()'    directly.
  *       Low-level system call tracing is enabled/disabled automatically
- *       when tracing callbacks are installed/deleted as the result of
- *       calls to `syscall_trace_start()' and `syscall_trace_stop()'.
+ *       when tracing callbacks are  installed/deleted as the result  of
+ *       calls to  `syscall_trace_start()'  and  `syscall_trace_stop()'.
  *       Manually enabling/disable tracing will work, however attempting
- *       to start/stop tracing via installation of dynamic tracing
- *       callbacks may break, since those functions may only call this
+ *       to  start/stop  tracing  via  installation  of  dynamic tracing
+ *       callbacks may break, since those  functions may only call  this
  *       one when the first callback is registered, or the last callback
  *       is deleted.
  * NOTE: A user can manually invoke this function from the builtin debugger
@@ -143,7 +143,7 @@ NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
  * @param: nx:     When true, don't throw an exception or block.
  * @return: true:  Successfully changed the current tracing state.
  * @return: false: Tracing was already enabled/disabled, or could
- *                 not be enabled/disabled when `nx == true'. */
+ *                 not  be  enabled/disabled  when  `nx == true'. */
 PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	bool result;
 	struct idt_segment newsyscall;
@@ -158,7 +158,7 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	addr = enable ? (void *)&x86_syscall32_int80_traced
 	              : (void *)&x86_syscall32_int80;
 #ifdef __x86_64__
-	/* NOTE: On x86_64, we must use `SEGMENT_DESCRIPTOR_TYPE_INTRGATE' as gate type
+	/* NOTE: On x86_64, we  must use `SEGMENT_DESCRIPTOR_TYPE_INTRGATE'  as gate  type
 	 *       for int80h because we always _need_ to enter the kernel with #IF disabled
 	 *       in order to account for `swapgs' if `(IRET.CS AND 3) != 0' */
 	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_INTRGATE, 3, 1);
@@ -212,8 +212,8 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 #if 1
 		                         CPU_IPI_FNORMAL
 		                         /* NOTE: Don't wake up deep-sleep CPUs!
-		                          *       When a CPU wakes up, it already has to go through all
-		                          *       of the initialization that also contains the part where
+		                          *       When  a CPU  wakes up, it  already has to  go through all
+		                          *       of the initialization that  also contains the part  where
 		                          *       it needs to load its IDT according to tracing of syscalls
 		                          *       currently being enabled. */
 #else
@@ -237,7 +237,7 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 #endif /* __x86_64__ */
 
 	/* Since we modified various bits of program text,
-	 * we must also flush the instruction cache. */
+	 * we  must  also  flush  the  instruction  cache. */
 	__flush_instruction_cache();
 	return result;
 }
@@ -281,17 +281,17 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 		                   (u64)SEGMENT_USER_CODE32_RPL << 48);
 		__wrmsr(IA32_LSTAR, (u64)&x86_syscall64_syscall);
 		/* TODO: `IA32_CSTAR' must be set to some kernel-space PC location
-		 *       that is used to handle user-space using `syscall' from
+		 *       that is used  to handle user-space  using `syscall'  from
 		 *       32-bit mode!
-		 *       On Intel CPUs, this MSR isn't used, and the CPU natively
-		 *       causes a #UD to be thrown, but AMD CPUs do make use of
+		 *       On  Intel CPUs, this MSR isn't used, and the CPU natively
+		 *       causes a #UD to  be thrown, but AMD  CPUs do make use  of
 		 *       this MSR, so we must still program it, else the CPU might
-		 *       end up jumping to some user-space text location when a
+		 *       end up jumping  to some user-space  text location when  a
 		 *       32-bit program makes use of `syscall'! */
 		__wrmsr(IA32_FMASK, EFLAGS_IF);
 	} else {
 		/* Re-write `__x86_32_syscall_iret' and `__x86_64_syscall_iret' to
-		 * do the equivalent of `intr_exit', without all of the special
+		 * do the equivalent  of `intr_exit', without  all of the  special
 		 * handling for `sysret' */
 		PRIVATE ATTR_FREERODATA byte_t const intr_exit[] = {
 			0xfa,                         /*     cli                   */

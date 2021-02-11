@@ -293,7 +293,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 load_next_part:
 
 		/* Locate the part concerning the requested IO, while trying to automatically
-		 * include all of the data-pages that the IO could potentially ever perform. */
+		 * include all of the data-pages that the IO could potentially ever  perform. */
 		assert(!task_wasconnected());
 		part = vm_datablock_locatepart(self,
 		                               FLOOR_ALIGN(file_position, PAGESIZE),
@@ -451,7 +451,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
 			                                           page_bytes, file_position);
 		} EXCEPT {
 			/* Try-catch is required, because `src' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}

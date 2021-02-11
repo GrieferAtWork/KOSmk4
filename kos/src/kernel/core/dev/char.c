@@ -150,7 +150,7 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
 	if (self->cd_type.ct_fini)
 		(*self->cd_type.ct_fini)(self);
 	/* Check if the device should be removed from devfs, and drop
-	 * the references held to its INode and directory entry. */
+	 * the references  held to  its  INode and  directory  entry. */
 	if (self->cd_devfs_inode) {
 		devfs_remove(self->cd_devfs_inode, /* No-op if already done... */
 		             self->cd_devfs_entry);
@@ -209,7 +209,7 @@ character_device_alloc(struct driver *__restrict owner,
 	return result;
 }
 
-/* Lookup a character device associated with `devno' and return a reference to it.
+/* Lookup  a character device associated with `devno'  and return a reference to it.
  * When no character device is associated that device number, return `NULL' instead. */
 PUBLIC WUNUSED REF struct character_device *KCALL
 character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
@@ -224,7 +224,7 @@ character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 }
 
 /* Same as `character_device_lookup()', but return `NULL'
- * if the lookup would have caused an exception. */
+ * if   the  lookup  would   have  caused  an  exception. */
 PUBLIC WUNUSED REF struct character_device *
 NOTHROW(KCALL character_device_lookup_nx)(dev_t devno) {
 	REF struct character_device *result;
@@ -263,10 +263,10 @@ again:
 }
 
 /* Lookup a character device, given its `name`, with is its default filename
- * as will appear in the /dev/ directory, and may optionally be prefixed
+ * as  will appear  in the /dev/  directory, and may  optionally be prefixed
  * by a string `/dev/' that is stripped before comparison.
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
- * an encoding that is always attempted first by attempting to decode the
+ * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
  * >> character_device_lookup_name("3:64");      // MKDEV(3, 64)
  * >> character_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
@@ -326,7 +326,7 @@ character_device_add_to_devfs(struct character_device *__restrict self) {
 }
 
 
-/* Unregister the given character-device from the character-device-id tree, as well as
+/* Unregister  the given character-device from the character-device-id tree, as well as
  * removing its auto-generated entry from `/dev' (should that entry have been created).
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
@@ -396,10 +396,10 @@ pty_assign_name(struct character_device *__restrict self,
                 char prefix, minor_t id) {
 	if (id >= PTY_DEVCNT) {
 		/* KOS Extension: Since we allocate '20' bits for minor device numbers,
-		 *                it's actually possible to get _much_ more than 256
+		 *                it's actually possible  to get _much_  more than  256
 		 *                pty devices in KOS (1048576 to be exact).
 		 *             >> But for all those additional nodes, we need a new
-		 *                naming scheme that isn't standardized due to its
+		 *                naming  scheme that isn't standardized due to its
 		 *                nature of being an extension:
 		 * MASTER: /dev/ptyX12345
 		 * SLAVE:  /dev/ttyX12345
@@ -425,7 +425,7 @@ pty_assign_name(struct character_device *__restrict self,
 }
 
 /* Register a PTY master/slave pair within devfs, as well
- * as assign matching character device numbers to each. */
+ * as  assign matching character  device numbers to each. */
 INTERN void KCALL
 pty_register(struct pty_master *__restrict master,
              struct pty_slave *__restrict slave)
@@ -492,7 +492,7 @@ pty_register(struct pty_master *__restrict master,
 	}
 }
 
-/* Automatically register the given character-device, assigning it an auto-generated device ID.
+/* Automatically   register  the  given   character-device,  assigning  it   an  auto-generated  device  ID.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
  * NOTE: When empty, `cd_name' will be set to
  *       `"%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) % (MAJOR(devno),MINOR(devno))'
@@ -732,7 +732,7 @@ handle_characterdevice_mmap(struct character_device *__restrict self,
 		info->hmi_fsname = xincref(self->cd_devfs_entry);
 		if (!info->hmi_fspath) {
 			/* Try to lookup (one of) the mounting point(s) of devfs within the current namespace.
-			 * If such a mounting point exists, `superblock_find_mount_from_vfs()' will return
+			 * If such  a mounting  point exists,  `superblock_find_mount_from_vfs()' will  return
 			 * `NULL', which is allowed to happen, and will be dealt with by our caller. */
 			info->hmi_fspath = superblock_find_mount_from_vfs(&devfs, THIS_VFS);
 		}

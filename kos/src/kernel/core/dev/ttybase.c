@@ -116,7 +116,7 @@ again_set_myleader_as_fproc:
 		if (axref_cmpxch(&term->t_fproc, NULL, my_leader_pid))
 			return; /* Lazily set the caller as the initial foreground process */
 		/* Check if the old foreground process has already
-		 * terminated, but hasn't been cleaned up, yet. */
+		 * terminated, but  hasn't been  cleaned up,  yet. */
 		oldpid = axref_get(&term->t_fproc);
 		if unlikely(!oldpid)
 			goto again_set_myleader_as_fproc;
@@ -143,12 +143,12 @@ do_try_override_fproc:
 			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
 			       term->cd_name, awref_ptr(&my_leader_pid->tp_thread),
 			       taskpid_getrootpid(my_leader_pid));
-			/* ... Attempts by a process in a background process group to write to its controlling
+			/* ...  Attempts by a process in a background process group to write to its controlling
 			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
 			 * following special cases applies:
 			 *   - If [...] the process is ignoring or blocking the SIGTTOU signal, the process
-			 *     is allowed to write to the terminal and the SIGTTOU signal is not sent.
-			 *   - If [...] the process group of the writing process is orphaned, and the writing
+			 *     is allowed to  write to the  terminal and  the SIGTTOU signal  is not  sent.
+			 *   - If [...] the  process group of  the writing  process is orphaned,  and the  writing
 			 *     process is not ignoring or blocking the SIGTTOU signal, the write() shall return -1
 			 *     with errno set to [EIO] and no signal shall be sent */
 			if (taskpid_isorphan_p(my_leader_pid)) {
@@ -159,7 +159,7 @@ do_throw_ttou:
 			}
 
 			/* NOTE: We also do the same if our process group leader has died, because once
-			 *       that has happened, any other process is allowed to steal the TTY! */
+			 *       that has happened,  any other  process is  allowed to  steal the  TTY! */
 			my_leader = taskpid_gettask(my_leader_pid);
 			if (my_leader) {
 				FINALLY_DECREF_UNLIKELY(my_leader);
@@ -170,7 +170,7 @@ do_throw_ttou:
 				goto do_throw_ttou;
 			}
 
-			/* We might get here if the calling process changed its process group
+			/* We might get here if the  calling process changed its process  group
 			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
 			 * calling process only. */
 			task_raisesignalprocess(task_getprocess(), SIGTTOU);
@@ -186,7 +186,7 @@ do_throw_ttou:
 			if (taskpid_isorphan_p(my_leader_pid))
 				goto do_throw_ttin;
 			/* NOTE: We also do the same if our process group leader has died, because once
-			 *       that has happened, any other process is allowed to steal the TTY! */
+			 *       that has happened,  any other  process is  allowed to  steal the  TTY! */
 			my_leader = taskpid_gettask(my_leader_pid);
 			if (my_leader) {
 				FINALLY_DECREF_UNLIKELY(my_leader);
@@ -196,7 +196,7 @@ do_throw_ttou:
 			} else {
 				goto do_throw_ttin;
 			}
-			/* We might get here if the calling process changed its process group
+			/* We might get here if the  calling process changed its process  group
 			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
 			 * calling process only. */
 			task_raisesignalprocess(task_getprocess(), SIGTTIN);
@@ -240,13 +240,13 @@ kernel_terminal_raise(struct terminal *__restrict self,
 }
 
 /* Check if the calling thread is allowed to read from `self'
- * This function must be called by read-operator overrides! */
+ * This  function must be  called by read-operator overrides! */
 PUBLIC void KCALL
 kernel_terminal_check_sigttin(struct terminal *__restrict self) {
 	kernel_terminal_check_sigtty(self, false);
 }
 
-/* Default character-device read/write operator implementations for tty devices
+/* Default character-device read/write  operator implementations  for tty  devices
  * These functions will call forward to `terminal_iread()' and `terminal_owrite()' */
 PUBLIC NONNULL((1)) size_t KCALL
 ttybase_device_iread(struct character_device *__restrict self,
@@ -715,7 +715,7 @@ do_TCSETA: {
 	/* XXX: TIOCMBIS: Modem bits? */
 	/* XXX: TIOCMBIC: Modem bits? */
 	/* XXX: TIOCMSET: Modem bits? */
-	
+
 	/* XXX: TIOCCONS: Set this tty as the one bound to /dev/console (and /dev/tty0) */
 
 	case TCGETX:

@@ -63,9 +63,9 @@
  *     is connection to has been  send (but note that if  one of those signals  is
  *     send before `task_waitfor()'  is called, then  `task_waitfor()' will  never
  *     block to begin with, but return immediately)
- *   - The moment  that `task_waitfor()'  returns, _all_  connections that  the  calling
- *     thread had made  in the  past will  have already been  severed (to  be even  more
- *     precise:  a  connection is  severed before  `sig_send()'  returns, with  the only
+ *   - The moment that `task_waitfor()' returns, _all_ connections that the calling
+ *     thread  had made in the past will have already been severed (to be even more
+ *     precise:  a connection  is severed  before `sig_send()'  returns, with  the  only
  *     exception being signal completion functions that call `sig_completion_reprime()')
  *
  * How to use `struct sig', and what `interlocked' means:

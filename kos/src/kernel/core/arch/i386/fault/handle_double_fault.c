@@ -54,14 +54,14 @@
 
 DECL_BEGIN
 
-/* Note that unlike all other interrupt handlers, the double-fault handler
- * gets invoked with a ucpustate, rather than an icpustate (at least on i386).
- * This is required since a double fault isn't handled on the stack of the
- * thread that caused the exception, but rather on its own stack, meaning that
+/* Note that  unlike all  other interrupt  handlers, the  double-fault  handler
+ * gets invoked with a ucpustate, rather than an icpustate (at least on  i386).
+ * This is required  since a double  fault isn't  handled on the  stack of  the
+ * thread that caused the exception, but rather on its own stack, meaning  that
  * its return-sp isn't at the end of the irregs field when it points to kernel-
  * space.
  * On x86_64, this isn't the case since all irregs always contain a stack pointer,
- * with the double-fault handler simply using the alternate-stack mechanism for
+ * with the double-fault  handler simply using  the alternate-stack mechanism  for
  * safely executing on an alternate stack. */
 struct df_cpustate {
 #ifdef __x86_64__
@@ -80,7 +80,7 @@ struct df_cpustate {
 INTERN ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED struct cpu *
 NOTHROW(KCALL x86_failsafe_getcpu)(void) {
 	struct cpu *result;
-	/* Try to figure out which task we are (but
+	/* Try to  figure out  which task  we are  (but
 	 * don't do anything that could break stuff...) */
 	if (cpu_count <= 1) {
 		/* Simple case: There's only 1 CPU, so that has to be us! */
@@ -183,9 +183,9 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	pc = (void *)state->dcs_regs.ucs_eip;
 #endif /* !__x86_64__ */
 
-	/* In order to even be able to write to the system log, we must be able to
+	/* In order to even  be able to write  to the system log,  we must be able  to
 	 * identify ourselves. As such, try to fix the `THIS_TASK' pointer by changing
-	 * it to become the thiscpu_sched_current pointer of our current CPU, or, if
+	 * it to become the thiscpu_sched_current pointer  of our current CPU, or,  if
 	 * that pointer is broken, use the current CPU's IDLE thread instead. */
 #ifdef __x86_64__
 	me = x86_failsafe_getcpu();
@@ -197,7 +197,7 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	x86_repair_broken_tls_state_impl(me);
 	COMPILER_BARRIER();
 	/* Ok. If we're still alive, then the above ~should~ have just
-	 * giving us ~some~ semblance of a consistent TLS state. */
+	 * giving us  ~some~  semblance  of a  consistent  TLS  state. */
 
 	printk(KERN_EMERG "Double fault at %p\n", pc);
 	{

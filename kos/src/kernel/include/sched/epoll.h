@@ -135,7 +135,7 @@ epoll_controller_create(void) THROWS(E_BADALLOC);
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
- *                                   compile-time       `CONFIG_EPOLL_MAX_NESTING'       limit.
+ *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
  * @return: false: Another monitor for `hand' already exists. */
 FUNDEF NONNULL((1, 2)) bool KCALL

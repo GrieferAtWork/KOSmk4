@@ -80,7 +80,7 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 		void *tempbase;
 		size_t aligned_num_bytes = (size_t)((maxpageaddr - minpageaddr) + PAGESIZE);
 		/* XXX: Instead of vm_paged_map(), maybe just call `f_write()' multiple times?
-		 *      Or at the very least, do so when vm_paged_map() fails! */
+		 *      Or  at   the   very   least,  do   so   when   vm_paged_map()   fails! */
 		tempbase = vm_map(&vm_kernel,
 		                  HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
 		                  aligned_num_bytes,

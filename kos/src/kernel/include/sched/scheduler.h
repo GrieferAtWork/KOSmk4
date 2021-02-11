@@ -402,11 +402,11 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
  *          calling  `sched_super_override_end'  when no  override is  active also
  *          results in panic.
  *
- * @param: release_sched_override: When non-zero, also call `sched_override_end()'
- *                                 Note that  `sched_override_start()'  is  called
+ * @param: release_sched_override: When  non-zero,  also  call   `sched_override_end()'
+ *                                 Note   that   `sched_override_start()'   is   called
  *                                 unconditionally  by  `sched_super_override_start()',
  *                                 unless `thiscpu_sched_override' was already non-NULL
- *                                 before `sched_super_override_start()' was called. */
+ *                                 before  `sched_super_override_start()'  was  called. */
 FUNDEF NOCONNECT void FCALL sched_super_override_start(void) THROWS(E_WOULDBLOCK, ...);
 FUNDEF NOBLOCK void NOTHROW(FCALL sched_super_override_end)(__BOOL release_sched_override DFL(1));
 

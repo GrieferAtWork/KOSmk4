@@ -46,17 +46,17 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7)
 	 *  - 8(%esp)  == RETURN_SP
 	 *  - 12(%esp) == RETURN_SS
 	 * Notice that this doesn't match `struct irregs_user',
-	 * since EFLAGS is missing between CS and SP.
-	 * The user-space EFLAGS value hasn't been changed and
-	 * is still stored in our current EFLAGS value. */
+	 * since  EFLAGS  is   missing  between   CS  and   SP.
+	 * The  user-space EFLAGS value hasn't been changed and
+	 * is   still  stored  in  our  current  EFLAGS  value. */
 	.cfi_def_cfa %esp, 0
 	.cfi_rel_offset %eip, 0
 	.cfi_rel_offset %cs, 4
 	.cfi_rel_offset %esp, 8
 	.cfi_rel_offset %ss, 12
 	cli /* Disable preemption (NOTE: user-space RPC redirection contains a special case
-	     * to detect us not having a proper IRET tail and fixes this for us if we get
-	     * interrupted before we're able to disable interrupts with this instruction!) */
+	     * to detect us not having a proper IRET  tail and fixes this for us if we  get
+	     * interrupted before we're able to disable interrupts with this  instruction!) */
 	/* Must transform to { IP, CS, EFLAGS, SP, SS } */
 	pushfl_cfi
 	xchgl  %ss:0(%esp), %eax  /* { EAX, IP, CS, SP, SS }      (EAX == EFLAGS) */
@@ -106,11 +106,11 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7_iret)
 	movl   %ecx, %fs
 
 	/* At this point, we need to mirror the behavior or UKERN segment system calls in
-	 * that we take arguments from the user-space stack, rather than from registers.
+	 * that we take arguments from the user-space stack, rather than from  registers.
 	 * When it comes to which system call should be invoked, that depends 2 factors:
 	 *  >> lcall $7, $0     -- sysno == %eax
 	 *  >> lcall $7, $1234  -- sysno == 1234
-	 * Or in other words, when the segment-offset of the lcall instruction used is ZERO,
+	 * Or in other words, when the segment-offset  of the lcall instruction used is  ZERO,
 	 * or if the caller used something other than an lcall instruction, use %eax as sysno.
 	 * Otherwise, use the segment offset as sysno */
 

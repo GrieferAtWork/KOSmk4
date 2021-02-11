@@ -141,8 +141,8 @@ do_parse_as_hex:
 
 	case 'a' ... 'f':
 	case 'A' ... 'F':
-		/* Check if there are any non-hex characters.
-		 * If so, this has to be a register name.
+		/* Check  if there are any non-hex characters.
+		 * If so,  this has  to  be a  register  name.
 		 * Otherwise, it's a hex number without prefix */
 		{
 			char *iter = p;

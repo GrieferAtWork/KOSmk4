@@ -44,7 +44,7 @@ struct task;
  *       be the better solution. */
 
 /* Recursive, shared/mutually exclusive synchronization primitive
- * NOTE:  This   one   must   be   capable   of   dealing   with:
+ * NOTE:  This one must be capable of dealing with:
  * >> rwlock_read(x);
  * >> rwlock_read(x);  // Secondary read lock does not count to the total number of reading threads.
  * >> rwlock_write(x); // Upgrade lock by changing to a state that prevents new threads from being added,

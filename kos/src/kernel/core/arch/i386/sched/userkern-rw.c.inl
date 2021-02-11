@@ -109,13 +109,13 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 	state = args->va_state;
 	/* Only user-space can access the register map.
 	 * This is a security precaution to prevent user-space from passing
-	 * a pointer to the register map into kernel-space, and have the
-	 * kernel leak secure information, or even worse: override kernel
+	 * a  pointer to the  register map into  kernel-space, and have the
+	 * kernel leak secure information,  or even worse: override  kernel
 	 * registers to corrupt the kernel or gain ring 0 access. */
 	if unlikely(!icpustate_isuser(state)) {
-		/* XXX: While is would be insanely slow, we could use
+		/* XXX: While is would be  insanely slow, we could  use
 		 *      the unwind system to unwind to the kernel entry
-		 *      point, at which point we could emulate access
+		 *      point,  at which point  we could emulate access
 		 *      to the original user-space registers via CFI... */
 		goto nope;
 	}

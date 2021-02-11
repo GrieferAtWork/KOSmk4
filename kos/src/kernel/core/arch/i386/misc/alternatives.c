@@ -47,7 +47,7 @@ NOTHROW(FCALL has_feature)(u32 feature) {
 	case X86_FEATURE_TYP_CPUID: {
 		u32 word = 0;
 		STATIC_ASSERT(X86_FEATURE_TYP_CPUID == 0);
-		/* Use the boot-cpu's cpuid feature table (since that one
+		/* Use the boot-cpu's cpuid  feature table (since that  one
 		 * can be overwritten, unlike the actual cpuid instruction) */
 		switch (feature & ~X86_FEATURE_BITMASK) {
 
@@ -180,9 +180,9 @@ init_alternatives(struct x86_alternative const *start,
 }
 
 
-/* Perform arch-specific driver initialization.
+/* Perform   arch-specific   driver    initialization.
  * On x86, this function handles code alternatives, as
- * defined via the optional `.alternatives' section. */
+ * defined via the  optional `.alternatives'  section. */
 INTERN ATTR_COLDTEXT NONNULL((1)) void KCALL
 arch_driver_initialize(struct driver *__restrict self) {
 	REF struct driver_section *sect;
@@ -224,7 +224,7 @@ NOTHROW(KCALL x86_initialize_alternatives)(void) {
 	if (x86_lapicbase_)
 		bootcpu_x86_cpuid_.ci_1d |= CPUID_1D_ACPI;
 	else {
-		/* NOTE: The KOS kernel assumes that HAVE_TSC -> HAVE_APIC,
+		/* NOTE: The  KOS kernel assumes that HAVE_TSC -> HAVE_APIC,
 		 *       so if we don't have an APIC, then we must hide TSC. */
 		bootcpu_x86_cpuid_.ci_1d &= ~(CPUID_1D_ACPI | CPUID_1D_TSC);
 	}

@@ -56,9 +56,9 @@ DECL_BEGIN
 #define IFELSEX3264(x32, x64) x32
 #endif /* !__x86_64__ */
 
-/* NOTE: Generic system call emulation helpers are implemented as WEAK
- *       because some of them have more efficient assembly versions in
- *       some of the (32|64).S files within the same folder as this file.
+/* NOTE: Generic system  call emulation  helpers are  implemented as  WEAK
+ *       because  some of  them have  more efficient  assembly versions in
+ *       some of the (32|64).S files within the same folder as this  file.
  *       As such, we simply define everything there is, and let the linker
  *       get rid of the (inefficient) C versions if assembly versions have
  *       been defined. */
@@ -217,7 +217,7 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
                                               bool *prestart_system_call);
 
 /* Emulate the execution of a system call.
- * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
+ * NOTE: `syscall_emulate_r()'  is  the  same  as  `syscall_emulate()',  however
  *       will reset the kernel-space stack and will not unwind, or return to the
  *       stack of the caller */
 #ifdef __x86_64__

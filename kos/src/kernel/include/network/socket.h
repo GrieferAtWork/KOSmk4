@@ -558,7 +558,7 @@ struct socket_ops {
 	 *    returned by `so_accept()'. For this purpose, it is undefined
 	 *    if  already-received, but yet-to-be-accepted sockets use the
 	 *    old, or the new send/receive buffer sizes.
-	 *    Also: In  the case  of unix  domain sockets,  where the  send/recv
+	 *    Also: In the  case of  unix domain  sockets, where  the  send/recv
 	 *    buffers of the accept(2)-ed socket  are the same as the  recv/send
 	 *    buffers of the  client socket (the  one that connect(2)-ed),  then
 	 *    the initial buffers sizes used are the greater of those configured

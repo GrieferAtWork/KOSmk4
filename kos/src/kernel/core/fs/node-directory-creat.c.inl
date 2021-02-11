@@ -33,7 +33,7 @@ DECL_BEGIN
  * NOTE: When `open_mode & O_DOSPATH' is set, ignore casing when checking for existing files.
  * @param: open_mode: Set of `O_CREAT | O_EXCL | O_DOSPATH'
  * @param: ptarget_dirent: When non-NULL, store a reference to the resulting node's directory entry here.
- * @param: pwas_newly_created: When non-NULL, write `true' if a new file was
+ * @param: pwas_newly_created: When non-NULL,  write `true'  if  a new  file  was
  *                             created, or `false' when the file already existed.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
  * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
@@ -500,4 +500,3 @@ open_existing_entry:
 #undef DEFINE_DIRECTORY_MKDIR
 
 DECL_END
-

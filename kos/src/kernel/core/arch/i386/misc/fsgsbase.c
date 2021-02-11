@@ -103,13 +103,13 @@ PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
  * WARNING: Only the 64-bit variants of these instructions can be patched!
  *          The 32-bit variants cannot.
  * Before using this function, the caller should check that fsgsbase really
- * isn't supported by the host CPU, as indicated by `CPUID_7B_FSGSBASE'
- * @param: real_pc: The real PC that should be used for DISP-offsets.
+ * isn't  supported by  the host  CPU, as  indicated by `CPUID_7B_FSGSBASE'
+ * @param: real_pc: The real  PC that  should  be used  for  DISP-offsets.
  *                  May differ from `pc' when `pc' points into an aliasing
  *                  memory mapping with write-access
  * @return: true:   Successfully patched the given code location.
  * @return: false:  The given code location was already patched,
- *                  or isn't one of the above instructions. */
+ *                  or isn't  one  of  the  above  instructions. */
 PUBLIC ATTR_COLDTEXT NOBLOCK bool
 NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc) {
 	/* F3 REX.W 0F AE /0 RDFSBASE r64 */
@@ -189,7 +189,7 @@ INTDEF FREE uint32_t __x86_fixup_fsgsbase_end[];
 INTERN NOBLOCK ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	uint32_t *iter;
-	/* Check if our CPU supports fsgsbase. If it does, the we don't have
+	/* Check if our CPU supports fsgsbase. If it does, the we don't  have
 	 * to do anything, and we can NOP out calls to `x86_fsgsbase_patch()' */
 	if (X86_HAVE_FSGSBASE) {
 		*((byte_t *)x86_fsgsbase_patch + 0) = 0xc3;

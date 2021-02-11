@@ -57,8 +57,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_register %esp, %ebp /* EBP is the designated return-sp register */
 	.cfi_register %eip, %edi /* EDI is the designated return-pc register */
 	/* `IA32_SYSENTER_ESP' points at the ESP0 field of the CPU's TSS
-	 * In other words: we only need to replace ESP with its own
-	 * dereference, and we already have `THIS_TASK->t_stackend'. */
+	 * In other words:  we only  need to  replace ESP  with its  own
+	 * dereference, and  we  already  have  `THIS_TASK->t_stackend'. */
 	movl   %ss:0(%esp), %esp
 	/* Construct an IRET tail. */
 	pushl  $(SEGMENT_USER_DATA_RPL) /* %ss */
@@ -119,8 +119,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_register %esp, %ebp /* EBP is the designated return-sp register */
 	.cfi_register %eip, %edi /* EDI is the designated return-pc register */
 	/* `IA32_SYSENTER_ESP' points at the ESP0 field of the CPU's TSS
-	 * In other words: we only need to replace ESP with its own
-	 * dereference, and we already have `THIS_TASK->t_stackend'. */
+	 * In other words:  we only  need to  replace ESP  with its  own
+	 * dereference, and  we  already  have  `THIS_TASK->t_stackend'. */
 	movl   %ss:0(%esp), %esp
 	/* Construct an IRET tail. */
 	pushl  $(SEGMENT_USER_DATA_RPL) /* %ss */
@@ -133,7 +133,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	pushl  %edi                   /* %eip */
 
 	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
-	 * property enabled, thus allowing for normal system call return behavior. */
+	 * property enabled,  thus  allowing  for normal  system  call  return  behavior. */
 /*	.cfi_def_cfa %esp, 0 */
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
@@ -322,13 +322,13 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	popl_cfi %ds
 	.cfi_restore_iret_ds
 
-	/* At this point, most of the original user-space CPU context from the point
+	/* At this point,  most of the  original user-space CPU  context from the  point
 	 * when the `sysenter' instruction was executed has been restored. Additionally,
-	 * we have already applied the required register transformations for safely
+	 * we have  already applied  the required  register transformations  for  safely
 	 * returning to user-space once we're done here.
 	 * -> With all of this done, we can now continue handling the sysenter as
 	 *    though the CPU had supported the instruction from the get-go, using
-	 *    the same assembly-level wrappers that would normally be used for
+	 *    the same assembly-level  wrappers that would  normally be used  for
 	 *    routing a real sysenter system call invocation. */
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
@@ -374,7 +374,7 @@ END(x86_syscall_emulate_sysenter_r)
 .section .text.cold
 INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	/* Called when the %ebp pointer of a sysenter callback
-	 * is faulty (aka: points into kernel-space) */
+	 * is   faulty   (aka:   points   into   kernel-space) */
 	.cfi_startproc simple
 	EXTERN(x86_syscall_personality_asm32_sysenter_break)
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break

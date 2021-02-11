@@ -33,7 +33,7 @@
 DECL_BEGIN
 
 /* Create new files within a given directory.
- * If another file with the same name already existed, then
+ * If another  file with  the same  name already  existed,  then
  * `FMKFILE_F_EXISTS' is set, and that file is returned instead.
  * @throw: E_FSERROR_ILLEGAL_PATH:        `info->mkf_name' contains bad characters
  * @throw: E_FSERROR_DISK_FULL:           Disk full
@@ -52,7 +52,7 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 }
 
 /* Delete the specified file from this directory
- * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had already been deleted, or
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or
  *                                        renamed (it no longer exists as `entry'
  *                                        within `self').
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
@@ -76,7 +76,7 @@ fdirnode_unlink(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DISK_FULL:               Disk full
  * @throw: E_FSERROR_READONLY:                Read-only filesystem
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `info->frn_name' already exists
- * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted 
+ * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted
  * @throw: E_FSERROR_CROSS_DEVICE_LINK:       ...
  * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: ... */
 PUBLIC NONNULL((1, 2)) void FCALL

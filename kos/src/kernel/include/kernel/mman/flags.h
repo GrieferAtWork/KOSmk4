@@ -68,19 +68,19 @@ DECL_BEGIN
  * GFP_MAP_NOSPLIT  0x00040000    [MAP_NOSPLIT,MNODE_F_NOSPLIT]
  * GFP_MAP_NOMERGE  0x00080000    [MAP_NOMERGE,MNODE_F_NOMERGE]
  * -                0x00100000                               [MAP_FIXED_NOREPLACE]
- * -                0x04000000                               [MAP_UNINITIALIZED]
- * GFP_MAP_NOASLR   0x40000000    [MAP_NOASLR]
+ * -                0x04000000 [MAP_UNINITIALIZED]
+ * GFP_MAP_NOASLR     0x40000000      [MAP_NOASLR]
  *
  */
 
 
 /* >> uintptr_t mnodeflags_from_mapflags(unsigned int prot);
  * Convert `MAP_*' to `MNODE_F_*':
- *   - 0            -> MNODE_F_NORMAL
- *   - MAP_PREPARED -> MNODE_F_MPREPARED
- *   - MAP_LOCKED   -> MNODE_F_MLOCK
- *   - MAP_NOSPLIT  -> MNODE_F_NOSPLIT
- *   - MAP_NOMERGE  -> MNODE_F_NOMERGE */
+ *   - 0             ->  MNODE_F_NORMAL
+ *   - MAP_PREPARED  ->  MNODE_F_MPREPARED
+ *   - MAP_LOCKED    ->  MNODE_F_MLOCK
+ *   - MAP_NOSPLIT   ->  MNODE_F_NOSPLIT
+ *   - MAP_NOMERGE   ->  MNODE_F_NOMERGE */
 #if (0 == MNODE_F_NORMAL &&               \
      MAP_PREPARED == MNODE_F_MPREPARED && \
      MAP_LOCKED == MNODE_F_MLOCK &&       \
@@ -97,14 +97,14 @@ DECL_BEGIN
 #endif /* !... */
 
 /* >> uintptr_t mbnodeflags_from_mapflags(unsigned int prot);
- * Convert `MAP_*' to `MNODE_F_*' | `MBNODE_F_*':
- *   - 0            -> MNODE_F_NORMAL
- *   - MAP_PREPARED -> MNODE_F_MPREPARED
- *   - MAP_LOCKED   -> MNODE_F_MLOCK
- *   - MAP_POPULATE -> MBNODE_F_POPULATE
- *   - MAP_NONBLOCK -> MBNODE_F_NONBLOCK
- *   - MAP_NOSPLIT  -> MNODE_F_NOSPLIT
- *   - MAP_NOMERGE  -> MNODE_F_NOMERGE */
+ * Convert   `MAP_*'   to    `MNODE_F_*'   |    `MBNODE_F_*':
+ *   - 0             ->  MNODE_F_NORMAL
+ *   - MAP_PREPARED  ->  MNODE_F_MPREPARED
+ *   - MAP_LOCKED    ->  MNODE_F_MLOCK
+ *   - MAP_POPULATE  ->  MBNODE_F_POPULATE
+ *   - MAP_NONBLOCK  ->  MBNODE_F_NONBLOCK
+ *   - MAP_NOSPLIT   ->  MNODE_F_NOSPLIT
+ *   - MAP_NOMERGE   ->  MNODE_F_NOMERGE */
 #if (0 == MNODE_F_NORMAL &&               \
      MAP_PREPARED == MNODE_F_MPREPARED && \
      MAP_LOCKED == MNODE_F_MLOCK &&       \
@@ -141,11 +141,11 @@ DECL_BEGIN
 
 /* >> uintptr_t mnodeflags_from_prot(unsigned int prot);
  * Convert `MAP_*' to `PROT_*':
- *    PROT_NONE   -> 0
- *    PROT_EXEC   -> MNODE_F_PEXEC
- *    PROT_WRITE  -> MNODE_F_PWRITE
- *    PROT_READ   -> MNODE_F_PREAD
- *    PROT_SHARED -> MNODE_F_SHARED
+ *   - PROT_NONE    ->  0
+ *   - PROT_EXEC    ->  MNODE_F_PEXEC
+ *   - PROT_WRITE   ->  MNODE_F_PWRITE
+ *   - PROT_READ    ->  MNODE_F_PREAD
+ *   - PROT_SHARED  ->  MNODE_F_SHARED
  */
 #if (PROT_NONE == 0 &&               \
      PROT_EXEC == MNODE_F_PEXEC &&   \
@@ -199,9 +199,9 @@ DECL_BEGIN
 
 /* >> unsigned int mapfindflags_from_gfp(gfp_t gfp);
  * Convert `GFP_*' to `MAP_*':
- *    GFP_MAP_BELOW  -> MAP_GROWSDOWN
- *    GFP_MAP_ABOVE  -> MAP_GROWSUP
- *    GFP_MAP_NOASLR -> MAP_NOASLR
+ *   - GFP_MAP_BELOW   ->  MAP_GROWSDOWN
+ *   - GFP_MAP_ABOVE   ->  MAP_GROWSUP
+ *   - GFP_MAP_NOASLR  ->  MAP_NOASLR
  * NOTE: Intended to construct flags for `mman_findunmapped()' from `gfp'! */
 #if (GFP_MAP_BELOW == MAP_GROWSDOWN && \
      GFP_MAP_ABOVE == MAP_GROWSUP &&   \
@@ -224,10 +224,10 @@ DECL_BEGIN
 
 /* >> unsigned int mnodeflags_from_gfp(gfp_t gfp);
  * Convert `GFP_*' to `MNODE_F_*':
- *    GFP_MAP_PREPARED -> MNODE_F_MPREPARED
- *    GFP_LOCKED       -> MNODE_F_MLOCK
- *    GFP_MAP_NOSPLIT  -> MNODE_F_NOSPLIT
- *    GFP_MAP_NOMERGE  -> MNODE_F_NOMERGE */
+ *   - GFP_MAP_PREPARED  ->  MNODE_F_MPREPARED
+ *   - GFP_LOCKED        ->  MNODE_F_MLOCK
+ *   - GFP_MAP_NOSPLIT   ->  MNODE_F_NOSPLIT
+ *   - GFP_MAP_NOMERGE   ->  MNODE_F_NOMERGE */
 #if (GFP_MAP_PREPARED == MNODE_F_MPREPARED && \
      GFP_LOCKED == MNODE_F_MLOCK &&           \
      GFP_MAP_NOSPLIT == MNODE_F_NOSPLIT &&    \
@@ -252,9 +252,9 @@ DECL_BEGIN
 
 /* >> unsigned int prot_from_elfpf(unsigned int elfpf);
  * Convert ELF's `PF_*' to `PROT_*':
- *    PF_X -> PROT_EXEC
- *    PF_W -> PROT_WRITE
- *    PF_R -> PROT_READ */
+ *   - PF_X  ->  PROT_EXEC
+ *   - PF_W  ->  PROT_WRITE
+ *   - PF_R  ->  PROT_READ */
 #if (PF_X == PROT_EXEC && PF_W == PROT_WRITE && PF_R == PROT_READ)
 #define prot_from_elfpf(elfpf) \
 	((elfpf) & (PF_X | PF_W | PF_R))
@@ -275,9 +275,9 @@ DECL_BEGIN
 
 /* >> uintptr_t mnodeflags_from_elfpf(unsigned int elfpf);
  * Convert ELF's `PF_*' to `MNODE_F_P*':
- *    PF_X -> MNODE_F_PEXEC
- *    PF_W -> MNODE_F_PWRITE
- *    PF_R -> MNODE_F_PREAD */
+ *   - PF_X  ->  MNODE_F_PEXEC
+ *   - PF_W  ->  MNODE_F_PWRITE
+ *   - PF_R  ->  MNODE_F_PREAD */
 #if (PF_X == MNODE_F_PEXEC &&  \
      PF_W == MNODE_F_PWRITE && \
      PF_R == MNODE_F_PREAD)

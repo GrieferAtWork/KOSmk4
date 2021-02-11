@@ -52,6 +52,8 @@ DECL_BEGIN
 
 
 /* To differentiate between hints and allocated, but non-present pages, we use this:
+ *
+ * ```
  *                                                       P64_PAGE_FPREPARED
  *                                                       |
  *                                                       |         P64_PAGE_FISAHINT
@@ -91,6 +93,7 @@ DECL_BEGIN
  * 4 0000000000000000000000000000000000000000000000000000000000000000: Unused (P64_PAGE_ABSENT)
  *    6 6 5 5 5 5 5 4 4 4 4 4 3 3 3 3 3 2 2 2 2 2 1 1 1 1 1 8 6 4 2 0
  *    2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0
+ * ```
  *
  * NOTE: In the case of E4, you may assume that any address with `P64_PDIR_VEC4INDEX(addr) >= 256'
  *       always  has the `P64_PAGE_FPRESENT' bit set, and that it points to a statically allocated
@@ -384,8 +387,8 @@ p64_pdir_e3_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
 typedef union p64_pdir_e4
 p64_pdir_e4_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/];
 
-/* E1 identity mapping access for the current page directory.
- *    Index #0: VEC4 -- The same index as used in `struct p64_pdir::p_e4'
+/* E1 identity   mapping   access   for   the   current   page   directory.
+ *    Index #0: VEC4 -- The  same index as used in  `struct p64_pdir::p_e4'
  *    Index #1: VEC3 -- The same index as used in `union p64_pdir_e4::p_e3'
  *    Index #2: VEC2 -- The same index as used in `union p64_pdir_e3::p_e2'
  *    Index #3: VEC1 -- The same index as used in `union p64_pdir_e2::p_e1'

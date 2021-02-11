@@ -763,10 +763,10 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					                      sock.h_mode);
 				}
 			} EXCEPT {
-				/* Special case: If the send fails for any operation other
-				 *               than the first one, then the related error
+				/* Special case: If  the  send fails  for any  operation other
+				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
-				 *               were sent successfully is returned instead. */
+				 *               were sent successfully  is returned  instead. */
 				if (i != 0) {
 					freea(iov_vec);
 					goto done;
@@ -881,10 +881,10 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					                      sock.h_mode);
 				}
 			} EXCEPT {
-				/* Special case: If the send fails for any operation other
-				 *               than the first one, then the related error
+				/* Special case: If  the  send fails  for any  operation other
+				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
-				 *               were sent successfully is returned instead. */
+				 *               were sent successfully  is returned  instead. */
 				if (i != 0) {
 					freea(iov_vec);
 					goto done;
@@ -1323,10 +1323,10 @@ sys_recvmmsg_impl(fd_t sockfd,
 					                      /* timeout:       */ abs_timeout);
 				}
 			} EXCEPT {
-				/* Special case: If the send fails for any operation other
-				 *               than the first one, then the related error
+				/* Special case: If  the  send fails  for any  operation other
+				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
-				 *               were sent successfully is returned instead. */
+				 *               were sent successfully  is returned  instead. */
 				if (i != 0) {
 					error_class_t cls = error_class();
 					if (ERRORCLASS_ISRTLPRIORITY(cls))
@@ -1508,10 +1508,10 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 					                      /* timeout:       */ abs_timeout);
 				}
 			} EXCEPT {
-				/* Special case: If the send fails for any operation other
-				 *               than the first one, then the related error
+				/* Special case: If  the  send fails  for any  operation other
+				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
-				 *               were sent successfully is returned instead. */
+				 *               were sent successfully  is returned  instead. */
 				if (i != 0) {
 					error_class_t cls = error_class();
 					if (ERRORCLASS_ISRTLPRIORITY(cls))

@@ -61,7 +61,7 @@ NOTHROW(KCALL memcaseeq_ku_nopf)(KERNEL void const *kernel_buffer,
 
 #ifdef ALWAYS_GET_PARENT_INODE
 /* Same as `path_getchild_or_parent_inode()', but _always_ store a reference
- * to the INode of the given path `self' within `*pparent_inode' */
+ * to  the  INode   of  the  given   path  `self'  within   `*pparent_inode' */
 #ifdef PATH_GETCASECHILD
 PUBLIC REF struct path *KCALL
 path_getcasechild_and_parent_inode(struct path *__restrict self,
@@ -79,7 +79,7 @@ path_getchild_and_parent_inode(struct path *__restrict self,
 #endif /* !PATH_GETCASECHILD */
 #else /* ALWAYS_GET_PARENT_INODE */
 /* Search for a specific child path within `self', _OR_ store a reference
- * to the INode of `self' within `*pparent_inode' when NULL is returned.
+ * to  the INode of `self' within `*pparent_inode' when NULL is returned.
  * In the case where non-NULL is returned, `*pparent_inode' is left in an undefined state. */
 #ifdef PATH_GETCASECHILD
 PUBLIC REF struct path *KCALL
@@ -111,7 +111,7 @@ path_getchild_or_parent_inode(struct path *__restrict self,
 			if (result->p_dirent->de_namelen != namelen)
 				continue;
 			/* First pass: Assume the likely case that we've already got the
-			 *             correct entry and perform the final name-compare
+			 *             correct  entry and perform the final name-compare
 			 *             while not holding a lock to `self' */
 			if unlikely(!tryincref(result))
 				continue;
@@ -140,10 +140,10 @@ path_getchild_or_parent_inode(struct path *__restrict self,
 			return result;
 		}
 #ifdef PATH_GETCASECHILD
-		/* Failed to find an entry matching the given hash.
+		/* Failed to  find an  entry matching  the given  hash.
 		 * In the case of a case-insensitive lookup, this could
-		 * very well be happening due to the given name using
-		 * a different casing than any of the names we've got. */
+		 * very well be happening due  to the given name  using
+		 * a different casing than any of the names we've  got. */
 		goto find_name_with_different_casing;
 #endif /* PATH_GETCASECHILD */
 	}
@@ -153,13 +153,13 @@ fail_and_unlock:
 	sync_endread(self);
 	return NULL;
 find_name_after_initial_missmatch:
-	/* The first candidate wasn't the one, but we released our lock on `self'
-	 * in order to quickly match file names. - Re-acquire that lock and perform
+	/* The first  candidate wasn't  the one,  but we  released our  lock on  `self'
+	 * in order to  quickly match file  names. - Re-acquire  that lock and  perform
 	 * the search once again, only this time around, make use of `memeq_ku_nopf()',
-	 * thus not having to release the lock on `self', allowing us to keep on
+	 * thus  not  having to  release the  lock on  `self', allowing  us to  keep on
 	 * searching through all possible candidates.
-	 * If during this we encounter a problem with the given path not being accessible
-	 * directly, we'll release our lock on `self', create a kernel-space copy of `name'
+	 * If  during  this  we encounter  a  problem with  the  given path  not  being accessible
+	 * directly, we'll  release our  lock on  `self',  create a  kernel-space copy  of  `name'
 	 * by use of alloca() / kmalloc(), the try the search one last time using our non-faulting
 	 * copy. */
 	sync_read(self);

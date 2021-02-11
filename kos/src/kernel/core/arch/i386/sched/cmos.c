@@ -162,7 +162,7 @@ got_time:
 	}
 	/* Fix 12-hour time information. */
 	if ((x86_cmos.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && (cmos_hour & 0x80) != 0)
-		cmos_hour = ((cmos_hour & 0x7f) + 12) % 24; 
+		cmos_hour = ((cmos_hour & 0x7f) + 12) % 24;
 	/* Figure out the proper year. */
 	year = cmos_year;
 	if (x86_cmos.cr_century)
@@ -183,7 +183,7 @@ got_time:
 		/* TODO:
 		 *   - If current time is not
 		 *     (now >= 03:00:00 on the last Sunday of April) &&
-		 *     (now <  02:00:00 on the last Sunday in October),
+		 *     (now < 02:00:00 on the last Sunday in  October),
 		 *     add 1 hour to the result
 		 *   - This only leaves the undefined case for the single
 		 *     hour in October that is run twice:
@@ -196,11 +196,11 @@ got_time:
 		 *       Sun, October: 01:59:99    01:59:59     02:59:59   -- Wrong
 		 *       Sun, October: 02:00:00    03:00:00     03:00:00   -- OK
 		 *
-		 * The CMOS chip would probably run into the same issue, and somehow
+		 * The CMOS chip would probably run into the same issue, and  somehow
 		 * needs to remember not to turn back the clock again when it reaches
 		 * 01:59:59 a second time. I don't know if that bit is standardized
-		 * anywhere (or can be read at all...), but we could keep track of
-		 * this ourselves, and turn the clock forward if KOS was already
+		 * anywhere (or can be read at all...), but we could keep track  of
+		 * this  ourselves, and turn  the clock forward  if KOS was already
 		 * running before the RTC got turned back.
 		 */
 	}
@@ -212,7 +212,7 @@ got_time:
 PUBLIC_CONST ktime_t const tsc_realtime_err = NSEC_PER_SEC; /* 1 second */
 
 /* Retrieve the current realtime, as read from an external clock source.
- * This function's implementation is arch-specific, and should only be
+ * This function's implementation is  arch-specific, and should only  be
  * called from within `tsc_resync_interrupt()' in order to determine the
  * actual current realtime timestamp. */
 PUBLIC NOBLOCK NOPREEMPT ktime_t NOTHROW(FCALL tsc_resync_realtime)(void) {
@@ -237,18 +237,18 @@ NOTHROW(KCALL cmos_setalarm)(time_t time) {
 	time /= 60;
 	cmos_hour = time % 24;
 	if ((x86_cmos.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && cmos_hour >= 12)
-		cmos_hour = (cmos_hour - 12) | 0x80; 
+		cmos_hour = (cmos_hour - 12) | 0x80;
 	if ((x86_cmos.cr_stb & CMOS_B_DM) == CMOS_B_DM_BCD) {
 		cmos_second = CMOS_BCD_ENCODE(cmos_second);
 		cmos_minute = CMOS_BCD_ENCODE(cmos_minute);
 		cmos_hour   = CMOS_BCD_ENCODE(cmos_hour & 0x7f) | (cmos_hour & 0x80);
 	}
-	/* Store new alarm values, but only do so if they've changed.
+	/* Store  new alarm values,  but only do  so if they've changed.
 	 * This is done since the hour-value isn't that likely to change
-	 * all too often, so we can gain a bit of performance by only
+	 * all too often, so  we can gain a  bit of performance by  only
 	 * changing it when we have to.
 	 * The same goes for the other registers, too. (though admittedly,
-	 * the second register will probably change every time...) */
+	 * the   second  register  will  probably  change  every  time...) */
 	if (x86_cmos.cr_alarm_hour != cmos_hour) {
 		cmos_wr(CMOS_ALARM_HOUR, cmos_hour);
 		x86_cmos.cr_alarm_hour = cmos_hour;
@@ -351,7 +351,7 @@ NOTHROW(KCALL x86_initialize_cmos)(void) {
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_tsc_resync)(void) {
 	/* Initialize the RTC interrupt to perform periodic re-sync.
-	 * Also enable use of realtime() for retrieving the actual,
+	 * Also enable use of realtime() for retrieving the  actual,
 	 * current system time. */
 	time_t then, then2;
 	PREEMPTION_DISABLE();

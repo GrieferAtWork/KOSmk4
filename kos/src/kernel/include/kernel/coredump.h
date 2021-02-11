@@ -82,7 +82,7 @@ struct __siginfo_struct;
  *                            the kernel.
  * @param: ktraceback_vector: The vector of kernel-space program pointers traversed during unwinding.
  *                            Always `NULL' when `orig_kstate' is also `NULL'
- * @param: ktraceback_length: The number of program pointers found within `ktraceback_vector'
+ * @param: ktraceback_length: The   number   of   program   pointers   found   within   `ktraceback_vector'
  * The complete traceback of any given coredump looks like this (from least-recent address, to most-recent,
  * with  program  pointer  information  which  may  not  necessarily  be  known  written  in   [brackets]):
  *
@@ -119,8 +119,8 @@ coredump_create_for_signal(struct icpustate *__restrict state,
                            struct __siginfo_struct const *__restrict si);
 
 /* Create a coredump because of the currently thrown exception
- * @param: originates_from_kernelspace: When true,  include  the  kernel's  exception
- *                                      context and traceback alongside the coredump.
+ * @param: originates_from_kernelspace: When  true,  include   the  kernel's   exception
+ *                                      context  and  traceback alongside  the coredump.
  *                                      Otherwise, only include user-space  information.
  *                                      This should be true for exceptions thrown within
  *                                      the kernel through use of `THROW()', but `false'

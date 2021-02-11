@@ -52,8 +52,8 @@
 #define GiB(n) ((n) * 1024 * 1024 * 1024)
 
 /* Need at least 2 control vectors to allow for the case
- * where an unaligned physical memory access happens to
- * cross a 1GiB boundary, in which case 2 vectors are
+ * where  an unaligned physical memory access happens to
+ * cross a 1GiB  boundary, in which  case 2 vectors  are
  * needed to allow the request to complete successfully. */
 #if (!defined(CONFIG_PHYS2VIRT_IDENTITY_MINALLOC) || \
      (CONFIG_PHYS2VIRT_IDENTITY_MINALLOC + 0) < 2)
@@ -101,13 +101,13 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 	/* Check if 1GiB pages are possible.
 	 * If they are, configure physident to use them.
 	 * Otherwise, pre-allocate up to `CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC'
-	 * pages of physical memory to-be used for dynamic mapping of
+	 * pages  of  physical  memory  to-be  used  for  dynamic  mapping of
 	 * E1-vectors allocated by `x86_phys2virt64_require()' */
 	if (X86_HAVE_1GIB_PAGES) {
 		/* 1GiB pages are stored in E3-vector entries.
-		 * Since all E3-vectors within kernel-space are pre-allocated to
+		 * Since  all E3-vectors within  kernel-space are pre-allocated to
 		 * ensure consistency of the kernel-share segment, don't even have
-		 * to allocate _any_ memory here! (all of the allocations have
+		 * to  allocate _any_  memory here!  (all of  the allocations have
 		 * already been done during the assembly bootstrap) */
 		unsigned int vec4;
 		union p64_pdir_e3 e3;
@@ -129,7 +129,7 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 	} else {
 		physpage_t pp;
 		printk(FREESTR(KERN_INFO "[p2v] Use 2MiB pages for the phys2virt memory segment\n"));
-		/* TODO: Add a kernel commandline option to select how much
+		/* TODO: Add a kernel commandline  option to select how  much
 		 *       memory should be reserved for the phys2virt mapping! */
 		metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC * PAGESIZE;
 		pp = page_malloc(CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC);
@@ -180,18 +180,18 @@ NOTHROW(KCALL metadata_clearall)(void) {
 	COMPILER_WRITE_BARRIER();
 	metadata_avail = metadata_size;
 	COMPILER_WRITE_BARRIER();
-	/* Flush paging caches on all CPUs that are currently online.
-	 * Technically, we'd only need to do this for the phys2virt address
-	 * ranges. However, there sadly isn't any instruction that would allow
+	/* Flush  paging  caches  on  all  CPUs  that  are  currently   online.
+	 * Technically, we'd only  need to  do this for  the phys2virt  address
+	 * ranges. However, there sadly isn't any instruction that would  allow
 	 * us to do this, so it's easier to just blindly invalidate everything. */
 	vm_supersyncall();
 }
 
 
-/* Ensure that the given `addr', which must be located
+/* Ensure that the  given `addr', which  must be  located
  * inside of [KERNEL_PHYS2VIRT_MIN, KERNEL_PHYS2VIRT_MAX]
- * is mapped against its designated physical address.
- * This function is called from within the #PF handler
+ * is  mapped  against its  designated  physical address.
+ * This function is  called from within  the #PF  handler
  * when a kernel-originating fault happens for an address
  * within that range.
  * NOTE: When called before `x86_initialize_phys2virt64()',
@@ -216,7 +216,7 @@ again_read_e3_word:
 #endif /* !CONFIG_NO_SMP */
 	/* Check for unlikely case:
 	 *    This is a sporadic pagefault, or some other CPU
-	 *    already allocated the same 1GiB page vector. */
+	 *    already allocated  the same  1GiB page  vector. */
 	e3.p_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 	if unlikely(e3.p_vec2.v_present)
 		goto done;
@@ -238,7 +238,7 @@ again_read_e3_word:
 	assert(IS_ALIGNED(new_e3_word, PAGESIZE));
 	metadata_avail -= PAGESIZE;
 	/* Create a temporary mapping of `PHYS:e3_word',
-	 * using the current thread's VM trampoline. */
+	 * using the  current  thread's  VM  trampoline. */
 	{
 		unsigned int vec2;
 		pagedir_pushval_t pushval;
@@ -249,9 +249,9 @@ again_read_e3_word:
 		                              PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e2_vector);
 		/* Figure out which physical memory range should be mapped.
-		 * We're going to fill in 512 * 2MiB pages, totaling 1GiB
+		 * We're going to fill in  512 * 2MiB pages, totaling  1GiB
 		 * of physical memory.
-		 * Thus, use the relative offset from the start of the
+		 * Thus, use  the relative  offset from  the start  of  the
 		 * phys2virt segment, then floor-align that offset by 1GiB. */
 		e2.p_word = (uintptr_t)addr - KERNEL_PHYS2VIRT_BASE;
 		e2.p_word &= ~(GiB(1) - 1);
@@ -293,11 +293,11 @@ done:
 	;
 }
 
-/* A special VM node (that isn't linked to any backing data part,
+/* A  special VM  node (that isn't  linked to any  backing data part,
  * and is thus a so-called ~reserved~ memory mapping), but is checked
- * for by the #PF handler, where it indicates an access made to the
+ * for  by the #PF handler, where it  indicates an access made to the
  * physical identity area.
- * Separately, this node's presence within the kernel VM prevents
+ * Separately, this node's  presence within the  kernel VM  prevents
  * anything else from being mapped into the physical identity range. */
 PUBLIC struct mnode x86_phys2virt64_node = {
 #ifdef CONFIG_USE_NEW_VM

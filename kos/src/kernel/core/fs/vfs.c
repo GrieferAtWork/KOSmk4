@@ -57,7 +57,7 @@
 
 DECL_BEGIN
 
-/* Path allocation functions. (using a cache, because of how
+/* Path allocation functions. (using a cache, because of  how
  * often path objects can potentially be allocated and freed) */
 DEFINE_PREALLOCATION_CACHE(PUBLIC, path, struct path, 256)
 DEFINE_HANDLE_REFCNT_FUNCTIONS(path, struct path);
@@ -375,7 +375,7 @@ path_printex(struct path *__restrict self,
              struct path *__restrict root) {
 	ssize_t temp, result;
 	if (!(mode & PATH_PRINT_MODE_CANREACH) && root != &vfs_kernel) {
-		/* Verify that `root' is reachable from `self'.
+		/* Verify  that  `root' is  reachable  from `self'.
 		 * If it's not, then we should print something like
 		 * !PATH_PRINT_MODE_DOSPATH: \\?\
 		 * PATH_PRINT_MODE_DOSPATH:  //?/
@@ -559,7 +559,7 @@ again_acquire_locks:
 	TRY {
 		/* Must acquire locks to:
 		 *  `self->p_lock'        (sync_write(self))
-		 *  `v->v_mount_lock'     (sync_write(&v->v_mount_lock))
+		 *  `v->v_mount_lock'          (sync_write(&v->v_mount_lock))
 		 *  `super->s_mount_lock' (superblock_mountlock_write(super)) */
 		SYNC_ACQUIRE3(sync_trywrite(self),
 		              sync_write(self),
@@ -634,7 +634,7 @@ again_acquire_locks:
 		    !(ATOMIC_READ(old_super->s_flags) & SUPERBLOCK_FUNMOUNTED)) {
 			assert(self->p_mount->mp_fsmount.ln_pself == &old_super->s_mount);
 			/* This will be the last mounting point, but the superblock
-			 * hasn't been marked as being unmounted, yet. */
+			 * hasn't    been   marked   as   being   unmounted,   yet. */
 			if unlikely(!superblock_nodeslock_trywrite(old_super)) {
 				superblock_mountlock_endwrite(super);
 				incref(old_super);
@@ -816,7 +816,7 @@ again_acquire_super:
 	    !(ATOMIC_READ(super->s_flags) & SUPERBLOCK_FUNMOUNTED)) {
 		assert(self->p_mount->mp_fsmount.ln_pself == &super->s_mount);
 		/* This will be the last mounting point, but the superblock
-		 * hasn't been marked as being unmounted, yet. */
+		 * hasn't    been   marked   as   being   unmounted,   yet. */
 		if unlikely(!superblock_nodeslock_trywrite(super)) {
 			sync_endwrite(&v->v_mount_lock);
 			superblock_mountlock_endwrite(super);
@@ -872,15 +872,15 @@ again_acquire_super:
 		kfree(mount);
 	xdecref(old_node); /* p_inode */
 	decref(super);     /* mp_super */
-	/* Clear all recently used paths, thus doing our best
-	 * to remove any that were apart of the deleted path.
-	 * Note that there does exist a race condition where
-	 * another thread may have walked a sub-path of the old
-	 * mounting point, and hasn't yet marked their final path
-	 * segment as recently used, in which case a non-existent
-	 * path may show in cache. - But that's OK, since this is
-	 * only a cache that is meant to keep paths alive between
-	 * individual accesses, so keeping a deleted path alive for
+	/* Clear  all  recently  used  paths,  thus  doing  our  best
+	 * to  remove  any  that  were  apart  of  the  deleted path.
+	 * Note  that  there  does  exist  a  race  condition   where
+	 * another  thread  may have  walked  a sub-path  of  the old
+	 * mounting point,  and hasn't  yet marked  their final  path
+	 * segment as  recently used,  in which  case a  non-existent
+	 * path  may show  in cache. -  But that's OK,  since this is
+	 * only a cache  that is  meant to keep  paths alive  between
+	 * individual accesses, so keeping  a deleted path alive  for
 	 * longer than necessarily is unnecessary, but not dangerous. */
 	path_recent_clear(v);
 }
@@ -907,7 +907,7 @@ again_acquire_locks:
 	}
 	if unlikely(dst == src) {
 		/* Special case: Don't actually move, the check that `src' is a
-		 *               mounting point was all we really had to do. */
+		 *               mounting point was  all we really  had to  do. */
 		sync_endwrite(src);
 		kfree(dst_mount);
 		return;
@@ -1049,7 +1049,7 @@ again_acquire_mount_lock:
 		    !(ATOMIC_READ(dst_old_super->s_flags) & SUPERBLOCK_FUNMOUNTED)) {
 			assert(dst->p_mount->mp_fsmount.ln_pself == &dst_old_super->s_mount);
 			/* This will be the last mounting point, but the superblock
-			 * hasn't been marked as being unmounted, yet. */
+			 * hasn't    been   marked   as   being   unmounted,   yet. */
 			if unlikely(!superblock_nodeslock_trywrite(dst_old_super)) {
 				incref(dst_old_super);
 				sync_endwrite(dst);
@@ -1120,16 +1120,16 @@ again_acquire_mount_lock:
 			kfree(src_mount);
 		decref(dst_old_super); /* mp_super */
 		xdecref(dst_old_node); /* p_inode */
-		/* Clear all recently used paths, thus doing our best
-		 * to remove any that were apart of the deleted path.
-		 * Note that there does exist a race condition where
-		 * another thread may have walked a sub-path of the old
-		 * mounting point, and hasn't yet marked their final path
-		 * segment as recently used, in which case a non-existent
-		 * path may show in cache. - But that's OK, since this is
-		 * only a cache that is meant to keep paths alive between
+		/* Clear all  recently  used  paths, thus  doing  our  best
+		 * to  remove  any that  were  apart of  the  deleted path.
+		 * Note that  there  does  exist  a  race  condition  where
+		 * another  thread may  have walked  a sub-path  of the old
+		 * mounting point, and hasn't  yet marked their final  path
+		 * segment as recently used,  in which case a  non-existent
+		 * path may show in cache. -  But that's OK, since this  is
+		 * only a cache that is  meant to keep paths alive  between
 		 * individual accesses, so keeping a deleted path alive for
-		 * longer than necessarily is wasteful, but not dangerous. */
+		 * longer  than necessarily is wasteful, but not dangerous. */
 		path_recent_clear(v);
 		return;
 	}
@@ -1199,7 +1199,7 @@ again_acquire_mount_lock:
 	dst_mount->mp_super   = src_super;             /* Inherit reference. */
 	dst_mount->mp_fsmount = src_mount->mp_fsmount; /* Inherit link. */
 	/* XXX: Whenever accessing the `mp_fsmount' chain, wouldn't we
-	 *      need to acquire a lock to the neighboring paths, too? */
+	 *      need to acquire a lock to the neighboring paths,  too? */
 	if likely(dst_mount->mp_fsmount.ln_pself)
 		*dst_mount->mp_fsmount.ln_pself = dst;
 	if (dst_mount->mp_fsmount.ln_next)
@@ -1224,10 +1224,10 @@ again_acquire_mount_lock:
  * @param: premoved_inode:  Upon success, store a reference to the removed INode here.
  * @param: premoved_dirent: Upon success, store a reference to the removed INode's directory entry here.
  * @param: pcontaining_directory: Upon success, store a reference to the directory node from which an element got removed here.
- *                                Since `self->p_inode' can arbitrarily change due to mounting, this is the
- *                                only save way to determine the exact directory from which the element got removed.
+ *                                Since   `self->p_inode'   can   arbitrarily   change   due   to   mounting,   this   is   the
+ *                                only save  way  to  determine  the  exact directory  from  which  the  element  got  removed.
  * @param: premoved_path:         Upon success, store a reference to the removed path here (or `NULL' if it wasn't
- *                                a directory that got removed, or if that directory didn't have a path node)
+ *                                a directory that  got removed, or  if that  directory didn't have  a path  node)
  * @return: * : Set of `DIRECTORY_REMOVE_STATUS_*'
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified file was already deleted)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (self was deleted)
@@ -1299,7 +1299,7 @@ again:
  * @param: psource_directory: When non-NULL, store a reference to the source directory from which an element got removed here.
  * @param: ptarget_directory: When non-NULL, store a reference to the target directory to which an element got added here.
  * @param: premoved_path:     When non-NULL, store a reference to the removed child-path
- *                            of `source_path' here, or `NULL' if no path got removed.
+ *                            of `source_path' here, or `NULL'  if no path got  removed.
  * @return: * : Set of `DIRECTORY_RENAME_STATUS_*', though never `DIRECTORY_RENAME_STATUS_REMOUNT'
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RENAME: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified source file was deleted)
@@ -1443,8 +1443,8 @@ NOTHROW(KCALL path_destroy_after_delpend)(struct path *__restrict self) {
 	/* Already done: `p_parent', `p_inode', `p_cldlist', `p_delpend' */
 	/* Still missing: `p_mount', `p_dirent' */
 	struct mounted_path *mount;
-	/* NOTE: We wait with decref()-ing `self->p_dirent' until now, so that
-	 *       the path_child() functions don't need to tryincref() before
+	/* NOTE: We wait with  decref()-ing `self->p_dirent' until  now, so  that
+	 *       the  path_child()  functions  don't need  to  tryincref() before
 	 *       being able to access `p_dirent' when searching for some specific
 	 *       entry. */
 	decref(self->p_dirent);
@@ -1683,10 +1683,10 @@ NOTHROW(KCALL vfs_clearmounts)(struct vfs *__restrict self) {
 	mounting_points = ATOMIC_XCH(self->v_mount, VFS_MOUNT_ILLEGAL);
 	assertf(mounting_points != VFS_MOUNT_ILLEGAL,
 	        "vfs_clearmounts() called more than once");
-	/* (lazily) get rid of all mounting points.
+	/* (lazily)  get   rid  of   all  mounting   points.
 	 * Before, each mounting point was a reference loop:
 	 *   PATH -> PARENT... -> VFS -> v_mount -> PATH
-	 * Here, we break that cycle between `VFS' and `v_mount',
+	 * Here, we break that cycle between `VFS' and  `v_mount',
 	 * meaning that any remaining mounting points will go away
 	 * as soon as their associated paths stop being used. */
 	while (mounting_points) {
@@ -1733,10 +1733,10 @@ NOTHROW(KCALL vfs_assert_recent_integrity)(struct vfs *__restrict self) {
 }
 #endif /* !NDEBUG */
 
-/* Indicate that `self' has been used recently, allowing the path to be cached
+/* Indicate  that  `self' has  been  used recently,  allowing  the path  to  be cached
  * such that it will remain allocated for a while, even when not referenced elsewhere.
  * NOTE: When `self->p_vfs->v_fscount' is ZERO(0) upon entry, or drops to ZERO(0) before
- *       returning, `self' will not be cached as recently used, and the call
+ *       returning,  `self'  will  not  be  cached  as  recently  used,  and  the   call
  *       behaves as a no-op.
  * NOTE: Always re-returns `self' */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct path *
@@ -1798,7 +1798,7 @@ NOTHROW(KCALL path_recent)(struct path *__restrict self) {
 			/* Bring this path back to the front. */
 			if unlikely(self == v->v_recent_back) {
 				/* Handle the special case where the path
-				 * was at the back of the recent-cache. */
+				 * was at the  back of the  recent-cache. */
 				struct path *prev;
 				assert(self->p_recent.ln_next == NULL);
 				assert((self == v->v_recent_list) ==
@@ -1930,7 +1930,7 @@ NOTHROW(KCALL path_rehash_smaller_nx)(struct path *__restrict self) {
 
 
 /* Create or lookup the path or a given `child_dir' within `self'
- * NOTE: This function is meant to be used to instantiate paths that could not
+ * NOTE: This function  is meant  to be  used to  instantiate paths  that could  not
  *       be found before (aka.: those for which `path_(case)child()' returned false) */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_newchild(struct path *__restrict self,

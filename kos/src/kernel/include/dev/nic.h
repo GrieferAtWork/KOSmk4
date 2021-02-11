@@ -68,22 +68,22 @@ struct nic_packet {
 	};
 	byte_t           *np_tailend;  /* [1..1] End of tail data (grows down) */
 	/* TODO: Add a field `REF struct vm *np_payldvm; // [0..1][lock(WRITE_ONCE)]'
-	 *       that  contains   a  non-NULL   pointer   when  the   VM   containing
-	 *       the memory regions described by payload entires differs
-	 *       from   the   current   VM   of   the   calling  thread.
-	 * -> Right  now, a  lot of VM  context switching happens  as part of
-	 *    outbound packet  routing, and  we  could drastically  cut  down
-	 *    on this  (especially in  cases where  the NIC  driver  back-end
-	 *    doesn't even  need  to  access memory  directly,  but  can  use
-	 *    some  sort  of DMA  access), by  having  drivers deal  with the
-	 *    task of  selecting  the  proper VM  for  accessing  the  packet
-	 *    payload.  (This  could   especially  improve  performance   for
-	 *    packets that  exist _only_  in kernel-space,  such that  no  VM
-	 *    switch  would  be  necessary  at  all  when `np_payloads == 0',
-	 *    indicative   of  the  packet  only  consisting  of  header+tail
-	 *    data,  as would be  the case for packets  created by the kernel
-	 *    itself (such as ARP packets, or other packets send by protocols
-	 *    directly implemented within the kernel)) */
+	 *       that contains a non-NULL pointer  when the VM containing the  memory
+	 *       regions  described by  payload entires  differs from  the current VM
+	 *       of the calling thread.
+	 * -> Right now, a lot of VM context switching happens as part  of
+	 *    outbound packet routing, and  we could drastically cut  down
+	 *    on this (especially in cases  where the NIC driver  back-end
+	 *    doesn't  even need  to access  memory directly,  but can use
+	 *    some  sort of DMA  access), by having  drivers deal with the
+	 *    task  of selecting  the proper  VM for  accessing the packet
+	 *    payload. (This  could  especially  improve  performance  for
+	 *    packets that exist _only_ in  kernel-space, such that no  VM
+	 *    switch would be  necessary at  all when  `np_payloads == 0',
+	 *    indicative  of  the  packet only  consisting  of header+tail
+	 *    data, as would be the case for packets created by the kernel
+	 *    itself (such  as  ARP  packets, or  other  packets  send  by
+	 *    protocols directly implemented within the kernel)) */
 	size_t            np_payloads; /* [const] Total payload size (in bytes) */
 	size_t            np_payloadc; /* [const] # of payload vectors. */
 	COMPILER_FLEXIBLE_ARRAY(struct aio_buffer_entry, np_payloadv); /* [const][np_payloadc] Specified payloads */
@@ -158,7 +158,7 @@ struct nic_device_ops {
 	/* [1..1] Set the value of `self->nd_flags' to `new_flags',
 	 *        using ATOMIC_CMPXCH() semantics with `old_flags'
 	 * @return: true:  Flags were successfully updated
-	 * @return: false: `old_flags' didn't match `self->nd_flags'
+	 * @return: false: `old_flags'  didn't  match  `self->nd_flags'
 	 * This is mainly used to turn on the NIC on/off using `IFF_UP' */
 	bool (KCALL *nd_setflags)(struct nic_device *__restrict self,
 	                          uintptr_t old_flags, uintptr_t new_flags);
@@ -287,7 +287,7 @@ struct nic_rpacket {
 
 /* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
  * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
- *                          The guaranty here  is  that:  `return->rp_size >= max_packet_size'
+ *                          The  guaranty  here is  that: `return->rp_size >= max_packet_size'
  *                          NOTE: Must be at least `ETH_ZLEN' */
 FUNDEF ATTR_RETNONNULL struct nic_rpacket *KCALL
 nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC);

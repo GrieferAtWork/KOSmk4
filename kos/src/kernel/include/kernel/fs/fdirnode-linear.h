@@ -80,7 +80,7 @@ struct flindirnode_ops {
 	FDIRNODE_OPS_FIELDS(prefix, T);                                                   \
 //	                                                                                  \
 	/* [1..1] Read a directory entry from a given position within the directory file. \
-	 * Note that this function should _NOT_ initialize `return->fld_link'             \
+	 * Note   that   this   function  should   _NOT_   initialize  `return->fld_link' \
 	 * @param: pentry_pos: [in]  Pointer to the position of the entry to read.        \
 	 *                     [out] Pointer to the next entry followed the one returned. \
 	 *                           When `NULL' is returned, what's written back is      \

@@ -92,7 +92,7 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 		decref(*pcontaining_path);
 		*pcontaining_path = new_containing_path;
 		if unlikely(!last_seglen) {
-			/* This can happen when `sl_node->sl_text == "/"', since in this
+			/* This  can happen when `sl_node->sl_text == "/"', since in this
 			 * case, we'd still end with a trailing path segment of 0-length. */
 			sync_read(*pcontaining_path);
 			*pnew_containing_directory = (REF struct directory_node *)incref((*pcontaining_path)->p_inode);
@@ -128,7 +128,7 @@ got_result_path:
 				THROW(E_FSERROR_FILE_NOT_FOUND);
 			if ((last_seg + last_seglen < buf + reqlen) &&
 			    (last_seg[last_seglen] == '/')) {
-				/* The symlink _must_ point to a directory!
+				/* The  symlink  _must_  point  to  a  directory!
 				 * s.a. `FS_MODE_FIGNORE_TRAILING_SLASHES' above. */
 				if (!INODE_ISDIR(*pnew_result)) {
 					decref_unlikely(*pnew_result);
@@ -217,7 +217,7 @@ path_expandchild(struct path *__restrict parent_path,
 		struct symlink_node *lnk_child_node;
 		lnk_child_node = (struct symlink_node *)child_node;
 		/* Keep track of the number of allowed symbolic links.
-		 * If no more links are allowed, throw an exception. */
+		 * If no more links  are allowed, throw an  exception. */
 		if unlikely(!*premaining_links)
 			THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
 		--*premaining_links;

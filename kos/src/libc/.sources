@@ -162,7 +162,7 @@ BEGIN
 		 *          of a toolchain  the GCC  backend truely is...  (not hating  on
 		 *          GCC itself, just on its backing toolchain)
 		 *     -> The error here lies in:
-		 *        - AR, for creating archives with duplicate symbols without
+		 *        - AR,  for creating archives  with duplicate symbols without
 		 *          taking a closer  look at those  symbols and selecting  the
 		 *          ones that aren't declared as WEAK, and neither  displaying
 		 *          an error when more than one symbol is declared as non-WEAK

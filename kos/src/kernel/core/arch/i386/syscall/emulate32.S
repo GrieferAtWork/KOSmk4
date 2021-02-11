@@ -59,10 +59,10 @@
 
 
 /* Emulate the execution of a system call.
- * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
- *       will reset the kernel-space stack to `state', and immediately return
+ * NOTE: `syscall_emulate_r()'   is  the  same  as  `syscall_emulate()',  however
+ *       will  reset the  kernel-space stack  to `state',  and immediately return
  *       to userspace after the system call has returned (or unwind any exception
- *       that was thrown by the system call, also dealing with the possibility
+ *       that  was thrown by  the system call, also  dealing with the possibility
  *       of RPC function handling, as well as system call restarting) */
 
 /* >> FUNDEF ATTR_NORETURN void FCALL
@@ -88,7 +88,7 @@ END(x86_syscall_emulate_traced_r)
 
 PUBLIC_FUNCTION(syscall_emulate_r)
 	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
-	/* Start by copying `sc_info' (%edx) just infront of `state' (%ecx)
+	/* Start by copying `sc_info' (%edx)  just infront of `state'  (%ecx)
 	 * Note that that sc_info may already be overlapping with said target
 	 * area, meaning that we have to use memmove() semantics copying data
 	 * from the top down to the bottom */
@@ -101,9 +101,9 @@ PUBLIC_FUNCTION(syscall_emulate_r)
 
 	/* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
 INTERN_OBJECT(x86_syscall_emulate_r_redirection)
-	/* When system calls are being traced, this `rep; movsl' is re-written as
-	 * `jmp8 x86_syscall_emulate_traced_r'. Note that in this case, the entry
-	 * point of `x86_syscall_emulate_traced_r' will do the missed `rep; movsl'
+	/* When system  calls  are  being  traced, this  `rep; movsl'  is  re-written  as
+	 * `jmp8 x86_syscall_emulate_traced_r'.   Note  that  in  this  case,  the  entry
+	 * point  of  `x86_syscall_emulate_traced_r'  will  do  the  missed  `rep; movsl'
 	 * before performing tracing and returning to `.Lsyscall_emulate_r_after_tracing' */
 	.byte  0xf3 /* rep */
 	.byte  0xa5 /* movsl */
@@ -118,10 +118,10 @@ END(x86_syscall_emulate_r_redirection)
 
 
 	/* At this point, our stack looks like this:
-	 * %edi = %esp - 4
-	 * 0(%esp):                                                 struct rpc_syscall_info sc_info;
-	 * SIZEOF_RPC_SYSCALL_INFO(%esp):                           struct icpustate state;
-	 * SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%esp): <END-OF-STACK> */
+	 * >> %edi = %esp - 4
+	 * >> 0(%esp):                                                 struct rpc_syscall_info sc_info;
+	 * >> SIZEOF_RPC_SYSCALL_INFO(%esp):                           struct icpustate state;
+	 * >> SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%esp): <END-OF-STACK> */
 
 
 INTERN_LABEL(__x86_syscall_emulate_r_protect_start):

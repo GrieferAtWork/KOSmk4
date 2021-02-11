@@ -55,7 +55,7 @@ for (local l: File.open("../../../include/asm/os/kos/signal.h")) {
 	if (value >= #signum_values)
 		signum_values.resize(value + 1);
 	comment = comment.rpartition("(")[0].rstrip().rstrip(".").rstrip();
-	
+
 
 	signum_values[value] = (name, comment);
 }

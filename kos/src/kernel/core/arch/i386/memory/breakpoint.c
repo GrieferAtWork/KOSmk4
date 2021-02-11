@@ -37,8 +37,8 @@
 DECL_BEGIN
 
 /* Per-MMan debug registers. (lazily loaded during task switches)
- * NOTE: When setting a debug register (using __wrdrN()), you
- *       must also update these fields accordingly. - Otherwise,
+ * NOTE: When  setting  a debug  register (using  __wrdrN()), you
+ *       must  also update these fields accordingly. - Otherwise,
  *       any changes made will become lost the next time the mman
  *       is changed.
  * NOTE: These fields are _NOT_ inherited during `mman_fork()'! */

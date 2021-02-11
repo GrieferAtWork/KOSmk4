@@ -75,7 +75,7 @@
 
 DECL_BEGIN
 
-/* [0..1] The block device / partition from which the kernel was booted.
+/* [0..1] The  block  device  / partition  from  which the  kernel  was booted.
  * Set to `(struct basic_block_device *)-1' if indeterminate during early boot. */
 PUBLIC REF struct basic_block_device *boot_partition = NULL;
 
@@ -239,7 +239,7 @@ block_device_partition_ioctl(struct block_device *__restrict self,
 
 
 /* Called to destroy a block device child partition after
- * the partition has already been finalized otherwise. */
+ * the partition  has already  been finalized  otherwise. */
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL block_device_clear_delparts)(struct block_device *__restrict self) {
 	struct block_device_partition *iter, *next;
@@ -335,7 +335,7 @@ NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self) 
 	}
 	assert(self->bd_devlink.a_vaddr == DEV_UNSET);
 	/* Check if the device should be removed from devfs, and drop
-	 * the references held to its INode and directory entry. */
+	 * the references  held to  its  INode and  directory  entry. */
 	if (self->bd_devfs_inode) {
 		devfs_remove(self->bd_devfs_inode, /* No-op if already done... */
 		             self->bd_devfs_entry);
@@ -378,7 +378,7 @@ NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self) 
 	          GFP_NORMAL);
 }
 
-/* Lookup a block device associated with `devno' and return a reference to it.
+/* Lookup  a block device associated with `devno'  and return a reference to it.
  * When no block device is associated that device number, return `NULL' instead. */
 PUBLIC WUNUSED REF struct basic_block_device *KCALL
 block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
@@ -436,13 +436,13 @@ again:
  * as will appear in the /dev/ directory, and may optionally be prefixed
  * by a string `/dev/' that is stripped before comparison.
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
- * an encoding that is always attempted first by attempting to decode the
+ * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
  * >> block_device_lookup_name("3:64");      // MKDEV(3, 64)
  * >> block_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
  * >> block_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
  * This function is mainly intended for decoding device names from commandline
- * arguments, such as the kernel's `boot=<NAME>' option which overrides the
+ * arguments, such as  the kernel's `boot=<NAME>'  option which overrides  the
  * kernel's boot partition (in case the kernel can't auto-detect its partition
  * properly).
  * @return: NULL: No device matching `name' exists. */
@@ -570,7 +570,7 @@ block_device_add_to_devfs(struct basic_block_device *__restrict self) {
 }
 
 
-/* Unregister the given block-device from the block-device-id tree, as well as
+/* Unregister  the  given  block-device  from  the  block-device-id  tree,  as  well as
  * removing its auto-generated entry from `/dev' (should that entry have been created).
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
@@ -578,7 +578,7 @@ PUBLIC NONNULL((1)) bool KCALL
 block_device_unregister(struct basic_block_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
-	/* FIXME: Running `partprobe /dev/hda' causes the a soft-lock where the
+	/* FIXME: Running  `partprobe /dev/hda'  causes  the a  soft-lock  where the
 	 *        kernel will continuously print `Removing block-device `/dev/hda1'' */
 	printk(KERN_INFO "[blk] Removing block-device `/dev/%s'\n", self->bd_name);
 	if likely(self->bd_devlink.a_vaddr != DEV_UNSET) {
@@ -635,8 +635,8 @@ block_device_register(struct basic_block_device *__restrict self, dev_t devno)
 }
 
 
-/* Automatically register the given block-device, assigning it an auto-generated device ID.
- * If `self' is a partition (s.a. `block_device_ispartition()'), assign based on other
+/* Automatically   register  the  given  block-device,  assigning  it  an  auto-generated  device  ID.
+ * If   `self'   is  a   partition  (s.a.   `block_device_ispartition()'),   assign  based   on  other
  * preexisting partitions `MKDEV(MAJOR(bp_master),MINOR(EXISTING_PARTITION_WITH_GREATEST_MINOR) + 1)',
  * or assign `MKDEV(MAJOR(bp_master),MINOR(bp_master) + 1)'.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
@@ -712,9 +712,9 @@ NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
 
 /* Create a new sub-partition for `master', placing it as the given address.
  * Following this, automatically register the new partition with `block_device_register_auto()',
- * after assigning the name `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)))'.
+ * after  assigning  the  name   `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
- *       partition is created, and that partition will be returned instead.
+ *       partition is created, and that  partition will be returned  instead.
  * @param: part_label:    The name of the partition, or `NULL'
  * @param: part_sysid:    The partition system ID, or `0'
  * @param: part_typeguid: The partition type GUID, or `NULL'
@@ -842,12 +842,12 @@ again:
 	}
 }
 
-/* High-level read/write to/from a block-device, on a per-byte basis.
+/* High-level  read/write  to/from  a  block-device,  on  a  per-byte   basis.
  * These functions are mainly intended for use by file-system drivers, as well
- * as for creating disk partitions. - Regular user-space access usually goes
- * through the VM data-block mapping interface, which is backed by some sort
+ * as for creating disk partitions.  - Regular user-space access usually  goes
+ * through the VM data-block mapping interface,  which is backed by some  sort
  * of system which will call though to `block_device_(read|write)_async()', if
- * not `block_device_(read|write)_async_sector()'.  */
+ * not `block_device_(read|write)_async_sector()'. */
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_read(struct block_device *__restrict self, VIRT CHECKED void *dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read");
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_write(struct block_device *__restrict self, VIRT CHECKED void const *src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_BADALLOC, ...) ASMNAME("block_device_write");
 FUNDEF NONNULL((1)) size_t KCALL _block_device_sync(struct block_device *__restrict self) THROWS(E_IOERROR, E_IOERROR_READONLY, E_BADALLOC, ...) ASMNAME("block_device_sync");
@@ -1094,7 +1094,7 @@ again:
 			aio_handle_init_noop(&handle, AIO_COMPLETION_FAILURE);
 		}
 		/* Search for additional sectors which may need saving, so we can improve
-		 * performance by saving a whole bunch of different blocks at once. */
+		 * performance  by  saving a  whole bunch  of  different blocks  at once. */
 		for (i = 0; i < BD_MAX_CACHE_SECTORS; ++i) {
 			struct extended_save_handle *new_handles;
 			struct aio_handle_generic *my_handle;
@@ -1158,14 +1158,14 @@ again:
 			/* Wait for the primary task to be completed. */
 check_handle_state_for_save:
 			switch (__builtin_expect(handle.hg_status, AIO_COMPLETION_SUCCESS)) {
-	
+
 			case AIO_COMPLETION_CANCEL:
 				/* Shouldn't happen: If the operation was aborted, re-start. */
 				goto again;
-	
+
 			case AIO_COMPLETION_SUCCESS:
 				break;
-	
+
 			case AIO_COMPLETION_FAILURE:
 				/* Propagate errors as exceptions. */
 				memcpy(&THIS_EXCEPTION_DATA,
@@ -1173,7 +1173,7 @@ check_handle_state_for_save:
 				       sizeof(handle.hg_error));
 				error_throw_current();
 				break;
-	
+
 			default:
 				aio_handle_generic_waitfor(&handle);
 				goto check_handle_state_for_save;
@@ -1210,14 +1210,14 @@ check_handle_state_for_save:
 		/* Wait for the read to have completed. */
 check_handle_state_for_load:
 		switch (__builtin_expect(handle.hg_status, AIO_COMPLETION_SUCCESS)) {
-	
+
 		case AIO_COMPLETION_CANCEL:
 			/* Shouldn't happen: If the operation was aborted, re-start. */
 			goto again;
-	
+
 		case AIO_COMPLETION_SUCCESS:
 			break;
-	
+
 		case AIO_COMPLETION_FAILURE:
 			/* Propagate errors as exceptions. */
 			memcpy(&THIS_EXCEPTION_DATA,
@@ -1225,7 +1225,7 @@ check_handle_state_for_load:
 			       sizeof(handle.hg_error));
 			error_throw_current();
 			break;
-	
+
 		default:
 			aio_handle_generic_waitfor(&handle);
 			goto check_handle_state_for_load;

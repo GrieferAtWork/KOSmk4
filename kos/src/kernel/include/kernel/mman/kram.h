@@ -114,14 +114,14 @@ typedef unsigned int gfp_t;
  *                        then the sub-page-misalignment will  be carried over into  the
  *                        return value. If another mapping  already exists at the  given
  *                        location, then unconditionally return `MAP_INUSE'
- * @param: num_bytes:     The # of bytes to allocate. The actual amount is ceil-
- *                        aligned to multiples of pages (after also including  a
+ * @param: num_bytes:     The  # of bytes to allocate. The actual amount is ceil-
+ *                        aligned to multiples of  pages (after also including  a
  *                        possibly sub-page-misalignment from GFP_MAP_FIXED+hint)
  * @param: flags:         Allocation option flags (see above)
- * @param: min_alignment: The minimum alignment for  the returned pointer. Ignored  when
- *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value greater
+ * @param: min_alignment: The minimum alignment  for the returned  pointer. Ignored  when
+ *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value  greater
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
- *                        is   aligned  by  multiple  pages.  s.a.  `mman_findunmapped()' */
+ *                        is aligned by multiple pages. s.a. `mman_findunmapped()' */
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment DFL(PAGESIZE))
@@ -276,8 +276,8 @@ NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
  * @return: MMAN_UNMAP_KRAM_LOCKED_EX_DONE:  Success (you must invoke the done-callback)
  * @return: MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC: Success (memory will  be free'd  asynchronously)
  *                                           In this case, so-long as the job isn't allocated
- *                                           in-line with the memory being free'd, the given
- *                                           done-callback  is  responsible  to  free  `job'
+ *                                           in-line  with the memory being free'd, the given
+ *                                           done-callback is responsible to free `job'
  * @return: * : Insufficient memory (re-queue the returned job for later execution) */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mman_unmap_kram_job *
 NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict job,

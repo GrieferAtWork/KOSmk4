@@ -333,7 +333,7 @@ cmdline_flatten_callback(void *arg,
 
 /* Split a given commandline into tightly-packed, NUL-terminated
  * strings,   and   return   the   total   number   of  strings.
- * NOTE:  Obviously,   this  function   will  modify   `cmdline'
+ * NOTE:  Obviously, this function will modify `cmdline'
  * >> char *iter, *my_cmdline = get_cmdline();
  * >> size_t i, argc = cmdline_split(my_cmdline, NULL);
  * >> for (iter = my_cmdline, i = 0; i < argc; ++i, iter = strend(iter) + 1) {

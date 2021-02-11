@@ -296,12 +296,12 @@ END(x86_nopf_rep_stosb)
  * >>     rep    movsb
  * >>     ret
  * >> END(x86_nopf_rep_movsb)
- * Yes. - That's literally the implementation,
+ * Yes.  -  That's  literally  the   implementation,
  * however there is something very special about it:
  *  - Whenever a #PF happens, the kernel will see if it originated from
  *    that `rep movsb' instruction.
  *    If it did, then instead of actually handling the #PF, the kernel will
- *    instead advance the instruction pointer to the `ret' instruction,
+ *    instead advance  the instruction  pointer to  the `ret'  instruction,
  *    causing the `rep' to be aborted.
  * IN:
  *   - USER CHECKED void       *%edi:  Destination pointer

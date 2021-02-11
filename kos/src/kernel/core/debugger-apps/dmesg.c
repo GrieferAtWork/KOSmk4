@@ -150,7 +150,7 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 		dbg_setcolor(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK);
 		dbg_printf(DBGSTR("%$s"), (size_t)real_len, packet->sp_msg);
 		/* Print the packet timestamp within the status bar,
-		 * alongside the F1:help information message. */
+		 * alongside  the   F1:help   information   message. */
 		dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
 		{
 			dbg_pprinter_arg_t printer = DBG_PPRINTER_ARG_INIT(0, (int)dbg_screen_height - 1);
@@ -161,29 +161,29 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 			              packet->sp_nsec, packet->sp_tid);
 			if (!kernel_poisoned()) {
 				/* Include the name of the main executable associated
-				 * with the process of the packet writer's tid.
+				 * with  the  process  of  the  packet  writer's tid.
 				 *
 				 * Of course, there is the race condition where the writer
 				 * has since terminated, and a different process has taken
 				 * its place, but that could only happen if the system had
-				 * to recycle PIDs since then, and we're already back to
+				 * to recycle PIDs since then,  and we're already back  to
 				 * where we were before in terms of allocated PIDs.
 				 *
 				 * Admittedly, this could (fairly easily) happen when someone
-				 * sets the value in /proc/sys/kernel/pid_max too low, but
-				 * in this case I want to point out that we're within the
-				 * debugger here, and any sane person probably wouldn't want
-				 * to make their life pointlessly harder, so they'd have to
+				 * sets the value  in /proc/sys/kernel/pid_max  too low,  but
+				 * in  this case  I want to  point out that  we're within the
+				 * debugger here, and any sane person probably wouldn't  want
+				 * to make their life pointlessly  harder, so they'd have  to
 				 * intentionally lower the pid_max value, at which point they
-				 * (at the very least) should be aware of its possible side-
+				 * (at  the very least) should be aware of its possible side-
 				 * effects.
 				 *
 				 * And aside from forcing the kernel to recycle PIDs early on,
-				 * the only other way is to somehow keep on allocating PIDs
-				 * without causing any writes to the system log, because the
+				 * the  only other way  is to somehow  keep on allocating PIDs
+				 * without causing any writes to  the system log, because  the
 				 * dmesg buffer most definitely couldn't hold
-				 * `PID_RECYCLE_THRESHOLD_DEFAULT' individual packets without
-				 * having to wrap around and overwrite earlier ones at least
+				 * `PID_RECYCLE_THRESHOLD_DEFAULT' individual packets  without
+				 * having to wrap around and  overwrite earlier ones at  least
 				 * once (at which point this whole problem would also go away)
 				 */
 				REF struct task *sender;
@@ -215,12 +215,12 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 
 
 /* Render the main dmesg screen.
- * @param: data: Render data. Only `rd_minpacket' and
+ * @param: data: Render  data.  Only  `rd_minpacket'  and
  *               `rd_selected' must be set by the caller! */
 PRIVATE ATTR_DBGTEXT void KCALL
 dbg_dmesg_render(struct dbg_dmesg_render_data *__restrict data) {
 	bool must_rerender;
-	/* The packet detail area must be large enough to
+	/* The packet detail area must be large enough  to
 	 * fit all the text of a max-length syslog packet. */
 	data->rd_packet_area_height = CEILDIV(CONFIG_SYSLOG_LINEMAX, dbg_screen_width);
 	/* Need at least 3 additional lines of vertical screen estate. */

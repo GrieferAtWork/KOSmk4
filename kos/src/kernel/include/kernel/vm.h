@@ -892,9 +892,9 @@ struct vm_datapart {
                                           * transition to `VM_DATAPART_STATE_INCORE' will instead transition
                                           * to `VM_DATAPART_STATE_LOCKED')
                                           * NOTE: This flag can be modified by user-space. */
-#define VM_DATAPART_FLAG_CHANGED  0x0004 /* [lock(dp_lock,SET(READ(dp_lock)))] Set  when  any  of  the  part's  page property
-                                          * bits are  changed  to  indicate  a  modified  page  (cleared  once  all  modified
-                                          * pages   have  been  saved  once  again  (s.a.  `vm_datablock_type::dt_savepart'))
+#define VM_DATAPART_FLAG_CHANGED  0x0004 /* [lock(dp_lock,SET(READ(dp_lock)))] Set when any of the part's page property
+                                          * bits  are changed  to indicate a  modified page (cleared  once all modified
+                                          * pages  have been saved  once again (s.a. `vm_datablock_type::dt_savepart'))
                                           * NOTE:  This   flag   is   ignored   when   `VM_DATAPART_FLAG_TRKCHNG'   is   set.
                                           * NOTE: This flag may be set atomically while only holding a read-lock to `dp_lock' */
 #define VM_DATAPART_FLAG_KEEPRAM  0x0800 /* [const] Don't page_free() RAM or swap_free() SWAP when the part is destroyed. */
@@ -958,7 +958,7 @@ struct vm_datapart {
 	                                            * Lazily allocated/de-allocated as futex objects are being used.
 	                                            * NOTE: For the duration of at least one futex object existing,
 	                                            *       this   field   can   be   considered    `[1..1][const]'
-	                                            *       However, you still may not dereference this field from
+	                                            *       However, you still may not dereference this field  from
 	                                            *      `struct vm_futex::vmf_part' without first acquiring `dp_lock',
 	                                            *       since there exists  a chance that  the associated is  currently
 	                                            *       being split,  and  that  the futex  is  currently  being  moved
@@ -997,7 +997,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vm_datapart, dp_refcnt, vm_datapart_destroy);
  * keep  it being visible outside the small region  that is controllable by the part itself.
  * These references are: `self->dp_block->db_parts*' (1), `self->dp_crefs*' (n) and `self->dp_srefs*' (n)
  *                       Should references  exist  beyond  those explainable  via  these  pointers,  plus
- *                       one additional reference that is gifted to this function by its caller, merging
+ *                       one additional reference that is gifted to this function by its caller,  merging
  *                       will not be done.
  * If merging is impossible for any other reason (blocking locks, insufficient memory, etc.), the
  * operation  will  stop,  and  the  function  behaves  identical  to  a  regular  `decref(self)' */
@@ -1220,9 +1220,9 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
                                       size_t partrel_min_dpage DFL(0),
                                       size_t partrel_max_dpage DFL((size_t)-1));
 
-/* Synchronize   all   modified  pages   within   the  given   part-relative   address  range.
- * If  the  given  part-relative   address  range  is  out-size   of  the  bounds  of   `self'
- * after   a  lock  to  `self'  has  been  acquired,  then  that  range  is  truncated  first.
+/* Synchronize all modified pages within the given part-relative address  range.
+ * If the given part-relative address range is out-size of the bounds of  `self'
+ * after a lock to `self' has been acquired, then that range is truncated first.
  * NOTE: The caller should not be holding any kind of lock to either `self' or its data block.
  * NOTE: If  the  data block  associated  with `self'  does  not implement  a `dt_savepart'
  *       function, or if `self' doesn't have the CHANGED flag set, the function immediately
@@ -1236,8 +1236,8 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
  *       write is performed to such a region of memory.
  * NOTE: If the saved address range spans the entirety of `self', then this function
  *       will also unset the CHANGED bit of `self'
- * @param: recheck_modifications_before_remap: When true and `self' has some SHARED memory
- *                                             mappings, re-check that there are  actually
+ * @param: recheck_modifications_before_remap: When  true and `self' has some SHARED memory
+ *                                             mappings, re-check that  there are  actually
  *                                             changed pages within the given address range
  *                                             before doing all of the work associated with
  *                                             re-mapping all shared mappings as read-only.
@@ -1387,8 +1387,8 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
 
 
 
-/* Split   the    given    datapart    after   `vpage_offset'    pages    of    virtual    memory.
- * Additionally,   map  new  nodes  within  all  VMs  in   with  `self'  is  mapped  as  part  of.
+/* Split  the  given  datapart  after  `vpage_offset'  pages  of  virtual  memory.
+ * Additionally, map new nodes within all VMs in with `self' is mapped as part of.
  * NOTE: The caller must not be holding locks to _any_ of those VMs or the given data part itself.
  * @return: * :   A reference to the new upper-half of `self', starting
  *                after  `vpage_offset'  pages  at  the  end  of `self'
@@ -1442,7 +1442,7 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
  * as well  as  guaranty that  the  part  is either  INCORE  or  LOCKED.
  * Alternatively, they may also use this function when `!isshared(self)'
  * HINT: The easiest way to ensure this is through
- *       use of `vm_datapart_lockread_setcore()'
+ *       use  of  `vm_datapart_lockread_setcore()'
  * @param: vpage_offset: The offset of the page to load.
  *                       The caller must ensure that this is `< vm_datapart_numvpages(self)'
  * @param: pchanged: [IN]  If `true', mark the associated page as changed, instead of initialized.
@@ -2159,8 +2159,8 @@ struct vm_node {
 	uintptr_half_t              vn_flags;  /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] VM Node flags (Set of `VM_FLAG_F*'). */
 	struct vm                  *vn_vm;     /* [1..1][const] The associated VM */
 	REF struct vm_datapart     *vn_part;   /* [0..1][lock(vn_vm->v_treelock)][const_if(VM_NODE_FLAG_HINTED || VM_NODE_FLAG_KERNPRT)]
-	                                        * NOTE:  When  `vn_block'  is  `NULL',  then  this  field  is  _required_  to  be `NULL'
-	                                        * The mapped  part (or  `NULL'  if this  VM Node  describes  a reserved  memory  region) */
+	                                        * NOTE:  When `vn_block' is `NULL', then this  field is _required_ to be  `NULL'
+	                                        * The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
 	REF struct vm_datablock    *vn_block;  /* [0..1][const] The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
 	REF struct path            *vn_fspath; /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct directory_entry *vn_fsname; /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
@@ -2311,8 +2311,8 @@ struct vm {
 	                                             *          with a reference counter of ZERO(0)! */
 	struct atomic_rwlock       v_tasklock;      /* Lock for `v_tasks' */
 	WEAK REF struct task      *v_deltasks;      /* [0..1][CHAIN(key:KEY_task__next)]
-	                                             * Chain   of   tasks   that   are   pending   deletion   from   `v_tasks',
-	                                             * as   well  as   follow-up  `heap_free()'   of  the   task  in  question.
+	                                             * Chain of tasks  that are pending  deletion from  `v_tasks',
+	                                             * as well as follow-up `heap_free()' of the task in question.
 	                                             * NOTE: All other components of the task will have already been destroyed. */
 	struct vm_node             v_kernreserve;   /* A special RESERVED-like node that  is used by user-space  VMs
 	                                             * to  cover the entire kernel-space, preventing user-space from
@@ -2999,8 +2999,8 @@ NOTHROW(FCALL vm_isused)(struct vm *__restrict self,
  * NOTE: For a valid  usage example of  this function, you  may look at  the implementation  of
  *       the  `vm_datapart_(read|write)()' function pair,  which uses it  in order to determine
  *       the number of bytes that must be processed using `vm_datapart_(read|write)_buffered()'
- * @param: for_writing: When true, make sure that memory within the associated gets
- *                      faulted such that copy-on-write operations are carried out.
+ * @param: for_writing: When true, make sure that  memory within the associated  gets
+ *                      faulted  such that copy-on-write  operations are carried out.
  *                      Otherwise, only make  sure that memory  from the given  range
  *                      can be read from (though again: even this is only to be taken
  *                      as  a hint. - This function is  allowed to just do nothing if
@@ -3095,8 +3095,8 @@ vm_lock_and_unshare_datapart_for_writing(struct vm *__restrict self,
                                          bool *pdid_unshare);
 
 
-/* Sync  changes  made  to  file  mappings  within  the  given address
- * range   with  on-disk  file  images.  (s.a.  `vm_datablock_sync()')
+/* Sync changes made to file mappings within the given  address
+ * range with on-disk file images. (s.a. `vm_datablock_sync()')
  * NOTE: Memory ranges that aren't actually mapped are simply ignored.
  * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
 FUNDEF u64 FCALL
@@ -3405,8 +3405,8 @@ NOTHROW(vm_kernel_locked_operation)(T *__restrict obj,
 #endif /* __cplusplus */
 
 
-/* List  of   callbacks  that   should  be   invoked  after   vm_exec()
- * These  are  called alongside  stuff  like `handle_manager_cloexec()'
+/* List  of  callbacks  that  should  be  invoked  after  vm_exec()
+ * These are called alongside stuff like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_MMAN', and is never `&vm_kernel' */
 DATDEF CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks;
 /* VM initialization/finalization callbacks. */

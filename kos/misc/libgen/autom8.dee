@@ -750,8 +750,14 @@ reflow_normal_block:
 				if (lineLenMax < l)
 					lineLenMax = l;
 			}
-			if (lineLength < 0)
+			if (lineLength < 0) {
+				/* TODO: If  it's possible to  reduce `lineLenMax' without having
+				 *       to introduce additional  comment lines,  emit a  warning
+				 *       to notify the user that they should, and how they should
+				 *       move around comment text in order to make the block more
+				 *       compact! */
 				lineLength = lineLenMax;
+			}
 			local lastLine = currentBlock.last;
 			local lastLineLen = shortestPossibleLightLength(lastLine);
 			if ((lastLineLen == lineLenMin && #currentBlock > 2) ||
@@ -949,7 +955,11 @@ function autom8File(filename: string) {
 	local oldBytes;
 	try {
 		oldBytes = File.open(filename, "r").read();
-		parser.text = trimTrailingSpaces(oldBytes.decode("utf-8"));
+		try {
+			parser.text = trimTrailingSpaces(oldBytes.decode("utf-8"));
+		} catch (UnicodeDecodeError from errors) {
+			parser.text = trimTrailingSpaces(oldBytes.decode("latin-1"));
+		}
 	} catch (...) {
 		print File.stderr: ("Error while loading file:", repr filename);
 		throw;
@@ -981,7 +991,7 @@ function autom8File(filename: string) {
 }
 
 global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({
-	"h", "hh", "c", "inl", "dee", "sh", "S", "def"
+	"h", "hh", "c", "inl", "dee", "sh", "S", "def", "ld", "sources"
 });
 
 function autom8FileWithWildcard(filename: string) {

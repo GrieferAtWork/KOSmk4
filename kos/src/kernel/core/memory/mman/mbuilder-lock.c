@@ -374,7 +374,7 @@ mbuilder_reflow_filemap_or_unlock(struct mbuilder *__restrict self,
 	if (mbnode_is_continuous(fmnode)) {
 		/* TODO: Must check whatever'll eventually end up being done by
 		 *       `mfile_map_reflow_or_unlock()' when the `MAP_POPULATE'
-		 *       (here: `fmnode->mbn_flags & MBNODE_F_POPULATE')   flag
+		 *       (here: `fmnode->mbn_flags & MBNODE_F_POPULATE') flag
 		 *       was set. */
 		return true;
 	}

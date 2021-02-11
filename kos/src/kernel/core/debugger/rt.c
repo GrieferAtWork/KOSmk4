@@ -57,7 +57,7 @@ PUBLIC ATTR_DBGBSS struct task *dbg_current = NULL;
 
 /* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
  *        Set to non-NULL before `dbg_active' becomes `true', and set
- *        to `NULL' before `dbg_active' becomes `false' */
+ *        to   `NULL'    before    `dbg_active'    becomes    `false' */
 DATDEF ATTR_DBGBSS struct cpu *dbg_cpu_ ASMNAME("dbg_cpu");
 PUBLIC ATTR_DBGBSS struct cpu *dbg_cpu_ = NULL;
 

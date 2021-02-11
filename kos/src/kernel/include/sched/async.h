@@ -61,7 +61,7 @@ INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
 struct async_worker_callbacks {
 	/* [1..1] Poll-callback.
 	 * Test  for  available  work  (if  available,  return `true'),
-	 * else: connect to the appropriate signals that get  broadcast
+	 * else: connect  to the appropriate signals that get broadcast
 	 * when work does become available, and finally test once again
 	 * for  work being available (and also return `true' if this is
 	 * the  case), in order  to prevent the  race condition of work

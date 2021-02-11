@@ -752,9 +752,9 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 
 
 
-/* Execute  the   CFI  expression   loaded  into   the  given   unwind-emulator   `SELF'.
- * Upon  success,  `SELF->ue_stacksz'   will  have   been  updated  to   the  new   stack
- * size,  allowing  the  caller  to  read   the  expression's  return  values  from   it.
+/* Execute the CFI expression loaded into the given unwind-emulator  `SELF'.
+ * Upon  success, `SELF->ue_stacksz' will have been updated to the new stack
+ * size, allowing the caller to read the expression's return values from it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
  *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'

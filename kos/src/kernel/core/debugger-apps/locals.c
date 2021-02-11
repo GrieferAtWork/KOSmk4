@@ -211,7 +211,7 @@ again:
 		dbg_putc(')');
 		if (error == UNWIND_EMULATOR_NO_FUNCTION) {
 			/* `UNWIND_EMULATOR_NO_FUNCTION' means that the variable is undefined
-			 * for the current source location, which happens when the compiler
+			 * for the current source location,  which happens when the  compiler
 			 * decides to optimize the variable away before its scope ends. */
 			dbg_print(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_LIGHT_GRAY,
 			                              ANSITTY_CL_MAROON,

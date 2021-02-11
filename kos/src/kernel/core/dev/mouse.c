@@ -538,7 +538,7 @@ mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK
 
 
 /* Generate mouse input packets
- * Note that when generating event packets, the motion
+ * Note  that when generating event packets, the motion
  * packets should always be created before other events */
 PUBLIC bool KCALL
 mouse_device_motion(struct mouse_device *__restrict self,
@@ -732,11 +732,11 @@ NOTHROW(KCALL mouse_device_hwheel_nopr)(struct mouse_device *__restrict self,
 
 
 /* Initialize/finalize the given mouse device.
- * NOTE: Drivers that override the `ct_fini' operator of a given mouse
+ * NOTE: Drivers that override  the `ct_fini' operator  of a given  mouse
  *       must ensure that `mouse_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by mouse,
- *       get initialized by `mouse_device_init()', and should not be
+ *       get  initialized by `mouse_device_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl
@@ -916,7 +916,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 			was_clamped = true;
 		}
 		/* If the cursor position was clamped, and we're in ABS mouse mode, force
-		 * the creation of a sequence of motion packets in order to update the
+		 * the creation of a  sequence of motion packets  in order to update  the
 		 * clamped, absolute mouse position. */
 		if (was_clamped && (ATOMIC_READ(me->md_flags) & MOUSE_DEVICE_FLAG_GENABS))
 			mouse_device_do_motion_nopr_locked(me, 0, 0);

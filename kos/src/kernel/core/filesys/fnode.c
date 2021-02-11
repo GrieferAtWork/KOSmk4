@@ -36,7 +36,7 @@
 DECL_BEGIN
 
 /* Mandatory callback for all types derived from `struct fnode',
- * for use with `mf_ops->mo_changed'. MUST NOT BE OVERWRITTEN! */
+ * for  use with `mf_ops->mo_changed'.  MUST NOT BE OVERWRITTEN! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
                                uintptr_t old_flags,
@@ -58,12 +58,12 @@ NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
 		                             next, self));
 		if (next == NULL) {
 			/* First changed node was added to the superblock.
-			 * ->  */
+			 * -> */
 		}
 	}
 }
 
-/* File-node destroy callback. Must be set in `mo_destroy',
+/* File-node  destroy callback. Must be set in `mo_destroy',
  * but may be overwritten by sub-classes, in which case this
  * function must be called as the last thing done within the
  * sub-class destroy-operator. */

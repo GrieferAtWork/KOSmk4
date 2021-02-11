@@ -65,7 +65,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			byte_t *addr;
 			addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
 			/* If the interrupt originated for user-space, make sure to validate
-			 * the address bounds structure, so-as not to leak kernel memory. */
+			 * the address bounds  structure, so-as not  to leak kernel  memory. */
 			if (icpustate_isuser(state))
 				validate_readable(addr, (flags & EMU86_F_OP16) ? 4 : 8);
 			if (flags & EMU86_F_OP16) {
@@ -83,8 +83,8 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 		}
 		if ((s32)bound_index >= (s32)bound_min &&
 		    (s32)bound_index <= (s32)bound_max) {
-			/* Race condition: the CPU read bad bounds, but some other thread
-			 *                 must have modified the bounds before we got to
+			/* Race condition: the CPU read bad bounds, but some other  thread
+			 *                 must have modified the bounds before we got  to
 			 *                 read them. - Just ignore this and act as though
 			 *                 this exception has never gotten raised! */
 			icpustate_setpc(state, (uintptr_t)pc);

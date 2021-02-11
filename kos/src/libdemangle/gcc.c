@@ -180,19 +180,23 @@ err:
 PRIVATE char const *CC
 itanium_demangle_unqualified_name(struct itanium_printer *self,
                                   char const *__restrict text) {
-	/* <unqualified-name> ::= <operator-name> [<abi-tags>]
+	/* ```
+	 * <unqualified-name> ::= <operator-name> [<abi-tags>]
 	 *                    ::= <ctor-dtor-name>
 	 *                    ::= <source-name>
 	 *                    ::= <unnamed-type-name>
-	 *                    ::= DC <source-name>+ E      # structured binding declaration */
+	 *                    ::= DC <source-name>+ E      # structured binding declaration
+	 * ``` */
 	switch (text[0]) {
 
 	case 'a':
-		/* N        # &=
+		/* ```
+		 * N        # &=
 		 * S        # =
 		 * a        # &&
 		 * d        # & (unary)
-		 * n        # & */
+		 * n        # &
+		 * ``` */
 		switch (text[1]) {
 		case 'N':
 			text += 2;
@@ -233,10 +237,12 @@ check_abi_tags:
 		}
 		break;
 	case 'c':
-		/* l        # ()
+		/* ```
+		 * l        # ()
 		 * m        # ,
 		 * o        # ~
-		 * v <type> # (cast) */
+		 * v <type> # (cast)
+		 * ``` */
 		switch (text[1]) {
 		case 'l':
 			text += 2;
@@ -260,11 +266,13 @@ check_abi_tags:
 		goto check_abi_tags;
 
 	case 'd':
-		/* V        # /=
+		/* ```
+		 * V        # /=
 		 * a        # delete[]
 		 * e        # * (unary)
 		 * l        # delete
-		 * v        # /  */
+		 * v        # /
+		 * ``` */
 		switch (text[1]) {
 		case 'V':
 			text += 2;
@@ -291,9 +299,11 @@ check_abi_tags:
 		goto check_abi_tags;
 
 	case 'e':
-		/* O        # ^=
+		/* ```
+		 * O        # ^=
 		 * o        # ^
-		 * q        # == */
+		 * q        # ==
+		 * ``` */
 		switch (text[1]) {
 		case 'O':
 			text += 2;
@@ -311,8 +321,10 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'g':
-		/* e        # >=
-		 * t        # > */
+		/* ```
+		 * e        # >=
+		 * t        # >
+		 * ``` */
 		switch (text[1]) {
 		case 'e':
 			text += 2;
@@ -325,7 +337,10 @@ check_abi_tags:
 		default: goto err;
 		}
 		goto check_abi_tags;
-	case 'i': // x        # []
+	case 'i':
+		/* ```
+		 * x        # []
+		 * ``` */
 		switch (text[1]) {
 		case 'x':
 			text += 2;
@@ -335,11 +350,13 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'l':
-		/* S        # <<=
+		/* ```
+		 * S        # <<=
 		 * e        # <=
 		 * i <source-name>          # operator ""
 		 * s        # <<
-		 * t        # < */
+		 * t        # <
+		 * ``` */
 		switch (text[1]) {
 		case 'S':
 			text += 2;
@@ -367,11 +384,13 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'm':
-		/* I        # -=
+		/* ```
+		 * I        # -=
 		 * L        # *=
 		 * i        # -
 		 * l        # *
-		 * m        # -- (postfix in <expression> context) */
+		 * m        # -- (postfix in <expression> context)
+		 * ``` */
 		switch (text[1]) {
 		case 'I':
 			text += 2;
@@ -397,11 +416,13 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'n':
-		/* a        # new[]
+		/* ```
+		 * a        # new[]
 		 * e        # !=
 		 * g        # - (unary)
 		 * t        # !
-		 * w        # new */
+		 * w        # new
+		 * ``` */
 		switch (text[1]) {
 		case 'a':
 			text += 2;
@@ -427,9 +448,11 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'o':
-		/* R        # |=
+		/* ```
+		 * R        # |=
 		 * o        # ||
-		 * r        # | */
+		 * r        # |
+		 * ``` */
 		switch (text[1]) {
 		case 'R':
 			text += 2;
@@ -447,12 +470,14 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'p':
-		/* L        # +=
+		/* ```
+		 * L        # +=
 		 * l        # +
 		 * m        # ->*
 		 * p        # ++ (postfix in <expression> context)
 		 * s        # + (unary)
-		 * t        # -> */
+		 * t        # ->
+		 * ``` */
 		switch (text[1]) {
 		case 'L':
 			text += 2;
@@ -481,7 +506,10 @@ check_abi_tags:
 		default: goto err;
 		}
 		goto check_abi_tags;
-	case 'q': // u        # ?
+	case 'q':
+		/* ```
+		 * u        # ?
+		 * ``` */
 		switch (text[1]) {
 		case 'u':
 			text += 2;
@@ -491,10 +519,12 @@ check_abi_tags:
 		}
 		goto check_abi_tags;
 	case 'r':
-		/* M        # %=
+		/* ```
+		 * M        # %=
 		 * S        # >>=
 		 * m        # %
-		 * s        # >> */
+		 * s        # >>
+		 * ``` */
 		switch (text[1]) {
 		case 'M':
 			text += 2;
@@ -515,7 +545,10 @@ check_abi_tags:
 		default: goto err;
 		}
 		goto check_abi_tags;
-	case 's': // s        # <=>
+	case 's':
+		/* ```
+		 * s        # <=>
+		 * ``` */
 		switch (text[1]) {
 		case 's':
 			text += 2;
@@ -524,7 +557,10 @@ check_abi_tags:
 		default: goto err;
 		}
 		goto check_abi_tags;
-	case 'v': //  <digit> <source-name>   # vendor extended operator
+	case 'v':
+		/* ```
+		 *  <digit> <source-name>   # vendor extended operator
+		 * ``` */
 		if (text[1] < '0' || text[1] > '9')
 			goto err;
 		text += 2;
@@ -583,8 +619,10 @@ check_abi_tags:
 		break;
 
 	case 'U':
-		/* <unnamed-type-name> ::= Ut [ <non-negative<number>> ] _
-		 *                     ::= Ul <lambda-sig> E [ <non-negative<number>> ] _ */
+		/* ```
+		 * <unnamed-type-name> ::= Ut [ <non-negative<number>> ] _
+		 *                     ::= Ul <lambda-sig> E [ <non-negative<number>> ] _
+		 * ``` */
 		if (text[1] == 't') {
 			text += 2;
 			itanium_print(self, "<anonymous type>");
@@ -633,7 +671,8 @@ err:
 PRIVATE char const *CC
 itanium_demangle_type(struct itanium_printer *self,
                       char const *__restrict text) {
-	/* <type> ::= <builtin-type>
+	/* ```
+	 * <type> ::= <builtin-type>
 	 *        ::= [<extended-qualifier>*] [<CV-qualifiers>] <type>                                         # <qualified-type>
 	 *        ::= [<CV-qualifiers>] [<exception-spec>] [Dx] F [Y] <bare-function-type> [<ref-qualifier>] E # <function-type>
 	 *        ::= <class-enum-type>
@@ -648,7 +687,8 @@ itanium_demangle_type(struct itanium_printer *self,
 	 *        ::= C <type>        # complex pair (C99)
 	 *        ::= G <type>        # imaginary (C99)
 	 *        ::= Dp <type>       # pack expansion (C++0x)
-	 *        ::= <substitution>  # See Compression below  */
+	 *        ::= <substitution>  # See Compression below
+	 * ``` */
 	switch (text[0]) {
 
 	case 'v':
@@ -736,7 +776,8 @@ itanium_demangle_type(struct itanium_printer *self,
 		itanium_print(self, "<ellipsis>");
 		break; /* # ellipsis */
 	case 'D':
-		/* d # IEEE 754r decimal floating point (64 bits)
+		/* ```
+		 * d # IEEE 754r decimal floating point (64 bits)
 		 * e # IEEE 754r decimal floating point (128 bits)
 		 * f # IEEE 754r decimal floating point (32 bits)
 		 * h # IEEE 754r half-precision floating point (16 bits)
@@ -745,7 +786,8 @@ itanium_demangle_type(struct itanium_printer *self,
 		 * s # char16_t
 		 * a # auto
 		 * c # decltype(auto)
-		 * n # std::nullptr_t (i.e., decltype(nullptr)) */
+		 * n # std::nullptr_t (i.e., decltype(nullptr))
+		 * ``` */
 		switch (text[1]) {
 
 		case 'd':
@@ -868,13 +910,18 @@ itanium_demangle_type(struct itanium_printer *self,
 		}
 		break;
 
-	case 'u': /*  <source-name>        # vendor extended type */
+	case 'u':
+		/* ```
+		 *  <source-name>        # vendor extended type
+		 * ``` */
 		++text;
 		text = itanium_demangle_source_name(self, text);
 		break;
 
-	/* <extended-qualifier> ::= U <source-name> [<template-args>] # vendor extended type qualifier */
 	case 'U': {
+		/* ```
+		 * <extended-qualifier> ::= U <source-name> [<template-args>] # vendor extended type qualifier
+		 * ``` */
 		char const *name_start;
 		char const *template_args_start;
 		++text;
@@ -899,9 +946,11 @@ itanium_demangle_type(struct itanium_printer *self,
 			goto err;
 	}	break;
 
-	/* <CV-qualifiers>      ::= [r] [V] [K]                       # restrict (C99), volatile, const */
 	{
 		char const *qual;
+		/* ```
+		 * <CV-qualifiers>      ::= [r] [V] [K]                       # restrict (C99), volatile, const
+		 * ``` */
 		__IF0 { case 'r': qual = " restrict"; }
 		__IF0 { case 'V': qual = " volatile"; }
 		__IF0 { case 'K': qual = " const"; }
@@ -912,7 +961,9 @@ itanium_demangle_type(struct itanium_printer *self,
 	}	break;
 
 	case 'F':
-		/* F [Y] <bare-function-type> [<ref-qualifier>] E # <function-type> */
+		/* ```
+		 * F [Y] <bare-function-type> [<ref-qualifier>] E # <function-type>
+		 * ``` */
 		++text;
 		if (text[0] == 'Y') {
 			itanium_print(self, "extern \"C\" ");
@@ -993,8 +1044,10 @@ itanium_demangle_type(struct itanium_printer *self,
 		break;
 
 	case 'A':
-		/* <array-type> ::= A <positive dimension<number>> _ <element<type>>
-		 *              ::= A [<dimension expression>] _ <element<type>> */
+		/* ```
+		 * <array-type> ::= A <positive dimension<number>> _ <element<type>>
+		 *              ::= A [<dimension expression>] _ <element<type>>
+		 * ``` */
 		++text;
 		if (*text == '_') {
 			text = itanium_demangle_type(self, text + 1);
@@ -1102,7 +1155,9 @@ itanium_demangle_expr_primary(struct itanium_printer *self,
 PRIVATE char const *CC
 itanium_demangle_template_args(struct itanium_printer *self,
                                char const *__restrict text) {
-	/* <template-args> :: = I <template-arg>+ E */
+	/* ```
+	 * <template-args> :: = I <template-arg>+ E
+	 * ``` */
 	if unlikely(text[0] != 'I')
 		goto err;
 	++text;
@@ -1129,11 +1184,12 @@ err:
 PRIVATE char const *CC
 itanium_demangle_template_arg(struct itanium_printer *self,
                               char const *__restrict text) {
-	/* <template-arg> ::= <type>                                             # type or template
+	/* ```
+	 * <template-arg> ::= <type>                                             # type or template
 	 *                ::= X <expression> E                                   # expression
 	 *                ::= <expr-primary>                                     # simple expressions
 	 *                ::= J <template-arg>* E                                # argument pack
-	 */
+	 * ``` */
 	switch (*text) {
 
 	case 'X':
@@ -1180,12 +1236,13 @@ err:
 PRIVATE char const *CC
 itanium_demangle_name(struct itanium_printer *self,
                       char const *__restrict text) {
-	/* <name> ::= <nested-name>
+	/* ```
+	 * <name> ::= <nested-name>
 	 *        ::= <unscoped-name>
 	 *        ::= <unscoped-template-name> <template-args>
 	 *        ::= <local-name>          # See Scope Encoding below
 	 *        ::= St <unqualified-name> # std::
-	 */
+	 * ``` */
 again:
 	switch (text[0]) {
 
@@ -1197,12 +1254,13 @@ again:
 		goto err;
 
 	case 'N':
-		/* <nested-name> ::= N [<CV-qualifiers>] [<ref-qualifier>] <prefix> <unqualified-name> E
+		/* ```
+		 * <nested-name> ::= N [<CV-qualifiers>] [<ref-qualifier>] <prefix> <unqualified-name> E
 		 *               ::= N [<CV-qualifiers>] [<ref-qualifier>] <template-prefix> <template-args> E
 		 * <CV-qualifiers>      ::= [r] [V] [K]  # restrict (C99), volatile, const
 		 * <ref-qualifier>      ::= R            # & ref-qualifier
 		 *                      ::= O            # && ref-qualifier
-		 */
+		 * ``` */
 		++text;
 		if (*text == 'r') {
 			itanium_print(self, "restrict ");
@@ -1233,7 +1291,9 @@ again:
 			++text;
 		} else if (itanium_demangle_template_prefix(NULL, text)) {
 			text = itanium_demangle_template_prefix(self, text);
-			/* <template - args> :: = I <template-arg>+ E */
+			/* ```
+			 * <template - args> :: = I <template-arg>+ E
+			 * ``` */
 			if unlikely(!text || text[0] != 'I')
 				goto err;
 			itanium_print(self, "<");
@@ -1260,9 +1320,11 @@ again:
 		break;
 
 	case 'Z':
-		/* <local-name> ::= Z <function<encoding>> E <entity<name>> [<discriminator>]
+		/* ```
+		 * <local-name> ::= Z <function<encoding>> E <entity<name>> [<discriminator>]
 		 *              ::= Z <function<encoding>> E s [<discriminator>]
-		 *              ::= Z <function<encoding>> Ed [ <parameter<number>> ] _ <entity<name>> */
+		 *              ::= Z <function<encoding>> Ed [ <parameter<number>> ] _ <entity<name>>
+		 * ``` */
 		++text;
 		text = itanium_demangle_encoding(self, text);
 		if unlikely(!text || *text != 'E')
@@ -1293,8 +1355,10 @@ again:
 				goto err;
 			/* Check for a discriminator */
 check_discriminator:
-			/* <discriminator> ::= _ <non-negative<number>>      # when number < 10
-			 *                 ::= __ <non-negative<number>> _   # when number >= 10 */
+			/* ```
+			 * <discriminator> ::= _ <non-negative<number>>      # when number < 10
+			 *                 ::= __ <non-negative<number>> _   # when number >= 10
+			 * ``` */
 			if (text[0] == '_') {
 				size_t num;
 				++text;
@@ -1326,7 +1390,8 @@ err:
 PRIVATE char const *CC
 itanium_demangle_encoding(struct itanium_printer *self,
                           char const *__restrict text) {
-	/* <encoding> ::= <function<name>> <bare-function-type>
+	/* ```
+	 * <encoding> ::= <function<name>> <bare-function-type>
 	 *            ::= <data<name>>
 	 *            ::= TV <type>        # virtual table
 	 *            ::= TT <type>        # VTT structure (construction vtable index)
@@ -1346,7 +1411,7 @@ itanium_demangle_encoding(struct itanium_printer *self,
 	 *               ::= v <v-offset> _
 	 * <nv-offset> ::= <offset<number>>                              # non-virtual base override
 	 * <v-offset>  ::= <offset<number>> _ <virtual offset<number>>   # virtual base override, with vcall offset
-	 */
+	 * ``` */
 again:
 	if (text[0] == 'T') {
 		switch (text[1]) {
@@ -1503,8 +1568,10 @@ again:
 			goto err;
 		}
 	} else {
-		/* <encoding> ::= <function<name>> <bare-function-type>
-		 *            ::= <data<name>> */
+		/* ```
+		 * <encoding> ::= <function<name>> <bare-function-type>
+		 *            ::= <data<name>>
+		 * ``` */
 		text = itanium_demangle_name(self, text);
 		if unlikely(!text)
 			goto err;

@@ -25,13 +25,13 @@
 
 DECL_BEGIN
 
-/* AT scancode mappings for kos's linux-compatible, device-
- * independent keycodes (aka. `KEY_*' from <kos/keyboard.h>)
+/* AT scancode mappings  for kos's linux-compatible,  device-
+ * independent keycodes (aka. `KEY_*' from  <kos/keyboard.h>)
  * Only KEY_* codes below 256 can be encoded as AT scancodes.
  *
  * AT scancode bytes are encoded in `at_scancodes[KEY_*] & 0x7f',
- * and AT scancode sequences that should be prefixed by a
- * second byte have that byte encoded as a non-zero value in
+ * and  AT  scancode  sequences  that  should  be  prefixed  by a
+ * second byte  have that  byte encoded  as a  non-zero value  in
  * `at_scancodes[KEY_*] & 0xff'.
  * The value of `at_scancodes[KEY_*] & 0x80' is reserved and is
  * currently always 0. */

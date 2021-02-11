@@ -296,13 +296,14 @@ END(__i386_atomic64_fetchxor)
 
 
 .section .text.cold
-/* Because gcc refuses to properly compile the inline-assembly wrappers
+/* Because gcc  refuses  to  properly compile  the  inline-assembly  wrappers
  * when not building with __OPTIMIZE__, we need to provide a C-ABI compatible
  * wrapper. (ugh...) */
 .cfi_startproc
 /* Atomically compare-exchange a 64-bit data word from `self' */
 PUBLIC_FUNCTION(atomic64_cmpxch_val)
 	/* >> __i386_atomic64_cmpxch
+	 * ```
 	 * IN:       4(%esp) = self
 	 *           8(%esp) = (oldval & 0x00000000ffffffff)
 	 *          12(%esp) = (oldval & 0xffffffff00000000) >> 32
@@ -311,7 +312,8 @@ PUBLIC_FUNCTION(atomic64_cmpxch_val)
 	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0x00000000ffffffff)
 	 *          %edx = (u32)(REAL_OLD_VALUE & 0xffffffff00000000) >> 32
 	 *          %eflags.ZF = (REAL_OLD_VALUE == oldval) ? 1 : 0
-	 * CLOBBER: %ecx, %eflags\ZF */
+	 * CLOBBER: %ecx, %eflags\ZF
+	 * ``` */
 	pushl_cfi_r %edi
 	pushl_cfi_r %ebx
 	movl   (8 +  4)(%esp), %edi /* (atomic64_t *)self */

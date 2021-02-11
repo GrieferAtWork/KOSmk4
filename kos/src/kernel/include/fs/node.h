@@ -200,7 +200,7 @@ struct inode_type {
 		 *    `BD_ASYNC_COMPLETED_SUCCESS' before actually returning.
 		 *  - Or by only invoking  `completed' with something other  than
 		 *    `BD_ASYNC_COMPLETED_SUCCESS', which can also be done at any
-		 *    point after this  function has  already returned  normally.
+		 *    point after this function has already returned normally.
 		 *    I.e.: It is done asynchronously!
 		 * NOTE: Don't call  `aio_multihandle_done(aio)'  from  within  these  callbacks!
 		 *       It is the responsibility of whoever declared the multihandle to indicate

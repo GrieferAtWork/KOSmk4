@@ -226,7 +226,7 @@ NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self) 
 	heap_free(FS_HEAP, self, self->de_heapsize, FS_GFP);
 }
 
-/* Allocate a new directory entry.
+/* Allocate a  new directory  entry.
  * The caller must still initialize:
  *   - de_next
  *   - de_bypos
@@ -297,7 +297,7 @@ NOTHROW(KCALL inode_recent_getcur)(void) {
 }
 
 
-/* Indicate that `self' has been used recently, allowing the INode to be cached
+/* Indicate that  `self' has  been used  recently,  allowing the  INode to  be  cached
  * such that it will remain allocated for a while, even when not referenced elsewhere. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL inode_recent)(struct inode *__restrict self) {
@@ -671,7 +671,7 @@ inode_loadattr(struct inode *__restrict self)
 
 
 
-/* Assert that the calling thread is allowed to access the given
+/* Assert that the  calling thread  is allowed to  access the  given
  * the specified file, throwing an `E_FSERROR_ACCESS_DENIED' if not.
  * @param: type: Set of `R_OK | W_OK | X_OK' */
 PUBLIC NONNULL((1)) void KCALL
@@ -725,7 +725,7 @@ inode_tryaccess(struct inode *__restrict self, unsigned int type)
 
 
 
-/* Collect stat-information about the given INode `self', implementing
+/* Collect  stat-information about the  given INode `self', implementing
  * the behavior of the `stat(2)' system call for INodes, as well as many
  * other handle types, including PATH and FILE objects. */
 PUBLIC NONNULL((1)) void KCALL
@@ -761,9 +761,9 @@ inode_stat(struct inode *__restrict self,
  * and chain the node as part of the associated superblock's list of
  * changed INodes.
  * @param: what:   Set of `INODE_FCHANGED|INODE_FATTRCHANGED',
- *                 of which at least one must be given.
+ *                 of  which  at  least  one  must  be  given.
  * @return: true:  Successfully marked the INode for having been changed,
- *                 or the node had already been scheduled as having been
+ *                 or the node had already been scheduled as having  been
  *                 changed.
  * @return: false: The `INODE_FDELETED' bit has been set for `self' */
 PUBLIC NOBLOCK NONNULL((1)) bool
@@ -915,9 +915,9 @@ inode_chtime(struct inode *__restrict self,
 }
 
 /* Change permissions, SUID/SGID and the sticky
- * bit of the given INode (flags mask: 07777)
+ * bit  of the given  INode (flags mask: 07777)
  * The new file mode is calculated as `(old_mode & perm_mask) | perm_flag',
- * before being masked by what the underlying filesystem is capable of
+ * before being  masked by  what the  underlying filesystem  is capable  of
  * representing.
  * @return: * : The old file mode
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
@@ -946,15 +946,15 @@ inode_chmod(struct inode *__restrict self,
 			/* Permission restrictions:
 			 *   - `i_fileuid' must match the caller's fsuid, or the caller must have `CAP_FOWNER'
 			 *   - If `i_filegid' doesn't relate to the caller, and the caller doesn't
-			 *     have `CAP_FSETID', then the `S_ISGID' bit is always turned off.
+			 *     have  `CAP_FSETID', then  the `S_ISGID'  bit is  always turned off.
 			 * That is all. - Every user's allowed to set the SETUID bit, since they can only do this
-			 * for files they own, and in doing this, only allow programs to impersonate that user!
+			 * for  files they own, and in doing this,  only allow programs to impersonate that user!
 			 */
 			if (self->i_fileuid != cred_getfsuid())
 				require(CAP_FOWNER);
 			if ((perm_flag & S_ISGID) || (perm_mask & S_ISGID)) {
 				/* The Set-gid bit can must be turned off (i.e. cannot be turned on/or left on)
-				 * when the caller isn't apart of the group associated with `self->i_filegid' */
+				 * when the caller isn't apart  of the group associated with  `self->i_filegid' */
 				if (!capable(CAP_FSETID) &&
 				    !cred_isfsgroupmember(self->i_filegid)) {
 					perm_mask &= ~S_ISGID;
@@ -1038,8 +1038,8 @@ inode_chown(struct inode *__restrict self,
 #endif /* CONFIG_EVERYONE_IS_ROOT */
 			new_mode = self->i_filemode;
 			if (new_mode & 0111) {
-				/* When changing the owner or group of an executable file,
-				 * then the S_ISUID and S_ISGID bits should be cleared.
+				/* When  changing the  owner or  group of  an executable file,
+				 * then the  S_ISUID  and  S_ISGID  bits  should  be  cleared.
 				 * However, `S_ISGID' is not cleared when `S_IXGRP' isn't set. */
 				mode_t mask;
 				if (new_mode & S_IXGRP) {
@@ -1099,14 +1099,14 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
 	struct superblock *super = self->i_super;
 	unsigned int result;
 	/* Everything that had been changed about the node will be getting synced.
-	 * We must therefor remove the node from the changed list.
+	 * We  must   therefor   remove   the  node   from   the   changed   list.
 	 * NOTE: This must be done now, with the node getting re-added if syncing
 	 *       fails, because the process of removing the node from the changed
 	 *       list is able to cause an E_WOULDBLOCK exception to be thrown. */
 	if (!sync_trywrite(&super->s_changed_lock))
 		return INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED;
 	result = INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_NOTFOUND;
-	/* NOTE: There is a chance that we may not find ourself apart of the changed
+	/* NOTE: There is a chance that we may  not find ourself apart of the  changed
 	 *       list. - This can happen when the superblock itself is also performing
 	 *       a synchronization pass at the moment, in which case we don't actually
 	 *       need to do anything, though should still perform the sync beforehand,
@@ -1117,7 +1117,7 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
 		if (last == self) {
 			*piter = self->i_changed_next; /* Unlink. */
 			/* Remember that we unlinked ourself in case the sync
-			 * fails and we have to re-add ourself as changed. */
+			 * fails and we  have to re-add  ourself as  changed. */
 			result = INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED;
 #ifndef NDEBUG
 			memset(&self->i_changed_next, 0xcc, sizeof(void *));
@@ -1149,7 +1149,7 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
  * NOTE: This function is allowed to be called after a node has been
  *       deleted, though only if
  * @param: what: Set of `INODE_FCHANGED|INODE_FATTRCHANGED',
- *               of which at least one must be given.
+ *               of  which  at  least  one  must  be  given.
  * @return: * :  Set of `INODE_FCHANGED|INODE_FATTRCHANGED' describing what was actually synced
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1237,7 +1237,7 @@ again_do_remove_from_super:
 		error = inode_try_remove_from_superblock_changed(self);
 		if unlikely(error == INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED) {
 			/* Failed to remove the INode. - Must blocking-lock the superblock,
-			 * then try to acquire a lock to the INode once again in order to
+			 * then try to acquire a lock to  the INode once again in order  to
 			 * re-check that the node still hasn't been modified. */
 			sync_endwrite(self);
 			sync_write(&self->i_super->s_changed_lock);
@@ -1245,7 +1245,7 @@ again_do_remove_from_super:
 			sync_write(self);
 			if (!(ATOMIC_READ(self->i_flags) & (INODE_FCHANGED | INODE_FATTRCHANGED)))
 				goto again_do_remove_from_super; /* The node is still unchanged */
-			/* The node has once again changed in the mean time... (just
+			/* The  node has once  again changed in  the mean time... (just
 			 * leave it as part of the superblock's chain of changed nodes) */
 		}
 		if (error == INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED)
@@ -1258,8 +1258,8 @@ done:
 
 
 
-/* Ensure that the given symbolic-link INode has been loaded.
- * This function is a no-op when `self->sl_text != NULL' upon entry,
+/* Ensure  that  the  given  symbolic-link  INode  has  been  loaded.
+ * This function is a no-op when `self->sl_text != NULL' upon  entry,
  * and guaranties that `self->sl_text' will be non-NULL upon success.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1292,9 +1292,9 @@ symlink_node_load(struct symlink_node *__restrict self)
 }
 
 
-/* Wrapper around `symlink_node_load()' for reading the text of a symbolic
+/* Wrapper around `symlink_node_load()' for reading the text of a  symbolic
  * link into a user-supplied user-space buffer, whilst returning the number
- * of required bytes of memory (EXCLUDING a trailing NUL-character, which
+ * of required bytes of memory  (EXCLUDING a trailing NUL-character,  which
  * this function will _NOT_ append to the supplied buffer!) */
 PUBLIC NONNULL((1)) size_t KCALL
 symlink_node_readlink(struct symlink_node *__restrict self,
@@ -1358,7 +1358,7 @@ NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict sel
 	assert(sync_writing(self));
 	new_mask = (self->d_mask >> 1);
 	/* Don't further reduce the hash size if we're already
-	 * back to where it would have been originally. */
+	 * back  to  where  it  would  have  been  originally. */
 	if (new_mask < DIRECTORY_DEFAULT_MASK)
 		return;
 	/* Allocate the new directory map. */
@@ -1388,7 +1388,7 @@ NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict sel
 
 
 /* Read the next directory entry from `self' that hasn't been loaded, yet.
- * Return NULL and set the `INODE_FDIRLOADED' flag once the entirety of
+ * Return  NULL and set  the `INODE_FDIRLOADED' flag  once the entirety of
  * the directory has been loaded.
  * NOTE: The caller must be holding a read-lock on `self'.
  * @assume(sync_reading(self));
@@ -1448,20 +1448,20 @@ continue_reading:
 		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 #ifndef NDEBUG
 		/* `rwlock_write()' will have thrown an error if it didn't
-		 *  manage to upgrade the associated R/W-lock atomically.
-		 *  That error will be propagated until the point where
-		 *  the caller originally acquired the first read-lock
+		 *  manage  to upgrade the associated R/W-lock atomically.
+		 *  That error will  be propagated until  the point  where
+		 *  the  caller  originally acquired  the  first read-lock
 		 *  to the node, which will be released, then re-acquired,
 		 *  before we try this whole thing again.
-		 *  In other words: If we get here, we should be able to
+		 *  In other words: If we get here,  we should be able  to
 		 *                  assume that the `rwlock_write()' above
 		 *                  didn't temporarily grant other threads
-		 *                  write-access to the `d_dirend' field. */
+		 *                  write-access to the `d_dirend'  field. */
 		assert(self->d_dirend == entry_start_position);
 		assert(result->de_pos >= entry_start_position &&
 		       result->de_pos < last_directory_position);
 #endif
-		/* Set the partially-loaded flag and the directory
+		/* Set the partially-loaded  flag and the  directory
 		 * end pointer up to which data has now been loaded. */
 		self->d_dirend = last_directory_position;
 		if (!self->d_bypos_end) {
@@ -1472,7 +1472,7 @@ continue_reading:
 			result->de_bypos.ln_next  = NULL;
 		} else if (result->de_pos < self->d_bypos_end->de_pos) {
 			struct directory_entry *insert_after;
-			/* When the directory is being re-loaded after a umount(),
+			/* When the directory is being re-loaded after a  umount(),
 			 * an older entry for this directory entry may still exist,
 			 * or we just have to insert the new entry somewhere else. */
 			insert_after = self->d_bypos_end;
@@ -1578,20 +1578,20 @@ continue_reading:
 		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 #ifndef NDEBUG
 		/* `rwlock_write()' will have thrown an error if it didn't
-		 *  manage to upgrade the associated R/W-lock atomically.
-		 *  That error will be propagated until the point where
-		 *  the caller originally acquired the first read-lock
+		 *  manage  to upgrade the associated R/W-lock atomically.
+		 *  That error will  be propagated until  the point  where
+		 *  the  caller  originally acquired  the  first read-lock
 		 *  to the node, which will be released, then re-acquired,
 		 *  before we try this whole thing again.
-		 *  In other words: If we get here, we should be able to
+		 *  In other words: If we get here,  we should be able  to
 		 *                  assume that the `rwlock_write()' above
 		 *                  didn't temporarily grant other threads
-		 *                  write-access to the `d_dirend' field. */
+		 *                  write-access to the `d_dirend'  field. */
 		assert(self->d_dirend == entry_start_position);
 		assert(result->de_pos >= entry_start_position &&
 		       result->de_pos < last_directory_position);
 #endif
-		/* Set the partially-loaded flag and the directory
+		/* Set the partially-loaded  flag and the  directory
 		 * end pointer up to which data has now been loaded. */
 		self->d_dirend = last_directory_position;
 		if (!self->d_bypos_end) {
@@ -1602,7 +1602,7 @@ continue_reading:
 			result->de_bypos.ln_next  = NULL;
 		} else if (result->de_pos < self->d_bypos_end->de_pos) {
 			struct directory_entry *insert_after;
-			/* When the directory is being re-loaded after a umount(),
+			/* When the directory is being re-loaded after a  umount(),
 			 * an older entry for this directory entry may still exist,
 			 * or we just have to insert the new entry somewhere else. */
 			insert_after = self->d_bypos_end;
@@ -1792,7 +1792,7 @@ read_directory:
 
 /* Same as the function above, but return the entry's self-pointer within the directory node.
  * @param: poneshot_entry:  A storage location for directories implementing the one-shot interface.
- * @return: poneshot_entry: The directory implements the one-shot interface, and the
+ * @return: poneshot_entry: The  directory  implements  the one-shot  interface,  and the
  *                          located directory entry has been stored in `*poneshot_entry'.
  * @return: * :   A reference to the associated INode.
  * @return: NULL: No INode with the given `name' exists.
@@ -1949,7 +1949,7 @@ read_directory:
 
 
 /* Same as `directory_getentry()', but automatically dereference
- * the directory entry to retrieve the associated INode.
+ * the   directory  entry  to  retrieve  the  associated  INode.
  * Additionally, the caller isn't required to already be holding
  * a read-lock for the given directory.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
@@ -2154,11 +2154,11 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
 	uintptr_t old_flags;
 	old_flags = ATOMIC_FETCHOR(self->i_flags, INODE_FDELETED);
 	if (old_flags & (INODE_FCHANGED | INODE_FATTRCHANGED)) {
-		/* The INode is still marked as having changed, so we must try to remove
+		/* The  INode is still marked as having changed, so we must try to remove
 		 * it from the chain of changed INodes. If we fail to do this, it doesn't
 		 * matter:
 		 *  - Error:INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED:
-		 *     - The couldn't acquire a lock to the superblock's `s_changed_lock' chain.
+		 *     - The  couldn't  acquire a  lock  to the  superblock's  `s_changed_lock' chain.
 		 *       In this case, whoever is holding that lock will see that the `INODE_FDELETED'
 		 *       flag has been set when they come around to syncing our now.
 		 *  - Error:INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_NOTFOUND:
@@ -2280,7 +2280,7 @@ again:
 				assert(node->i_filenlink != 0);
 				assert(node->i_super == self->i_super);
 				/* In order to allow for file deletion, the caller needs
-				 * write-access to the containing directory node. */
+				 * write-access  to  the   containing  directory   node. */
 				if (mode & DIRECTORY_REMOVE_FCHKACCESS)
 					inode_access(self, W_OK);
 				if (INODE_ISDIR(node)) {
@@ -2290,7 +2290,7 @@ again:
 					dir = (struct directory_node *)node;
 					if (dir->d_size != 0)
 						THROW(E_FSERROR_DIRECTORY_NOT_EMPTY);
-					/* If the directory hasn't been fully loaded,
+					/* If the  directory  hasn't  been  fully  loaded,
 					 * read one entry to check that it's really empty. */
 					if (!(ATOMIC_READ(dir->i_flags) & INODE_FDIRLOADED)) {
 						if unlikely(!sync_trywrite(dir))
@@ -2427,7 +2427,7 @@ again:
 						if unlikely(!node->i_type->it_file.f_truncate)
 							THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_TRUNC);
 						/* NOTE: No need to worry about deletion/truncation of VM data parts
-						 *       Since the file is going away, nothing needs to be saved! */
+						 *       Since  the file is  going away, nothing  needs to be saved! */
 						(*node->i_type->it_file.f_truncate)(node, 0);
 						node->i_filesize = 0;
 					}
@@ -2601,7 +2601,7 @@ acquire_sourcedir_writelock:
 					/* Check if the source node has been deleted. */
 					inode_check_deleted(source_inode);
 					/* In order to allow for file rename, the caller needs
-					 * write-access to the containing directory nodes. */
+					 * write-access to  the  containing  directory  nodes. */
 					if (mode & DIRECTORY_RENAME_FCHKACCESS) {
 						inode_access(source_directory, W_OK);
 						if (source_directory != target_directory)
@@ -2652,7 +2652,7 @@ acquire_sourcedir_writelock:
 						REF struct inode *target_inode;
 						struct superblock *super = source_inode->i_super;
 						/* Make sure that the source INode is fully synced, so we are safe to remove
-						 * it in case of the `d_rename()' operator returning a new INode. */
+						 * it   in  case  of  the  `d_rename()'  operator  returning  a  new  INode. */
 						inode_sync(source_inode, INODE_FCHANGED | INODE_FATTRCHANGED);
 
 						/* Acquire a write-lock to the associated superblock's file-tree. */
@@ -2725,9 +2725,9 @@ acquire_sourcedir_writelock:
 								if (delnode == source_inode && (source_inode->i_flags & INODE_FPERSISTENT))
 									decref_nokill(source_inode); /* The reference previously stored in the file tree. */
 								/* Now insert the new INode
-								 * NOTE: Because we've been holding a lock to the source INode, as well as
+								 * NOTE: Because we've been  holding a  lock to the  source INode,  as well  as
 								 *       to the superblock's INode tree the whole time, it should be guarantied
-								 *       that the node won't have been accessed by something else in the mean
+								 *       that  the node won't have been accessed  by something else in the mean
 								 *       time, meaning that this must never overlap with another node! */
 								inode_tree_insert(&super->s_nodes, target_inode);
 							}
@@ -2841,19 +2841,19 @@ acquire_sourcedir_writelock:
 										directory_addentry(target_directory, incref(target_entry));
 								} else {
 									TRY {
-										/* NOTE: No need to fiddle with some target_path here! Because
-										 *       we've been holding a write-lock to `target_directory'
-										 *       this entire time, the VFS sub-system would have been
+										/* NOTE: No need  to  fiddle  with some  target_path  here!  Because
+										 *       we've  been  holding  a  write-lock  to  `target_directory'
+										 *       this entire  time,  the  VFS  sub-system  would  have  been
 										 *       unable to access the target directory and see the temporary
-										 *       file we've accidentally placed there, before this call
-										 *       right here will remove that file once again as part of
+										 *       file  we've  accidentally  placed there,  before  this call
+										 *       right here  will remove  that file  once again  as part  of
 										 *       the exception cleanup. */
 										(*type->it_directory.d_unlink)(target_directory,
 										                               target_entry,
 										                               source_inode);
 									} EXCEPT {
 										/* If that fails, ensure a consistent state by still
-										 * adding the new entry to the target directory. */
+										 * adding  the  new entry  to the  target directory. */
 										if likely(!target_directory->i_type->it_directory.d_oneshot.o_lookup)
 											directory_addentry(target_directory, incref(target_entry));
 										RETHROW();
@@ -2923,9 +2923,9 @@ acquire_sourcedir_writelock:
 						source_entry = NULL;
 					}
 					/* Must add the new entry _after_ removing the old one, since the act
-					 * of adding new entires may realloc() the d_map vector, which the
+					 * of  adding new entires  may realloc() the  d_map vector, which the
 					 * `psource_entry' above may point into.
-					 * So this has to happen afterwards, else we run the risk of writing to
+					 * So this has to happen afterwards, else  we run the risk of writing  to
 					 * free()'d memory in the line: `*psource_entry = source_entry->de_next;' */
 					if likely(!target_directory->i_type->it_directory.d_oneshot.o_lookup)
 						directory_addentry(target_directory, incref(target_entry));
@@ -3196,7 +3196,7 @@ again:
 	/* Synchronize the underlying block device. */
 	if (sync_device && self->s_device)
 		block_device_sync(self->s_device);
-	/* Syncing one thing may have caused some
+	/* Syncing one thing  may have caused  some
 	 * other thing to become marked as changed. */
 	if (ATOMIC_READ(self->s_changed) != NULL)
 		goto again;
@@ -3301,9 +3301,9 @@ NOTHROW(KCALL inode_set_closed)(struct inode *__restrict self) {
 	                             old_flags | (INODE_FDELETED |
 	                                          INODE_FSUPERDEL)));
 	/* Trigger some signals to wake up blocking operations
-	 * that may still be in progress on this node.
+	 * that  may  still  be  in  progress  on  this  node.
 	 * Any piece of code that won't understand this part will
-	 * just have to deal with a sporadic wake-up, which is
+	 * just have to  deal with a  sporadic wake-up, which  is
 	 * allowed to happen irregardless. */
 	sig_broadcast(&__inode_lock(self)->rw_chmode);
 	sig_broadcast(&__inode_lock(self)->rw_unshare);
@@ -3418,7 +3418,7 @@ superblock_set_unmounted_impl(struct superblock *__restrict self)
 	TRY {
 		/* Synchronize all remaining nodes to flush changes. */
 		superblock_sync(self);
-		/* Anonymize all remaining nodes (any changes not synced prior
+		/* Anonymize all  remaining nodes  (any changes  not synced  prior
 		 * to the final `superblock_sync()' before will not be persistent) */
 		inode_anonymize_tree(self->s_nodes);
 	} EXCEPT {
@@ -3454,7 +3454,7 @@ superblock_set_unmounted(struct superblock *__restrict self)
 	superblock_nodeslock_endwrite(self);
 	/* Clear recently used INodes, thus uncaching any that were apart of `self' */
 #if 0 /* Always do this in case it failed on a previous invocation.             \
-       * TODO: A proper solution would be to prepare a BLOCKING_CLEANUP         \
+       * TODO: A  proper  solution  would  be  to  prepare  a  BLOCKING_CLEANUP \
        *       descriptor that will be scheduled to call `inode_recent_clear()' \
        *       in another thread in order to ensure that INodes are cleared! */
 	if (result)
@@ -3645,19 +3645,19 @@ NOTHROW(FCALL superblock_cleanup_unmounted)(void *pfun, unsigned int action) {
 
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL superblock_schedule_set_unmounted)(struct superblock *__restrict self) {
-	/* This function is used to implement the remote unmounting of
-	 * superblock that need to be unmounted after `vfs_clearmounts()'
+	/* This  function  is  used  to  implement  the  remote  unmounting   of
+	 * superblock  that  need  to  be  unmounted  after  `vfs_clearmounts()'
 	 * was used to clear all mounting points, following which the associated
-	 * path segments being destroyed lead to all mounting points for some
-	 * specific superblock being removed, causing the superblock to have to
+	 * path  segments being destroyed  lead to all  mounting points for some
+	 * specific superblock being removed, causing the superblock to have  to
 	 * be unloaded in its entirety.
-	 * This is quite the complicated situation, because in order to actually
-	 * synchronize a superblock (as is required before actually proceeding to
-	 * unload it), we need to be able to block, and be allowed to throw exceptions!
+	 * This  is  quite  the  complicated  situation,  because  in  order  to  actually
+	 * synchronize  a  superblock  (as  is  required  before  actually  proceeding  to
+	 * unload it), we need to  be able to block, and  be allowed to throw  exceptions!
 	 * However, since this function gets called as the result of a decref() operation,
-	 * we aren't allowed to do either. (Also: what would be the fallback to causing
-	 * an exception here? The superblock is already gone, and we can't bring back its
-	 * mounting points. So the only alternative to doing our job and cleaning it up
+	 * we aren't allowed to do  either. (Also: what would  be the fallback to  causing
+	 * an  exception here? The superblock is already gone, and we can't bring back its
+	 * mounting points. So the only  alternative to doing our  job and cleaning it  up
 	 * would be to leave it as a memory leak...) */
 	assert(self->s_flags & SUPERBLOCK_FMUSTUNMOUNT);
 	assert(self->s_mount == NULL);
@@ -4089,7 +4089,7 @@ check_result_for_deletion:
 			decref_likely(result);
 			goto again;
 		}
-		/* Construct the reference stored in the INode tree
+		/* Construct  the reference stored in the INode tree
 		 * when the generated node is said to be persistent. */
 		if (ATOMIC_READ(result->i_flags) & INODE_FPERSISTENT)
 			incref(result);
@@ -4104,7 +4104,7 @@ check_result_for_deletion:
 }
 
 
-/* Find some mounting point that is apart of the given `ns'
+/* Find some  mounting point  that is  apart of  the given  `ns'
  * If multiple such paths exist, arbitrarily return one of them.
  * If no such paths exist, return NULL instead. */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct path *KCALL
@@ -4278,8 +4278,8 @@ lookup_filesystem_type(USER CHECKED char const *name)
 
 /* Open the given block-device as a superblock.
  * NOTE: If the given `device' has already been opened, return the existing
- *       filesystem or throw an `E_FSERROR_DEVICE_ALREADY_MOUNTED'
- *       error if the given type doesn't match the existing association.
+ *       filesystem   or   throw   an    `E_FSERROR_DEVICE_ALREADY_MOUNTED'
+ *       error if the  given type doesn't  match the existing  association.
  * @param: flags: Set of `SUPERBLOCK_F*'
  * @throws: E_FSERROR_DEVICE_ALREADY_MOUNTED: [...]
  * @throws: E_FSERROR_UNKNOWN_FILE_SYSTEM:    The driver associated with `type' is finalizing
@@ -4359,7 +4359,7 @@ superblock_open(struct superblock_type *__restrict type,
 		}
 	}
 	TRY {
-		/* Now that we're holding a lock to the filesystem list, check
+		/* Now that we're holding a  lock to the filesystem list,  check
 		 * if the driver is being finalized. - If it is, don't allow new
 		 * filesystems to be mounted with it. */
 		if unlikely(driver_isfinalizing(type->st_driver))
@@ -4410,9 +4410,9 @@ superblock_open(struct superblock_type *__restrict type,
 			result->s_features.sf_name_max     = (u16)-1;
 			result->s_features.sf_filesizebits = 64;
 #ifndef NDEBUG
-			/* The devfs is initialized statically, so `st_open' should never
-			 * try to fill in the magic-field with its magic number. As such,
-			 * we can check for an `st_open' callback that forgot to fill in
+			/* The devfs is initialized  statically, so `st_open' should  never
+			 * try to fill in the magic-field  with its magic number. As  such,
+			 * we  can check for  an `st_open' callback that  forgot to fill in
 			 * this field by later checking if it's still set to this constant. */
 			result->s_features.sf_magic = DEVFS_SUPER_MAGIC;
 #endif /* !NDEBUG */
@@ -4566,9 +4566,9 @@ NOTHROW(MFILE_OPS_CC inode_destroy)(struct inode *__restrict self) {
 		struct superblock *super = self->i_super;
 #if 0 /* Don't check this. - Something may have gone wrong \
        * during initialization of an otherwise persistent INode. */
-		/* NOTE: If the INode was persistent, the caller must have already
-		 *       removed it from the superblock's file tree. - Otherwise,
-		 *       our reference counter should not have reached ZERO(0), as
+		/* NOTE: If  the  INode was  persistent,  the caller  must  have already
+		 *       removed it  from  the  superblock's  file  tree.  -  Otherwise,
+		 *       our reference  counter  should  not have  reached  ZERO(0),  as
 		 *       the file tree itself should have carried one of our references! */
 		if (!(self->i_flags & INODE_FPERSISTENT))
 #endif

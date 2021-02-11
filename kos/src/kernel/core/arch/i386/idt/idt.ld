@@ -90,11 +90,11 @@
 	                    : SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 
 #ifdef __x86_64__
-/* Can't safely make use of traps on x86_64, since only entry to any
+/* Can't safely make use  of traps on x86_64,  since only entry to  any
  * kind of interrupt, we need to check if the interrupt originated from
- * user-space, and if it did, need to invoke `swapgs', which would't
- * work properly if another interrupt could happen before then, making
- * us think that `swapgs' was already invoked when it actually wasn't */
+ * user-space,  and if it  did, need to  invoke `swapgs', which would't
+ * work properly if another interrupt could happen before then,  making
+ * us think that `swapgs' was  already invoked when it actually  wasn't */
 #undef TRAP
 #undef GATE
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
@@ -167,7 +167,7 @@ GATE(2f)
 
 /* Non-exception/service vectors.
  * All of these are configured as interrupts, with the
- * exception of 80h (which is the syscall vector) */
+ * exception  of  80h  (which is  the  syscall vector) */
 INTR(30)
 INTR(31)
 INTR(32)

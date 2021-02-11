@@ -29,7 +29,9 @@
 DECL_BEGIN
 
 /* Flags for `struct rpc_entry::re_kind'
+ *
  * HINT (relation of flags/functions in the sense of semantics):
+ * ```
  *   == INTERNAL =======    == KERNEL-API ===========    == USER-API ====================
  *   RPC_KIND_INTERRUPT     TASK_USER_RPC_FINTR          ~RPC_SCHEDULE_FLAG_NOINTERRUPT
  *   RPC_KIND_USER_SYNC     TASK_USER_RPC_FSYNC          RPC_SCHEDULE_SYNC, ~RPC_SCHEDULE_ASYNC
@@ -39,6 +41,7 @@ DECL_BEGIN
  *                          TASK_RPC_FWAITFOR            RPC_SCHEDULE_FLAG_WAITSMPACK
  *                          TASK_RPC_FDONTWAKE           RPC_SCHEDULE_FLAG_DONTWAKE
  *                          TASK_RPC_FHIGHPRIO           RPC_SCHEDULE_FLAG_HIGHPRIO
+ * ```
  */
 #define RPC_KIND_SYNC            0x0000 /* Synchronous RPC */
 #define RPC_KIND_USER            0x0001 /* User RPC (service before returning to user-space) */

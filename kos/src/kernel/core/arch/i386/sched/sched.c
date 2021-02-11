@@ -212,9 +212,9 @@ INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
 
 
 /* Modify `state' to insert an asynchronous call to the given RPC function.
- * When that function then returns, the old state will restored.
+ * When  that  function  then  returns,   the  old  state  will   restored.
  * The reason passed to `func' is either `TASK_RPC_REASON_ASYNCUSER' if the
- * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
+ * old state  points into  user-space, or  `TASK_RPC_REASON_ASYNC' if  not. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           task_rpc_t func, void *arg) {
@@ -245,7 +245,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 }
 
 
-/* Same as `task_push_asynchronous_rpc()', but pass a copy
+/* Same  as  `task_push_asynchronous_rpc()', but  pass  a copy
  * of the given buffer as value for `arg' to the given `func'. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
@@ -281,9 +281,9 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 }
 
 
-/* An arch-specific function used to re-direct the given task's user-space
- * return target to instead point back towards a kernel-space function which is then
- * able to service RPC functions scheduled using `task_(schedule|exec)_user_[s]rpc()'
+/* An   arch-specific   function   used   to   re-direct   the   given   task's  user-space
+ * return target  to instead  point back  towards  a kernel-space  function which  is  then
+ * able  to  service  RPC  functions  scheduled  using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
  *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
  *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
@@ -291,10 +291,10 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
- * NOTE: The caller must ensure that preemption is disabled,
- *       and that `self' is hosted by the calling CPU.
+ * NOTE: The  caller must ensure that preemption is disabled,
+ *       and that  `self'  is  hosted  by  the  calling  CPU.
  *       Additionally, the caller must ensure that `self' has
- *       neither terminated, nor is actually set up to be a
+ *       neither terminated, nor is actually  set up to be  a
  *       kernel-space thread.
  * @return: true:  Successfully redirected the given thread.
  * @return: false: The given thread had already been redirected. */
@@ -316,8 +316,8 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	thread_save->ir_ss     = thread_iret->ir_ss;
 	thread_save->ir_rsp    = thread_iret->ir_rsp;
 	COMPILER_READ_BARRIER();
-	/* NOTE: The write-order of all of these is highly important,
-	 *       so just put a write-barrier around every write.
+	/* NOTE: The write-order of all  of these is highly  important,
+	 *       so  just  put  a  write-barrier  around  every  write.
 	 *       For more information, see `irregs_rdip()' and friends. */
 	COMPILER_WRITE_BARRIER();
 	thread_iret->ir_rip = (uintptr_t)&x86_rpc_user_redirection;
@@ -354,9 +354,9 @@ INTDEF void ASMCALL x86_rpc_kernel_redirection(void);
 INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
 
 /* Modify `state' to insert an asynchronous call to the given RPC function.
- * When that function then returns, the old state will restored.
+ * When  that  function  then  returns,   the  old  state  will   restored.
  * The reason passed to `func' is either `TASK_RPC_REASON_ASYNCUSER' if the
- * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
+ * old state  points into  user-space, or  `TASK_RPC_REASON_ASYNC' if  not. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           task_rpc_t func, void *arg) {
@@ -399,7 +399,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 }
 
 
-/* Same as `task_push_asynchronous_rpc()', but pass a copy
+/* Same  as  `task_push_asynchronous_rpc()', but  pass  a copy
  * of the given buffer as value for `arg' to the given `func'. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
@@ -470,7 +470,7 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 		                      &unwind_setreg_ucpustate, &st);
 		if unlikely(unwind_error != UNWIND_SUCCESS) {
 			/* XXX: There may be cases where this is allowed.
-			 *      Maybe custom task termination protocols? */
+			 *      Maybe custom task termination  protocols? */
 			kernel_panic("Unwind failed: %u", unwind_error);
 		}
 		if (!ucpustate_iskernel(&st))
@@ -480,10 +480,10 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	return st.ucs_eflags;
 }
 
-/* Return a pointer to the original user-space IRET tail of the calling thread.
+/* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
- *       and that `thread' is hosted by the calling CPU. */
+ *       and that  `thread' is  hosted by  the calling  CPU. */
 PUBLIC ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	struct irregs_user *result;
@@ -493,7 +493,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 #define stacktop() ((byte_t *)FORTASK(self, this_x86_kernel_psp0))
 	result = (struct irregs_user *)(stacktop() - SIZEOF_IRREGS_USER);
 	/* We need to account for the special case of the IRET tail pointing a VM86 thread!
-	 * If this is the case, then fields of `result' are currently mapped as:
+	 * If  this  is  the  case,  then  fields  of  `result'  are  currently  mapped as:
 	 *  - ((u32 *)result)[-4] = real_result->ir_eip
 	 *  - ((u32 *)result)[-3] = real_result->ir_cs
 	 *  - ((u32 *)result)[-2] = real_result->ir_eflags
@@ -510,7 +510,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	    !(((u32 *)result)[-3] & 0xffff0000) &&
 	    ADDR_ISUSER(((u32 *)result)[-4])) {
 		/* There is a very good chance that this is a vm86 thread, however we _really_
-		 * have to be sure about this, and the only way to be 100% sure, is to unwind
+		 * have to be sure about this, and the only way to be 100% sure, is to  unwind
 		 * the stack until we hit user-space, at which point we can unwind the %eflags
 		 * register to see if it has the VM bit set. */
 		u32 userspace_eflags;
@@ -547,9 +547,9 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 
 
 
-/* An arch-specific function used to re-direct the given task's user-space
- * return target to instead point back towards a kernel-space function which is then
- * able to service RPC functions scheduled using `task_(schedule|exec)_user_[s]rpc()'
+/* An   arch-specific   function   used   to   re-direct   the   given   task's  user-space
+ * return target  to instead  point back  towards  a kernel-space  function which  is  then
+ * able  to  service  RPC  functions  scheduled  using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
  *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
  *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
@@ -557,10 +557,10 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
- * NOTE: The caller must ensure that preemption is disabled,
- *       and that `self' is hosted by the calling CPU.
+ * NOTE: The  caller must ensure that preemption is disabled,
+ *       and that  `self'  is  hosted  by  the  calling  CPU.
  *       Additionally, the caller must ensure that `self' has
- *       neither terminated, nor is actually set up to be a
+ *       neither terminated, nor is actually  set up to be  a
  *       kernel-space thread.
  * @return: true:  Successfully redirected the given thread.
  * @return: false: The given thread had already been redirected. */
@@ -573,9 +573,9 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 #ifndef CONFIG_X86_EMULATE_LCALL7
 	/* Check for special case: `self' was interrupted in
 	 * `x86_syscall32_lcall7' before it was able to complete its IRET tail.
-	 * NOTE: It is sufficient to only check for EIP == ENTRY_OF(x86_syscall32_lcall7),
+	 * NOTE: It is sufficient to only  check for EIP ==  ENTRY_OF(x86_syscall32_lcall7),
 	 *       since the first thing `x86_syscall32_lcall7' does is to disable preemption,
-	 *       meaning that interrupts could only ever happen for the very first
+	 *       meaning  that  interrupts  could  only  ever  happen  for  the  very  first
 	 *       instruction. */
 	if unlikely(self != THIS_TASK &&
 	            FORTASK(self, this_sstate)->scs_irregs.ir_eip == (uintptr_t)(void *)&x86_syscall32_lcall7) {
@@ -594,7 +594,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		FORTASK(self, this_sstate) = (struct scpustate *)fixup;
 		/* Read the original user-space EFLAGS value. */
 		eflags = ((struct scpustate *)fixup)->scs_irregs.ir_eflags;
-		/* Skip the lcall IRET adjustment we're doing ourself below by
+		/* Skip the lcall IRET adjustment  we're doing ourself below  by
 		 * advancing the instruction pointer from `x86_syscall32_lcall7'
 		 * to `x86_syscall32_lcall7_iret' */
 		((struct scpustate *)fixup)->scs_irregs.ir_eip = (uintptr_t)(void *)&x86_syscall32_lcall7_iret;
@@ -613,8 +613,8 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;
 	COMPILER_READ_BARRIER();
-	/* NOTE: The write-order of all of these is highly important,
-	 *       so just put a write-barrier around every write.
+	/* NOTE: The write-order of all  of these is highly  important,
+	 *       so  just  put  a  write-barrier  around  every  write.
 	 *       For more information, see `irregs_rdip()' and friends. */
 	COMPILER_WRITE_BARRIER();
 	thread_iret->ir_eip = (uintptr_t)&x86_rpc_user_redirection;
@@ -635,7 +635,7 @@ NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__
                                                     byte_t *__restrict UNUSED(lsda)) {
 	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
-	 * frame just as it is, with no modifications made to the register state. */
+	 * frame just as  it is,  with no modifications  made to  the register  state. */
 	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	return DWARF_PERSO_CONTINUE_UNWIND;
@@ -647,7 +647,7 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *
                                                       byte_t *__restrict UNUSED(lsda)) {
 	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
-	 * frame just as it is, with no modifications made to the register state. */
+	 * frame just as  it is,  with no modifications  made to  the register  state. */
 	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection) {
 		kcpustate_setpc(state, (uintptr_t)&x86_rpc_kernel_redirection_handler);
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;

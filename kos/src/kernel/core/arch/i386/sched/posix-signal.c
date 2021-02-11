@@ -214,10 +214,10 @@ again:
 			mymask = sigmask_getwr();
 			memcpy(mymask, restore_sigmask, sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
-			/* Make sure that mandatory signals always remain unmasked.
-			 * In case we just escaped an RPC attempt by another thread sending
+			/* Make   sure   that   mandatory  signals   always   remain  unmasked.
+			 * In  case we  just escaped an  RPC attempt by  another thread sending
 			 * either one of these signals, not to worry, as code below will always
-			 * check for `sigmask_check_s()' when `restore_sigmask' is non-NULL. */
+			 * check for  `sigmask_check_s()' when  `restore_sigmask' is  non-NULL. */
 			sigdelset(mymask, SIGKILL);
 			sigdelset(mymask, SIGSTOP);
 		}
@@ -234,11 +234,11 @@ again:
 			rpc_syscall_info32_to_rpc_syscall_info(sc_info, &sc);
 			COMPILER_READ_BARRIER();
 			/* Check for restartable system calls.
-			 * NOTE: When performing this check, use the system call given
-			 *       by the caller as the one that would be restarted.
+			 * NOTE: When performing this check,  use the system call  given
+			 *       by  the  caller as  the  one that  would  be restarted.
 			 *       This, alongside the fact that sys_sigreturn() is marked
-			 *       as being [restart(must)], will ensure that we always
-			 *       eventually come back around to being able to restart
+			 *       as being [restart(must)],  will ensure  that we  always
+			 *       eventually come back  around to being  able to  restart
 			 *       the system call. */
 			if (restore_sigmask) {
 				struct icpustate *new_state;
@@ -254,8 +254,8 @@ again:
 			if unlikely(SYSCALL_VECTOR_ISSIGRETURN32(sc.rsi_sysno)) {
 				/* Special case: Return to sigreturn.
 				 * -> To prevent recursion, restart this system call immediately
-				 *    by looping back to the start of our function!
-				 * NOTE: This special case mainly prevents user-space from being
+				 *    by  looping   back  to   the   start  of   our   function!
+				 * NOTE: This  special case mainly  prevents user-space from being
 				 *       able to cause a kernel stack overflow by chaining a bunch
 				 *       of sigreturn invocations ontop of each other. */
 				restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_CPU];
@@ -268,8 +268,8 @@ again:
 				goto again;
 			}
 			/* Emulate the system call.
-			 * NOTE: Mirror the exceptions model specified in `sc_info',
-			 *       in that we propagate system call exceptions the same
+			 * NOTE: Mirror the exceptions  model specified in  `sc_info',
+			 *       in that we propagate system call exceptions the  same
 			 *       way they would have originally been propagated if the
 			 *       system call hadn't had to be restarted. */
 			sc.rsi_flags &= ~RPC_SYSCALL_INFO_FMETHOD;
@@ -286,14 +286,14 @@ again:
 	} EXCEPT {
 		/* Implement our own custom exception handler to work around the fact
 		 * that EFLAGS.DF is undefined when sigreturn() is called, meaning it
-		 * would also be undefined how exceptions caused by restarted system
+		 * would also be undefined how exceptions caused by restarted  system
 		 * calls are handled.
-		 * The intended behavior here is that sigreturn() only accounts for
+		 * The  intended  behavior here  is  that sigreturn()  only  accounts for
 		 * its own EFLAGS.DF when validating and processing is restore arguments,
 		 * but will mirror the exceptions model of a restarted system call. */
 
-		/* NOTE: Technically, this behavior right here is incorrect, as it doesn't
-		 *       preserve the correct user-space EFLAGS.DF value. However, we have
+		/* NOTE: Technically, this behavior  right here is  incorrect, as it  doesn't
+		 *       preserve the correct  user-space EFLAGS.DF value.  However, we  have
 		 *       no other way of passing the knowledge about how the exception should
 		 *       be propagated to `x86_userexcept_propagate()' and friends.
 		 *       So with this in mind, this is the best we can do when it comes to this problem.
@@ -420,10 +420,10 @@ again:
 			sigmask = sigmask_getwr();
 			memcpy(sigmask, restore_sigmask, sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
-			/* Make sure that mandatory signals always remain unmasked.
-			 * In case we just escaped an RPC attempt by another thread sending
+			/* Make   sure   that   mandatory  signals   always   remain  unmasked.
+			 * In  case we  just escaped an  RPC attempt by  another thread sending
 			 * either one of these signals, not to worry, as code below will always
-			 * check for `sigmask_check_s()' when `restore_sigmask' is non-NULL. */
+			 * check for  `sigmask_check_s()' when  `restore_sigmask' is  non-NULL. */
 			sigdelset(sigmask, SIGKILL);
 			sigdelset(sigmask, SIGSTOP);
 		}
@@ -440,11 +440,11 @@ again:
 			rpc_syscall_info64_to_rpc_syscall_info(sc_info, &sc);
 			COMPILER_READ_BARRIER();
 			/* Check for restartable system calls.
-			 * NOTE: When performing this check, use the system call given
-			 *       by the caller as the one that would be restarted.
+			 * NOTE: When performing this check,  use the system call  given
+			 *       by  the  caller as  the  one that  would  be restarted.
 			 *       This, alongside the fact that sys_sigreturn() is marked
-			 *       as being [restart(must)], will ensure that we always
-			 *       eventually come back around to being able to restart
+			 *       as being [restart(must)],  will ensure  that we  always
+			 *       eventually come back  around to being  able to  restart
 			 *       the system call. */
 			if (restore_sigmask) {
 				struct icpustate *new_state;
@@ -460,8 +460,8 @@ again:
 			if unlikely(SYSCALL_VECTOR_ISSIGRETURN64(sc.rsi_sysno)) {
 				/* Special case: Return to sigreturn.
 				 * -> To prevent recursion, restart this system call immediately
-				 *    by looping back to the start of our function!
-				 * NOTE: This special case mainly prevents user-space from being
+				 *    by  looping   back  to   the   start  of   our   function!
+				 * NOTE: This  special case mainly  prevents user-space from being
 				 *       able to cause a kernel stack overflow by chaining a bunch
 				 *       of sigreturn invocations ontop of each other. */
 				restore_cpu     = (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&state->ics_gpregs);
@@ -475,8 +475,8 @@ again:
 				goto again;
 			}
 			/* Emulate the system call.
-			 * NOTE: Mirror the exceptions model specified in `sc_info',
-			 *       in that we propagate system call exceptions the same
+			 * NOTE: Mirror the exceptions  model specified in  `sc_info',
+			 *       in that we propagate system call exceptions the  same
 			 *       way they would have originally been propagated if the
 			 *       system call hadn't had to be restarted. */
 			sc.rsi_flags &= ~RPC_SYSCALL_INFO_FMETHOD;
@@ -493,14 +493,14 @@ again:
 	} EXCEPT {
 		/* Implement our own custom exception handler to work around the fact
 		 * that EFLAGS.DF is undefined when sigreturn() is called, meaning it
-		 * would also be undefined how exceptions caused by restarted system
+		 * would also be undefined how exceptions caused by restarted  system
 		 * calls are handled.
-		 * The intended behavior here is that sigreturn() only accounts for
+		 * The  intended  behavior here  is  that sigreturn()  only  accounts for
 		 * its own EFLAGS.DF when validating and processing is restore arguments,
 		 * but will mirror the exceptions model of a restarted system call. */
 
-		/* NOTE: Technically, this behavior right here is incorrect, as it doesn't
-		 *       preserve the correct user-space EFLAGS.DF value. However, we have
+		/* NOTE: Technically, this behavior  right here is  incorrect, as it  doesn't
+		 *       preserve the correct  user-space EFLAGS.DF value.  However, we  have
 		 *       no other way of passing the knowledge about how the exception should
 		 *       be propagated to `x86_userexcept_propagate()' and friends.
 		 *       So with this in mind, this is the best we can do when it comes to this problem.

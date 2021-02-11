@@ -54,7 +54,7 @@ DECL_BEGIN
 #endif /* !__x86_64__ */
 
 /* Return the ID (one of `X86_REGISTER_*' from <asm/registers.h>,
- * or one of `X86_DBGREGISTER_*') from a given register name. */
+ * or one  of `X86_DBGREGISTER_*')  from a  given register  name. */
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(KCALL x86_dbg_regfromname)(char const *__restrict name,
                                    size_t namelen) {

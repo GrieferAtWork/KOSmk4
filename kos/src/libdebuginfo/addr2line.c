@@ -270,7 +270,7 @@ again_cu_component:
 				 * >> 	inline_function2();
 				 * >> 	return result;
 				 * >> }
-				 * LEVEL(0, test_function()) --> inline_function
+				 * LEVEL(0, test_function()) -->  inline_function
 				 * LEVEL(1, test_function()) --> inline_function2
 				 * LEVEL(2, test_function()) --> test_function
 				 */
@@ -568,9 +568,9 @@ err_corrupt:
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully retrieved information.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either no information is known about `module_relative_pc',
  *                                    or the given `level >= OUT(result->al_levelcnt)', and also
- *                                    isn't  equal  to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
- *                                    `result->al_levelcnt' is set  to 0 if  no information  is
- *                                    known at all, or whatever the total number of information
+ *                                    isn't  equal   to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
+ *                                    `result->al_levelcnt' is  set to  0 if  no information  is
+ *                                    known at all, or whatever the total number of  information
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
 INTERN TEXTSECTION NONNULL((1, 2)) unsigned int

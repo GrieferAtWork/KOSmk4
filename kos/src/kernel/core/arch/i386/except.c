@@ -62,7 +62,7 @@
 
 
 /* TODO: This file needs some _major_ cleanup! */
-/* TODO: This file should be merged with libc's except.c file, and be
+/* TODO: This  file should be merged with libc's except.c file, and be
  *       implemented as part of the hybrid-interface (though obviously
  *       there are some major differences between the two) */
 
@@ -681,9 +681,9 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 
 search_fde:
 	/* unwind `state' until the nearest exception handler, or until user-space is reached.
-	 * If the later happens, then we must propagate the exception to it instead.
+	 * If the  later  happens,  then  we  must propagate  the  exception  to  it  instead.
 	 * NOTE: -1 because the state we're being given has its PC pointer
-	 *       set to be directed after the faulting instruction. */
+	 *       set  to  be  directed  after  the  faulting  instruction. */
 	memcpy(&old_state, state, sizeof(old_state));
 	pc = (void *)(kcpustate_getpc(&old_state) - 1);
 	error = unwind_fde_find(pc, &fde);
@@ -737,7 +737,7 @@ search_fde:
 	}
 
 	/* When unwinding to user-space, well get an error `UNWIND_INVALID_REGISTER',
-	 * when trying to assign a user-space value to the CS register. */
+	 * when  trying  to   assign  a   user-space  value  to   the  CS   register. */
 	if (error == UNWIND_INVALID_REGISTER) {
 		struct ucpustate ustate;
 		unwind_cfa_sigframe_state_t sigframe_cfa;
@@ -753,24 +753,24 @@ search_fde:
 			goto err_old_state;
 		if (ucpustate_isuser(&ustate)) {
 			/* At this point, we've got an exception that should be unwound
-			 * into user-space, with the user-space context at the unwind
+			 * into user-space, with the  user-space context at the  unwind
 			 * location within user-space.
 			 *
-			 * This can happen when (e.g.) `x86_handle_pagefault()' throws
-			 * an exception directly (using `THROW()'), but should not happen
-			 * when a system call throws an exception, as system call entry
-			 * points and emulators are required to provide custom personality
+			 * This  can  happen  when  (e.g.)  `x86_handle_pagefault()'  throws
+			 * an exception directly  (using `THROW()'), but  should not  happen
+			 * when a  system call  throws an  exception, as  system call  entry
+			 * points and emulators are  required to provide custom  personality
 			 * functions that would then call `x86_userexcept_unwind()', however
-			 * will additionally provide the `sc_info' argument which is being
-			 * left as `NULL' here (indicating an async user-space exception). */
+			 * will additionally provide the  `sc_info' argument which is  being
+			 * left as `NULL' here  (indicating an async user-space  exception). */
 			x86_userexcept_unwind(&ustate, NULL);
 		}
 
-		/* Check for special case: If the unwind location is `x86_rpc_user_redirection',
+		/* Check for special case: If the unwind location is  `x86_rpc_user_redirection',
 		 * then we must still allow the unwind, even though registers might look somewhat
 		 * wrong. (as in: they will look like user-space registers)
 		 * That is intended, and we must handle this case by directly loading the unwound
-		 * register state, thus matching `x86_rpc_user_redirection_personality()' */
+		 * register   state,   thus   matching   `x86_rpc_user_redirection_personality()' */
 		if (ucpustate_getpc(&ustate) == (uintptr_t)&x86_rpc_user_redirection &&
 		    SEGMENT_IS_VALID_KERNCODE(ustate.ucs_cs) &&
 		    SEGMENT_IS_VALID_KERNDATA(ustate.ucs_ss))
@@ -809,20 +809,20 @@ search_fde:
 				 * >> ESP -= 4;
 				 * >> *(u16 *)ESP = DS;
 				 * In other words, it leaves the upper 2 bytes of the pushed DWORD
-				 * undefined (or rather: have them keep their previous values)
-				 * -> To fix this, libunwind (and also some other components
+				 * undefined (or  rather: have  them keep  their previous  values)
+				 * -> To fix this, libunwind  (and also some other  components
 				 *    that use segment registers) have been adjusted, in order
-				 *    to both ignore the upper 2 bytes during reads, and fill
+				 *    to  both ignore the upper 2 bytes during reads, and fill
 				 *    them as all zeroes during writes.
 				 * Intel manuals:
 				 * ... if the operand size is 32-bits, either a zero-extended value is
 				 * pushed on the stack or the segment selector is written on the stack
-				 * using a 16-bit move. For the last case, all recent Core and Atom
-				 * processors perform a 16-bit move, leaving the upper portion of the
+				 * using a 16-bit move.  For the last case,  all recent Core and  Atom
+				 * processors  perform a 16-bit move, leaving the upper portion of the
 				 * stack location unmodified. ...
-				 * -> In other words: Bochs is entirely correct in its emulation, and
+				 * -> In  other words: Bochs  is entirely correct  in its emulation, and
 				 *    I'm a fault here, in which case. Honestly: Thank you Bochs. That's
-				 *    one less Problem for me to figure out the hard way once testing
+				 *    one less Problem for  me to figure out  the hard way once  testing
 				 *    on real Hardware is going to start...
 				 */
 				LOG_SEGMENT_INCONSISTENCY_CHK('c', ustate.ucs_cs, SEGMENT_IS_VALID_KERNCODE);
@@ -874,7 +874,7 @@ err:
 
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
 
-/* This function is hooked by CFI under `struct unwind_fde_struct::f_persofun'
+/* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 PUBLIC NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
@@ -919,11 +919,11 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 			/* Just to the associated handler */
 			kcpustate_setpc(state, landingpad + handler);
 			if (action != 0) {
-				/* The ABI wants us to fill %eax with a pointer to the exception (`_Unwind_Exception').
-				 * However, since KOS exception is kept a bit simpler (so-as to allow it to function
-				 * without the need of dynamic memory allocation), the current exception isn't an internal
+				/* The ABI wants  us to fill  %eax with  a pointer to  the exception  (`_Unwind_Exception').
+				 * However,  since  KOS exception  is kept  a bit  simpler  (so-as to  allow it  to function
+				 * without  the need of dynamic memory allocation),  the current exception isn't an internal
 				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
-				 * So while what we write here really doesn't matter at all, let's just put in something
+				 * So while what we  write here really doesn't  matter at all, let's  just put in  something
 				 * that at the very least makes a bit of sense. */
 				gpregs_setpax(&state->kcs_gpregs, error_code());
 			}

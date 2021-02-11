@@ -37,7 +37,7 @@ DECL_BEGIN
 PRIVATE ATTR_FREETEXT void KCALL
 override_slab_malloc(byte_t *p_slab_malloc) {
 	/* slab_malloc[SZ]:
-	 *     xorP  %Pax, %Pax
+	 *     xorP %Pax, %Pax
 	 *     ret   IF_32($4) */
 #ifdef __x86_64__
 	*p_slab_malloc++ = 0x48; /* REX */
@@ -58,13 +58,13 @@ override_slab_kmalloc_x(byte_t *p_slab_kmalloc, size_t sz,
                         byte_t *kmalloc_xnx) {
 	/* slab_kmalloc[SZ]:
 	 * #ifdef __x86_64__
-	 *     movl  %edi, %esi // flags
-	 *     movl  $sz,  %edi // num_bytes
+	 *     movl %edi,  %esi  //  flags
+	 *     movl $sz, %edi // num_bytes
 	 * #else
 	 *     // NOTE: Because kmalloc is STDCALL, it will cleanup the +1
 	 *     //       additional word that we've pushed onto the stack here.
 	 *     popl  %eax
-	 *     pushl $sz
+	 *     pushl  $sz
 	 *     pushl %eax
 	 * #endif
 	 *     jmp   kmalloc */

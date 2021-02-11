@@ -81,12 +81,12 @@ DECL_BEGIN
  * >>     rep;   movsb
  * >>     ret
  * >> END(x86_nopf_rep_movsb)
- * Yes. - That's literally the implementation,
+ * Yes.  -  That's  literally  the   implementation,
  * however there is something very special about it:
  *  - Whenever a #PF happens, the kernel will see if it originated from
  *    that `rep movsb' instruction.
  *    If it did, then instead of actually handling the #PF, the kernel will
- *    advance the instruction pointer to the `ret' instruction, causing
+ *    advance the  instruction pointer  to the  `ret' instruction,  causing
  *    the `rep' to be aborted.
  * IN:
  *   - USER CHECKED void       *%edi:  Destination pointer
@@ -112,10 +112,10 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_rep_movsb)();
  *      will execute `repe cmpsb'
  *  #3 Return to the caller (i.e. `ret')
  *  #4 If a #PF (or non-canon #GP on x86_64) is triggered during
- *     any of this, the program counter to return to the caller
- *     with all registers unaltered from the point in time when
+ *     any  of this, the program counter to return to the caller
+ *     with all registers unaltered from the point in time  when
  *     the #PF happened.
- *     In general, this means that these functions return with
+ *     In general, this means that these functions return  with
  *     with `%[er]cx != 0' when a copy-error happened, and with
  *     `%[er]cx == 0' upon success.
  */
@@ -308,7 +308,7 @@ NOTHROW(KCALL readq_nopf)(USER CHECKED void const *addr,
 }
 
 /* Try to write `value' into a possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return  `true'  on   success,  `false'  on   error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr,
                            u8 value) {
@@ -322,7 +322,7 @@ NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to write `value' into a possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return  `true'  on   success,  `false'  on   error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr,
                            u16 value) {
@@ -336,7 +336,7 @@ NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to write `value' into a possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return  `true'  on   success,  `false'  on   error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr,
                            u32 value) {
@@ -350,7 +350,7 @@ NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to write `value' into a possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return  `true'  on   success,  `false'  on   error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr,
                            u64 value) {
@@ -375,14 +375,14 @@ NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr,
 
 
 
-/* Copy memory from `src' to `dst', but stop if any sort of #PF happens,
+/* Copy memory from `src' to `dst', but  stop if any sort of #PF  happens,
  * regardless of that #PF being handleable or not (aka: load-on-access, or
- * copy-on-write will never be triggered by this function, and the same
+ * copy-on-write  will never be  triggered by this  function, and the same
  * also goes for VIO)
- * This function can be used to copy user-space memory whilst holding an
+ * This function can be used to copy user-space memory whilst holding  an
  * atomic lock, allowing the caller to handle the PF by handling the next
  * data byte/word/etc. individually after releasing the atomic lock, thus
- * allowing a necessary #PF to run its course without the caller holding
+ * allowing a necessary #PF to run its course without the caller  holding
  * an atomic lock.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
@@ -449,7 +449,7 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orq_rax_Pcx)();      /* lock o
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorq_rax_Pcx)();     /* lock xorq     %rax, (%Pcx) -- ATOMIC_XOR(*(u64 *)%Pcx, %rax) */
 #endif /* __x86_64__ */
 
-/* Try to ATOMIC_XCH at a possibly faulty `addr', storing the
+/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -465,7 +465,7 @@ NOTHROW(KCALL atomic_xchb_nopf)(USER CHECKED void const *addr,
 	return !error;
 }
 
-/* Try to ATOMIC_XCH at a possibly faulty `addr', storing the
+/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -481,7 +481,7 @@ NOTHROW(KCALL atomic_xchw_nopf)(USER CHECKED void const *addr,
 	return !error;
 }
 
-/* Try to ATOMIC_XCH at a possibly faulty `addr', storing the
+/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -498,7 +498,7 @@ NOTHROW(KCALL atomic_xchl_nopf)(USER CHECKED void const *addr,
 }
 
 #ifdef __x86_64__
-/* Try to ATOMIC_XCH at a possibly faulty `addr', storing the
+/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -516,7 +516,7 @@ NOTHROW(KCALL atomic_xchq_nopf)(USER CHECKED void const *addr,
 #endif /* __x86_64__ */
 
 
-/* Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing the
+/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -532,7 +532,7 @@ NOTHROW(KCALL atomic_fetchaddb_nopf)(USER CHECKED void const *addr,
 	return !error;
 }
 
-/* Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing the
+/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -548,7 +548,7 @@ NOTHROW(KCALL atomic_fetchaddw_nopf)(USER CHECKED void const *addr,
 	return !error;
 }
 
-/* Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing the
+/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -565,7 +565,7 @@ NOTHROW(KCALL atomic_fetchaddl_nopf)(USER CHECKED void const *addr,
 }
 
 #ifdef __x86_64__
-/* Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing the
+/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
  * Return `true' on success, `false' on error */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
@@ -837,7 +837,7 @@ DATDEF byte_t x86_nopf_end[];     /* End address for NOPF memory access PC value
 DATDEF byte_t x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
 DATDEF byte_t x86_nopf_ret[];     /* Return PC for #PF with `x86_nopf_check(pc) == true' */
 
-/* Return the #PF-execution-resume address for a #PF that happened at `pc', where
+/* Return  the #PF-execution-resume  address for a  #PF that happened  at `pc', where
  * pc is apart of a x86_nopf_* function, as indicated by `x86_nopf_check(pc) == true' */
 #define x86_nopf_retof(pc)                         \
 	((uintptr_t)(pc) < (uintptr_t)x86_nopf_end_clc \

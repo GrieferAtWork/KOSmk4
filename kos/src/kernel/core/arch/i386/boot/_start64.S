@@ -93,7 +93,7 @@ END(vga_cls)
 
 /* CLOBBER: [%eflags]
  * OUT: [pointer_to_start_of_last_line: %edi]
- * Scroll the VGA display by 1 line and set
+ * Scroll the  VGA  display  by 1  line  and  set
  * the VGA pointer to the start of the last line. */
 PRIVATE_FUNCTION(vga_scroll)
 	pushl  %esi
@@ -362,7 +362,7 @@ INTERN_FUNCTION(_start)
 
 #if 1 /* Fixup required when loaded via bochs's `load32bitOSImage' function */
 	/* Prematurely load our GDT, so we can manually set valid segments for %ds, %es and %ss,
-	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
+	 * as  we only  want to  rely on  the boot loader  to have  set up  a valid  %ds and %cs */
 	.pushsection .rodata.free
 1:	.word  (SEGMENT_COUNT * 8 - 1)
 	.long  V2P(__templatecpu_x86_gdt)
@@ -640,7 +640,7 @@ INTERN_FUNCTION(_start)
 #define FLAGS_PAGE2MIB ((P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT | P64_PAGE_FDIRTY | P64_PAGE_F2MIB) & 0xffffffff)
 #define FLAGS_VECTOR   ((P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT) & 0xffffffff)
 
-	/* Initialize x86_64 paging:
+	/* Initialize   x86_64   paging:
 	 * >> u64 word = FLAGS_PAGE2MIB;
 	 * >> for (unsigned int i = 0; i < 2 * 512; ++i) {
 	 * >>     ks_share_e2[i / 512][i % 512].p_word = word;
@@ -686,12 +686,12 @@ INTERN_FUNCTION(_start)
 	 * >> pagedir_kernel.p_e4[257] = &pagedir_kernel.p_e4[0] + FLAGS_VECTOR; */
 	movl   $(pagedir_kernel_p_e4(0) + FLAGS_VECTOR), pagedir_kernel_p_e4(257)
 	/* HINT: Right now our VM looks like this:
-	 * [0] 0000000000000000..000000007fffffff --> 0000000000000000..000000007fffffff
-	 * [1] ffff800000000000..ffff80007fffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
-	 * [2] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
-	 * [3] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
+	 *  - [0] 0000000000000000..000000007fffffff --> 0000000000000000..000000007fffffff
+	 *  - [1] ffff800000000000..ffff80007fffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
+	 *  - [2] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
+	 *  - [3] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
 	 * We're currently running from [0] and eventually want to end up running from [3]
-	 * Once we're at [3], we'll be deleting the mappings producing [0] and [1] */
+	 * Once  we're  at [3],  we'll  be deleting  the  mappings producing  [0]  and [1] */
 
 	/* Prepare to enable paging. */
 	movl   $(pagedir_kernel_phys), %eax
@@ -700,7 +700,7 @@ INTERN_FUNCTION(_start)
 	/* Configure the %CR4 register. */
 	movl   %cr4, %eax
 	/* Enable PageSizeExtension (required for 2Mib pages & long-mode),
-	 * as well as PhysicalAddressExtension (required for the 48-bit
+	 * as well as  PhysicalAddressExtension (required  for the  48-bit
 	 * physical address space needed in long-mode) */
 	orl    $(CR4_PSE | CR4_PAE), %eax
 
@@ -727,7 +727,7 @@ INTERN_FUNCTION(_start)
 	rdmsr
 	orl    $(IA32_EFER_LME), %eax /* LongModeEnabled */
 	/* Since we're already here, try to enable some other long-mode extensions,
-	 * such as the NXE bit, as well as SCE (SysCallExtensions) */
+	 * such   as   the   NXE   bit,   as   well   as   SCE  (SysCallExtensions) */
 	ttest  mask=CPUID_80000001D_NX, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D)
 	jz     1f
 	orl    $(IA32_EFER_NXE), %eax
@@ -743,7 +743,7 @@ INTERN_FUNCTION(_start)
 
 	/* Even though paging's been enabled now, we can't unmap the unused identity mappings
 	 * just yet, because we're still running from low-memory and can't jump to our target
-	 * located at the end of the 64-bit address space until we've actually entered long
+	 * located at the end of the 64-bit  address space until we've actually entered  long
 	 * mode. */
 
 	.pushsection .rodata.free
@@ -785,7 +785,7 @@ END(_start)
 .section .text.free
 INTERN_FUNCTION(_start64)
 	/* Do an absolute jump to get out of physical
-	 * memory and into the virtual world! */
+	 * memory   and   into  the   virtual  world! */
 	movabs $(1f), %rax
 	jmpq   *%rax
 1:	/* Now we're truly in virtual, 64-bit mode! */
@@ -812,7 +812,7 @@ INTERN_FUNCTION(_start64)
 	lldtw  %ax
 
 	/* Load %ss and %cs (in pmode we'd use `ljmpl' for this,
-	 * but there is no `ljmpq', so we must use `iretq') */
+	 * but there  is no  `ljmpq', so  we must  use  `iretq') */
 	movq   $(__kernel_boottask_stack + KERNEL_STACKSIZE), %rsp
 	pushq  $(SEGMENT_KERNEL_DATA0)                       /* ir_ss */
 	pushq  $(__kernel_boottask_stack + KERNEL_STACKSIZE) /* ir_rsp */
@@ -822,7 +822,7 @@ INTERN_FUNCTION(_start64)
 	iretq
 1:
 
-	/* With all cpu registers now updated to use virtual pointers, delete
+	/* With all cpu registers now  updated to use virtual pointers,  delete
 	 * page directory mappings that were used to transition to 64-bit mode. */
 	movq   $(0), (__x86_pagedir_kernel_share + 0)
 	movq   $(0), (__x86_pagedir_kernel_share + 8)
@@ -831,12 +831,12 @@ INTERN_FUNCTION(_start64)
 	/* HINT: Right now our VM looks like this:
 	 * [0] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
 	 * [1] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
-	 * In this picture, we're currently running from [1] (mapped at -2GiB...0) */
+	 * In  this  picture, we're  currently running  from  [1] (mapped  at -2GiB...0) */
 
 
 	/* Set the `%gs.base' (`THIS_TASK') register to point to `&_boottask'
-	 * Normally we'd just use `wrgsbase' for this, however we havn't yet
-	 * determined if that instruction even exists, so for now we have to
+	 * Normally  we'd just use `wrgsbase' for this, however we havn't yet
+	 * determined if that instruction even exists, so for now we have  to
 	 * use the associated MSR... */
 	movq   $(_boottask), %rdx
 	movl   %edx, %eax
@@ -849,7 +849,7 @@ INTERN_FUNCTION(_start64)
 	lidtq  x86_idt_ptr
 
 	/* And that's all the assembly-based initialization done!
-	 * Now we just have to invoke `__i386_kernel_main()' */
+	 * Now we  just  have  to  invoke  `__i386_kernel_main()' */
 	pushq  $(SEGMENT_USER_DATA_RPL)   /* ics_irregs.ir_ss */
 	pushq  $(0)                       /* ics_irregs.ir_rsp (set by `__i386_kernel_main') */
 	pushq  $(EFLAGS_IF)               /* ics_irregs.ir_rflags */

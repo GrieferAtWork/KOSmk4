@@ -179,12 +179,12 @@ L(.Lacquire_lapicid_lock):
 	je     L(.Lfirst_lapicid_lock) /* Recursive debugger entry (handled later) */
 	movq   x86_dbg_lapictemporary-8(,%rcx,8), %rcx /* Restore %rcx */
 	/* This is where we get if some other CPU is currently inside the debugger...
-	 * At this point, either re-enable interrupts (if they were enabled before),
+	 * At  this point, either re-enable interrupts (if they were enabled before),
 	 * and always idle a bit (pause) before trying once again. */
 	ttest  mask=EFLAGS_IF, loc=0(%rsp)
 	jz     1f /* Not allowed to block... */
 	sti
-	/* A secondary pause is used because `sti' only enables interrupts after the next instruction.
+	/* A secondary pause is used  because `sti' only enables  interrupts after the next  instruction.
 	 * The intend here is that we execute `pause' at least once with interrupts enabled (if possible) */
 	pause
 	pause
@@ -219,14 +219,14 @@ L(.Ldone_lapicid_lock):
 	movw   $(1), x86_dbg_owner_lapicid
 #endif /* CONFIG_NO_SMP */
 
-	/* As far as scheduling semantics go, we're now in debugger mode.
-	 * However, we still have a lot to do in order to set up the expected
+	/* As  far  as scheduling  semantics go,  we're  now in  debugger mode.
+	 * However,  we still have a lot to do  in order to set up the expected
 	 * debug-mode environment (including stack, segments, scheduling, etc.) */
 
-	/* First step: Check if we've already been in debugger mode before.
+	/* First step: Check if  we've already  been in  debugger mode  before.
 	 *             If we were, then the debugger has tried to enter itself,
-	 *             in which case we mustn't override `DBG_REGLEVEL_EXIT',
-	 *             but should instead reset the stack and invoke the new
+	 *             in which case  we mustn't override  `DBG_REGLEVEL_EXIT',
+	 *             but should instead  reset the stack  and invoke the  new
 	 *             debugger entry point. */
 	EXTERN(dbg_active)
 	cmpb   $(0), dbg_active
@@ -382,7 +382,7 @@ L(.Ldont_reset_dbg_stack):
 
 	/* Fill in TRAP-level cpu state information.
 	 * NOTE: Don't do so if the debugger is being entered recursively!
-	 *       In the later case, we must keep the original trap state. */
+	 *       In  the later case, we must keep the original trap state. */
 	cmpb   $(0), dbg_active
 	jne    1f
 	EXTERN(x86_dbg_trapstate)
@@ -398,9 +398,9 @@ L(.Ldont_reset_dbg_stack):
 
 	/* Setup the debugger entry point callback.
 	 * This needs to be done immediately after loading the debugger stack,
-	 * since in the case of a recursive debugger invocation, `%rdi' may
-	 * actually point into the debugger stack, meaning we have to copy it
-	 * before actually starting to make use of the stack!
+	 * since  in the case  of a recursive  debugger invocation, `%rdi' may
+	 * actually point into the debugger stack, meaning we have to copy  it
+	 * before   actually   starting   to   make   use   of   the    stack!
 	 * For this purpose, we set-up the stack as:
 	 *    %rbx:    OFFSET_DBG_ENTRY_INFO_ENTRY(%rdi)
 	 *  0(%rsp):    entry:%rdi   (either `OFFSET_DBG_ENTRY_INFO_ARGV(0)(%rdi)' or <undefined>)
@@ -416,7 +416,7 @@ L(.Ldont_reset_dbg_stack):
 	 *              [...]
 	 *              <END-OF-STACK>
 	 */
-	/* XXX: Do some additional verification of `struct dbg_entry_info const *%ecx'
+	/* XXX: Do some additional  verification of  `struct dbg_entry_info const *%ecx'
 	 *      After all: If there is anything wrong with it, we're in _deep_ troubles! */
 #ifndef DEFINE_DBG                                /* >> #ifndef DEFINE_DBG                                     */
 	testq  %rdi, %rdi                             /* >> if (%rdi != NULL)                                      */
@@ -464,7 +464,7 @@ L(.Lcall_default):                                /* >> {                       
 L(.Ldebug_stack_setup):                           /* >> }                                                      */
 
 	/* At this point, we have the debugger stack fully set-up, and must now
-	 * invoke all of the high-level debugger initialization callbacks. */
+	 * invoke  all  of  the high-level  debugger  initialization callbacks. */
 
 	/* Check if this is a recursive callback. */
 	cmpb   $(0), dbg_active
@@ -491,7 +491,7 @@ L(.Ldebug_stack_setup):                           /* >> }                       
 	popq   %rdx
 	popq   %rcx
 	popq   %r8
-	popq   %r9 
+	popq   %r9
 	/* NOTE: Additional, stack-based registers would now be accessible, starting at `0(%rsp)' */
 	/* Push `dbg_exit' as the return address for the entry point function. */
 	EXTERN(dbg_exit)

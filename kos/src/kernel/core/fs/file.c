@@ -400,7 +400,7 @@ again:
 					sync_read(parent);
 					parent_node = parent->p_inode->i_fileino;
 					sync_endread(parent);
-					/* Barrier to prevent the dangerous
+					/* Barrier  to  prevent  the  dangerous
 					 * write that follows from being moved. */
 					COMPILER_BARRIER();
 					buf->d_ino = (__ino64_t)parent_node;
@@ -467,7 +467,7 @@ read_entry_pos_0:
 						struct directory_node *dir;
 						/* No successor.
 						 * Either we're on a dangling entry, the directory has ended,
-						 * or the remainder of the directory hasn't been loaded yet. */
+						 * or the remainder of the directory hasn't been loaded  yet. */
 						dir = (struct directory_node *)self->f_node;
 						if (entry != ATOMIC_READ(dir->d_bypos_end)) {
 							/* Danging entry (rewind to find the proper position). */
@@ -509,7 +509,7 @@ got_next_entry:
 				/* Move backwards one-at-a-time. */
 				if unlikely(entry == ((struct directory_node *)self->f_node)->d_bypos) {
 					/* Our directory index broken when files were added/removed.
-					 * We're not on the first entry, so set continue searching
+					 * We're not on the first  entry, so set continue  searching
 					 * for the one that the user requested. */
 					entry_pos = 0;
 					continue;
@@ -578,8 +578,8 @@ got_next_entry:
 		}
 		decref(entry);
 		/* Save the new stream position.
-		 * NOTE: This would be allowed to be a weak access.
-		 *       However, after so much work, let's put some
+		 * NOTE: This would  be allowed  to be  a weak  access.
+		 *       However, after so  much work,  let's put  some
 		 *       effort into confirming that we've copied data. */
 		if (!atomic64_cmpxch(&self->f_offset,
 		                     (u64)dirpos,
@@ -716,7 +716,7 @@ oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
 		/* Free unused memory. */
 		struct oneshot_directory_buffer *truncated_buffer;
 		struct oneshot_directory_buffer *new_buffer;
-		/* Finalize the buffer end-pointer to cut-off any trailing data.
+		/* Finalize the buffer end-pointer  to cut-off any trailing  data.
 		 * This must be done to prevent the caller from reading beyond the
 		 * heap block when later traversing the directory. */
 		buf->odb_end = data->current_ent;
@@ -864,7 +864,7 @@ again:
 					sync_read(parent);
 					parent_node = parent->p_inode->i_fileino;
 					sync_endread(parent);
-					/* Barrier to prevent the dangerous
+					/* Barrier  to  prevent  the  dangerous
 					 * write that follows from being moved. */
 					COMPILER_BARRIER();
 					buf->d_ino = (__ino64_t)parent_node;
@@ -903,7 +903,7 @@ again:
 			buffer = oneshot_getentries((struct directory_node *)self->d_node);
 			COMPILER_READ_BARRIER();
 			new_buffer = ATOMIC_CMPXCH_VAL(self->d_buf, NULL, buffer);
-			/* Another thread allocated the buffer in the
+			/* Another thread allocated  the buffer in  the
 			 * mean time (WRITE_ONCE; keep existing buffer) */
 			if unlikely(new_buffer != NULL)
 				oneshot_freeentries(buffer);
@@ -980,8 +980,8 @@ read_entry_pos_0:
 				req_index = dirpos;
 		}
 		/* Save the new stream position.
-		 * NOTE: This would be allowed to be a weak access.
-		 *       However, after so much work, let's put some
+		 * NOTE: This would  be allowed  to be  a weak  access.
+		 *       However, after so  much work,  let's put  some
 		 *       effort into confirming that we've copied data. */
 		if (!atomic64_cmpxch(&self->d_offset,
 		                     (u64)dirpos,
@@ -1027,7 +1027,7 @@ STATIC_ASSERT(offsetof(struct file, f_path) == offsetof(struct fifo_user, fu_pat
 STATIC_ASSERT(offsetof(struct file, f_dirent) == offsetof(struct fifo_user, fu_dirent));
 
 /* This is the most-used handle converter function,
- * since most open() calls return FILE-objects. */
+ * since most  open()  calls  return  FILE-objects. */
 INTERN NONNULL((1)) REF void *KCALL
 handle_file_tryas(struct file *__restrict self,
                   uintptr_half_t wanted_type)

@@ -116,7 +116,7 @@ INTDEF byte_t __kernel_bootiob_startpage_p[] ASMNAME("__x86_iob_empty_page_p");
 
 /* The first mapping: a single page not mapped to anything, located at `0xc0000000'.
  * This page is used to ensure that iterating through user-memory can always be done
- * safely, after only the starting pointer has been checked, so long as at least 1
+ * safely,  after only the starting pointer has been  checked, so long as at least 1
  * byte is read for every 4096 bytes being advanced. */
 #define X86_KERNEL_VMMAPPING_CORE_TEXT        0 /* .text */
 #define X86_KERNEL_VMMAPPING_CORE_RODATA      1 /* .rodata */
@@ -387,7 +387,7 @@ INIT_MNODE(x86_pdata_mnode,
 
 
 
-/* The components for initializing the initial mapping of the .free section.
+/* The components for initializing the  initial mapping of the .free  section.
  * These are handled on their own, as they are part of the .free section, thus
  * allowing them to be deleted once .free gets removed. */
 INTDEF struct mpart x86_kernel_vm_part_free;
@@ -528,7 +528,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	/* Insert kernel-space memory nodes into the kernel VM, and re-map memory as needed. */
 	vm_node_insert(&x86_vmnode_transition_reserve);
 	/* NOTE: Map the .text and .rodata sections as writable for now, so-as to allow initialization
-	 *       code to modify itself, as well as otherwise constant data structures. */
+	 *       code   to   modify  itself,   as  well   as   otherwise  constant   data  structures. */
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
@@ -549,9 +549,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	vm_node_insert(&x86_kernel_vm_node_free);
 	vm_node_insert(&kernel_meminfo_mnode);
 
-	/* Insert the mapping for the physical identity (.pdata) section.
+	/* Insert  the  mapping  for   the  physical  identity  (.pdata)   section.
 	 * The contents of this section are mainly required for SMP initialization,
-	 * though can also be used for other things that require being placed at a
+	 * though  can also be used for other things that require being placed at a
 	 * known physical memory location. */
 	if (!pagedir_prepare(__kernel_pdata_start - KERNEL_CORE_BASE, (size_t)__kernel_pdata_size))
 		kernel_panic(FREESTR("Failed to prepare kernel VM for mapping .pdata\n"));
@@ -597,7 +597,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 			iter = mnode_tree_nextnode(iter);
 #ifdef __x86_64__
 			/* Since the 64-bit page directory identity mapping isn't located
-			 * at the end of the kernel address space, we also have to unmap
+			 * at the end of the kernel address space, we also have to  unmap
 			 * memory following the last mapping. */
 			if (!iter) {
 				pagedata_next_min = (void *)0;
@@ -623,7 +623,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 
 	/* Clear the trampoline mappings of the 3 initial threads.
 	 * Before this point, they were (likely) still filled in with the original
-	 * physical memory identity mapping containing the kernel core image, or
+	 * physical memory identity mapping containing  the kernel core image,  or
 	 * may have also not been mapped at all (in which case this is a no-op)
 	 * s.a.: the comment inside of `vm_copyfromphys_noidentity_partial()' in `boot/acpi.c' */
 #ifdef CONFIG_USE_NEW_VM
@@ -641,10 +641,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_mman_kernel_rdonly)(void) {
-	/* Go through all kernel VM mappings, and make everything that's been
+	/* Go through all  kernel VM  mappings, and make  everything that's  been
 	 * mapped as writable, but should actually be read-only, truly read-only.
-	 * This affects the kernel's .text and .rodata section, which previously
-	 * allowed self-modifying code to replace itself with an optimized/more
+	 * This affects the kernel's .text and .rodata section, which  previously
+	 * allowed self-modifying code to  replace itself with an  optimized/more
 	 * appropriate version. */
 	pagedir_map(mnode_getaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT]),
 	            mnode_getsize(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT]),
@@ -694,15 +694,15 @@ INTDEF byte_t __kernel_pfree_endpage_p[];
 INTDEF byte_t __kernel_pfree_numpages[];
 
 /* This function can't be made apart of the .free section, because if it was,
- * it could potentially override itself, crashing in a spectacular manner.
- * However, there still is another place we can (and are) able to put it,
- * that place being at the far end of the boot cpu's #DF handler stack.
- * Under normal circumstances, early boot should never cause a double fault,
+ * it could potentially  override itself, crashing  in a spectacular  manner.
+ * However, there still is  another place we  can (and are)  able to put  it,
+ * that place being  at the  far end  of the  boot cpu's  #DF handler  stack.
+ * Under  normal circumstances, early boot should never cause a double fault,
  * and when it does, we probably won't get here, either.
  * And even if we do, this function only gets overwritten when the #DF handler
  * used practically the entirety of its stack.
  * As a trade-off, this function's text cannot be larger than `KERNEL_DF_STACKSIZE'
- * bytes, and should it ever grow larger than that, a linker error will occur! */
+ * bytes, and should  it ever grow  larger than  that, a linker  error will  occur! */
 INTERN ATTR_SECTION(".text.xdata.x86.free_unloader") ATTR_NORETURN
 void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #if 1
@@ -716,19 +716,19 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 		pagedir_kernelunprepare(__kernel_free_start, (size_t)__kernel_free_size);
 	}
 
-	/* Release all pages of the .free section, as well as those
+	/* Release all  pages of  the .free  section, as  well as  those
 	 * previously used by BRK data to the physical memory allocator. */
 	page_free((physpage_t)__kernel_pfree_startpage_p,
 	          (size_t)__kernel_pfree_numpages);
 
-	/* TODO: Go through memory information and find the first `PMEMBANK_TYPE_KFREE'
+	/* TODO: Go through memory information and find the first  `PMEMBANK_TYPE_KFREE'
 	 *       bank, then split it into a `PMEMBANK_TYPE_KERNEL' / `PMEMBANK_TYPE_RAM'
 	 *       pair, with the first part having a size of `brk_size', while the second
 	 *       part uses the remainder as RAM.
 	 *       NOTE: If the `PMEMBANK_TYPE_KFREE' bank is smaller than `brk_size',
 	 *             extend it beforehand.
 	 * TODO: This should be done beforehand by another function that is apart of the
-	 *       .free section. That way, we can keep this function a bit smaller! */
+	 *       .free  section.  That way,  we can  keep this  function a  bit smaller! */
 
 	printk("UNLOAD_FREE successfully completed!\n");
 

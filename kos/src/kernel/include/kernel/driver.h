@@ -153,7 +153,7 @@ DECL_BEGIN
  *   $ g++ -fno-rtti -shared -static-libgcc -ffreestanding -o MY_DRIVER.o MY_DRIVER.c
  *   $ g++ -fno-rtti -shared -static-libgcc -ffreestanding -nostdlib -Wl,-soname=MY_DRIVER -o MY_DRIVER MY_DRIVER.o -lgcc
  * NOTE: No need to pass -fPIC as longer driver initialization times
- *       should be preferred above overall slow driver run-times.
+ *       should be preferred  above overall  slow driver  run-times.
  */
 
 
@@ -180,7 +180,7 @@ DATDEF size_t /*         */ drv_argc;          /* Driver argument count (== &drv
 DATDEF char /*          */ *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 
 
-/* NOTE: This function may  be  implemented  by  individual  drivers!
+/* NOTE: This  function  may  be implemented  by  individual drivers!
  *       This isn't a function that is exported by the kernel itself!
  * Try (as in: never throw, or block) to clear global caches,  releasing
  * heap  memory as those  caches are cleared  before returning the total

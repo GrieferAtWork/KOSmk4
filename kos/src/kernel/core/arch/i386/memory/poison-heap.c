@@ -46,8 +46,8 @@ struct ph_item {
 	byte_t     *pi_loc; /* Location where to inject the redirection/return */
 	union {
 		byte_t *pi_dst; /* [valid_if(ADDR_ISKERN(pi_dst))] Target where-to point a redirection */
-		size_t  pi_ret; /* [valid_if(!ADDR_ISKERN(pi_dst))] # of bytes to unwind during a ret. The 
-		                 * least significant bit indicates that the function should return 0/NULL */
+		size_t  pi_ret; /* [valid_if(!ADDR_ISKERN(pi_dst))] # of bytes to unwind during a ret. The
+		                 * least significant bit indicates that the function should return  0/NULL */
 	};
 };
 

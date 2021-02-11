@@ -1160,7 +1160,7 @@ do_unsigned:
 			/* The only way to differentiate between `signed char' and `char'
 			 * in debug information (which we need to do, since we only allow
 			 * `char *' to be printed  as strings, but leave  `signed char *'
-			 * alone),   is  to  look   at  the  name   field  of  the  type:
+			 * alone), is to look at the name field of the type:
 			 * ```
 			 * <1><xxx>: Abbrev Number: xxx (DW_TAG_base_type)
 			 *    <xxx>   DW_AT_byte_size   : 1

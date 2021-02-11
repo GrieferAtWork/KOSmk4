@@ -103,7 +103,7 @@ struct rpc_syscall_info;
  * @return: * :     The CPU state to restore (usually just `state' again).
  * @return: TASK_RPC_RESTART_SYSCALL: [valid_if(reason == TASK_RPC_REASON_SYSCALL)]
  *                                    The interrupted system call should be restarted
- *                                    without ever returning back to user-space. */
+ *                                    without  ever  returning  back  to  user-space. */
 typedef WUNUSED NONNULL((2)) struct icpustate *
 (FCALL *task_rpc_t)(void *arg,
                     struct icpustate *__restrict state,
@@ -113,9 +113,9 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
 #endif /* __CC__ */
 
 /* RPC reason codes. */
-#define TASK_RPC_REASON_ASYNC        0x0000 /* The  RPC  is  being  served   asynchronous,  following  either  an   IPI
-                                             * being served  by  the target  CPU,  or  the target  thread  having  been
-                                             * preempted  before,  and  now finding  its  next quantum  to  have begun.
+#define TASK_RPC_REASON_ASYNC        0x0000 /* The  RPC is  being served  asynchronous, following  either an IPI
+                                             * being served by the target CPU, or the target thread having  been
+                                             * preempted before, and now finding its next quantum to have begun.
                                              * NOTE: This reason is never set when the RPC was scheduled synchronously. */
 #define TASK_RPC_REASON_ASYNCUSER    0x0001 /* Similar to `TASK_RPC_REASON_ASYNC', however this may still be a valid
                                              * reason  for synchronous kernel-space RPCs, as the RPC is being served
@@ -153,8 +153,8 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
                                              *          successfully, while being re-directed somewhere along the way. */
 #define TASK_RPC_REASON_SHUTDOWN     0x0004 /* The RPC is being serviced because the hosting thread is currently exiting.
                                              * This reason is given in one of two cases:
-                                             *  - To service  any  remaining synchronous  RPC  that  is when  `task_exit()'  is  called,
-                                             *    or when  task_destroy() was  called for  a  thread that  was never  actually  started.
+                                             *  - To service any remaining synchronous RPC that is when `task_exit()' is  called,
+                                             *    or when task_destroy() was called for a thread that was never actually started.
                                              *    WARNING: In this case, the RPC is executed by an arbitrary thread on an arbitrary CPU.
                                              *  - To service an asynchronous RPC when the target thread has terminated, but wasn't
                                              *    yet terminated when  `task_schedule_asynchronous_rpc()' already returned  `true'

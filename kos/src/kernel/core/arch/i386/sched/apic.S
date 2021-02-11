@@ -39,8 +39,8 @@
 
 /* >> FUNDEF NOBLOCK WUNUSED NOPREEMPT bool
  * >> NOTHROW(FCALL arch_cpu_hwipi_pending_nopr)(void);
- * Check if IPIs are pending to be executed by the calling CPU,
- * returning `true' if this is the case, or `false' it not.
+ * Check  if IPIs are  pending to be executed  by the calling CPU,
+ * returning  `true'  if  this is  the  case, or  `false'  it not.
  * In order to serve any pending IPIs, preemption must be enabled. */
 .section .text
 PUBLIC_FUNCTION(arch_cpu_hwipi_pending_nopr)

@@ -83,9 +83,9 @@ udp_autobind_impl(struct udp_socket *__restrict me) {
 	static u16 nextport = 10000;
 	/* TODO: Do proper port binding! */
 	/* TODO: Linux uses a /proc file to specify the range of
-	 *       ports used for dynamic port allocation by IP:
+	 *       ports  used for dynamic  port allocation by IP:
 	 *       /proc/sys/net/ipv4/ip_local_port_range
-	 *       We should also support that file and select
+	 *       We  should  also support  that file  and select
 	 *       some port out of that range here. */
 	me->us_bindip.s_addr = htonl(0);
 	me->us_bindport      = htons(ATOMIC_FETCHINC(nextport));
@@ -165,7 +165,7 @@ udp_getpeername(struct socket *__restrict self,
 PRIVATE NONNULL((1)) void KCALL
 udp_bind(struct socket *__restrict self,
          USER CHECKED struct sockaddr const *addr,
-         socklen_t addr_len) 
+         socklen_t addr_len)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
 	struct udp_socket *me;
 	USER CHECKED struct sockaddr_in const *in;
@@ -185,7 +185,7 @@ udp_bind(struct socket *__restrict self,
 		 *       PACKET.UDP.DST_PORT == me->us_bindport;
 		 *       Where `me->us_bindip.s_addr == 0' causes the ip-check to be skipped,
 		 *       as though the mask resulting from `(-1 << ffs(me->us_bindip.s_addr)'
-		 *       evaluated to `0' (reminder: ffs(x) is FindFirstSet, such that
+		 *       evaluated to  `0'  (reminder:  ffs(x)  is  FindFirstSet,  such  that
 		 *       `(x & (1 << ffs(x))) != 0' so-long as `x != 0') */
 	} EXCEPT {
 		ATOMIC_AND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
@@ -232,16 +232,16 @@ udp_sendtov(struct socket *__restrict self,
 	REF struct nic_packet *packet;
 	(void)msg_flags;
 	/* TODO: Support for `msg_flags & MSG_DONTROUTE' (don't use a gateway,
-	 *       but only send to directly reachable peers; this is what KOS
+	 *       but only send to directly  reachable peers; this is what  KOS
 	 *       currently does for every outbound packet; there is no concept
 	 *       of gateways as of yet...) */
 	/* TODO: Support for `msg_flags & MSG_MORE' (don't immediately transmit
-	 *       the datagram. Wait for more data for up to 200 milliseconds) */
+	 *       the datagram. Wait for more  data for up to 200  milliseconds) */
 
 	me  = (struct udp_socket *)self;
 	in  = udp_verify_sockaddr(addr, addr_len);
-	/* TODO: From what I understand, network cards should actually be
-	 *       selected based on `in->sin_addr.s_addr' (i.e. the target's
+	/* TODO: From what I  understand, network cards  should actually  be
+	 *       selected  based on `in->sin_addr.s_addr' (i.e. the target's
 	 *       IP address). As such, there needs to be a routing table for
 	 *       mapping IP addresses to NIC devices, rather than having one
 	 *       default adapter for _everything_.
@@ -304,7 +304,7 @@ udp_recvfromv(struct socket *__restrict self,
 	me = (struct udp_socket *)self;
 	/* TODO: Implement once we've got routing of incoming UDP packets. */
 	/* Reminder: When the received packet is larger than the given buffer,
-	 *           then we must set `*presult_flags & MSG_TRUNC' before
+	 *           then  we  must  set  `*presult_flags & MSG_TRUNC'  before
 	 *           completion! */
 	(void)me;
 	(void)buf;

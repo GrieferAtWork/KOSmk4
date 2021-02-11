@@ -616,7 +616,3 @@
 #undef IDT_SPECIFIC_IMPL
 #endif /* IDT_SPECIFIC_IMPL */
 /*[[[end]]]*/
-
-
-
-

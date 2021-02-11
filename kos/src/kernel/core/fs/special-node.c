@@ -29,10 +29,10 @@
 
 DECL_BEGIN
 
-/* Mandatory finalizier that must be called by `struct inode_type::it_fini'
- * of any INode that is `S_ISFIFO()'. This function must be called by
+/* Mandatory finalizier that  must be  called by  `struct inode_type::it_fini'
+ * of any  INode  that  is  `S_ISFIFO()'. This  function  must  be  called  by
  * file-system specific overrides for `struct inode_type::it_fini', and should
- * be linked in as part of the `struct inode_type::it_directory::d_mknod'
+ * be  linked  in  as part  of  the `struct inode_type::it_directory::d_mknod'
  * callback. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fifo_node_fini)(struct inode *__restrict self) {

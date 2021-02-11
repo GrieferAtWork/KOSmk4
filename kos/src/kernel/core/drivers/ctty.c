@@ -156,7 +156,7 @@ ctty_open(struct character_device *__restrict self,
 
 /* The character device made available under /dev/tty
  * This device implements all operators as direct aliasing callbacks
- * to the TTY character device addressable through `task_getctty()' */
+ * to  the TTY character device addressable through `task_getctty()' */
 PUBLIC struct character_device dev_tty = {
 	/* .cd_refcnt   = */ 1,
 	/* .cd_heapsize = */ sizeof(dev_tty),

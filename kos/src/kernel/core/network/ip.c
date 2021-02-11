@@ -113,10 +113,10 @@ NOTHROW(KCALL network_ip_datagrams_delete)(struct network_ip_datagrams *__restri
 	}
 }
 
-/* Fill in a given section of the IP datagram payload and update
- * hole descriptors accordingly. If There are no more holes, and
- * the `IP_DATAGRAM_FLAG_GOTLAST' flag has been set, `true' is
- * returned and `self->dg_hol' may not be updated accordingly.
+/* Fill in a given section of the IP datagram payload and  update
+ * hole descriptors accordingly. If There are no more holes,  and
+ * the `IP_DATAGRAM_FLAG_GOTLAST' flag  has been  set, `true'  is
+ * returned and `self->dg_hol'  may not  be updated  accordingly.
  * Otherwise (i.e. when the datagram remains incomplete), `false'
  * is returned. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 4)) bool
@@ -141,13 +141,13 @@ NOTHROW(KCALL ip_datagram_write)(struct ip_datagram *__restrict self,
 	hole = holeat(self->dg_hol);
 	assert(hole->dh_end <= self->dg_len);
 	if unlikely(start_offset >= hole->dh_end) {
-		/* Simple case: the specified range lies beyond the end of the last hole.
+		/* Simple case: the specified range lies beyond  the end of the last  hole.
 		 *              In other words: This write doesn't actually fill any holes! */
 writeall_return_false:
 		memcpy((byte_t *)self->dg_buf + start_offset, data, length);
 		return false;
 	}
-	/* Must delete all holes that are overlapping with the given range.
+	/* Must  delete  all  holes  that   are  overlapping  with  the  given   range.
 	 * First this, skip all leading holes that only begin after, or at `end_offset' */
 	hole_pself = &self->dg_hol;
 	hole_start = self->dg_hol;
@@ -193,7 +193,7 @@ writeall_return_false:
 	assert(start_offset <= hole_start);
 	assert(end_offset > hole_start);
 	assert(end_offset >= hole->dh_end);
-	/* Find the first (or last from the right) hole that
+	/* Find the first (or last from the right) hole  that
 	 * still overlaps with the written range (or in other
 	 * words: the hole where `->dh_end > start_offset'). */
 	firsthole_start = hole->dh_prev;
@@ -279,7 +279,7 @@ ip_routepacket(struct nic_device *__restrict dev,
 		struct timespec now;
 		/* Calculate the fragment's effective size
 		 * NOTE: There is a special case where the fragment with offset=0
-		 *       is also used to set the header of the final datagram! */
+		 *       is  also used to  set the header  of the final datagram! */
 		fragment_start   = (offset & IP_OFFMASK) * 8;
 		fragment_size    = total_length;
 		fragment_payload = (byte_t *)packet_data;
@@ -364,7 +364,7 @@ do_write_fragment_nogotlast:
 			}
 
 			/* The fragment doesn't fit into the already-allocated buffer.
-			 * Make sure that the `IP_DATAGRAM_FLAG_GOTLAST' flag hasn't
+			 * Make sure that  the `IP_DATAGRAM_FLAG_GOTLAST' flag  hasn't
 			 * been set already. */
 			if unlikely(dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST) {
 				struct iphdr *datagram;
@@ -403,7 +403,7 @@ do_write_fragment_nogotlast:
 					/* Copy already-written fragment data. */
 					memcpy(new_buffer, dg->dg_buf, dg->dg_len);
 					/* Free the old buffer.
-					 * NOTE: Because hole-descriptors use buffer-relative pointer,
+					 * NOTE: Because hole-descriptors  use  buffer-relative  pointer,
 					 *       we don't need to update them in this case, or the atomic
 					 *       realloc case above! */
 					kfree(dg->dg_buf);
@@ -416,7 +416,7 @@ do_write_fragment_nogotlast:
 					dg->dg_flg |= IP_DATAGRAM_FLAG_GOTLAST;
 				if (fragment_start == old_length) {
 					/* The entirety of the fragment exists exactly at the end of the old datagram.
-					 * With this in mind, we don't need to create/update/delete/etc. hole data,
+					 * With  this in mind,  we don't need  to create/update/delete/etc. hole data,
 					 * since no new holes got created! */
 					memcpy((byte_t *)dg->dg_buf + fragment_start, fragment_payload, fragment_size);
 					if (dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST)
@@ -430,8 +430,8 @@ do_write_fragment_nogotlast:
 					hole->dh_end  = fragment_start;
 					dg->dg_hol    = old_length;
 				} else {
-					/* Highly unlikely case: The current fragment partially overlaps
-					 * with some older fragment such that the new fragment is larger.
+					/* Highly unlikely case:  The current  fragment partially  overlaps
+					 * with some older fragment such  that the new fragment is  larger.
 					 * The standard allows this, however in practice there really isn't
 					 * a good reason for this to ever happen...
 					 * We handle this case by creating a new hole at the end, and doing
@@ -651,7 +651,7 @@ struct ip_arp_and_datagram_job {
 	unsigned int              adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_handle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
 	/* XXX: Have another state where we wait for an ARP request to finish being sent?
-	 *      Right now, our ARP timeout starts as soon as the ARP request is started,
+	 *      Right  now, our ARP timeout starts as soon as the ARP request is started,
 	 *      rather than waiting until the ARP request has made it through our NIC... */
 };
 
@@ -791,19 +791,19 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
 
 /* Send a given IP datagram packet `packet'.
  * NOTE: The caller is responsible to ensure that `packet'
- *       still has sufficient head/tail memory to include
+ *       still  has sufficient head/tail memory to include
  *       ethernet headers.
  * Or in other words, this function assumes that:
  * >> assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
  * >> assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
- * - Additionally, the caller is responsible to ensure that the
- *   fully initialized IP header (i.e. `struct iphdr') is pointed
+ * - Additionally, the caller  is responsible to  ensure that  the
+ *   fully  initialized IP header (i.e. `struct iphdr') is pointed
  *   to by `packet->np_head' upon entry, as this function will try
  *   to read from that structure in order to figure out addressing
- *   information that are required for filling in information for
+ *   information that are required for filling in information  for
  *   underlying network layers.
  * - NOTE: If necessary, this function will also perform the required
- *         ARP network traffic in order to translate the target IP
+ *         ARP network traffic  in order to  translate the target  IP
  *         address pointed to by the IP header of `packet'.
  * NOTE: This function automatically fills in the following fields of the IP header:
  *   - ip_v      (With the value `4')
@@ -850,8 +850,8 @@ ip_senddatagram(struct nic_device *__restrict dev,
 	{
 		u16 dgramid;
 		/* Fill in header fields that are automatically calculated.
-		 * NOTE: We use one datagram ID per peer so we get the max
-		 *       number of unique IDs, whilst not leaking any info
+		 * NOTE: We  use one  datagram ID per  peer so we  get the max
+		 *       number of  unique IDs,  whilst not  leaking any  info
 		 *       about how much we've been talking to different peers. */
 		dgramid = ATOMIC_FETCHINC(peer->npa_ipgramid);
 		hdr->ip_v   = IPVERSION;
@@ -909,7 +909,7 @@ struct ip_arp_and_datagrams_job {
 	unsigned int                   adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_multihandle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
 	/* XXX: Have another state where we wait for an ARP request to finish being sent?
-	 *      Right now, our ARP timeout starts as soon as the ARP request is started,
+	 *      Right  now, our ARP timeout starts as soon as the ARP request is started,
 	 *      rather than waiting until the ARP request has made it through our NIC... */
 };
 
@@ -1052,13 +1052,13 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
 };
 
 
-/* Similar to `ip_senddatagram()', however instead of taking a NIC
- * packet object, this function takes a packet descriptor. With this
+/* Similar to `ip_senddatagram()',  however instead of  taking a  NIC
+ * packet object, this function takes a packet descriptor. With  this
  * in mind, this function is more efficient in cases where the caller
  * isn't given a packet object, but rather, is presented with an I/O-
  * vector, or similar.
  * Note however that if you've been given a NIC packet, you should really
- * use the above function instead, since doing so reduces the amount of
+ * use the above function instead, since  doing so reduces the amount  of
  * copying necessary when the datagram can fit into a single fragment.
  * NOTE: This function automatically fills in the following fields of the IP header:
  *   - ip_v      (With the value `4')
@@ -1092,7 +1092,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 #ifndef __OPTIMIZE_SIZE__
 		else {
 			/* XXX: No need to have the send-part be started by the async-job.
-			 *      When the MAC is already available, then _we_ can do that
+			 *      When the MAC is already  available, then _we_ can do  that
 			 *      already! */
 		}
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1110,7 +1110,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 				memcpy(&used_packet, packet, sizeof(used_packet));
 
 				/* Don't include the original IP header within datagram fragments.
-				 * Instead, the IP header is replicated within every fragment. */
+				 * Instead, the  IP header  is replicated  within every  fragment. */
 				used_packet.npd_head += sizeof(struct iphdr);
 				used_packet.npd_headsz -= sizeof(struct iphdr);
 				assert((dev->nd_net.n_ipsize & 7) == 0);
@@ -1139,8 +1139,8 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 				RETHROW();
 			}
 			/* Fill in header fields that are automatically calculated.
-			 * NOTE: We use one datagram ID per peer so we get the max
-			 *       number of unique IDs, whilst not leaking any info
+			 * NOTE: We  use one  datagram ID per  peer so we  get the max
+			 *       number of  unique IDs,  whilst not  leaking any  info
 			 *       about how much we've been talking to different peers. */
 			dgramid = ATOMIC_FETCHINC(peer->npa_ipgramid);
 			/* Construct the IP headers for all of the fragments. */

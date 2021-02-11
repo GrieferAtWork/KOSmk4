@@ -67,61 +67,61 @@
 DECL_BEGIN
 
 /* NOTE: In order to emulate linux's readdir() API, we have to make
- *       a compromise as far as thread-safety and semantics go:
+ *       a compromise  as far  as thread-safety  and semantics  go:
  *
- * On KOS, the readdir() operation (s.a. `sys_kreaddir()') is dispatched
- * via an atomic handle operation `h_readdir' that does all of the usual
+ * On KOS,  the  readdir()  operation (s.a.  `sys_kreaddir()')  is  dispatched
+ * via  an  atomic handle  operation `h_readdir'  that does  all of  the usual
  * read+advance all on its own. (this callback also supports a PEEK operation)
  *
  * As such, it is up to the operator to decide when to actually advance the
- * read/write pointer, which is controlled via the readdir-mode:
+ * read/write   pointer,   which  is   controlled  via   the  readdir-mode:
  *   - READDIR_DEFAULT:  Yield to next entry when `buf' was of sufficient size
  *   - READDIR_CONTINUE: Always yield to next entry
  *   - READDIR_PEEK:     Never yield to next entry
  *
  * The readdir() implementation from libc.so makes use of `READDIR_DEFAULT',
- * in conjunction with `READDIR_MULTIPLE' to get optimal performance.
+ * in  conjunction  with  `READDIR_MULTIPLE'  to  get  optimal  performance.
  *
- * However, we run into a problem since we can't let the per-handle backend
+ * However,  we run into a problem since  we can't let the per-handle backend
  * decide when to actually advance the read/write pointer, since only we know
- * when the user-provided buffer actually has sufficient length to store any
+ * when  the user-provided buffer actually has sufficient length to store any
  * additional directory entries.
  *
  * As such, the API emulated in this file isn't 100% thread-safe, in that multiple
- * threads reading from the same directory stream might get duplicate entries at
+ * threads reading from the same directory  stream might get duplicate entries  at
  * one point, but skip other entries at other points:
  *
  *  #1: Use `READDIR_PEEK' to read the next directory entry.
- *      If end-of-directory was encountered, stop reading.
+ *      If end-of-directory was  encountered, stop  reading.
  *
  *  #2: Convert the entry to the appropriate linux-format.
  *      If the user-provided buffer is too small, indicate
  *      this fact to the caller.
  *
  *  #3: Use `READDIR_CONTINUE' alongside an empty buffer to
- *      force the directory stream to advance to the next
+ *      force the directory stream  to advance to the  next
  *      entry.
  *
  *  #4: Continue with step #1
  *
  * You should immediately realize that this scheme isn't thread-safe, since another
- * thread may read some other entry from the directory between step #1 and #3, and
+ * thread  may read some other entry from the directory between step #1 and #3, and
  * you would be right in this assessment.
  *
- * To (try to) mitigate this problem (since using multiple threads to read directory
- * entries isn't actually something too far-fetched), a hash-vector of statically
- * allocated locks exists that is used alongside the internal address of the associated
+ * To (try to)  mitigate this problem  (since using multiple  threads to read  directory
+ * entries isn't  actually  something  too far-fetched),  a  hash-vector  of  statically
+ * allocated locks exists that is used alongside the internal address of the  associated
  * file-handle in order to acquire a (waitable) lock during every linux-emulated readdir
  * operation.
  * But note that this only guards against parallel calls to linux's readdir API. When
- * this is also mixed with KOS's readdir API, you will once again run into the data
+ * this  is also mixed with KOS's readdir API,  you will once again run into the data
  * race described above.
  */
 
 
 
-/* NOTE: The readdir lock system is designed to have as small of a memory
- *       footprint as possible. - It's not (even meant to be) designed for
+/* NOTE: The  readdir lock system is designed to  have as small of a memory
+ *       footprint as possible. - It's not (even meant to be) designed  for
  *       performance. (since this whole file is only meant for binary linux
  *       compatibility) */
 #ifndef CONFIG_READDIR_LOCK_COUNT
@@ -166,18 +166,18 @@ readdir_lock_acquire(void *h_data) {
 	index = readdir_lock_index(h_data);
 	word  = readdir_lockbits_word(index);
 	mask  = readdir_lockbits_mask(index);
-	/* NOTE: No need to worry about re-entrancy for this lock!
-	 *       This lock is only acquired from the syscall wrappers
-	 *       in this file, and there is no way that some kernel
+	/* NOTE: No need  to worry  about re-entrancy  for this  lock!
+	 *       This lock is only acquired from the syscall  wrappers
+	 *       in  this file, and  there is no  way that some kernel
 	 *       callback further down the path of execution will call
-	 *       back to one of these, mainly since directly invoking
-	 *       system calls while already in kernel isn't allowed.
+	 *       back to one of these, mainly since directly  invoking
+	 *       system  calls while already  in kernel isn't allowed.
 	 *
-	 * -> The only way that a system call can invoke some other system
+	 * -> The  only  way that  a system  call can  invoke some  other system
 	 *    call is by sending an RPC to itself, and using `syscall_emulate()'
-	 *    alongside the register state given to the RPC handler.
-	 *    And in this scenario, the RPC delivery mechanism will have
-	 *    already unwound our stack, at which we'd have already released
+	 *    alongside  the   register  state   given  to   the  RPC   handler.
+	 *    And  in  this  scenario,  the  RPC  delivery  mechanism  will have
+	 *    already  unwound our  stack, at  which we'd  have already released
 	 *    the readdir lock, so no dead-lock is possible.
 	 */
 	for (;;) {
@@ -255,7 +255,7 @@ public:
 };
 
 
-/* Try to peek the next not-yet-consumed directory entry from `self'.
+/* Try to peek the next  not-yet-consumed directory entry from  `self'.
  * Once the end of the directory has been reached, return NULL instead. */
 PRIVATE WUNUSED NONNULL((1)) struct dirent *KCALL
 readdir_buffer_peek(struct readdir_buffer *__restrict self) {
@@ -321,9 +321,9 @@ DEFINE_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 	}
 	buf->d_namlen = ent->d_namlen;
 	/* Copy the name to user-space.
-	 * WARNING: This copy has no buffer bounds, and there is no way
+	 * WARNING: This copy has no buffer  bounds, and there is no  way
 	 *          for user-space to limit how much data is copied here.
-	 *          Furthermore, on KOS the max *possible* name length
+	 *          Furthermore, on KOS  the max  *possible* name  length
 	 *          copied here is 65535! */
 	memcpy(buf->d_name, ent->d_name,
 	       ent->d_namlen + 1,
@@ -361,9 +361,9 @@ DEFINE_COMPAT_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 	}
 	buf->d_namlen = ent->d_namlen;
 	/* Copy the name to user-space.
-	 * WARNING: This copy has no buffer bounds, and there is no way
+	 * WARNING: This copy has no buffer  bounds, and there is no  way
 	 *          for user-space to limit how much data is copied here.
-	 *          Furthermore, on KOS the max *possible* name length
+	 *          Furthermore, on KOS  the max  *possible* name  length
 	 *          copied here is 65535! */
 	memcpy(buf->d_name, ent->d_name,
 	       ent->d_namlen + 1,

@@ -137,7 +137,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	}
 	dbg_printf(" #%-2u", thread->t_cpu->c_id);
 
-	/* When the thread is sleeping, it's current program location will
+	/* When  the thread  is sleeping,  it's current  program location will
 	 * always be in `task_sleep()', so there's no need to print this info. */
 	if (state != THREAD_STATE_SLEEPING) {
 		old_current = dbg_current;
@@ -246,16 +246,16 @@ evalthreadexpr(char *expr, struct task **presult) {
 	}	return true;
 
 	/* TODO: Allow selecting by path:
-	 *    `c0i'  cpu[0].idle
-	 *    `c0c'  cpu[0].current
-	 *    `c0s'  cpu[0].sleeping
-	 *    `c0s2' cpu[0].sleeping->next
-	 *    `bc'   _bootcpu.current
-	 *    `bs'   _bootcpu.sleeping
-	 *    `bs2'  _bootcpu.sleeping->next */
+	 *    `c0i':  cpu[0].idle
+	 *    `c0c':  cpu[0].current
+	 *    `c0s':  cpu[0].sleeping
+	 *    `c0s2': cpu[0].sleeping->next
+	 *    `bc':   _bootcpu.current
+	 *    `bs':   _bootcpu.sleeping
+	 *    `bs2':  _bootcpu.sleeping->next */
 	/* TODO: Allow selecting by name:
-	 *    `b'    _boottask
-	 *    `bi'   _bootidle */
+	 *    `b':    _boottask
+	 *    `bi':   _bootidle */
 
 	default:
 		break;

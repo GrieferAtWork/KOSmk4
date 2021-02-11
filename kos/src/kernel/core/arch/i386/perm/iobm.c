@@ -52,16 +52,16 @@ DECL_BEGIN
 PUBLIC ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap = NULL;
 
 /* [0..1][lock(THIS_CPU && !PREEMPTION_ENABLED())]
- * The I/O permissions bitmap currently active within the calling CPU.
+ * The I/O  permissions  bitmap  currently active  within  the  calling  CPU.
  * Set to `NULL' during preemption; Filled in during the first #PF that ended
- * up being caused by the CPU trying to access the I/O permissions bitmap. */
+ * up being caused by  the CPU trying to  access the I/O permissions  bitmap. */
 PUBLIC ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap = NULL;
 
-/* Check if `self' is currently mapped with write permissions within the calling CPU.
- * If this is the case, get rid of those write permissions, but keep the ioperm bitmap
- * itself mapped as read-only (used to implement copy-on-write during clone() in order
- * to prevent a race condition when user-space calls `clone()' followed by `ioperm()',
- * where we need to prevent the `ioperm()' call from potentially modifying the I/O
+/* Check  if `self' is currently mapped with  write permissions within the calling CPU.
+ * If  this is the case, get rid of those write permissions, but keep the ioperm bitmap
+ * itself mapped as read-only (used to implement copy-on-write during clone() in  order
+ * to prevent a race condition when user-space calls `clone()' followed by  `ioperm()',
+ * where we need  to prevent  the `ioperm()' call  from potentially  modifying the  I/O
  * permissions bitmap of the child thread, which it otherwise would if the child thread
  * got scheduled on a different CPU, or hasn't yet received its first quantum) */
 LOCAL NOBLOCK void
@@ -96,8 +96,8 @@ NOTHROW(KCALL clone_this_ioperm_bitmap)(struct task *__restrict new_thread,
                                         uintptr_t UNUSED(flags)) {
 	struct ioperm_bitmap *iob;
 	/* The ioperm() permissions bitmap is always inherited by child threads!
-	 * Only the iopl() level is not inherited in certain cases (as
-	 * configurable via `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
+	 * Only  the  iopl()  level  is  not  inherited  in  certain  cases  (as
+	 * configurable     via      `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
 	iob = THIS_X86_IOPERM_BITMAP;
 	/* unlikely, since this isn't really something that modern applications
 	 * commonly make use of! */
@@ -297,7 +297,7 @@ PUBLIC struct ioperm_bitmap ioperm_bitmap_empty = {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_iobm)(void) {
-	/* Fill the contents of the empty IOB vector with all FFh bytes,
+	/* Fill  the  contents of  the empty  IOB vector  with all  FFh bytes,
 	 * thus setting the access permissions of all I/O ports as restricted. */
 #ifdef __x86_64__
 	memsetq(__x86_iob_empty_base, UINT64_C(0xffffffffffffffff), 8192 / 8);

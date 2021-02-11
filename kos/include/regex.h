@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x606ffd87 */
+/* HASH CRC-32:0xa8cdfd02 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,27 +221,27 @@ typedef enum {
 #define REG_ERPAREN  REG_ERPAREN  /* Unmatched ) or \); not returned from regcomp. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
-#define REG_ENOSYS   -1 /* Returned when libc.so fails to load `libregex.so' for some reason */
+#define REG_ENOSYS   (-1) /* Returned when libc.so fails to load `libregex.so' for some reason */
 #endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
-#define REG_NOERROR  0  /* Success. */
-#define REG_NOMATCH  1  /* Didn't find a match (for regexec). */
+#define REG_NOERROR  0    /* Success. */
+#define REG_NOMATCH  1    /* Didn't find a match (for regexec). */
 /* POSIX */
-#define REG_BADPAT   2  /* Invalid pattern. */
-#define REG_ECOLLATE 3  /* Inalid collating element. */
-#define REG_ECTYPE   4  /* Invalid character class name. */
-#define REG_EESCAPE  5  /* Trailing backslash. */
-#define REG_ESUBREG  6  /* Invalid back reference. */
-#define REG_EBRACK   7  /* Unmatched left bracket. */
-#define REG_EPAREN   8  /* Parenthesis imbalance. */
-#define REG_EBRACE   9  /* Unmatched \{. */
-#define REG_BADBR    10 /* Invalid contents of \{\}. */
-#define REG_ERANGE   11 /* Invalid range end. */
-#define REG_ESPACE   12 /* Ran out of memory. */
-#define REG_BADRPT   13 /* No preceding re for repetition op. */
+#define REG_BADPAT   2    /* Invalid pattern. */
+#define REG_ECOLLATE 3    /* Inalid collating element. */
+#define REG_ECTYPE   4    /* Invalid character class name. */
+#define REG_EESCAPE  5    /* Trailing backslash. */
+#define REG_ESUBREG  6    /* Invalid back reference. */
+#define REG_EBRACK   7    /* Unmatched left bracket. */
+#define REG_EPAREN   8    /* Parenthesis imbalance. */
+#define REG_EBRACE   9    /* Unmatched \{. */
+#define REG_BADBR    10   /* Invalid contents of \{\}. */
+#define REG_ERANGE   11   /* Invalid range end. */
+#define REG_ESPACE   12   /* Ran out of memory. */
+#define REG_BADRPT   13   /* No preceding re for repetition op. */
 /* GNU-specific errors */
-#define REG_EEND     14 /* Premature end. */
-#define REG_ESIZE    15 /* Compiled pattern bigger than 2^16 bytes. */
-#define REG_ERPAREN  16 /* Unmatched ) or \); not returned from regcomp. */
+#define REG_EEND     14   /* Premature end. */
+#define REG_ESIZE    15   /* Compiled pattern bigger than 2^16 bytes. */
+#define REG_ERPAREN  16   /* Unmatched ) or \); not returned from regcomp. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

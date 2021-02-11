@@ -315,9 +315,9 @@ DECL_END
 DECL_BEGIN
 
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
- * NOTE: The caller is responsible to ensure that mem-part is in a state
+ * NOTE: The  caller is responsible  to ensure that mem-part  is in a state
  *       where the bitset is valid (iow: `MPART_ST_HASST(self->mp_state)'),
- *       and   that    `partrel_block_index'    is    located    in-bounds.
+ *       and that `partrel_block_index' is located in-bounds.
  * NOTE: The caller must be holding a lock to `self', unless the intend is to
  *       change the state of a  block that used to be  `MPART_BLOCK_ST_INIT',
  *       in which case `mpart_setblockstate()' may be called without  holding
@@ -382,7 +382,7 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
  * this function immediately returns `false'.
  * Otherwise, all blocks of the part are searched, and if one is found that
  * uses the `MPART_BLOCK_ST_INIT'  state, return  `true'. Otherwise,  clear
- * the    `MPART_F_MAYBE_BLK_INIT'     flag     and     return     `false'.
+ * the `MPART_F_MAYBE_BLK_INIT' flag and return `false'.
  * NOTE: The caller must be holding a lock to `self' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self) {

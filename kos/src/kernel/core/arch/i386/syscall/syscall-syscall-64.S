@@ -53,7 +53,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall)
 	.cfi_register %rip, %rcx
 	.cfi_register %rflags, %r11
 	/* Because we can assume that we only get here from user-space with #IF enabled,
-	 * we don't have to swapgs or sti conditionally, but can simply always do so. */
+	 * we don't have to swapgs  or sti conditionally, but  can simply always do  so. */
 	swapgs
 	EXTERN(this_x86_rpc_redirection_iret)
 	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
@@ -121,7 +121,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	.cfi_register %rip, %rcx
 	.cfi_register %rflags, %r11
 	/* Because we can assume that we only get here from user-space with #IF enabled,
-	 * we don't have to swapgs or sti conditionally, but can simply always do so. */
+	 * we don't have to swapgs  or sti conditionally, but  can simply always do  so. */
 	swapgs
 	EXTERN(this_x86_rpc_redirection_iret)
 	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)

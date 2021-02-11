@@ -75,7 +75,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
  *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
- *                  and if a coredump ends up being generated as a result of the signal being
+ *                  and  if a coredump ends up being generated  as a result of the signal being
  *                  raised, that coredump will include information about `error_info()', rather
  *                  than the given `siginfo'
  * @return: NULL:   User-space does not define an signal handler.

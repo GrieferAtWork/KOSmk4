@@ -356,8 +356,8 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
 			local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
 			return [](data: string | Bytes) {
 				local final MAX_PACKET_SIZE = 512;
-#if 1 /* Technically,  this  is  incorrect.  GDB  documents  that  the   ~-stream
-       * should   be   used   for   "[...] the textual responses to CLI commands"
+#if 1 /* Technically, this is incorrect. GDB documents that the  ~-stream
+       * should be used for "[...] the textual responses to CLI commands"
        * https://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stream-Records.html
        * And  that  the @-stream  should  be used  for  what we're  doing,  as it
        * contains             "[...] any textual output from the running target".

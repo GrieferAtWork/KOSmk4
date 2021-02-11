@@ -50,7 +50,7 @@ DECL_BEGIN
  * The obvious intend here is to use the coreheap system for allocating
  * mem-parts and mem-nodes for use with `mfile_zero' and  `mman_kernel'
  * in order to implement a  higher-level memory mapping system that  is
- * then    capable   of   mapping   arbitrary-size   memory   mappings.
+ * then capable of mapping arbitrary-size memory mappings.
  * s.a.:
  *   - MPART_F_COREPART
  */

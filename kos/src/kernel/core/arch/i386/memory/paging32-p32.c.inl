@@ -59,7 +59,7 @@ STATIC_ASSERT(P32_PDIR_E2_IDENTITY_BASE == (P32_PDIR_E1_IDENTITY_BASE + (P32_PDI
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
- * controller itself, which must be aligned and sized
+ * controller itself, which  must be  aligned and  sized
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
@@ -180,11 +180,11 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 	} else if (e2.p_4mib.d_4mib_1) {
 		/* Convert a 4MiB mapping to 1024*4KiB pages
 		 * Because the mapping may be getting used _right_ _now_, we have
-		 * to be careful about how we go about initializing the vector.
-		 * Because the process has to be atomic, we use our thread-local
-		 * temporary mapping trampoline to temporarily map the new page
-		 * for initialization (Because the trampoline always uses
-		 * `P32_PAGE_FNOFLATTEN' when mapping, it is always prepared) */
+		 * to be careful about how  we go about initializing the  vector.
+		 * Because  the process has to be atomic, we use our thread-local
+		 * temporary mapping trampoline to  temporarily map the new  page
+		 * for  initialization  (Because   the  trampoline  always   uses
+		 * `P32_PAGE_FNOFLATTEN'  when  mapping, it  is  always prepared) */
 		new_e1_vector = page_mallocone32();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
@@ -230,7 +230,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		/* The first page needs to be marked under special conditions. */
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
 		/* With a prepare-first token held, check if our e2 control work is still correct.
-		 * If some other thread flattened the vector in the mean time, that control word
+		 * If some other thread flattened the vector  in the mean time, that control  word
 		 * will have changed. */
 		if unlikely(e2.p_word != ATOMIC_READ(e2_p->p_word)) {
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
@@ -248,11 +248,11 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 }
 
 
-/* Called after an E1-vector was flattened into an E2-entry
+/* Called after  an E1-vector  was flattened  into an  E2-entry
  * that now resides at `P32_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
 PRIVATE NOBLOCK void
 NOTHROW(FCALL p32_pagedir_sync_flattened_e1_vector)(unsigned int vec2) {
-	/* Even though the in-memory mapping of `P32_PDIR_VECADDR(vec4, vec3, vec2, 0..511)'
+	/* Even  though the in-memory mapping of `P32_PDIR_VECADDR(vec4, vec3, vec2, 0..511)'
 	 * didn't change, due to being flattened, the contents of our page directory identity
 	 * mapping _have_ changed:
 	 *     UNMAP(P32_PDIR_E1_IDENTITY[vec2][0..1023])  (This is exactly 1 page)
@@ -397,9 +397,9 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 	assertf(!(e2.p_word & P32_PAGE_F4MIB),
 	        "A 4MiB page couldn't have been prepared (only 4KiB pages can be)");
 	/* Check if the 4KiB vector can be merged.
-	 * NOTE: We are guarantied that accessing the E1-vector is OK, because
-	 *       the caller guaranties that at least some part of the vector is
-	 *       still marked as prepared, meaning that no other thread is able
+	 * NOTE: We are guarantied  that accessing the  E1-vector is OK,  because
+	 *       the caller guaranties that at least  some part of the vector  is
+	 *       still marked as prepared, meaning  that no other thread is  able
 	 *       to fully free() the vector until we've cleared all of our marked
 	 *       bits. */
 	e1_p = P32_PDIR_E1_IDENTITY[vec2];
@@ -414,7 +414,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1_unprepare_start + vec1_unprepare_size) - 1));
 		p32_pagedir_unset_prepared(&e1_p[vec1], vec2, vec1, vec1_unprepare_start, vec1_unprepare_size);
 	}
-	/* Read the current prepare-version _before_ we check if flattening is
+	/* Read  the  current prepare-version  _before_  we check  if  flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
 	 * forcing us to check again further below. */
 	old_version = ATOMIC_READ(x86_pagedir_prepare_version);
@@ -435,7 +435,7 @@ again_try_exchange_e2_word:
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
 		if unlikely(must_restart) {
 			/* Check again if the vector can be flattened.
-			 * Note that we need a read-lock to to the prepare-lock in
+			 * Note  that  we need  a read-lock  to  to the  prepare-lock in
 			 * order to prevent the vector from being freed while we do this */
 			X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was);
 			/* Re-load the E2 control word in case it has changed. */
@@ -726,10 +726,10 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 
 /* Set a mapping hint for pages apart of the given virtual memory range.
- * Mapping hints are overwritten once a page has been mapped, and when
+ * Mapping hints are overwritten once a  page has been mapped, and  when
  * not specified, will default to `NULL'.
  * Their main purpose is to be accessible through atomic means, allowing
- * them to be used by the PAGE_FAULT handler, while still ensuring that
+ * them to be used by the PAGE_FAULT handler, while still ensuring  that
  * access remains non-blocking. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -814,9 +814,9 @@ NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 }
 
 /* Special variants of `pagedir_mapone()' that should be used to
- * temporary override the mapping of a single, prepared page.
- * These functions are mainly intended for use with `this_trampoline_page', allowing
- * each thread to push/pop its trampoline page, with doing so actually being an atomic
+ * temporary override the  mapping of a  single, prepared  page.
+ * These functions are  mainly intended for  use with `this_trampoline_page',  allowing
+ * each  thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
@@ -903,7 +903,7 @@ NOTHROW(FCALL p32_pagedir_denywrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
- *       can perform the task without needing to allocate more memory! */
+ *       can perform the task without  needing to allocate more  memory! */
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmap_userspace)(void) {
 	unsigned int vec2, free_count = 0;
@@ -923,9 +923,9 @@ again_read_word:
 			continue; /* 4MiB page. */
 		pageptr = e2.p_word >> P32_PAGE_SHIFT;
 		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
-			/* Must sync memory before we can actually delete pages.
-			 * Otherwise, other CPUs may still be using the mappings after
-			 * they've already been re-designated as general-purpose RAM, at
+			/* Must  sync  memory  before  we  can  actually  delete   pages.
+			 * Otherwise, other CPUs  may still be  using the mappings  after
+			 * they've  already been re-designated as general-purpose RAM, at
 			 * which point they'd start reading garbage, or corrupt pointers. */
 			pagedir_syncall_smp();
 			page_freeone((physpage_t)pageptr);

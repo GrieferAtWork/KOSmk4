@@ -28,8 +28,8 @@
 #include "fastpass-impl.S"
 
 /* NOTE: Must define sysenter _after_ int80, such that `SC_BEGIN_ALL_NOTHROW()'
- *       system calls use normal IRET for returning to user-space, so-as to
- *       ensure that system call invocations using `int 80h' will not clobber
+ *       system calls use  normal IRET  for returning to  user-space, so-as  to
+ *       ensure that system call invocations  using `int 80h' will not  clobber
  *       `%ecx' and `%edx' upon return to user-space.
  *       Only system calls invoked via `sysenter' are allowed to clobber those
  *       registers! */

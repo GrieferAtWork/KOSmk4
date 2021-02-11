@@ -81,27 +81,27 @@
  * Use the normal #PF handler in debugger mode.
  *
  * This one's kind-of a departure from the original intend that the debugger
- * mode should be as disconnected from the rest of the system as possible.
- * However I've been running into a couple of problems related to how the
- * kernel heap uses lazy mappings to speed up memory allocations outside of
- * GFP_PREFLT and GFP_LOCKED, where any piece of heap memory not allocated
- * with one of these flags may cause the kernel to panic if accessed from
- * within debug mode, since the debugger's old #PF handler intentionally
+ * mode  should be as disconnected from the  rest of the system as possible.
+ * However I've been running  into a couple of  problems related to how  the
+ * kernel heap uses lazy mappings to speed up memory allocations outside  of
+ * GFP_PREFLT and GFP_LOCKED, where any  piece of heap memory not  allocated
+ * with one of these flags  may cause the kernel  to panic if accessed  from
+ * within  debug mode,  since the  debugger's old  #PF handler intentionally
  * refused to handle this kind of mapping.
- * The design flaw in this is that many places, such as `driver_section_lock()'
- * will make use of regular, old heap memory that falls under the category of
- * the above, meaning that whenever the debugger was accessing debug information
+ * The design flaw in this is  that many places, such as  `driver_section_lock()'
+ * will make use of  regular, old heap  memory that falls  under the category  of
+ * the  above, meaning that whenever the debugger was accessing debug information
  * of dynamically loaded drivers, there was a chance that it was accessing memory
  * which it was unable to properly initialize.
  *
- * I've debated how to go about fixing this design flaw, and considered adding
- * a global variable `bool dbg_restricted_memory' that could be used to toggle
- * which kind of #PF handler should get used. But then I'd probably had to
- * configure it to not restrict memory by default since there are just soo
- * many places that you wouldn't even think about needing normal #PF handling.
- * So with that in mind, such a flag would have only ever been enabled while
- * doing some kind of dangerous memory access while in debugger-mode. However
- * with the current API, such memory access shouldn't be performed directly
+ * I've debated how to go about fixing this design flaw, and considered  adding
+ * a global variable `bool dbg_restricted_memory' that could be used to  toggle
+ * which kind of  #PF handler should  get used.  But then I'd  probably had  to
+ * configure it to  not restrict  memory by default  since there  are just  soo
+ * many places that you wouldn't even think about needing normal #PF  handling.
+ * So with that in mind,  such a flag would have  only ever been enabled  while
+ * doing some kind of dangerous  memory access while in debugger-mode.  However
+ * with the current  API, such  memory access shouldn't  be performed  directly
  * anyhow. That's what the `dbg_readmemory()' and `dbg_writememory()' functions
  * are for.
  * So the conclusion was that the debugger shouldn't actually be using its own
@@ -191,8 +191,8 @@ handle_iob_access(struct cpu *__restrict me,
 			iob = incref(&ioperm_bitmap_empty);
 			ATOMIC_INC(iob->ib_share);
 		}
-		/* NOTE: The following line causes an inconsistency that is fixed by
-		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
+		/* NOTE: The following line  causes an inconsistency  that is fixed  by
+		 *       assigning        `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
 		 *       below. Because preemption is currently off, this inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, iob);
@@ -209,7 +209,7 @@ handle_iob_access(struct cpu *__restrict me,
 			cow = ioperm_bitmap_copyf(iob, GFP_LOCKED | GFP_PREFLT);
 
 			/* Unmap the current IOB map if it still points to our old IOB.
-			 * This must be done to ensure that the assumption:
+			 * This  must   be  done   to  ensure   that  the   assumption:
 			 *     FORCPU(me, thiscpu_x86_ioperm_bitmap) == NULL ||
 			 *     FORCPU(me, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP
 			 * continues to be consistent.
@@ -237,8 +237,8 @@ handle_iob_access(struct cpu *__restrict me,
 			decref(iob);
 			return false;
 		}
-		/* NOTE: The following line causes an inconsistency that is fixed by
-		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
+		/* NOTE: The following line  causes an inconsistency  that is fixed  by
+		 *       assigning        `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
 		 *       below. Because preemption is currently off, this inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, cow);
@@ -270,7 +270,7 @@ NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
 }
 
 /* Check if `*pc' points to some I/O instruction that doesn't
- * perform a read or write access to `fault_addr'. */
+ * perform   a   read  or   write  access   to  `fault_addr'. */
 LOCAL WUNUSED bool FCALL
 is_io_instruction_and_not_memory_access(byte_t const *pc,
                                         struct icpustate *state,
@@ -434,8 +434,8 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		hinted_node = (struct mnode *)pagedir_gethint(addr);
 		if (hinted_node != NULL) {
 			/* Count how # CPUs are doing hinted-node initialization, so
-			 * that `mman_unmap_kram_locked()' can sync itself with
-			 * other CPUs which may still be accessing a mem-node which
+			 * that  `mman_unmap_kram_locked()'  can  sync  itself  with
+			 * other CPUs which may still be accessing a mem-node  which
 			 * is currently being split. */
 			mman_kernel_hintinit_inuse_inc();
 #ifndef CONFIG_NO_SMP
@@ -466,14 +466,14 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	mf.mfl_mman = &mman_kernel;
 	if (ADDR_ISUSER(addr) || FAULT_IS_USER) {
 #ifndef NDEBUG
-		/* Special case: When the TLS segment contains an invalid pointer, us
+		/* Special case: When the TLS segment  contains an invalid pointer,  us
 		 *               trying to obtain THIS_MMAN at this point is just going
 		 *               to result in a #DF:
 		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
 		 *   #2: Trigger #PF at `%tls.base'
 		 *   #3: When `%tls.base' points into user-space (e.g. is `NULL'), we get here again
 		 *   #4: Repeat at step #1
-		 * This then eventually results in a stack overflow that cannot be
+		 * This  then eventually results in a stack overflow that cannot be
 		 * inspected properly, so when compiling for a debug-target, we use
 		 * memcpy_nopf() to access the TLS segment. */
 		struct task *mythread;
@@ -519,7 +519,7 @@ again_lock_mman:
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 		if unlikely(!mman_lock_tryacquire(mf.mfl_mman)) {
 			/* Access to the phys2virt section is allowed while preemption is disabled.
-			 * However, when preemption is disabled, locking the kernel VM may fail,
+			 * However,  when preemption is  disabled, locking the  kernel VM may fail,
 			 * so we need a special-case check for access to the phys2virt section when
 			 * we've previously failed to lock the kernel VM for reading. */
 			if (mf.mfl_mman == &mman_kernel && !FAULT_IS_USER &&
@@ -564,37 +564,37 @@ again_lock_mman:
 				}
 #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__x86_64__)
 				else {
-					/* We can get here if the calling program is running in compatibility
+					/* We can get here if the calling program is running in  compatibility
 					 * mode, and has just attempted to perform a memory access/call to its
 					 * ukern segment.
-					 * NOTE: At this point we already know that `addr < KERNELSPACE_BASE',
-					 *       and because any non-canonical CR2 would have instead caused
+					 * NOTE: At  this point we already know that `addr < KERNELSPACE_BASE',
+					 *       and because any  non-canonical CR2 would  have instead  caused
 					 *       a GPF, we actually also know that `addr <= 0x0000ffffffffffff' */
 					if (icpustate_getcs(state) == SEGMENT_USER_CODE32_RPL &&
 					    addr >= (void *)(uintptr_t)COMPAT_KERNELSPACE_BASE &&
 					    /* NOTE: The addr <= 32-bit is necessary since the hosted
 					     *       application may have done something like `*(u32 *)0xffffffff = 0',
-					     *       which would (among other addresses) have also accessed
-					     *       memory beyond the 32-bit address space, and I'm not entirely
-					     *       sure if a processor would wrap the pointer in this case...
+					     *       which   would   (among   other  addresses)   have   also  accessed
+					     *       memory  beyond  the 32-bit  address  space, and  I'm  not entirely
+					     *       sure if  a  processor  would  wrap the  pointer  in  this  case...
 					     * Also: There may be other ways for 32-bit programs to deref 64-bit
 					     *       pointers that I can't think of right now. */
 					    addr <= (void *)(uintptr_t)UINT32_C(0xffffffff)) {
 						struct mnode *krs;
 						/* The access is of a 32-bit program trying to reach into
-						 * what it ~thinks~ is the location of its kernel-space.
+						 * what it ~thinks~ is the location of its  kernel-space.
 						 * -> Try to handle this case by re-sizing the `v_kernreserve'
 						 *    to instead start at +3GiB, but only do so if there isn't
 						 *    anything else mapped within that address range.
-						 * Technically, it would be more correct if'd had already done
-						 * this during the exec() that spawned the calling application,
-						 * especially since prior to this being done, the application
-						 * would have been able to map something else into the +3GiB...+4GiB
-						 * address space range, however given that this is highly kos-specific
-						 * behavior, I do think that doing this lazily should be ok (especially
+						 * Technically,  it  would  be  more  correct  if'd  had  already   done
+						 * this  during  the  exec()  that  spawned  the  calling   application,
+						 * especially  since  prior   to  this  being   done,  the   application
+						 * would have been  able to  map something else  into the  +3GiB...+4GiB
+						 * address space range, however given  that this is highly  kos-specific
+						 * behavior, I do think that doing this lazily should be ok  (especially
 						 * since a 32-bit program trying to map into +3GiB...+4GiB would already
-						 * be doing something that it shouldn't, as attempting to map that area
-						 * of memory is something that cannot be done when hosted by a 32-bit
+						 * be doing something that it shouldn't, as attempting to map that  area
+						 * of memory is something  that cannot be done  when hosted by a  32-bit
 						 * kernel) */
 
 						mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
@@ -632,7 +632,7 @@ again_lock_mman:
 								assert(krs->mn_fspath == NULL);
 								assert(krs->mn_fsname == NULL);
 								/* Re-insert the node and continue operating as if we'd found
-								 * everything as it has been changed into from the get-go. */
+								 * everything as it  has been changed  into from the  get-go. */
 								mnode_tree_insert(&mm->mm_mappings, krs);
 #define NEED_got_node_and_lock
 								goto got_node_and_lock;
@@ -652,7 +652,7 @@ got_node_and_lock:
 #endif /* NEED_got_node_and_lock */
 
 		/* At this point, the accessed mem-node has been
-		 * determined, and is known to be non-NULL! */
+		 * determined, and  is  known  to  be  non-NULL! */
 		mf.mfl_part = mf.mfl_node->mn_part;
 		if unlikely(mf.mfl_part == NULL) {
 			/* Deal with reserved memory nodes. */
@@ -694,7 +694,7 @@ do_handle_iob_node_access:
 					 * was already mapped during the current quantum as full segfault. */
 					if unlikely(FORCPU(me, thiscpu_x86_ioperm_bitmap) != NULL) {
 						/* Check for special case: even if the IOPERM bitmap is already
-						 * mapped, allow a mapping upgrade if it was mapped read-only
+						 * mapped, allow a mapping upgrade  if it was mapped  read-only
 						 * before, but is now needed as read-write. */
 						if (FAULT_IS_WRITE && !pagedir_iswritable(addr))
 							; /* Upgrade the mapping */
@@ -704,14 +704,14 @@ do_handle_iob_node_access:
 					}
 					allow_preemption = icpustate_getpreemption(state);
 					/* Make special checks if the access itself seems to
-					 * originate from a direct user-space access. */
+					 * originate  from  a   direct  user-space   access. */
 					if (FAULT_IS_USER) {
 						/* User-space can never get write-access to the IOB vector. */
 						if (FAULT_IS_WRITE)
 							goto pop_connections_and_throw_segfault;
-						/* User-space isn't allowed to directly access the IOB vector.
-						 * To not rely on undocumented processor behavior, manually check
-						 * if the access originates from a user-space I/O instruction.
+						/* User-space isn't  allowed  to  directly  access  the  IOB  vector.
+						 * To not  rely on  undocumented processor  behavior, manually  check
+						 * if the  access  originates  from  a  user-space  I/O  instruction.
 						 * If not (such as user-space directly trying to read kernel memory),
 						 * then we always deny the access, no matter what! */
 						if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state,
@@ -729,16 +729,16 @@ do_handle_iob_node_access:
 				IF_SMP(if (icpustate_getpreemption(state)) __sti());
 			}
 
-			/* Either this is an access to the IOB vector of a different CPU,
-			 * or the accessed node is just some random, reservation node.
-			 * In the former case, we must take care to deal with a race condition
-			 * which may happen in an SMP system where our current thread has been
-			 * moved to a different CPU since we've re-enabled preemption at the
-			 * start of this function, and before getting here. In that case, the
-			 * access is still going to reference the IOB of the old CPU, and we
+			/* Either this  is an  access to  the IOB  vector of  a different  CPU,
+			 * or  the  accessed  node  is  just  some  random,  reservation  node.
+			 * In  the former case, we must take care to deal with a race condition
+			 * which may happen in an SMP system where our current thread has  been
+			 * moved  to a different  CPU since we've  re-enabled preemption at the
+			 * start of this function, and before  getting here. In that case,  the
+			 * access is still going to  reference the IOB of  the old CPU, and  we
 			 * have to alter our behavior depending on the access happening because
-			 * of the some invalid access to a different CPU's IOB vector, or the
-			 * access being caused by the CPU itself, and a CPU-transfer happening
+			 * of  the some invalid access to a  different CPU's IOB vector, or the
+			 * access  being caused by the CPU itself, and a CPU-transfer happening
 			 * at just the wrong moment. */
 #ifndef CONFIG_NO_SMP
 			if (is_iob_node(mf.mfl_node)) {
@@ -746,29 +746,29 @@ do_handle_iob_node_access:
 				if (!icpustate_getpreemption(state))
 					goto pop_connections_and_throw_segfault;
 				/* I/O access from kernel-space wouldn't result in an IOB check, so
-				 * if the access comes from kernel-space, then this is the calling
+				 * if  the access comes from kernel-space, then this is the calling
 				 * thread incorrectly accessing some other cpu's IOB. */
 				if (!FAULT_IS_USER)
 					goto pop_connections_and_throw_segfault;
 				/* If the calling thread couldn't have changed CPUs, then this is an access to  */
 				if (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE)
 					goto pop_connections_and_throw_segfault;
-				/* The calling thread is capable of being migrated between different CPUs,
+				/* The  calling thread is  capable of being  migrated between different CPUs,
 				 * and the accessed node _is_ the IOB vector of a different CPU. However with
-				 * all of these factors, there still exists the possibility that the access
-				 * happened because the CPU itself accessed the vector, as may be triggered
+				 * all of these factors, there still  exists the possibility that the  access
+				 * happened because the CPU itself accessed  the vector, as may be  triggered
 				 * by use of the `(in|out)(b|w|l)' instructions.
-				 * To make sure that we can handle those cases as well, as can check the
+				 * To  make sure that we can handle those cases as well, as can check the
 				 * memory to which `icpustate_getpc(state)' points for being one of these
 				 * instructions.
 				 * To prevent the possibility of repeating the access to the IOB vector during
-				 * this check (in case a bad jump caused IP to end up within the IOB vector),
+				 * this  check (in case a bad jump caused IP to end up within the IOB vector),
 				 * also make sure that `pc' isn't apart of said vector! */
 				if ((byte_t const *)pc >= vm_node_getminaddr(mf.mfl_node) &&
 				    (byte_t const *)pc <= vm_node_getmaxaddr(mf.mfl_node))
 					goto pop_connections_and_throw_segfault;
 				/* If we got here cause of an I/O instruction, just return to the caller and
-				 * have them attempt the access once again, hopefully without accessing  */
+				 * have them  attempt the  access once  again, hopefully  without  accessing */
 				if (is_io_instruction_and_not_memory_access((byte_t const *)pc, state,
 				                                            (uintptr_t)addr))
 					goto pop_connections_and_return;
@@ -909,8 +909,8 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					task_popconnections();
 					if (FAULT_IS_USER)
 						PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
-					/* Manually fix-up exception flags since we're not actually going
-					 * to call `__cxa_end_catch()' because of the direct unwinding
+					/* Manually fix-up  exception flags  since we're  not actually  going
+					 * to  call  `__cxa_end_catch()'  because  of  the  direct  unwinding
 					 * used here. As such, we must manually ensure that `EXCEPT_FINCATCH'
 					 * isn't set once we return to our caller. */
 					PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
@@ -960,7 +960,7 @@ do_normal_vio:
 					real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
 				regload_area = (u32 *)vm_node_getaddr(THIS_KERNEL_STACK);
 				/* Fill in the register save area to match what's going to
-				 * get loaded by `x86_vio_kernel_esp_bootstrap_loader()' */
+				 * get  loaded  by `x86_vio_kernel_esp_bootstrap_loader()' */
 				regload_area[0] = real_ss;
 				regload_area[1] = real_esp;
 				regload_area[2] = args.vea_args.va_state->ics_irregs_k.ir_eip;
@@ -1215,7 +1215,7 @@ do_unwind_state:
 			mnode_hinted_mmap(hinted_node, pageaddr);
 #else /* CONFIG_USE_NEW_VM */
 			/* This is a hinted node (perform assertions on all
-			 * of the requirements documented for such a node) */
+			 * of  the requirements documented for such a node) */
 			physpage_t ppage;
 			uintptr_half_t pagedir_prot;
 			assert(hinted_node->vn_flags & VM_NODE_FLAG_HINTED);
@@ -1258,14 +1258,14 @@ do_unwind_state:
 	effective_vm = &vm_kernel;
 	if (ADDR_ISUSER(addr) || FAULT_IS_USER) {
 #ifndef NDEBUG
-		/* Special case: When the TLS segment contains an invalid pointer, us
+		/* Special case: When the TLS segment  contains an invalid pointer,  us
 		 *               trying to obtain THIS_MMAN at this point is just going
 		 *               to result in a #DF:
 		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
 		 *   #2: Trigger #PF at `%tls.base'
 		 *   #3: When `%tls.base' points into user-space (e.g. is `NULL'), we get here again
 		 *   #4: Repeat at step #1
-		 * This then eventually results in a stack overflow that cannot be
+		 * This  then eventually results in a stack overflow that cannot be
 		 * inspected properly, so when compiling for a debug-target, we use
 		 * memcpy_nopf() to access the TLS segment. */
 		struct task *mythread;
@@ -1305,7 +1305,7 @@ do_unwind_state:
 again_lookup_node:
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 			/* Access to the phys2virt section is allowed while preemption is disabled.
-			 * However, when preemption is disabled, locking the kernel VM may fail,
+			 * However,  when preemption is  disabled, locking the  kernel VM may fail,
 			 * so we need a special-case check for access to the phys2virt section when
 			 * we've previously failed to lock the kernel VM for reading. */
 			if unlikely(!sync_tryread(effective_vm)) {
@@ -1347,36 +1347,36 @@ again_lookup_node:
 				}
 #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__x86_64__)
 				else {
-					/* We can get here if the calling program is running in compatibility
+					/* We can get here if the calling program is running in  compatibility
 					 * mode, and has just attempted to perform a memory access/call to its
 					 * ukern segment.
-					 * NOTE: At this point we already know that `addr < KERNELSPACE_BASE',
-					 *       and because any non-canonical CR2 would have instead caused
+					 * NOTE: At  this point we already know that `addr < KERNELSPACE_BASE',
+					 *       and because any  non-canonical CR2 would  have instead  caused
 					 *       a GPF, we actually also know that `addr <= 0x0000ffffffffffff' */
 					if (icpustate_getcs(state) == SEGMENT_USER_CODE32_RPL &&
 					    addr >= (void *)(uintptr_t)COMPAT_KERNELSPACE_BASE &&
 					    /* NOTE: The addr <= 32-bit is necessary since the hosted
 					     *       application may have done something like `*(u32 *)0xffffffff = 0',
-					     *       which would (among other addresses) have also accessed
-					     *       memory beyond the 32-bit address space, and I'm not entirely
-					     *       sure if a processor would wrap the pointer in this case...
+					     *       which   would   (among   other  addresses)   have   also  accessed
+					     *       memory  beyond  the 32-bit  address  space, and  I'm  not entirely
+					     *       sure if  a  processor  would  wrap the  pointer  in  this  case...
 					     * Also: There may be other ways for 32-bit programs to deref 64-bit
 					     *       pointers that I can't think of right now. */
 					    addr <= (void *)(uintptr_t)UINT32_C(0xffffffff)) {
 						/* The access is of a 32-bit program trying to reach into
-						 * what it ~thinks~ is the location of its kernel-space.
+						 * what it ~thinks~ is the location of its  kernel-space.
 						 * -> Try to handle this case by re-sizing the `v_kernreserve'
 						 *    to instead start at +3GiB, but only do so if there isn't
 						 *    anything else mapped within that address range.
-						 * Technically, it would be more correct if'd had already done
-						 * this during the exec() that spawned the calling application,
-						 * especially since prior to this being done, the application
-						 * would have been able to map something else into the +3GiB...+4GiB
-						 * address space range, however given that this is highly kos-specific
-						 * behavior, I do think that doing this lazily should be ok (especially
+						 * Technically,  it  would  be  more  correct  if'd  had  already   done
+						 * this  during  the  exec()  that  spawned  the  calling   application,
+						 * especially  since  prior   to  this  being   done,  the   application
+						 * would have been  able to  map something else  into the  +3GiB...+4GiB
+						 * address space range, however given  that this is highly  kos-specific
+						 * behavior, I do think that doing this lazily should be ok  (especially
 						 * since a 32-bit program trying to map into +3GiB...+4GiB would already
-						 * be doing something that it shouldn't, as attempting to map that area
-						 * of memory is something that cannot be done when hosted by a 32-bit
+						 * be doing something that it shouldn't, as attempting to map that  area
+						 * of memory is something  that cannot be done  when hosted by a  32-bit
 						 * kernel) */
 						sync_write(effective_vm);
 						node = vm_getnodeofpageid(effective_vm, pageid);
@@ -1413,7 +1413,7 @@ again_lookup_node:
 								assert(node->vn_fspath == NULL);
 								assert(node->vn_fsname == NULL);
 								/* Re-insert the node and continue operating as if we'd found
-								 * everything as it has been changed into from the get-go. */
+								 * everything as it  has been changed  into from the  get-go. */
 								vm_node_insert(node);
 								sync_downgrade(effective_vm);
 								goto got_node_and_effective_vm_lock;
@@ -1460,7 +1460,7 @@ do_handle_iob_node_access:
 						 * was already mapped during the current quantum as full segfault. */
 						if unlikely(FORCPU(me, thiscpu_x86_ioperm_bitmap) != NULL) {
 							/* Check for special case: even if the IOPERM bitmap is already
-							 * mapped, allow a mapping upgrade if it was mapped read-only
+							 * mapped, allow a mapping upgrade  if it was mapped  read-only
 							 * before, but is now needed as read-write. */
 							if ((ecode & X86_PAGEFAULT_ECODE_WRITING) && !pagedir_iswritable(addr))
 								; /* Upgrade the mapping */
@@ -1470,14 +1470,14 @@ do_handle_iob_node_access:
 						}
 						allow_preemption = icpustate_getpreemption(state);
 						/* Make special checks if the access itself seems to
-						 * originate from a direct user-space access. */
+						 * originate  from  a   direct  user-space   access. */
 						if (FAULT_IS_USER) {
 							/* User-space can never get write-access to the IOB vector. */
 							if (ecode & X86_PAGEFAULT_ECODE_WRITING)
 								goto pop_connections_and_throw_segfault;
-							/* User-space isn't allowed to directly access the IOB vector.
-							 * To not rely on undocumented processor behavior, manually check
-							 * if the access originates from a user-space I/O instruction.
+							/* User-space isn't  allowed  to  directly  access  the  IOB  vector.
+							 * To not  rely on  undocumented processor  behavior, manually  check
+							 * if the  access  originates  from  a  user-space  I/O  instruction.
 							 * If not (such as user-space directly trying to read kernel memory),
 							 * then we always deny the access, no matter what! */
 							if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
@@ -1495,16 +1495,16 @@ do_handle_iob_node_access:
 					}
 					IF_SMP(if (icpustate_getpreemption(state)) __sti());
 				}
-				/* Either this is an access to the IOB vector of a different CPU,
-				 * or the accessed node is just some random, reservation node.
-				 * In the former case, we must take care to deal with a race condition
-				 * which may happen in an SMP system where our current thread has been
-				 * moved to a different CPU since we've re-enabled preemption at the
-				 * start of this function, and before getting here. In that case, the
-				 * access is still going to reference the IOB of the old CPU, and we
+				/* Either this  is an  access to  the IOB  vector of  a different  CPU,
+				 * or  the  accessed  node  is  just  some  random,  reservation  node.
+				 * In  the former case, we must take care to deal with a race condition
+				 * which may happen in an SMP system where our current thread has  been
+				 * moved  to a different  CPU since we've  re-enabled preemption at the
+				 * start of this function, and before  getting here. In that case,  the
+				 * access is still going to  reference the IOB of  the old CPU, and  we
 				 * have to alter our behavior depending on the access happening because
-				 * of the some invalid access to a different CPU's IOB vector, or the
-				 * access being caused by the CPU itself, and a CPU-transfer happening
+				 * of  the some invalid access to a  different CPU's IOB vector, or the
+				 * access  being caused by the CPU itself, and a CPU-transfer happening
 				 * at just the wrong moment. */
 #ifndef CONFIG_NO_SMP
 				if (is_iob_node(node)) {
@@ -1512,29 +1512,29 @@ do_handle_iob_node_access:
 					if (!icpustate_getpreemption(state))
 						goto pop_connections_and_throw_segfault;
 					/* I/O access from kernel-space wouldn't result in an IOB check, so
-					 * if the access comes from kernel-space, then this is the calling
+					 * if  the access comes from kernel-space, then this is the calling
 					 * thread incorrectly accessing some other cpu's IOB. */
 					if (!FAULT_IS_USER)
 						goto pop_connections_and_throw_segfault;
 					/* If the calling thread couldn't have changed CPUs, then this is an access to  */
 					if (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE)
 						goto pop_connections_and_throw_segfault;
-					/* The calling thread is capable of being migrated between different CPUs,
+					/* The  calling thread is  capable of being  migrated between different CPUs,
 					 * and the accessed node _is_ the IOB vector of a different CPU. However with
-					 * all of these factors, there still exists the possibility that the access
-					 * happened because the CPU itself accessed the vector, as may be triggered
+					 * all of these factors, there still  exists the possibility that the  access
+					 * happened because the CPU itself accessed  the vector, as may be  triggered
 					 * by use of the `(in|out)(b|w|l)' instructions.
-					 * To make sure that we can handle those cases as well, as can check the
+					 * To  make sure that we can handle those cases as well, as can check the
 					 * memory to which `icpustate_getpc(state)' points for being one of these
 					 * instructions.
 					 * To prevent the possibility of repeating the access to the IOB vector during
-					 * this check (in case a bad jump caused IP to end up within the IOB vector),
+					 * this  check (in case a bad jump caused IP to end up within the IOB vector),
 					 * also make sure that `pc' isn't apart of said vector! */
 					if (pc >= (uintptr_t)vm_node_getminaddr(node) &&
 					    pc <= (uintptr_t)vm_node_getmaxaddr(node))
 						goto pop_connections_and_throw_segfault;
 					/* If we got here cause of an I/O instruction, just return to the caller and
-					 * have them attempt the access once again, hopefully without accessing  */
+					 * have them  attempt the  access once  again, hopefully  without  accessing */
 					if (is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
 						goto done_before_pop_connections;
 				}
@@ -1563,8 +1563,8 @@ do_handle_iob_node_access:
 #ifdef CONFIG_HAVE_DEBUGGER
 					/* Don't dispatch VIO while in debugger-mode. Doing so would open
 					 * up all kinds of loopholes by which properly-working debug APIs
-					 * could shoot themselves in the leg by accidentally accessing
-					 * VIO with a faulty implementation, or user-driven VIO, which
+					 * could shoot themselves  in the leg  by accidentally  accessing
+					 * VIO with a  faulty implementation, or  user-driven VIO,  which
 					 * would cause the debugger to hang itself... */
 					if (dbg_active)
 						goto decref_part_and_pop_connections_and_throw_segfault;
@@ -1676,8 +1676,8 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							task_popconnections();
 							if (FAULT_IS_USER)
 								PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
-							/* Manually fix-up exception flags since we're not actually going
-							 * to call `__cxa_end_catch()' because of the direct unwinding
+							/* Manually fix-up  exception flags  since we're  not actually  going
+							 * to  call  `__cxa_end_catch()'  because  of  the  direct  unwinding
 							 * used here. As such, we must manually ensure that `EXCEPT_FINCATCH'
 							 * isn't set once we return to our caller. */
 							PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
@@ -1734,7 +1734,7 @@ do_normal_vio:
 							real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
 						regload_area = (u32 *)vm_node_getaddr(THIS_KERNEL_STACK);
 						/* Fill in the register save area to match what's going to
-						 * get loaded by `x86_vio_kernel_esp_bootstrap_loader()' */
+						 * get  loaded  by `x86_vio_kernel_esp_bootstrap_loader()' */
 						regload_area[0] = real_ss;
 						regload_area[1] = real_esp;
 						regload_area[2] = args.vea_args.va_state->ics_irregs_k.ir_eip;
@@ -1779,7 +1779,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 						decref_unlikely(part);
 						goto again_lookup_node;
 					}
-					/* In case an unshare did actually happen, `vm_lock_and_unshare_datapart_for_writing()'
+					/* In  case an unshare did actually happen, `vm_lock_and_unshare_datapart_for_writing()'
 					 * will have already performed the necessary page directory re-mapping, so we're already
 					 * done. */
 					if (did_unshare) {
@@ -1794,10 +1794,10 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 						goto decref_part_and_pop_connections_and_set_exception_pointers;
 					}
 					vm_datapart_lockread_setcore(part);
-					/* Check if the part still includes the accessed page.
-					 * This is required to ensure that `vm_datapart_loadpage()'
+					/* Check if  the  part  still  includes  the  accessed  page.
+					 * This is required  to ensure that  `vm_datapart_loadpage()'
 					 * can be called safely (the part may have been split between
-					 * the time of us acquiring a read-lock to it, and the point
+					 * the time of us acquiring a read-lock to it, and the  point
 					 * when we released our write-lock to the effected VM) */
 					if unlikely(node_vpage_offset >= vm_datapart_numvpages(part)) {
 						sync_endread(part);
@@ -1830,7 +1830,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					goto again_lookup_node;
 				}
 
-				/* Check to ensure that the mapped target hasn't changed
+				/* Check to ensure that the mapped target hasn't  changed
 				 * while we were loading the affected page into the core. */
 				if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
 				            node->vn_part != part || node->vn_prot != node_prot) {
@@ -1853,8 +1853,8 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
 				else if ((pagedir_prot & PAGEDIR_MAP_FWRITE) && !(ecode & X86_PAGEFAULT_ECODE_WRITING)) {
 					/* When `X86_PAGEFAULT_ECODE_WRITING' wasn't set, we didn't actually unshare the part, so if
-					 * we're mapping it with write permissions, we must delete those in case of a PRIVATE
-					 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
+					 * we're mapping  it with  write permissions,  we must  delete those  in case  of a  PRIVATE
+					 * memory  mapping  when the  part isn't  anonymous, or  mapped by  other SHARED  or PRIVATE
 					 * mappings. */
 					if (!(node_prot & VM_PROT_SHARED) &&
 					    (ATOMIC_READ(part->dp_block->db_parts) != MFILE_PARTS_ANONYMOUS ||

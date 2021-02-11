@@ -103,12 +103,12 @@ ATTR_USED struct mb2_header mb_multiboot2 = {
 
 
 
-/* Convert between BIOS and our own memory bank typing
- * Note that we can't just adopt BIOS indices for our own
+/* Convert between  BIOS and  our own  memory bank  typing
+ * Note  that we can't just adopt BIOS indices for our own
  * typing, since we encode memory priority as part of bank
- * type IDs, where during initialization, greater IDs can
- * override existing mappings, while lower IDs are ignore
- * in areas of overlap with existing mappings of greater
+ * type  IDs, where during initialization, greater IDs can
+ * override  existing mappings, while lower IDs are ignore
+ * in areas of overlap  with existing mappings of  greater
  * IDs. */
 INTERN_CONST ATTR_FREERODATA u8 const memtype_bios_matrix[6] = {
 	[0] = PMEMBANK_TYPE_UNDEF,  /* Undefined (Fallback). */
@@ -185,7 +185,7 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	REF struct driver *drv;
 	aligned_blob_size = blob_size + (blob_addr & PAGEMASK);
 	aligned_blob_size = CEIL_ALIGN(aligned_blob_size, PAGESIZE);
-	/* Create a temporary mapping of prepared virtual memory which
+	/* Create a  temporary  mapping  of  prepared  virtual  memory  which
 	 * we can then use to map the driver's data blob into virtual memory. */
 	blob = vm_mapres(&vm_kernel,
 	                 HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
@@ -199,10 +199,10 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		            (physaddr_t)(blob_addr & ~PAGEMASK),
 		            PAGEDIR_MAP_FREAD);
 		/* Load the mapped driver blob as a driver module.
-		 * NOTE: We pass the `DRIVER_INSMOD_FLAG_NOINIT' flag so-as to allow
+		 * NOTE: We  pass  the  `DRIVER_INSMOD_FLAG_NOINIT'  flag  so-as  to allow
 		 *       the driver to be initialized (and have its dependencies be bound)
-		 *       once all drivers specified by the boot loader have been loaded.
-		 *    -> That way, driver dependencies can be loaded in the same manner,
+		 *       once all drivers specified by  the boot loader have been  loaded.
+		 *    -> That way,  driver dependencies  can be  loaded in  the same  manner,
 		 *       thus not relying on file-system drivers not having any dependencies. */
 		drv = driver_insmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
 		                         blob_size,
@@ -496,7 +496,7 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 					x86_boot_driver_base   = (byte_t *)tag_iter - KERNEL_CORE_BASE;
 				}
 				/* Remember the offset of the last driver tag, so we may enumerate
-				 * them once again during `x86_initialize_bootloader_drivers()' */
+				 * them once  again  during  `x86_initialize_bootloader_drivers()' */
 				x86_boot_driver_size = (size_t)((byte_t *)tag_end -
 				                                ((byte_t *)x86_boot_driver_base +
 				                                 KERNEL_CORE_BASE));

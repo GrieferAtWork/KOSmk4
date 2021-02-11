@@ -62,7 +62,7 @@ PUBLIC unsigned int _x86_fpustate_variant ASMNAME("x86_fpustate_variant") = FPU_
 
 /* [0..1] The task associated with the current FPU register contents, or NULL if none.
  * NOTE: When accessing this field, preemption must be disabled, as
- *       this field affects the behavior of task state switches. */
+ *       this field affects  the behavior of  task state  switches. */
 PUBLIC ATTR_PERCPU struct task *thiscpu_fputhread = NULL;
 
 /* [0..1][owned] The per-task FPU state (lazily allocated) */
@@ -71,7 +71,7 @@ PUBLIC ATTR_PERTASK struct fpustate *this_fpustate = NULL;
 DEFINE_PERTASK_ONEXIT(pertask_cleanup_fpustate);
 INTERN NOBLOCK void
 NOTHROW(KCALL pertask_cleanup_fpustate)(void) {
-	/* Unset the calling thread potentially holding the FPU state.
+	/* Unset the  calling thread  potentially holding  the FPU  state.
 	 * Since the task will go away, we don't actually have to save it. */
 	ATOMIC_CMPXCH(PERCPU(thiscpu_fputhread), THIS_TASK, NULL);
 }
@@ -137,7 +137,7 @@ NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self) {
 
 
 /* Ensure that `this_fpustate' has been allocated, allocating
- * and initializing it now if it hasn't already. */
+ * and   initializing   it   now   if   it   hasn't  already. */
 PUBLIC void KCALL fpustate_init(void) THROWS(E_BADALLOC) {
 	if (PERTASK_GET(this_fpustate))
 		return;
@@ -176,12 +176,12 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
 }
 
 /* Similar to `fpustate_save()', but save the state of whichever thread is
- * currently holding the active FPU context. - When called, this function
- * will ensure that the most-up-to-date FPU context is written to memory,
- * and will be read back from memory the next time that thread (if any)
+ * currently  holding the active FPU context. - When called, this function
+ * will  ensure that the most-up-to-date FPU context is written to memory,
+ * and will be read back  from memory the next  time that thread (if  any)
  * performs another FPU operation.
- * The main purpose of this function is to aid in implementing FPU support
- * in debuggers, where this function is called when suspending execution of
+ * The main purpose  of this function  is to aid  in implementing FPU  support
+ * in  debuggers, where this  function is called  when suspending execution of
  * the associated CPU, after which the debugger can read/write FPU information
  * for any thread by simply looking at `FORTASK(thread, this_fpustate)' */
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
@@ -199,7 +199,7 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
 		/* Save the context */
 		x86_fpustate_save(FORTASK(holder, this_fpustate));
 		/* Disable FPU access (so-as to lazily re-load it
-		 * the next time an access is made by `holder') */
+		 * the next time an  access is made by  `holder') */
 		__wrcr0(__rdcr0() | CR0_TS);
 		PERCPU(thiscpu_fputhread) = NULL;
 	}
@@ -209,7 +209,7 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
 
 
 
-/* Load / Save the FPU context of the calling thread to/from the given `state'
+/* Load / Save the FPU context of  the calling thread to/from the given  `state'
  * If no FPU state had yet to be allocated when `fpustate_loadfrom()' is called,
  * a new state will be allocated before returning. */
 PUBLIC NOBLOCK void KCALL
@@ -264,7 +264,7 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 	COMPILER_BARRIER();
 	if (new_task == old_task) {
 		/* No other thread used the FPU in the mean time.
-		 * We get here when preemption disabled the FPU, only for the original
+		 * We  get here when  preemption disabled the FPU,  only for the original
 		 * thread to be the only one to access the FPU once it loops back around. */
 		__clts();
 	} else {
@@ -280,12 +280,12 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		if (!mystate) {
 			/* Try to have interrupts enabled when allocating memory.
 			 * By doing this, we prevent the allocation failing with `E_WOULDBLOCK'
-			 * if at some point it needs to do something that may block. */
+			 * if  at  some  point  it  needs  to  do  something  that  may  block. */
 			if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 				__sti();
 			/* Lazily allocate a new state upon first access.
 			 * NOTE: If this causes an exception, that exception
-			 *       will be propagated to user-space. */
+			 *       will   be    propagated   to    user-space. */
 			mystate = fpustate_alloc();
 			__cli();
 			PERTASK_SET(this_fpustate, mystate);
@@ -305,7 +305,7 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		TRY {
 			x86_fpustate_load(mystate);
 		} EXCEPT {
-			/* Because we've saved the old task's state, a failure to load the
+			/* Because  we've saved the  old task's state, a  failure to load the
 			 * new task's state will may have left the FPU in an undefined state.
 			 * -> Because of this, we must indicate that no one is holding the
 			 *    active FPU context at this point. */
@@ -376,7 +376,7 @@ NOTHROW(FCALL x86_fxsave_compress_ftw)(struct sfpustate const *__restrict self) 
 
 /* Convert xfpustate's FTW to sfpustate's
  * NOTE: Return value is actually a `u16', but use `u32'
- *       so assembly doesn't have to movzwl the value! */
+ *       so  assembly doesn't have  to movzwl the value! */
 INTERN ATTR_PURE NOBLOCK u32
 NOTHROW(FCALL x86_fxsave_decompress_ftw)(struct xfpustate const *__restrict self) {
 	return fpustate_ftwx2ftw(self->fx_ftw, self->fx_regs);
@@ -391,7 +391,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_fpu)(void) {
 setup_fpu_emulation:
 		/* TODO: Add an FPU emulation library
 		 *       Currently, enabling `nofpu' will cause a DOUBLE_FAULT the first
-		 *       time we get into the #NM interrupt handler, because it will
+		 *       time we get  into the  #NM interrupt handler,  because it  will
 		 *       recurse into itself... */
 		return;
 	}
@@ -448,7 +448,7 @@ setup_fpu_emulation:
 		printk(FREESTR(KERN_INFO "[fpu] Enable native fxsave/fxrstor support [mxcsr_mask=%#I32x]\n"),
 		       x86_fxsave_mxcsr_mask_);
 		/* The FXSAVE variants version of FTW works differently: a 0-bit means an empty register,
-		 * and a 1-bit means a used register, whereas FSAVE assigns 2 bits per register, with 3
+		 * and  a 1-bit means a used register, whereas  FSAVE assigns 2 bits per register, with 3
 		 * meaning empty, and 0-2 meaning used, potentially with special values. */
 		x86_fpustate_init_ftw_value = 0;
 
@@ -508,7 +508,7 @@ setup_fpu_emulation:
 		}
 	}
 	/* Set the TS bit because while the FPU is now initialized, `thiscpu_fputhread'
-	 * isn't actually set to anything, much less the calling thread. */
+	 * isn't   actually   set  to   anything,   much  less   the   calling  thread. */
 	__wrcr0(cr0 | CR0_TS);
 }
 

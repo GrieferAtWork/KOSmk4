@@ -26,21 +26,21 @@
 .section .text.linker_entry
 INTERN_FUNCTION(linker_entry)
 	/* Low-level linker entry point (this is the initial user-level
-	 * entry point that gets called by the kernel when dynamically
+	 * entry point that gets called by the kernel when  dynamically
 	 * linked binaries are invoked)
 	 *
-	 * Note that at this point we're already in user-space, so no
+	 * Note that  at this  point we're  already in  user-space, so  no
 	 * more screwing around with `iret' or direct access of preemption
 	 * control or IO from here on \^w^/
 	 */
 
 	/* The current (expected) register/stack state looks like this:
-	 *   %rdi:  struct elfexec_info *info;     // Information about execution context (see the struct for more details)
-	 *                                             // Note that this struct is actually allocated in the stack, with its end
-	 *                                             // marking the base of the user-space stack
-	 *   %rsi:  uintptr_t                loadaddr; // Loadaddr (load offset) of the main binary (usually
-	 *                                             // 0, since that binary probably can't be relocated)
-	 *   %rdx:  struct process_peb      *peb;      // Points to the process environment block (contains argc+argv[] and environ[])
+	 *   %rdi:  struct elfexec_info *info;     // Information about execution context (see the struct for more  details)
+	 *                                         // Note that this struct is actually allocated in the stack, with its end
+	 *                                         // marking the base of the user-space stack
+	 *   %rsi:  uintptr_t            loadaddr; // Loadaddr (load offset) of the main binary (usually
+	 *                                         // 0,  since that binary probably can't be relocated)
+	 *   %rdx:  struct process_peb  *peb;      // Points to the process environment block (contains argc+argv[] and environ[])
 	 */
 	INTERN(linker_main)
 	call   linker_main
@@ -48,8 +48,8 @@ INTERN_FUNCTION(linker_entry)
 	/* Run user-level initializers */
 	INTERN(DlModule_RunAllStaticInitializers)
 	call   DlModule_RunAllStaticInitializers
-	ret                /* SP = &(struct elfexec_info)::pr_entry_sp;
-	                    * PC = (struct elfexec_info)::pr_entry; */
+	ret                /* >> SP = &(struct elfexec_info)::pr_entry_sp;
+	                    * >> PC = (struct elfexec_info)::pr_entry; */
 END(linker_entry)
 
 #endif /* !GUARD_LIBDL_ARCH_I386__START64_S */

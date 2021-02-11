@@ -33,8 +33,8 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* List  of   callbacks   that   should  be   invoked   after   mman_exec()
- * These  are  called   alongside  stuff  like   `handle_manager_cloexec()'
+/* List of  callbacks  that  should be  invoked  after  mman_exec()
+ * These are called alongside stuff like `handle_manager_cloexec()'
  * NOTE: The passed mman is always `THIS_MMAN', and is never `&mman_kernel' */
 DATDEF CALLBACK_LIST(void KCALL(void)) mman_onexec_callbacks;
 /* Mman initialization/finalization callbacks. */

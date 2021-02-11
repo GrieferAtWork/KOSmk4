@@ -42,7 +42,7 @@
 
 #undef CONFIG_MFILE_LEGACY_VIO_OPS
 #ifndef CONFIG_USE_NEW_FS
-#if 1 /* TODO: Currently required  for backwards compatibility  to the old  mman.
+#if 1 /* TODO: Currently required for  backwards compatibility to  the old  mman.
        * The  plan is to  eventually disable this  option, and merge `inode_type'
        * with `mfile_ops', which should then contain a pointer for VIO operators.
        * With this option enabled, the old behavior is used, instead. */
@@ -298,7 +298,7 @@ struct mfile_ops {
 	/* [0..1] Construct a new given mem-part. When not implemented, use the default                         \
 	 *        mechanism for the creation of new mem-parts.                                                  \
 	 * This function is mainly intended to be used by `mfile_pyhs' in order to create                       \
-	 * custom, already-initialized mem-parts for use with a given physical location.                        \
+	 * custom, already-initialized mem-parts for use with a given physical  location.                       \
 	 * NOTE: This function may assume that the given address range is aligned by `mf_part_amask'.           \
 	 * The following fields should _NOT_ already be initialized by this                                     \
 	 * function, and will unconditionally be initialized by the caller:                                     \
@@ -339,7 +339,7 @@ struct mfile_ops {
 	 * @assume(num_bytes != 0);                                                                             \
 	 * @assume(WRITABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));               \
 	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned            \
-	 *       end of the last file-block when `num_bytes' isn't aligned by whole blocks, where               \
+	 *       end of the last  file-block when `num_bytes' isn't  aligned by whole blocks,  where            \
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */                               \
 	/* TODO: Change this function to add support for iov-based I/O  */                                      \
 	NONNULL((1)) void (KCALL *prefix##loadblocks)(T *__restrict self, pos_t addr,                           \
@@ -353,7 +353,7 @@ struct mfile_ops {
 	 * @assume(num_bytes != 0);                                                                             \
 	 * @assume(READABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));               \
 	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned             \
-	 *       end of the last file-block when `num_bytes' isn't aligned by whole blocks, where               \
+	 *       end  of the last file-block when `num_bytes'  isn't aligned by whole blocks, where             \
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */                               \
 	/* TODO: Change this function to add support for iov-based I/O  */                                      \
 	NONNULL((1)) void (KCALL *prefix##saveblocks)(T *__restrict self, pos_t addr,                           \
@@ -371,7 +371,7 @@ struct mfile_ops {
 	/* [0..1] Stream operators. */                                                                          \
 	struct mfile_stream_ops const *prefix##stream;                                                          \
 	                                                                                                        \
-	/* [0..1] VIO file operators. When non-NULL, then this file is backed by                                \
+	/* [0..1] VIO file operators. When non-NULL,  then this file is backed  by                              \
 	 * VIO, and the `mo_loadblocks' and `mo_saveblocks' operators are ignored,                              \
 	 * though should still be set to `NULL' for consistency. */                                             \
 	struct vio_operators const *prefix##vio
@@ -385,8 +385,8 @@ struct mfile_ops {
 
 	/* [0..1] Construct a new given mem-part. When not implemented, use the default
 	 *        mechanism for the creation of new mem-parts.
-	 * This function  is  mainly  intended  to  be  used  by  `mfile_pyhs'  in  order  to  create
-	 * custom,   already-initialized  mem-parts   for  use   with  a   given  physical  location.
+	 * This function is mainly intended to be used by `mfile_pyhs' in order to create
+	 * custom, already-initialized mem-parts for use with a given physical  location.
 	 * NOTE: This function may assume that the given address range is aligned by `mf_part_amask'.
 	 * The following fields should _NOT_ already be initialized by this
 	 * function, and will unconditionally be initialized by the caller:
@@ -485,6 +485,8 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
 /* Flags defined here also map to:
  *  - `ST_*' from <sys/statvfs.h>
  *  - `MS_*' from <sys/mount.h>
+ *
+ * ```
  *  0x00000001  MFILE_F_READONLY       ST_RDONLY           MS_RDONLY
  *  0x00000002  MFILE_FS_NOSUID        ST_NOSUID           MS_NOSUID
  *  0x00000004                         ST_NODEV            MS_NODEV
@@ -498,7 +500,9 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
  *  0x00020000                                             MS_UNBINDABLE
  *  0x00200000                                             MS_RELATIME
  *  0x01000000                                             MS_STRICTATIME
- *  0x02000000                                             MS_LAZYTIME */
+ *  0x02000000                                             MS_LAZYTIME
+ * ```
+ */
 
 /* Flags for `struct mfile::mf_flags' */
 #define MFILE_F_NORMAL          0x00000000 /* Normal flags. */
@@ -980,7 +984,7 @@ struct mfile_extendpart_data {
  *   EXCEPT:                                     mfile_lock_end(self) && unlock()
  * @return: * : Success: A pointer to an extended mem-part that contains the entirety
  *                       of the address  range originally specified  in `data'.  Note
- *                       that  in this case, you're inheriting a lock to that part.
+ *                       that in this case, you're inheriting a lock to that part.
  *                       Note: In this case, this function also guaranties that the
  *                       returned part doesn't exist in  SWAP, though it may  still
  *                       not be allowed (i.e. it's state may be MPART_ST_VOID)

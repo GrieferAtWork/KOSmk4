@@ -148,17 +148,17 @@ BEGIN
 	GCC_FLAGS({ "-gz=zlib" })
 
 	LD_FLAGS({
-		/* This flag disables alignment that
+		/* This  flag  disables  alignment  that
 		 * would unnecessarily bloat the kernel. */
 		"--nmagic",
 		"--eh-frame-hdr",
 		"--gc-sections",
 
 		/* This right here is _needed_, else ld will remove ~unused~
-		 * symbols that are exported from the kernel core. */
+		 * symbols  that  are   exported  from   the  kernel   core. */
 		"--gc-keep-exported",
 
-		/* This following flag allows us to overlay sections,
+		/* This  following flag allows us to overlay sections,
 		 * which is required for PERXXX templates and offsets. */
 		"--no-check-sections",
 	})
@@ -173,7 +173,7 @@ BEGIN
 
 	/* Special case: Include the rtld-flat.bin binary blob within the kernel core.
 	 *               We do this by using a .incbin assembler directive, however in
-	 *               order to do so safely, the associated assembler source file
+	 *               order to do so safely,  the associated assembler source  file
 	 *               needs to have an artificial dependency on rtld-flat.bin */
 	BEGIN GROUP("kernel") {
 			stepWithDependencies(COMPILE, {
@@ -260,7 +260,7 @@ BEGIN
 							} else {
 								local symbol_name = data[0];
 								/* Mark symbols as weak, so-as to allow them to-be removed without
-								 * causing a linker error during the first re-link pass. */
+								 * causing  a  linker  error   during  the  first  re-link   pass. */
 								fp << "\t" << PTR << " .Lname" << i << " /* index: " << i << " */\n"
 								      "\t.weak " << symbol_name << "; " << PTR << " " << symbol_name << "\n";
 								if (R_SIZE32 !is none) {
@@ -312,4 +312,3 @@ BEGIN
 	END
 
 END
-

@@ -245,12 +245,12 @@ nic_device_sendall_background(struct nic_device *__restrict self,
 
 
 /* Extended version of `nic_packetlist_segments()'
- * NOTE: Memory from `packet->npd_head' and `packet->npd_tail' will
- *       be hard-copied into the new packets as implicit head/tail
- *       data objects. In other words: Only `npd_payload' has to be
- *       kept valid until after the packet has been fully sent.
+ * NOTE: Memory from `packet->npd_head' and `packet->npd_tail'  will
+ *       be hard-copied into the  new packets as implicit  head/tail
+ *       data objects. In other words: Only `npd_payload' has to  be
+ *       kept valid  until after  the packet  has been  fully  sent.
  *       As such, head/tail is meant to be used for kernel-generated
- *       descriptors, while the payload may also contain user-space
+ *       descriptors,  while the payload may also contain user-space
  *       data.
  * HINT: After this call, you may assume:
  * >> for (i = self->npl_cnt - return; i < self->npl_cnt; ++i) {

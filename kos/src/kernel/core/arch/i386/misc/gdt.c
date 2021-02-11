@@ -111,8 +111,8 @@ INTDEF byte_t __x86_ldt_lcall7_main_hi[];
 
 PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
 #ifdef CONFIG_X86_EMULATE_LCALL7
-	/* Define the lcall7 segment as something that will cause a #NP when accessed,
-	 * thus allowing us to emulate its behavior, rather than having to implement it
+	/* Define  the lcall7 segment as something that  will cause a #NP when accessed,
+	 * thus allowing us to emulate its behavior, rather than having to implement  it
 	 * properly. As far as the reasoning for this goes, take a look at the emulation
 	 * implementation found in `/kos/src/kernel/core/arch/i386/fault/handle_gpf.c' */
 	/* NOTE: Setting the P(present) bit to 0 will trigger a #NP */
@@ -143,7 +143,7 @@ NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
 
 
 #ifndef __x86_64__
-/* The per-task values with which the `SEGMENT_USER_FSBASE' and
+/* The  per-task values with which the `SEGMENT_USER_FSBASE' and
  * `SEGMENT_USER_GSBASE' segments are populated during scheduler
  * preemption. */
 PUBLIC ATTR_PERTASK uintptr_t this_x86_user_fsbase = 0;

@@ -81,7 +81,7 @@ PRIVATE unsigned int x86_syslog_smplock = 0;
 
 
 /* Raw, low-level write the given data to the default x86 system log.
- * The write is performed atomically in respect to other calls to
+ * The write is  performed atomically  in respect to  other calls  to
  * this function. */
 PUBLIC NOBLOCK NONNULL((1)) void FCALL
 x86_syslog_write(char const *__restrict data,

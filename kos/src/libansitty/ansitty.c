@@ -161,7 +161,7 @@ DECL_BEGIN
 /* TTY states */
 #define STATE_TEXT_UTF8        0 /* Default state: at the start of the next character. */
 #define STATE_TEXT_UTF8_MBS    1 /* Inside of a multi-byte-character-string (same as `STATE_TEXT_UTF8', \
-                                  * but  `at_esclen'  is non-NULL  and refers  to the  number of  UTF-8 \
+                                  * but  `at_esclen'  is non-NULL  and refers  to  the number  of UTF-8 \
                                   * characters already present within `at_escape') */
 #define STATE_ESC              2 /* State set immediately after a `\e' character was encountered */
 #define STATE_CSI              3 /* Process escape arguments. */
@@ -790,9 +790,9 @@ ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	                            ANSITTY_FLAG_INSDEL_SCRN)) {
 
 	case 0: {
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> ABCD...EF
-		 * abcdefghi      abcdefghi */
+		/* >> 123456789       123456789
+		 * >> ABCDEFGHI  -->  ABCD...EF
+		 * >> abcdefghi       abcdefghi */
 		ansitty_coord_t xy[2];
 		ansitty_coord_t sxy[2];
 		ansitty_coord_t cells_in_line;
@@ -807,9 +807,9 @@ ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	}	goto do_putuni_and_break;
 
 	case ANSITTY_FLAG_INSDEL_SCRN:
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> ABCD...EF
-		 * abcdefghi      GHIabcdef */
+		/* >> 123456789       123456789
+		 * >> ABCDEFGHI  -->  ABCD...EF
+		 * >> abcdefghi       GHIabcdef */
 		COPYCELL(1, MAXCOORD);
 do_putuni_and_break:
 		PUTUNILAST(ch);
@@ -817,9 +817,9 @@ do_putuni_and_break:
 
 	case ANSITTY_FLAG_HEDIT: {
 		ansitty_coord_t xy[2];
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> D...EFGHI
-		 * abcdefghi      abcdefghi */
+		/* >> 123456789       123456789
+		 * >> ABCDEFGHI  -->  D...EFGHI
+		 * >> abcdefghi       abcdefghi */
 		GETCURSOR(xy);
 		if (xy[0] <= 1) {
 			/* Full area shift */
@@ -836,9 +836,9 @@ do_putuni_and_break:
 	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
 		ansitty_coord_t xy[2];
 		unsigned int copy_count;
-		/* 123456789      456789ABC
-		 * ABCDEFGHI  --> D...EFGHI
-		 * abcdefghi      abcdefghi */
+		/* >> 123456789       456789ABC
+		 * >> ABCDEFGHI  -->  D...EFGHI
+		 * >> abcdefghi       abcdefghi */
 		GETCURSOR(xy);
 		if (xy[1] == 0) {
 			if (xy[0] <= 1) {
@@ -1306,9 +1306,9 @@ do_single_argument_case:
 			                            ANSITTY_FLAG_INSDEL_SCRN)) {
 
 			case 0: {
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ABCD...EF
-				 * abcdefghi      abcdefghi */
+				/* >> 123456789       123456789
+				 * >> ABCDEFGHI  -->  ABCD...EF
+				 * >> abcdefghi       abcdefghi */
 				ansitty_coord_t xy[2];
 				ansitty_coord_t sxy[2];
 				ansitty_coord_t cells_in_line;
@@ -1323,17 +1323,17 @@ do_single_argument_case:
 			}	break;
 
 			case ANSITTY_FLAG_INSDEL_SCRN:
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ABCD...EF
-				 * abcdefghi      GHIabcdef */
+				/* >> 123456789       123456789
+				 * >> ABCDEFGHI  -->  ABCD...EF
+				 * >> abcdefghi       GHIabcdef */
 				COPYCELL(n, MAXCOORD);
 				break;
 
 			case ANSITTY_FLAG_HEDIT: {
 				ansitty_coord_t xy[2];
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> D...EFGHI
-				 * abcdefghi      abcdefghi */
+				/* >> 123456789       123456789
+				 * >> ABCDEFGHI  -->  D...EFGHI
+				 * >> abcdefghi       abcdefghi */
 				GETCURSOR(xy);
 				if ((unsigned int)n >= xy[0]) {
 					/* Full area shift */
@@ -1348,9 +1348,9 @@ do_single_argument_case:
 				ansitty_coord_t xy[2];
 				ansitty_coord_t xy2[2];
 				unsigned int copy_count;
-				/* 123456789      456789ABC
-				 * ABCDEFGHI  --> D...EFGHI
-				 * abcdefghi      abcdefghi */
+				/* >> 123456789       456789ABC
+				 * >> ABCDEFGHI  -->  D...EFGHI
+				 * >> abcdefghi       abcdefghi */
 				GETCURSOR(xy);
 				if (xy[1] == 0) {
 					if (xy[0] < (unsigned int)n)
@@ -1396,9 +1396,9 @@ done_insert_ansitty_flag_hedit:
 			                            ANSITTY_FLAG_INSDEL_SCRN)) {
 
 			case 0: {
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ABCDHI...
-				 * abcdefghi      abcdefghi */
+				/* >> 123456789       123456789
+				 * >> ABCDEFGHI  -->  ABCDHI...
+				 * >> abcdefghi       abcdefghi */
 				/* TODO: Need to account for the right margin here! */
 				ansitty_coord_t xy[2];
 				ansitty_coord_t sxy[2];
@@ -1420,9 +1420,9 @@ done_insert_ansitty_flag_hedit:
 			}	break;
 
 			case ANSITTY_FLAG_INSDEL_SCRN: {
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ABCDHIabc
-				 * abcdefghi      defghi... */
+				/* >> 123456789       123456789
+				 * >> ABCDEFGHI  -->  ABCDHIabc
+				 * >> abcdefghi       defghi... */
 				ansitty_coord_t xy[2];
 				ansitty_coord_t xy2[2];
 				ansitty_coord_t new_x;
@@ -1443,9 +1443,9 @@ done_insert_ansitty_flag_hedit:
 
 			case ANSITTY_FLAG_HEDIT: {
 				ansitty_coord_t xy[2];
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ...AEFGHI
-				 * abcdefghi      abcdefghi */
+				/* >> 123456789       123456789
+				 * >> ABCDEFGHI  -->  ...AEFGHI
+				 * >> abcdefghi       abcdefghi */
 				GETCURSOR(xy);
 				if ((unsigned int)n >= xy[0]) {
 					/* Full area shift */
@@ -1460,9 +1460,9 @@ done_insert_ansitty_flag_hedit:
 			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
 				ansitty_coord_t xy[2];
 				unsigned int copy_count;
-				/* 123456789      ...123456
-				 * ABCDEFGHI  --> 789AEFGHI
-				 * abcdefghi      abcdefghi */
+				/* >> 123456789       ...123456
+				 * >> ABCDEFGHI  -->  789AEFGHI
+				 * >> abcdefghi       abcdefghi */
 				GETCURSOR(xy);
 				copy_count = xy[0];
 				if (xy[1] != 0) {
@@ -2268,7 +2268,7 @@ done_insert_ansitty_flag_hedit:
 				 * PM = 0 - not recognized
 				 * PM = 1 - set
 				 * PM = 2 - reset
-				 * PM = 3  -  permanently set
+				 * PM = 3  - permanently  set
 				 * PM = 4 - permanently reset
 				 * NOTE: `PS' is the same as in `\e[<PS>h' and `\e[<PS>l' */
 				size_t len;
@@ -3287,7 +3287,7 @@ do_process_string_command:
 		/* ESC Y Ps Ps    Move the cursor to given row and column.
 		 * Parameters for cursor  movement are at  the end of  the ESC Y  escape
 		 * sequence. Each ordinate is encoded in a single character as value+32.
-		 * For example,  !  is  1.  The screen  coordinate  system  is  0-based. */
+		 * For example, ! is 1. The screen coordinate system is 0-based. */
 		if ((byte_t)ch < 32) {
 			if (ch == CC_CAN)
 				goto set_text_and_done;

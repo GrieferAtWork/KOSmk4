@@ -333,7 +333,7 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  * >> task_schedule_asynchronous_rpc(target, &redirect_iret_to_execute_rpcs);
  * Once entered, `x86_rpc_user_redirection()' will then restore the saved IRET
  * tail,  before  proceeding  to  serve  _all_  pending  RPC  callbacks (s.a.:
- * the   `Anytime the thread returns to user-space'   row   in   `task_rpc()')
+ * the `Anytime the thread returns to user-space' row in `task_rpc()')
  * WARNING:
  *    Because of the redirection, in order to get/set any of the kernel  IRET
  *    registers when inside of an interrupt/syscall with preemption  enabled,
@@ -357,7 +357,7 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 /* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
- *       and that `thread' is hosted by the calling CPU. */
+ *       and that  `thread' is  hosted by  the calling  CPU. */
 #define x86_get_irregs(thread) \
 	((struct irregs *)FORTASK(thread, *(uintptr_t *)&this_x86_kernel_psp0) - 1)
 
@@ -370,7 +370,7 @@ struct irregs_user;
 /* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
- *       and that `thread' is hosted by the calling CPU. */
+ *       and that  `thread' is  hosted by  the calling  CPU. */
 FUNDEF ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 #endif /* !__x86_64__ */

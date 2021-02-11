@@ -1591,7 +1591,7 @@ INTERN int DLFCN_CC libdl_dlclearcaches(void) {
 	 *  - Within the same thread:
 	 *    - Immediately return `0'
 	 *  - From another thread:
-	 *    - Wait for the first thread to finish, then mirror
+	 *    - Wait for  the first  thread to  finish, then  mirror
 	 *      its return value and don't re-execute this function.
 	 */
 

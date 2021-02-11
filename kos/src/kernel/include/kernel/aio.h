@@ -49,6 +49,7 @@ DECL_BEGIN
  *   - the IDE/ATA driver   /kos/src/kernel/modide   (async-job: no)
  * To try and bring all of the information together, you may use the following flow-chart:
  *
+ * ```
  *   ┌─── <ENTRY>
  *   │
  *   │                                      ┌────────────> [struct device]
@@ -192,6 +193,8 @@ DECL_BEGIN
  *                                             [28] >> return;
  *                                             [29] >>do_cancel:
  *                                             [30] >> aio_handle_complete(aio, AIO_COMPLETION_CANCEL);
+ * ```
+ *
  * HINT: SMP locks aren't required because `aio_handle_fini()' will
  *       wait  until the handle's completion function has returned!
  */
@@ -286,11 +289,11 @@ typedef NOBLOCK NOPREEMPT NONNULL((1)) void
 
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 #define AIO_HANDLE_HEAD                                                                                    \
-	struct aio_handle            *ah_next; /* [0..1][lock(INTERNAL)] Pointer to the next AIO handle.       \
-	                                        * This field is only used internally in order to easily chain  \
-	                                        * pending AIO operations. Filled in during device-specific     \
+	struct aio_handle            *ah_next; /* [0..1][lock(INTERNAL)]  Pointer  to  the  next  AIO  handle. \
+	                                        * This  field is only used internally in order to easily chain \
+	                                        * pending  AIO  operations. Filled  in  during device-specific \
 	                                        * handle init, and set to `AIO_HANDLE_NEXT_COMPLETED' in order \
-	                                        * to allow the AIO handle to be destroyed after `ah_func' has  \
+	                                        * to  allow the AIO handle to be destroyed after `ah_func' has \
 	                                        * returned */                                                  \
 	struct aio_handle_type const *ah_type; /* [1..1][lock(WRITE_ONCE_DURING_INIT)]                         \
 	                                        * AIO usage type (set by a driver implementing AIO             \
@@ -659,7 +662,7 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self);
 /* Allocate handles for the purpose of AIO completion.
  * WARNING: Don't free a handle after you already started using it in the context of an AIO parameter.
  * NOTE: `aio_multihandle_allochandle()' calls `aio_multihandle_fail()' upon
- *       error, before returning propagating an error / returning `NULL'. */
+ *       error, before returning  propagating an error  / returning  `NULL'. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct aio_handle *KCALL
 aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		THROWS(E_BADALLOC);

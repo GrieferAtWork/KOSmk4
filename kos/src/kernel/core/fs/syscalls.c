@@ -1102,7 +1102,7 @@ DEFINE_SYSCALL2(errno_t, umount2,
 	                 E_INVALID_ARGUMENT_CONTEXT_UMOUNT2_FLAGS);
 	(void)MNT_FORCE;  /* KOS always does this (though we could probably add a mode where we first
 	                   * acquire locks to all cached files and ensure that none of them carry any
-	                   * untraceable references, as would be indicative of them being opened, or
+	                   * untraceable  references, as would be indicative of them being opened, or
 	                   * being mapped by some VM) */
 	(void)MNT_DETACH; /* Just detaching would result in reference leaks (file data wouldn't get anonymized) */
 	(void)MNT_EXPIRE; /* TODO: Only set the `SUPERBLOCK_FUNMOUNTED' flag for the associated superblock. */
@@ -2915,7 +2915,7 @@ DEFINE_SYSCALL5(ssize_t, freadlinkat,
 		++result;
 	} else if (result >= buflen) {
 		/* From `man':
-		 *  ... It will (silently) truncate the contents (to a length
+		 *  ... It will (silently) truncate the contents (to a  length
 		 *      of bufsiz characters), in case the buffer is too small
 		 *      to hold all of the contents
 		 * In other words, it's $h1t, which is why KOS offers the extension
@@ -3031,8 +3031,8 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	uintptr_t thread_flags;
 	thread_flags = PERTASK_GET(this_task.t_flags);
 #ifdef CONFIG_HAVE_USERPROCMASK
-	/* If the calling thread uses userprocmask, we must copy
-	 * their final process mask into kernel-space before we do
+	/* If the calling  thread uses userprocmask,  we must  copy
+	 * their final process mask into kernel-space before we  do
 	 * the exec. Note that the `TASK_FUSERPROCMASK' flag itself
 	 * is later unset by `reset_user_except_handler()' */
 	if (thread_flags & TASK_FUSERPROCMASK) {
@@ -3044,8 +3044,8 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		validate_readable(um_sigset, sizeof(sigset_t));
 
 		/* Copy the final user-space signal mask into kernel-space.
-		 * If the exec() ends up succeeding, then this will be the
-		 * signal mask that the new program will start execution
+		 * If  the exec() ends up succeeding, then this will be the
+		 * signal mask that  the new program  will start  execution
 		 * under. */
 		mymask = sigmask_kernel_getwr();
 		memcpy(&mymask->sm_mask, um_sigset, sizeof(sigset_t));
@@ -3065,7 +3065,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			/* Load the newly initialized VM as our current VM */
 			task_setmman(newmm);
 		}
-		/* ==== Point of no return: This is where we
+		/* ==== Point of no  return: This  is where  we
 		 *      indicate success to our parent process. */
 #ifdef CONFIG_HAVE_USERPROCMASK
 		{
@@ -3073,9 +3073,9 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			old_flags = ATOMIC_FETCHAND(THIS_TASK->t_flags,
 			                            ~(TASK_FVFORK | TASK_FUSERPROCMASK |
 			                              TASK_FUSERPROCMASK_AFTER_VFORK));
-			/* Special case: If userprocmask was enabled after vfork(), then
+			/* Special case: If  userprocmask  was enabled  after  vfork(), then
 			 *               we must write-back a NULL to its `pm_sigmask' field
-			 *               in order to indicate to the parent process that
+			 *               in order  to indicate  to the  parent process  that
 			 *               their userprocmask hasn't been enabled, yet. */
 			if (old_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
 				USER CHECKED struct userprocmask *um;
@@ -3100,7 +3100,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 				sig_broadcast(&mypid->tp_changed);
 		}
 		/* With the VFORK flag cleared, check for pending POSIX signals,
-		 * since this also means that our thread's user-visible signal
+		 * since this also means  that our thread's user-visible  signal
 		 * mask has once again come into effect.
 		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
 		sigmask_check();
@@ -3108,13 +3108,13 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		args->ea_mman = THIS_MMAN;
 		mman_exec(args);
 #ifdef CONFIG_HAVE_USERPROCMASK
-		/* If the previous process used to have a userprocmask, and didn't make proper
-		 * use of calling `sys_sigmask_check()', we check for pending signals in the
+		/* If the previous process used to have a userprocmask, and didn't make  proper
+		 * use  of calling `sys_sigmask_check()',  we check for  pending signals in the
 		 * context of the new process, just so it gets to start out with a clean slate.
 		 *
 		 * Note though that assuming the original program used the userprocmask API
-		 * correctly, there shouldn't be any unmasked, pending signals from before
-		 * the call to exec() at this point (of course, there could always be some
+		 * correctly, there shouldn't be any unmasked, pending signals from  before
+		 * the  call to exec() at this point (of course, there could always be some
 		 * from during the call...) */
 		if (thread_flags & TASK_FUSERPROCMASK)
 			sigmask_check();
@@ -3138,16 +3138,16 @@ kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 		                               args->ea_xdentry->de_namelen,
 		                               &format_length,
 		                               NULL);
-		/* Allocate the register buffer beforehand, so this
+		/* Allocate  the  register  buffer  beforehand,  so  this
 		 * allocation failing can still be handled by user-space.
-		 * NOTE: We always allocate this buffer on the heap, since file paths can get quite long,
-		 *       an being as far to the bottom of the kernel stack as we are, it could be a bit
+		 * NOTE: We  always  allocate this  buffer on  the heap,  since  file paths  can get  quite long,
+		 *       an being  as far  to the  bottom of  the  kernel stack  as we  are, it  could be  a  bit
 		 *       risky to allocate a huge stack-based structure when we still have to call `mman_exec()',
 		 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
 		buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
 		TRY {
 			dst = buf;
-			/* FIXME: If the process uses chroot() between this and the previous
+			/* FIXME: If  the process  uses chroot()  between this  and the previous
 			 *        printent() call, then we may write past the end of the buffer!
 			 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
 			 *           during every invocation! */
@@ -3203,10 +3203,10 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 	tls_info->ei_code = ERROR_CODEOF(E_OK);
 	tls_info->ei_flags &= ~EXCEPT_FINCATCH;
 	TRY {
-		/* Check for race condition: Our RPC only got executed because the
-		 * main thread is currently being terminated. - In this case it wouldn't
+		/* Check  for  race  condition:  Our  RPC  only  got  executed  because  the
+		 * main  thread is  currently being terminated.  - In this  case it wouldn't
 		 * make any sense to try and load a new binary into the VM, so just indicate
-		 * to the receiving thread that we've been terminated by propagating an
+		 * to the  receiving thread  that we've  been terminated  by propagating  an
 		 * E_EXIT_THREAD exception to them. */
 		if unlikely(reason == TASK_RPC_REASON_SHUTDOWN) {
 			assert(THIS_TASKPID);
@@ -3217,7 +3217,7 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		}
 		/* Actually map the specified file into memory!
 		 * NOTE: For this purpose, we simply re-direct the given user-space
-		 *       CPU state to which the RPC would have normally returned! */
+		 *       CPU state to which the  RPC would have normally  returned! */
 		data->er_args.ea_state = state;
 		kernel_do_execveat(&data->er_args);
 		state = data->er_args.ea_state;
@@ -3229,10 +3229,10 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		goto restore_exception;
 	}
 	memcpy(tls_info, &old_exception_info, sizeof(old_exception_info));
-	/* Success! -> In this case _we_ must inherit the given RPC data packet,
-	 *             since the sending thread will terminate (or has already
+	/* Success! -> In  this case _we_ must inherit the given RPC data packet,
+	 *             since the sending  thread will terminate  (or has  already
 	 *             terminated) by having its `task_waitfor()' function return
-	 *             by throwing an E_EXIT_THREAD exception that got caused by
+	 *             by throwing an E_EXIT_THREAD exception that got caused  by
 	 *            `vmb_apply()' terminating all threads except for the calling
 	 *             one (us) within the current process. */
 	execargs_fini(&data->er_args);
@@ -3243,8 +3243,8 @@ restore_exception:
 done_signal_exception:
 	if (sig_broadcast(&data->er_error) == 0) {
 		/* Can't deliver the error to the original caller of `exec()', since
-		 * they must have died in the mean time. - With that in mind, the
-		 * error that caused the problem must go unnoticed, and we are
+		 * they must have died in  the mean time. -  With that in mind,  the
+		 * error  that  caused the  problem must  go  unnoticed, and  we are
 		 * responsible for the cleanup of `data'. */
 		kfree(data);
 	}
@@ -3313,9 +3313,9 @@ kernel_execveat(fd_t dirfd,
 		} else {
 			struct kernel_exec_rpc_data *data;
 			struct task *proc = task_getprocess_of(caller);
-			/* Since the new process is meant to override our's as a whole, the actual
+			/* Since the new process is  meant to override our's  as a whole, the  actual
 			 * exec() must be performed by the main thread of our own process. - For this
-			 * purpose, we must use an RPC to load the new binary from the main thread. */
+			 * purpose,  we must use an RPC to load  the new binary from the main thread. */
 			data = (struct kernel_exec_rpc_data *)kmalloc(sizeof(struct kernel_exec_rpc_data),
 			                                              GFP_LOCKED);
 			/* Initialize RPC information. */
@@ -3333,7 +3333,7 @@ kernel_execveat(fd_t dirfd,
 				                                   data,
 				                                   TASK_RPC_FHIGHPRIO,
 				                                   GFP_NORMAL)) {
-					/* The main thread was already terminated. - Propagate its
+					/* The main  thread was  already terminated.  - Propagate  its
 					 * termination signal manually (since we may not have received
 					 * it before in case our thread had been detached). */
 					union wait status;
@@ -3346,7 +3346,7 @@ kernel_execveat(fd_t dirfd,
 				assert(data->er_args.ea_xpath == args.ea_xpath);
 				assert(data->er_args.ea_xnode == args.ea_xnode);
 				/* NoKill, because we still got 1 more reference to each, which will be
-				 * dropped after `RETHROW()' by the `FINALLY_DECREF_UNLIKELY()' above. */
+				 * dropped  after `RETHROW()' by the `FINALLY_DECREF_UNLIKELY()' above. */
 				decref_nokill(args.ea_xdentry);
 				decref_nokill(args.ea_xpath);
 				decref_nokill(args.ea_xnode);
@@ -3354,20 +3354,20 @@ kernel_execveat(fd_t dirfd,
 				RETHROW();
 			}
 			/* With the RPC now scheduled, 1 of a couple of things will happen:
-			 *  #1: The main thread succeeds and is able to load+execute the binary.
-			 *      In this case, it will signal all threads except for itself to
-			 *      terminate, which is that case means us receiving a synchronous
+			 *  #1: The  main thread succeeds and is able to load+execute the binary.
+			 *      In  this case,  it will signal  all threads except  for itself to
+			 *      terminate, which is  that case means  us receiving a  synchronous
 			 *      RPC that simply causes an `E_EXIT_THREAD' exception to be thrown,
 			 *      and thus `task_waitfor()' to propagate that exception.
 			 *  #2: The main thread fails to load the binary.
-			 *      In this case, the main thread will have used `sig_broadcast()' to wake
-			 *      us up via the `&data->er_error' signal. (The signal runtime guaranties
+			 *      In  this  case, the  main  thread will  have  used `sig_broadcast()'  to wake
+			 *      us up  via  the  `&data->er_error' signal.  (The  signal  runtime  guaranties
 			 *      that a non-zero return value of `sig_broadcast()' means that `wait_waitfor()'
-			 *      will always return in the receiving thread, meaning that in this case we
-			 *      are guarantied to be allowed to continue execution, without having to be
+			 *      will always return  in the  receiving thread, meaning  that in  this case  we
+			 *      are guarantied to  be allowed  to continue  execution, without  having to  be
 			 *      afraid of being terminated before we're able to clean up `data'.
-			 *  #3: The RPC was executed only because the main thread has terminated.
-			 *      In this case, the RPC function will have forwarded the exit status
+			 *  #3: The RPC was executed only  because the main thread has  terminated.
+			 *      In this case, the RPC function will have forwarded the exit  status
 			 *      as an E_EXIT_THREAD exception that will be handled the same way any
 			 *      other exception caused by case #2 would have been.
 			 */
@@ -3386,7 +3386,7 @@ kernel_execveat(fd_t dirfd,
 			       &data->er_except,
 			       sizeof(data->er_except));
 			/* On error, we re-inherit the arguments structure, however the
-			 * references within are always inherited by the RPC callback! */
+			 * references within are always inherited by the RPC  callback! */
 			kfree(data);
 			/* (Re-)throw the exception that caused the exec() to fail. */
 			error_throw_current();
@@ -3816,7 +3816,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT) ||        \
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64) ||      \
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT_TIME64))
-/* Verify that the calling thread is allowed to assign arbitrary
+/* Verify that the calling thread is allowed to assign  arbitrary
  * timestamp to the given `node's last-accessed and last-modified
  * fields. */
 PRIVATE NONNULL((1)) void KCALL

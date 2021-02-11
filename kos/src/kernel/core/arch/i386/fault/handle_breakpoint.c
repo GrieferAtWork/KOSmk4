@@ -123,7 +123,7 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 	} else {
 		/* Fallback: Some other kind of instruction?
 		 * >> shouldn't really happen, unless user-space is tinkering
-		 *    with backing memory on a multi-core machine... */
+		 *    with  backing   memory  on   a  multi-core   machine... */
 		faultpc = pc;
 		pc      = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
 		icpustate_setpc(state, (uintptr_t)pc);

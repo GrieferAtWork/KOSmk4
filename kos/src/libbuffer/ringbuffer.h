@@ -36,7 +36,7 @@ DECL_BEGIN
  * When `ringbuffer_read()' is called, and no data is available, the function
  * will block  until data  becomes available,  or the  ringbuffer is  closed.
  * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
- *        it may call `task_yield()' when trying to acquire `self->rb_lock'
+ *        it may call `task_yield()'  when trying to acquire  `self->rb_lock'
  * @return: * : The number of bytes read. */
 INTDEF __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_read(struct ringbuffer *__restrict self,

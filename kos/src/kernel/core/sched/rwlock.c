@@ -1188,9 +1188,9 @@ wait_for_unshare:
 					task_disconnectall();
 					goto got_lock;
 				}
-				/* Wait   for   a  while,   assuming  that   readers   behave  as   they  should
-				 * and  release  their  locks  before  entering  a  wait-state  when  trying  to
-				 * reacquire   them,  but  noticing   that  the  lock   is  in  UPGRADING  mode.
+				/* Wait  for  a while,  assuming that  readers  behave as  they should
+				 * and release their locks before entering a wait-state when trying to
+				 * reacquire  them, but noticing  that the lock  is in UPGRADING mode.
 				 * NOTE: We use a small timeout so we can try again in case we missed something. */
 				{
 					ktime_t tmo = ktime();

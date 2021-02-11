@@ -93,7 +93,7 @@ PRIVATE ATTR_FREETEXT MpFloatingPointerStructure *
 NOTHROW(KCALL Mp_LocateFloatingPointerStructure)(void) {
 	MpFloatingPointerStructure *result;
 	uintptr_t base;
-	/* NOTE: No need to identity-map these, as they're all part of the
+	/* NOTE: No need to identity-map these,  as they're all part of  the
 	 *       first 1Gb of physical memory, which is fully mapped at this
 	 *       point, both in 32-bit and 64-bit mode. */
 	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x40E);
@@ -214,7 +214,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 					} else {
 						/* Remember this additional CPU's LAPIC id.
 						 * NOTE: The CPU controller itself will then be allocated and initialized
-						 *       later on. - For right now, we only save its LAPIC id where its
+						 *       later on. - For right now, we  only save its LAPIC id where  its
 						 *       controller point will go later (s.a. `x86_initialize_apic()'). */
 						printk(FREESTR(KERN_INFO "[smp] Found secondary processor #%u with lapic id %#.2" PRIx8 "\n"),
 						       cpu_count_, entry->mp_processor.p_lapicid);

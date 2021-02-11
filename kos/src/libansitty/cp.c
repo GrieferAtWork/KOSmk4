@@ -50,8 +50,8 @@ PRIVATE char16_t const ldm_chars[] = {
 	CHR('c') 0x000c, /* Form Feed */
 	CHR('d') '\r',   /* Carriage return */
 	CHR('e') '\n',   /* Line feed */
-	CHR('f') 0x00b0, /* ° Degree symbol */
-	CHR('g') 0x00b1, /* ± Plus/minus */
+	CHR('f') 0x00b0, /* Â° Degree symbol */
+	CHR('g') 0x00b1, /* Â± Plus/minus */
 	CHR('h') '\n',   /* New line */
 	CHR('i') 0x000b, /* Vertical tab */
 	CHR('j') 0x2518, /* Lower-right corner */

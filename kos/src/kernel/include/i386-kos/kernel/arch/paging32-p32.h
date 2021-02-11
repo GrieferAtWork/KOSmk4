@@ -34,6 +34,8 @@
 DECL_BEGIN
 
 /* To differentiate between hints and allocated, but non-present pages, we use this:
+ *
+ * ```
  *                       P32_PAGE_FPREPARED
  *                       |
  *                       |         P32_PAGE_FISAHINT
@@ -56,6 +58,7 @@ DECL_BEGIN
  *   00000000000000000000000000000000: Unused (P32_PAGE_ABSENT)
  *    3 2 2 2 2 2 1 1 1 1 1 8 6 4 2 0
  *    0 8 6 4 2 0 8 6 4 2 0
+ * ```
  *
  * NOTE: All entires of  E2 >=  768 are always  allocated (these  are the  ones
  *       responsible for  mapping kernel-space  at 0xc0000000-0xffffffff),  and
@@ -221,8 +224,8 @@ p32_pdir_e1_identity_t[1024 /* P32_PDIR_VEC2INDEX(pointer) */]
 typedef union p32_pdir_e2
 p32_pdir_e2_identity_t[1024 /* P32_PDIR_VEC2INDEX(pointer) */];
 
-/* E1 identity mapping access for the current page directory.
- *    Index #0: VEC2 -- The same index as used in `p32_pdir::p_e2'
+/* E1 identity   mapping  access  for  the  current  page  directory.
+ *    Index  #0: VEC2 --  The same index  as used in `p32_pdir::p_e2'
  *    Index #1: VEC1 -- The same index as used in `p32_pdir_e2::p_e1'
  * Example:
  * >> VIRT void *pointer = get_pointer();

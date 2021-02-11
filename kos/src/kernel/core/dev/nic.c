@@ -50,7 +50,7 @@ DECL_BEGIN
 	                                  (ht_size),                                           \
 	                                  (nic)->nd_hdgfp))
 
-/* Allocate a new NIC packet which may be used to send the given payload.
+/* Allocate  a new NIC packet which may be used to send the given payload.
  * Reserve sufficient space for headers and footers of up to the specified
  * sizes to be included alongside the payload. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
@@ -231,7 +231,7 @@ nic_device_write(struct character_device *__restrict self,
 
 /* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
  * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
- *                          The guaranty here is that: `return->rp_size >= max_packet_size'
+ *                          The  guaranty  here is  that: `return->rp_size >= max_packet_size'
  *                          NOTE: Must be at least `ETH_ZLEN' */
 PUBLIC ATTR_RETNONNULL struct nic_rpacket *KCALL
 nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC) {
@@ -259,8 +259,8 @@ NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self) {
 }
 
 /* Inherit a routable NIC packet and route it.
- * Routing may either be done synchronously (i.e. before this function returns),
- * or asynchronously (i.e. at some future point in time by some other thread)
+ * Routing  may either be done synchronously (i.e. before this function returns),
+ * or asynchronously (i.e.  at some future  point in time  by some other  thread)
  * If the caller _needs_ routing to be performed immediately, they should instead
  * make use of `eth_routepacket()', followed by `nic_rpacket_free()'
  * @param: real_packet_size: The actual used packet size (`<= packet->rp_size')

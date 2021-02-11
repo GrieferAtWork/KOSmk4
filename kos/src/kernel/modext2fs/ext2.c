@@ -288,13 +288,13 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	 *                 created in the mean time.
 	 *                 Handle this case by acting as though the file
 	 *                 had been deleted.
-	 * (XXX: This really shouldn't  have happened  though, unless  user-space
-	 *       has manually been writing to the underlying partitions,  because
-	 *       otherwise  the  file should  still be  of the  same type,  as an
-	 *       API  call going through  the kernel would  have marked our INode
-	 *       as  deleted,  meaning that  there'd  be no  situation  where its
-	 *       attributes  could still  be loadable...  At least  I think there
-	 *       isn't  a  way,  although   this  behavior  might  be   allowed?)
+	 * (XXX: This  really shouldn't have  happened though, unless user-space
+	 *       has manually been writing to the underlying partitions, because
+	 *       otherwise the file  should still  be of  the same  type, as  an
+	 *       API call going through the  kernel would have marked our  INode
+	 *       as deleted,  meaning that  there'd be  no situation  where  its
+	 *       attributes could still  be loadable... At  least I think  there
+	 *       isn't a way, although this behavior might be allowed?)
 	 *       Anyways: Just handle miss-matching INode types as missing files. */
 	if ((self->i_filemode & S_IFMT) != (real_mode & S_IFMT))
 		THROW(E_FSERROR_FILE_NOT_FOUND);

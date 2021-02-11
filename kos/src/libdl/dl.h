@@ -302,8 +302,8 @@ INTDEF void *LIBCCALL libdl___tls_get_addr(void);
 struct tls_segment;
 
 /* Allocate/Free a static TLS segment
- * These functions are  called by  by libc  in order to  safely create  a new  thread, such  that
- * all current and  future modules are  able to  store thread-local storage  within that  thread.
+ * These functions are called by by libc in  order to safely create a new thread, such  that
+ * all current and future modules are able to store thread-local storage within that thread.
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */

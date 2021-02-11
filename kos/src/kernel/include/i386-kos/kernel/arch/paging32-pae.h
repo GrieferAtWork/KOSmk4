@@ -34,6 +34,8 @@
 DECL_BEGIN
 
 /* To differentiate between hints and allocated, but non-present pages, we use this:
+ *
+ * ```
  *                                                       PAE_PAGE_FPREPARED
  *                                                       |
  *                                                       |         PAE_PAGE_FISAHINT
@@ -60,6 +62,7 @@ DECL_BEGIN
  * E XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX1: Owned: page_freeone(DATA & PAE_PAGE_FVECTOR) (present)
  * 3  6 6 5 5 5 5 5 4 4 4 4 4 3 3 3 3 3 2 2 2 2 2 1 1 1 1 1 8 6 4 2 0
  *    2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0
+ * ```
  *
  * NOTE: In the case of E3, all entries (all 4 of them) are always PRESENT.
  *       In order to support identity-mapping, as well as shared kernel-memory,
@@ -252,8 +255,8 @@ pae_pdir_e2_identity_t[4   /* PAE_PDIR_VEC3INDEX(pointer) */]
 typedef union pae_pdir_e3
 pae_pdir_e3_identity_t[4   /* PAE_PDIR_VEC3INDEX(pointer) */];
 
-/* E1 identity mapping access for the current page directory.
- *    Index #0: VEC3 -- The same index as used in `struct pae_pdir::p_e3'
+/* E1 identity   mapping   access   for   the   current   page   directory.
+ *    Index #0: VEC3 -- The  same index as used in  `struct pae_pdir::p_e3'
  *    Index #1: VEC2 -- The same index as used in `union pae_pdir_e3::p_e2'
  *    Index #2: VEC1 -- The same index as used in `union pae_pdir_e2::p_e1'
  * Example:

@@ -179,11 +179,11 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 			                                   flags);
 #if 0
 			/* XXX: This is technically correct, but if we use this, KOS will
-			 *      attempt to use the grub partition as filesystem root... */
+			 *      attempt to use the  grub partition as filesystem  root... */
 			if ((u64)part.p_flags & EFI_PART_F_ACTIVE)
 #else
 			/* According to my tutorial, the boot partition should be named `kos'.
-			 * Until we've got something better, use that as indicator. */
+			 * Until  we've  got   something  better,  use   that  as   indicator. */
 			if (dst >= name + 3 &&
 			    name[0] == 'k' &&
 			    name[1] == 'o' &&
@@ -227,12 +227,12 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 
 
 /* Automatically parse the MBR/EFI tables of the disk, and try to partition if accordingly.
- * If one of the partitions found have the ACTIVE/BOOTABLE flag set, a reference to that
- * partition is returned to the caller. If more than one partition has that flag set, or
+ * If one of the partitions  found have the ACTIVE/BOOTABLE flag  set, a reference to  that
+ * partition is returned to the  caller. If more than one  partition has that flag set,  or
  * if none of them do, `NULL' is returned instead, though the function has still succeeded.
  * NOTE: The caller should invoke `block_device_delparts' in the master partition beforehand.
  * NOTE: When `self' is a partition itself, its contents will still be parsed for partition
- *       tables like they usually would, though new partitions will still be added to the
+ *       tables like they usually would, though new  partitions will still be added to  the
  *       master device, as `block_device_makepart()' is used to create them. */
 PRIVATE NONNULL((1)) REF struct block_device_partition *KCALL
 block_device_autopart_impl(struct basic_block_device *__restrict self,
@@ -377,7 +377,7 @@ block_device_autopart(struct basic_block_device *__restrict self)
 	REF struct block_device_partition *active_part;
 	active_part = block_device_autopart_ex(self);
 	if (active_part) {
-		/* If the the root VFS has already been mounted, then we've moved past the
+		/* If the the root VFS has already  been mounted, then we've moved past  the
 		 * early boot phase of trying to figure out what device was used to boot us.
 		 * In that case, simply ignore any possible active partition. */
 		if (ATOMIC_READ(vfs_kernel.p_inode) != NULL)

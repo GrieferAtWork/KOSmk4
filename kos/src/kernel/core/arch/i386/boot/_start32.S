@@ -53,7 +53,7 @@
 #define P2V(x) ((x) + KERNEL_CORE_BASE)
 #define V2P(x) ((x) - KERNEL_CORE_BASE)
 
-/* The starting VEC2-index (in `x86_pdir::p_e2') and amount
+/* The starting  VEC2-index  (in  `x86_pdir::p_e2')  and  amount
  * of continuous indices thereafter of the kernel-share segment.
  * That is the segment where the kernel itself resides at, which
  * is then mapped again in all other page directories. */
@@ -120,7 +120,7 @@ INTERN_FUNCTION(_start)
 
 #if 1 /* Fixup required when loaded via bochs's `load32bitOSImage' function */
 	/* Prematurely load our GDT, so we can manually set valid segments for %ds, %es and %ss,
-	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
+	 * as  we only  want to  rely on  the boot loader  to have  set up  a valid  %ds and %cs */
 	.pushsection .rodata.free
 1:	.word  (SEGMENT_COUNT * 8 - 1)
 	.long  V2P(__templatecpu_x86_gdt)
@@ -359,12 +359,12 @@ INTERN_FUNCTION(_start)
 #ifndef CONFIG_NO_PAGING_PAE
 .Linit_paging_pae:
 #ifdef HYBRID_PAGING_MODE
-	/* Check if the host supports the cmpxchg8b instruction (our PAE paging implementation
+	/* Check  if the host  supports the cmpxchg8b instruction  (our PAE paging implementation
 	 * requires this instruction to function properly, and there is no way around this, since
 	 * the control words used by PAE are 64-bit wide)
-	 * However, judging by the fact that any CPU that supports PAE must necessarily have some
-	 * sort of wiring in place to be able to atomically fetch 64-bit values from RAM, it would
-	 * seem likely that it would also expose this functionality in the firs tof providing this
+	 * However, judging by the fact  that any CPU that supports  PAE must necessarily have  some
+	 * sort of wiring in place to be able  to atomically fetch 64-bit values from RAM, it  would
+	 * seem  likely that it would also expose this  functionality in the firs tof providing this
 	 * very instruction, but still though: it can't hurt to be save and disable PAE if CX8 isn't
 	 * available. */
 	ttest  mask=CPUID_1D_CX8, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D)
@@ -376,7 +376,7 @@ INTERN_FUNCTION(_start)
 	 *    even gain that ability from using PAE.
 	 */
 #else /* !HYBRID_PAGING_MODE */
-	/* TODO: Assert that the hosting CPU supports PAE and CX8.
+	/* TODO: Assert that the hosting  CPU supports PAE and  CX8.
 	 *       If it doesn't, print an an error message on-screen. */
 #endif /* HYBRID_PAGING_MODE */
 
@@ -448,7 +448,7 @@ INTERN_FUNCTION(_start)
 	movl   %cr4, %eax
 	orl    $(CR4_PAE), %eax
 	/* With PAE we're also able to support the NX bit, so try to enable
-	 * its effects while in kernel-space (if supported by the CPU) */
+	 * its effects  while in  kernel-space (if  supported by  the  CPU) */
 	ttest  mask=CPUID_7B_SMEP, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %eax
@@ -469,10 +469,10 @@ INTERN_FUNCTION(_start)
 #ifndef CONFIG_NO_PAGING_P32
 .Linit_paging_p32:
 #ifdef HYBRID_PAGING_MODE
-	/* Manually clear the PAE-support flag (it shouldn't actually be set, but someone may
+	/* Manually clear the PAE-support  flag (it shouldn't actually  be set, but someone  may
 	 * wish to hack the kernel to quickly disable PAE by changing the conditional jump above
-	 * into an unconditional one, in which case we'd get here with PAE-enabled still set)
-	 * Make their live a bit easier by allowing for such a simple hack and act like the cpu
+	 * into an unconditional one, in  which case we'd get  here with PAE-enabled still  set)
+	 * Make their live a bit easier by allowing for such a simple hack and act like the  cpu
 	 * told us that PAE wasn't supported.
 	 * Also: The check for `CPUID_1D_CX8' assumes that we clear the PAE bit for it. */
 	andl   $(~CPUID_1D_PAE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
@@ -541,18 +541,18 @@ INTERN_FUNCTION(_start)
 	orl    $(CR0_PG | CR0_WP), %eax
 
 	/* Jump into virtual memory.
-	 * NOTE: We manually encode these instructions, since we are _very_ dependent on
-	 *       their layout. - Since this is the point where we enable paging, followed
-	 *       by jumping into virtual memory, instruction pointers within this block
-	 *       have to remain identity-mapped in physical memory during paging initialization
-	 *       above. - To accomodate for this, take note that the mov to cr0 and jmp take
+	 * NOTE: We  manually  encode  these  instructions,  since  we  are  _very_  dependent  on
+	 *       their layout.  -  Since  this is  the  point  where we  enable  paging,  followed
+	 *       by  jumping  into  virtual  memory,   instruction  pointers  within  this   block
+	 *       have to remain  identity-mapped in physical  memory during paging  initialization
+	 *       above. - To  accomodate for  this, take note  that the  mov to cr0  and jmp  take
 	 *       up a total of 8 bytes (which is very helpful since we need to use some power-of-2
-	 *       number that is at least as large, meaning we can just use that same 8 for this)
-	 *       We then align this piece of code such that it stored on an 8-byte boundary,
-	 *       thus also ensuring that there isn't a page-split anywhere inside, meaning we
-	 *       can get the management above to only have to ensure a single page of identity-
+	 *       number that is at least as large, meaning  we can just use that same 8 for  this)
+	 *       We then align  this piece  of code  such that it  stored on  an 8-byte  boundary,
+	 *       thus also ensuring  that there  isn't a  page-split anywhere  inside, meaning  we
+	 *       can get the management above  to only have to ensure  a single page of  identity-
 	 *       mapped memory needing to exist.
-	 * With all of this mind, we are guarantied that the page which these 8 bytes of text
+	 * With all of this mind, we are guarantied that the page which these 8 bytes of  text
 	 * reside inside of is identity-mapped when we enable paging, which is all we need for
 	 * this setup to work flawlessly!
 	 * To accomplish this identity mapping, PAE/P32 do the following
@@ -629,7 +629,7 @@ END(__x86_paging_init_identity_mapped_text)
 	lidtl  x86_idt_ptr
 
 	/* Setup the state of /bin/init at our stack base, thus following the
-	 * general expectation that the user-space return state can be found
+	 * general expectation that the user-space return state can be  found
 	 * at exactly that location. */
 	pushl  $(SEGMENT_USER_DATA_RPL)   /* ir_ss */
 	pushl  $(0)                       /* ir_esp (set by `__i386_kernel_main') */

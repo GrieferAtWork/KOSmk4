@@ -136,13 +136,13 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	/* Kernel-space target! */
 
 	/* Check if the only reason we're still directed to kernel-space
-	 * was another IRET redirection to `x86_rpc_user_redirection' */
+	 * was  another  IRET redirection  to `x86_rpc_user_redirection' */
 	cmpq   $(x86_rpc_user_redirection), (OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP)(%rsp)
 	/* Load the saved CPU state, which will bring us back up to the
 	 * start of `x86_rpc_user_redirection'.
-	 * From there, we automatically restore the actual user-space
+	 * From  there, we automatically  restore the actual user-space
 	 * iret tail, handle additional RPC requests, before eventually
-	 * getting here while the current IRET tail still points into
+	 * getting here while the current  IRET tail still points  into
 	 * userspace when `x86_userexcept_propagate()' is invoked! */
 	je     1f
 	PUBLIC(x86_userexcept_unwind_interrupt_kernel_rsp)

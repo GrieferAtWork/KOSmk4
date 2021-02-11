@@ -78,24 +78,24 @@ NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pdir) {
 
 
 /* [default(true)]
- * Allow managed memory access to be performed by `dbg_(read|write)memory'
- * and friends. What this means is that (so-long as the kernel hasn't been
+ * Allow managed memory access to be performed by  `dbg_(read|write)memory'
+ * and friends. What this means is that (so-long as the kernel hasn't  been
  * poisoned, and this field is set to `true' (which is is during a debugger
- * reset)) the below functions can be used to load lazy memory mappings,
- * and initiate the regular copy-on-write semantics expected by high-level
- * memory access, and as would also be done if the access was being done
+ * reset))  the below functions  can be used to  load lazy memory mappings,
+ * and initiate the regular copy-on-write semantics expected by  high-level
+ * memory access, and as would  also be done if  the access was being  done
  * directly, rather than through the below functions.
- * This in turn is mainly useful when debugging user-space programs, where
- * this functionality allows one to view memory that hasn't been accessed
+ * This  in turn is mainly useful when debugging user-space programs, where
+ * this functionality allows one to  view memory that hasn't been  accessed
  * by the user-space program, yet, or was at one point off-loaded into swap
- * memory. But note that this field is ignored once the kernel has been
- * poisoned, as this kind of functionality may cause the debugger memory
- * primitives to call into possibly faulty kernel code (such as possibly
+ * memory. But note  that this field  is ignored once  the kernel has  been
+ * poisoned,  as this kind  of functionality may  cause the debugger memory
+ * primitives  to call into  possibly faulty kernel  code (such as possibly
  * faulty disk drivers).
- * Also note that VIO memory is _never_ dispatched while in debugger mode,
- * not even when accessed directly. Instead, any VIO region will instead
- * result in a SEGFAULT, with the exception of the userkern segment, which
- * simply acts as though it didn't exist, allowing pass-through access to
+ * Also note that VIO memory is _never_ dispatched while in debugger  mode,
+ * not  even when accessed  directly. Instead, any  VIO region will instead
+ * result in a SEGFAULT, with the exception of the userkern segment,  which
+ * simply acts as though it  didn't exist, allowing pass-through access  to
  * the actual kernel (meaning that when passed a kernel-space address, then
  * the below functions will instead read/write memory to/from kernel-space) */
 PUBLIC ATTR_DBGBSS bool dbg_memory_managed = false;
@@ -107,7 +107,7 @@ PUBLIC ATTR_DBGBSS bool dbg_memory_managed = false;
 
 
 /* Get/set memory in the context of `dbg_current'
- * NOTE: These functions will not make use of copy-on-write or lazy memory allocations,
+ * NOTE: These functions will not make use  of copy-on-write or lazy memory  allocations,
  *       but will instead indicate an error, or (in when `force' is true), write directly
  *       to the physical memory backing of the underlying page directory.
  * @return: * : The number of trailing bytes that could not be copied. */
@@ -119,10 +119,10 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 	if (!num_bytes)
 		return 0; /* Nothing to do here. */
 	/* NOTE: If the kernel hasn't been poisoned yet, we should
-	 *       try to access memory normally, so-long as we're
+	 *       try  to access memory  normally, so-long as we're
 	 *       not dealing with VIO memory.
 	 *       Otherwise, debugging user-space programs becomes a
-	 *       chore since we'd be unable to load lazy memory
+	 *       chore since  we'd be  unable to  load lazy  memory
 	 *       mappings that havn't been accessed, yet. */
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 		error = memcpy_nopf(buf, addr, num_bytes);
@@ -143,16 +143,16 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 			return num_bytes;
 		/* Leave interrupts unchanged, since we don't have to worry
 		 * about being preempted by another thread. (and if we are,
-		 * it's up to that thread to properly preserve the pagedir
+		 * it's up to that thread to properly preserve the  pagedir
 		 * register, even if it's different from what's used by our
 		 * current VM)
-		 * This is one of the advantages of being in debug-mode.
+		 * This is  one of  the advantages  of being  in  debug-mode.
 		 * Note also that we need to keep preemption enabled in order
 		 * for the `memcpy()' below to be able to load unmapped pages
-		 * from disk, which can likely only be done as a blocking
+		 * from disk, which  can likely  only be done  as a  blocking
 		 * operation.
 		 * Also note that if that blocking operation fails, the user
-		 * 
+		 *
 		 */
 		PAGEDIR_P_BEGINUSE_KEEP_PR(pdir) {
 			error = memcpy_nopf(buf, addr, num_bytes);
@@ -160,7 +160,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 				struct vm *old_vm, *new_vm;
 				size_t ok;
 				TRY {
-					/* Re-validate in case the memcpy_nopf() above
+					/* Re-validate   in   case  the   memcpy_nopf()  above
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
 						goto done_nopanic_copy;
@@ -202,10 +202,10 @@ NOTHROW(KCALL dbg_writememory)(void *addr,
 	if (!num_bytes)
 		return 0; /* Nothing to do here. */
 	/* NOTE: If the kernel hasn't been poisoned yet, we should
-	 *       try to access memory normally, so-long as we're
+	 *       try  to access memory  normally, so-long as we're
 	 *       not dealing with VIO memory.
 	 *       Otherwise, debugging user-space programs becomes a
-	 *       chore since we'd be unable to load lazy memory
+	 *       chore since  we'd be  unable to  load lazy  memory
 	 *       mappings that havn't been accessed, yet. */
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 again_memcpy_nopf_kernel:
@@ -257,7 +257,7 @@ again_memcpy_nopf:
 				struct vm *old_vm, *new_vm;
 				size_t ok;
 				TRY {
-					/* Re-validate in case the memcpy_nopf() above
+					/* Re-validate   in   case  the   memcpy_nopf()  above
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
 						goto done_nopanic_copy;

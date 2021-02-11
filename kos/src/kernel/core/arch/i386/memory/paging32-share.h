@@ -27,12 +27,12 @@ DECL_BEGIN
 
 #ifndef CONFIG_NO_PAGING_P32
 struct ATTR_ALIGNED(4096) p32_kernel_share {
-	/* These 255 E1-vectors are used to fill in the last 1GiB of virtual memory
+	/* These 255 E1-vectors are  used to fill  in the last  1GiB of virtual  memory
 	 * with mappings to identity-map the first 1GiB of physical memory during boot.
-	 * Later on then, these mappings are re-used to provide a common mapping of
-	 * kernel-space memory within all page directories by only ever changing the
-	 * contents of these E1-entires which are pointed-to by every page directory.
-	 * Note that we don't need 256 of these entires, since the last one already
+	 * Later on then,  these mappings are  re-used to provide  a common mapping  of
+	 * kernel-space  memory within all  page directories by  only ever changing the
+	 * contents of these E1-entires which  are pointed-to by every page  directory.
+	 * Note that we don't  need 256 of  these entires, since  the last one  already
 	 * gets used as the identity vector (s.a. `P32_MMAN_KERNEL_PDIR_IDENTITY_BASE')
 	 *
 	 * The initialization in _start32.S looks like this:
@@ -56,10 +56,10 @@ struct ATTR_ALIGNED(4096) p32_kernel_share {
 #ifndef CONFIG_NO_PAGING_PAE
 struct ATTR_ALIGNED(4096) pae_kernel_share {
 	/* `ks_share_e1' here is the same deal as `p32_kernel_share', used to fill in
-	 * the last 1GiB of virtual memory with an identity-map of the first 1GiB of
-	 * physical memory. - However we only need 508 instead of 512 vectors since
+	 * the  last 1GiB of virtual memory with an identity-map of the first 1GiB of
+	 * physical  memory. - However we only need  508 instead of 512 vectors since
 	 * the last 4 vectors are needed in order to identity-map the page directory.
-	 * The second vector `ks_share_e2' is needed to allocate the top-level page
+	 * The second vector `ks_share_e2' is  needed to allocate the top-level  page
 	 * directory vectors for the kernel page directory.
 	 *
 	 * The initialization in _start32.S looks like this:
@@ -102,7 +102,7 @@ typedef union {
 
 
 /* Allocate BSS memory for the initial shared+identity mapping
- * that will later be shared with, and re-appear in all other
+ * that  will later be shared with, and re-appear in all other
  * page directories (except for the identity page)
  * NOTE: This buffer is quite large (1Mb), but we'd need
  *       to allocate it sooner or later, no matter what. */

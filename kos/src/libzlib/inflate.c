@@ -566,8 +566,8 @@ case 2:
 				PRIVATE u16 const length_base[31] = {
 					3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
 					35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258,
-					0, 0 /* These   last   2   aren't  defined   by   the  standard.
-					      * By using `0' for them, we  can detect them as an  error.
+					0, 0 /* These  last  2   aren't  defined   by  the   standard.
+					      * By using `0' for them, we can detect them as an error.
 					      * HINT: These would belong to symbol codes `286' and `287' */
 				};
 				/* # of additional bits used to extend the copy-length. */
@@ -816,8 +816,8 @@ done:
  * and `zlib_reader_eof(self)' also returning false.
  * WARNING: In order for `feed' to function properly, the reader
  *          must   have  access  to  a  sliding  window  buffer.
- *          Otherwise, you must ensure that the compressed data
- *          blob   is   already  complete   from   the  get-go. */
+ *          Otherwise,  you must ensure that the compressed data
+ *          blob is already complete from the get-go. */
 INTERN NONNULL((1)) void CC
 libzlib_reader_feed(struct zlib_reader *__restrict self,
                     void const *blob, size_t blob_size) {

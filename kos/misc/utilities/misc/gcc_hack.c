@@ -55,7 +55,7 @@ static char const KOS_ROOT_[] = KOS_ROOT;
 #define CSTRLEN(x) ((sizeof(x) / sizeof(*(x))) - 1)
 
 /* Verify that `filename' is non-absolute, or points into the KOS root.
- * If it doesn't return non-zero and print a warning to stdout.
+ * If it  doesn't  return  non-zero  and print  a  warning  to  stdout.
  * Otherwise, return `0'
  * @param: op0: First part of the associated operand.
  * @param: op1: Second part of the associated operand. */
@@ -100,8 +100,8 @@ validate_sysroot_argument(char const *filename,
 				appname = iter + 1;
 		}
 		/* NOTE: Write to stdout because writing to stderr may be interpreted
-		 *       the same as a non-zero exit code by some utilities, and we
-		 *       really want this kind of issue to fly under the radar of
+		 *       the same as a non-zero exit  code by some utilities, and  we
+		 *       really  want this  kind of issue  to fly under  the radar of
 		 *       tools! */
 		printf(format, appname, filename, op0, op1);
 	}

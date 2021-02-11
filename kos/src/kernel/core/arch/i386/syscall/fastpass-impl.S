@@ -91,7 +91,7 @@
  *   - _SYSFAST_WANT(NAME, name): Expands to non-zero if `NAME' should be defined as a system call.
  *                                Note that `NAME' must be written in upper-case!
  *   - _SYSFAST_SECTNAME(name):   System call definition section names.
- *                                Note that we use a unique section name for fastpass
+ *                                Note that we use a unique section name for  fastpass
  *                                system calls, so-as to allow --gc-sections to delete
  *                                the unused auto-generated system call wrappers.
  *   - _SYSFAST_FUNCNAME(name):   Symbol name generator for the low-level system call
@@ -144,14 +144,14 @@
 #endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
 
 
-/* _SYSFAST_WANT(NAME, name) = 
+/* _SYSFAST_WANT(NAME, name) =
  *   SYSCALL_FASTPASS_KIND_SYS64:
  *      defined(__ARCH_WANT_SYSCALL_##NAME)
  *   SYSCALL_FASTPASS_KIND_SYS32_INT80:
  *      defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
  *   SYSCALL_FASTPASS_KIND_SYS32_SYSENTER:
  *      (defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))) &&
- *      (__NR32RC_##name >= 5) // NOTE: Variants with register-count 0..4 are binary-compatible with int80!
+ *      (__NR32RC_##name  >=  5)  //  NOTE:  Variants  with  register-count  0..4  are  binary-compatible  with  int80!
  */
 #ifdef SYSCALL_FASTPASS_KIND_SYS64
 #define _SYSFAST_WANT(NAME, name) IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME)
@@ -205,7 +205,7 @@
 #ifdef __x86_64__
 #ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
 /* We can just use `sysret' as a drop-in replacement for `sysexit', since
- * `sysret' doesn't clobber any 32-bit registers that `sysexit' doesn't
+ * `sysret' doesn't clobber any  32-bit registers that `sysexit'  doesn't
  * also clobber! */
 #define SC_IRET X86_IRET_BUT_PREFER_SYSRET32
 #elif defined(SYSCALL_FASTPASS_KIND_SYS32_INT80)
@@ -216,10 +216,10 @@
  *       - int 80h
  *       - syscall
  * Documentation throughout the kernel states that both of these methods
- * yield identical results, though one minor detail that is documented
+ * yield identical results, though one  minor detail that is  documented
  * nowhere else is left to use to decide upon:
  *       `int 80h' on x86_64 is allowed to clobber %rcx and %r11
- * By allowing for this, we can use identical return-paths for both
+ * By allowing for  this, we  can use identical  return-paths for  both
  * invocation methods, by trying to make use of `sysret' in both cases. */
 #define SC_IRET X86_IRET_BUT_PREFER_SYSRET64
 #endif /* ... */
@@ -233,10 +233,10 @@
 #endif /* !... */
 
 
-/* Define _all_ low-level system call variants of a system
- * call that is entirely unable to throw any exceptions.
+/* Define _all_ low-level system call variants of a  system
+ * call that is  entirely unable to  throw any  exceptions.
  * Such a system call can be defined a bit simpler, however
- * if the implementation somehow does manage to throw an
+ * if the implementation  somehow does manage  to throw  an
  * exception, then the behavior is undefined.
  * Essentially, only stub/no-op system calls (such as `rtm_test()')
  * fall under this category. */
@@ -415,7 +415,7 @@ SC_BEGIN(execveat)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
-	/* Don't clobber registers, which have painstakingly
+	/* Don't  clobber  registers, which  have painstakingly
 	 * been set-up by the program loader. - _ALL_ registers
 	 * must be well defined after an exec()! */
 	SC_IRET_NOCLOBBER
@@ -477,7 +477,7 @@ SC_BEGIN(execve)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
-	/* Don't clobber registers, which have painstakingly
+	/* Don't  clobber  registers, which  have painstakingly
 	 * been set-up by the program loader. - _ALL_ registers
 	 * must be well defined after an exec()! */
 	SC_IRET_NOCLOBBER
@@ -632,8 +632,8 @@ SC_END(rtm_begin)
 #define _SC_RTM_TEST_DEFINED 1
 SC_BEGIN_ALL_NOTHROW(rtm_test)
 	/* Special arch-specific system call behavior:
-	 *    In order to more closely match the behavior of
-	 *    the x86 `xtest' instruction (which sets ZF=1
+	 *    In order to more closely match the behavior  of
+	 *    the x86  `xtest' instruction  (which sets  ZF=1
 	 *    when outside of RTM mode), we do the same, thus
 	 *    simplifying the user-space RTM testing code.
 	 */
@@ -695,4 +695,3 @@ SC_END_ALL_NOTHROW(rtm_abort)
 #undef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
 #undef SYSCALL_FASTPASS_KIND_SYS32_INT80
 #undef SYSCALL_FASTPASS_KIND_SYS64
-

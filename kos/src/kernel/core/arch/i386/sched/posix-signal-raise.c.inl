@@ -39,17 +39,17 @@ DECL_BEGIN
 
 
 /* Update the given `state' to raise the specified `siginfo'
- * as a user-space signal within the calling thread.
- * NOTE: The caller is responsible to handle special signal
- *       handlers (`KERNEL_SIG_*') before calling this function!
+ * as   a  user-space  signal  within  the  calling  thread.
+ * NOTE: The   caller  is  responsible  to  handle  special  signal
+ *       handlers  (`KERNEL_SIG_*')  before calling  this function!
  *       This function should only be used to enqueue the execution
  *       of a signal handler with a user-space entry point.
  * @param: state:   The interrupt CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.
  * @param: siginfo: The signal that is being raised.
  * @param: sc_info: When non-NULL, `sc_info' describes a system call that may be restarted.
- *                  Note however that ontop of this, [restart({auto,must,dont})]
- *                  logic will still be applied, which is done in cooperation
+ *                  Note  however   that   ontop   of   this,   [restart({auto,must,dont})]
+ *                  logic  will   still  be   applied,  which   is  done   in   cooperation
  *                  with the system call restart database.
  * @return: * :     The updated CPU state.
  * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set, but `action'
@@ -103,8 +103,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 				delete_sc_info = true;
 		}
 		/* When not restarting the system call, then we must
-		 * either have it return with -EINTR, or the signal
-		 * handler must return to the user-space exception
+		 * either have it return with -EINTR, or the  signal
+		 * handler must return  to the user-space  exception
 		 * handler. */
 		if (delete_sc_info) {
 			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
@@ -150,7 +150,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	if (action->sa_flags & SIGACTION_SA_ONSTACK) {
 		/* TODO: SS_AUTODISARM */
 		/* TODO: If we raised an E_INTERRUPT above, then we mustn't
-		 *       switch to the alternate signal stack again here! */
+		 *       switch  to the alternate  signal stack again here! */
 		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	}
 #ifdef DEFINE_RAISE64
@@ -389,8 +389,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	 *   - %rbx == user_fpustate ?: NULL
 	 *   - %r12 == must_restore_sigmask ? user_sigset : NULL
 	 *   - %r13 == user_sc_info ?: NULL
-	 * NOTE: This register state is what is expected by `sys_sigreturn'
-	 *       Note also that we can only use callee-preserve registers
+	 * NOTE: This register state is what is expected by  `sys_sigreturn'
+	 *       Note also that  we can only  use callee-preserve  registers
 	 *       here, as all other registers may be clobbered by the signal
 	 *       handler itself. */
 	gpregs_setpbp(&state->ics_gpregs, (u64)(uintptr_t)&user_ucontext->uc_mcontext.mc_context);
@@ -403,8 +403,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	 *   - %ebx == user_fpustate ?: NULL
 	 *   - %esi == must_restore_sigmask ? user_sigset : NULL
 	 *   - %edi == user_sc_info ?: NULL
-	 * NOTE: This register state is what is expected by `sys_sigreturn'
-	 *       Note also that we can only use callee-preserve registers
+	 * NOTE: This register state is what is expected by  `sys_sigreturn'
+	 *       Note also that  we can only  use callee-preserve  registers
 	 *       here, as all other registers may be clobbered by the signal
 	 *       handler itself. */
 	gpregs_setpbp(&state->ics_gpregs, (u32)(uintptr_t)&user_ucontext->uc_mcontext.mc_context);
@@ -430,4 +430,3 @@ DECL_END
 #undef NAME2
 #undef DEFINE_RAISE32
 #undef DEFINE_RAISE64
-

@@ -72,11 +72,11 @@ do_hide_cursor:
 	}
 }
 
-/* Process input for an edit field at the given position, allowing
+/* Process input for an edit  field at the given position,  allowing
  * the user to type in input text, with that text then being written
  * to the given `buf'.
  * Note that if `buf' is non-empty (buf[0] != '\0') upon entry,
- * editing will resume with the current contents of `buf'
+ * editing will  resume  with  the current  contents  of  `buf'
  * @param: pcursor_pos:  [0..1][in|out]: The index where the cursor starts out/ends up
  * @param: pscreen_left: [0..1][in|out]: The index of the left-most visible character
  * @return: * : One of `DBG_EDITFIELD_RETURN_*' */

@@ -58,13 +58,13 @@ DECL_END
 #undef CC
 
 DECL_BEGIN
-/* Helper wrappers to determine the predecessor/successor of a given `pc',
+/* Helper wrappers to  determine the predecessor/successor  of a given  `pc',
  * which is allowed to point into user-space, in which case user-space memory
- * is accessed through use of `dbg_readmemory()', rather than direct access. */
+ * is accessed through use of `dbg_readmemory()', rather than direct  access. */
 PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
 NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
-	/* This `12' must be >= the max number of remaining zero-bytes
-	 * following after any other sequence of instruction bytes.
+	/* This `12' must  be >=  the max number  of remaining  zero-bytes
+	 * following  after  any  other  sequence  of  instruction  bytes.
 	 * This is used to ensure that libdisasm sees that our instruction
 	 * sequence terminates after a certain offset. */
 	byte_t textbuf[ARCH_INSTRUCTION_MAXLENGTH], *result;
@@ -98,7 +98,7 @@ NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa, u8 maxlen)
 }
 
 /* # of instructions to back-track in order to verify that
- * some given instruction point fits into the instruction
+ * some  given instruction point fits into the instruction
  * stream described by surrounding instructions. */
 #ifndef LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE
 #define LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE 16
@@ -136,7 +136,7 @@ find_shorter_instructions:
 done_backtrack:
 	if (lowest_iter >= (byte_t const *)pc)
 		return NULL; /* No base-reference found... */
-	/* Find the start of the first instruction that
+	/* Find  the  start  of the  first  instruction that
 	 * ends at `>= pc', but starts at `>= rev_iter_curr' */
 	iter = lowest_iter;
 	for (;;) {
@@ -172,11 +172,11 @@ NOTHROW(LIBINSTRLEN_CC dbg_instruction_trypred)(void const *pc, instrlen_isa_t i
 
 
 /* Print addr2line optimized for the debugger.
- * Example (of an inlined function):
+ * Example   (of    an   inlined    function):
  * >> c010783a+4   [my_inline_function+8] [bar.c:9]
  * >> c0107828+38  [my_function+26] [bar.c:42]
  * This is similar to `addr2line_printf()', however doesn't include the full source path,
- * and doesn't follow the file(line,col) format, but instead opts for much shorter lines
+ * and doesn't follow the file(line,col) format, but instead opts for much shorter  lines
  * which can then (usually) be displayed in one continuous line, rather than having to be
  * split up into multiple lines.
  * Additionally, this function also highlights output using differing colors. */
@@ -422,7 +422,7 @@ NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
 
 
 /* Display a selections menu with a set of `options' (which is a NULL-terminated vector strings)
- * Options are on top of each other, and can be navigated using the arrow keys.
+ * Options  are  on  top  of   each  other,  and  can  be   navigated  using  the  arrow   keys.
  * @return: * : The index of the selected option, or one of `DBG_MENU_SELECTION_*' */
 PUBLIC ATTR_DBGTEXT WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(KCALL dbg_menuex)(char const *__restrict title,

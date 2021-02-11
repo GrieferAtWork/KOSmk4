@@ -117,8 +117,8 @@ SECTIONS {
 		*(.text.x86.syscall32.*) /* C-level implementations of system calls (for compatibility mode). */
 #endif /* __x86_64__ */
 		*(.text.x86.cisr.*)
-		/* Must be KEEP, or else these get deleted by --gc-sections, since
-		 * they're only referenced by this linker script, and not by actual
+		/* Must be KEEP, or else  these get deleted by --gc-sections,  since
+		 * they're  only referenced by this linker script, and not by actual
 		 * kernel code (we use the linker script to pre-calculate the values
 		 * to-be written to the IDT vector) */
 		KEEP(*(.text.x86.asmirq.*))
@@ -249,7 +249,7 @@ SECTIONS {
 #endif /* !CONFIG_NO_SMP */
 
 	/* Kernel debug data.
-	 * NOTE: This VM area is automatically managed by the `DILINK' link-driver,
+	 * NOTE: This VM area is automatically managed by the `DILINK'  link-driver,
 	 *       such that at runtime it will contain the compressed versions of all
 	 *       of the .debug_* sections. */
 	PROVIDE_HIDDEN(__kernel_debug_start = ABSOLUTE(.));
@@ -351,7 +351,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_xdata_startpage = addr2pageid(ABSOLUTE(.)));
 		PROVIDE_HIDDEN(__kernel_xdata_startpage_p = addr2pageptr_p(ABSOLUTE(.)));
 		/* PDATA: Memory that remains mapping at VADDR=PADDR within the kernel VM.
-		 *        Note however that this memory is linked by its virtual address! */
+		 *        Note  however that this memory is linked by its virtual address! */
 		PROVIDE_HIDDEN(__kernel_pdata_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_pdata_start_p = ABSOLUTE(.) - KERNEL_CORE_BASE);
 		PROVIDE_HIDDEN(__kernel_pdata_startpage = addr2pageid(ABSOLUTE(.)));
@@ -409,7 +409,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(_bootcpu_x86_tss = ABSOLUTE(.));
 		STATIC_ASSERT((ABSOLUTE(.) & PAGEMASK) == 0);
 		. = ABSOLUTE(_bootcpu + thiscpu_x86_iob);
-		/* Re-use the physical memory allocated for _bootcpu's IOB
+		/* Re-use the physical  memory allocated  for _bootcpu's  IOB
 		 * vector as the pages used to describe the empty IOB vector. */
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__x86_iob_empty_page = addr2pageid(ABSOLUTE(.)));
@@ -516,8 +516,8 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_size_nofree = ABSOLUTE(ABSOLUTE(__kernel_free_start) - ABSOLUTE(__kernel_start)));
 	SECTION(.free) {
 		/* A special section where data can go that will be unmapped, but have
-		 * its physical backing memory not be freed once `.free' is deleted.
-		 * This section is needed by x86_64's pageing initialization, or more
+		 * its physical backing memory not  be freed once `.free' is  deleted.
+		 * This section is needed by x86_64's pageing initialization, or  more
 		 * specifically its `kernel_initialize_boot_trampolines()' function */
 		KEEP(*(.free.unmap_but_keep_allocated))
 		IP_ALIGN(PAGESIZE);

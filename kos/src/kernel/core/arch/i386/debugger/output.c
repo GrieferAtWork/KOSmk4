@@ -66,7 +66,7 @@ DECL_BEGIN
 #define VGA_VRAM_SIZE  0x01000
 
 
-/* macro for composing an 8-bit VGA register
+/* macro  for  composing an  8-bit  VGA register
  * index and value into a single 16-bit quantity */
 #define VGA_OUT16VAL(v,r)    (((v) << 8)|(r))
 
@@ -78,7 +78,7 @@ DECL_BEGIN
 
 
 /* generic VGA port read/write */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_DBGTEXT u8 
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_DBGTEXT u8
 NOTHROW(KCALL vga_r)(port_t port) {
 	return inb_p(port);
 }
@@ -175,7 +175,7 @@ PUBLIC ATTR_DBGBSS unsigned int dbg_indent = 0;
 
 /* The logecho-enabled state for debugger output.
  * When enabled (default), debugger output is echoed via some
- * architecture-specific mechanism onto an external logging
+ * architecture-specific mechanism onto  an external  logging
  * sink which then allows external programs to inspect/record
  * debugger output. */
 PUBLIC ATTR_DBGBSS bool dbg_logecho_enabled = false;
@@ -439,7 +439,7 @@ NOTHROW(FCALL vga_disable_offscreen_buffer)(void) {
 
 
 /* Hints towards the screen driver to temporarily stop drawing to the screen,
- * but instead draw to a separate buffer, thus preventing flickering in the
+ * but instead draw to a separate  buffer, thus preventing flickering in  the
  * case of whole screen redraw operations.
  * NOTE: Also affects updates made to the cursor position
  * @param: force: When true, force updates to stop. */
@@ -702,7 +702,7 @@ for (local i,x: util.enumerate(l)) {
 
 /* Encode the given unicode character `ch' using cp437 (the codepage
  * used by VGA) If the character can't be encoded, return 0 instead.
- * s.a.: https://en.wikipedia.org/wiki/Code_page_437  */
+ * s.a.: https://en.wikipedia.org/wiki/Code_page_437 */
 LOCAL ATTR_CONST u8
 NOTHROW(FCALL cp437_encode)(/*utf-32*/ u32 ch) {
 	u8 result;
@@ -912,8 +912,8 @@ do_put_cp_ch:
 		case '\n':
 			if (VGA_GETCUR_X() <= dbg_indent &&
 			    cp437_encode(dbg_last_character) != 0) {
-				/* Special case: The previous line was filled entirely, and the cursor had to be wrapped
-				 *               to the next line, however the first character then printed was also a
+				/* Special case: The previous line was filled entirely, and the cursor had to be  wrapped
+				 *               to the next line,  however the first character  then printed was also  a
 				 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 				 *               by the caller already happened implicitly, thus not creating an entirely
 				 *               empty line and wasting what little screen space we only have. */
@@ -1327,10 +1327,10 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(FCALL vga_map)(void) {
 		vga_oldmapping_did_prepare = false;
 		return;
 	}
-	/* We might get here so early during booting that the page frame allocator
+	/* We might get here so early during booting that the page frame  allocator
 	 * has yet to be initialized, at which point prepare would fail. - However,
 	 * at that point we'd still have access to the physical identity map, so we
-	 * should instead also support its use instead of only hacking around to
+	 * should  instead also support  its use instead of  only hacking around to
 	 * place a temporary mapping of the VGA display just before the kernel. */
 	vga_oldmapping_did_prepare = pagedir_prepare((void *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK),
 	                                             VGA_VRAM_SIZE);
@@ -1558,7 +1558,7 @@ dbg_printer(void *UNUSED(ignored),
 
 
 /* Get/Set debug TTY screen data
- * NOTE: Out-of-bound cells are read as the same value as a space-character
+ * NOTE: Out-of-bound cells  are read  as the  same value  as a  space-character
  *       cell when written using `dbg_putc(' ')' at the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
  * NOTE: These functions will read/write the SCROLL-TOP screen data, and

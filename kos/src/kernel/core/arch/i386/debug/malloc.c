@@ -67,18 +67,18 @@ PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
 kernel_disable_debug_malloc(void) {
 
 	/* `heap_validate_all()' takes up quite a bit of execution time, since
-	 * it has to scan a whole bunch of memory for potential faults.
-	 * By overriding it to become a no-op, we can speed up execution time
+	 * it  has  to scan  a  whole bunch  of  memory for  potential faults.
+	 * By overriding it to become a no-op, we can speed up execution  time
 	 * of kernel builds with this feature enabled by quite a lot. */
 	inject_ret((void *)&heap_validate_all, 0);
 	inject_ret((void *)&heap_validate, 4);
 
 	/* The generate-traceback function used by debug_malloc to store a small
-	 * portion of the backtrace associated with any given allocation is the
-	 * other major factor when it comes to the getting rid of the slow-down
+	 * portion  of the backtrace associated with any given allocation is the
+	 * other major factor when it comes to the getting rid of the  slow-down
 	 * associated with mall debugging enabled.
 	 * If that function as defined (we check for this by weakly linking it),
-	 * then redirect it against a no-op traceback generator function. */
+	 * then redirect  it  against  a  no-op  traceback  generator  function. */
 	if (trace_malloc_generate_traceback) {
 		inject_jmp((void *)&trace_malloc_generate_traceback,
 		           (void *)&noop_generate_traceback);

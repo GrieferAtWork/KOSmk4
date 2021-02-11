@@ -167,7 +167,7 @@ select_random_integer_with_bias(uintptr_t minval,
  * hadn't actually been set.
  * @param: self:      The mman in which to create the mapping. For this purpose,
  *                    any mman  other than  `mman_kernel' will  always cause  an
- *                    error when  trying  to  map  to  a  kernel-space  address.
+ *                    error when trying to map to a kernel-space address.
  *                    NOTE: The caller  must be  holding a  lock to  this  mman!
  * @param: addr:      A hint for where to search for free memory.
  * @param: num_bytes: The min. number of bytes that  should not already be in  use,
@@ -610,7 +610,7 @@ err:
  * locks and re-attempt the call.
  * @param: self:      The mman in which to create the mapping. For this purpose,
  *                    any mman  other than  `mman_kernel' will  always cause  an
- *                    error when  trying  to  map  to  a  kernel-space  address.
+ *                    error when trying to map to a kernel-space address.
  *                    NOTE: The caller  must be  holding a  lock to  this  mman!
  * @param: addr:      A hint for where to search for free memory.
  * @param: num_bytes: The min. number of bytes that  should not already be in  use,

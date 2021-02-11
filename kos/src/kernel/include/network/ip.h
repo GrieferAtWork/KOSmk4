@@ -143,9 +143,9 @@ struct nic_packet_desc;
  * in mind, this function is more efficient in cases where the caller
  * isn't given a packet object, but rather, is presented with an I/O-
  * vector, or similar.
- * Note  however  that  if  you've  been  given  a  NIC  packet,  you  should really
- * use  the  above  function  instead,  since   doing  so  reduces  the  amount   of
- * copying  necessary  when   the  datagram   can  fit  into   a  single   fragment.
+ * Note however that if you've been given a NIC packet, you should really
+ * use the above function instead, since  doing so reduces the amount  of
+ * copying necessary when the datagram can fit into a single fragment.
  * NOTE: This function automatically fills in the following fields of the IP header:
  *   - ip_v      (With the value `4')
  *   - ip_len    (With the value `nic_packet_size(packet)')

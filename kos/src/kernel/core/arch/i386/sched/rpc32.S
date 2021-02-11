@@ -163,10 +163,10 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 /*	.cfi_reg_offset %fs, (28 + OFFSET_ICPUSTATE_FS - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp */
 	.cfi_endproc
 
-	/* With all saved registers now apart of the stack, and the
+	/* With  all saved registers now apart of the stack, and the
 	 * entire IRET tail having been fully restored, create a new
 	 * CFI procedure that is then implemented as a signal-frame,
-	 * making further stack unwinding much simpler, as we can
+	 * making further stack  unwinding much simpler,  as we  can
 	 * once again make life simpler by defining a CFA. */
 	.cfi_startproc simple
 	.cfi_signal_frame
@@ -224,13 +224,13 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	/* Kernel-space target! */
 
 	/* Check if the only reason we're still directed to kernel-space
-	 * was another IRET redirection to `x86_rpc_user_redirection' */
+	 * was  another  IRET redirection  to `x86_rpc_user_redirection' */
 	cmpl   $(x86_rpc_user_redirection), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP(%esp)
 	/* Load the saved CPU state, which will bring us back up to the
 	 * start of `x86_rpc_user_redirection'.
-	 * From there, we automatically restore the actual user-space
+	 * From  there, we automatically  restore the actual user-space
 	 * iret tail, handle additional RPC requests, before eventually
-	 * getting here while the current IRET tail still points into
+	 * getting here while the current  IRET tail still points  into
 	 * userspace when `x86_userexcept_propagate()' is invoked! */
 	je     1f
 	EXTERN(x86_userexcept_unwind_interrupt_kernel_esp)

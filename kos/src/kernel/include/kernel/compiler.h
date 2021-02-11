@@ -528,7 +528,7 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_read(&(self)->field); }                      \
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_write(&(self)->field); }                    \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                                          \
-	 *       no lock may have been held temporarily, meaning that the caller should                                                                                            \
+	 *       no lock may have been held  temporarily, meaning that the caller  should                                                                                          \
 	 *       re-load local copies of affected resources.                                                                                                                       \
 	 * @return: 0 : A previously held read-lock was lost and could not be re-acquired.                                                                                         \
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                                       \
@@ -582,7 +582,7 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }                      \
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _write(self); }                    \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                            \
-	 *       no lock may have been held temporarily, meaning that the caller should                                                                              \
+	 *       no lock may have been held  temporarily, meaning that the caller  should                                                                            \
 	 *       re-load local copies of affected resources.                                                                                                         \
 	 * @return: 0 : A previously held read-lock was lost and could not be re-acquired.                                                                           \
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                         \
@@ -634,7 +634,7 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) { _acquire(self); }                                      \
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) { _acquire(self); }                                     \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                     \
-	 *       no lock may have been held temporarily, meaning that the caller should                                                                       \
+	 *       no lock may have been held  temporarily, meaning that the caller  should                                                                     \
 	 *       re-load local copies of affected resources.                                                                                                  \
 	 * @return: 0 : A previously held read-lock was lost and could not be re-acquired.                                                                    \
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                  \
@@ -685,7 +685,7 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) { _wait(self); }                                         \
 	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) { _wait(self); }                                        \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                     \
-	 *       no lock may have been held temporarily, meaning that the caller should                                                                       \
+	 *       no lock may have been held  temporarily, meaning that the caller  should                                                                     \
 	 *       re-load local copies of affected resources.                                                                                                  \
 	 * @return: 0 : A previously held read-lock was lost and could not be re-acquired.                                                                    \
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                  \

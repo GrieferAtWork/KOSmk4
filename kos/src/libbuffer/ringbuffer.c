@@ -78,13 +78,12 @@ NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 		} else {
 			lo = self->rb_avail - hi;
 			/* Complicated case: The buffer current looks like this:
+			 *  >> HIJKLMN?????????ABCDEFG
+			 *  >> <lo--->         <hi--->
 			 *
-			 *  HIJKLMN?????????ABCDEFG
-			 *  <lo--->         <hi--->
-			 *
-			 *  And we need to get it to look like this:
-			 *  ABCDEFGHIJKLMN?????????
-			 *  <hi---><lo--->
+			 * And we need to get it to look like this:
+			 *  >> ABCDEFGHIJKLMN?????????
+			 *  >> <hi---><lo--->
 			 */
 			/* TODO: This could be done more efficiently by using the ????-area as a temporary buffer.
 			 *       Because we're eventually trying to  get rid of that area,  we can assume that  it
@@ -188,7 +187,7 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
  * When `ringbuffer_read()' is called, and no data is available, the function
  * will block  until data  becomes available,  or the  ringbuffer is  closed.
  * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
- *        it may call `task_yield()' when trying to acquire `self->rb_lock'
+ *        it may call `task_yield()'  when trying to acquire  `self->rb_lock'
  * @return: * : The number of bytes read. */
 INTERN __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_read(struct ringbuffer *__restrict self,

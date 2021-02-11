@@ -160,7 +160,7 @@ ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
 		for (;;) {
 			result = ATOMIC_READ(self->rb_limit);
 			/* When trying to set some limit greater than the max-unprivileged-buffer-size
-			 * limit, the caller needs `CAP_SYS_RESOURCE' capabilities, or the new limit
+			 * limit, the caller needs `CAP_SYS_RESOURCE'  capabilities, or the new  limit
 			 * must be lower than the previous limit. */
 			if (new_lim > result)
 				require(CAP_SYS_RESOURCE);

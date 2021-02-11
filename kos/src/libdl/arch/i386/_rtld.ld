@@ -24,7 +24,7 @@
 #include <asm/pagesize.h>
 
 #if 0
-#define PHDR(x) 
+#define PHDR(x)
 #else
 PHDRS {
 	/* s.a. `.sources:OPT_ELF_FLATTEN_ALLOWED_HEADERS' for program headers that are kept. */

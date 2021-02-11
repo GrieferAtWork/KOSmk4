@@ -136,7 +136,7 @@ LOCAL NONNULL((1)) void KCALL
 block_device_set_readahead(struct basic_block_device *__restrict self, size_t value) {
 	require(CAP_SET_BLOCKDEV_READAHEAD);
 	/* KOS doesn't implement read-ahead on the block-device layer.
-	 * Instead, read-ahead (if at all) is only done on a per-file
+	 * Instead,  read-ahead (if at all) is only done on a per-file
 	 * basis, where we cache them in vm_datapart objects. */
 	(void)self;
 	(void)value;

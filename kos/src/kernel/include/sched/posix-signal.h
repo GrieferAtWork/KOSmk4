@@ -325,7 +325,7 @@ struct rpc_syscall_info;
  * @param: siginfo: The signal that is being raised.
  * @param: sc_info: When non-NULL, `sc_info' describes a system call that may be restarted.
  *                  Note  however   that   ontop   of   this,   [restart({auto,must,dont})]
- *                  logic will still be applied, which is done in cooperation
+ *                  logic  will   still  be   applied,  which   is  done   in   cooperation
  *                  with the system call restart database.
  * @return: * :     The updated CPU state.
  * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set, but `action'

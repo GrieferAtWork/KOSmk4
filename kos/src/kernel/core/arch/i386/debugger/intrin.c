@@ -290,7 +290,7 @@ DBG_COMMAND(r,
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
-	/* Implement a custom register dumping implementation so that we
+	/* Implement a custom  register dumping implementation  so that  we
 	 * can include %kernel_gs.base on x86_64 (because the value of that
 	 * register should have a constant value and be implied by ) */
 #ifdef __x86_64__
@@ -325,12 +325,12 @@ DBG_COMMAND(r,
 		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_SUFFIX);
 		if (kgsbase != (u64)dbg_current) {
 			/* Print an error indicator if %kernel_gs.base is incorrect
-			 * NOTE: There should never be a scenario where this register has a different
-			 *       value than the current thread. (even though the kernel is entered
-			 *       with the user-space %gs.base register value, there is no case where
-			 *       interrupts are enabled while %gs.base is still incorrect, so no thread
-			 *       should ever be interruptible with an incorrect %gs.base. If this can
-			 *       still happen somewhere, then that is a bug that would be indicate by this)
+			 * NOTE: There should  never  be  a  scenario  where  this  register  has  a  different
+			 *       value   than  the  current   thread.  (even  though   the  kernel  is  entered
+			 *       with   the  user-space  %gs.base  register  value,  there  is  no  case  where
+			 *       interrupts are  enabled  while  %gs.base  is still  incorrect,  so  no  thread
+			 *       should  ever  be  interruptible  with  an  incorrect  %gs.base.  If  this  can
+			 *       still happen somewhere, then  that is a  bug that would  be indicate by  this)
 			 *       Note that the debugger determines the calling thread using a different method.
 			 *       Namely: CURRENT_LAPIC_ID -> CURRENT_CPU -> thiscpu_sched_current */
 			dbg_putc(' ');

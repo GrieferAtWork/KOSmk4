@@ -51,7 +51,7 @@ struct block_device_type {
 	 * modify  data structures that are used locklessly by such interrupt handlers. */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_fini)(struct block_device *__restrict self);
 	/* [1..1] Read function.
-	 * NOTE: Errors may  propagated  by  calling  `aio->ah_func'  with  `AIO_COMPLETION_FAILURE'
+	 * NOTE: Errors  may  propagated  by  calling  `aio->ah_func'  with `AIO_COMPLETION_FAILURE'
 	 *       Errors that are thrown by this function are automatically passed to `aio->ah_func'.
 	 * @assume(num_sectors != 0);
 	 * @param: self:        The block device being addressed.
@@ -82,7 +82,7 @@ struct block_device_type {
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 	/* [1..1] Write function.
 	 * Same as `dt_read', but used for writing data instead.
-	 * NOTE: Errors may  propagated  by  calling  `aio->ah_func'  with  `AIO_COMPLETION_FAILURE'
+	 * NOTE: Errors  may  propagated  by  calling  `aio->ah_func'  with `AIO_COMPLETION_FAILURE'
 	 *       Errors that are thrown by this function are automatically passed to `aio->ah_func'.
 	 * NOTE: The caller is responsible to check the `BLOCK_DEVICE_FLAG_READONLY' flag,
 	 *       and  trigger  an   `E_IOERROR_READONLY'  error  if   that  bit  is   set.
@@ -181,7 +181,7 @@ struct block_device
 	__BASIC_BLOCK_DEVICE_FIELDS
 #endif /* !__cplusplus */
 	struct block_device_partition_list   bd_parts;      /* [0..1][lock(bd_parts_lock)] Sub-partitions of this device.
-	                                                     * NOTE: Always `NULL' for partitions devices!
+	                                                     * NOTE: Always   `NULL'   for   partitions   devices!
 	                                                     *       Attempting to sub-partition another partition
 	                                                     *       will simply simply adjust offsets, and create
 	                                                     *       the new partition as part of the main device. */
@@ -348,7 +348,7 @@ block_device_register_auto(struct basic_block_device *__restrict self)
  * Following this, automatically register the new partition with `block_device_register_auto()',
  * after assigning the name `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)) - MINOR(block_device_devno(master)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
- *       partition is created, and that partition will be returned instead.
+ *       partition is created, and that  partition will be returned  instead.
  * @param: part_label:    The name of the partition, or `NULL'
  * @param: part_sysid:    The partition system ID, or `0'
  * @param: part_typeguid: The partition type GUID, or `NULL'
@@ -365,10 +365,10 @@ block_device_makepart(struct basic_block_device *__restrict master,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
 
 
-/* Automatically parse the MBR/EFI tables of the  disk, and try to partition if  accordingly.
- * If one of  the partitions found  have the ACTIVE/BOOTABLE  flag set, a  reference to  that
- * partition is returned  to the caller.  If more than  one partition has  that flag set,  or
- * if  none of them do, `NULL' is returned  instead, though the function has still succeeded.
+/* Automatically parse the MBR/EFI tables of the disk, and try to partition if accordingly.
+ * If one of the partitions  found have the ACTIVE/BOOTABLE flag  set, a reference to  that
+ * partition is returned to the  caller. If more than one  partition has that flag set,  or
+ * if none of them do, `NULL' is returned instead, though the function has still succeeded.
  * NOTE: The caller should invoke `block_device_delparts' in the master partition beforehand.
  * NOTE: When `self' is a partition itself, its contents will still be parsed for partition
  *       tables like they usually would, though new  partitions will still be added to  the

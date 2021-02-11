@@ -280,7 +280,7 @@ NOTHROW(KCALL vm_node_destroy_locked_ram)(struct mnode *__restrict self) {
 	assert(self->vn_link.ln_next == NULL);
 	assert(self->vn_part->dp_srefs == self);
 	/* Clear out the SREFS field, as `vm_datapart_destroy()'
-	 * will cause panic if that field is non-NULL */
+	 * will   cause   panic  if   that  field   is  non-NULL */
 	self->vn_part->dp_srefs = NULL;
 	/* Drop references and free the node descriptor. */
 	decref_unlikely(self->vn_block);
@@ -315,13 +315,13 @@ INTDEF FREE union pae_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct
 
 
 PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
-	/* A CPU structure is quite complicated, since it contains an in-line
+	/* A  CPU  structure  is  quite  complicated,  since  it  contains  an  in-line
 	 * memory hole spanning two pages at an offset of `+(uintptr_t)thiscpu_x86_iob'
-	 * bytes form the start of the CPU structure, that is then followed by
-	 * 1 additional page that is really only needed for the single 0xff byte
-	 * at its start, as mandated by the Intel developer manual for termination
+	 * bytes form  the  start  of the  CPU  structure,  that is  then  followed  by
+	 * 1 additional  page that  is really  only  needed for  the single  0xff  byte
+	 * at its start,  as mandated  by the  Intel developer  manual for  termination
 	 * of the IOB vector.
-	 * As such, the cpu structure itself consists of 3 consecutive VM nodes
+	 * As such, the cpu structure itself  consists of 3 consecutive VM  nodes
 	 * describing the memory mappings before, for, and after the 2-page hole. */
 	struct mnode *cpu_node1;
 	struct mnode *cpu_node2;
@@ -444,7 +444,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	cpu_baseaddr = (byte_t *)self;
 	sync_write(&vm_kernel); /* Never throws due to early-boot guaranties. */
-	/* NOTE: Must remove `cpu_node2' first, since that mnode object is actually
+	/* NOTE: Must remove `cpu_node2'  first, since that  mnode object is  actually
 	 *       stored inside of `cpu_node1', meaning that once that node is removed,
 	 *       the `cpu_node2' descriptor will automatically become invalid! */
 	cpu_node2 = vm_node_remove(&vm_kernel, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes);
@@ -492,7 +492,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	}
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
-	 *       need to be holding a lock to the kernel VM for this part! */
+	 *       need to  be holding  a lock  to the  kernel VM  for this  part! */
 	pagedir_unmap(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
 	              vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
 	pagedir_sync(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
@@ -670,13 +670,13 @@ i386_allocate_secondary_cores(void) {
 		FORTASK(altidle, this_handle_manager) = incref(&handle_manager_kernel);
 
 		/* Set up the boot-strap CPU state for the new CPU.
-		 * -> When a CPU is started by using an INIT IPI, it will perform internal setup
+		 * -> When a CPU  is started  by using  an INIT IPI,  it will  perform internal  setup
 		 *    functions before executing `FORTASK(PERCPU(thiscpu_sched_current), this_sstate)'
-		 *    Since this is the first time that we're starting this CPU, we direct
-		 *    that state to perform some high-level CPU initialization functions,
-		 *    such as determining CPU features (and comparing those against those
-		 *    implement by the boot CPU in order to determine the features available
-		 *    by the lowest common denominator), before shutting down again, until
+		 *    Since  this  is  the  first  time  that  we're  starting  this  CPU,  we  direct
+		 *    that  state   to  perform   some   high-level  CPU   initialization   functions,
+		 *    such   as  determining   CPU  features   (and  comparing   those  against  those
+		 *    implement by  the  boot  CPU  in  order  to  determine  the  features  available
+		 *    by  the  lowest   common  denominator),  before   shutting  down  again,   until
 		 *    some future point in time when the CPU will be used again. */
 		{
 			struct scpustate *init_state;
@@ -726,7 +726,7 @@ i386_allocate_secondary_cores(void) {
 #endif /* !__x86_64__ */
 		FORCPU(altcore, thiscpu_x86_tss.t_psp0) = FORTASK(altidle, this_x86_kernel_psp0);
 
-		/* Have the CPU load the proper GDT during the initial startup.
+		/* Have  the CPU load the proper GDT during the initial startup.
 		 * All of the other `thiscpu_x86_saved_*' registers already have
 		 * their proper values as the result of static initialization! */
 		FORCPU(altcore, thiscpu_x86_saved_gdtr.dt_base) = (uintptr_t)FORCPU(altcore, thiscpu_x86_gdt);
@@ -745,7 +745,7 @@ DATDEF cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask");
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_pic)(void)
 #else /* !CONFIG_HAVE_DEBUGGER */
 /* The debugger calls this function during init,
- * so we can't mark it as ATTR_FREETEXT */
+ * so  we   can't  mark   it  as   ATTR_FREETEXT */
 INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 #endif /* CONFIG_HAVE_DEBUGGER */
 {
@@ -767,8 +767,8 @@ INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 	outb_p(X86_PIC2_DATA, X86_ICW4_8086);
 
 #ifdef CONFIG_HAVE_DEBUGGER
-	/* This function should only ever be called once (I've seen the
-	 * PIC stop working properly if it's initialized more than once...)
+	/* This   function  should  only  ever  be  called  once  (I've  seen  the
+	 * PIC stop  working  properly  if it's  initialized  more  than  once...)
 	 * To ensure this, we re-write our own entry-point with a ret-instruction. */
 	*(u8 *)(void *)&x86_initialize_pic = 0xc3; /* ret */
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -840,7 +840,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			copytophys(physpage2addr(entry_page),
 			           x86_smp_entry,
 			           x86_smp_entry_size);
-	
+
 			/* Allocate control structures for secondary cores. */
 			i386_allocate_secondary_cores();
 		}
@@ -867,13 +867,13 @@ done_early_altcore_init:
 			cpu_offline_mask[i / 8] |= 1 << (i % 8); /* Mark the CPU as offline */
 			apic_send_init(FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 		}
-		/* NOTE: The APIC specs require us to wait for 10ms
-		 *       before we should send `APIC_ICR0_TYPE_FSIPI'
-		 *       And wouldn't you know, that's also the time that
+		/* NOTE: The APIC  specs  require  us  to  wait  for  10ms
+		 *       before  we  should  send   `APIC_ICR0_TYPE_FSIPI'
+		 *       And wouldn't you know, that's also the time  that
 		 *       our LAPIC calibration code needs to determine the
 		 *       frequency of the BSP's LAPIC timer.
 		 *       So we just merge the two together to speed
-		 *       up boot time by just that tiny bit more. */
+		 *       up boot time by  just that tiny bit  more. */
 #endif /* !CONFIG_NO_SMP */
 
 		/* Calibrate the APIC */

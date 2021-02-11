@@ -125,7 +125,7 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 	sc_info.rsi_sysno = segment_offset ? segment_offset
 	                                   : (u32)gpregs_getpax(&state->ics_gpregs);
 #ifndef __OPTIMIZE_SIZE__
-	/* 32-bit libc makes use of lcall7-clone to implement its pthread_create().
+	/* 32-bit libc makes use of lcall7-clone to implement its  pthread_create().
 	 * To prevent the need of going the long route of sending an RPC to ourself,
 	 * have a special optimization for this use-case. */
 	if (sc_info.rsi_sysno == __NR32_clone)
@@ -234,7 +234,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
 					icpustate_setpc(state, (uintptr_t)pc);
 #if defined(__x86_64__) && 0 /* This entire instruction is invalid in 64-bit
-                              * mode (see above), so no need for this! */
+                              * mode  (see  above),  so  no  need  for this! */
 					if (EMU86_F_IS64(op_flags))
 						x86_emulate_syscall64_lcall7(state, offset);
 #endif /* __x86_64__ && 0 */

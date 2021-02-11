@@ -362,11 +362,11 @@ NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
 	self->jp_encoding = JSON_ENCODING_UTF8;
 	if likely((char *)start + 4 < end) {
 		/* Automatically determine input encoding:
-		 *      00 00 00 xx  UTF-32BE
-		 *      00 xx 00 xx  UTF-16BE
-		 *      xx 00 00 00  UTF-32LE
-		 *      xx 00 xx 00  UTF-16LE
-		 *      xx xx xx xx  UTF-8 */
+		 *      00 00 00 xx   UTF-32BE
+		 *      00 xx 00 xx   UTF-16BE
+		 *      xx 00 00 00   UTF-32LE
+		 *      xx 00 xx 00   UTF-16LE
+		 *      xx xx xx xx   UTF-8 */
 		union {
 			uint32_t word;
 			uint8_t bytes[4];
@@ -828,7 +828,7 @@ NOTHROW_NCX(CC libjson_parser_rewind)(struct json_parser *__restrict self) {
 /* Advance the parser to the next object member or array index
  * @return: JSON_ERROR_OK:    The parser now points at the first token after the `,'
  *                            following   previous   object   memory/array    index.
- *                            Should that token be a `}' or `]', `JSON_ERROR_NOOBJ'
+ *                            Should that token be a `}' or `]',  `JSON_ERROR_NOOBJ'
  *                            will be returned instead.
  * @return: JSON_ERROR_NOOBJ: The end of the current object/array was reached.
  *                            The parser now points at the `}' or `]' following the object/array
@@ -1370,7 +1370,7 @@ INTERN_CONST char const libjson_empty_string[1] = { 0 };
 /* A somewhat hacky variant of `libjson_parser_printstring()', which replaces the source
  * string  in-line (thus  modifying the source  string) with its  utf-8 encoded variant.
  * This is done by re-encoding the string using a special extension syntax token that is
- * specifically designed  to  be able  to  hold  a NUL-terminated  utf-8  string  token:
+ * specifically designed to be able to hold a NUL-terminated utf-8 string token:
  * BEFORE:  \"foo\\nbar\"
  * AFTER:   \0foo\nbar\0\0
  * NOTE: If the source input uses a multi-byte format, the leading \0's width matches
@@ -1448,7 +1448,7 @@ do_return_empty_string:
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_RANGE:  The encoded value does not fit into the given type.
- *                             NOTE:  Not  returned  by  `json_parser_getfloat()'!
+ *                             NOTE:  Not  returned  by   `json_parser_getfloat()'!
  *                             In this case `*presult' is filled with the truncated
  *                             integer value, and the parser points at the first token after the number */
 INTERN NONNULL((1, 2)) int

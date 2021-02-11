@@ -465,7 +465,7 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 1:	/* %Pbx = struct cpu *THIS_CPU;
 	 * %Psp = struct icpustate *state;
 	 * %Pbp = struct task *old_sched_override; */
-	
+
 	/* Save the current register state. */
 	EXTERN(this_sstate)
 	movP   %Psp, %segtls:this_sstate
@@ -482,7 +482,7 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 1:
 
 	/* Resume execution by loading the next thread. But still
-	 * check if that thread differs from our current thread. */
+	 * check if that thread differs from our current  thread. */
 	EXTERN(thiscpu_sched_current)
 	movP   thiscpu_sched_current(%Pbx), %Pax
 	EXTERN(this_task)

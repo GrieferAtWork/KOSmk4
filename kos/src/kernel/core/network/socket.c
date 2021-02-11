@@ -108,9 +108,9 @@ NOTHROW(KCALL socket_destroy)(struct socket *__restrict self) {
 	if (self->sk_ops->so_fini)
 		(*self->sk_ops->so_fini)(self);
 	if unlikely(self->sk_ncon.axr_obj) {
-		/* Drop a reference from the non-blocking connect() controller.
+		/* Drop a reference  from the  non-blocking connect()  controller.
 		 * If this ends up killing it, then `socket_connect_aio_destroy()'
-		 * will cancel the connect() operation if it hadn't been canceled
+		 * will cancel the connect() operation if it hadn't been  canceled
 		 * already! */
 		decref_likely(self->sk_ncon.axr_obj);
 	}
@@ -139,7 +139,7 @@ socket_isconnected(struct socket *__restrict self) {
 	 * E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
 	 * exception when the socket isn't connected.
 	 * The hacky part is that this function may be called while the caller has an active
-	 * set of connections, however `so_getpeername()' may expect that there aren't any
+	 * set of connections, however `so_getpeername()'  may expect that there aren't  any
 	 * active connections, meaning that we must save/restore active connections. */
 	struct task_connections cons;
 	task_pushconnections(&cons);
@@ -219,10 +219,10 @@ DEFINE_INTERN_ALIAS(handle_socket_polltest, socket_polltest);
 
 
 
-/* The synchronous / non-blocking version of the async function `socket_aconnect()'.
+/* The synchronous / non-blocking version of the async function  `socket_aconnect()'.
  * When called with `IO_NONBLOCK', the connect will be done in the background through
- * use of `self->sk_ncon' (which can be waited for through use of `poll()').
- * When `IO_NONBLOCK' isn't specified, this function simply calls its async variant
+ * use of  `self->sk_ncon'  (which  can  be waited  for  through  use  of  `poll()').
+ * When `IO_NONBLOCK' isn't specified, this  function simply calls its async  variant
  * before waiting for the connect() to complete, canceling it if anything goes wrong.
  * @return: * : One of `SOCKET_CONNECT_*' */
 PUBLIC NONNULL((1)) int KCALL
@@ -245,10 +245,10 @@ again:
 			decref_unlikely(nc);
 			return SOCKET_CONNECT_NONBLOCK_ALREADY;
 		}
-		/* Wait for this current connect to complete, then try again.
-		 * There are some socket types that allow re-connect(), so
-		 * doing a blocking connect() while a background connect is
-		 * still in progress can simply be done by waiting for the
+		/* Wait for this current connect  to complete, then try  again.
+		 * There are  some socket  types  that allow  re-connect(),  so
+		 * doing a  blocking connect()  while a  background connect  is
+		 * still in  progress can  simply be  done by  waiting for  the
 		 * background connect() to complete, then looping back to start
 		 * a new foreground connect(). */
 		if (aio_handle_generic_hascompleted(&nc->sca_aio)) {
@@ -266,9 +266,9 @@ again:
 			task_disconnectall();
 			goto do_blocking_connect;
 		}
-		/* No need to keep our reference to the background-connect
+		/* No need  to keep  our reference  to the  background-connect
 		 * controller around: signals allow connections to be received
-		 * after the signal object itself has already been destroyed! */
+		 * after the signal object itself has already been  destroyed! */
 		decref_unlikely(nc);
 		/* Wait for the previous connect() to complete. */
 		task_waitfor();
@@ -276,11 +276,11 @@ again:
 	}
 	/* No background connect attempt in progress.
 	 * -> Start one, or do a simplified blocking connect
-	 * NOTE: The situation where one thread starts a blocking connect(),
+	 * NOTE: The situation where one thread starts a blocking  connect(),
 	 *       while another does a non-blocking one can be ignored, and is
-	 *       handled on a per-socket-type case (actual socket states
-	 *       are not mandated by the general-purpose socket API, and
-	 *       this really isn't something that should be done by a
+	 *       handled  on  a  per-socket-type case  (actual  socket states
+	 *       are not  mandated by  the  general-purpose socket  API,  and
+	 *       this  really  isn't  something  that  should  be  done  by a
 	 *       proper application) */
 	if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
 		nc = (REF struct socket_connect_aio *)kmalloc(sizeof(struct socket_connect_aio),
@@ -381,14 +381,14 @@ socket_asendto_peer(struct socket *__restrict self,
 
 
 /* Send the contents of a given buffer over this socket.
- * NOTE: When `aio' is initialized to implement the retsize operator,
- *       then the # of sent bytes will be returned by that function.
+ * NOTE: When `aio'  is initialized  to implement  the retsize  operator,
+ *       then the #  of sent  bytes will  be returned  by that  function.
  *       Otherwise, the caller may assume that all data was sent, so-long
- *       as this function returns normally, and `aio' completes without
+ *       as this function returns  normally, and `aio' completes  without
  *       and errors.
- * @param: msg_control: When non-NULL, contains pointers to ancillary data buffer and resulting
+ * @param: msg_control: When non-NULL, contains pointers to ancillary data buffer and  resulting
  *                      length. Note that this function must copy the contents of this structure
- *                      if it needs to be accessed after returning. (i.e. AIO needs to use its
+ *                      if it needs to be accessed after  returning. (i.e. AIO needs to use  its
  *                      own copy of this structure)
  * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR |
  *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB | MSG_DONTWAIT'
@@ -498,10 +498,10 @@ waitfor_send_aio(struct socket *__restrict self,
 		if (!aio_handle_generic_waitfor(aio, timeout)) {
 			aio_handle_cancel(aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
-			/* Only throw an error if we did actually manage to cancel the AIO
+			/* Only throw an error  if we did actually  manage to cancel the  AIO
 			 * There is the small race condition where the send succeeded between
-			 * the waitfor function timing out, and us canceling the operation.
-			 * If that happened, then we mustn't indicate a timeout, since the
+			 * the waitfor function timing out,  and us canceling the  operation.
+			 * If  that happened, then  we mustn't indicate  a timeout, since the
 			 * operation actually succeeded. */
 			if (aio->hg_status == AIO_COMPLETION_CANCEL)
 				THROW(E_NET_TIMEOUT);
@@ -513,7 +513,7 @@ waitfor_send_aio(struct socket *__restrict self,
 
 
 /* Send helper functions for blocking and non-blocking operations.
- * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ * NOTE: Additionally,  these  functions accept  `MSG_DONTWAIT' in
  *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
  *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
  * @return: * : The actual number of sent bytes (as returned by AIO) */
@@ -624,7 +624,7 @@ struct connect_and_send_job {
 	struct aio_buffer         cas_buffer;   /* [override(.ab_entv, [if(.ab_entc != 1, [owned])])][const] I/O buffer. */
 	size_t                    cas_bufsize;  /* [const][== aio_buffer_size(&cas_buffer)] I/O buffer size. */
 	struct aio_handle_generic cas_aio;      /* if (cas_socket != NULL): AIO handle for connect()
-	                                         * if (cas_socket == NULL): AIO handle for send() */
+	                                         * if (cas_socket ==  NULL): AIO  handle for  send() */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -789,14 +789,14 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 }
 
 /* Send the contents of a given buffer over this socket to the specified address.
- * NOTE: When `aio' is initialized to implement the retsize operator,
- *       then the # of sent bytes will be returned by that function.
+ * NOTE: When `aio'  is initialized  to implement  the retsize  operator,
+ *       then the #  of sent  bytes will  be returned  by that  function.
  *       Otherwise, the caller may assume that all data was sent, so-long
- *       as this function returns normally, and `aio' completes without
+ *       as this function returns  normally, and `aio' completes  without
  *       and errors.
- * @param: msg_control: When non-NULL, contains pointers to ancillary data buffer and resulting
+ * @param: msg_control: When non-NULL, contains pointers to ancillary data buffer and  resulting
  *                      length. Note that this function must copy the contents of this structure
- *                      if it needs to be accessed after returning. (i.e. AIO needs to use its
+ *                      if it needs to be accessed after  returning. (i.e. AIO needs to use  its
  *                      own copy of this structure)
  * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR |
  *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
@@ -860,7 +860,7 @@ socket_asendtov(struct socket *__restrict self,
 
 
 /* Send helper functions for blocking and non-blocking operations.
- * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
+ * NOTE: Additionally,  these  functions accept  `MSG_DONTWAIT' in
  *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
  *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
  * @return: * : The actual number of sent bytes (as returned by AIO) */
@@ -1026,7 +1026,7 @@ again_receive:
 			                                       abs_timeout);
 		}
 		/* Skip the address-match check if the socket implementation indicates EOF
-		 * Although technically, EOF shouldn't be possible for a connection-less
+		 * Although technically, EOF shouldn't  be possible for a  connection-less
 		 * socket like the one we seem to be dealing with here... */
 		if (result != 0) {
 			/* Check if the peer addresses match. */
@@ -1056,14 +1056,14 @@ again_receive:
  * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
  *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
  *                        operation.
- * @param: msg_control:   When non-NULL, contains pointers to ancillary data buffer and resulting
+ * @param: msg_control:   When non-NULL, contains pointers to ancillary data buffer and  resulting
  *                        length. Note that this function must copy the contents of this structure
- *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
+ *                        if it needs to be accessed after  returning. (i.e. AIO needs to use  its
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
  *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
- * @param: abs_timeout:   Timeout after which to throw `E_NET_TIMEOUT' in the event
- *                        that no data could be received up until that point. Ignored
+ * @param: abs_timeout:   Timeout  after  which  to  throw  `E_NET_TIMEOUT'  in  the  event
+ *                        that  no  data could  be received  up  until that  point. Ignored
  *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
  *                        When `KTIME_INFINITE', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
@@ -1142,14 +1142,14 @@ socket_recvv(struct socket *__restrict self,
  * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
  *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
  *                        operation.
- * @param: msg_control:   When non-NULL, contains pointers to ancillary data buffer and resulting
+ * @param: msg_control:   When non-NULL, contains pointers to ancillary data buffer and  resulting
  *                        length. Note that this function must copy the contents of this structure
- *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
+ *                        if it needs to be accessed after  returning. (i.e. AIO needs to use  its
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
  *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
- * @param: abs_timeout:   Timeout after which to throw `E_NET_TIMEOUT' in the event
- *                        that no data could be received up until that point. Ignored
+ * @param: abs_timeout:   Timeout  after  which  to  throw  `E_NET_TIMEOUT'  in  the  event
+ *                        that  no  data could  be received  up  until that  point. Ignored
  *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
  *                        When `KTIME_INFINITE', the `sk_rcvtimeo' timeout is used instead.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
@@ -1258,9 +1258,9 @@ socket_listen(struct socket *__restrict self,
 }
 
 /* Accept incoming client (aka. peer) connection requests.
- * NOTE: This function blocks unless `IO_NONBLOCK' is specified,
+ * NOTE: This   function  blocks  unless  `IO_NONBLOCK'  is  specified,
  *       or the `MSG_DONTWAIT' bit has been set in `self->sk_msgflags'.
- *       In this case, you may poll() for clients via `POLLINMASK'
+ *       In this  case, you  may poll()  for clients  via  `POLLINMASK'
  * @return: * :   A reference to a socket that has been connected to a peer.
  * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
@@ -1283,7 +1283,7 @@ socket_accept(struct socket *__restrict self, iomode_t mode)
 }
 
 /* Disallow further reception of data (causing `recv()' to return `0' as soon
- * as all currently queued data has been read), and/or further transmission
+ * as all currently queued data  has been read), and/or further  transmission
  * of data (causing `send()' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED: [...] */
@@ -1875,16 +1875,16 @@ socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
 }
 
 /* Get/Set socket buffer sizes.
- * This functionality can also be accessed through `socket_(get|set)sockopt'.
- * For more information, see the documentation of the associated operators
+ * This  functionality can also  be accessed through `socket_(get|set)sockopt'.
+ * For more  information, see  the documentation  of the  associated  operators
  * within `struct socket_ops' above. But note that that interface also includes
  * restriction of buffer sizes in accordance to the `socket_default_*' globals.
  * NOTE: When calling the setters, the caller is responsible to ensure that
- *       the specified buffer size is allowed, and may do this through use
+ *       the specified buffer size is allowed, and may do this through  use
  *       of the `socket_default_*' globals.
- * NOTE: No default exceptions are defined for these callbacks, and normally
+ * NOTE: No default exceptions are defined for these callbacks, and  normally
  *       these should never result in any exceptions, however implementations
- *       are still allowed to throw anything (which may be necessary in case
+ *       are still allowed to throw anything (which may be necessary in  case
  *       reading/writing buffer sizes requires a lock, meaning that acquiring
  *       said lock might result in E_WOULDBLOCK) */
 PUBLIC size_t KCALL

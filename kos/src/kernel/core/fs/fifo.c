@@ -63,7 +63,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
  *    - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE
  *    - HANDLE_TYPE_FIFO_USER
  * This hop-backend implements command codes normally reserved for pipe
- * objects, thus allowing user-space to make use of pipe hop commands
+ * objects, thus allowing user-space to  make use of pipe hop  commands
  * with FIFO objects. */
 INTERN syscall_slong_t KCALL
 fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
@@ -191,7 +191,7 @@ no_readers:
 		/* Posix requires that we raise(SIGPIPE) in this scenario... */
 		task_raisesignalthread(THIS_TASK, SIGPIPE);
 		/* If SIGPIPE is being ignored, we must instead throw some
-		 * exception that causes user-space to set errno=EPIPE. */
+		 * exception that  causes user-space  to set  errno=EPIPE. */
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			  E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
 	}
@@ -304,7 +304,7 @@ no_readers:
 		/* Posix requires that we raise(SIGPIPE) in this scenario... */
 		task_raisesignalthread(THIS_TASK, SIGPIPE);
 		/* If SIGPIPE is being ignored, we must instead throw some
-		 * exception that causes user-space to set errno=EPIPE. */
+		 * exception that  causes user-space  to set  errno=EPIPE. */
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			  E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
 	}
@@ -437,7 +437,7 @@ NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
 
 /* Create a reader/writer for the given `pipe'
  * NOTE: If applicable, the caller should fill in `fu_path' and/or
- *       `fu_dirent' directly after calling this function.
+ *       `fu_dirent'   directly   after  calling   this  function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
 PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED NONNULL((1)) REF struct fifo_user *FCALL

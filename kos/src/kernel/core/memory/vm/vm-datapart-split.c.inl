@@ -281,8 +281,8 @@ again:
 PUBLIC NONNULL((1)) REF struct vm_datapart *
 NOTHROW(KCALL vm_datapart_split_nx)(struct vm_datapart *__restrict self, size_t vpage_offset)
 #else /* SPLIT_NX */
-/* Split   the    given    datapart    after   `vpage_offset'    pages    of    virtual    memory.
- * Additionally,   map  new  nodes  within  all  VMs  in   with  `self'  is  mapped  as  part  of.
+/* Split  the  given  datapart  after  `vpage_offset'  pages  of  virtual  memory.
+ * Additionally, map new nodes within all VMs in with `self' is mapped as part of.
  * NOTE: The caller must not be holding locks to _any_ of those VMs or the given data part itself.
  * @return: * :   A reference to the new upper-half of `self', starting
  *                after  `vpage_offset'  pages  at  the  end  of `self'

@@ -58,15 +58,15 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #undef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
 
-/* Use the disassembly printer to determine the length
- * of instructions, rather than making use of libdisasm.
- * In theory, this shouldn't really make a difference, but
- * in practice, there can easily occur cases where the length
- * of an instruction determined by libdisasm will differ from
+/* Use   the   disassembly  printer   to  determine   the  length
+ * of   instructions,  rather  than   making  use  of  libdisasm.
+ * In theory,  this  shouldn't  really  make  a  difference,  but
+ * in  practice, there  can easily  occur cases  where the length
+ * of an  instruction determined  by libdisasm  will differ  from
  * the length determined for the same instruction by libinstrlen.
- * So to prevent inconsistencies during disassembly printing, we
- * instead always make use of the disassembly printer to provide
- * us with information about the length of an instruction. */
+ * So  to prevent inconsistencies during disassembly printing, we
+ * instead always make use of the disassembly printer to  provide
+ * us with  information  about  the  length  of  an  instruction. */
 #define CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER 1
 
 #ifndef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
@@ -85,8 +85,8 @@ DECL_BEGIN
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self) {
 	enum { MAXTEXTSIZ = 128 };
-	/* This `12' must be >= the max number of remaining zero-bytes
-	 * following after any other sequence of instruction bytes.
+	/* This `12' must  be >=  the max number  of remaining  zero-bytes
+	 * following  after  any  other  sequence  of  instruction  bytes.
 	 * This is used to ensure that libdisasm sees that our instruction
 	 * sequence terminates after a certain offset. */
 	enum { TEXTTAILSIZE = 12 };
@@ -96,7 +96,7 @@ NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self)
 	if (!textsiz)
 		return false;
 	/* zero-fill a small tail area after the text to
-	 * ensure that instructions are terminated. */
+	 * ensure  that  instructions  are   terminated. */
 	memset(textbuf + textsiz, 0, TEXTTAILSIZE);
 	/* Print instructions from our text buffer. */
 	old_pc          = self->d_pc;
@@ -114,7 +114,7 @@ NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self)
 
 #ifdef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
 
-/* # of instructions to unwind for the purpose of
+/* # of  instructions  to  unwind  for  the  purpose  of
  * verifying the program counter when walking backwards. */
 #define AV_VERIFY_DISTANCE 8
 
@@ -432,10 +432,10 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
                                         void *symbol_addr) {
 	struct av_symbol *sym;
 	/* Semantically speaking, this function behaves identical to the default
-	 * symbol printer, in that it will try to lookup debug information and
+	 * symbol printer, in that it will  try to lookup debug information  and
 	 * use those to display the names of symbols.
 	 * However, since KOS's addr2line function really is quite slow, we extend
-	 * on that default functionality by making use of an intermediate cache. */
+	 * on that default functionality by  making use of an intermediate  cache. */
 	sym = av_lookup_symbol((uintptr_t)symbol_addr);
 	if (sym) {
 		uintptr_t symbol_offset;
@@ -618,8 +618,8 @@ NOTHROW(FCALL av_main)(void *addr) {
 			key = dbg_getkey();
 		} while (key & KEY_FRELEASED);
 		/* TODO: When pressing ENTER, the user should be able to immediately
-		 *       go the target location of a JMP or CALL instruction.
-		 *       When this is done, the previous address should be saved on
+		 *       go the  target  location  of a  JMP  or  CALL  instruction.
+		 *       When  this is done, the previous address should be saved on
 		 *       a stack of already-visited locations, which can be returned
 		 *       to by pressing BACKSPACE.
 		 *       Additionally, there should be a menu to display the current
@@ -632,8 +632,8 @@ NOTHROW(FCALL av_main)(void *addr) {
 
 		case KEY_E:
 			/* Edit the current address in the hex editor.
-			 * NOTE: Disable read-only by default, since the user may
-			 *       with to keep switching back and forth to look at
+			 * NOTE: Disable  read-only by default,  since the user may
+			 *       with to keep switching back  and forth to look  at
 			 *       the generated assembly (in case they choose to use
 			 *       this mechanism to re-write assembly code) */
 			addr = dbg_hexedit(addr, false);

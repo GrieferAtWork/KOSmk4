@@ -67,7 +67,7 @@ NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value) {
 	outl(PCI_DATA_PORT, value);
 }
 
-/* Return a PCI device located at the given
+/* Return  a  PCI device  located at  the given
  * `address', or NULL if no such device exists. */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED struct pci_device *
 NOTHROW(KCALL lookup_pci_device)(pci_addr_t address) {

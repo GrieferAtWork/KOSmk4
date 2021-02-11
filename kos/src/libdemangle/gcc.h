@@ -37,6 +37,7 @@ DECL_BEGIN
 
 /* Taken from `https://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling'
  * How to read:
+ * ```
  *     <...>           : Rule
  *     <function name> : Same as <name>.
  *     #...            : Comment
@@ -44,8 +45,10 @@ DECL_BEGIN
  *     (...)           : Grouping
  *     <foo>*          : Repeat 0, or more times
  *     <foo>+          : Repeat 1, or more times
+ * ```
  *
  *
+ * ```
  * <mangled-name> ::= _Z <encoding>
  *                ::= _Z <encoding> . <vendor-specific suffix>
  *
@@ -370,7 +373,7 @@ DECL_BEGIN
  *                ::= Si # std::basic_istream<char,std::char_traits<char>>
  *                ::= So # std::basic_ostream<char,std::char_traits<char>>
  *                ::= Sd # std::basic_iostream<char,std::char_traits<char>>
- *
+ * ```
  */
 
 struct itanium_printer {

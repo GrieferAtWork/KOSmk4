@@ -68,6 +68,7 @@ struct chrdev;
 
 /* Filesystem/device type-tree:
  *
+ * ```
  *   mfile                                         (TODO: replacement for `struct vm_datablock')
  *     |
  *     +---> fnode                                 (TODO: replacement for `struct inode')
@@ -89,6 +90,7 @@ struct chrdev;
  *                      +-----> blkdev  (S_IFBLK)  (TODO: replacement for `struct block_device')
  *                      |
  *                      +-----> chrdev  (S_IFCHR)  (TODO: replacement for `struct character_device')
+ * ```
  *
  * Assumptions/expectations in regards to the configuration of different filesystem classes:
  *   - fnode:

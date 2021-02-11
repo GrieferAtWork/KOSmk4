@@ -196,12 +196,12 @@ INTERN_FUNCTION(x86_native_tsc_deadline)
 .Lret_true:
 	ret    $(8) /* Success */
 .Lclear_deadline:
-	/* When returning false, we must write UINT64_MAX to IA32_TSC_DEADLINE
-	 * in order to prevent the APIC timer interrupt from indicating a deadline
+	/* When returning  false,  we  must write  UINT64_MAX  to  IA32_TSC_DEADLINE
+	 * in order to prevent the APIC  timer interrupt from indicating a  deadline
 	 * event after we've indicated to our caller that their deadline had already
 	 * expired.
 	 * -> API users should be allowed to assume that us returning `false' means that
-	 *    The high-level `tsc_deadline_passed()' function won't get invoked! */
+	 *    The  high-level  `tsc_deadline_passed()'   function  won't  get   invoked! */
 	movl   %eax, 4(%esp)
 	movl   %edx, 8(%esp)
 	xorl   %eax, %eax
@@ -418,7 +418,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 #endif /* !__x86_64__ */
 	/* Store the current counter.
 	 * NOTE: Must only do this if the interrupt wasn't already handled,
-	 *       else this might result in an APIC interval being lost:
+	 *       else  this might  result in  an APIC  interval being lost:
 	 * >> READ(CURRENT) = 0x123;
 	 * >> HW:SCHEDULE_INTERRUPT;
 	 * >> CURRENT = 0x100000;
@@ -484,7 +484,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 
 	/* Store the current counter.
 	 * NOTE: Must only do this if the interrupt wasn't already handled,
-	 *       else this might result in an APIC interval being lost:
+	 *       else  this might  result in  an APIC  interval being lost:
 	 * >> READ(CURRENT) = 0x123;
 	 * >> HW:SCHEDULE_INTERRUPT;
 	 * >> CURRENT = 0x100000;
@@ -565,7 +565,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 
 INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 	/* Primary entry point for loading a new thread-context for
-	 * some thread `%Pax', whilst running on some cpu `%Pbx' */
+	 * some thread `%Pax',  whilst running on  some cpu  `%Pbx' */
 	EXTERN(this_sstate)
 	movP   this_sstate(%Pax), %Psp
 
@@ -675,7 +675,7 @@ INTERN_FUNCTION(x86_load_scpustate_esp_nopr)
 	ASM_POP_SGREGS_CFI_R(%rcx)
 
 	/* Update the kernel TLS pointer.
-	 * NOTE: This must be done _after_ segment registers were loaded,
+	 * NOTE: This must be done  _after_ segment registers were  loaded,
 	 *       as the use of `ASM_POP_SGREGS_CFI_R()' clobbered %gs.base! */
 	wrgsbaseq %rax
 	.cfi_same_value %gs.base
@@ -748,7 +748,7 @@ END(x86_unwind_scpustate_Psp)
 #ifndef __x86_64__
 #ifndef CONFIG_NO_PAGING_PAE
 INTERN_FUNCTION(__x86_lazy_disable_ioperm_bitmap_pae)
-	/* When PAE paging is disabled, paging initialization overrides this
+	/* When  PAE  paging  is  disabled,  paging  initialization  overrides  this
 	 * instruction location with a `jmp __x86_lazy_disable_ioperm_bitmap_return' */
 	movl   %ecx, 0x8(%edx)
 	movl   %ecx, 0xc(%edx)

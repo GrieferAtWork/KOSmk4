@@ -50,13 +50,16 @@ DECL_BEGIN
 
 
 /* Always display a list above of the commandline containing the
- * names of all commands start with the currently entered word.
+ * names of all commands start with the currently entered  word.
  *
+ * ```
  *   lsMOD   lsMEM   lsRAM
  *   lsBLK   lsCHR
  * $ ls_
+ * ```
+ *
  * Where uppercase letter are printed in a different color. (and _ is the cursor)
- * Without this option, this list is only displayed after TAB is pressed.
+ * Without this  option,  this list  is  only  displayed after  TAB  is  pressed.
  */
 #undef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
 #if 1
@@ -83,7 +86,7 @@ PRIVATE ATTR_DBGBSS char *argv[DBG_ARGC_MAX];
 
 
 /* Split the given commandline and store the arguments in `argv'
- * @param: pincomplete: When non-NULL, set to true when the `cmdln' ends
+ * @param: pincomplete: When non-NULL, set to true when the `cmdln'  ends
  *                      with an incomplete " or '-sequence, or a trailing
  *                      \-character */
 PRIVATE ATTR_DBGTEXT size_t KCALL
@@ -444,7 +447,7 @@ do_print_unmatched:
 }
 
 
-/* Wait for user-input in the form of a key-down event (key-up
+/* Wait for user-input in the  form of a key-down event  (key-up
  * events are discarded), but don't consume that key-down event. */
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_waitforinput)(void) {
@@ -487,7 +490,7 @@ NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
 	bool incomplete_word = false;
 	{
 		size_t i = cursor;
-		/* Don't do anything if the cursor is at the start of the
+		/* Don't do anything  if the  cursor is  at the  start of  the
 		 * commandline, or is only preceded by white-space characters. */
 		if (!cursor)
 			goto done;
@@ -594,7 +597,7 @@ set_starts_empty_string:
 	}
 do_print_options:
 	/* Print a list of all available options and
-	 * wait until the user presses another key. */
+	 * wait  until the user presses another key. */
 	{
 		size_t match_count;
 		unsigned int matchlist_y, wordstart_x;
@@ -761,7 +764,7 @@ NOTHROW(KCALL cmdline_backlog_try_appendcurrent)(void) {
 			cmdline_latest = (size_t)(tempstart - cmdline_backlog);
 			cmdline_didsavetemp = false;
 		}
-		/* If the currently selected entry wasn't modified from its
+		/* If the currently selected entry wasn't modified from  its
 		 * original, then don't re-add it to the backlog once again! */
 		cursel = cmdline_backlog + cmdline_current;
 		if (cmdline_len == strlen(cursel) &&
@@ -836,7 +839,7 @@ again_readline:
 
 		/* Force-enable render-to-screen. */
 		dbg_endupdate(true);
-		/* Add a visual indicator for when the exit state doesn't match the currently
+		/* Add a visual indicator for when the exit state doesn't match the  currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
 		dbg_setcolor(dbg_getdefaultcolor());
@@ -867,7 +870,7 @@ continue_readline:
 #ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
 			if (should_print_autocomplete || did_press_tab) {
 				bool badcmd = false;
-				/* Don't allow auto-completion to be aborted
+				/* Don't  allow  auto-completion to  be aborted
 				 * if we got here because the user pressed TAB! */
 				if (did_press_tab)
 					dbg_awaituser_end(true);

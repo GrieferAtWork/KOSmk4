@@ -108,7 +108,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
  * >> /cygdrive/e/c/kls/kos/src/kernel/core/foo/bar.c(42) : my_function+26 : c0107828+38 : Called from here
  * The format used is:
  *    debug_addr2line_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
- *    " : " + (al_rawname ? al_rawname : al_name ? al_name : "???") + "+" +
+ *    " : " + (al_rawname  ?  al_rawname  :  al_name  ?  al_name  :  "???")  +  "+"  +
  *            (level == 0 ? (start_pc - al_symstart) : (al_linestart - al_symstart)) +
  *    " : " + (level == 0 ? (start_pc.hex() + "+" + (end_pc - start_pc))
  *                        : (al_symstart.hex() + "+" + (al_symend - al_symstart).hex())) +

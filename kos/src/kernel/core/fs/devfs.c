@@ -131,8 +131,8 @@ PUBLIC struct superblock devfs = {
 
 
 /* Insert a new device node into /dev, using `name' as the
- * filename of the file to-be placed under /dev.
- * NOTE: The caller is responsible to ensure that `name'
+ * filename  of  the   file  to-be   placed  under   /dev.
+ * NOTE: The  caller  is responsible  to ensure  that `name'
  *       is a valid filename, suitable to a directory entry.
  * @param: name:         The name of the file to-be placed under /dev
  * @param: kind:         The type of file to create (either `S_IFCHR' or `S_IFBLK')
@@ -142,7 +142,7 @@ PUBLIC struct superblock devfs = {
  * @return: true:  Successfully created a new entry under /dev
  * @return: false: A file matching `name' already exists.
  *                 In this case, both `*pdevfs_node' and `*pdevfs_entry'
- *                 (if given) will have been set to `NULL'. */
+ *                 (if   given)   will   have   been   set   to  `NULL'. */
 PUBLIC bool KCALL
 devfs_insert(USER CHECKED char const *name,
              mode_t kind, dev_t devno,
@@ -237,7 +237,7 @@ NOTHROW(KCALL devfs_service_pending_delete)(void) {
 
 
 /* Without blocking, remove an INode from the
- * root directory of the /dev filesystem */
+ * root  directory  of  the  /dev  filesystem */
 PUBLIC NOBLOCK void
 NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
                             struct directory_entry *__restrict entry) {
